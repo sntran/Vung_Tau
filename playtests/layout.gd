@@ -3,7 +3,8 @@ extends RefCounted
 # each kind of talk panel. Use ui_report(). Check that each control is fully
 # on the screen, no control covers the top bar, no label hides lines, and
 # each button is at least 88 px high at the base width. Check that the
-# player is visible when the talk panel is open.
+# player is visible when the talk panel is open. Check that the text of each
+# button is inside the button.
 # sizes: 720x1280 1080x2400 1280x720
 # phase: --start-time=06:00
 
@@ -86,6 +87,8 @@ func _check(d: PlaytestDriver, shot: String) -> void:
 				problems.append("%s covers the top bar" % name)
 		if item.hidden_lines:
 			problems.append("%s hides lines (%s of %s show)" % [name, item.get("visible_lines"), item.get("lines")])
+		if item.get("outside_button", false):
+			problems.append("the text %s is outside its button" % name)
 		if item.trimmed:
 			problems.append("%s cuts its text" % name)
 		if item.button and rect.size.y < UiTheme.BUTTON_MIN_HEIGHT - 0.5:

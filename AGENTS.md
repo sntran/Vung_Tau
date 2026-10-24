@@ -90,6 +90,7 @@ Verified in the development workspace (Linux, 2 CPUs, no GPU, no Vulkan):
 - The renderer is slow under llvmpipe: about 20 frames per second at 720×1280 and 10 at 1080×2400. MSAA halves these numbers, so it is off.
 - An Xvfb screen of 1280×720 is too small for a 1080×2400 window. `tools/playtest.sh` uses `-screen 0 2560x2560x24`.
 - Godot exports the iOS Xcode project on Linux. Only the build of an `.ipa` needs macOS.
+- With the sun shadow on, the Compatibility renderer under llvmpipe makes up-facing surfaces about three times too bright when the sun is high. The sun has no shadow until plan 0002 checks it on phones.
 - The web export (thread support off) starts in the pre-installed Chromium with WebGL 2.
 
 Commands that work:

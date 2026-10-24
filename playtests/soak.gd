@@ -20,17 +20,26 @@ func run(d: PlaytestDriver) -> void:
 	for i in TAPS:
 		var s := d.state()
 		var kind := rng.randi_range(0, 2)
+		# A sheet covers the world. Then only its choices can be tapped.
+		if s.mode != "hem":
+			kind = 2
 		var error := ""
 		if kind == 0:
+			# A random floor point in the free part of the screen.
 			var pos: Vector3 = s.player
-			var point := Vector3(pos.x + rng.randf_range(-5.0, 5.0), 0, rng.randf_range(-1.5, 1.7))
+			var point := Vector3.ZERO
+			for attempt in 10:
+				point = Vector3(pos.x + rng.randf_range(-5.0, 5.0), 0, rng.randf_range(-1.5, 1.7))
+				if _in_free_part(d, s, point):
+					break
 			error = await d.try_tap_floor(point, false)
 			counts.floor += 1
 		elif kind == 1:
 			# A random spot from the spots that are on the screen now.
 			var on_screen: Array[String] = []
 			for id in spot_ids:
-				if d.locate(id).error == "":
+				var where := d.locate(id)
+				if where.error == "" and _in_free_part_2d(s, where.point):
 					on_screen.append(id)
 			if on_screen.is_empty():
 				error = "no spot on the screen"
@@ -58,4 +67,16 @@ func run(d: PlaytestDriver) -> void:
 			await d.screenshot("tap_%03d" % (i + 1))
 	d.step("taps: %s" % [counts])
 	d.step("reasons for the taps that were not possible: %s" % [reasons])
-	d.expect(counts.skipped < TAPS / 4, "more than half of the random taps were not possible: %s" % [counts])
+	d.expect(counts.skipped < TAPS / 4, "more than a quarter of the random taps were not possible: %s" % [counts])
+
+
+## Returns true when the 3D point is in the free part of the screen, away from the walk buttons.
+func _in_free_part(d: PlaytestDriver, s: Dictionary, point: Vector3) -> bool:
+	return _in_free_part_2d(s, d.world_to_view(point))
+
+
+func _in_free_part_2d(s: Dictionary, view_point: Vector2) -> bool:
+	var free: Rect2 = s.free_rect
+	# The walk buttons are in the low corners of the free part.
+	var inner := Rect2(free.position, free.size - Vector2(0, 130))
+	return inner.has_point(view_point)

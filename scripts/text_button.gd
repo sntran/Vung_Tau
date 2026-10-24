@@ -17,6 +17,8 @@ func _init() -> void:
 	clip_text = false
 	_box = VBoxContainer.new()
 	_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# The text box follows the button size through its anchors.
+	_box.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_box.add_theme_constant_override("separation", 2)
 	_box.alignment = BoxContainer.ALIGNMENT_CENTER
 	add_child(_box)
@@ -78,8 +80,10 @@ func _fit() -> void:
 		needed += _box.get_theme_constant("separation") + _text_height(sub_label, inner_width)
 	needed += _margin.y * 2.0
 	custom_minimum_size.y = maxf(UiTheme.BUTTON_MIN_HEIGHT, ceilf(needed))
-	_box.position = _margin
-	_box.size = Vector2(inner_width, maxf(size.y, custom_minimum_size.y) - _margin.y * 2.0)
+	_box.offset_left = _margin.x
+	_box.offset_right = -_margin.x
+	_box.offset_top = _margin.y
+	_box.offset_bottom = -_margin.y
 
 
 func _text_height(label: Label, width: float) -> float:

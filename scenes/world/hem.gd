@@ -282,7 +282,10 @@ func _build_floor_collider() -> void:
 	var sand_end := road_w + beach.sand_width
 	var areas := [
 		# [size, center]
-		[Vector3(end_x - start_x, 0.2, hem_width), Vector3((start_x + end_x) / 2.0, -0.1, 0)],
+		# The hẻm floor and the ground on the near side. A tap on the near
+		# ground walks the player to the nearest point of the walk area.
+		[Vector3(end_x - start_x + 6.0, 0.2, hem_width + 24.0),
+				Vector3((start_x - 6.0 + end_x) / 2.0, -0.1, 12.0)],
 		[Vector3(road_w, 0.2, 20.0), Vector3(end_x + road_w / 2.0, -0.1, 0)],
 		[Vector3(sand_end - road_w, 0.2, 30.0), Vector3(end_x + (road_w + sand_end) / 2.0, Beach.SAND_Y - 0.1, 0)],
 	]

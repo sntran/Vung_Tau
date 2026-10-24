@@ -49,7 +49,7 @@ func build() -> void:
 			Color("#E3DDCC"), "WallTop")
 	# Sand and sea.
 	Greybox.box(self, Vector3(sand_width + 4.0, 0.2, 200.0),
-			Vector3(wall_x + 0.35 + (sand_width + 4.0) / 2.0, SAND_Y - 0.1, 0), Color("#E2D3A4"), "Sand")
+			Vector3(wall_x + 0.35 + (sand_width + 4.0) / 2.0, SAND_Y - 0.1, 0), Color("#CDB98A"), "Sand")
 	var sea := Greybox.box(self, Vector3(6000.0, 0.1, 6000.0),
 			Vector3(wall_x + sand_width + 3000.0, SEA_Y - 0.05, 0), Color("#2F6E8A"), "Sea")
 	sea.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

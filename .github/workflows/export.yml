@@ -2,7 +2,7 @@ name: Export
 
 on:
   push:
-    branches: [main, feat/0001-foundation]
+    branches: [main]
   workflow_dispatch:
 
 concurrency:

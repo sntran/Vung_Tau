@@ -3,7 +3,8 @@ extends RefCounted
 # then back with the walk buttons only. At each lot, check that the player
 # is within 1 m of the target. Check that the clock moved forward the correct
 # number of minutes for the distance. Check that the player is always on the
-# floor (Y within 0.1 m of the floor). Screenshot each lot. At the end, the
+# floor (Y within 0.1 m of the floor). Screenshot each lot. At the end, a tap
+# on the near ground walks the player to the edge of the walk area, and the
 # arrow keys walk the player the same as the walk buttons.
 # phase: --start-time=06:00
 
@@ -56,6 +57,17 @@ func run(d: PlaytestDriver) -> void:
 		_check_clock(d, start_time, expected_walk, "walk.left %d" % guard)
 		await d.screenshot("walk_left_%d" % guard)
 	d.expect(d.state().player.x <= 0.5, "the walk buttons bring the player back to the homestay")
+	# A tap on the near ground (out of the walk area) walks the player to the
+	# nearest point of the walk area.
+	var near_from: Vector3 = d.state().player
+	var ground := Vector3(near_from.x + 2.0, 0, 5.0)
+	if await d.tap_floor(ground):
+		await _walk_and_watch(d)
+		var at: Vector3 = d.state().player
+		d.expect(absf(at.x - ground.x) < 0.5 and at.z > 1.2,
+				"a tap on the near ground walks the player to the edge of the walk area: %s" % at)
+		expected_walk += Vector2(at.x - near_from.x, at.z - near_from.z).length()
+		await d.screenshot("near_ground")
 	# The arrow keys do the same as the walk buttons.
 	var from: Vector3 = d.state().player
 	await d.key(KEY_RIGHT)

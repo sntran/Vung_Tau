@@ -25,6 +25,7 @@ sky = SubResource("sky")
 ambient_light_source = 2
 ambient_light_color = Color(0.85, 0.88, 0.9, 1)
 ambient_light_energy = 0.7
+reflected_light_source = 1
 tonemap_mode = 2
 fog_enabled = true
 fog_light_color = Color(0.8, 0.88, 0.92, 1)
@@ -41,7 +42,7 @@ environment = SubResource("environment")
 
 [node name="Sun" type="DirectionalLight3D" parent="World"]
 transform = Transform3D(1, 0, 0, 0, 0.5, 0.866, 0, -0.866, 0.5, 0, 10, 0)
-shadow_enabled = true
+shadow_enabled = false
 directional_shadow_mode = 0
 directional_shadow_max_distance = 40.0
 

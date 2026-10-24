@@ -440,7 +440,8 @@ func _apply_time(minutes: int) -> void:
 	sun.rotation_degrees = DayLight.sun_rotation(minutes)
 	sun.light_color = DayLight.sun_color(minutes)
 	sun.light_energy = DayLight.sun_energy(minutes)
-	sun.shadow_enabled = DayLight.sun_height(minutes) > 0.0
+	# No sun shadows: see plan 0001, note N18.
+	sun.shadow_enabled = false
 	_update_top_bar()
 
 

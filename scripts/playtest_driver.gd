@@ -237,6 +237,15 @@ func _describe(node: Variant) -> String:
 	return "%s (%s)" % [n.name, n.get_class()]
 
 
+func _button_parent(control: Control) -> Button:
+	var parent := control.get_parent()
+	while parent:
+		if parent is Button:
+			return parent
+		parent = parent.get_parent()
+	return null
+
+
 func _scroll_parent(control: Control) -> ScrollContainer:
 	var parent := control.get_parent()
 	while parent:
@@ -417,7 +426,21 @@ func state() -> Dictionary:
 		"sound": GameState.sound,
 		"intro_done": bool(GameState.flag("intro_done")),
 		"view_size": viewport().get_visible_rect().size,
+		"shutters": _shutters(hem),
+		"boats_in": hem.beach.boats_in.visible,
+		"exercisers": hem.beach.exercisers.visible,
 	}
+
+
+## Returns the shutter position of each shop: "open", "half", or "closed".
+func _shutters(hem: Node) -> Dictionary:
+	var names := {TubeHouse.Shutter.OPEN: "open", TubeHouse.Shutter.HALF: "half",
+			TubeHouse.Shutter.CLOSED: "closed"}
+	var result := {}
+	for lot: Dictionary in Content.layout.lots:
+		if lot.get("ground") == "shop" and lot.has("spot"):
+			result[lot.spot] = names[hem.houses[lot.id].shutter]
+	return result
 
 
 ## Returns the test IDs of the visible choices of the active UI: the talk
@@ -470,6 +493,10 @@ func ui_report() -> Array[Dictionary]:
 		var scroll := _scroll_parent(control)
 		if scroll:
 			entry.scroll_rect = scroll.get_global_rect()
+		# The text of a button must be inside the button.
+		var button := _button_parent(control)
+		if button and (control is Label) and (control as Label).text != "":
+			entry.outside_button = not button.get_global_rect().grow(0.5).encloses(control.get_global_rect())
 		if control is Label:
 			var label := control as Label
 			entry.lines = label.get_line_count()

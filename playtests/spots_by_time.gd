@@ -3,6 +3,7 @@ extends RefCounted
 # 21:40: tap each spot that is present. Check that the dialogue line ID is
 # the correct one for that spot and time. Check that a cart that is not
 # present cannot be tapped and is not shown as near. Screenshot each spot.
+# At each start time, also check the shutters (R19) and the boats (R17).
 # phase: --start-time=05:50
 # phase: --start-time=11:00 --fresh-save
 # phase: --start-time=15:00 --fresh-save
@@ -27,6 +28,14 @@ const EXPECTED := {
 		"coc": "spot.coc.look", "bac": "spot.bac.closed", "mia": "", "go": "spot.go.look",
 		"banhkhot": "spot.banhkhot.closed", "hvl": "spot.hvl.look", "beach": "spot.beach.night"},
 }
+## The shutter positions and the boats at each start time (R17, R19).
+const START_VIEW := {
+	1: {"shutters": {"pho": "open", "bac": "closed", "banhkhot": "closed"}, "boats_in": true},
+	2: {"shutters": {"pho": "half", "bac": "closed", "banhkhot": "open"}, "boats_in": false},
+	3: {"shutters": {"pho": "closed", "bac": "closed", "banhkhot": "open"}, "boats_in": false},
+	4: {"shutters": {"pho": "closed", "bac": "closed", "banhkhot": "open"}, "boats_in": false},
+	5: {"shutters": {"pho": "closed", "bac": "closed", "banhkhot": "closed"}, "boats_in": false},
+}
 ## The spots in the order along the hẻm.
 const ORDER := ["home", "pho", "banhmi", "coc", "bac", "mia", "go", "banhkhot", "hvl", "beach"]
 
@@ -38,6 +47,11 @@ func run(d: PlaytestDriver) -> void:
 	await d.tap_id("choice.okay")
 	await d.wait_idle()
 	await d.screenshot("start")
+	var view: Dictionary = START_VIEW[d.phase]
+	var s0 := d.state()
+	d.expect(s0.shutters == view.shutters, "at %s the shutters are %s, not %s" % [s0.time_text, s0.shutters, view.shutters])
+	d.expect(s0.boats_in == view.boats_in and s0.exercisers == view.boats_in,
+			"at %s the boats on the sand and the people: %s, not %s" % [s0.time_text, s0.boats_in, view.boats_in])
 	var expected: Dictionary = EXPECTED[d.phase]
 	var hem: Node = d.main().hem
 	for spot_id: String in ORDER:

@@ -89,8 +89,8 @@ static func sun_energy(minutes: int) -> float:
 	var height := sun_height(minutes)
 	if height <= 0.0:
 		return 0.18
-	return lerpf(0.5, 1.25, clampf(height * 1.6, 0.0, 1.0))
+	return lerpf(0.5, 1.0, clampf(height * 1.6, 0.0, 1.0))
 
 
 static func ambient_energy(minutes: int) -> float:
-	return lerpf(0.75, 0.22, darkness(minutes) / 0.55)
+	return lerpf(0.6, 0.22, darkness(minutes) / 0.55)
