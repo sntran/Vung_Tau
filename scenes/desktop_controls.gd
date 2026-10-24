@@ -128,9 +128,11 @@ func move_stick() -> Vector2:
 
 func _stick(axis_x: JoyAxis, axis_y: JoyAxis) -> Vector2:
 	var value := Vector2(Input.get_joy_axis(_pad_device, axis_x), Input.get_joy_axis(_pad_device, axis_y))
-	if value.length() < STICK_DEADZONE:
+	var length := value.length()
+	if length < STICK_DEADZONE:
 		return Vector2.ZERO
-	return value.limit_length(1.0)
+	# After the deadzone, the value starts again at 0: a small push gives a slow turn.
+	return value / length * clampf((length - STICK_DEADZONE) / (1.0 - STICK_DEADZONE), 0.0, 1.0)
 
 
 func _on_phone_raised(up: bool) -> void:

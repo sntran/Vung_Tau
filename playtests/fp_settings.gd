@@ -1,17 +1,28 @@
 extends RefCounted
 # PT-16 fp_settings. In the Settings app (plan 0003, R28, and plan 0004, R1
-# to R4), change each setting. Quit and start again. All settings are the same. Also check that
-# each setting has its effect.
+# to R4), change each setting. Quit and start again. All settings are the
+# same. Also check that each setting has its effect. Run 1 changes the
+# settings of plans 0002 and 0003. Run 2 checks them and changes the settings
+# of plan 0004. Run 3 checks all settings again.
 # phase: --start-time=06:00
+# phase:
 # phase:
 
 
 func run(d: PlaytestDriver) -> void:
 	await d.wait_idle()
-	if d.phase == 1:
-		await _change(d)
-	else:
-		await _check(d)
+	match d.phase:
+		1:
+			await _change(d)
+		2:
+			await _check(d)
+			await _change_new(d)
+		_:
+			await _check(d)
+
+
+## The settings of plan 0004. Run 2 changes them.
+const NEW_SETTINGS := ["quality", "mouse_sensitivity", "fullscreen"]
 
 
 func _expected_path(d: PlaytestDriver) -> String:
@@ -40,21 +51,10 @@ func _change(d: PlaytestDriver) -> void:
 	await d.tap_phone_id("settings.gyro")
 	await _tap_slider(d, "settings.fov", 0.25)
 	await d.tap_phone_id("settings.tap_walk")
-	# Plan 0004: the quality preset, the mouse speed, and fullscreen. Fullscreen
-	# goes on and off again, because a fullscreen window under Xvfb has the
-	# size of the whole virtual screen.
-	await d.tap_phone_id("settings.quality")
-	await _tap_slider(d, "settings.mouse_sensitivity", 0.8)
-	await d.tap_phone_id("settings.fullscreen")
-	await d.wait_frames(10)
-	d.expect(DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN, "the fullscreen setting makes the window fullscreen")
-	await d.tap_phone_id("settings.fullscreen")
-	await d.wait_frames(10)
-	d.expect(DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_WINDOWED, "the fullscreen setting off makes a window again")
 	await d.wait_frames(3)
 	var after: Dictionary = d.state().settings
 	for key: String in before:
-		if key == "fullscreen":
+		if key in NEW_SETTINGS:
 			continue
 		d.expect(after[key] != before[key], "the setting %s changed: %s" % [key, after[key]])
 	d.expect(after.subtitles == "en", "the subtitles are in English: %s" % after.subtitles)
@@ -76,6 +76,30 @@ func _change(d: PlaytestDriver) -> void:
 	d.expect(not d.state().walking and d.state().player.distance_to(p0) < 0.1, "with tap to walk off, a tap does not walk")
 	var file := FileAccess.open(_expected_path(d), FileAccess.WRITE)
 	file.store_string(JSON.stringify(d.state().settings))
+	file.close()
+	await d.wait_frames(5)
+
+
+## The quality preset, the mouse speed, and fullscreen (plan 0004). Fullscreen
+## goes on and off again, because a fullscreen window under Xvfb has the size
+## of the whole virtual screen.
+func _change_new(d: PlaytestDriver) -> void:
+	await d.tap_phone_id("phone.home")
+	await d.open_app("settings")
+	var before: Dictionary = d.state().settings
+	await d.tap_phone_id("settings.quality")
+	await _tap_slider(d, "settings.mouse_sensitivity", 0.8)
+	await d.tap_phone_id("settings.fullscreen")
+	await d.wait_frames(10)
+	d.expect(DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN, "the fullscreen setting makes the window fullscreen")
+	await d.tap_phone_id("settings.fullscreen")
+	await d.wait_frames(10)
+	d.expect(DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_WINDOWED, "the fullscreen setting off makes a window again")
+	var after: Dictionary = d.state().settings
+	for key: String in ["quality", "mouse_sensitivity"]:
+		d.expect(after[key] != before[key], "the setting %s changed: %s" % [key, after[key]])
+	var file := FileAccess.open(_expected_path(d), FileAccess.WRITE)
+	file.store_string(JSON.stringify(after))
 	file.close()
 	await d.wait_frames(5)
 

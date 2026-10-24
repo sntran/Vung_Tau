@@ -139,6 +139,10 @@ run_one() {
       >"$log" 2>&1 &
     local pid=$!
     # A script that does not parse never ends the run. Stop it at once.
+    # Godot can also hang at the quit after the result (the main thread waits
+    # for a worker thread, see AGENTS.md). Then stop it 20 s after the result,
+    # and use the result that it printed.
+    local result_seen=0 stopped=0
     while kill -0 "$pid" 2>/dev/null; do
       if grep -q "Parse Error" "$log" 2>/dev/null; then
         sleep 2
@@ -146,10 +150,22 @@ run_one() {
         kill "$pid" 2>/dev/null
         break
       fi
+      if grep -q "^PLAYTEST \(PASS\|FAIL\)" "$log" 2>/dev/null; then
+        result_seen=$((result_seen + 1))
+        if (( result_seen > 20 )); then
+          pkill -f -- "--out=$out --save-path=$out/save.json --phase=$n" 2>/dev/null
+          stopped=1
+        fi
+      fi
       sleep 1
     done
     wait "$pid"
     local status=$?
+    if [[ $stopped == 1 ]]; then
+      echo "  note: run $n did not quit 20 s after its result; the script stopped it" >&2
+      status=0
+      grep -q "PLAYTEST PASS" "$log" || status=1
+    fi
     if [[ $status == 124 ]]; then
       echo "  FAIL: run $n takes more than $TIME_LIMIT seconds" >&2
       result=1

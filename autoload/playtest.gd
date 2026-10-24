@@ -19,6 +19,10 @@ var driver: PlaytestDriver
 var _logger: Object
 
 
+## The wait in game time between the end of a run and the quit (see _finish()).
+const QUIT_WAIT_S := 1.0
+
+
 func _ready() -> void:
 	scenario_name = GameState.arg_value("playtest")
 	if scenario_name == "":
@@ -139,5 +143,14 @@ func _finish() -> void:
 	# for the audio server.
 	get_tree().call_group("main", "stop_sounds")
 	for i in 3:
+		await get_tree().process_frame
+	# A quit soon after the start does not end the process: the main thread
+	# waits for a task of the worker threads (seen with Godot 4.7.2, plan
+	# 0004). Wait 1 s of game time, and do not quit during the bake of the
+	# walk area.
+	await get_tree().create_timer(QUIT_WAIT_S, true).timeout
+	var main := get_tree().get_first_node_in_group("main")
+	var end := Time.get_ticks_msec() + 30000
+	while main != null and main.hem.is_baking() and Time.get_ticks_msec() < end:
 		await get_tree().process_frame
 	get_tree().quit(0 if passed else 1)

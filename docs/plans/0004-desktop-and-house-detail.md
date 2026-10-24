@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Approved |
+| Status | In progress |
 | Branch | `feat/0004-desktop-and-house-detail` |
 | Depends on | 0003 (status "Built") |
 
@@ -167,3 +167,23 @@ The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0007 puts h
 - **Q2.** Which parts in R7 are not correct for Vũng Tàu, and which parts are missing? (For example: solar water heaters on roofs, an altar for Ông Địa in shops, numbers painted on the walls.) Answered in part: the photos show solar water heaters on many flat roofs (now in R7).
 - **Q3.** Answered: in a dense hẻm, corrugated metal roofs and flat concrete terraces are the most common. Tile roofs are common in villa areas (R7, R10c).
 - **Q4.** Answered: the street photos show granite or tiled ground floor fronts and some fully tiled fronts with patterns. They are in R7.
+- **Q5.** The bold wall colors "sky blue" (`#7DB3DC`) and "bright yellow" (`#E6C440`), the stripes, the brick color, and the accent colors (R10b) are first values of the builder, with the source "builder, check" in `palette.json`. Are they correct?
+- **Q6.** Esc shows the home screen of the phone, because the phone is the menu of the game (N3). Is that the menu that I want, or do I want a separate pause menu?
+
+## 8. Builder notes
+
+- **N1. The renderer of a preset.** Godot selects the renderer when it starts. The builder verified with Godot 4.7.2 that a settings file (`override.cfg`, or `application/config/project_settings_override` in `user://`) changes the value of the setting, but not the renderer. The command-line argument `--rendering-method` works. So when the preset needs another renderer (Low on desktop uses the Mobile renderer), the game starts again with this argument (`OS.set_restart_on_exit`). The Settings app shows the note "The change starts after a restart" and a "Restart now" button. The play tests and the editor do not start again. A computer with Low starts the game two times at each start. `docs/release-notes.md` says so.
+- **N2. The first preset.** The first start selects Low on a phone, in the web build, and on a computer without a graphics card (lavapipe in the workspace and in CI), Medium with a graphics chip in the processor, and High with a separate graphics card (`RenderingServer.get_video_adapter_type()`).
+- **N3. Desktop controls.** A click of a real mouse on the world captures the cursor. Then a click acts on the focus, the same as E. Esc shows the home screen of the phone (the phone is the menu), and Esc again lowers it (Q6). With a gamepad and the phone up, the D-pad selects a button of the phone, A presses it, and B goes back, so that the gamepad can use the apps (PT-27).
+- **N4. Low shadows.** R5 asks for sun shadows on all presets. Low uses one shadow split and hard shadows, the cost of a phone. Medium uses two splits, and High and Ultra use four, with soft shadows. The web build keeps the shadows off (section 5 of `AGENTS.md` has the result).
+- **N5. Light on Forward+.** In the narrow hẻm, SDFGI and SSAO made the street almost black at noon in the first look review. The SDFGI energy is now 4, and SDFGI converges in 5 frames (it also helps after a jump of the clock). I check the PT-25 screenshots of High against Low.
+- **N6. The shaders without a graphics card.** The play tests render on the CPU (lavapipe). The first plaster shader computed many noise functions for each pixel and made the frame about two times slower. The shaders now read two tileable noise textures that the game makes at the start (`HouseMaterials.noise_textures()`). At the "along" view of PT-32, a frame takes about 110 ms at 1280 × 720 under lavapipe with all parts and the shadow.
+- **N7. The hẻm floor and D5.** D5 says that ground textures are CC0 scans that CI downloads. The hẻm floor of this plan is a shader made in code (concrete, cracks, patches). The download of the scanned ground textures is a step of plan 0005, for the real ground.
+- **N8. The palette.** The greys of the aerial photos (saturation 0.02 or less) have a value 10 % higher (for example `#C1C2C3` to `#D4D5D6`). `palette.json` keeps each measured value next to the value that the game uses. The colors of the houses of the hẻm follow the rules of R10a: neighbors differ, 2 bold walls in the 14 houses of the hẻm (salmon and turquoise), and 1 in 4 on the beach road (sky blue). `content_checker.gd` checks the rules.
+- **N9. The floors of the mini-hotels.** R10 gives 2 to 5 floors for each house of `hem_layout.json`, and R7 gives 5 to 8 floors for a mini-hotel. The two mini-hotels on the beach road have 5 floors. PT-31 builds mini-hotels with 5 to 8 floors.
+- **N10. The narrow hẻm (R11a).** The hẻm is 2.8 m wide. The carts, the people, and the places where the player stands now follow the width of the hẻm (`Hem.cart_z` and the others). People stand nearer to the player, so a look at the face, the chest, or the hips of a person makes the focus (it was the face only).
+- **N11. The step and the shutter.** The tiled step in front of each house is 8 cm high and 30 cm deep, on the floor layer, so the player walks on it and a tap on it walks there. The rolled shutter box is inside the top of the opening, and the shutter runs behind the front of the wall. Then the shutter does not go through the sign or the step (PT-29). The shutter rolls in 1.2 s when the time changes during the game.
+- **N12. Parts that touch.** PT-31 found that pots on a balcony went through the rails and the AC units, and that roofs went past the side walls into the next house. Pots now stand only on deep balconies, in their own places, and roofs stop at the side walls. A mini-hotel has its balconies and its AC units away from its vertical sign.
+- **N13. The budget (R14).** PT-32 measured (with the occluders of R13): Low 348 to 464 draw calls and 132 000 to 150 000 triangles. High 453 to 654 draw calls and 138 000 to 172 000 triangles. `AGENTS.md` has the values.
+- **N14. Play tests.** PT-25 to PT-32 are new. PT-16 and PT-21 change the new settings too. A phase line in a scenario can have `--renderer=forward_plus`, and the argument `--quality=NAME` sets the preset (a setup step, the same as `--start-time`). Fullscreen in PT-16 goes on and off again, because a fullscreen window under Xvfb has the size of the whole virtual screen.
+

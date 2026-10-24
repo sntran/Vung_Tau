@@ -639,6 +639,18 @@ func walk_toward(x: float, z := 0.0, step := 6.0) -> bool:
 ## Walks to the point with the joystick only: it turns the view to the point
 ## with look drags, then holds the joystick forward for the time of the walk.
 func stick_to(point: Vector3) -> bool:
+	# A long walk along the hẻm goes by the free lane in the middle, as a
+	# player steers past the carts and the people at the sides (plan 0004, R11a).
+	var hem: Hem = main().hem
+	var start: Vector3 = state().player
+	var lane_z := hem.helper_z - 0.6
+	if absf(point.x - start.x) > 3.0 and start.x < hem.end_x and absf(start.z - lane_z) > 0.3:
+		await _stick_straight(Vector3(start.x, start.y, lane_z))
+		await _stick_straight(Vector3(clampf(point.x, hem.start_x, hem.end_x - 0.5), start.y, lane_z))
+	return await _stick_straight(point)
+
+
+func _stick_straight(point: Vector3) -> bool:
 	for attempt in 3:
 		var pos: Vector3 = state().player
 		var flat := Vector2(point.x - pos.x, point.z - pos.z)
@@ -1188,8 +1200,10 @@ func pad_look_at(point: Vector3, tolerance := 3.0, timeout_s := 40.0) -> bool:
 		# One axis at a time. A small error uses a small push of the stick, so
 		# that one frame at a low frame rate does not turn too far.
 		var error := error_yaw if absf(error_yaw) > tolerance else error_pitch
-		var push := clampf(absf(error) / 40.0, DesktopControls.STICK_DEADZONE + 0.02, 0.6)
-		var seconds := absf(error) / (speed * push)
+		# The turn rate after the deadzone (see DesktopControls._stick()).
+		var rate := clampf(absf(error) / 40.0, 0.03, 0.6)
+		var push := DesktopControls.STICK_DEADZONE + rate * (1.0 - DesktopControls.STICK_DEADZONE)
+		var seconds := absf(error) / (speed * rate)
 		if absf(error_yaw) > tolerance:
 			await pad_stick(true, Vector2(-signf(error_yaw) * push, 0), seconds)
 		else:

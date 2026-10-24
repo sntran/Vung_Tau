@@ -12,7 +12,7 @@ func run(d: PlaytestDriver) -> void:
 	await PlaytestLayout.check(d, "start")
 	# A subtitle: Bà Tư speaks.
 	await d.talk_to("batu")
-	await d.wait_line()
+	await d.wait_line("batu")
 	await _check_overlap(d, "subtitle")
 	await d.raise_phone()
 	await _check_overlap(d, "subtitle_phone_up")

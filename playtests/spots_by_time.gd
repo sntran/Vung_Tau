@@ -80,8 +80,8 @@ func run(d: PlaytestDriver) -> void:
 		await d.wait_frames(3)
 		var s := d.state()
 		var card: Dictionary = d.main().lens_card()
-		d.expect(card.get("line", "") == line, "%s at %s: the Lens shows %s, it must be %s" % [spot_id,
-				s.time_text, card.get("line", ""), line])
+		d.expect(card.get("line", "") == line, "%s at %s: the Lens shows %s, it must be %s (eye %s, focus point %s, focus \"%s\")" % [
+				spot_id, s.time_text, card.get("line", ""), line, s.eye, hem.focus_points[spot_id], s.focus])
 		await d.screenshot(spot_id)
 
 

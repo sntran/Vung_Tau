@@ -97,6 +97,8 @@ Verified in the development workspace (Linux, 2 CPUs, no GPU, no Vulkan):
 - With the sun shadow on, the Compatibility renderer under llvmpipe makes up-facing surfaces about three times too bright when the sun is high. The sun has no shadow until a plan checks it on phones.
 - The web export (thread support off) starts in the pre-installed Chromium with WebGL 2.
 - Hugging Face is reachable from the workspace. VieNeu-TTS v3 Turbo (`vieneu==3.8.3`) runs on the CPU with ONNX Runtime: about 2 s for each line with 4 CPUs. ONNX Runtime 1.23 and later refuse the model files in the Hugging Face cache ("External data path escapes model directory"), so `tools/voices/requirements.txt` pins 1.22.1.
+- A quit in the first seconds after the start does not end the process: the main thread waits for a task of the worker threads, and no worker runs it (seen with the house kit of plan 0004, with `gdb`). The play-test system waits 1 s of game time after the end of a run before it quits.
+- `TaskStop` on a play-test run stops the shell, but the Godot processes go on and use the CPU. Look for them with `pgrep -fa godot` and stop them.
 - An Ogg stream that still plays when Godot quits is not freed ("resources still in use at exit"). The play-test system stops the voices some frames before it quits (`stop_sounds()` in `scenes/main.gd`).
 
 Commands that work:

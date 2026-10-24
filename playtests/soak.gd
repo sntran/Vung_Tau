@@ -3,7 +3,7 @@ extends RefCounted
 # people, and the visible buttons of the phone (plan 0003). Between the taps, do random joystick touches and look
 # drags. Check that there is no script error, and that the player is always
 # on the floor and never in a wall.
-# The 200 taps are in 4 runs of 50, so that each run is shorter than 180 s at
+# The 200 taps are in 8 runs of 25, so that each run is shorter than 180 s at
 # 2400×1080 under lavapipe. The random number state goes from one run to the
 # next, so the taps are one sequence with seed 1. The game starts again
 # between the runs, from the same save file.
@@ -11,9 +11,13 @@ extends RefCounted
 # phase: --seed=1
 # phase: --seed=1
 # phase: --seed=1
+# phase: --seed=1
+# phase: --seed=1
+# phase: --seed=1
+# phase: --seed=1
 
 const TAPS := 200
-const RUNS := 4
+const RUNS := 8
 
 
 func run(d: PlaytestDriver) -> void:

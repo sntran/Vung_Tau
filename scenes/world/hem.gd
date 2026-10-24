@@ -86,7 +86,8 @@ func build() -> void:
 	cart_stand_z = cart_z + 1.1
 	npc_z = -half + 0.45
 	npc_stand_z = npc_z + 0.75
-	helper_z = 0.3
+	# The boy of the hủ tiếu gõ walks near the other side, so that a player can pass him.
+	helper_z = half - 0.55
 	parts = HouseParts.new()
 	parts.name = "HouseParts"
 	add_child(parts)
@@ -545,6 +546,11 @@ func bake_navigation(wait := false) -> void:
 		return
 	_baking = true
 	NavigationServer3D.bake_from_source_geometry_data_async(mesh, _nav_source, _on_baked)
+
+
+## True while the walk area bakes in a thread.
+func is_baking() -> bool:
+	return _baking
 
 
 func _on_baked() -> void:
