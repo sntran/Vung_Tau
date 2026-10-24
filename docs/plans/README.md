@@ -40,11 +40,13 @@ The order can change.
 | Number | Name | Content |
 |---|---|---|
 | 0002 | [First-person walking](0002-first-person.md) | Written, status "Draft". The player sees through the eyes of the visitor and walks like a person. Landscape layout, joystick, look drag, gyroscope look, tap to walk. |
-| 0003 | Real places from photos | A test with one real place in Vũng Tàu: photos taken on site, then three methods compared on real phones (photo textures on simple shapes, photogrammetry meshes, Gaussian splats). It also makes the capture guide for the people who take the photos. |
-| 0004 | Phở shop | Sit at the table. Order with the cuts ("một tô phở tái nạm gầu bò viên"), the extras, the herb plate, the sauces, eating, and paying. Port the flow from `docs/prototype/hem-2d.html`. |
-| 0005 | Cà phê cóc | Order "đen đá", "sữa đá" or "nâu đá", "bạc sỉu". Watch the phin drip. |
-| 0006 | Homestay meal | Eat with the host family. Home dishes and strong-smelling sauces. The owner names the dishes. |
-| 0007 | Street snacks | Bánh mì at dawn, bánh khọt, hột vịt lộn, hủ tiếu gõ at night. |
-| 0008 | Bãi Trước | Morning exercise, the boats, the fish, the evening on the coast road. |
-| 0009 | Scooter | Wear a helmet and ride along the coast in the evening. |
-| 0010 | Store release | Signed Android and iOS builds, store pages, privacy text. |
+| 0003 | [Real geography of Vũng Tàu](0003-real-geography.md) | Written, status "Draft". The real ground, hills, coast, beaches, sea, and roads, from OpenStreetMap and the Copernicus elevation data. |
+| 0004 | Known structures | Bãi Trước, Bãi Sau, Mũi Nghinh Phong, Tượng Chúa Kitô Vua, Hải đăng, Bạch Dinh, and others that the owner names. Made by code from their real outlines and sizes. |
+| 0005 | Houses on the lots | A house generator with real proportions and a detail kit (shutters, balconies, wires, signs, plants). It puts houses on the lots between the roads. The homestay hẻm moves to its real place. |
+| 0006 | Phở shop | Sit at the table. Order with the cuts ("một tô phở tái nạm gầu bò viên"), the extras, the herb plate, the sauces, eating, and paying. Port the flow from `docs/prototype/hem-2d.html`. |
+| 0007 | Cà phê cóc | Order "đen đá", "sữa đá" or "nâu đá", "bạc sỉu". Watch the phin drip. |
+| 0008 | Homestay meal | Eat with the host family. Home dishes and strong-smelling sauces. The owner names the dishes. |
+| 0009 | Street snacks | Bánh mì at dawn, bánh khọt, hột vịt lộn, hủ tiếu gõ at night. |
+| 0010 | Beach mornings and evenings | Morning exercise, the boats, the fish, the evening on the coast road. |
+| 0011 | Scooter | Wear a helmet and ride along the coast in the evening. |
+| 0012 | Store release | Signed Android and iOS builds, store pages, privacy text. |
