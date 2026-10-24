@@ -3,11 +3,22 @@ extends RefCounted
 # Check that each control is fully on the screen, no control covers the top
 # bar or the center dot, no label hides lines, the text of each button is in
 # the button, and each button is at least 88 px high at the 720 px base height.
+# The scenario has 2 runs, so that each run is shorter than 180 s at
+# 2400×1080 under lavapipe. The second run starts from the save file of the
+# first run.
 # phase: --start-time=06:00
+# phase:
 
 
 func run(d: PlaytestDriver) -> void:
 	await d.wait_idle()
+	if d.phase == 1:
+		await _first_run(d)
+	else:
+		await _second_run(d)
+
+
+func _first_run(d: PlaytestDriver) -> void:
 	await PlaytestLayout.check(d, "intro")
 	await d.tap_id("choice.step_outside")
 	await PlaytestLayout.check(d, "greeting")
@@ -30,6 +41,9 @@ func run(d: PlaytestDriver) -> void:
 	await d.tap_id("topbar.settings")
 	await PlaytestLayout.check(d, "settings")
 	await d.tap_id("settings.close")
+
+
+func _second_run(d: PlaytestDriver) -> void:
 	await d.tap_id("topbar.clock")
 	await PlaytestLayout.check(d, "clock_sheet")
 	await d.tap_id("clock.wait_1100")

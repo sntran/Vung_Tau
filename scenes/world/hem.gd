@@ -42,6 +42,8 @@ var helper: Npc
 var beach: Beach
 var nav_region: NavigationRegion3D
 var clack_count := 0
+## The game time of the last clack, in seconds from the start of the scene.
+var clack_time := 0.0
 
 var _spot_lots: Dictionary = {}
 var _cart_areas: Dictionary = {}
@@ -54,6 +56,7 @@ var _stall_closed: Dictionary = {}
 var _stall_bodies: Dictionary = {}
 var _helper_phase := 0.0
 var _clack_left := 0.0
+var _scene_time := 0.0
 var _minutes := -1
 var _present_key := ""
 var _nav_source: NavigationMeshSourceGeometryData3D
@@ -515,9 +518,11 @@ func _process(delta: float) -> void:
 	if not helper.visible:
 		return
 	# The helper clacks the sticks each 4 to 5 seconds.
+	_scene_time += delta
 	_clack_left -= delta
 	if _clack_left <= 0.0:
 		_clack_left = randf_range(4.0, 5.0)
 		clack_count += 1
+		clack_time = _scene_time
 		helper.show_bubble(Content.ui_text("clack_bubble"), CLACK_BUBBLE_SECONDS)
 		clacked.emit(helper.global_position)

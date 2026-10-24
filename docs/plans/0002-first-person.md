@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | In progress |
+| Status | Built |
 | Branch | `feat/0002-first-person` |
 | Depends on | 0001 (status "Built") |
 
@@ -142,4 +142,4 @@ These notes record how the builder read the parts of the plan that were not full
 - **N13. Web layout (R25).** The play-test system runs inside the game, and the web build has no command line. So `tools/playtest.sh --all` runs PT-17 one more time at 1280×720 with the Compatibility renderer (the renderer of the web build) on the desktop Godot.
 - **N14. Speed under lavapipe (R24).** The Mobile renderer runs at about 15 frames per second at 1280×720 and 6 at 2400×1080, with no shadows. The night lights make it slower. PT-09 has 4 runs of 50 taps, so that each run is shorter than 180 s at 2400×1080.
 - **N15. Sun shadows.** The sun still has no shadow (plan 0001, N18). With the Mobile renderer, the shadow costs more time under lavapipe. A plan must check shadows on real phones.
-
+- **N16. Game time in the play tests.** At 2400×1080 under lavapipe, one frame can take 0.4 s. Godot does not do more than 16 physics steps in one frame (`physics/common/max_physics_steps_per_frame`), so the game time is then slower than the real time. The checks that measure a time or a distance use the game time: `hold_stick()`, `gyro()`, and the interval of the clacks in PT-08. `layout` (PT-06 of plan 0001) and PT-17 have 2 runs each, so that each run is shorter than 180 s.

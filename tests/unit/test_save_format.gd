@@ -13,6 +13,8 @@ func _state() -> Dictionary:
 	return {
 		"day": 3, "minutes": 725, "walk_m": 2.5, "cards": ["anSang", "coc"],
 		"flags": {"intro_done": true}, "sound": false, "player": Vector3(13.25, 0, -0.6),
+		"yaw": 35.5, "pitch": -12.0,
+		"settings": {"look_sensitivity": 1.5, "invert_y": true, "gyro": false, "fov": 80.0, "tap_walk": false},
 	}
 
 
@@ -26,6 +28,33 @@ func test_round_trip() -> void:
 	assert_eq(data.sound, false)
 	assert_almost_eq(data.player.x, 13.25, 0.001)
 	assert_almost_eq(data.player.z, -0.6, 0.001)
+	assert_almost_eq(data.yaw, 35.5, 0.001)
+	assert_almost_eq(data.pitch, -12.0, 0.001)
+	assert_eq(data.settings, _state().settings)
+
+
+func test_version_1_save_is_not_loaded() -> void:
+	# Plan 0002 changed the save to version 2. A save of version 1 starts a new game.
+	var json: Dictionary = JSON.parse_string(SaveFormat.to_json(_state()))
+	json.version = 1
+	assert_eq(SaveFormat.from_json(JSON.stringify(json)), {})
+
+
+func test_bad_settings_take_the_defaults() -> void:
+	var json: Dictionary = JSON.parse_string(SaveFormat.to_json(_state()))
+	json.settings = {"look_sensitivity": "fast", "gyro": 1, "fov": 70}
+	var data := SaveFormat.from_json(JSON.stringify(json))
+	assert_eq(data.settings.look_sensitivity, SaveFormat.DEFAULT_SETTINGS.look_sensitivity)
+	assert_eq(data.settings.gyro, SaveFormat.DEFAULT_SETTINGS.gyro)
+	assert_almost_eq(data.settings.fov, 70.0, 0.001)
+	json.erase("settings")
+	assert_eq(SaveFormat.from_json(JSON.stringify(json)).settings, SaveFormat.DEFAULT_SETTINGS)
+
+
+func test_pitch_is_limited() -> void:
+	var state := _state()
+	state.pitch = 120.0
+	assert_almost_eq(SaveFormat.from_json(SaveFormat.to_json(state)).pitch, 80.0, 0.001)
 
 
 func test_save_has_version() -> void:

@@ -129,9 +129,9 @@ func _read_keys() -> void:
 func _read_gyro(delta: float) -> void:
 	if not GameState.settings.gyro or not sensor.has_data():
 		return
-	var rate := sensor.look_rate()
-	player.gyro_yaw += rad_to_deg(rate.x) * delta
-	player.gyro_pitch = clampf(player.gyro_pitch + rad_to_deg(rate.y) * delta,
+	var turn := sensor.turn(delta)
+	player.gyro_yaw += rad_to_deg(turn.x)
+	player.gyro_pitch = clampf(player.gyro_pitch + rad_to_deg(turn.y),
 			-Player.PITCH_LIMIT, Player.PITCH_LIMIT)
 
 

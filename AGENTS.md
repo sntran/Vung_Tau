@@ -89,6 +89,7 @@ Verified in the development workspace (Linux, 2 CPUs, no GPU, no Vulkan):
 - With `--audio-driver Dummy`, Godot prints no ALSA errors. `tools/playtest.sh` and `tools/test.sh` use it.
 - Godot 4.7 has the `Logger` class (`OS.add_logger()`). The play-test system uses it to record each engine error and script error as a failure in `log.json`.
 - The Mobile renderer under lavapipe (package `mesa-vulkan-drivers`) runs at about 15 frames per second at 1280×720 and 6 at 2400×1080, with no shadows and no MSAA. The Compatibility renderer under llvmpipe runs at about 20 frames per second at 720×1280. MSAA halves these numbers, so it is off.
+- At a low frame rate, the game time is slower than the real time: Godot does not do more than 16 physics steps in one frame (`project.godot`). A play-test check that measures a time or a distance must use the game time (`SceneTreeTimer`, `wait_seconds()`), not `Time.get_ticks_msec()`. A run longer than 180 s at 2400×1080 must be split into phases.
 - Without the package `mesa-vulkan-drivers`, Godot cannot make a Vulkan surface and falls back to OpenGL. `tools/setup.sh` installs the package.
 - An Xvfb screen of 1280×720 is too small for a 1080×2400 window. `tools/playtest.sh` uses `-screen 0 2560x2560x24`.
 - Godot exports the iOS Xcode project on Linux. Only the build of an `.ipa` needs macOS.

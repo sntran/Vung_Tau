@@ -5,11 +5,22 @@ extends RefCounted
 # a joystick touch or a look drag starts on it.
 # sizes: 1280x720 2400x1080 1920x1080 720x1280
 # compatibility: 1280x720
+# The scenario has 2 runs, so that each run is shorter than 180 s at
+# 2400×1080 under lavapipe. The second run starts from the save file of the
+# first run.
 # phase: --start-time=06:00
+# phase:
 
 
 func run(d: PlaytestDriver) -> void:
 	await d.wait_idle()
+	if d.phase == 1:
+		await _first_run(d)
+	else:
+		await _second_run(d)
+
+
+func _first_run(d: PlaytestDriver) -> void:
 	await PlaytestLayout.check(d, "intro")
 	await PlaytestLayout.check_buttons_take_touches(d, "intro")
 	await d.tap_id("choice.step_outside")
@@ -27,6 +38,9 @@ func run(d: PlaytestDriver) -> void:
 	await PlaytestLayout.check(d, "talk_from_action")
 	await d.tap_id("choice.chua")
 	await d.tap_id("choice.thanks")
+
+
+func _second_run(d: PlaytestDriver) -> void:
 	# The joystick shows where the thumb is. It does not cover a button.
 	await d.hold_stick(Vector2(0, -1), 0.5)
 	for sheet: Array in [["topbar.notebook", "notebook.close"], ["topbar.settings", "settings.close"],

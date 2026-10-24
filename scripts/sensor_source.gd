@@ -25,6 +25,12 @@ func look_rate() -> Vector2:
 	return Vector2(rate.dot(up), rate.dot(right))
 
 
+## Returns the view turn from the gyroscope in radians during "delta" seconds
+## of game time. The play-test system uses game time for its checks.
+func turn(delta: float) -> Vector2:
+	return look_rate() * delta
+
+
 ## True when the phone has a gyroscope that gives data now.
 func has_data() -> bool:
 	return Input.get_gyroscope().length_squared() > 1e-8

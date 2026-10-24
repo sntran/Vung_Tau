@@ -141,17 +141,27 @@ func key(keycode: Key) -> void:
 ## A drag with a drag event at each frame (plan 0002, R26). "from" and "to"
 ## are screen (window) pixel positions.
 func drag(from: Vector2, to: Vector2, seconds: float, index := 0) -> void:
+	await drag_path([from, to], seconds, index)
+
+
+## Sends a drag along the points (screen pixel positions), at the same speed
+## on each part, during the seconds. The first point is the press, the last
+## point is the release.
+func drag_path(points: Array[Vector2], seconds: float, index := 0) -> void:
 	var press := InputEventScreenTouch.new()
 	press.index = index
-	press.position = from
+	press.position = points[0]
 	press.pressed = true
 	Input.parse_input_event(press)
 	await wait_frames(1)
+	var total := 0.0
+	for i in range(1, points.size()):
+		total += points[i - 1].distance_to(points[i])
 	var start := Time.get_ticks_msec()
-	var last := from
+	var last := points[0]
 	while true:
 		var t := clampf((Time.get_ticks_msec() - start) / maxf(seconds * 1000.0, 1.0), 0.0, 1.0)
-		var pos := from.lerp(to, t)
+		var pos := _point_on_path(points, total * t)
 		var event := InputEventScreenDrag.new()
 		event.index = index
 		event.position = pos
@@ -164,10 +174,20 @@ func drag(from: Vector2, to: Vector2, seconds: float, index := 0) -> void:
 			break
 	var release := InputEventScreenTouch.new()
 	release.index = index
-	release.position = to
+	release.position = points[points.size() - 1]
 	release.pressed = false
 	Input.parse_input_event(release)
 	await wait_frames(1)
+
+
+func _point_on_path(points: Array[Vector2], distance: float) -> Vector2:
+	var left := distance
+	for i in range(1, points.size()):
+		var part := points[i - 1].distance_to(points[i])
+		if left <= part and part > 0.0:
+			return points[i - 1].lerp(points[i], left / part)
+		left -= part
+	return points[points.size() - 1]
 
 
 ## Touches a point on the left half, drags in the direction, holds, then
@@ -184,10 +204,9 @@ func hold_stick(direction: Vector2, seconds: float) -> void:
 	press.pressed = true
 	Input.parse_input_event(press)
 	await wait_frames(1)
-	var end := Time.get_ticks_msec() + int(seconds * 1000.0)
 	var last := s_start
-	var first := true
-	while Time.get_ticks_msec() < end or first:
+	var timer: SceneTreeTimer = null
+	while timer == null or timer.time_left > 0.0:
 		var event := InputEventScreenDrag.new()
 		event.index = 0
 		event.position = s_target
@@ -195,8 +214,12 @@ func hold_stick(direction: Vector2, seconds: float) -> void:
 		event.screen_relative = event.relative
 		Input.parse_input_event(event)
 		last = s_target
-		first = false
 		await wait_frames(1)
+		# The time is game time. It starts when the stick moves the player, not
+		# at the press. At a low frame rate, the game time is slower than the
+		# real time.
+		if timer == null:
+			timer = _tree.create_timer(seconds, false, true)
 	var release := InputEventScreenTouch.new()
 	release.index = 0
 	release.position = s_target
@@ -237,7 +260,7 @@ func _free_points(zone: String) -> Array[Vector2]:
 
 ## Turns the view with drags on the right half until the 3D point is at the
 ## center dot (within "tolerance" degrees). Returns true when it is there.
-func look_at_point(point: Vector3, tolerance := 2.0, timeout_s := 10.0) -> bool:
+func look_at_point(point: Vector3, tolerance := 2.0, timeout_s := 30.0) -> bool:
 	var end := Time.get_ticks_msec() + int(timeout_s * 1000.0)
 	while Time.get_ticks_msec() < end:
 		var s := state()
@@ -267,12 +290,15 @@ func look_at_point(point: Vector3, tolerance := 2.0, timeout_s := 10.0) -> bool:
 			fail("no free point in the look zone")
 			return false
 		move = (from + move).clamp(Vector2(5, 5), view - Vector2(5, 5)) - from
-		# A drag needs more than 12 px to turn the view.
+		# A drag needs more than 12 px to turn the view. The turn is the
+		# distance from the press to the release, so a short turn goes out
+		# 16 px first and then back to the end point.
+		var path: Array[Vector2] = [to_screen(from)]
 		if move.length() < 14.0:
-			move = move.normalized() * 14.0
-			if (from + move).x > view.x - 5.0 or (from + move).y > view.y - 5.0 or (from + move).x < 5.0 or (from + move).y < 5.0:
-				move = -move
-		await drag(to_screen(from), to_screen(from + move), 0.25)
+			var out := Vector2(0, 16) if from.y + 21.0 < view.y else Vector2(0, -16)
+			path.append(to_screen(from + out))
+		path.append(to_screen(from + move))
+		await drag_path(path, 0.25)
 		await wait_idle(5.0)
 	fail("the view does not turn to %s" % point)
 	return false
@@ -299,8 +325,14 @@ func gyro(rate: Vector3, seconds: float) -> void:
 	if not m.sensor is ScriptedSensorSource:
 		m.sensor = ScriptedSensorSource.new()
 		m._apply_settings()
-	(m.sensor as ScriptedSensorSource).play(Vector2(rate.y, rate.x), seconds)
-	await wait_seconds(seconds)
+	var source := m.sensor as ScriptedSensorSource
+	source.play(Vector2(rate.y, rate.x), seconds)
+	# The game reads the source only when the gyroscope setting is on.
+	if GameState.settings.gyro:
+		while source.playing():
+			await wait_frames(1)
+	else:
+		await wait_seconds(seconds)
 	await wait_frames(2)
 
 
@@ -556,6 +588,7 @@ func check_floor_point(pos: Vector3) -> String:
 ## It turns the view to the point with look drags first. Each tap goes not
 ## farther than "step" meters.
 func walk_toward(x: float, z := 0.0, step := 6.0) -> bool:
+	var stuck := 0
 	for i in 16:
 		var pos: Vector3 = state().player
 		var to := Vector2(x - pos.x, z - pos.z)
@@ -577,8 +610,17 @@ func walk_toward(x: float, z := 0.0, step := 6.0) -> bool:
 				break
 		if not tapped:
 			# No floor point is free to tap: walk this part with the joystick.
-			await stick_to(point_on_way(pos, target))
+			# In the hẻm, a cart can be between the player and the point. Then
+			# go to the middle line first.
+			if absf(pos.x) < 30.0 and absf(pos.z - 0.2) > 0.6:
+				await stick_to(Vector3(pos.x, pos.y, 0.2))
+			else:
+				await stick_to(point_on_way(pos, target))
 		await wait_idle()
+		var now: Vector3 = state().player
+		stuck = stuck + 1 if Vector2(now.x - pos.x, now.z - pos.z).length() < 0.2 else 0
+		if stuck >= 3:
+			break
 	fail("the player does not come to (%.2f, %.2f)" % [x, z])
 	return false
 
@@ -733,6 +775,7 @@ func state() -> Dictionary:
 		"near_spot": m.near_spot,
 		"walked_total_m": GameState.walked_total_m,
 		"clack_count": hem.clack_count,
+		"clack_time": hem.clack_time,
 		"bubble_visible": bubble,
 		"lights_on": hem.lights_on().size(),
 		"lights_in_view": m.lights_in_view(),

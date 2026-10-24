@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | In progress |
+| Status | Built |
 | Branch | `feat/0001-foundation` |
 | Depends on | Nothing |
 

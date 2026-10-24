@@ -31,7 +31,8 @@ The builder writes questions and answers under "Open questions". The builder doe
 
 | Number | Name | Status |
 |---|---|---|
-| 0001 | [Foundation and the walkable hẻm](0001-foundation.md) | In progress |
+| 0001 | [Foundation and the walkable hẻm](0001-foundation.md) | Built |
+| 0002 | [First-person walking](0002-first-person.md) | Built |
 
 ## Proposed order of the next plans
 
@@ -39,7 +40,6 @@ The order can change.
 
 | Number | Name | Content |
 |---|---|---|
-| 0002 | [First-person walking](0002-first-person.md) | Written, status "Draft". The player sees through the eyes of the visitor and walks like a person. Landscape layout, joystick, look drag, gyroscope look, tap to walk. |
 | 0003 | [Real geography of Vũng Tàu](0003-real-geography.md) | Written, status "Draft". The real ground, hills, coast, beaches, sea, and roads, from OpenStreetMap and the Copernicus elevation data. |
 | 0004 | Known structures | Bãi Trước, Bãi Sau, Mũi Nghinh Phong, Tượng Chúa Kitô Vua, Hải đăng, Bạch Dinh, and others that I name. Made by code from their real outlines and sizes. |
 | 0005 | Houses on the lots | A house generator with real proportions and a detail kit (shutters, balconies, wires, signs, plants). It puts houses on the lots between the roads. The homestay hẻm moves to its real place. |
