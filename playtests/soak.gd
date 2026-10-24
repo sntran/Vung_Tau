@@ -156,6 +156,17 @@ func _check_body(d: PlaytestDriver, i: int) -> bool:
 	var p: Vector3 = s.player
 	var overlaps := d.player_overlaps()
 	if p.y > 0.25 or p.y < Beach.SAND_Y - 0.1 or not overlaps.is_empty():
-		d.fail("action %d: the player left the floor or is in a wall at %s %s" % [i + 1, p, overlaps])
+		var space: PhysicsDirectSpaceState3D = d.main().get_world_3d().direct_space_state
+		var below := space.intersect_ray(PhysicsRayQueryParameters3D.create(p + Vector3(0, 0.5, 0), p - Vector3(0, 1.0, 0)))
+		var under: String = str((below.collider as Node).get_path()) if not below.is_empty() else "nothing"
+		var probe := PhysicsShapeQueryParameters3D.new()
+		var capsule := CapsuleShape3D.new()
+		capsule.radius = Player.RADIUS + 0.05
+		capsule.height = Player.HEIGHT + 0.1
+		probe.shape = capsule
+		probe.transform = Transform3D(Basis(), p + Vector3(0, Player.HEIGHT / 2.0, 0))
+		for hit: Dictionary in space.intersect_shape(probe):
+			under += ", near %s" % (hit.collider as Node).get_path()
+		d.fail("action %d: the player left the floor or is in a wall at %s %s, on %s" % [i + 1, p, overlaps, under])
 		return false
 	return true

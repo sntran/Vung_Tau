@@ -21,6 +21,8 @@ const LOT_STAND_Z := -0.75
 const CART_STAND_Z := 0.0
 const NPC_STAND_Z := -0.55
 const HELPER_Z := 0.9
+## The collision height of a stool of the cà phê cóc (see _build_stall).
+const STOOL_SOLID_HEIGHT := 0.6
 const HELPER_SPEED := 0.9
 ## The navigation mesh uses this cell size. The map cell size must be the same.
 const NAV_CELL := 0.15
@@ -203,7 +205,11 @@ func _build_stall(spot_id: String, center: float, width: float) -> void:
 	for i in colors.size():
 		var stool_pos := Vector3(-width / 2.0 + 0.8 + i * 0.85, 0, 0.45)
 		Greybox.stool(open, stool_pos, Color(colors[i]))
-		Greybox.solid_shape(open_body, Vector3(0.32, 0.32, 0.32), stool_pos + Vector3(0, 0.16, 0))
+		# The collision is higher than the stool: the player can step up 0.2 m,
+		# and the round bottom of the capsule climbs a 0.32 m box. A person
+		# does not walk onto a stool.
+		Greybox.solid_shape(open_body, Vector3(0.32, STOOL_SOLID_HEIGHT, 0.32),
+				stool_pos + Vector3(0, STOOL_SOLID_HEIGHT / 2.0, 0))
 	for sitter: Array in [[1.65, "#F2F2F2", "#273445", "#151515"], [2.5, "#E9C7D8", "#3D3D55", "#2B1C14"]]:
 		Greybox.person(open, Vector3(-width / 2.0 + sitter[0], 0, 0.45), Color(sitter[1]), Color(sitter[2]),
 				Color("#C99A72"), Color(sitter[3]), 1.15, "Sitter")

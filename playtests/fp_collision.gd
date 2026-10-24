@@ -3,7 +3,8 @@ extends RefCounted
 # the beach wall for 3 s. After each push, the capsule must not intersect a
 # collision shape. The player must stay on the floor. Look at a wall from
 # 0.3 m. The screenshot must not show the inside of the wall.
-# Runs 1 to 3: the house walls of the hẻm and the bánh mì cart (06:00). Run 4:
+# Runs 1 to 3: the house walls of the hẻm, the bánh mì cart, and the stools of
+# the cà phê cóc (06:00). Run 4:
 # the beach wall, the palm trees, and the water. Runs 5 and 6: the carts of
 # 15:00 (nước mía, hột vịt lộn) and of 18:30 (hủ tiếu gõ). Runs 7 and 8: the
 # other walls. Each run has few pushes, so that it is shorter than 180 s at
@@ -34,12 +35,25 @@ func run(d: PlaytestDriver) -> void:
 		await _beach(d)
 	if WALL_RUNS.has(d.phase):
 		# The house walls of the main row (not the open shops).
-		var walls := Content.layout.lots.filter(func(lot: Dictionary) -> bool:
+		var walls: Array = Content.layout.lots.filter(func(lot: Dictionary) -> bool:
 			return not (lot.has("spot") and lot.ground == "shop"))
 		var part: Array = WALL_RUNS[d.phase]
 		for lot: Dictionary in walls.slice(part[0], part[1]):
 			var x: float = hem.lot_x[lot.id]
 			await _push(d, "wall of " + lot.id, Vector3(x + 0.8, 0, 0), Vector3(x + 0.8, 1.6, -half))
+	if d.phase == 3:
+		# The stools of the cà phê cóc (open at 06:00): the player walks into
+		# them but does not step up on them (they are higher than a step).
+		var stall: Node3D = hem.get_node("StallOpen_coc")
+		var width := 0.0
+		for lot: Dictionary in Content.layout.lots:
+			if lot.id == "coc":
+				width = float(lot.width)
+		for i in 2:
+			var stool := stall.global_position + Vector3(-width / 2.0 + 0.8 + i * 0.85, 0, 0.45)
+			await _push(d, "stool %d" % (i + 1), Vector3(stool.x, 0, 0.6), stool + Vector3(0, 0.2, 0))
+			d.expect(float(d.state().player.y) < 0.05, "stool %d: the player does not stand on the stool: y %.2f" % [
+					i + 1, d.state().player.y])
 	if d.phase == 7:
 		# The opposite row and the end wall.
 		var opposite_x: float = hem.start_x + 6.0
