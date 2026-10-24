@@ -3,7 +3,7 @@ extends RefCounted
 ## Splits a spoken line into subtitle parts (plan 0003, R13).
 ##
 ## A part has two lines at most, with MAX_CHARS characters or fewer in each
-## line. The speaker name and ": " are on the first line of each part, so
+## line (fewer when the screen is narrow). The speaker name and ": " are on the first line of each part, so
 ## they count too. A long line splits at the sentences first, then at the
 ## phrases (a comma, a semicolon, a colon, or a dash), then at the words.
 ## Each part shows for a time in proportion to its length.
@@ -13,17 +13,22 @@ const MAX_LINES := 2
 const SENTENCE_ENDS := ".!?…"
 const PHRASE_ENDS := ",;:—–"
 
+## The line length of the split that runs now: MAX_CHARS, or fewer on a
+## narrow screen.
+static var _limit := MAX_CHARS
+
 
 ## Returns the parts of the text: a list of {lines: PackedStringArray, weight: int}.
 ## "prefix" is the length of the speaker name and ": " on the first line.
-static func parts(text: String, prefix := 0, max_lines := MAX_LINES) -> Array[Dictionary]:
+static func parts(text: String, prefix := 0, max_lines := MAX_LINES, max_chars := MAX_CHARS) -> Array[Dictionary]:
+	_limit = mini(max_chars, MAX_CHARS)
 	var units: Array[String] = []
 	for sentence in _split_after(text.strip_edges(), SENTENCE_ENDS):
-		if wrap(sentence, prefix).size() <= max_lines:
+		if wrap_lines(sentence, prefix).size() <= max_lines:
 			units.append(sentence)
 			continue
 		for phrase in _split_after(sentence, PHRASE_ENDS):
-			if wrap(phrase, prefix).size() <= max_lines:
+			if wrap_lines(phrase, prefix).size() <= max_lines:
 				units.append(phrase)
 			else:
 				units.append_array(_word_chunks(phrase, prefix, max_lines))
@@ -31,7 +36,7 @@ static func parts(text: String, prefix := 0, max_lines := MAX_LINES) -> Array[Di
 	var current := ""
 	for unit in units:
 		var joined := unit if current == "" else current + " " + unit
-		if current != "" and wrap(joined, prefix).size() > max_lines:
+		if current != "" and wrap_lines(joined, prefix).size() > max_lines:
 			result.append(_part(current, prefix))
 			current = unit
 		else:
@@ -43,7 +48,8 @@ static func parts(text: String, prefix := 0, max_lines := MAX_LINES) -> Array[Di
 
 ## The parts for the "both" setting: each part has one Vietnamese line and
 ## one English line. The two texts split into the same number of parts.
-static func parts_both(vi: String, en: String, prefix := 0) -> Array[Dictionary]:
+static func parts_both(vi: String, en: String, prefix := 0, max_chars := MAX_CHARS) -> Array[Dictionary]:
+	_limit = mini(max_chars, MAX_CHARS)
 	var vi_words := vi.strip_edges().split(" ", false)
 	var en_words := en.strip_edges().split(" ", false)
 	for count in range(1, 40):
@@ -58,14 +64,16 @@ static func parts_both(vi: String, en: String, prefix := 0) -> Array[Dictionary]
 	return [{"lines": PackedStringArray([vi, en]), "weight": 1}]
 
 
-## Wraps the text into lines of MAX_CHARS or fewer characters. The first line
+## Wraps the text into lines of the line length or fewer characters. The first line
 ## has "prefix" characters less. Two lines are balanced when they can be.
-static func wrap(text: String, prefix := 0) -> PackedStringArray:
+static func wrap_lines(text: String, prefix := 0, max_chars := -1) -> PackedStringArray:
+	if max_chars > 0:
+		_limit = mini(max_chars, MAX_CHARS)
 	var words := text.strip_edges().split(" ", false)
 	if words.is_empty():
 		return PackedStringArray([""])
 	var whole := " ".join(words)
-	if whole.length() + prefix <= MAX_CHARS:
+	if whole.length() + prefix <= _limit:
 		return PackedStringArray([whole])
 	# Two lines: the break that makes the longer line shortest.
 	var best := -1
@@ -73,7 +81,7 @@ static func wrap(text: String, prefix := 0) -> PackedStringArray:
 	for i in range(1, words.size()):
 		var first := " ".join(words.slice(0, i))
 		var second := " ".join(words.slice(i))
-		if first.length() + prefix <= MAX_CHARS and second.length() <= MAX_CHARS:
+		if first.length() + prefix <= _limit and second.length() <= _limit:
 			var width := maxf(first.length() + prefix, second.length())
 			if width < best_width:
 				best_width = width
@@ -83,13 +91,13 @@ static func wrap(text: String, prefix := 0) -> PackedStringArray:
 	# More lines: fill each line.
 	var lines := PackedStringArray()
 	var line := ""
-	var budget := MAX_CHARS - prefix
+	var budget := _limit - prefix
 	for word in words:
 		var next := word if line == "" else line + " " + word
 		if line != "" and next.length() > budget:
 			lines.append(line)
 			line = word
-			budget = MAX_CHARS
+			budget = _limit
 		else:
 			line = next
 	lines.append(line)
@@ -97,7 +105,7 @@ static func wrap(text: String, prefix := 0) -> PackedStringArray:
 
 
 static func _part(text: String, prefix: int) -> Dictionary:
-	return {"lines": wrap(text, prefix), "weight": maxi(1, text.length())}
+	return {"lines": wrap_lines(text, prefix), "weight": maxi(1, text.length())}
 
 
 ## Splits after each character of "ends" that comes before a space.
@@ -122,7 +130,7 @@ static func _word_chunks(text: String, prefix: int, max_lines: int) -> Array[Str
 	var current := ""
 	for word in text.split(" ", false):
 		var next := word if current == "" else current + " " + word
-		if current != "" and wrap(next, prefix).size() > max_lines:
+		if current != "" and wrap_lines(next, prefix).size() > max_lines:
 			result.append(current)
 			current = word
 		else:
@@ -140,7 +148,7 @@ static func _split_words(words: PackedStringArray, count: int, prefix: int) -> P
 		return PackedStringArray()
 	# The narrowest width that fits the words in "count" lines or fewer.
 	var width := -1
-	for w in range(1, MAX_CHARS + 1):
+	for w in range(1, _limit + 1):
 		var lines := _fill(words, w, prefix)
 		if not lines.is_empty() and lines.size() <= count:
 			width = w

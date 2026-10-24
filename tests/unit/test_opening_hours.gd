@@ -36,19 +36,19 @@ func test_all_spots_in_the_data() -> void:
 
 func test_pho_line_rules_by_time() -> void:
 	var pho := Content.spot("pho")
-	assert_eq(Content.line_rule(pho, 300).line, "spot.pho.closed_before")
-	assert_eq(Content.line_rule(pho, 330).line, "spot.pho.open")
-	assert_eq(Content.line_rule(pho, 629).line, "spot.pho.open")
-	assert_eq(Content.line_rule(pho, 630).line, "spot.pho.sold_out")
-	assert_eq(Content.line_rule(pho, 719).line, "spot.pho.sold_out")
-	assert_eq(Content.line_rule(pho, 720).line, "spot.pho.closed_after")
-	assert_eq(Content.line_rule(pho, 100).line, "spot.pho.closed_after")
+	assert_eq(Content.rule_for(pho, "lens", 300).line, "spot.pho.closed_before")
+	assert_eq(Content.rule_for(pho, "lens", 330).line, "spot.pho.open")
+	assert_eq(Content.rule_for(pho, "lens", 629).line, "spot.pho.open")
+	assert_eq(Content.rule_for(pho, "lens", 630).line, "spot.pho.sold_out")
+	assert_eq(Content.rule_for(pho, "lens", 719).line, "spot.pho.sold_out")
+	assert_eq(Content.rule_for(pho, "lens", 720).line, "spot.pho.closed_after")
+	assert_eq(Content.rule_for(pho, "lens", 100).line, "spot.pho.closed_after")
 
 
 func test_beach_line_rules_by_time() -> void:
 	var beach := Content.spot("beach")
-	assert_eq(Content.line_rule(beach, 269).line, "spot.beach.night")
-	assert_eq(Content.line_rule(beach, 270).line, "spot.beach.dawn")
-	assert_eq(Content.line_rule(beach, 450).line, "spot.beach.day")
-	assert_eq(Content.line_rule(beach, 960).line, "spot.beach.evening")
-	assert_eq(Content.line_rule(beach, 1290).line, "spot.beach.night")
+	assert_eq(Content.rule_for(beach, "lens", 269).line, "spot.beach.night")
+	assert_eq(Content.rule_for(beach, "lens", 270).line, "spot.beach.dawn")
+	assert_eq(Content.rule_for(beach, "lens", 450).line, "spot.beach.day")
+	assert_eq(Content.rule_for(beach, "lens", 960).line, "spot.beach.evening")
+	assert_eq(Content.rule_for(beach, "lens", 1290).line, "spot.beach.night")

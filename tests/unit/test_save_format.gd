@@ -14,7 +14,10 @@ func _state() -> Dictionary:
 		"day": 3, "minutes": 725, "walk_m": 2.5, "cards": ["anSang", "coc"],
 		"flags": {"intro_done": true}, "sound": false, "player": Vector3(13.25, 0, -0.6),
 		"yaw": 35.5, "pitch": -12.0,
-		"settings": {"look_sensitivity": 1.5, "invert_y": true, "gyro": false, "fov": 80.0, "tap_walk": false},
+		"settings": {"look_sensitivity": 1.5, "invert_y": true, "gyro": false, "fov": 80.0, "tap_walk": false,
+				"subtitles": "both", "subtitle_size": 1.25, "subtitle_box": 0.5},
+		"met": ["batu"], "phrases": [{"vi": "Dạ, chưa ạ.", "en": "Not yet."}],
+		"messages": [{"id": "welcome", "text": "Chào con!", "day": 1, "minutes": 360}], "unread": 1,
 	}
 
 
@@ -31,6 +34,25 @@ func test_round_trip() -> void:
 	assert_almost_eq(data.yaw, 35.5, 0.001)
 	assert_almost_eq(data.pitch, -12.0, 0.001)
 	assert_eq(data.settings, _state().settings)
+	assert_eq(data.met, ["batu"] as Array[String])
+	assert_eq(data.phrases.size(), 1)
+	assert_eq(data.phrases[0].vi, "Dạ, chưa ạ.")
+	assert_eq(data.messages[0].id, "welcome")
+	assert_eq(data.unread, 1)
+
+
+func test_save_of_plan_0002_loads_with_the_new_defaults() -> void:
+	var json: Dictionary = JSON.parse_string(SaveFormat.to_json(_state()))
+	for key: String in ["met", "phrases", "messages", "unread"]:
+		json.erase(key)
+	for key: String in ["subtitles", "subtitle_size", "subtitle_box"]:
+		json.settings.erase(key)
+	var data := SaveFormat.from_json(JSON.stringify(json))
+	assert_eq(data.settings.subtitles, "vi")
+	assert_eq(data.met, [] as Array[String])
+	assert_eq(data.unread, 0)
+	json.settings.subtitles = "klingon"
+	assert_eq(SaveFormat.from_json(JSON.stringify(json)).settings.subtitles, "vi", "a bad subtitle language takes the default")
 
 
 func test_version_1_save_is_not_loaded() -> void:

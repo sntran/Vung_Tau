@@ -128,4 +128,9 @@ func _finish() -> void:
 		print("PLAYTEST FAIL %s phase %d" % [scenario_name, driver.phase])
 		for failure in driver.failures:
 			print("  - " + failure)
+	# A voice that plays at the quit is not freed: stop the sounds, then wait
+	# for the audio server.
+	get_tree().call_group("main", "stop_sounds")
+	for i in 3:
+		await get_tree().process_frame
 	get_tree().quit(0 if passed else 1)

@@ -5,6 +5,11 @@
 #   tools/playtest.sh NAME [--size=WxH] [--renderer=mobile|compatibility]
 #                                         Run one scenario (default 1280x720, mobile).
 #   tools/playtest.sh --all               Run all scenarios at all their sizes.
+#   tools/playtest.sh NAME --only-phase=N  Run only phase N of a scenario (to
+#                                          find a defect in a long scenario).
+#   tools/playtest.sh --all --shard=I/N    Run the I-th of N parts of the
+#                                          scenarios (CI runs the parts at the
+#                                          same time).
 #
 # Output goes to build/playtest/NAME/WxH/: numbered screenshots, log.json,
 # and godot-N.log (the Godot output of run N).
@@ -19,6 +24,9 @@
 #                                          The runs use the same save file.
 #                                          The argument --fresh-save deletes
 #                                          the save file before the run.
+#
+# The environment variable PLAYTEST_MAX_FPS limits the frame rate, so that a
+# fast computer can test like a slow one (for example PLAYTEST_MAX_FPS=3).
 #
 # A play test fails when an expect() fails or a wait times out, when Godot
 # prints "SCRIPT ERROR" or "ERROR:" (not the audio driver lines), or when the
@@ -44,11 +52,15 @@ all=0
 name=""
 size=""
 renderer="mobile"
+only_phase=""
+shard=""
 for arg in "$@"; do
   case "$arg" in
     --all) all=1 ;;
     --size=*) size="${arg#--size=}" ;;
     --renderer=*) renderer="${arg#--renderer=}" ;;
+    --only-phase=*) only_phase="${arg#--only-phase=}" ;;
+    --shard=*) shard="${arg#--shard=}" ;;
     -*) usage ;;
     *) name="$arg" ;;
   esac
@@ -101,6 +113,9 @@ run_one() {
   local result=0 n=0
   for args in "${phases[@]}"; do
     n=$((n + 1))
+    if [[ -n "$only_phase" && "$n" != "$only_phase" ]]; then
+      continue
+    fi
     local log="$out/godot-$n.log"
     if [[ " $args " == *" --fresh-save "* ]]; then
       rm -f "$out/save.json"
@@ -108,7 +123,7 @@ run_one() {
     fi
     # shellcheck disable=SC2086
     timeout "$TIME_LIMIT" xvfb-run -a -s "-screen 0 2560x2560x24" \
-      "$GODOT" --path "$ROOT" $RENDERER_ARGS --audio-driver Dummy \
+      "$GODOT" --path "$ROOT" $RENDERER_ARGS --audio-driver Dummy ${PLAYTEST_MAX_FPS:+--max-fps "$PLAYTEST_MAX_FPS"} \
       --resolution "$run_size" -- \
       --playtest="$scenario" --out="$out" --save-path="$out/save.json" --phase="$n" $args \
       >"$log" 2>&1 &
@@ -171,35 +186,49 @@ else
   scenarios=("$name")
 fi
 
+# All runs: scenario, size, and renderer.
+runs=()
 for scenario in "${scenarios[@]}"; do
   if [[ "$all" == 1 ]]; then
     run_sizes="$(sizes_of "$scenario")"
   else
     run_sizes="${size:-1280x720}"
   fi
-  runs=()
   for s in $run_sizes; do
-    runs+=("$s:$renderer")
+    runs+=("$scenario:$s:$renderer")
   done
   if [[ "$all" == 1 ]]; then
     for s in $(grep -E '^# compatibility:' "$ROOT/playtests/$scenario.gd" | head -1 | sed 's/^# compatibility://'); do
-      runs+=("$s:compatibility")
+      runs+=("$scenario:$s:compatibility")
     done
   fi
-  for run in "${runs[@]}"; do
-    s="${run%%:*}"
-    r="${run##*:}"
-    label="$scenario $s"
-    [[ "$r" == mobile ]] || label="$label $r"
-    start=$(date +%s)
-    if run_one "$scenario" "$s" "$r"; then
-      echo "PASS $label ($(( $(date +%s) - start )) s)"
-      passed=$((passed + 1))
-    else
-      echo "FAIL $label ($(( $(date +%s) - start )) s)"
-      failed+=("$label")
+done
+
+# A shard I/N takes the runs I, I + N, I + 2N, and so on.
+if [[ -n "$shard" ]]; then
+  part="${shard%%/*}"
+  parts="${shard##*/}"
+  selected=()
+  for i in "${!runs[@]}"; do
+    if (( i % parts == part - 1 )); then
+      selected+=("${runs[$i]}")
     fi
   done
+  runs=("${selected[@]}")
+fi
+
+for run in "${runs[@]}"; do
+  IFS=: read -r scenario s r <<<"$run"
+  label="$scenario $s"
+  [[ "$r" == mobile ]] || label="$label $r"
+  start=$(date +%s)
+  if run_one "$scenario" "$s" "$r"; then
+    echo "PASS $label ($(( $(date +%s) - start )) s)"
+    passed=$((passed + 1))
+  else
+    echo "FAIL $label ($(( $(date +%s) - start )) s)"
+    failed+=("$label")
+  fi
 done
 
 echo "Passed: $passed. Failed: ${#failed[@]}."

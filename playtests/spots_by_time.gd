@@ -1,16 +1,17 @@
 extends RefCounted
 # PT-03 spots_by_time. For each start time 05:50, 11:00, 15:00, 18:30, and
-# 21:40: tap each spot that is present. Check that the dialogue line ID is
-# the correct one for that spot and time. Check that a cart that is not
-# present cannot be tapped and is not shown as near. Screenshot each spot.
-# At each start time, also check the shutters (R19) and the boats (R17).
+# 21:40: tap each spot that is present, and point the Lens app at it (plan
+# 0003, R23). Check that the description is the correct one for that spot
+# and time. Check that a cart that is not present cannot be tapped and has no
+# Lens card. Screenshot each spot. At each start time, also check the
+# shutters (R19) and the boats (R17).
 # phase: --start-time=05:50
 # phase: --start-time=11:00 --fresh-save
 # phase: --start-time=15:00 --fresh-save
 # phase: --start-time=18:30 --fresh-save
 # phase: --start-time=21:40 --fresh-save
 
-## The expected line for each spot at each start time. "" means that the cart is not there.
+## The expected Lens description for each spot at each start time. "" means that the cart is not there.
 const EXPECTED := {
 	1: {"home": "spot.home.look", "pho": "spot.pho.open", "banhmi": "spot.banhmi.look",
 		"coc": "spot.coc.look", "bac": "spot.bac.closed", "mia": "", "go": "",
@@ -53,6 +54,7 @@ func run(d: PlaytestDriver) -> void:
 	for spot_id: String in ORDER:
 		var line: String = expected[spot_id]
 		var stand: Vector3 = hem.stand_points[spot_id]
+		await d.lower_phone()
 		if line == "":
 			await _check_absent(d, spot_id, stand)
 			continue
@@ -61,29 +63,25 @@ func run(d: PlaytestDriver) -> void:
 		if not await d.tap_id("spot." + spot_id):
 			continue
 		await d.wait_idle()
+		await d.open_app("lens")
+		await d.look_at_id("spot." + spot_id)
+		await d.wait_frames(3)
 		var s := d.state()
-		d.expect(s.line == line, "%s at %s: the line is %s, it must be %s" % [spot_id, s.time_text, s.line, line])
+		var card: Dictionary = d.main().lens_card()
+		d.expect(card.get("line", "") == line, "%s at %s: the Lens shows %s, it must be %s" % [spot_id,
+				s.time_text, card.get("line", ""), line])
 		await d.screenshot(spot_id)
-		await _back_to_hem(d)
 
 
-## A cart that is not there cannot be tapped and is not shown as near.
+## A cart that is not there cannot be tapped and has no Lens card.
 func _check_absent(d: PlaytestDriver, spot_id: String, stand: Vector3) -> void:
 	var error: String = await d.try_tap_id("spot." + spot_id)
 	d.expect(error != "", "the cart %s is not there, but a tap on it is possible" % spot_id)
 	# Walk to the place of the cart with floor taps.
 	await d.walk_toward(stand.x, stand.z)
-	var s := d.state()
-	d.expect(s.near_spot != spot_id, "the cart %s is not there, but the panel shows it as near" % spot_id)
-	d.expect(s.line != "" and not s.line.begins_with("spot.%s." % spot_id), "the panel shows a line of the cart %s" % spot_id)
+	await d.open_app("lens")
+	await d.look_at_point(stand + Vector3(0, 1.2, -1.3), 4.0)
+	await d.wait_frames(3)
+	var card: Dictionary = d.main().lens_card()
+	d.expect(card.get("id", "") != spot_id, "the cart %s is not there, but the Lens shows it" % spot_id)
 	await d.screenshot("no_" + spot_id)
-
-
-func _back_to_hem(d: PlaytestDriver) -> void:
-	var choices: Array = d.state().choices
-	for id: String in ["choice.okay", "choice.go_out"]:
-		if choices.has(id):
-			await d.tap_id(id)
-			await d.wait_frames(3)
-			return
-	d.fail("no choice goes back to the hẻm: %s" % [choices])

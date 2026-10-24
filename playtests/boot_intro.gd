@@ -1,14 +1,16 @@
 extends RefCounted
-# PT-01 boot_intro. Start at 06:00. The intro shows. Tap "Step outside".
-# Bà Tư's greeting shows. Tap "Dạ, chưa ạ". The card anSang is in the
-# notebook. The toast shows. Tap "Thanks, Bà Tư". The talk panel shows the
-# homestay. Then the other path: "Good morning!" in English.
+# PT-01 boot_intro. Start at 06:00. The first message of cô Nga comes, and
+# the phone button has a dot. Read it in the Messages app. Go to Bà Tư. She
+# speaks with a subtitle. Answer "Dạ, chưa ạ" with Play (plan 0003). The card
+# anSang is in the Sổ tay, and a notification shows. A second visit does not
+# add the card again. Then the other path: "Good morning!" in English.
 # phase: --start-time=06:00
 # phase: --start-time=06:00 --fresh-save
 
 
 func run(d: PlaytestDriver) -> void:
 	await d.wait_idle()
+	await _intro(d)
 	if d.phase == 1:
 		await _path_chua(d)
 	else:
@@ -19,64 +21,56 @@ func _intro(d: PlaytestDriver) -> void:
 	var s := d.state()
 	d.expect(s.time == 360, "the game starts at 06:00, not %s" % s.time_text)
 	d.expect(s.day == 1, "the game starts on day 1")
-	d.expect(s.line == "intro.welcome", "the intro shows, not %s" % s.line)
-	d.expect(s.choices == ["choice.step_outside"], "the intro has one choice: %s" % [s.choices])
-	await d.screenshot("intro")
-	await d.tap_id("choice.step_outside")
+	d.expect(s.messages.has("welcome"), "the first message of cô Nga came: %s" % [s.messages])
+	d.expect(s.phone_dot, "the phone button has a dot for the new message")
+	d.expect(s.intro_done, "the intro is done")
+	await d.screenshot("start")
+	await d.open_app("messages")
+	d.expect(d.find("message.welcome") != null, "the Messages app shows the welcome message")
+	s = d.state()
+	d.expect(s.unread == 0 and not s.phone_dot, "the messages are read, and the dot goes away")
+	await d.screenshot("messages")
+	await d.lower_phone()
+	var line := await d.talk_to("batu")
+	d.expect(line == "batu.greet", "Bà Tư greets the player, not \"%s\"" % line)
 	await d.wait_frames(3)
 	s = d.state()
-	d.expect(s.line == "batu.greet", "Bà Tư's greeting shows, not %s" % s.line)
-	d.expect(s.intro_done, "the intro is done")
-	d.expect(s.choices == ["choice.chua", "choice.good_morning"], "the greeting has two choices: %s" % [s.choices])
+	d.expect(s.subtitle.get("line_id", "") == "batu.greet", "the subtitle shows her greeting: %s" % [s.subtitle])
 	await d.screenshot("greeting")
 
 
 func _path_chua(d: PlaytestDriver) -> void:
-	await _intro(d)
-	await d.tap_id("choice.chua")
-	await d.wait_frames(3)
+	d.expect(await d.answer("chua", "play"), "the reply \"Dạ, chưa ạ\" is in the phrasebook")
+	var line := await d.wait_line("batu")
+	d.expect(line == "batu.reply_chua", "Bà Tư answers \"chưa\", not \"%s\"" % line)
 	var s := d.state()
-	d.expect(s.line == "batu.reply_chua", "Bà Tư answers \"chưa\", not %s" % s.line)
-	d.expect(s.cards == ["anSang"], "the card anSang is in the notebook: %s" % [s.cards])
-	d.expect(s.toast_visible, "the toast shows")
-	await d.screenshot("reply_chua_toast")
-	await d.tap_id("choice.thanks")
-	await d.wait_frames(3)
-	s = d.state()
-	d.expect(s.line == "hem.near" and s.near_spot == "home", "the talk panel shows the homestay: %s %s" % [s.line, s.near_spot])
-	await d.screenshot("homestay_panel")
-	# The notebook has the card.
-	await d.tap_id("topbar.notebook")
-	await d.wait_frames(3)
-	d.expect(d.state().mode == "notebook", "the notebook opens")
-	d.expect(d.find("card.anSang") != null, "the notebook shows the card anSang")
+	d.expect(s.cards == ["anSang"], "the card anSang is in the Sổ tay: %s" % [s.cards])
+	d.expect(s.notification.contains(Content.card("anSang").title) or s.notification.contains("Ăn sáng"),
+			"a notification shows: %s" % s.notification)
+	await d.screenshot("reply_chua")
+	await d.wait_quiet()
+	await d.open_app("notebook")
+	d.expect(d.find("card.anSang") != null, "the Sổ tay shows the card anSang")
 	await d.screenshot("notebook_one_card")
-	await d.tap_id("notebook.close")
-	await d.wait_frames(3)
-	d.expect(d.state().mode == "hem", "the notebook closes")
+	await d.lower_phone()
 	# A second visit to Bà Tư does not add the card again.
-	await d.bring_into_view("npc.batu")
-	await d.tap_id("npc.batu")
+	await d.stick_to(Vector3(8.0, 0.0, 0.2))
 	await d.wait_idle()
-	d.expect(d.state().line == "batu.greet", "a tap on Bà Tư shows her greeting")
-	await d.tap_id("choice.chua")
-	await d.wait_frames(3)
-	d.expect(d.state().cards == ["anSang"], "the card is in the notebook one time only")
-	await d.tap_id("choice.thanks")
-	await d.wait_frames(3)
+	d.expect(d.state().talk_npc == "", "the talk ended when the player walked away")
+	await d.wait_quiet()
+	line = await d.talk_to("batu")
+	d.expect(line == "batu.greet", "a second tap on Bà Tư plays her greeting, not \"%s\"" % line)
+	await d.answer("chua", "play")
+	await d.wait_line("batu")
+	d.expect(d.state().cards == ["anSang"], "the card is in the Sổ tay one time only")
 
 
 func _path_english(d: PlaytestDriver) -> void:
-	await _intro(d)
-	await d.tap_id("choice.good_morning")
-	await d.wait_frames(3)
+	d.expect(await d.answer("good_morning", "english"), "the English reply is in the phrasebook")
+	var line := await d.wait_line("batu")
+	d.expect(line == "batu.reply_english", "Bà Tư answers in English, not \"%s\"" % line)
 	var s := d.state()
-	d.expect(s.line == "batu.reply_english", "Bà Tư answers in English, not %s" % s.line)
-	d.expect(s.cards == ["anSang"], "the card anSang is in the notebook: %s" % [s.cards])
-	d.expect(s.toast_visible, "the toast shows")
+	d.expect(s.cards == ["anSang"], "the card anSang is in the Sổ tay: %s" % [s.cards])
 	await d.screenshot("reply_english")
-	await d.tap_id("choice.okay")
-	await d.wait_frames(3)
-	s = d.state()
-	d.expect(s.line == "hem.near" and s.near_spot == "home", "the talk panel shows the homestay")
-	await d.screenshot("homestay_panel")
+	await d.wait_quiet()
+	d.expect(d.state().messages.has("an_sang_english"), "cô Nga sends a tip after the English answer")

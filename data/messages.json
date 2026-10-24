@@ -1,5 +1,5 @@
 {
-	"note": "The text messages of cô Nga in the Messages app (plan 0003, R24, R25). A message comes once. \"at\" is a time (minutes after midnight) on each day, or on \"day\" only. \"after\" is an event: \"start\" (a new game), \"wake\" (a new morning), \"heard:LINE\" (the player heard the line), or \"lens:LINE\" (the Lens app showed the description). \"unless_card\" stops the message when the player knows the card. \"repeat\": true lets the message come again each day.",
+	"note": "The text messages of cô Nga in the Messages app (plan 0003, R24, R25). A message comes once. \"at\" is a time (minutes after midnight) on each day, or on \"day\" only. \"before\" stops a message with \"at\" when the time is later. \"after\" is an event: \"start\" (a new game), \"wake\" (a new morning), \"heard:LINE\" (the player heard the line), or \"lens:LINE\" (the Lens app showed the description). \"unless_card\" stops the message when the player knows the card. \"repeat\": true lets the message come again each day.",
 	"sender": {
 		"name": "Cô Nga",
 		"speaker": "nga",
@@ -42,7 +42,8 @@
 			"at": 375,
 			"unless_card": "boats",
 			"text": "Bãi Trước is at the end of the hẻm. Early morning is the time to go: the boats are in.",
-			"status": "confirmed"
+			"status": "confirmed",
+			"before": 450
 		},
 		{
 			"id": "tip_pho",
@@ -50,7 +51,8 @@
 			"at": 420,
 			"unless_card": "breakfast",
 			"text": "Cô Sáu's phở is two doors from the homestay. Go before it sells out!",
-			"status": "confirmed"
+			"status": "confirmed",
+			"before": 630
 		},
 		{
 			"id": "sold_out",

@@ -1,7 +1,8 @@
 class_name Npc
 extends Node3D
 ## A person in the hẻm. A person with an "npc_id" is touchable: a tap on the
-## person walks the player to the person and opens the talk panel.
+## person walks the player to the person, and the person talks. The person
+## speaks through a 3D audio player at the head (plan 0003, R11).
 
 @export var npc_id := ""
 @export var shirt := Color("#E7E2D6")
@@ -11,12 +12,16 @@ extends Node3D
 @export var height := 1.55
 ## A person that moves is on the layer MOVING. The navigation mesh does not use it.
 @export var moving := false
+## False for a person that only talks with other people (no touch area).
+@export var touchable := true
+
+## The player does not hear the voice at more than this distance (R11).
+const VOICE_RANGE := 12.0
 
 var touch_area: Area3D
 var body: PhysicsBody3D
-var bubble: Label3D
 var figure: Node3D
-var _bubble_left := 0.0
+var voice: AudioStreamPlayer3D
 var _built := false
 
 
@@ -29,19 +34,13 @@ func build() -> void:
 		return
 	_built = true
 	figure = Greybox.person(self, Vector3.ZERO, shirt, pants, skin, hair, height, "Figure")
-	bubble = Label3D.new()
-	bubble.name = "Bubble"
-	bubble.font = preload("res://assets/fonts/BeVietnamPro-Italic.ttf")
-	bubble.font_size = 64
-	bubble.pixel_size = 0.004
-	bubble.modulate = Color("#1D2725")
-	bubble.outline_modulate = Color("#FFF8E0")
-	bubble.outline_size = 18
-	bubble.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	bubble.no_depth_test = true
-	bubble.position = Vector3(0, height + 0.55, 0)
-	bubble.visible = false
-	add_child(bubble)
+	voice = AudioStreamPlayer3D.new()
+	voice.name = "Voice"
+	voice.position = Vector3(0, height - 0.1, 0)
+	voice.max_distance = VOICE_RANGE
+	voice.unit_size = 3.0
+	voice.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
+	add_child(voice)
 	# The body stops the player.
 	body = AnimatableBody3D.new() if moving else StaticBody3D.new()
 	body.name = "Solid"
@@ -55,7 +54,7 @@ func build() -> void:
 	capsule.position = Vector3(0, height / 2.0, 0)
 	body.add_child(capsule)
 	add_child(body)
-	if npc_id != "":
+	if npc_id != "" and touchable:
 		touch_area = Area3D.new()
 		touch_area.name = "Touch"
 		touch_area.collision_layer = Layers.TOUCH
@@ -93,19 +92,6 @@ func facing() -> Vector3:
 	return global_basis.z
 
 
-## Shows a small speech bubble for some seconds.
-func show_bubble(text: String, seconds: float) -> void:
-	bubble.text = text
-	bubble.visible = true
-	_bubble_left = seconds
-
-
-func is_bubble_visible() -> bool:
-	return bubble.visible and visible
-
-
-func _process(delta: float) -> void:
-	if _bubble_left > 0.0:
-		_bubble_left -= delta
-		if _bubble_left <= 0.0:
-			bubble.visible = false
+## The position of the head: the voice comes from here.
+func head_position() -> Vector3:
+	return global_position + Vector3(0, height - 0.1, 0)

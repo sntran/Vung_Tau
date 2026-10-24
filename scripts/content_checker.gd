@@ -407,8 +407,9 @@ func _check_messages(messages: Dictionary, dialogue: Dictionary, card_ids: Dicti
 		_check_status(message, file, where)
 		if not message.has("at") and not message.has("after"):
 			_error(file, where, "a message must have \"at\" or \"after\"")
-		if message.has("at"):
-			_check_minute(message.at, file, where, "at")
+		for field: String in ["at", "before"]:
+			if message.has(field):
+				_check_minute(message[field], file, where, field)
 		if message.has("day") and (typeof(message.day) not in [TYPE_INT, TYPE_FLOAT] or message.day < 1):
 			_error(file, where, "\"day\" must be a day number (1 or more)")
 		if message.has("after"):

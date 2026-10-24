@@ -8,12 +8,12 @@ extends RefCounted
 func run(d: PlaytestDriver) -> void:
 	await d.wait_idle()
 	# A button with a known test ID reacts to tap_id().
-	await d.tap_id("topbar.notebook")
+	await d.tap_id("phone.button")
 	await d.wait_frames(3)
-	d.expect(d.state().mode == "notebook", "tap_id(topbar.notebook) opens the notebook")
-	await d.tap_id("notebook.close")
+	d.expect(d.state().phone_up, "tap_id(phone.button) raises the phone")
+	await d.tap_id("phone.button")
 	await d.wait_frames(3)
-	d.expect(d.state().mode == "hem", "tap_id(notebook.close) closes the notebook")
+	d.expect(not d.state().phone_up, "a second tap_id(phone.button) lowers the phone")
 
 	# A tap on an off-screen node fails with a clear message. At the door, the
 	# player looks along the hẻm, so the homestay is at the side.
@@ -24,34 +24,39 @@ func run(d: PlaytestDriver) -> void:
 	# A missing test ID fails with a clear message.
 	error = await d.try_tap_id("no.such.node")
 	d.expect(error.contains("no visible node"), "a tap on a missing node fails with a clear message: \"%s\"" % error)
-	# A node under a control fails: the clock sheet covers the world.
-	await d.tap_id("topbar.clock")
-	await d.wait_frames(3)
-	error = await d.try_tap_id("spot.pho")
-	d.expect(error.contains("covered"), "a tap on a covered node fails with a clear message: \"%s\"" % error)
-	d.step("covered message: " + error)
-	d.expect(d.state().mode == "clock", "the failed tap did not send a tap")
-	await d.tap_id("clock.close")
-	await d.wait_frames(3)
+	# A node under a control fails: the phone covers the right part of the
+	# world. Turn the view to the left of the phở shop, so that the shop is at the right.
+	var pho: Vector3 = d.main().hem.focus_points["pho"]
+	var eye: Vector3 = d.state().eye
+	await d.look_at_point(eye + (pho - eye).rotated(Vector3.UP, deg_to_rad(28.0)), 3.0)
+	await d.open_app("clock")
+	var phone_rect: Rect2 = d.state().phone_rect
+	var at := d.locate("spot.pho")
+	if d.expect(phone_rect.has_point(at.get("point", Vector2.ZERO)), "the phở shop is under the phone: %s" % [at]):
+		error = await d.try_tap_id("spot.pho")
+		d.expect(error.contains("covered"), "a tap on a covered node fails with a clear message: \"%s\"" % error)
+		d.step("covered message: " + error)
+	d.expect(d.state().phone_up and d.state().app == "clock", "the failed tap did not send a tap")
+	await d.lower_phone()
 	# A hidden cart cannot be tapped at 06:00.
 	error = await d.try_tap_id("spot.go")
 	d.expect(error.contains("no visible node"), "a hidden cart cannot be tapped: \"%s\"" % error)
 
 	# tap() with a raw screen position presses the button there.
-	var where := d.locate("topbar.notebook")
-	d.expect(where.error == "", "locate(topbar.notebook) works")
+	var where := d.locate("phone.button")
+	d.expect(where.error == "", "locate(phone.button) works")
 	await d.tap(d.to_screen(where.point))
 	await d.wait_frames(3)
-	d.expect(d.state().mode == "notebook", "tap() on the notebook button opens the notebook")
-	await d.tap_id("notebook.close")
-	await d.wait_frames(3)
+	d.expect(d.state().phone_up, "tap() on the phone button raises the phone")
+	await d.lower_phone()
 
 	# hold_stick() walks the player, drag() turns the view, look_at_id() finds a node.
 	var p0: Vector3 = d.state().player
 	await d.hold_stick(Vector2(0, -1), 1.5)
 	await d.wait_idle()
 	var walked: float = Vector2(d.state().player.x - p0.x, d.state().player.z - p0.z).length()
-	d.expect(walked > 1.5 and walked < 2.7, "hold_stick() for 1.5 s walks about 2.1 m: %.2f m" % walked)
+	# The release comes in the frame after the time, so a slow frame adds some walk.
+	d.expect(walked > 1.5 and walked < 3.2, "hold_stick() for 1.5 s walks about 2.1 m: %.2f m" % walked)
 	var yaw0: float = d.state().yaw
 	var start := d.to_screen(await d._free_point("look"))
 	await d.drag(start, start + Vector2(-100, 0), 0.3)
@@ -79,11 +84,11 @@ func run(d: PlaytestDriver) -> void:
 
 	# state() and ui_report() read the game.
 	var s := d.state()
-	for key: String in ["time", "day", "cards", "mode", "player", "line", "choices"]:
+	for key: String in ["time", "day", "cards", "player", "talk_state", "subtitle", "phone_up"]:
 		d.expect(s.has(key), "state() has \"%s\"" % key)
 	var report := d.ui_report()
-	var clock_found := false
+	var button_found := false
 	for item: Dictionary in report:
-		if item.test_id == "topbar.clock":
-			clock_found = item.rect.size.y >= UiTheme.BUTTON_MIN_HEIGHT
-	d.expect(clock_found, "ui_report() has the clock button with its rectangle")
+		if item.test_id == "phone.button":
+			button_found = item.rect.size.y >= UiTheme.BUTTON_MIN_HEIGHT
+	d.expect(button_found, "ui_report() has the phone button with its rectangle")

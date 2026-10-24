@@ -4,15 +4,14 @@ extends RefCounted
 
 
 ## Checks the screen and saves a screenshot. Records a failure for each problem:
-## a control that is not fully on the screen, a control on the top bar or on
-## the center dot, a label that hides lines or cuts its text, button text out
-## of its button, and a button lower than 88 px.
+## a control that is not fully on the screen, a control on the center dot, a
+## subtitle under the phone or in the joystick zone, a label that hides lines
+## or cuts its text, button text out of its button, and a button lower than 88 px.
 static func check(d: PlaytestDriver, shot: String) -> void:
 	await d.wait_idle()
 	await d.wait_frames(3)
 	var s := d.state()
 	var view := Rect2(Vector2.ZERO, s.view_size)
-	var bar: Rect2 = s.top_bar_rect
 	var dot: Vector2 = view.get_center()
 	var report := d.ui_report()
 	var problems: Array[String] = []
@@ -25,12 +24,16 @@ static func check(d: PlaytestDriver, shot: String) -> void:
 		if item.has("scroll_rect") and (rect.position.x < area.position.x - 0.5 or rect.end.x > area.end.x + 0.5):
 			problems.append("%s is wider than its scroll area" % name)
 		var visible_rect: Rect2 = rect.intersection(area) if item.has("scroll_rect") else rect
-		if not item.path.contains("/TopBar") and visible_rect.size.y > 0.5 and visible_rect.intersects(bar):
-			problems.append("%s covers the top bar" % name)
-		# In the hẻm, nothing covers the center dot. A sheet covers all of the world.
-		if s.mode == "hem" and not item.path.contains("CenterDot") and not item.path.contains("Joystick") \
-				and visible_rect.grow(-0.5).has_point(dot):
+		# Nothing covers the center dot (plan 0003, R16).
+		if not item.path.contains("CenterDot") and not item.path.contains("Joystick") \
+				and visible_rect.size.x > 1.0 and visible_rect.size.y > 1.0 and visible_rect.grow(-0.5).has_point(dot):
 			problems.append("%s covers the center dot" % name)
+		# The subtitles are clear of the phone and of the joystick zone (R13).
+		if item.path.ends_with("/Subtitles"):
+			if s.phone_up and rect.intersects(s.phone_rect):
+				problems.append("the subtitles are under the phone")
+			if rect.intersects(s.stick_zone):
+				problems.append("the subtitles are in the joystick zone")
 		if item.hidden_lines:
 			problems.append("%s hides lines (%s of %s show)" % [name, item.get("visible_lines"), item.get("lines")])
 		if item.get("outside_button", false):
@@ -50,12 +53,9 @@ static func inside(outer: Rect2, inner: Rect2) -> bool:
 			and inner.end.x <= outer.end.x + 0.5 and inner.end.y <= outer.end.y + 0.5
 
 
-## Starts a drag on each visible button in the hẻm. The drag must not start
-## the joystick or turn the view: the button takes the touch.
+## Starts a drag on each visible button. The drag must not start the
+## joystick or turn the view: the button takes the touch.
 static func check_buttons_take_touches(d: PlaytestDriver, shot: String) -> void:
-	var s := d.state()
-	if s.mode != "hem":
-		return
 	for item: Dictionary in d.ui_report():
 		if not item.button or item.test_id == "":
 			continue
@@ -68,6 +68,6 @@ static func check_buttons_take_touches(d: PlaytestDriver, shot: String) -> void:
 		var after := d.state()
 		d.expect(not after.joystick_visible and absf(wrapf(float(after.yaw) - yaw, -180.0, 180.0)) < 0.5,
 				"%s: a drag that starts on the button %s starts the joystick or turns the view" % [shot, item.test_id])
-		if after.mode != "hem":
-			d.fail("%s: a drag on %s opened %s" % [shot, item.test_id, after.mode])
+		if after.app != d.state().app:
+			d.fail("%s: a drag on %s opened %s" % [shot, item.test_id, after.app])
 			return

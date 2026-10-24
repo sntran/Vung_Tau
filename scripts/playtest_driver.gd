@@ -277,11 +277,30 @@ func look_at_point(point: Vector3, tolerance := 2.0, timeout_s := 30.0) -> bool:
 		# look(-relative.x * k, -relative.y * k * invert): the drag that gives the error.
 		var move := Vector2(-error_yaw / per_pixel, -error_pitch / per_pixel * invert)
 		var view := viewport().get_visible_rect().size
+		# The drag must end on the world, not on the phone or a button: at a
+		# low frame rate, the drag has only its first and last points, and a
+		# control under the last point takes the touch.
+		var m: Node = main()
+		var blocked: Array[Rect2] = [m.phone.button.get_global_rect().grow(10.0)]
+		if m.phone.up:
+			blocked.append(m.phone.device.get_global_rect().grow(10.0))
+		if m.action_button.visible:
+			blocked.append(m.action_button.get_global_rect().grow(10.0))
+		var free_end := func(end: Vector2) -> Vector2:
+			end = end.clamp(Vector2(5, 5), view - Vector2(5, 5))
+			for rect: Rect2 in blocked:
+				if rect.has_point(end):
+					# Out of the control on the shorter way: up, or to the left.
+					if end.y - rect.position.y < end.x - rect.position.x:
+						end.y = rect.position.y - 1.0
+					else:
+						end.x = rect.position.x - 1.0
+			return end
 		# Start at the free point with the most room for the drag.
 		var from := Vector2.ZERO
 		var best_room := -1.0
 		for candidate: Vector2 in await _free_points("look"):
-			var drag_end := (candidate + move).clamp(Vector2(5, 5), view - Vector2(5, 5))
+			var drag_end: Vector2 = free_end.call(candidate + move)
 			var room := (drag_end - candidate).length()
 			if room > best_room:
 				best_room = room
@@ -289,7 +308,7 @@ func look_at_point(point: Vector3, tolerance := 2.0, timeout_s := 30.0) -> bool:
 		if best_room < 0.0:
 			fail("no free point in the look zone")
 			return false
-		move = (from + move).clamp(Vector2(5, 5), view - Vector2(5, 5)) - from
+		move = free_end.call(from + move) - from
 		# A drag needs more than 12 px to turn the view. The turn is the
 		# distance from the press to the release, so a short turn goes out
 		# 16 px first and then back to the end point.
@@ -472,11 +491,17 @@ func _tap_point(test_id: String) -> Dictionary:
 	if where.error != "":
 		return where
 	var cover: String = await _check_cover(where.node, where.point, test_id)
+	# The check waits some frames. At a low frame rate, the UI can change in that
+	# time (for example the phrasebook after a new line).
+	if not is_instance_valid(where.node):
+		return {"error": "%s is gone" % test_id, "point": Vector2.ZERO}
 	if cover != "" and where.node is Node3D:
 		# A player taps a part of the object that they can see. Try the center
 		# dot and the corners of the shape.
 		for point: Vector2 in _other_points(where.node):
 			var other: String = await _check_cover(where.node, point, test_id)
+			if not is_instance_valid(where.node):
+				return {"error": "%s is gone" % test_id, "point": Vector2.ZERO}
 			if other == "":
 				where.point = point
 				cover = ""
@@ -698,13 +723,129 @@ func world_to_view(pos: Vector3) -> Vector2:
 	return viewport().get_camera_3d().unproject_position(pos)
 
 
-## Answers the intro and the greeting of Bà Tư with taps (the path in English).
+## Waits at the start of a scenario. The intro of plan 0001 is now the first
+## message of cô Nga (plan 0003): it needs no answer.
 func skip_intro() -> void:
 	await wait_idle()
-	await tap_id("choice.step_outside")
-	await tap_id("choice.good_morning")
-	await tap_id("choice.okay")
-	await wait_idle()
+
+
+# --- The phone (plan 0003) -----------------------------------------------
+
+## Raises the phone with a tap on the phone button.
+func raise_phone() -> bool:
+	if main().phone.up:
+		return true
+	await tap_id("phone.button")
+	return expect(main().phone.up, "the phone is up")
+
+
+## Lowers the phone with a tap on the phone button.
+func lower_phone() -> bool:
+	if not main().phone.up:
+		return true
+	await tap_id("phone.button")
+	return expect(not main().phone.up, "the phone is down")
+
+
+## Raises the phone and opens the app ("listen", "lens", "messages",
+## "notebook", "clock", or "settings") from the home screen.
+func open_app(app: String) -> bool:
+	if not await raise_phone():
+		return false
+	var phone: Phone = main().phone
+	if phone.app == app:
+		return true
+	if phone.app != "":
+		await tap_id("phone.home")
+	await tap_id("phone.app." + app)
+	await wait_frames(3)
+	return expect(phone.app == app, "the app %s is open, not \"%s\"" % [app, phone.app])
+
+
+## Scrolls the app so that the control with the test ID shows (as a player
+## scrolls with a finger).
+func show_in_phone(test_id: String) -> void:
+	var control := find(test_id) as Control
+	if control == null:
+		return
+	var scroll := _scroll_parent(control)
+	if scroll:
+		scroll.ensure_control_visible(control)
+		await wait_frames(3)
+
+
+## Taps a control of the phone with the test ID. The phone must be up.
+func tap_phone_id(test_id: String) -> bool:
+	if not main().phone.up:
+		fail("tap_phone_id(%s): the phone is down" % test_id)
+		return false
+	await show_in_phone(test_id)
+	var ok := await tap_id(test_id)
+	await wait_frames(3)
+	return ok
+
+
+## The visible subtitle: {speaker, lines, line_id, caption}, or an empty dictionary.
+func subtitle() -> Dictionary:
+	var subtitles: Subtitles = main().subtitles
+	return subtitles.current.duplicate() if subtitles.visible else {}
+
+
+## The entries of the Listen app: [{speaker, vi, en}] (the speaker as the app shows it).
+func transcript() -> Array:
+	return main().transcript_view()
+
+
+## True while the person speaks a line (the audio plays at the head).
+func audio_playing(npc_id: String) -> bool:
+	var m: Node = main()
+	return m.is_speaking(npc_id) and m.hem.npcs[npc_id].voice.playing
+
+
+## Waits until the person speaks a line. Returns the line ID, or "" at the timeout.
+func wait_line(npc_id: String, timeout_s := 15.0) -> String:
+	var m: Node = main()
+	if await wait_until(func() -> bool: return m.is_speaking(npc_id), timeout_s, "%s speaks" % npc_id):
+		return m.speech[npc_id].line
+	return ""
+
+
+## Waits until the talk waits for an answer (the phrasebook shows the replies).
+func wait_answer(timeout_s := 20.0) -> bool:
+	var m: Node = main()
+	return await wait_until(func() -> bool: return not m.talk.is_empty() and m.talk.state == "answer",
+			timeout_s, "the person waits for an answer")
+
+
+## Turns to the person, taps the person, and waits for the first line.
+## Returns the line ID, or "".
+func talk_to(npc_id: String) -> String:
+	await bring_into_view("npc." + npc_id)
+	if not await tap_id("npc." + npc_id):
+		return ""
+	return await wait_line(npc_id, 30.0)
+
+
+## Answers with a reply of the phrasebook: "mode" is "play", "say", or
+## "english". For "say", it also taps "I said it". The reply "say_again" is
+## the "say again" phrase.
+func answer(reply_id: String, mode: String) -> bool:
+	if reply_id != "say_again" and not await wait_answer():
+		return false
+	if not await open_app("listen"):
+		return false
+	if not await tap_phone_id("reply.%s.%s" % [reply_id, mode]):
+		return false
+	if mode == "say":
+		return await tap_phone_id("said.done")
+	return true
+
+
+## Waits until no person speaks and the talk does not wait for a step.
+func wait_quiet(timeout_s := 20.0) -> bool:
+	var m: Node = main()
+	return await wait_until(func() -> bool: return m.speech.is_empty() and m._steps.is_empty(), timeout_s,
+			"the people are quiet")
 
 
 ## Returns the collision objects that the player capsule goes into by more
@@ -759,24 +900,42 @@ func state() -> Dictionary:
 	var player: Node3D = m.player
 	var pos := player.global_position
 	var hem: Node = m.hem
-	var bubble := false
-	if hem.helper:
-		bubble = hem.helper.is_bubble_visible()
+	var phone: Phone = m.phone
+	var talk: Dictionary = m.talk
+	var speaking := {}
+	for npc_id: String in m.speech:
+		speaking[npc_id] = m.speech[npc_id].line
 	return {
 		"time": GameState.minutes,
 		"time_text": GameClock.format_time(GameState.minutes),
 		"day": GameState.day,
 		"cards": GameState.cards.duplicate(),
-		"mode": m.mode,
 		"player": pos,
 		"walking": player.walking,
-		"line": m.line_id if m.mode == "hem" else "",
-		"choices": visible_choice_ids(),
-		"near_spot": m.near_spot,
+		"talk_npc": talk.get("npc", ""),
+		"talk_state": talk.get("state", ""),
+		"talk_line": talk.get("line", ""),
+		"speaking": speaking,
+		"subtitle": subtitle(),
+		"listen_on": m.listen_on,
+		"transcript_size": m.transcript.size(),
+		"phone_up": phone.up,
+		"app": phone.app,
+		"phone_rect": phone.device.get_global_rect() if phone.up else Rect2(),
+		"phone_button_rect": phone.button.get_global_rect(),
+		"phone_dot": phone.has_dot(),
+		"notification": phone.last_notification,
+		"banner_visible": phone.banner_visible(),
+		"messages": GameState.messages.map(func(message: Dictionary) -> String: return message.id),
+		"unread": GameState.unread,
+		"phrases": GameState.phrases.duplicate(true),
+		"met": GameState.met.duplicate(),
+		"subtitle_rect": m.subtitles.get_global_rect() if m.subtitles.visible else Rect2(),
+		"stick_zone": m.stick_zone(),
 		"walked_total_m": GameState.walked_total_m,
 		"clack_count": hem.clack_count,
 		"clack_time": hem.clack_time,
-		"bubble_visible": bubble,
+		"tv_on": hem.tv.playing,
 		"lights_on": hem.lights_on().size(),
 		"lights_in_view": m.lights_in_view(),
 		"view_settled": _view_settled(m),
@@ -793,9 +952,6 @@ func state() -> Dictionary:
 		"joystick_visible": m.joystick.visible,
 		"settings": GameState.settings.duplicate(),
 		"fov": player.camera.fov,
-		"top_bar_rect": m.top_bar.get_global_rect(),
-		"panel_rect": m.talk_panel.get_global_rect(),
-		"toast_visible": m.toast.visible,
 		"sound": GameState.sound,
 		"intro_done": bool(GameState.flag("intro_done")),
 		"view_size": viewport().get_visible_rect().size,
@@ -824,21 +980,17 @@ func _shutters(hem: Node) -> Dictionary:
 	return result
 
 
-## Returns the test IDs of the visible choices of the active UI: the talk
-## panel in the hẻm, or the clock sheet. The notebook has no choices.
+## Returns the test IDs of the visible buttons of the open phone app.
 func visible_choice_ids() -> Array[String]:
 	var result: Array[String] = []
-	var m: Node = main()
-	var root: Control = m.talk_panel if m.mode == "hem" else m.clock_sheet
-	if m.mode == "notebook":
+	var phone: Phone = main().phone
+	if not phone.up:
 		return result
 	var controls: Array[Control] = []
-	_collect_controls(root, controls)
+	_collect_controls(phone.device, controls)
 	for control in controls:
 		if control is Button and control.has_meta("test_id"):
-			var id: String = control.get_meta("test_id")
-			if id.begins_with("choice.") or (id.begins_with("clock.") and id != "clock.close"):
-				result.append(id)
+			result.append(control.get_meta("test_id"))
 	return result
 
 

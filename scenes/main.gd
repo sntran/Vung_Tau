@@ -1,12 +1,11 @@
 extends Node3D
-## The main scene: the world in first person and the UI.
+## The main scene: the world in first person, the voices, and the phone.
 ##
-## It reads the touch, mouse, and key input, runs the dialogue from
-## data/dialogue/hem.json, and keeps the world and the UI the same as the
-## game state.
+## It reads the touch, mouse, and key input. People speak aloud with
+## subtitles (plan 0003). The player answers with the phrasebook of the
+## Listen app, in English, or with an action in the world. The phone is the
+## only flat thing on the screen.
 
-## The player is near a spot at this distance or less (plan 0001, R26).
-const NEAR_DISTANCE := 2.0
 ## A tap is shorter than this and moves less than TAP_SLOP (plan 0002, R8).
 const TAP_SECONDS := 0.25
 const TAP_SLOP := 12.0
@@ -17,80 +16,130 @@ const FOCUS_RANGE := 3.0
 const FOCUS_ANGLE := 18.0
 ## A drag of one base pixel turns the view this many degrees at look speed 1.
 const LOOK_DEG_PER_PIXEL := 0.2
-const PANEL_MAX_FRACTION := 0.42
-const PORTRAIT_PANEL_FRACTION := 0.4
 const ACTION_SIZE := Vector2(180, 88)
+## The player hears a voice at this distance or less (plan 0003, R11).
+const HEAR_DISTANCE := 12.0
+## A talk ends when the player walks farther than this from the person (R15).
+const TALK_DISTANCE := 6.0
+## A talk with no answer ends after this time.
+const TALK_IDLE_SECONDS := 45.0
+## The time between the lines of a talk.
+const LINE_GAP_SECONDS := 0.5
+## The player can sleep at the homestay: at this distance from the door or less.
+const HOME_DISTANCE := 5.0
+## The bottom left part of the screen, where the left thumb holds the joystick.
+## The subtitles stay out of it (R13).
+const STICK_ZONE := Vector2(340, 260)
+const SUBTITLE_MARGIN := 16.0
 
-## "hem" (the talk panel is the active UI), "notebook", "clock", or "settings".
-var mode := "hem"
-var line_id := ""
-var near_spot := ""
-var choices: Array = []
-var context: Dictionary = {}
-var pending: Dictionary = {}
 ## The test ID of the focus ("spot.pho", "npc.batu"), or "".
 var focus_id := ""
 var focus_verb := ""
 ## The sensor source of the gyroscope. The play-test system can replace it.
 var sensor: SensorSource = SensorSource.new()
+## The talk with a person, or empty: {npc, state, line, answer, last, idle, saying, next}.
+## "state" is "speaking", "answer" (the person waits for an answer), "phone"
+## (the phone speaks a phrase), "saying" (the player says a phrase), or "idle".
+var talk: Dictionary = {}
+## The lines that the person speaks now: npc ID -> {line, left, heard}.
+var speech: Dictionary = {}
+## The Listen app writes down what the player hears while it is on (R19).
+var listen_on := false
+## The lines that the Listen app wrote down: [{speaker, line, vi, en}].
+var transcript: Array[Dictionary] = []
+## The line ID of the last Lens card, so that a card learns its cards one time.
+var lens_line := ""
+## True when a card came that the Sổ tay app did not show yet (R18).
+var new_card := false
 
 @onready var hem: Hem = $World/Hem
 @onready var player: Player = $World/Player
 @onready var sun: DirectionalLight3D = $World/Sun
 @onready var environment: Environment = $World/Environment.environment
 @onready var ui_root: Control = $UI/Root
-@onready var top_bar: TopBar = $UI/Root/TopBar
-@onready var talk_panel: TalkPanel = $UI/Root/TalkPanel
-@onready var notebook_sheet: NotebookSheet = $UI/Root/NotebookSheet
-@onready var clock_sheet: ClockSheet = $UI/Root/ClockSheet
-@onready var settings_sheet: SettingsSheet = $UI/Root/SettingsSheet
-@onready var toast: Toast = $UI/Root/Toast
 @onready var joystick: Joystick = $UI/Root/Joystick
 @onready var center_dot: CenterDot = $UI/Root/CenterDot
 @onready var action_button: Button = $UI/Root/ActionButton
 @onready var ting_player: AudioStreamPlayer = $Sounds/Ting
-@onready var clack_player: AudioStreamPlayer = $Sounds/Clack
+var subtitles: Subtitles
+var phone: Phone
+## The neutral voice of the phone (the Play button of the Listen app, R21).
+var phone_voice: AudioStreamPlayer
+var clack_player: AudioStreamPlayer3D
 
 ## The touches and the mouse press: id -> {start, last, time, zone, active}.
 var _touches: Dictionary = {}
 var _stick_id: Variant = null
+## The pending walk target: {spot} or {npc}.
+var _pending: Dictionary = {}
+## The time to the next chat line of each person with "chat" or "calls".
+var _chat_left: Dictionary = {}
+## The steps that wait: [{seconds, action, args, talk}]. A step of the talk
+## ("talk" is true) stops when the talk ends.
+var _steps: Array[Dictionary] = []
+var _tv_caption_left := 0.0
 
 
 func _ready() -> void:
 	add_to_group("main")
 	ui_root.theme = UiTheme.make()
 	ting_player.stream = Tones.ting()
-	clack_player.stream = Tones.clack()
 	action_button.set_meta("test_id", "action")
 	action_button.theme_type_variation = "PrimaryButton"
 	action_button.focus_mode = Control.FOCUS_NONE
 	action_button.pressed.connect(_on_action)
-	top_bar.clock_pressed.connect(_on_clock_pressed)
-	top_bar.sound_pressed.connect(_on_sound_pressed)
-	top_bar.notebook_pressed.connect(_on_notebook_pressed)
-	top_bar.settings_pressed.connect(_on_settings_pressed)
-	top_bar.center_pressed.connect(center_view)
-	talk_panel.choice_pressed.connect(_on_choice)
-	notebook_sheet.closed.connect(_close_sheets)
-	clock_sheet.closed.connect(_close_sheets)
-	clock_sheet.choice_pressed.connect(_on_clock_choice)
-	settings_sheet.closed.connect(_close_sheets)
-	settings_sheet.changed.connect(_on_settings_changed)
+	subtitles = Subtitles.new()
+	subtitles.name = "Subtitles"
+	ui_root.add_child(subtitles)
+	subtitles.text_changed.connect(func() -> void: _layout_subtitles(ui_root.get_viewport_rect().size))
+	phone = Phone.new()
+	phone.name = "Phone"
+	ui_root.add_child(phone)
+	phone.apps.lens.source_camera = player.camera
+	phone.request.connect(_on_phone_request)
+	phone.raised.connect(_on_phone_raised)
+	phone.app_changed.connect(_on_app_changed)
+	phone_voice = AudioStreamPlayer.new()
+	phone_voice.name = "PhoneVoice"
+	$Sounds.add_child(phone_voice)
+	clack_player = AudioStreamPlayer3D.new()
+	clack_player.name = "Clack"
+	clack_player.stream = Tones.clack()
+	clack_player.max_distance = float(Content.sound("clack").get("range_m", 25.0))
+	clack_player.unit_size = 4.0
+	hem.helper.add_child(clack_player)
+	clack_player.position = Vector3(0.3, 1.0, 0.15)
 	GameState.time_changed.connect(_on_time_changed)
 	GameState.card_learned.connect(_on_card_learned)
+	GameState.message_received.connect(_on_message)
 	player.stepped.connect(GameState.add_walk)
 	player.arrived.connect(_on_arrived)
 	hem.clacked.connect(_on_clacked)
 	AudioServer.set_bus_mute(0, not GameState.sound)
+	for npc: Dictionary in Content.npc_list():
+		for field: String in ["chat", "calls"]:
+			if npc.has(field):
+				_chat_left[npc.id] = randf_range(2.0, 6.0)
 
 	player.place(GameState.player_pos, GameState.yaw, GameState.pitch)
 	_apply_settings()
 	_layout()
 	_apply_time(GameState.minutes)
 	if not GameState.flag("intro_done"):
-		show_line("intro.welcome")
-	else:
-		show_hem_panel()
+		GameState.set_flag("intro_done")
+		check_messages("start")
+	check_messages()
+	_update_dot()
+
+
+## Stops all voices. An Ogg stream that still plays when the game quits is
+## not freed, so the play-test system calls this some frames before it quits.
+func stop_sounds() -> void:
+	for npc: Npc in hem.npcs.values():
+		npc.voice.stop()
+		npc.voice.stream = null
+	phone_voice.stop()
+	phone_voice.stream = null
 
 
 func _process(delta: float) -> void:
@@ -98,7 +147,11 @@ func _process(delta: float) -> void:
 	_read_keys()
 	_read_gyro(delta)
 	_update_focus()
-	_refresh_hem_panel()
+	_update_speech(delta)
+	_update_talk(delta)
+	_update_chats(delta)
+	_update_sounds(delta)
+	_refresh_phone()
 	GameState.player_pos = player.global_position
 	GameState.yaw = player.target_yaw
 	GameState.pitch = player.target_pitch
@@ -111,15 +164,14 @@ func _read_keys() -> void:
 	if _stick_id != null:
 		return
 	var keys := Vector2.ZERO
-	if mode == "hem":
-		if Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP):
-			keys.y += 1.0
-		if Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN):
-			keys.y -= 1.0
-		if Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT):
-			keys.x += 1.0
-		if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT):
-			keys.x -= 1.0
+	if Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP):
+		keys.y += 1.0
+	if Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN):
+		keys.y -= 1.0
+	if Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT):
+		keys.x += 1.0
+	if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT):
+		keys.x -= 1.0
 	var was_moving := player.move_input.length() > 0.0
 	player.move_input = keys.limit_length(1.0)
 	if was_moving and keys == Vector2.ZERO:
@@ -168,9 +220,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		_move("mouse", motion.position, motion.relative)
 
 
+## A touch on the world. The phone takes its own touches first, so the
+## joystick and the look work while the phone is up (D7).
 func _press(id: Variant, pos: Vector2) -> void:
-	if mode != "hem":
-		return
 	var view := ui_root.get_viewport_rect().size
 	# The mouse always turns the view. A touch on the left half is the joystick.
 	var zone := "look"
@@ -229,7 +281,7 @@ func _release(id: Variant, pos: Vector2) -> void:
 func _stop_walk() -> void:
 	if player.walking:
 		player.stop()
-		pending = {}
+		_pending = {}
 		_save_position()
 
 
@@ -261,11 +313,14 @@ func pick(screen_pos: Vector2) -> Dictionary:
 	return {"kind": "floor", "position": hit.position, "node": collider}
 
 
-## A tap on the world: walk to a spot, a person, or a point on the ground (D6).
+## A tap on the world: an answer by action (R1), or a walk to a spot, a
+## person, or a point on the ground (plan 0002, D6).
 func tap_world(screen_pos: Vector2) -> void:
-	if mode != "hem" or not GameState.settings.tap_walk:
-		return
 	var hit := pick(screen_pos)
+	if hit.kind in ["spot", "npc"] and try_action("%s.%s" % [hit.kind, hit.id]):
+		return
+	if not GameState.settings.tap_walk:
+		return
 	match hit.kind:
 		"spot":
 			walk_to(hem.stand_points[hit.id], {"spot": hit.id})
@@ -276,27 +331,23 @@ func tap_world(screen_pos: Vector2) -> void:
 
 
 ## Walks to the point. When the point is more than 15 m away, the player
-## walks 15 m in its direction and does not open the talk panel (R10).
+## walks 15 m in its direction, and the talk does not start (R10).
 func walk_to(point: Vector3, target: Dictionary) -> void:
 	var from := player.global_position
 	var flat := Vector3(point.x - from.x, 0, point.z - from.z)
 	if flat.length() > TAP_WALK_RANGE:
 		point = from + flat.normalized() * TAP_WALK_RANGE
 		target = {}
-	pending = target
+	_pending = target
 	player.walk_to(point)
 
 
 func _on_arrived() -> void:
 	_save_position()
-	var target := pending
-	pending = {}
-	if target.has("spot"):
-		open_spot(target.spot)
-	elif target.has("npc"):
-		open_npc(target.npc)
-	else:
-		show_hem_panel()
+	var target := _pending
+	_pending = {}
+	if target.has("npc"):
+		start_talk(target.npc)
 
 
 # --- Focus and the action button --------------------------------------------
@@ -305,33 +356,44 @@ func _on_arrived() -> void:
 func _update_focus() -> void:
 	var best := ""
 	var best_angle := FOCUS_ANGLE
-	var verb := ""
-	if mode == "hem":
-		var eye := player.eye_position()
-		var forward := player.view_forward()
-		for spot: Dictionary in Content.spot_list():
-			if not hem.is_present(spot.id, GameState.minutes):
-				continue
-			var angle := _focus_angle(eye, forward, hem.focus_points[spot.id])
-			if angle < best_angle:
-				best_angle = angle
-				best = "spot." + spot.id
-				var open := GameClock.is_open(spot.hours, GameState.minutes)
-				verb = spot.get("verb_open", spot.verb) if open else spot.verb
-		for npc_id: String in hem.npcs:
-			var npc: Npc = hem.npcs[npc_id]
-			if not npc.visible:
-				continue
-			var angle := _focus_angle(eye, forward, npc.global_position + Vector3(0, npc.height - 0.2, 0))
-			if angle < best_angle:
-				best_angle = angle
-				best = "npc." + npc_id
-				verb = Content.npc(npc_id).verb
+	var eye := player.eye_position()
+	var forward := player.view_forward()
+	for spot: Dictionary in Content.spot_list():
+		if not hem.is_present(spot.id, GameState.minutes):
+			continue
+		var angle := _focus_angle(eye, forward, hem.focus_points[spot.id])
+		if angle < best_angle:
+			best_angle = angle
+			best = "spot." + spot.id
+	for npc_id: String in hem.npcs:
+		var npc: Npc = hem.npcs[npc_id]
+		if not npc.visible or not npc.touchable:
+			continue
+		var angle := _focus_angle(eye, forward, npc.global_position + Vector3(0, npc.height - 0.2, 0))
+		if angle < best_angle:
+			best_angle = angle
+			best = "npc." + npc_id
 	focus_id = best
-	focus_verb = verb
+	focus_verb = _verb_for(best)
 	center_dot.set_active(best != "")
-	action_button.visible = best != ""
-	action_button.text = verb
+	action_button.visible = focus_verb != ""
+	action_button.text = focus_verb
+
+
+## The text of the action button for the focus: an answer by action, "Talk"
+## for a person, or the verb of the spot ("Rest" at the homestay).
+func _verb_for(target: String) -> String:
+	if target == "":
+		return ""
+	var answer := _action_for(target)
+	if not answer.is_empty():
+		return answer.verb
+	var parts := target.split(".")
+	if parts[0] == "npc":
+		if not talk.is_empty() and talk.npc == parts[1] and talk.state != "idle":
+			return ""
+		return Content.npc(parts[1]).get("verb", "")
+	return Content.spot(parts[1]).get("verb", "")
 
 
 func _focus_angle(eye: Vector3, forward: Vector3, point: Vector3) -> float:
@@ -343,273 +405,538 @@ func _focus_angle(eye: Vector3, forward: Vector3, point: Vector3) -> float:
 
 
 func _on_action() -> void:
-	if focus_id == "" or mode != "hem":
+	if focus_id == "":
 		return
 	_stop_walk()
+	if try_action(focus_id):
+		return
 	var parts := focus_id.split(".")
-	if parts[0] == "spot":
-		open_spot(parts[1])
-	else:
-		open_npc(parts[1])
+	if parts[0] == "npc":
+		start_talk(parts[1])
+	elif parts[1] == "home":
+		phone.raise_phone()
+		phone.open_app("clock")
 
 
-# --- Dialogue ------------------------------------------------------------
+# --- Speech ----------------------------------------------------------------
 
-## Shows the line of the spot for the time, and learns the cards of the rule.
-func open_spot(spot_id: String) -> void:
-	var spot := Content.spot(spot_id)
-	var rule := Content.line_rule(spot, GameState.minutes)
-	_learn(rule.get("learn", []))
-	show_line(rule.line, {"spot": spot_id})
-
-
-## Shows the line of the person. The person turns to face the player (R14).
-func open_npc(npc_id: String) -> void:
-	var npc := Content.npc(npc_id)
-	var rule := Content.line_rule(npc, GameState.minutes)
-	if hem.npcs.has(npc_id):
-		hem.npcs[npc_id].face(player.global_position)
-	_learn(rule.get("learn", []))
-	show_line(rule.line, {"npc": npc_id})
-
-
-## Shows the panel for the place where the player stands: the near spot, or a tip.
-func show_hem_panel() -> void:
-	if GameState.is_late():
-		show_line("hem.late")
+## The person speaks the line: the audio plays at the head, and the subtitle
+## shows when the player hears it (R11, R12).
+func speak(npc_id: String, line_id: String) -> void:
+	var npc: Npc = hem.npcs.get(npc_id)
+	if npc == null:
 		return
-	var spot_id := find_near_spot()
-	if spot_id != "":
-		show_line("hem.near", {"spot": spot_id})
-		return
-	var tip := Content.hem_tip(GameState.minutes, GameState.cards)
-	show_line(tip.line)
+	var line := Content.line(line_id)
+	npc.voice.stop()
+	npc.voice.stream = Content.clip_stream(line_id)
+	if npc.voice.stream:
+		npc.voice.play()
+	var seconds := Content.clip_duration(line_id)
+	var heard := can_hear(npc)
+	speech[npc_id] = {"line": line_id, "left": seconds, "heard": heard}
+	if heard:
+		_on_heard(npc_id, line_id, line, seconds)
 
 
-## The hẻm panel (a near spot or a tip) follows the player during a walk with
-## the joystick or the keys. A dialogue line stays until the player answers it.
-func _refresh_hem_panel() -> void:
-	if mode != "hem" or player.walking:
-		return
-	if line_id != "hem.near" and not line_id.begins_with("hem.tip."):
-		return
-	var spot_id := find_near_spot()
-	if spot_id != near_spot:
-		show_hem_panel()
+## True when the player hears the person: the person is there, at 12 m or less.
+func can_hear(npc: Npc) -> bool:
+	return npc.visible and player.eye_position().distance_to(npc.head_position()) <= HEAR_DISTANCE
 
 
-## Returns the nearest spot that is there now, at 2 m or less, or "".
-func find_near_spot() -> String:
-	var best := ""
-	var best_distance := NEAR_DISTANCE
-	var pos := player.global_position
-	for spot: Dictionary in Content.spot_list():
-		if not hem.is_present(spot.id, GameState.minutes):
-			continue
-		var stand: Vector3 = hem.stand_points[spot.id]
-		var distance := Vector2(pos.x - stand.x, pos.z - stand.z).length()
-		if distance <= best_distance:
-			best = spot.id
-			best_distance = distance
-	return best
-
-
-## Shows a line in the talk panel. At 23:30 or later, the only line is "hem.late".
-func show_line(id: String, line_context: Dictionary = {}) -> void:
-	if GameState.is_late() and id != "hem.late":
-		id = "hem.late"
-		line_context = {}
-	var line := Content.line(id)
-	line_id = id
-	context = line_context
-	near_spot = line_context.get("spot", "") if id == "hem.near" else ""
-	choices = line.choices
-	var params := _params()
-	var view := {
-		"line_id": id,
-		"text": Content.format(line.text, params).strip_edges(),
-		"hint": Content.format(line.get("hint", ""), params),
-		"phrases": line.get("phrases", []),
-		"choices": [],
-	}
-	if line.has("speaker"):
-		var speaker := Content.speaker(line.speaker)
-		view.speaker = speaker.name
-		view.speaker_color = Color(speaker.color)
-	for choice: Dictionary in choices:
-		view.choices.append({
-			"id": choice.id,
-			"label": Content.format(choice.label, params),
-			"sub": Content.format(choice.get("sub", ""), params),
-			"style": choice.get("style", ""),
-		})
-	talk_panel.show_line(view)
-	_update_top_bar()
-
-
-## The values for the "{key}" fields in the dialogue text.
-func _params() -> Dictionary:
-	var params := {
-		"day": GameState.day,
-		"time": GameClock.format_time(GameState.minutes),
-	}
-	var spot_id: String = context.get("spot", "")
-	if spot_id != "":
-		var spot := Content.spot(spot_id)
-		var hours: Variant = spot.hours
-		var open := GameClock.is_open(hours, GameState.minutes)
-		params.name = spot.name
-		params.en = spot.en
-		params.hours = Content.hours_text(hours)
-		params.status = ""
-		if hours != null:
-			params.open = GameClock.format_time(int(hours.open))
-			params.close = GameClock.format_time(int(hours.close))
-			params.status = Content.format(Content.string("status_open" if open else "status_closed"),
-					{"hours": params.hours})
-		params.look = spot.get("look_label_open", spot.look_label) if open else spot.look_label
-	return params
-
-
-func _on_choice(index: int) -> void:
-	if index < 0 or index >= choices.size() or mode != "hem":
-		return
-	var choice: Dictionary = choices[index]
-	_stop_walk()
-	_learn(choice.get("learn", []))
-	if choice.has("flag"):
-		GameState.set_flag(choice.flag)
-	if choice.has("minutes"):
-		GameState.add_minutes(int(choice.minutes))
-	if choice.has("until"):
-		GameState.wait_until(int(choice.until))
-	if choice.get("sleep", false):
-		sleep_until_morning()
-		return
-	if choice.get("open", "") == "clock":
-		open_clock()
-		return
-	var next: String = choice.get("next", "@hem")
-	match next:
-		"@hem":
-			show_hem_panel()
-		"@spot":
-			open_spot(context.spot)
-		_:
-			show_line(next, context)
-
-
-func _learn(card_ids: Array) -> void:
-	for card_id: String in card_ids:
+func _on_heard(npc_id: String, line_id: String, line: Dictionary, seconds: float) -> void:
+	var speaker := Content.speaker(line.speaker)
+	subtitles.show_line(line_id, speaker.name, Color(speaker.color), line.vi, line.en,
+			GameState.settings.subtitles, seconds)
+	if listen_on:
+		transcript.append({"speaker": line.speaker, "line": line_id, "vi": line.vi, "en": line.en})
+	for card_id: String in line.get("learn", []):
 		GameState.learn(card_id)
+	check_messages("heard:" + line_id)
 
 
-## The next day: the player is at the homestay door and looks along the hẻm (R4).
-func sleep_until_morning() -> void:
-	_stop_walk()
-	GameState.sleep_until_morning()
-	player.place(GameState.player_pos, GameState.yaw, GameState.pitch)
-	center_view()
-	show_line("home.morning")
+func _update_speech(delta: float) -> void:
+	for npc_id: String in speech.keys():
+		var item: Dictionary = speech[npc_id]
+		item.left -= delta
+		var npc: Npc = hem.npcs[npc_id]
+		# The subtitle stops when the player walks out of hearing.
+		if item.heard and not can_hear(npc) and subtitles.current.get("line_id", "") == item.line:
+			subtitles.clear()
+			item.heard = false
+		if item.left <= 0.0:
+			npc.voice.stop()
+			speech.erase(npc_id)
+			_on_line_finished(npc_id, item.line)
 
 
-# --- Sheets and the top bar ------------------------------------------------
+## True while the person speaks (the play tests read this).
+func is_speaking(npc_id: String) -> bool:
+	return speech.has(npc_id)
 
-func _on_clock_pressed() -> void:
-	if mode == "clock":
-		_close_sheets()
+
+func _on_line_finished(npc_id: String, line_id: String) -> void:
+	var line := Content.line(line_id)
+	var in_talk: bool = not talk.is_empty() and talk.npc == npc_id and talk.state == "speaking" and talk.line == line_id
+	if line.has("then"):
+		var next_speaker: String = Content.line(line.then).speaker
+		_wait_then(LINE_GAP_SECONDS, "speak", {"npc": next_speaker, "line": line.then}, in_talk)
+	if not in_talk:
+		return
+	talk.last = line_id
+	talk.idle = 0.0
+	if line.has("then"):
+		talk.line = line.then
+	elif not line.get("replies", []).is_empty() or not line.get("actions", []).is_empty():
+		talk.state = "answer"
+		talk.answer = line_id
 	else:
-		open_clock()
+		talk.state = "idle"
 
 
-func open_clock() -> void:
-	_open_sheet("clock")
-	var view := ui_root.get_viewport_rect().size
-	clock_sheet.show_time(GameState.minutes, 2 if view.x > view.y else 1)
-	clock_sheet.visible = true
+# --- Talk ------------------------------------------------------------------
+
+## Starts a talk with the person: the person turns to the player and speaks
+## the line for the time.
+func start_talk(npc_id: String) -> void:
+	var npc_data := Content.npc(npc_id)
+	if npc_data.is_empty() or not npc_data.get("talk", true) or not hem.npcs.has(npc_id):
+		return
+	# A talk that waits for an answer goes on. After the end of a talk, a tap starts it again.
+	if not talk.is_empty() and talk.npc == npc_id and talk.state != "idle":
+		return
+	end_talk(false)
+	var rule := Content.rule_for(npc_data, "lines", GameState.minutes)
+	if rule.is_empty():
+		return
+	for card_id: String in rule.get("learn", []):
+		GameState.learn(card_id)
+	GameState.meet(npc_id)
+	hem.npcs[npc_id].face(player.global_position)
+	_turn_to(hem.npcs[npc_id].head_position())
+	talk = {"npc": npc_id, "state": "speaking", "line": rule.line, "answer": "", "last": rule.line,
+			"idle": 0.0, "saying": {}}
+	speak(npc_id, rule.line)
 
 
-func _on_clock_choice(choice: Dictionary) -> void:
-	_close_sheets()
+## Turns the view of the player to the point (the face of the person in a talk).
+func _turn_to(point: Vector3) -> void:
+	var to := point - player.eye_position()
+	var yaw := rad_to_deg(atan2(-to.x, -to.z)) - player.gyro_yaw
+	player.target_yaw += wrapf(yaw - player.target_yaw, -180.0, 180.0)
+	player.target_pitch = clampf(rad_to_deg(atan2(to.y, Vector2(to.x, to.z).length())) - player.gyro_pitch,
+			-Player.PITCH_LIMIT, Player.PITCH_LIMIT)
+
+
+## Ends the talk. When the player walks away before the talk ends, the person
+## can call after the player with a short line (R15).
+func end_talk(walked_away: bool) -> void:
+	if talk.is_empty():
+		return
+	var npc_id: String = talk.npc
+	var state: String = talk.state
+	talk = {}
+	_steps = _steps.filter(func(step: Dictionary) -> bool: return not step.talk)
+	if walked_away and state in ["speaking", "answer", "saying"]:
+		var call: String = Content.speaker(npc_id).get("call_after", "")
+		if call != "":
+			speak(npc_id, call)
+
+
+func _update_talk(delta: float) -> void:
+	var due: Array[Dictionary] = []
+	for step in _steps:
+		step.seconds -= delta
+		if step.seconds <= 0.0:
+			due.append(step)
+	for step in due:
+		_steps.erase(step)
+		_do_step(step.action, step.args)
+	if talk.is_empty():
+		return
+	var npc: Npc = hem.npcs[talk.npc]
+	var flat := npc.global_position - player.global_position
+	if Vector2(flat.x, flat.z).length() > TALK_DISTANCE or not npc.visible:
+		end_talk(true)
+		return
+	if talk.state in ["answer", "idle"]:
+		talk.idle += delta
+		if talk.idle > TALK_IDLE_SECONDS:
+			end_talk(false)
+
+
+func _wait_then(seconds: float, action: String, args: Dictionary, in_talk := true) -> void:
+	_steps.append({"seconds": seconds, "action": action, "args": args, "talk": in_talk})
+
+
+func _do_step(action: String, args: Dictionary) -> void:
+	match action:
+		"speak":
+			speak(args.npc, args.line)
+		"answer":
+			_answer(args.line)
+
+
+## The person answers with the line, in the talk.
+func _answer(line_id: String) -> void:
+	if talk.is_empty():
+		return
+	talk.state = "speaking"
+	talk.line = line_id
+	talk.saying = {}
+	speak(talk.npc, line_id)
+
+
+## Returns the reply of the answer line with the ID, or the "say again" phrase.
+func _reply(reply_id: String) -> Dictionary:
+	if talk.is_empty():
+		return {}
+	if reply_id == "say_again":
+		var phrase := Content.say_again(talk.npc)
+		return {"id": "say_again", "vi": phrase.vi, "en": phrase.en, "next": talk.last}
+	if talk.state != "answer":
+		return {}
+	for reply: Dictionary in Content.line(talk.answer).get("replies", []):
+		if reply.id == reply_id:
+			return reply
+	return {}
+
+
+## The player answers with a phrase (R21). "mode" is "play" (the phone
+## speaks it), "said" (the player says it), or "english".
+func reply(reply_id: String, mode: String) -> bool:
+	var entry := _reply(reply_id)
+	if entry.is_empty():
+		return false
+	for card_id: String in entry.get("learn", []):
+		GameState.learn(card_id)
+	talk.idle = 0.0
+	var next: String = entry.get("next", "")
+	match mode:
+		"english":
+			if next != "":
+				_answer(next)
+			else:
+				talk.state = "idle"
+		"play":
+			talk.state = "phone"
+			var clip_id := VoiceClips.say_again_id(talk.npc) if reply_id == "say_again" \
+					else VoiceClips.reply_id(talk.answer, reply_id)
+			phone_voice.stream = Content.clip_stream(clip_id)
+			if phone_voice.stream:
+				phone_voice.play()
+			if next != "":
+				_wait_then(Content.clip_duration(clip_id) + LINE_GAP_SECONDS, "answer", {"line": next})
+			else:
+				talk.state = "idle"
+		"said":
+			talk.state = "saying"
+			talk.saying = entry
+	return true
+
+
+## The player said the phrase of "I'll say it". The person answers in a warmer way (R21).
+func said_done() -> void:
+	if talk.is_empty() or talk.state != "saying":
+		return
+	var entry: Dictionary = talk.saying
+	var next: String = entry.get("next_said", entry.get("next", ""))
+	if next == "":
+		talk.state = "idle"
+		talk.saying = {}
+		return
+	_wait_then(LINE_GAP_SECONDS, "answer", {"line": next})
+	talk.saying = {}
+	talk.state = "phone"
+
+
+## Returns the answer by action of the talk for the target, or empty.
+func _action_for(target: String) -> Dictionary:
+	if talk.is_empty() or talk.state != "answer":
+		return {}
+	for entry: Dictionary in Content.line(talk.answer).get("actions", []):
+		if entry.target == target:
+			return entry
+	return {}
+
+
+## An answer by action in the world (D8): the target is the test ID of the
+## spot or the person. Returns true when the talk had this action.
+func try_action(target: String) -> bool:
+	var entry := _action_for(target)
+	if entry.is_empty():
+		return false
 	_stop_walk()
-	if choice.get("sleep", false):
-		sleep_until_morning()
+	for card_id: String in entry.get("learn", []):
+		GameState.learn(card_id)
+	_answer(entry.next)
+	return true
+
+
+## The people who chat with other people (the neighbors at the cà phê cóc)
+## and the people who call out (Cô Út) speak each "every_s" seconds.
+func _update_chats(delta: float) -> void:
+	for npc_id: String in _chat_left:
+		var npc: Npc = hem.npcs.get(npc_id)
+		if npc == null or not npc.visible:
+			continue
+		if not talk.is_empty() and talk.npc == npc_id:
+			continue
+		var data := Content.npc(npc_id)
+		var chat: Dictionary = data.get("chat", data.get("calls", {}))
+		if _chat_busy(chat.line):
+			continue
+		_chat_left[npc_id] -= delta
+		if _chat_left[npc_id] <= 0.0:
+			_chat_left[npc_id] = float(chat.every_s)
+			speak(npc_id, chat.line)
+
+
+## True while a line of the chat that starts with the line plays or waits.
+func _chat_busy(first_line: String) -> bool:
+	var chain := {}
+	var line_id := first_line
+	while line_id != "" and not chain.has(line_id):
+		chain[line_id] = true
+		line_id = Content.line(line_id).get("then", "")
+	for npc_id: String in speech:
+		if chain.has(speech[npc_id].line):
+			return true
+	for step in _steps:
+		if chain.has(step.args.get("line", "")):
+			return true
+	return false
+
+
+# --- Sounds ----------------------------------------------------------------
+
+func _on_clacked(position_3d: Vector3) -> void:
+	clack_player.play()
+	var sound := Content.sound("clack")
+	if player.eye_position().distance_to(position_3d) <= float(sound.get("range_m", 25.0)):
+		subtitles.show_caption(sound.get("caption", ""))
+
+
+## The caption of the TV upstairs shows from time to time while the player hears it (R14).
+func _update_sounds(delta: float) -> void:
+	_tv_caption_left -= delta
+	if not hem.tv.playing or _tv_caption_left > 0.0:
 		return
-	var target := GameClock.wait_target(choice, GameState.minutes)
-	if target >= 0:
-		GameState.set_minutes(target)
-	show_hem_panel()
+	var sound := Content.sound("tv")
+	if player.eye_position().distance_to(hem.tv.global_position) <= float(sound.get("range_m", 8.0)):
+		subtitles.show_caption(sound.get("caption", ""))
+		_tv_caption_left = 6.0
 
 
-func _on_notebook_pressed() -> void:
-	if mode == "notebook":
-		_close_sheets()
-		return
-	_open_sheet("notebook")
-	var view := ui_root.get_viewport_rect().size
-	notebook_sheet.show_cards(GameState.cards, 1 if view.x < 1000.0 else 2)
-	notebook_sheet.visible = true
+# --- Messages and notifications ----------------------------------------------
+
+## Sends the messages of cô Nga that are due. "event" is "", "start",
+## "wake", "heard:LINE", or "lens:LINE" (R24).
+func check_messages(event := "") -> void:
+	for message: Dictionary in Content.message_list():
+		var repeat: bool = message.get("repeat", false)
+		if GameState.has_message(message.id, repeat):
+			continue
+		if message.has("day") and GameState.day != int(message.day):
+			continue
+		if message.has("unless_card") and GameState.knows(message.unless_card):
+			continue
+		if message.has("after"):
+			if message.after != event:
+				continue
+		elif message.has("at"):
+			if GameState.minutes < int(message.at) or GameState.minutes >= int(message.get("before", 1440)):
+				continue
+		var text := Content.format(message.text, {"day": GameState.day,
+				"time": GameClock.format_time(GameState.minutes)})
+		GameState.add_message(message.id, text)
 
 
-func _on_settings_pressed() -> void:
-	if mode == "settings":
-		_close_sheets()
-		return
-	_open_sheet("settings")
-	var view := ui_root.get_viewport_rect().size
-	settings_sheet.show_settings(GameState.settings, 2 if view.x > view.y else 1)
-	settings_sheet.visible = true
-
-
-func _on_settings_changed(settings: Dictionary) -> void:
-	GameState.set_settings(settings)
-	_apply_settings()
-
-
-func _apply_settings() -> void:
-	player.camera.fov = float(GameState.settings.fov)
-	top_bar.show_center(bool(GameState.settings.gyro) and sensor.has_data())
-
-
-func _open_sheet(sheet: String) -> void:
-	_close_sheets()
-	_stop_walk()
-	_cancel_touches()
-	mode = sheet
-
-
-func _close_sheets() -> void:
-	mode = "hem"
-	notebook_sheet.visible = false
-	clock_sheet.visible = false
-	settings_sheet.visible = false
-
-
-## Ends all touches: a sheet covers the world, so the joystick and the look stop.
-func _cancel_touches() -> void:
-	_touches.clear()
-	_stick_id = null
-	joystick.hide_stick()
-	player.move_input = Vector2.ZERO
-
-
-func _on_sound_pressed() -> void:
-	GameState.set_sound(not GameState.sound)
-	AudioServer.set_bus_mute(0, not GameState.sound)
-	if GameState.sound:
-		ting_player.play()
-	_update_top_bar()
+func _on_message(message: Dictionary) -> void:
+	var sender := Content.sender()
+	phone.notify(Content.format(Content.ui_text("notify_message"), {"name": sender.get("name", ""),
+			"text": message.text}))
+	ting_player.play()
+	if phone.up and phone.app == "messages":
+		GameState.read_messages()
+	_update_dot()
 
 
 func _on_card_learned(card_id: String) -> void:
 	var card := Content.card(card_id)
-	toast.show_text("%s [b]%s[/b]" % [Content.ui_text("toast_new_card"), card.title])
+	phone.notify(Content.format(Content.ui_text("notify_card"), {"title": card.title}))
 	ting_player.play()
-	_update_top_bar()
+	new_card = not (phone.up and phone.app == "notebook")
+	_update_dot()
 
 
-func _on_clacked(_position: Vector3) -> void:
-	clack_player.play()
+func _update_dot() -> void:
+	phone.set_dot(GameState.unread > 0 or new_card)
+
+
+# --- The phone ---------------------------------------------------------------
+
+func _on_phone_raised(_up: bool) -> void:
+	_on_app_changed(phone.app)
+
+
+func _on_app_changed(app: String) -> void:
+	if not phone.up:
+		return
+	if app == "messages":
+		GameState.read_messages()
+	elif app == "notebook":
+		new_card = false
+	_update_dot()
+
+
+func _on_phone_request(action: String, args: Dictionary) -> void:
+	match action:
+		"listen":
+			listen_on = bool(args.on)
+		"reply":
+			reply(args.id, args.mode)
+		"said_done":
+			said_done()
+		"save_phrase":
+			var index := int(args.index)
+			if index >= 0 and index < transcript.size():
+				var entry: Dictionary = transcript[index]
+				if GameState.save_phrase(entry.vi, entry.en):
+					phone.notify(Content.format(Content.ui_text("phrase_saved"), {"vi": entry.vi}))
+		"rest":
+			_rest(args.choice)
+		"settings":
+			GameState.set_settings(args.settings)
+			if bool(args.sound) != GameState.sound:
+				GameState.set_sound(bool(args.sound))
+				AudioServer.set_bus_mute(0, not GameState.sound)
+			_apply_settings()
+		"center":
+			center_view()
+
+
+## A choice of the Clock app: wait, or sleep until morning (R27).
+func _rest(choice: Dictionary) -> void:
+	_stop_walk()
+	end_talk(false)
+	if choice.get("sleep", false):
+		if is_at_home():
+			sleep_until_morning()
+		return
+	var target := GameClock.wait_target(choice, GameState.minutes)
+	if target >= 0:
+		GameState.set_minutes(target)
+
+
+func is_at_home() -> bool:
+	var flat := player.global_position - GameState.HOME_DOOR
+	return Vector2(flat.x, flat.z).length() <= HOME_DISTANCE
+
+
+## The next day: the player is at the homestay door and looks along the hẻm (plan 0001, R4).
+func sleep_until_morning() -> void:
+	_stop_walk()
+	end_talk(false)
+	GameState.sleep_until_morning()
+	player.place(GameState.player_pos, GameState.yaw, GameState.pitch)
+	center_view()
+	check_messages("wake")
+
+
+## The data of the open app.
+func phone_state() -> Dictionary:
+	match phone.app:
+		"listen":
+			return {"listen_on": listen_on, "transcript": transcript_view(), "talk": phrasebook()}
+		"lens":
+			return {"lens": lens_card()}
+		"messages":
+			return {"messages": GameState.messages, "sender": Content.sender()}
+		"notebook":
+			return {"cards": GameState.cards, "phrases": GameState.phrases}
+		"clock":
+			return {"minutes": GameState.minutes, "day": GameState.day, "at_home": is_at_home()}
+		"settings":
+			return {"settings": GameState.settings, "sound": GameState.sound}
+	return {}
+
+
+func _refresh_phone() -> void:
+	phone.set_time(GameClock.format_time(GameState.minutes))
+	if phone.up:
+		phone.refresh(phone_state())
+	if phone.up and phone.app == "lens":
+		_learn_from_lens()
+
+
+## The transcript as the Listen app shows it: the speaker name only after the
+## player has met that person (R19).
+func transcript_view() -> Array:
+	var result := []
+	for entry in transcript:
+		var speaker_name: String = Content.speaker(entry.speaker).name if GameState.has_met(entry.speaker) \
+				else Content.string("someone")
+		result.append({"speaker": speaker_name, "vi": entry.vi, "en": entry.en})
+	return result
+
+
+## The phrasebook of the talk (R20, R21): the replies of the line that waits
+## for an answer, and always the "say again" phrase.
+func phrasebook() -> Dictionary:
+	if talk.is_empty():
+		return {}
+	var result := {"say_again": Content.say_again(talk.npc), "replies": []}
+	if talk.state == "saying":
+		result.saying = {"vi": talk.saying.vi, "en": talk.saying.en}
+	elif talk.state == "answer":
+		result.replies = Content.line(talk.answer).get("replies", [])
+	return result
+
+
+## The card of the Lens app for the focus (R23).
+func lens_card() -> Dictionary:
+	var parts := focus_id.split(".")
+	if parts.size() < 2:
+		return {}
+	if parts[0] == "npc":
+		var npc_id := parts[1]
+		var shown: String = Content.speaker(npc_id).name if GameState.has_met(npc_id) else Content.string("someone")
+		return {"kind": "person", "name": shown}
+	var spot := Content.spot(parts[1])
+	var rule := Content.rule_for(spot, "lens", GameState.minutes)
+	var params := _spot_params(spot)
+	return {"kind": "spot", "id": spot.id, "line": rule.get("line", ""), "name": spot.name, "en": spot.en,
+			"status": params.status, "text": Content.format(Content.line(rule.get("line", "")).get("text", ""), params)}
+
+
+func _learn_from_lens() -> void:
+	var card := lens_card()
+	var line_id: String = card.get("line", "")
+	if line_id == "" or line_id == lens_line:
+		return
+	lens_line = line_id
+	var rule := Content.rule_for(Content.spot(card.id), "lens", GameState.minutes)
+	for card_id: String in rule.get("learn", []):
+		GameState.learn(card_id)
+	check_messages("lens:" + line_id)
+
+
+## The values for the "{key}" fields of a spot text.
+func _spot_params(spot: Dictionary) -> Dictionary:
+	var hours: Variant = spot.hours
+	var open := GameClock.is_open(hours, GameState.minutes)
+	var params := {"name": spot.name, "en": spot.en, "status": "", "hours": Content.hours_text(hours)}
+	if hours != null:
+		params.open = GameClock.format_time(int(hours.open))
+		params.close = GameClock.format_time(int(hours.close))
+		params.status = Content.format(Content.string("status_open" if open else "status_closed"),
+				{"hours": params.hours})
+	return params
+
+
+func _apply_settings() -> void:
+	player.camera.fov = float(GameState.settings.fov)
+	subtitles.apply_settings(float(GameState.settings.subtitle_size), float(GameState.settings.subtitle_box))
 
 
 func _on_time_changed(minutes: int, _day: int) -> void:
@@ -620,18 +947,7 @@ func _on_time_changed(minutes: int, _day: int) -> void:
 		_stop_walk()
 		player.place(hem.stand_points[room], player.target_yaw, player.target_pitch)
 		_save_position()
-	if GameState.is_late() and line_id != "hem.late" and mode == "hem" and not player.walking:
-		show_hem_panel()
-
-
-func _update_top_bar() -> void:
-	var part := GameClock.part_of_day(GameState.minutes, Content.ui.parts_of_day)
-	var at_beach := player.global_position.x > hem.end_x
-	var place := Content.ui_text("beach_name" if at_beach else "place_name")
-	var sub := Content.format(Content.ui_text("beach_sub" if at_beach else "place_sub"),
-			{"day": GameState.day})
-	top_bar.show_state(GameClock.format_time(GameState.minutes), part.vi, place, sub, GameState.sound,
-			GameState.cards.size(), Content.card_list().size())
+	check_messages()
 
 
 # --- Time and light --------------------------------------------------------
@@ -652,56 +968,46 @@ func _apply_time(minutes: int) -> void:
 	sun.light_energy = DayLight.sun_energy(minutes)
 	# No sun shadows: see plan 0001, note N18.
 	sun.shadow_enabled = false
-	_update_top_bar()
 
 
 # --- Layout ----------------------------------------------------------------
 
-## The parts of the screen. Landscape: the talk panel is at the right side.
-## Portrait (the web build in a narrow window): the talk panel is at the bottom.
+## The parts of the screen: the phone at the right, the action button below
+## the center dot, and the subtitles at the bottom, out of the joystick zone
+## and the phone (R13, R16).
 func _layout() -> void:
 	var view := ui_root.get_viewport_rect().size
-	var safe_top := _safe_top_inset()
-	var bar_height := UiTheme.TOP_BAR_HEIGHT + safe_top
-	top_bar.position = Vector2.ZERO
-	top_bar.size = Vector2(view.x, bar_height)
-	var bar_margin: MarginContainer = top_bar.get_child(0)
-	if bar_margin.get_theme_constant("margin_top") != 12 + int(safe_top):
-		bar_margin.add_theme_constant_override("margin_top", 12 + int(safe_top))
-	var landscape := view.x > view.y
-	var panel_width := minf(view.x * PANEL_MAX_FRACTION, 600.0) if landscape else view.x
-	var max_height := (view.y - bar_height - 16.0) if landscape else view.y * PORTRAIT_PANEL_FRACTION
-	talk_panel.size = Vector2(panel_width, talk_panel.size.y)
-	var panel_height := clampf(talk_panel.needed_height(), 120.0, max_height)
-	talk_panel.size = Vector2(panel_width, panel_height)
-	talk_panel.position = Vector2(view.x - panel_width, view.y - panel_height)
 	var center := view / 2.0
 	center_dot.position = center - center_dot.size / 2.0
 	action_button.size = ACTION_SIZE
 	action_button.position = Vector2(center.x - ACTION_SIZE.x / 2.0, center.y + 80.0)
 	joystick.position = Vector2.ZERO
 	joystick.size = view
-	for sheet: Control in [notebook_sheet, clock_sheet, settings_sheet]:
-		sheet.position = Vector2(0, bar_height)
-		sheet.size = Vector2(view.x, view.y - bar_height)
-	var clock_width := minf(view.x, 900.0 if landscape else 760.0)
-	clock_sheet.panel.size = Vector2(clock_width, 0)
-	clock_sheet.panel.position = Vector2((view.x - clock_width) / 2.0, 0)
-	var free_width := view.x - panel_width if landscape else view.x
-	var toast_width := minf(free_width - 32.0, 640.0)
-	toast.size = Vector2(toast_width, 0)
-	toast.position = Vector2((free_width - toast_width) / 2.0, bar_height + 16.0)
+	phone.layout(view)
+	_layout_subtitles(view)
 
 
-## Returns the top inset of the phone screen (a notch or a camera cutout) in base pixels.
-func _safe_top_inset() -> float:
-	var safe := DisplayServer.get_display_safe_area()
-	var window := get_window()
-	if safe.size.y <= 0 or window.size.y <= 0:
-		return 0.0
-	var inset := float(safe.position.y - window.position.y)
-	var scale := get_viewport().get_final_transform().get_scale().y
-	return clampf(inset / maxf(scale, 0.01), 0.0, 120.0)
+func _layout_subtitles(view: Vector2) -> void:
+	var stick := stick_zone()
+	var phone_left := view.x - minf(view.x * Phone.MAX_FRACTION, Phone.MAX_WIDTH) - Phone.MARGIN
+	# The line length is for the room above the joystick zone when the phone
+	# is up: the smallest room. Then the split does not change when the phone goes up.
+	var smallest := phone_left - 2.0 * SUBTITLE_MARGIN - subtitles.padding()
+	# Some letters are wider than the mean: keep 15 % more room.
+	subtitles.max_chars = clampi(int(smallest / (subtitles.char_width() * 1.15)), 12, SubtitleText.MAX_CHARS)
+	var width := minf(subtitles.box_width(), view.x - 2.0 * SUBTITLE_MARGIN)
+	# Beside the joystick zone, at the bottom, when there is room.
+	var left := stick.end.x + SUBTITLE_MARGIN
+	var right := phone.button.position.x - SUBTITLE_MARGIN
+	var bottom := view.y - SUBTITLE_MARGIN
+	if right - left < width:
+		# Else above the joystick zone and the phone button, at the left of the phone.
+		left = SUBTITLE_MARGIN
+		right = (phone_left if phone.up else view.x) - SUBTITLE_MARGIN
+		bottom = minf(stick.position.y, phone.button.position.y) - SUBTITLE_MARGIN
+	var x := clampf((left + right) / 2.0 - width / 2.0, left, maxf(left, right - width))
+	subtitles.size = Vector2(width, 0)
+	subtitles.position = Vector2(x, bottom - subtitles.size.y)
 
 
 # --- Values for the play tests ---------------------------------------------
@@ -709,11 +1015,16 @@ func _safe_top_inset() -> float:
 ## The zone of the joystick and the zone of the look, in base coordinates.
 func input_zones() -> Dictionary:
 	var view := ui_root.get_viewport_rect().size
-	var top := top_bar.size.y
 	return {
-		"stick": Rect2(0, top, view.x / 2.0, view.y - top),
-		"look": Rect2(view.x / 2.0, top, view.x / 2.0, view.y - top),
+		"stick": Rect2(0, 0, view.x / 2.0, view.y),
+		"look": Rect2(view.x / 2.0, 0, view.x / 2.0, view.y),
 	}
+
+
+## The part of the screen where the left thumb holds the joystick.
+func stick_zone() -> Rect2:
+	var view := ui_root.get_viewport_rect().size
+	return Rect2(0, view.y - STICK_ZONE.y, STICK_ZONE.x, STICK_ZONE.y)
 
 
 ## Returns the number of dynamic lights that light a part of the view.

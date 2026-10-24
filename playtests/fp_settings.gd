@@ -1,6 +1,7 @@
 extends RefCounted
-# PT-16 fp_settings. Change each setting. Quit and start again. All settings
-# are the same. Also check that each setting has its effect.
+# PT-16 fp_settings. In the Settings app (plan 0003, R28), change each
+# setting. Quit and start again. All settings are the same. Also check that
+# each setting has its effect.
 # phase: --start-time=06:00
 # phase:
 
@@ -19,6 +20,7 @@ func _expected_path(d: PlaytestDriver) -> String:
 
 ## Taps a slider at a fraction of its length.
 func _tap_slider(d: PlaytestDriver, test_id: String, fraction: float) -> void:
+	await d.show_in_phone(test_id)
 	var slider := d.find(test_id) as Control
 	var rect := slider.get_global_rect()
 	await d.tap(d.to_screen(Vector2(rect.position.x + rect.size.x * fraction, rect.get_center().y)))
@@ -28,23 +30,24 @@ func _tap_slider(d: PlaytestDriver, test_id: String, fraction: float) -> void:
 func _change(d: PlaytestDriver) -> void:
 	await d.skip_intro()
 	var before: Dictionary = d.state().settings
-	await d.tap_id("topbar.settings")
-	await d.wait_frames(3)
-	d.expect(d.state().mode == "settings", "the settings sheet opens")
+	await d.open_app("settings")
 	await d.screenshot("settings_before")
+	await d.tap_phone_id("settings.subtitles")
+	await _tap_slider(d, "settings.subtitle_size", 0.9)
+	await _tap_slider(d, "settings.subtitle_box", 0.1)
 	await _tap_slider(d, "settings.sensitivity", 0.8)
-	await d.tap_id("settings.invert")
-	await d.tap_id("settings.gyro")
+	await d.tap_phone_id("settings.invert")
+	await d.tap_phone_id("settings.gyro")
 	await _tap_slider(d, "settings.fov", 0.25)
-	await d.tap_id("settings.tap_walk")
+	await d.tap_phone_id("settings.tap_walk")
 	await d.wait_frames(3)
 	var after: Dictionary = d.state().settings
 	for key: String in before:
 		d.expect(after[key] != before[key], "the setting %s changed: %s" % [key, after[key]])
+	d.expect(after.subtitles == "en", "the subtitles are in English: %s" % after.subtitles)
 	d.expect(absf(float(d.state().fov) - float(after.fov)) < 0.5, "the field of view changes the camera")
 	await d.screenshot("settings_after")
-	await d.tap_id("settings.close")
-	await d.wait_frames(3)
+	await d.lower_phone()
 	# Invert: a drag up now turns the view down.
 	var pitch0: float = d.state().pitch
 	var start := d.to_screen(await d._free_point("look"))
@@ -69,9 +72,9 @@ func _check(d: PlaytestDriver) -> void:
 	var s := d.state()
 	for key: String in expected:
 		var value: Variant = s.settings[key]
-		var ok: bool = value == expected[key] if typeof(value) == TYPE_BOOL else absf(float(value) - float(expected[key])) < 0.001
+		var ok: bool = value == expected[key] if typeof(value) in [TYPE_BOOL, TYPE_STRING] \
+				else absf(float(value) - float(expected[key])) < 0.001
 		d.expect(ok, "after the restart the setting %s is %s, not %s" % [key, value, expected[key]])
 	d.expect(absf(float(s.fov) - float(expected.fov)) < 0.5, "after the restart the field of view is %s" % s.fov)
-	await d.tap_id("topbar.settings")
-	await d.wait_frames(3)
+	await d.open_app("settings")
 	await d.screenshot("settings_after_restart")

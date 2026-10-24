@@ -57,3 +57,41 @@ static func ting() -> AudioStreamWAV:
 static func clack() -> AudioStreamWAV:
 	return make([[980.0, 0.07, "triangle", 0.6, 0.0], [1960.0, 0.04, "square", 0.1, 0.0],
 			[980.0, 0.07, "triangle", 0.6, 0.22], [1960.0, 0.04, "square", 0.1, 0.22]])
+
+
+## The murmur of a TV upstairs (plan 0003, R2): voices and music through a
+## wall. It loops. "seconds" is the length of one loop.
+static func tv(seconds := 4.0) -> AudioStreamWAV:
+	var count := int(seconds * MIX_RATE)
+	var samples := PackedFloat32Array()
+	samples.resize(count)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 42
+	var low := 0.0
+	var band := 0.0
+	for i in count:
+		var t := float(i) / MIX_RATE
+		# Noise through two low-pass filters: a voice behind a wall.
+		low += (rng.randf_range(-1.0, 1.0) - low) * 0.08
+		band += (low - band) * 0.25
+		# Syllables: the level goes up and down about 4 times each second.
+		var syllables := 0.5 + 0.5 * sin(TAU * 4.1 * t + 2.0 * sin(TAU * 0.7 * t))
+		var music := 0.25 * sin(TAU * 196.0 * t) * (0.5 + 0.5 * sin(TAU * 0.5 * t))
+		samples[i] = band * 3.0 * syllables + music * 0.15
+	# Fade the ends of the loop, so that it has no click.
+	var fade := int(0.05 * MIX_RATE)
+	for i in fade:
+		samples[i] *= float(i) / fade
+		samples[count - 1 - i] *= float(i) / fade
+	var data := PackedByteArray()
+	data.resize(count * 2)
+	for i in count:
+		data.encode_s16(i * 2, int(clampf(samples[i] * 0.5, -1.0, 1.0) * 32767.0))
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = MIX_RATE
+	stream.stereo = false
+	stream.data = data
+	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	stream.loop_end = count
+	return stream

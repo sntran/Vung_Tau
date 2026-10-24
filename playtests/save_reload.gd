@@ -1,7 +1,8 @@
 extends RefCounted
-# PT-05 save_reload. Learn two cards and walk to the cà phê cóc. Quit the
-# game. Start it again with the same save path. Check the cards, the day,
-# the time, and the player position. Then put a save file with another
+# PT-05 save_reload. Learn two cards, save a phrase from the Listen app, and
+# walk to the cà phê cóc. Quit the game. Start it again with the same save
+# path. Check the cards, the day, the time, the player position, the
+# messages, the saved phrase, and the people that the player met. Then put a save file with another
 # version in place: the game starts a new game and does not crash.
 # phase: --start-time=06:00
 # phase:
@@ -24,24 +25,32 @@ func _expected_path(d: PlaytestDriver) -> String:
 
 
 func _play(d: PlaytestDriver) -> void:
-	await d.tap_id("choice.step_outside")
-	await d.tap_id("choice.chua")
-	await d.tap_id("choice.thanks")
-	await d.wait_idle()
+	await d.open_app("listen")
+	await d.tap_phone_id("listen.toggle")
+	await d.lower_phone()
+	await d.talk_to("batu")
+	await d.answer("chua", "play")
+	await d.wait_line("batu")
+	await d.wait_quiet()
+	await d.tap_phone_id("listen.entry.0")
+	await d.lower_phone()
 	await d.bring_into_view("spot.banhmi")
 	await d.tap_id("spot.banhmi")
 	await d.wait_idle()
-	await d.tap_id("choice.okay")
-	await d.wait_idle()
+	await d.open_app("lens")
+	await d.look_at_id("spot.banhmi")
+	await d.wait_frames(3)
+	await d.lower_phone()
 	var coc_x: float = d.main().hem.lot_x["coc"]
 	await d.walk_toward(coc_x, 0.3)
 	var s := d.state()
-	d.expect(s.cards == ["anSang", "banhmi"], "two cards are in the notebook: %s" % [s.cards])
-	d.expect(s.near_spot == "coc", "the player is at the cà phê cóc: %s" % s.near_spot)
+	d.expect(s.cards == ["anSang", "banhmi"], "two cards are in the Sổ tay: %s" % [s.cards])
+	d.expect(s.phrases.size() == 1, "one phrase is in the Sổ tay: %s" % [s.phrases])
 	await d.screenshot("before_quit")
 	var file := FileAccess.open(_expected_path(d), FileAccess.WRITE)
 	file.store_string(JSON.stringify({"cards": s.cards, "day": s.day, "time": s.time,
-			"x": s.player.x, "z": s.player.z, "yaw": s.target_yaw}))
+			"x": s.player.x, "z": s.player.z, "yaw": s.target_yaw, "messages": s.messages, "phrases": s.phrases,
+			"met": s.met}))
 	file.close()
 	# Wait some frames. Then the scenario ends and the game quits.
 	await d.wait_frames(5)
@@ -58,8 +67,10 @@ func _reload(d: PlaytestDriver) -> void:
 	d.expect(miss < 0.05, "after the restart the player is %.3f m from the old position" % miss)
 	d.expect(absf(wrapf(float(s.yaw) - float(expected.yaw), -180.0, 180.0)) < 0.5,
 			"after the restart the player looks in the same direction: %.1f, not %.1f" % [s.yaw, expected.yaw])
-	d.expect(s.intro_done and s.line == "hem.near" and s.near_spot == "coc",
-			"after the restart the panel shows the cà phê cóc, not the intro: %s %s" % [s.line, s.near_spot])
+	d.expect(s.intro_done, "after the restart the intro is done")
+	d.expect(s.messages == expected.messages, "after the restart the messages are %s, not %s" % [s.messages, expected.messages])
+	d.expect(s.phrases == expected.phrases, "after the restart the phrases are %s" % [s.phrases])
+	d.expect(s.met == expected.met, "after the restart the player knows %s, not %s" % [s.met, expected.met])
 	await d.screenshot("after_restart")
 	# Put a save file with another version in place for the next run.
 	var save_path := d.out_dir.path_join("save.json")
@@ -74,5 +85,5 @@ func _other_version(d: PlaytestDriver) -> void:
 	var s := d.state()
 	d.expect(s.day == 1 and s.time == 360 and s.cards.is_empty(),
 			"a save with another version starts a new game: day %d %s %s" % [s.day, s.time_text, s.cards])
-	d.expect(s.line == "intro.welcome", "the new game shows the intro, not %s" % s.line)
+	d.expect(s.messages == ["welcome", "how_to"], "the new game sends the first messages again: %s" % [s.messages])
 	await d.screenshot("new_game")

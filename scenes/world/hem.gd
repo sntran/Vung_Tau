@@ -22,7 +22,6 @@ const CART_STAND_Z := 0.0
 const NPC_STAND_Z := -0.55
 const HELPER_Z := 0.9
 const HELPER_SPEED := 0.9
-const CLACK_BUBBLE_SECONDS := 1.1
 ## The navigation mesh uses this cell size. The map cell size must be the same.
 const NAV_CELL := 0.15
 
@@ -39,6 +38,8 @@ var focus_points: Dictionary = {}
 var carts: Dictionary = {}
 var npcs: Dictionary = {}
 var helper: Npc
+## The TV upstairs at Phở Cô Sáu. It is on after the shop closes (plan 0003, R2).
+var tv: AudioStreamPlayer3D
 var beach: Beach
 var nav_region: NavigationRegion3D
 var clack_count := 0
@@ -89,6 +90,7 @@ func build() -> void:
 	for npc_data: Dictionary in layout.npcs:
 		_build_npc(npc_data)
 	_build_helper()
+	_build_tv(floor_height)
 	_build_ground()
 	_build_street_lamps()
 	beach = BeachScene.instantiate()
@@ -248,6 +250,12 @@ func _build_npc(data: Dictionary) -> void:
 	var npc: Npc = NpcScene.instantiate()
 	npc.npc_id = data.npc
 	npc.name = "Npc_%s" % data.npc
+	npc.touchable = Content.npc(data.npc).get("talk", true)
+	for field: String in ["shirt", "pants", "skin", "hair"]:
+		if data.has(field):
+			npc.set(field, Color(data[field]))
+	if data.has("height"):
+		npc.height = float(data.height)
 	var x := float(lot_x[data.lot]) + float(data.offset)
 	npc.position = Vector3(x, 0, -hem_width / 2.0 + 0.45)
 	add_child(npc)
@@ -268,6 +276,24 @@ func _build_helper() -> void:
 	# The two bamboo sticks.
 	Greybox.box(helper, Vector3(0.04, 0.04, 0.3), Vector3(0.3, 0.95, 0.15), Color("#C8A24A"))
 	Greybox.box(helper, Vector3(0.04, 0.04, 0.22), Vector3(0.3, 1.0, 0.12), Color("#C8A24A"))
+
+
+func _build_tv(floor_height: float) -> void:
+	tv = AudioStreamPlayer3D.new()
+	tv.name = "Tv"
+	tv.stream = Tones.tv()
+	tv.max_distance = float(Content.sound("tv").get("range_m", 8.0))
+	tv.unit_size = 2.0
+	tv.volume_db = -8.0
+	tv.position = Vector3(float(lot_x[_spot_lots.get("pho", "")]) if _spot_lots.has("pho") else 0.0,
+			floor_height * 1.5, -hem_width / 2.0 - 1.5)
+	add_child(tv)
+
+
+## True when the TV upstairs is on: Phở Cô Sáu is closed for the day.
+func tv_on(minutes: int) -> bool:
+	var spot := Content.spot("pho")
+	return not spot.is_empty() and Content.rule_for(spot, "lens", minutes).get("line", "") == "spot.pho.closed_after"
 
 
 func _make_touch_area(meta_key: String, item_id: String, size: Vector3) -> Area3D:
@@ -473,6 +499,11 @@ func update_time(minutes: int) -> void:
 		npcs[npc_id].set_present(npc_present)
 		present_key += "1" if npc_present else "0"
 	helper.set_present(is_present("go", minutes))
+	var tv_wanted := tv_on(minutes)
+	if tv_wanted and not tv.playing:
+		tv.play()
+	elif not tv_wanted and tv.playing:
+		tv.stop()
 	for light in _street_lights:
 		light.visible = dark
 	for lamp in _street_lamps:
@@ -524,5 +555,4 @@ func _process(delta: float) -> void:
 		_clack_left = randf_range(4.0, 5.0)
 		clack_count += 1
 		clack_time = _scene_time
-		helper.show_bubble(Content.ui_text("clack_bubble"), CLACK_BUBBLE_SECONDS)
 		clacked.emit(helper.global_position)

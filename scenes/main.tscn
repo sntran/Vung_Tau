@@ -1,14 +1,8 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scenes/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/world/hem.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/actors/player.tscn" id="3"]
-[ext_resource type="PackedScene" path="res://scenes/ui/top_bar.tscn" id="5"]
-[ext_resource type="PackedScene" path="res://scenes/ui/talk_panel.tscn" id="6"]
-[ext_resource type="PackedScene" path="res://scenes/ui/notebook_sheet.tscn" id="7"]
-[ext_resource type="PackedScene" path="res://scenes/ui/clock_sheet.tscn" id="8"]
-[ext_resource type="PackedScene" path="res://scenes/ui/toast.tscn" id="9"]
-[ext_resource type="PackedScene" path="res://scenes/ui/settings_sheet.tscn" id="10"]
 [ext_resource type="Script" path="res://scenes/ui/joystick.gd" id="11"]
 [ext_resource type="Script" path="res://scenes/ui/center_dot.gd" id="12"]
 
@@ -56,8 +50,6 @@ directional_shadow_max_distance = 40.0
 
 [node name="Ting" type="AudioStreamPlayer" parent="Sounds"]
 
-[node name="Clack" type="AudioStreamPlayer" parent="Sounds"]
-
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="Root" type="Control" parent="UI"]
@@ -78,18 +70,3 @@ script = ExtResource("12")
 
 [node name="ActionButton" type="Button" parent="UI/Root"]
 visible = false
-
-[node name="TalkPanel" parent="UI/Root" instance=ExtResource("6")]
-
-[node name="Toast" parent="UI/Root" instance=ExtResource("9")]
-
-[node name="ClockSheet" parent="UI/Root" instance=ExtResource("8")]
-visible = false
-
-[node name="NotebookSheet" parent="UI/Root" instance=ExtResource("7")]
-visible = false
-
-[node name="SettingsSheet" parent="UI/Root" instance=ExtResource("10")]
-visible = false
-
-[node name="TopBar" parent="UI/Root" instance=ExtResource("5")]
