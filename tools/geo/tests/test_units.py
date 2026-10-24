@@ -60,6 +60,13 @@ def test_width_from_tag_and_from_table():
     assert roads.width_of({}, "unknown_type", TABLE) == (TABLE["default"], "table")
 
 
+def test_width_from_lanes_and_links():
+    assert roads.width_of({"highway": "primary_link"}, "primary", TABLE) == (TABLE["link_width"], "table")
+    width, source = roads.width_of({"lanes": "3", "oneway": "yes"}, "primary", TABLE)
+    assert source == "lanes" and width == 3 * TABLE["lane_width"] + 2.0
+    assert roads.width_of({"lanes": "2"}, "residential", TABLE) == (2 * TABLE["lane_width"], "lanes")
+
+
 def test_road_types():
     assert roads.road_type({"highway": "primary_link"}) == "primary"
     assert roads.road_type({"highway": "service", "service": "alley"}) == "alley"
@@ -76,6 +83,24 @@ def test_hem_flag():
     assert not roads.is_hem("tertiary", 3.0, TABLE)
 
 
+def test_hem_name():
+    tags = {"name": "Hẻm 2 Hải Đăng"}
+    assert roads.is_hem("unclassified", 6.0, TABLE, tags)
+    assert roads.width_of(tags, "unclassified", TABLE) == (TABLE["hem_name_width"], "table")
+    assert roads.width_of({"name": "Hẻm 5", "width": "5"}, "unclassified", TABLE) == (5.0, "tag")
+    assert not roads.is_hem("unclassified", 6.0, TABLE, {"name": "Hẻmx"})
+    assert not roads.is_hem("primary", 12.0, TABLE, {"name": "Hạ Long"})
+
+
+def test_oneway_road_is_one_carriageway():
+    width, source = roads.width_of({"oneway": "yes"}, "primary", TABLE)
+    assert source == "table" and width == pytest.approx(TABLE["types"]["primary"] * TABLE["oneway_factor"])
+    assert roads.width_of({"oneway": "yes", "width": "9"}, "primary", TABLE) == (9.0, "tag")
+    assert roads.sidewalk_side({"oneway": "yes"}, "primary", TABLE) == "right"
+    assert roads.sidewalk_side({}, "primary", TABLE) == "both"
+    assert roads.sidewalk_side({"oneway": "yes", "sidewalk": "left"}, "primary", TABLE) == "left"
+
+
 def test_sidewalk():
     assert roads.has_sidewalk({}, "primary", TABLE)
     assert not roads.has_sidewalk({"sidewalk": "no"}, "primary", TABLE)
@@ -86,7 +111,7 @@ def test_sidewalk():
 def _road(rid, kind, points, width=6.0):
     pts = np.array(points, dtype=float)
     return roads.Road(id=rid, type=kind, name="", width=width, width_source="table", surface="", hem=False,
-                      sidewalk=False, oneway=False, lanes=0, bridge=False, tunnel=False,
+                      sidewalk="", oneway=False, lanes=0, bridge=False, tunnel=False,
                       refs=list(range(rid * 100, rid * 100 + len(pts))), node_points=pts, points=pts)
 
 
@@ -155,3 +180,11 @@ def test_curve_is_found():
 
 def test_straight_road_has_no_curve():
     assert homestay.find_curve(np.array([(0, 0), (500, 0), (900, 100)])) is None
+
+
+def test_grade_limit():
+    profile = np.array([0.0, 0.0, 3.0, 3.0, 3.0])
+    spacing = np.full(4, 2.0)
+    limited = terrain.limit_grade(profile, spacing, 0.25)
+    assert np.all(np.abs(np.diff(limited)) <= 0.5 + 0.01)
+    assert limited.mean() == pytest.approx(profile.mean(), abs=0.01)

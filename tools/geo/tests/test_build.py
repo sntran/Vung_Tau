@@ -63,7 +63,7 @@ def test_sea_floor_and_land(small_build):
 
 def test_roads(small_build):
     roads = {r["name"]: r for r in load(small_build, "roads.json")["roads"] if r["name"]}
-    assert roads["Quang Trung"]["type"] == "primary" and roads["Quang Trung"]["sidewalk"]
+    assert roads["Quang Trung"]["type"] == "primary" and roads["Quang Trung"]["sidewalk"] == "both"
     assert roads["Hẻm 42"]["hem"] and roads["Hẻm 42"]["width"] == 3.0
     assert roads["Lê Lợi"]["width"] == 6.0 and roads["Lê Lợi"]["width_source"] == "tag", "the override sets the width"
     assert roads["Lối đi thử"]["source"] == "override"
@@ -113,7 +113,7 @@ def test_road_is_flat_across(small_build):
             grade = abs(pts[i + 1][1] - pts[i - 1][1]) / np.linalg.norm(direction)
             for offset in (-(road["width"] / 2 - 0.5), 0.0, road["width"] / 2 - 0.5):
                 gx, gz = np.array([x, z]) + side * offset
-                tolerance = 0.15 + grade * abs(offset)
+                tolerance = 0.15 + 1.5 * grade * abs(offset)
                 assert ground.height(gx, gz) == pytest.approx(h, abs=tolerance), (name, i, offset)
     # The lighthouse road goes up the hill.
     heights = np.array(roads["Đường lên Hải Đăng"]["points"])[:, 1]

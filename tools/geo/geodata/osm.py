@@ -113,7 +113,12 @@ def apply_corrections(data: OsmData, corrections: list[dict]) -> None:
         if not reason:
             data.problems.append(f"the correction {c} has no reason, so it is not used")
             continue
-        if action == "add_way":
+        if action == "add_node":
+            added += 1
+            node = Node(-added, float(c["lon"]), float(c["lat"]), dict(c["tags"]))
+            data.nodes.append(node)
+            data.corrections.append(f"add node {node.id} ({c['tags']}): {reason}")
+        elif action == "add_way":
             added += 1
             coords = [tuple(p) for p in c["coords"]]
             # Corrections have negative IDs, so that they cannot be the same as an OSM ID.

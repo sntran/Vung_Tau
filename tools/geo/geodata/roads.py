@@ -13,6 +13,8 @@ NOT_ROADS = {"proposed", "construction", "platform", "bus_stop", "elevator", "co
 IMPORTANCE = ["motorway", "trunk", "primary", "secondary", "tertiary", "unclassified", "residential", "living_street",
               "pedestrian", "service", "alley", "track", "cycleway", "footway", "steps", "path"]
 _LINK = re.compile(r"_link$")
+# The width of a sidewalk. It is the same in scripts/geo/road_builder.gd.
+SIDEWALK_WIDTH_M = 2.0
 
 
 @dataclass
@@ -24,7 +26,7 @@ class Road:
     width_source: str
     surface: str
     hem: bool
-    sidewalk: bool
+    sidewalk: str
     oneway: bool
     lanes: int
     bridge: bool
@@ -41,7 +43,9 @@ class Road:
 
     @property
     def importance(self) -> int:
-        return IMPORTANCE.index(self.type) if self.type in IMPORTANCE else len(IMPORTANCE)
+        """The rank of the road: 0 is the most important. A hẻm has the rank of an alley."""
+        kind = "alley" if self.hem and self.type not in ("footway", "path", "steps", "track", "cycleway") else self.type
+        return IMPORTANCE.index(kind) if kind in IMPORTANCE else len(IMPORTANCE)
 
 
 def road_type(tags: dict) -> str | None:
@@ -73,27 +77,63 @@ def parse_width(value: str | None) -> float | None:
     return None
 
 
+def has_hem_name(tags: dict, table: dict) -> bool:
+    """In Vietnam, the name of a hẻm starts with "Hẻm" (in the center "Kiệt", in the north "Ngõ")."""
+    name = tags.get("name", "")
+    return any(name.startswith(prefix + " ") for prefix in table.get("hem_name_prefixes", []))
+
+
 def width_of(tags: dict, kind: str, table: dict) -> tuple[float, str]:
     """The width of a road and where it comes from: "tag" or "table"."""
     tagged = parse_width(tags.get("width")) or parse_width(tags.get("est_width"))
     if tagged is not None:
         return tagged, "tag"
-    return float(table["types"].get(kind, table["default"])), "table"
+    if has_hem_name(tags, table):
+        return float(table["hem_name_width"]), "table"
+    if tags.get("highway", "").endswith("_link"):
+        return float(table["link_width"]), "table"
+    lanes = tags.get("lanes", "")
+    if lanes.isdigit() and int(lanes) > 0:
+        side = sidewalk_side(tags, kind, table)
+        sidewalks = {"both": 2, "left": 1, "right": 1}.get(side, 0)
+        return int(lanes) * float(table["lane_width"]) + sidewalks * SIDEWALK_WIDTH_M, "lanes"
+    width = float(table["types"].get(kind, table["default"]))
+    if is_oneway(tags):
+        width = round(width * table.get("oneway_factor", 1.0), 2)
+    return width, "table"
 
 
-def is_hem(kind: str, width: float, table: dict) -> bool:
-    """A hẻm is a small road of a hẻm type with a width of 4 m or less (R5)."""
+def is_oneway(tags: dict) -> bool:
+    return tags.get("oneway") in ("yes", "1", "-1", "true")
+
+
+def is_hem(kind: str, width: float, table: dict, tags: dict | None = None) -> bool:
+    """A hẻm is a small road of a hẻm type with a width of 4 m or less (R5), or
+    a road with a hẻm name."""
+    if tags is not None and has_hem_name(tags, table):
+        return True
     return kind in table["hem_types"] and width <= table["hem_max_width"]
 
 
-def has_sidewalk(tags: dict, kind: str, table: dict) -> bool:
-    """Main roads have a curb and a sidewalk when OSM does not say otherwise (R11)."""
+def sidewalk_side(tags: dict, kind: str, table: dict) -> str:
+    """The sides with a curb and a sidewalk: "both", "left", "right", or "".
+    Main roads have them when OSM does not say otherwise (R11). A one-way main
+    road is one carriageway of a divided road. Traffic in Vietnam keeps to the
+    right, so the sidewalk of a carriageway is at its right side."""
     value = tags.get("sidewalk", tags.get("sidewalk:both"))
     if value in ("no", "none", "separate"):
-        return False
-    if value in ("both", "left", "right", "yes"):
-        return True
-    return kind in table["sidewalk_types"]
+        return ""
+    if value in ("both", "left", "right"):
+        return value
+    if value == "yes":
+        return "both"
+    if kind not in table["sidewalk_types"]:
+        return ""
+    return "right" if is_oneway(tags) else "both"
+
+
+def has_sidewalk(tags: dict, kind: str, table: dict) -> bool:
+    return sidewalk_side(tags, kind, table) != ""
 
 
 def make_roads(ways, projection, table: dict) -> list[Road]:
@@ -108,8 +148,8 @@ def make_roads(ways, projection, table: dict) -> list[Road]:
         lanes = way.tags.get("lanes", "")
         roads.append(Road(
             id=way.id, type=kind, name=way.tags.get("name", ""), width=width, width_source=source,
-            surface=way.tags.get("surface", ""), hem=is_hem(kind, width, table),
-            sidewalk=has_sidewalk(way.tags, kind, table), oneway=way.tags.get("oneway") == "yes",
+            surface=way.tags.get("surface", ""), hem=is_hem(kind, width, table, way.tags),
+            sidewalk=sidewalk_side(way.tags, kind, table), oneway=is_oneway(way.tags),
             lanes=int(lanes) if lanes.isdigit() else 0, bridge=way.tags.get("bridge", "no") != "no",
             tunnel=way.tags.get("tunnel", "no") != "no", refs=list(way.refs),
             node_points=np.column_stack([x, y]), points=np.column_stack([x, y]), source=way.source))

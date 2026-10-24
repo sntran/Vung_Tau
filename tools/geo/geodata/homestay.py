@@ -8,6 +8,8 @@ from shapely.geometry import LineString, Point
 # Road types that can be the coast road at Bãi Trước.
 COAST_ROAD_TYPES = {"trunk", "primary", "secondary", "tertiary", "unclassified", "residential"}
 COAST_ROAD_DISTANCE_M = 120.0
+# Main roads: the lighthouse road starts where the path leaves them.
+MAIN_ROAD_TYPES = {"motorway", "trunk", "primary", "secondary"}
 CURVE_TURN_DEG = 45.0
 CURVE_LENGTH_M = 60.0
 HEM_ANGLE_DEG = 30.0
@@ -75,6 +77,10 @@ def find_curve(points: np.ndarray) -> dict | None:
     }
 
 
+def _edge_road(network, a: int, b: int):
+    return next(road for other, _length, road in network.edges[a] if other == b)
+
+
 def _direction_from(road, ref_index: int):
     """Gives (step, direction) for each way along the road from one of its nodes."""
     pts = road.node_points
@@ -131,6 +137,15 @@ def find(roads, network, landmarks: dict, beach_outline, blocks) -> dict:
     path = network.shortest_path(sources, target)
     if len(path) < 2:
         result["problems"].append("no road goes from Bãi Trước to the lighthouse")
+        return result
+    # The lighthouse road starts where the path leaves the coast road and the
+    # other main roads along the coast (for example a coast road with another name).
+    start = max(i for i, ref in enumerate(path) if ref in sources)
+    while start + 1 < len(path) and _edge_road(network, path[start], path[start + 1]).type in MAIN_ROAD_TYPES:
+        start += 1
+    path = path[start:]
+    if len(path) < 2:
+        result["problems"].append("the lighthouse is on the coast road")
         return result
     path_points = np.array([network.position[r] for r in path])
     result["lighthouse_road"] = {"nodes": len(path), "length_m": round(float(LineString(path_points).length), 1),

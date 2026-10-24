@@ -30,6 +30,10 @@ from geodata.projection import Projection, map_to_game  # noqa: E402
 ROAD_POINT_STEP_M = 4.0
 WOOD_TAGS = {("natural", "wood"), ("landuse", "forest"), ("natural", "scrub")}
 BUILT_LANDUSE = {"residential", "commercial", "retail", "industrial", "construction", "military", "religious"}
+# A place where the roads cover more than this part of the ground (in a
+# Gaussian of TOWN_ROAD_SIGMA_M) is town.
+TOWN_ROAD_COVER = 0.12
+TOWN_ROAD_SIGMA_M = 40.0
 KEEP_IMPORT = '[remap]\n\nimporter="keep"\n'
 
 
@@ -143,7 +147,8 @@ def build(raw: Path, out: Path, geo: Path) -> int:
                                       area["height_step_m"], out / "height" / "overview.png")
     for png in (out / "height").glob("*.png"):
         write_keep_import(png)
-    surface = write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods, landuse, area, out / "surface.png")
+    surface = write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods, landuse, roads, area,
+                            out / "surface.png")
     write_keep_import(out / "surface.png")
 
     lon_min, lat_min = projection.map_to_lonlat(box.bounds[0], box.bounds[1])
@@ -204,14 +209,21 @@ def road_record(road) -> dict:
     return record
 
 
-def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods, landuse, area, path) -> dict:
+def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods, landuse, roads, area, path) -> dict:
     """An RGBA image for the ground materials: R is sand, G is town, B is wood,
-    A is the distance to the coastline (positive on land)."""
+    A is the distance to the coastline (positive on land).
+
+    OSM has few building outlines in Vũng Tàu, so a place with many roads is
+    also town: there, the roads cover more than TOWN_ROAD_COVER of the ground."""
     from PIL import Image
     from scipy import ndimage
     every = int(area["land_mask_grid_m"] / grid.step)
     town_shapes = [b["polygon"] for b in block_list if b["buildings"] > 0] + [g for _k, g in landuse]
     town = terrain.rasterize(grid, [p for s in town_shapes for p in polygons_of(s)]) | building_mask
+    road_cover = terrain.rasterize(grid, blocks_module.road_surfaces(
+        [r for r in roads if r.type not in blocks_module.NOT_BLOCK_EDGES]))
+    density = ndimage.gaussian_filter(road_cover.astype(np.float32), sigma=TOWN_ROAD_SIGMA_M / grid.step)
+    town |= (density > TOWN_ROAD_COVER) & land_mask
     wood = terrain.rasterize(grid, [p for s in woods for p in polygons_of(s)])
     to_sea = ndimage.distance_transform_edt(land_mask).astype(np.float32) * grid.step
     to_land = ndimage.distance_transform_edt(~land_mask).astype(np.float32) * grid.step

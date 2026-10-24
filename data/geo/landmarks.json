@@ -32,7 +32,7 @@
 		{
 			"id": "nui_lon",
 			"name_vi": "Núi Lớn",
-			"other_names": ["Núi Tương Kỳ", "Big Mountain"],
+			"other_names": ["Núi Tương Kỳ", "Tương Kỳ", "Big Mountain"],
 			"search": [{"tags": {"natural": "peak"}}, {"tags": {"natural": "hill"}}, {"tags": {"natural": "*"}}],
 			"hint": {"lat": 10.3579, "lon": 107.0671}
 		},
