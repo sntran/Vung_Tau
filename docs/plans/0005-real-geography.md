@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Branch | `feat/0005-real-geography` |
 | Depends on | 0004 (status "Built") |
 
@@ -10,13 +10,13 @@
 
 The player walks in first person on the real ground of Vũng Tàu: the real hills, the real coast, the real beaches, and the real roads.
 
-All shapes in this plan come from open data. Nothing comes from photos or from an artist. Plan 0006 adds the known structures (for example Bãi Trước, Mũi Nghinh Phong, Bãi Sau). Plan 0007 makes houses and puts them on the lots between the roads. This plan prepares the data for these two plans.
+All shapes in this plan come from open data. Nothing comes from photos or from an artist. Plan 0006 adds the known structures (for example Tượng Chúa Kitô Vua, Hải đăng Vũng Tàu, Bạch Dinh). Plan 0007 makes houses and puts them on the lots between the roads. This plan prepares the data for these two plans.
 
 ## 2. Out of scope
 
 - Buildings and landmarks. This plan only finds their positions and their lots in the data.
 - People, cars, and scooters.
-- Swimming and boats.
+- Swimming, and boats that move. (R13a puts boats at anchor on the sea.)
 - The walk to Miếu Hòn Bà, the Vi Ba road activities, and the shops. Later plans add them. This plan only prepares their ground, their paths, and the tide.
 - A change to the hẻm of plans 0001 and 0002. That hẻm stays the main game scene until plan 0007. This plan makes a separate scene.
 
@@ -48,8 +48,8 @@ Required notices. Show them on a "Credits" screen in the game and in `assets/CRE
 | D9 | The sky is `PhysicalSkyMaterial`. The sun position comes from the real latitude of Vũng Tàu and the game clock. | A real sun angle for a real place. |
 | D10 | The game shows Vũng Tàu today, as OpenStreetMap shows it. | The player is a traveler from the United States who visits Vũng Tàu today. |
 | D11 | The homestay is in a real hẻm, but the homestay, its family, and its neighbors are fictional. Do not use a real house number, a real family name, or a real business name. | A real place for the player, with respect for the people who live there. |
-| D12 | The sea level follows the real tide at Vũng Tàu. CI computes the tide constituents for Vũng Tàu from the open global tide model EOT20 (CC BY 4.0), with the Python package `pyTMD`. The game computes the sea level from these constituents and the game date and time. | Miếu Hòn Bà can be reached on foot only at low tide. The tide at Vũng Tàu is mixed, mainly semi-diurnal, with a mean range of about 2.5 m ([Vimaru JMST](https://jmst.vimaru.edu.vn/index.php/jmst/article/download/891/646/1911)). A fixed sea level cannot show this. |
-| D13 | The game has a real calendar. Day 1 is a real date. The top bar shows the solar date and the lunar date (âm lịch). | Tides, festivals, and the day of rằm (the 15th of the lunar month) depend on the date. People in Vietnam plan by the lunar date. |
+| D12 | The sea level follows the real tide at Vũng Tàu. CI computes the tide constituents for Vũng Tàu from the open global tide model EOT20, with the Python package `pyTMD`. The builder checks the license of EOT20 before use (CC BY 4.0 is expected), and adds its notice to the credits screen and `assets/CREDITS.md`. The game computes the sea level from these constituents and the game date and time. | Miếu Hòn Bà can be reached on foot only at low tide. The tide at Vũng Tàu is mixed, mainly semi-diurnal, with a mean range of about 2.5 m ([Vimaru JMST](https://jmst.vimaru.edu.vn/index.php/jmst/article/download/891/646/1911)). A fixed sea level cannot show this. |
+| D13 | The game has a real calendar. Day 1 is a real date. The Clock app of the phone (plan 0003) shows the solar date and the lunar date (âm lịch). Compute the lunar date with the Vietnamese rules: the new moon and the solar terms in the time zone UTC+7, not UTC+8. | Tides, festivals, and the day of rằm (the 15th of the lunar month) depend on the date. People in Vietnam plan by the lunar date. The Vietnamese calendar uses UTC+7, so a month can start one day earlier than in the Chinese calendar. |
 
 ## 5. Requirements
 
@@ -99,8 +99,8 @@ Required notices. Show them on a "Credits" screen in the game and in `assets/CRE
 - **R8f.** The game computes the sea level with the same constituents and the nodal corrections. The result must agree with the test values within 0.02 m.
 - **R8g.** The DEM has no sea floor. Make the near-shore sea floor: from the coastline, slope down to −4 m over 80 m, then stay at −4 m. Rocks in the sea (`natural=rock`, `natural=reef`, `natural=bare_rock`) rise to +0.5 m.
 - **R8h.** The path to Hòn Bà is a rough, uneven path of rocks, about 300 m long ([SGGP](https://www.sggp.org.vn/con-duong-da-xe-bien-noi-bo-voi-hon-ba-post544948.html)). It has pebbles and oyster shells, with rock outcrops and tide pools on both sides, and a wide sand flat in front of it at low tide. Make it mostly bare rock. Do not cover it with green algae: some photos show a green tint, but I walked there, and it was mostly rocks. A thin, wet dark tone at the low edges is enough. Take its outline from OSM if it exists (for example `natural=reef` or `natural=bare_rock`). If not, put it in `overrides.json`: a band about 30 m wide from the beach below Mũi Nghinh Phong to the islet. The height of the rocks is in `data/geo/hon_ba.json`. Set it so that the path is dry only for a few hours at the lowest tides of the month, around the 1st and the 15th of the lunar month. Sources say that the path shows on a few days each month, for a few hours, and that the sea goes down most on the 15th and 16th of the lunar month ([Báo Lào Cai](https://baolaocai.vn/hon-dao-co-duong-di-luc-an-luc-hien-o-vung-tau-khach-ghe-tham-phai-canh-ngay-post389986.html), [VinWonders](https://vinwonders.com/vi/wonderpedia/news/hon-ba-vung-tau/)).
-- **R8i.** `tide.py` lists the times in the next 12 months when the Hòn Bà ridge is dry for at least 2 hours between 05:00 and 18:00. The report shows them with the lunar date.
-- **R8j.** Day 1 of the game is a real date that I approve. The proposal: a date in the dry season (November to April) when the Hòn Bà ridge is dry in the morning of day 2 or day 3. Then a new player can reach Hòn Bà in the first days. The report proposes three dates.
+- **R8i.** `tide.py` lists the times in the next 12 months when the Hòn Bà rock path is dry for at least 2 hours between 05:00 and 18:00. The report shows them with the lunar date.
+- **R8j.** Day 1 of the game is a real date that I approve. The proposal: a date in the dry season (November to April) when the Hòn Bà rock path is dry in the morning of day 2 or day 3. Then a new player can reach Hòn Bà in the first days. The report proposes three dates.
 
 ### The world in Godot
 
@@ -113,7 +113,7 @@ Required notices. Show them on a "Credits" screen in the game and in `assets/CRE
 - **R11a.** Roadworks on the Hải Đăng road: the first 220 m from the bottom are being widened, and the work is planned to end in 2027 ([Zing](https://lifestyle.zingnews.vn/mo-rong-duong-len-ngon-hai-dang-song-ao-164-nam-tuoi-o-vung-tau-post1668055.html)). The game is set today, so show the work in progress: a part of the road with gravel and fresh concrete, barriers, drain pipes on the side, a small excavator, and a site sign with a fictional contractor name. Workers are there from 07:00 to 17:00, with a lunch break. The sounds of the machines play in those hours. If the homestay hẻm (R8a) is in this part of the road, the roadworks are at its corner. The roadworks are data in `overrides.json`, so a later plan can remove them when the work ends.
 - **R12.** Ground materials: sand on beaches, grass and trees on hills (use simple tree shapes for now), rock on steep slopes above 35°, and concrete on blocks. Use the CC0 scanned textures. Record each texture in `assets/CREDITS.md`.
 - **R12a.** The vegetation follows the season of the game date. In the dry season (November to April), the hills are partly dry, with brown and orange grass and bare trees. In the rainy season (May to October), the hills are green ([MoMo](https://www.momo.vn/du-lich-di-lai/diem-den/ba-ria-vung-tau)). Flame trees (phượng vĩ) on the hills and in the streets show red flowers in their season, around May and June. A news report from 3 June 2020 shows them in full bloom on the road to the lighthouse ([SGGP](https://www.sggp.org.vn/phuong-vi-do-ruc-duong-len-ngon-hai-dang-post557108.html)). Day 1 of the game is in the dry season (R8j), so the first look of the hills is dry. Main roads have dense rows of street trees, and the road along Bãi Trước has tall trees between the road and the sea. Tree types that show in the photos: casuarina (phi lao) along Bãi Sau and the coast roads, coconut and fan palms in the park of Bãi Trước, frangipani (hoa sứ) with white and yellow flowers, and large shade trees along the main roads.
-- **R13.** The sea follows D8 and D12. The sea surface moves up and down with the tide. The player cannot walk into water deeper than 0.5 m. A message says "The water is too deep here." The player can walk on the Hòn Bà ridge only when it is dry.
+- **R13.** The sea follows D8 and D12. The sea surface moves up and down with the tide. The player cannot walk into water deeper than 0.5 m. A message says "The water is too deep here." The player can walk on the Hòn Bà rock path only when it is dry.
 - **R13a.** Objects on the sea, from `data/geo/sea_objects.json`: 10 to 30 large cargo ships at anchor far offshore (they are in most photos of the coast), small fishing boats moored in the bay of Bãi Trước, and the ferry pier near Bãi Trước. Rock groynes along the sea wall of Bãi Trước come from OSM (`man_made=groyne` or `man_made=breakwater`) when it has them.
 - **R14.** The sun follows D9. Light at 06:00, 12:00, 18:00, and 21:00 must look different and correct for the time.
 - **R15.** Put a marker with the Vietnamese name above each landmark that the data found. Plan 0006 replaces the markers with structures.
@@ -127,7 +127,7 @@ Required notices. Show them on a "Credits" screen in the game and in `assets/CRE
   - Road widths from tags and from the table.
   - Blocks from a small set of roads.
   - The sea level from `tide.json` against the 200 test values (R8f).
-  - The lunar date for 20 known solar dates.
+  - The lunar date for 20 known solar dates. Include dates where the Vietnamese and the Chinese calendars differ, for example Tết in 1985 (20 January in Vietnam, 21 January in China).
 - **R18.** Python tests for `build.py` with a small test extract in `tools/geo/tests/`. CI runs them.
 
 ## 6. Play-test scenarios
@@ -139,7 +139,7 @@ Run each scenario at 1280×720.
 - **PT-35 `geo_beach`.** Walk from the road across the sand to the water. The player stops at the 0.5 m depth and the message shows.
 - **PT-36 `geo_hill`.** Walk up the road to the top of Núi Nhỏ. The player never goes through the ground. The player cannot walk up a slope that is steeper than 45° where there is no road.
 - **PT-37 `geo_chunks`.** Walk 2 km with tap to walk. At each frame, a ray down from the camera hits the ground or the sea. Record the time to load each chunk. No chunk takes more than 2 s under lavapipe.
-- **PT-38 `geo_tide`.** Start at a dry time from R8i, on the beach below Mũi Nghinh Phong. Walk the ridge to Hòn Bà with tap to walk. Then start 3 hours after the end of the dry time. The ridge is under water, and the player cannot walk on it. Take screenshots of the same view at low tide and high tide.
+- **PT-38 `geo_tide`.** Start at a dry time from R8i, on the beach below Mũi Nghinh Phong. Walk the rock path to Hòn Bà with tap to walk. Then start 3 hours after the end of the dry time. The rock path is under water, and the player cannot walk on it. Take screenshots of the same view at low tide and high tide.
 - **PT-39 `geo_anchors`.** Take a screenshot at each town anchor and at each structure in R1, with the marker visible.
 
 ## 7. Acceptance criteria
@@ -147,7 +147,7 @@ Run each scenario at 1280×720.
 1. The geodata workflow ran in CI. `anchors.png`, `homestay_area.png`, and the tide report exist. `data/geo/build/report.md` exists, and all landmarks in R1 are found, or the report says why not.
 2. All unit tests, Python tests, and play tests pass.
 3. I looked at the PT-33 screenshots and agree that the shapes of the hills, the coast, and the beaches are correct.
-4. The credits screen shows the OSM and Copernicus notices.
+4. The credits screen shows the OSM, Copernicus, and EOT20 notices.
 5. `AGENTS.md` describes the geodata pipeline and the commands.
 
 ## 8. Open questions
