@@ -35,15 +35,16 @@ The builder writes questions and answers under "Open questions". The builder doe
 
 ## Proposed order of the next plans
 
-These plans are not written yet. The order can change.
+The order can change.
 
 | Number | Name | Content |
 |---|---|---|
-| 0002 | Look of the hẻm | Tube houses with true proportions and materials, light by time of day, the sea, people. The goal is a real place, not boxes. |
-| 0003 | Phở shop | The table close-up. Order with the cuts ("một tô phở tái nạm gầu bò viên"), the extras, the herb plate, the sauces, eating, and paying. Port the flow from `docs/prototype/hem-2d.html`. |
-| 0004 | Cà phê cóc | Order "đen đá", "sữa đá" or "nâu đá", "bạc sỉu". Watch the phin drip. |
-| 0005 | Homestay meal | Eat with the host family. Home dishes and strong-smelling sauces. The owner names the dishes. |
-| 0006 | Street snacks | Bánh mì at dawn, bánh khọt, hột vịt lộn, hủ tiếu gõ at night. |
-| 0007 | Bãi Trước | Morning exercise, the boats, the fish, the evening on the coast road. |
-| 0008 | Scooter | Wear a helmet and ride along the coast in the evening. |
-| 0009 | Store release | Signed Android and iOS builds, store pages, privacy text. |
+| 0002 | [First-person walking](0002-first-person.md) | Written, status "Draft". The player sees through the eyes of the visitor and walks like a person. Landscape layout, joystick, look drag, gyroscope look, tap to walk. |
+| 0003 | Real places from photos | A test with one real place in Vũng Tàu: photos taken on site, then three methods compared on real phones (photo textures on simple shapes, photogrammetry meshes, Gaussian splats). It also makes the capture guide for the people who take the photos. |
+| 0004 | Phở shop | Sit at the table. Order with the cuts ("một tô phở tái nạm gầu bò viên"), the extras, the herb plate, the sauces, eating, and paying. Port the flow from `docs/prototype/hem-2d.html`. |
+| 0005 | Cà phê cóc | Order "đen đá", "sữa đá" or "nâu đá", "bạc sỉu". Watch the phin drip. |
+| 0006 | Homestay meal | Eat with the host family. Home dishes and strong-smelling sauces. The owner names the dishes. |
+| 0007 | Street snacks | Bánh mì at dawn, bánh khọt, hột vịt lộn, hủ tiếu gõ at night. |
+| 0008 | Bãi Trước | Morning exercise, the boats, the fish, the evening on the coast road. |
+| 0009 | Scooter | Wear a helmet and ride along the coast in the evening. |
+| 0010 | Store release | Signed Android and iOS builds, store pages, privacy text. |
