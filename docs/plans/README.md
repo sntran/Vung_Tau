@@ -31,7 +31,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 
 | Number | Name | Status |
 |---|---|---|
-| 0001 | [Foundation and the walkable hẻm](0001-foundation.md) | Draft |
+| 0001 | [Foundation and the walkable hẻm](0001-foundation.md) | In progress |
 
 ## Proposed order of the next plans
 

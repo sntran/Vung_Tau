@@ -245,6 +245,7 @@ func _scroll_parent(control: Control) -> ScrollContainer:
 ## Taps the node with the test ID. Returns an error text, or "" when the tap was sent.
 ## It does not record a failure. Use tap_id() for a normal step.
 func try_tap_id(test_id: String) -> String:
+	await _wait_stable(test_id)
 	var where := locate(test_id)
 	if where.error != "":
 		return where.error
@@ -253,6 +254,23 @@ func try_tap_id(test_id: String) -> String:
 		return cover
 	await tap(to_screen(where.point))
 	return ""
+
+
+## Waits until a control is shown and its screen position does not change
+## in two frames (a new panel needs some frames for its layout). It waits
+## not more than 15 frames. It does not wait for a 3D node: a player taps a
+## shop also when the camera moves.
+func _wait_stable(test_id: String) -> void:
+	var last := Vector2(-1, -1)
+	for i in 15:
+		var node := find(test_id)
+		if node is Node3D:
+			return
+		var where := locate(test_id)
+		if where.error == "" and where.point.distance_to(last) < 0.5:
+			return
+		last = where.get("point", Vector2(-1, -1))
+		await wait_frames(1)
 
 
 ## Taps the node with the test ID. Records a failure when the node is

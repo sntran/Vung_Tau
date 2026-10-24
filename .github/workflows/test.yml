@@ -1,0 +1,43 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Unit tests and play tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Xvfb and the Mesa OpenGL drivers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends xvfb xauth mesa-utils \
+            libgl1 libgl1-mesa-dri libglx-mesa0 libegl1 \
+            libxcursor1 libxinerama1 libxrandr2 libxi6 libfontconfig1
+
+      - name: Cache Godot
+        uses: actions/cache@v4
+        with:
+          path: .tools
+          key: godot-${{ runner.os }}-${{ hashFiles('tools/setup.sh') }}
+
+      - name: Set up the tools
+        run: tools/setup.sh
+
+      - name: Unit tests
+        run: tools/test.sh
+
+      - name: Play tests
+        run: tools/playtest.sh --all
+
+      - name: Upload the play-test output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playtest
+          path: build/playtest/
+          if-no-files-found: warn

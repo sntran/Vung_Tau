@@ -1,0 +1,186 @@
+name: Export
+
+on:
+  push:
+    branches: [main, feat/0001-foundation]
+  workflow_dispatch:
+
+concurrency:
+  group: export-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Web
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot and the export templates
+        uses: actions/cache@v4
+        with:
+          path: |
+            .tools
+            ~/.local/share/godot/export_templates
+          key: godot-templates-${{ runner.os }}-${{ hashFiles('tools/setup.sh') }}
+
+      - name: Set up the tools
+        run: tools/setup.sh --templates
+
+      - name: Export the web build
+        run: |
+          mkdir -p build/web
+          .tools/godot/godot --headless --path . --import
+          .tools/godot/godot --headless --path . --export-release "Web" build/web/index.html
+          test -f build/web/index.html
+          echo "Size of the web build:"
+          du -sh build/web
+          ls -l build/web
+
+      - name: Upload the web build for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  pages:
+    name: Publish to GitHub Pages
+    needs: web
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deploy
+        uses: actions/deploy-pages@v4
+
+  android:
+    name: Android debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up the Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: "platform-tools build-tools;34.0.0 platforms;android-34"
+
+      - name: Cache Godot and the export templates
+        uses: actions/cache@v4
+        with:
+          path: |
+            .tools
+            ~/.local/share/godot/export_templates
+          key: godot-templates-${{ runner.os }}-${{ hashFiles('tools/setup.sh') }}
+
+      - name: Set up the tools
+        run: tools/setup.sh --templates
+
+      - name: Make a debug keystore and the editor settings
+        run: |
+          keytool -genkeypair -v -keystore "$RUNNER_TEMP/debug.keystore" \
+            -storepass android -keypass android -alias androiddebugkey \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+          mkdir -p ~/.config/godot
+          for name in editor_settings-4.tres editor_settings-4.7.tres; do
+            cat > ~/.config/godot/$name <<SETTINGS
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/android_sdk_path = "$ANDROID_HOME"
+          export/android/java_sdk_path = "$JAVA_HOME"
+          export/android/debug_keystore = "$RUNNER_TEMP/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          SETTINGS
+          done
+
+      - name: Export the debug APK
+        env:
+          GODOT_ANDROID_KEYSTORE_DEBUG_PATH: ${{ runner.temp }}/debug.keystore
+          GODOT_ANDROID_KEYSTORE_DEBUG_USER: androiddebugkey
+          GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: android
+        run: |
+          mkdir -p build/android
+          .tools/godot/godot --headless --path . --import
+          .tools/godot/godot --headless --path . --export-debug "Android" build/android/vung-tau-debug.apk
+          test -f build/android/vung-tau-debug.apk
+          ls -l build/android
+
+      - name: Upload the APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-debug-apk
+          path: build/android/vung-tau-debug.apk
+
+  ios-project:
+    name: iOS Xcode project
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot and the export templates
+        uses: actions/cache@v4
+        with:
+          path: |
+            .tools
+            ~/.local/share/godot/export_templates
+          key: godot-templates-${{ runner.os }}-${{ hashFiles('tools/setup.sh') }}
+
+      - name: Set up the tools
+        run: tools/setup.sh --templates
+
+      - name: Export the Xcode project
+        run: |
+          mkdir -p build/ios
+          .tools/godot/godot --headless --path . --import
+          .tools/godot/godot --headless --path . --export-debug "iOS" build/ios/VungTau.ipa
+          ls -l build/ios
+
+      - name: Upload the Xcode project
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-xcode-project
+          path: build/ios/
+          include-hidden-files: true
+
+  ios:
+    name: iOS Simulator build
+    needs: ios-project
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - name: Download the Xcode project
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-xcode-project
+          path: build/ios
+
+      - name: Build for the iOS Simulator
+        run: |
+          set -o pipefail
+          cd build/ios
+          xcodebuild -list -project VungTau.xcodeproj
+          xcodebuild -project VungTau.xcodeproj -scheme VungTau \
+            -sdk iphonesimulator -destination "generic/platform=iOS Simulator" \
+            -configuration Debug CODE_SIGNING_ALLOWED=NO build 2>&1 | tee ../ios-build.log
+
+      - name: Upload the build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-log
+          path: build/ios-build.log

@@ -82,6 +82,15 @@ Verified in the development workspace (Linux, 2 CPUs, no GPU, no Vulkan):
 - `Input.parse_input_event()` with an `InputEventScreenTouch` presses a `Button`. Touch-to-mouse emulation is on by default.
 - GUT 9.7.1 runs with `godot --headless -s addons/gut/gut_cmdln.gd`.
 - GitHub, npm, and PyPI are reachable. Google downloads (Android SDK, Maven) and blender.org are not reachable.
+- GitHub archive downloads (`github.com/OWNER/REPO/archive/...`) return 403 in the workspace. `git clone` works. So `tools/setup.sh` gets GUT with `git clone`. GitHub release downloads (Godot, the export templates) work.
+- `Camera3D.project_ray_normal()` does not use the frustum offset. The camera uses a frustum offset, so `CameraRig.screen_ray()` calculates the ray. `Camera3D.unproject_position()` is correct.
+- The workspace prints "WARNING: Could not set V-Sync mode" at each start. This warning comes from the Mesa driver. It is not a defect.
+- With `--audio-driver Dummy`, Godot prints no ALSA errors. `tools/playtest.sh` and `tools/test.sh` use it.
+- Godot 4.7 has the `Logger` class (`OS.add_logger()`). The play-test system uses it to record each engine error and script error as a failure in `log.json`.
+- The renderer is slow under llvmpipe: about 20 frames per second at 720×1280 and 10 at 1080×2400. MSAA halves these numbers, so it is off.
+- An Xvfb screen of 1280×720 is too small for a 1080×2400 window. `tools/playtest.sh` uses `-screen 0 2560x2560x24`.
+- Godot exports the iOS Xcode project on Linux. Only the build of an `.ipa` needs macOS.
+- The web export (thread support off) starts in the pre-installed Chromium with WebGL 2.
 
 Commands that work:
 
@@ -93,8 +102,22 @@ godot --headless --path . --import
 godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -gexit
 
 # Run the game with a picture, without a screen
-xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --resolution 720x1280 -- --playtest=boot_intro
+xvfb-run -a -s "-screen 0 2560x2560x24" godot --path . --rendering-driver opengl3 --audio-driver Dummy --resolution 720x1280 -- --playtest=boot_intro
+
+# The project scripts (they do the commands above)
+tools/setup.sh               # Godot 4.7.2 in .tools/godot/, GUT in addons/gut/
+tools/setup.sh --templates   # also the export templates
+tools/test.sh                # all unit tests
+tools/playtest.sh walk_hem   # one play test at 720x1280
+tools/playtest.sh walk_hem --size=1080x2400
+tools/playtest.sh --all      # all play tests at all sizes (about 20 minutes)
+
+# Exports (they need the export templates)
+godot --headless --path . --export-release "Web" build/web/index.html
+godot --headless --path . --export-debug "iOS" build/ios/VungTau.ipa   # Xcode project only on Linux
 ```
+
+A play-test scenario is `playtests/NAME.gd`. It extends `RefCounted` and has `func run(d: PlaytestDriver) -> void`. The header lines `# phase: ARGS` and `# sizes: WxH ...` tell `tools/playtest.sh` how to run it. See `scripts/playtest_driver.gd` for the API.
 
 The audio driver prints ALSA errors in the workspace. These errors are not defects.
 
@@ -108,6 +131,16 @@ The audio driver prints ALSA errors in the workspace. These errors are not defec
 | `docs/playtests/` | Play-test reports from the architect. |
 | `docs/content/culture-notes.md` | What we know about the food and customs, with sources and check status. |
 | `docs/prototype/hem-2d.html` | The first 2D prototype. Use it as a reference for content and flow only. Do not copy its look. |
+| `project.godot`, `export_presets.cfg` | The Godot project and the export presets (Web, Android, iOS). |
+| `autoload/` | `Content` (reads and checks `data/`), `GameState` (clock, notebook, save), `Playtest` (active only with `--playtest=NAME`). |
+| `data/` | All content: cards, spots and opening hours, dialogue, the hẻm layout, UI text. |
+| `scenes/` | `main.tscn` (world and UI), `world/` (hẻm, tube house, beach, camera), `actors/` (player, NPC), `ui/` (top bar, talk panel, sheets, toast). |
+| `scripts/` | Classes with no scene: clock math, save format, content checks, light by time, greybox shapes, sounds, UI theme, play-test driver. |
+| `tests/unit/` | GUT unit tests. |
+| `playtests/` | Play-test scenarios PT-01 to PT-10. |
+| `tools/` | `setup.sh`, `test.sh`, `playtest.sh`. |
+| `assets/` | Fonts, icons, and `CREDITS.md`. |
+| `.github/workflows/` | `test.yml` (tests on each push) and `export.yml` (web, Android, iOS builds). |
 
 Plan 0001 adds the Godot project structure. See that plan.
 
