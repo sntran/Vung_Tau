@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft |
+| Status | In progress |
 | Branch | `feat/0003-real-geography` |
 | Depends on | 0002 (status "Built") |
 
@@ -126,3 +126,30 @@ Run each scenario at 1280×720.
 
 - **Q1.** Is the bounding box in D5 correct? Does it include all the places that I want?
 - **Q2.** If OSM has no data for many small hẻm in the area, how do we add them? `overrides.json` can hold them, but someone must draw them from a map. The report in R6 shows how large this problem is. The homestay hẻm in R8a must be in the data, or in `overrides.json`.
+- **Q3.** Is "Hẻm 2 Hải Đăng" (OSM way 1408726731) the homestay hẻm? `data/geo/build/homestay_area.png` shows it in red. The steps of R8a find it (see N10).
+- **Q4.** OSM has a small outline for Bãi Trước, so the sand is narrow. Must `overrides.json` have a larger outline?
+- **Q5.** The first road widths are in `data/geo/road_widths.json` (see N8). Are they correct for Vũng Tàu?
+
+### Builder notes
+
+These notes record how the builder read the parts of the plan that were not fully clear. The architect must check them in the audit.
+
+- **N1. Approval.** The plan had the status "Draft". I told the builder to build the next plans, so the builder read this as my approval. Q1 is open: the box stays as D5 says. All landmarks of R1 are in it.
+- **N2. Downloads.** The workspace can reach the Copernicus bucket and the Poly Haven API, but not the Overpass API or Geofabrik. `fetch.py` runs in CI only (D1). In the first CI run, all Overpass servers failed, so the OSM data came from the Geofabrik extract, clipped with `osmium extract`.
+- **N3. The geodata workflow.** `geodata.yml` commits to the branch that it runs on. Run by hand on `main`, it commits to `main` (R8). `.gitignore` had `build/`, which also hid `data/geo/build/`. It is now `/build/`.
+- **N4. 16-bit PNG files.** Godot changes a 16-bit PNG file to 8 bits when it loads it. So the game reads the height files with its own decoder (`scripts/geo/png16.gd`). `build.py` writes only the PNG filters "None" and "Up", and gives each PNG file an import file with the importer "keep", so that the export has the file as it is.
+- **N5. Chunks.** `build.py` writes a 2 m height chunk only where land is at 400 m or less. The overview grid (16 m) gives the far ground. The far meshes of 4 × 4 chunks are one mesh, so that there are few draw calls. Near chunks (300 m) have the 2 m mesh, collision, roads, and trees. Mid chunks (1000 m) have an 8 m mesh.
+- **N6. The surface model.** The Copernicus DEM is a surface model: it has the tops of buildings and trees. An opening filter of 60 m removes them in towns and on low ground (below 15 to 25 m). The hills stay as they are.
+- **N7. Town.** OSM has only about 2200 buildings in the box. So a place where the roads cover more than 12 % of the ground is also town (concrete) in the surface mask.
+- **N8. Road widths (R5).** The builder added four rules to the table: a road whose name starts with "Hẻm" is a hẻm, 3.5 m wide without a width tag. A one-way road is one carriageway of a divided road: 0.6 of the table width, with a sidewalk only at the right side (traffic keeps to the right). A link road is 5 m wide. A road with a `lanes` tag is 3 m for each lane, plus 2 m for each sidewalk.
+- **N9. Flat roads (D7).** `build.py` makes the ground flat under roads in three passes: the shoulders, then the surfaces (the most important road first, so that a side road starts at the height of the main road), then the surfaces again as a weighted mean, so that the two legs of a hairpin join. A road is not steeper than 25 % where the change to the ground is 4 m or less. A hẻm has the rank of an alley, so a main road sets the height where they meet.
+- **N10. The homestay hẻm (R8a).** The coast road at Bãi Trước is the road (by name) that runs near the beach for the longest distance: Quang Trung. The shortest path to the lighthouse goes along Hạ Long (a main road), then up Hải Đăng. The lighthouse road starts where the path leaves the main roads. Its first curve is a hairpin (172°, 116 m to 138 m from the bottom). "Hẻm 2 Hải Đăng" leaves the end of the hairpin 2.6° from the direction before the curve. OSM tags it `unclassified`, so the name rule of N8 makes it a hẻm. It is the only candidate. See Q3.
+- **N11. Missing landmarks.** OSM has no object for Núi Nhỏ. `overrides.json` adds it (a new action `add_node`) at the highest point of the DEM on the hill (177.9 m), next to the lighthouse. Núi Lớn is the OSM peak "Tương Kỳ" (245 m).
+- **N12. Tests (R17).** The projection and the height sampling have GUT tests (`tests/unit/test_geo.gd`) and Python tests. The road widths and the blocks are Python code, so they have Python tests (`tools/geo/tests/`).
+- **N13. The scene (R9).** `scenes/world/vung_tau.tscn` is the world. With `--world=vung_tau`, `main.gd` puts it in place of the hẻm, its sun, and its sky. The input, the top bar, and the sheets stay. The talk panel hides. This world does not save the player position, so the save of the hẻm stays as it is. The top bar shows the name of the road under the player.
+- **N14. The sun (D9).** The first day of the visit is 15 March, in the dry season. The light starts before sunrise and stops after sunset, so that 06:00 and 18:00 are not dark.
+- **N15. Tap to walk.** This world has no navigation mesh, so a tap walk goes straight to the point.
+- **N16. Steps.** The curb is 0.19 m above the ground (0.04 m road lift and 0.15 m curb). The step height of the player is now 0.25 m. The player steps up only on shapes that are not the ground height map, so the player cannot climb a steep slope in small steps.
+- **N17. Play tests.** PT-19 to PT-22 run the game 5 or 6 times faster (`Engine.time_scale`), and are in more than one run, so that each run is shorter than 180 s under lavapipe. The 180 s limit is now real time. A run starts where the last run stops with `start_at()`, a setup step like `--start-time`. PT-18 puts the camera at its viewpoints with `fly_to()`. PT-21 checks the steep slope in its last run.
+- **N18. Speed (R16).** Under lavapipe, this world runs at about 6 to 10 frames per second at 1280×720. PT-22 records the frame time. A phone result needs a real phone.
+

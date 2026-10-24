@@ -83,6 +83,10 @@ Verified in the development workspace (Linux, 2 CPUs, no GPU, no Vulkan):
 - `Input.parse_input_event()` with an `InputEventScreenTouch` presses a `Button`. Touch-to-mouse emulation is on by default.
 - GUT 9.7.1 runs with `godot --headless -s addons/gut/gut_cmdln.gd`.
 - GitHub, npm, and PyPI are reachable. Google downloads (Android SDK, Maven) and blender.org are not reachable.
+- The Copernicus DEM bucket (`copernicus-dem-30m.s3.amazonaws.com`) and the Poly Haven API are reachable. The Overpass API, Geofabrik, and `dl.polyhaven.org` are not. So `tools/geo/fetch.py` runs in CI only (plan 0003, D1).
+- Godot changes a 16-bit PNG file to 8 bits when it loads it. The game reads the 16-bit height files with `Png16` (`scripts/geo/png16.gd`). An import file with `importer="keep"` makes the export keep a file as it is, and Godot does not change that import file.
+- `PackedByteArray.decompress_dynamic(-1, FileAccess.COMPRESSION_DEFLATE)` reads a zlib stream (the data of a PNG file).
+- A `Vector2` has 32-bit floats. UTM values and degrees need 64 bits, so `GeoProjection` gives them in a `PackedFloat64Array`.
 - GitHub archive downloads (`github.com/OWNER/REPO/archive/...`) return 403 in the workspace. `git clone` works. So `tools/setup.sh` gets GUT with `git clone`. GitHub release downloads (Godot, the export templates) work.
 - `Camera3D.project_ray_normal()` does not use the frustum offset. The camera uses a frustum offset, so `CameraRig.screen_ray()` calculates the ray. `Camera3D.unproject_position()` is correct.
 - The workspace prints "WARNING: Could not set V-Sync mode" at each start. This warning comes from the Mesa driver. It is not a defect.
@@ -117,12 +121,23 @@ tools/playtest.sh fp_walk --size=2400x1080
 tools/playtest.sh fp_layout --renderer=compatibility   # the renderer of the web build
 tools/playtest.sh --all      # all play tests at all sizes (about 20 minutes)
 
+# Geodata (plan 0003). Python 3.13 with the packages of tools/geo/requirements.txt.
+python -m pip install -r tools/geo/requirements.txt
+python tools/geo/build.py          # data/geo/raw/ to data/geo/build/ (about 2 minutes, no download)
+python -m pytest -q tools/geo/tests
+python tools/geo/fetch.py          # CI only: the "Geodata" workflow runs it by hand on main
+tools/playtest.sh geo_views        # PT-18: the screenshots of the real places
+
+# The Vũng Tàu world (plan 0003): add -- --world=vung_tau to the Godot command. F3 shows the debug screen.
+
 # Exports (they need the export templates)
 godot --headless --path . --export-release "Web" build/web/index.html
 godot --headless --path . --export-debug "iOS" build/ios/VungTau.ipa   # Xcode project only on Linux
 ```
 
 A play-test scenario is `playtests/NAME.gd`. It extends `RefCounted` and has `func run(d: PlaytestDriver) -> void`. The header lines `# phase: ARGS`, `# sizes: WxH ...`, and `# compatibility: WxH` tell `tools/playtest.sh` how to run it. See `scripts/playtest_driver.gd` for the API. The first-person functions are `hold_stick()`, `drag()`, `look_at_id()`, `look_at_point()`, and `gyro()`. `gyro()` replaces the sensor source of the game with a `ScriptedSensorSource`, because a workspace has no gyroscope.
+
+A play test in the Vũng Tàu world has `--world=vung_tau` in its phase line. `start_at()` and `fly_to()` are setup steps that put the player or the camera at a point. `set_time_scale()` plays the game faster for a long walk; a check of a time must then use the game time.
 
 The audio driver prints ALSA errors in the workspace. These errors are not defects.
 
@@ -138,14 +153,16 @@ The audio driver prints ALSA errors in the workspace. These errors are not defec
 | `docs/prototype/hem-2d.html` | The first 2D prototype. Use it as a reference for content and flow only. Do not copy its look. |
 | `project.godot`, `export_presets.cfg` | The Godot project and the export presets (Web, Android, iOS). |
 | `autoload/` | `Content` (reads and checks `data/`), `GameState` (clock, notebook, save), `Playtest` (active only with `--playtest=NAME`). |
-| `data/` | All content: cards, spots and opening hours, dialogue, the hẻm layout, UI text. |
-| `scenes/` | `main.tscn` (world, input, and UI), `world/` (hẻm, tube house, beach), `actors/` (first-person player, NPC), `ui/` (top bar, talk panel, sheets, toast, joystick, center dot). |
-| `scripts/` | Classes with no scene: clock math, save format, content checks, light by time, greybox shapes, sounds, UI theme, play-test driver. |
+| `data/` | All content: cards, spots and opening hours, dialogue, the hẻm layout, UI text, credits. |
+| `data/geo/` | Plan 0003: the play area, the landmarks, the road widths, the OSM corrections (`overrides.json`), the raw extracts (`raw/`, with `manifest.json`), and the game data that `tools/geo/build.py` makes (`build/`, with `report.md` and `homestay_area.png`). ODbL, see `LICENSE` there. |
+| `scenes/` | `main.tscn` (world, input, and UI), `world/` (hẻm, tube house, beach, and `vung_tau.tscn`, the real ground of plan 0003), `actors/` (first-person player, NPC), `ui/` (top bar, talk panel, sheets, credits, toast, joystick, center dot). |
+| `scripts/` | Classes with no scene: clock math, save format, content checks, light by time, greybox shapes, sounds, UI theme, play-test driver. `geo/`: the projection, the geodata reader, the 16-bit PNG reader, the sun position, and the ground and road mesh builders. |
+| `shaders/` | The ground shader and the sea shader of the Vũng Tàu world. |
 | `tests/unit/` | GUT unit tests. |
-| `playtests/` | Play-test scenarios PT-01 and PT-03 to PT-17 (PT-02 and PT-07 were removed in plan 0002). |
-| `tools/` | `setup.sh`, `test.sh`, `playtest.sh`. |
+| `playtests/` | Play-test scenarios PT-01 and PT-03 to PT-22 (PT-02 and PT-07 were removed in plan 0002). |
+| `tools/` | `setup.sh`, `test.sh`, `playtest.sh`. `geo/`: the geodata pipeline (`fetch.py`, `build.py`, the `geodata` package, and its tests). |
 | `assets/` | Fonts, icons, and `CREDITS.md`. |
-| `.github/workflows/` | `test.yml` (tests on each push) and `export.yml` (web, Android, iOS builds). |
+| `.github/workflows/` | `test.yml` (tests on each push), `export.yml` (web, Android, iOS builds), and `geodata.yml` (download and build the geodata, by hand). |
 
 Plan 0001 adds the Godot project structure. See that plan.
 
