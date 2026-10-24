@@ -60,7 +60,12 @@ The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0007 puts h
   - Balcony: a slab that sticks out 0.6 m to 1.2 m, with a rail. Rail styles: plain vertical bars, iron patterns, stainless steel.
   - Ground floor: roll-up metal shutter (open, half, closed, with a short animation), folding iron gate (cửa xếp), or a wall with a door. A tiled step in front.
   - Roof, three types: a flat concrete roof with a parapet (the most common), a pitched roof of terracotta tiles (villa style, common in some neighborhoods), and a corrugated metal roof (tôn). Flat roofs have rebar that sticks up for a future floor, a steel water tank, laundry lines, and foam boxes with plants. The players see roofs from Núi Lớn and Núi Nhỏ, so roofs matter.
-  - Clutter: AC units, potted plants, shop signs with Vietnamese text, canvas or corrugated awnings, electric meter boxes, down pipes, wires, and cable bundles at the poles.
+  - Clutter: AC units, potted plants, shop signs with Vietnamese text, canvas or corrugated awnings, electric meter boxes, and down pipes.
+  - Overhead cables: concrete poles with thick, sagging bundles of many cables across the street and along it. In the street photos they are one of the strongest features. Make them dense, not a few thin lines.
+  - Rooftop: stainless steel water tanks (horizontal and vertical), satellite dishes, TV antennas, and sometimes a cell tower.
+  - Signs: vertical signs on the corner of a building ("KHÁCH SẠN" for hotels), stacked shop signs, light boxes, and signs fixed to balconies. Use fictional names only.
+  - Front materials: polished granite or ceramic tiles on the ground floor front, patterned ceramic tiles on the whole front of some houses, vase balusters (con tiện) and columns on villas, breeze blocks or small vent openings in bare side walls.
+  - Building types: tube houses of 2 to 5 floors, villas with pitched tile roofs, and mini-hotels of 5 to 8 floors with many small windows and narrow balconies near the beach.
 - **R8.** Plaster shader (`plaster.gdshader`), with a seed for each house:
   - Paint color with small changes in tone.
   - Rain streaks from the parapet and below each sill.
@@ -84,7 +89,19 @@ The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0007 puts h
   | `#B88C7C` | 0.054 | 0.33 | 0.72 |
   | `#939DB4` | 0.036 | 0.18 | 0.71 |
 
-  The photos have haze, which makes white walls look grey. So the builder makes each grey (saturation 0.02 or less) 10% lighter. Most walls have a saturation of 0.06 or less. Cream and peach walls have about 0.2. The test colors of the first probe had 0.3 to 0.4, which is why they looked artificial. The source of each value is "aerial photos, 2026-10-24". The photos are not in the repository. The house generator picks colors by weight. Two neighbor houses must not have the same color. A rare accent color (for example a faded blue or green) is at most 1 house in 8.
+  The photos have haze, which makes white walls look grey. So the builder makes each grey (saturation 0.02 or less) 10% lighter. Most walls have a saturation of 0.06 or less. Cream and peach walls have about 0.2. The test colors of the first probe had 0.3 to 0.4, which is why they looked artificial. The source of each value is "aerial photos, 2026-10-24". The photos are not in the repository.
+
+  Street-level photos that I chose add these values (white balance corrected with the asphalt as neutral grey):
+
+  | Part | sRGB | Saturation |
+  |---|---|---|
+  | Cream villa wall | `#D3CFB4` | 0.15 |
+  | Salmon hotel wall | `#CE9E74` | 0.44 |
+  | Turquoise wall | `#06ACC0` | 0.97 |
+  | Unpainted grey plaster | `#A3A799` | 0.08 |
+  | Terracotta roof tiles in sunlight | `#E19C61` | 0.57 |
+
+  So strong colors do exist, but on few buildings, and more on mini-hotels and shops than on homes. The rule: about 85% of walls come from the measured muted palette. About 15% are "bold": salmon, turquoise, sky blue, bright yellow, or two-color stripes. Bold walls are at most 1 house in 6 in a hẻm of homes, and up to 1 in 3 on a street near the beach with hotels. The house generator picks colors by weight. Two neighbor houses must not have the same color.
 - **R10b.** The palette also has colors for the accent parts: shutters, rails, window frames, signs, and awnings. These can be stronger than the walls.
 - **R10c.** Roof colors: terracotta tiles from `#D39B83`, `#B28469`, and `#634D3C` (measured in the same photos), with a seed for age and moss. Terracotta is about 6% of the town area in the photos.
 - **R11.** The hẻm floor: concrete with cracks and patches, a drain gutter, and covers. The tiled fronts of the houses differ from house to house.
@@ -125,4 +142,4 @@ The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0007 puts h
 - **Q1.** Which computer do I use to test the desktop builds (Windows, macOS, or Linux)?
 - **Q2.** Which parts in R7 are not correct for Vũng Tàu, and which parts are missing? (For example: solar water heaters on roofs, an altar for Ông Địa in shops, numbers painted on the walls.)
 - **Q3.** Answered in part: the first palette comes from aerial photos (R10a). Street-level photos can make it better, because aerial photos show roofs and haze. Which roof type is the most common in the hẻm near the homestay?
-- **Q4.** Do many houses in Vũng Tàu have ceramic tiles on the front wall (ốp gạch)? If yes, add tiled fronts to R7.
+- **Q4.** Answered: the street photos show granite or tiled ground floor fronts and some fully tiled fronts with patterns. They are in R7.

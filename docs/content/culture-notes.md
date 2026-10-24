@@ -77,6 +77,12 @@ Status values:
 |---|---|---|
 | Houses in Vũng Tàu are brick under plaster and paint. Brick shows only where plaster fell off, or on bare side walls that rise above a shorter neighbor. | Confirmed | First-hand |
 | A tube house is narrow (about 3 m to 4 m) and deep. It has 2 to 4 floors. The ground floor opens to the street with a roll-up shutter or a gate. It is often a small shop by day and a garage for scooters at night. The roof is flat, with laundry and plants. | Source | [Local Vietnam](https://localvietnam.com/?p=92926) |
+| Most walls are white, off-white, light grey, or cream. A few buildings, often mini-hotels and shops, have strong colors: salmon, turquoise, sky blue, yellow, or stripes. | Source | Photos that I chose, 2026-10-24 (not in the repository) |
+| Many villas and some taller buildings have pitched roofs of terracotta tiles. Low buildings often have corrugated metal roofs. Flat roofs have stainless steel water tanks, satellite dishes, and antennas. | Source | Photos that I chose, 2026-10-24 |
+| Thick bundles of overhead cables hang from concrete poles across and along the streets. | Source | Photos that I chose, 2026-10-24 |
+| Near the beach there are many mini-hotels of 5 to 8 floors with vertical "KHÁCH SẠN" signs. | Source | Photos that I chose, 2026-10-24 |
+| Ground floor fronts often have polished granite or ceramic tiles. Some fronts are fully covered with patterned tiles. Sidewalks are tiled. | Source | Photos that I chose, 2026-10-24 |
+| Older women often wear đồ bộ (a matching printed shirt and trousers) and a nón lá, and ride bicycles with a basket. | Source | Photos that I chose, 2026-10-24 |
 
 ## Daily life
 
