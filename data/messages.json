@@ -1,0 +1,83 @@
+{
+	"note": "The text messages of cô Nga in the Messages app (plan 0003, R24, R25). A message comes once. \"at\" is a time (minutes after midnight) on each day, or on \"day\" only. \"after\" is an event: \"start\" (a new game), \"wake\" (a new morning), \"heard:LINE\" (the player heard the line), or \"lens:LINE\" (the Lens app showed the description). \"unless_card\" stops the message when the player knows the card. \"repeat\": true lets the message come again each day.",
+	"sender": {
+		"name": "Cô Nga",
+		"speaker": "nga",
+		"color": "#8A5A34"
+	},
+	"messages": [
+		{
+			"id": "welcome",
+			"after": "start",
+			"text": "Chào con! Welcome to Vũng Tàu. I'm Nga, from the family at the homestay. You're staying with us in Hẻm 42, a short walk from Bãi Trước. It's 6 in the morning, and the hẻm is already busy. Walk around, eat, and fill your sổ tay (notebook) with what you learn.",
+			"status": "confirmed"
+		},
+		{
+			"id": "how_to",
+			"after": "start",
+			"text": "A tip: tap the street to walk, or tap a shop to go there. Point the Lens app at a place, and it tells you what it is. Turn on Listen, and it writes down what people say, in Vietnamese and English.",
+			"status": "confirmed"
+		},
+		{
+			"id": "an_sang",
+			"after": "heard:batu.reply_chua",
+			"text": "“Ăn sáng chưa?” is a greeting. Bà Tư is saying good morning, and she's also telling you where to eat.",
+			"status": "check"
+		},
+		{
+			"id": "an_sang_said",
+			"after": "heard:batu.reply_chua_said",
+			"text": "Bà Tư says you speak Vietnamese well! “Ăn sáng chưa?” is a greeting. She's saying good morning, and she's also telling you where to eat.",
+			"status": "check"
+		},
+		{
+			"id": "an_sang_english",
+			"after": "heard:batu.reply_english",
+			"text": "“Ăn sáng chưa?” is how neighbors say hi in the morning. Try “Dạ, chưa” (not yet) next time.",
+			"status": "check"
+		},
+		{
+			"id": "tip_beach",
+			"day": 1,
+			"at": 375,
+			"unless_card": "boats",
+			"text": "Bãi Trước is at the end of the hẻm. Early morning is the time to go: the boats are in.",
+			"status": "confirmed"
+		},
+		{
+			"id": "tip_pho",
+			"day": 1,
+			"at": 420,
+			"unless_card": "breakfast",
+			"text": "Cô Sáu's phở is two doors from the homestay. Go before it sells out!",
+			"status": "confirmed"
+		},
+		{
+			"id": "sold_out",
+			"after": "heard:cosau.sold_out",
+			"text": "Phở is a morning food here. Most bowls are sold by 10 or 11. Come back early tomorrow.",
+			"status": "check"
+		},
+		{
+			"id": "closed_after",
+			"after": "lens:spot.pho.closed_after",
+			"unless_card": "breakfast",
+			"text": "Phở is a morning food here. Come back early tomorrow.",
+			"status": "check"
+		},
+		{
+			"id": "late",
+			"at": 1410,
+			"repeat": true,
+			"text": "It's late, con. The hẻm is quiet and the shutters are down. Come home and sleep. Open the Clock app at the homestay.",
+			"status": "confirmed"
+		},
+		{
+			"id": "morning",
+			"after": "wake",
+			"repeat": true,
+			"text": "Ngày {day}. Good morning! At {time} the hẻm is already awake: a broom on the concrete, a scooter warming up, sea wind, and the smell of broth from Cô Sáu's.",
+			"status": "check"
+		}
+	]
+}

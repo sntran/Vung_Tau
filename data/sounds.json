@@ -1,0 +1,20 @@
+{
+	"note": "Sounds that are not speech, with their captions (plan 0003, R14). The caption shows in the subtitle box while the player hears the sound. \"range_m\" is the distance at which the player hears it.",
+	"sounds": {
+		"clack": {
+			"caption": "[lóc cóc]",
+			"range_m": 25.0,
+			"status": "confirmed"
+		},
+		"tv": {
+			"caption": "[a TV upstairs]",
+			"range_m": 8.0,
+			"status": "check"
+		},
+		"ting": {
+			"caption": "",
+			"range_m": 0.0,
+			"status": "confirmed"
+		}
+	}
+}

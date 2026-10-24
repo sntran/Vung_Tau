@@ -1,8 +1,4 @@
 {
-	"place_name": "Hẻm 42",
-	"place_sub": "Vũng Tàu · Ngày {day}",
-	"beach_name": "Bãi Trước",
-	"beach_sub": "Front Beach · Ngày {day}",
 	"parts_of_day": [
 		{
 			"before": 240,
@@ -35,16 +31,10 @@
 			"en": "night"
 		}
 	],
-	"sound_on": "Sound: on",
-	"sound_off": "Sound: off",
-	"notebook_button": "Sổ tay",
 	"notebook_title": "Sổ tay — what you learned",
 	"notebook_count": "{found} of {total} found. Cards you do not know yet show a hint. The hint says where to look.",
 	"notebook_locked": "? ? ?",
 	"notebook_hint": "Hint: {hint}",
-	"close": "Close",
-	"toast_new_card": "New in your sổ tay:",
-	"clack_bubble": "lóc cóc…",
 	"clock_title": "{time} · {part}",
 	"clock_hint": "{part} means {part_en}. Shops open and close by the clock.",
 	"clock_choices": [
@@ -93,5 +83,55 @@
 	"settings_fov": "Field of view: {value}",
 	"settings_tap_walk": "Tap to walk",
 	"center_view": "Center the view",
-	"too_far": "That is far. You walk part of the way."
+	"too_far": "That is far. You walk part of the way.",
+	"phone_button": "Phone",
+	"home": "Home",
+	"apps": {
+		"listen": "Listen",
+		"lens": "Lens",
+		"messages": "Messages",
+		"notebook": "Sổ tay",
+		"clock": "Clock",
+		"settings": "Settings"
+	},
+	"listen_on": "Listen: on",
+	"listen_off": "Listen: off",
+	"listen_empty": "Turn on Listen. The app writes down what people near you say, in Vietnamese and English.",
+	"listen_save_hint": "Tap a line to save it to your sổ tay.",
+	"phrasebook_title": "Phrasebook",
+	"phrasebook_empty": "Talk to someone. Your answers show here.",
+	"reply_play": "Play",
+	"reply_say": "I'll say it",
+	"reply_english": "Say it in English",
+	"said_title": "Say it with the tones:",
+	"said_done": "I said it",
+	"tones": {
+		"ngang": "level",
+		"huyền": "falling",
+		"sắc": "rising",
+		"hỏi": "dipping",
+		"ngã": "broken rising",
+		"nặng": "heavy"
+	},
+	"phrase_saved": "Saved to your sổ tay: {vi}",
+	"lens_empty": "Point the frame at a place.",
+	"lens_person": "{name}",
+	"messages_empty": "No messages yet.",
+	"notify_card": "New in your sổ tay: {title}",
+	"notify_message": "{name}: {text}",
+	"clock_day": "Ngày {day}",
+	"clock_rest": "Rest",
+	"clock_sleep_away": "You can sleep until morning at the homestay.",
+	"notebook_phrases": "Saved phrases",
+	"notebook_no_phrases": "Tap a line in the Listen app to save it here.",
+	"settings_sound": "Sound",
+	"settings_subtitles": "Subtitles: {value}",
+	"subtitle_languages": {
+		"vi": "Vietnamese",
+		"en": "English",
+		"both": "Both",
+		"off": "Off"
+	},
+	"settings_subtitle_size": "Subtitle size: {value}",
+	"settings_subtitle_box": "Subtitle box: {value}"
 }

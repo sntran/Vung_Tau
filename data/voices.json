@@ -1,0 +1,15 @@
+{
+	"note": "The VieNeu-TTS preset voice of each speaker (plan 0003, R3). These are the first values: Southern voices for the people of the hẻm, and a Northern voice for Bác Hà. The owner chooses the final voices after the audition (R9). \"phone\" is the neutral voice of the phone (the Play button of the Listen app).",
+	"model": "VieNeu-TTS-v3-Turbo",
+	"package": "vieneu==3.8.3",
+	"speakers": {
+		"batu": "Thục Đoan",
+		"cosau": "Kim Thanh",
+		"bacha": "Ngọc Huyền",
+		"cout": "Thùy Dung",
+		"nga": "Mỹ Duyên",
+		"chubay": "Thái Sơn",
+		"chuchin": "Đức Trí"
+	},
+	"phone": "Mai Anh"
+}

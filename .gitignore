@@ -4,7 +4,11 @@
 *.translation
 
 # Tools from tools/setup.sh
-.tools/
+.tools
 
 # Output of the tests and exports
-build/
+/build/
+
+# Python
+__pycache__/
+.pytest_cache/

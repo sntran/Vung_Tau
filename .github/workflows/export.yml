@@ -34,6 +34,8 @@ jobs:
           .tools/godot/godot --headless --path . --import
           .tools/godot/godot --headless --path . --export-release "Web" build/web/index.html
           test -f build/web/index.html
+          # The voice audition page of plan 0003 (R9) is at /voices/.
+          cp -r docs/voices build/web/voices
           echo "Size of the web build:"
           du -sh build/web
           ls -l build/web

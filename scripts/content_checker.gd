@@ -8,45 +8,45 @@ extends RefCounted
 const STATUS_VALUES := ["confirmed", "source", "check"]
 const SPOT_KINDS := ["house", "shop", "stall", "cart", "place"]
 const GROUND_TYPES := ["gate", "shop", "wall"]
-const CHOICE_STYLES := ["", "primary", "quiet"]
-## Special values for "next" in a dialogue choice.
-## "@hem" shows the hẻm panel. "@spot" shows the line of the near spot.
-const SPECIAL_NEXT := ["@hem", "@spot"]
+## The forms of address of plan 0003 (R20).
+const ADDRESS_FORMS := ["bà", "cô", "chú", "bác", "anh", "chị", "em"]
+## The events that start a message (data/messages.json).
+const MESSAGE_EVENTS := ["start", "wake"]
 const MINUTES_PER_DAY := 1440
+const SUBTITLE_IDS := ["vi", "en", "both", "off"]
 
 var errors: PackedStringArray = []
 
 
-## Checks all content. Each argument is the parsed JSON of one file.
-static func check_all(cards: Variant, spots: Variant, dialogue: Variant, layout: Variant,
-		ui: Variant) -> PackedStringArray:
+## Checks all content. "files" has the parsed JSON of each file: cards,
+## spots, dialogue, layout, ui, messages, voices, sounds, and manifest (the
+## voice manifest). "audio_exists" tells if an audio file exists (the tests
+## replace it).
+static func check_all(files: Dictionary, audio_exists := Callable()) -> PackedStringArray:
 	var checker := ContentChecker.new()
-	checker._check_all(cards, spots, dialogue, layout, ui)
+	checker._check_all(files, audio_exists if audio_exists.is_valid() else ResourceLoader.exists)
 	return checker.errors
 
 
-func _check_all(cards: Variant, spots: Variant, dialogue: Variant, layout: Variant,
-		ui: Variant) -> void:
-	if not _is_dict(cards, "cards.json", "file"):
-		return
-	if not _is_dict(spots, "spots.json", "file"):
-		return
-	if not _is_dict(dialogue, "dialogue/hem.json", "file"):
-		return
-	if not _is_dict(layout, "world/hem_layout.json", "file"):
-		return
-	if not _is_dict(ui, "ui.json", "file"):
-		return
-	var card_ids := _check_cards(cards)
-	var line_ids := _check_dialogue(dialogue, card_ids)
-	var spot_ids := _check_spots(spots, card_ids, line_ids)
-	_check_layout(layout, spot_ids, spots)
-	_check_ui(ui)
-	_check_text_nfc(cards, "cards.json")
-	_check_text_nfc(spots, "spots.json")
-	_check_text_nfc(dialogue, "dialogue/hem.json")
-	_check_text_nfc(layout, "world/hem_layout.json")
-	_check_text_nfc(ui, "ui.json")
+func _check_all(files: Dictionary, audio_exists: Callable) -> void:
+	var names := {"cards": "cards.json", "spots": "spots.json", "dialogue": "dialogue/hem.json",
+			"layout": "world/hem_layout.json", "ui": "ui.json", "messages": "messages.json",
+			"voices": "voices.json", "sounds": "sounds.json", "manifest": "assets/voices/manifest.json"}
+	for key: String in names:
+		if not _is_dict(files.get(key), names[key], "file"):
+			return
+	var card_ids := _check_cards(files.cards)
+	var lines := _check_dialogue(files.dialogue, card_ids)
+	var spot_ids := _check_spots(files.spots, files.dialogue, card_ids, lines)
+	_check_layout(files.layout, spot_ids, files.spots)
+	_check_ui(files.ui)
+	_check_messages(files.messages, files.dialogue, card_ids)
+	_check_voices(files.voices, files.dialogue)
+	_check_sounds(files.sounds)
+	_check_audio(files.dialogue, files.voices, files.manifest, audio_exists)
+	for key: String in names:
+		if key != "manifest":
+			_check_text_nfc(files[key], names[key])
 
 
 func _error(file: String, where: String, text: String) -> void:
@@ -165,107 +165,153 @@ func _check_cards(cards: Dictionary) -> Dictionary:
 	return ids
 
 
+## Checks the dialogue file. Returns the lines: line ID -> "speech" or "text".
 func _check_dialogue(dialogue: Dictionary, card_ids: Dictionary) -> Dictionary:
 	var file := "dialogue/hem.json"
-	var ids := {}
+	var kinds := {}
 	var speakers: Dictionary = {}
 	if _require(dialogue, "speakers", TYPE_DICTIONARY, file, "file"):
 		speakers = dialogue.speakers
-		for key: String in speakers:
-			var speaker: Variant = speakers[key]
-			if _is_dict(speaker, file, "speaker \"%s\"" % key):
-				_require(speaker, "name", TYPE_STRING, file, "speaker \"%s\"" % key)
-				_require(speaker, "color", TYPE_STRING, file, "speaker \"%s\"" % key)
+	if _require(dialogue, "say_again", TYPE_DICTIONARY, file, "file"):
+		if _require(dialogue.say_again, "vi", TYPE_STRING, file, "say_again") \
+				and not "{address}" in dialogue.say_again.vi:
+			_error(file, "say_again", "\"vi\" must have \"{address}\"")
+		_require(dialogue.say_again, "en", TYPE_STRING, file, "say_again")
+		_check_status(dialogue.say_again, file, "say_again")
 	if _require(dialogue, "strings", TYPE_DICTIONARY, file, "file"):
-		for field: String in ["status_open", "status_closed"]:
+		for field: String in ["status_open", "status_closed", "someone"]:
 			_require(dialogue.strings, field, TYPE_STRING, file, "strings")
 	if not _require(dialogue, "lines", TYPE_DICTIONARY, file, "file"):
-		return ids
+		return kinds
 	for line_id: String in dialogue.lines:
-		ids[line_id] = true
+		var line: Variant = dialogue.lines[line_id]
+		if typeof(line) == TYPE_DICTIONARY:
+			kinds[line_id] = "speech" if line.has("speaker") else "text"
+	for key: String in speakers:
+		var where := "speaker \"%s\"" % key
+		var speaker: Variant = speakers[key]
+		if not _is_dict(speaker, file, where):
+			continue
+		_require(speaker, "name", TYPE_STRING, file, where)
+		_require(speaker, "color", TYPE_STRING, file, where)
+		if _require(speaker, "address", TYPE_STRING, file, where) and not ADDRESS_FORMS.has(speaker.address):
+			_error(file, where, "address \"%s\" must be one of %s" % [speaker.address, ADDRESS_FORMS])
+		if speaker.has("call_after"):
+			_check_speech_ref(speaker.call_after, kinds, file, where, "call_after")
+			var call: Variant = dialogue.lines.get(speaker.call_after)
+			if typeof(call) == TYPE_DICTIONARY and call.get("speaker") != key:
+				_error(file, where, "the line \"%s\" of \"call_after\" must have the speaker \"%s\"" % [speaker.call_after, key])
 	for line_id: String in dialogue.lines:
 		var line: Variant = dialogue.lines[line_id]
 		var where := "line \"%s\"" % line_id
 		if not _is_dict(line, file, where):
 			continue
-		_require(line, "text", TYPE_STRING, file, where)
 		_check_status(line, file, where)
-		if line.has("speaker") and not speakers.has(line.speaker):
-			_error(file, where, "speaker \"%s\" does not exist" % line.speaker)
-		if line.has("phrases"):
-			if typeof(line.phrases) != TYPE_ARRAY:
-				_error(file, where, "\"phrases\" must be a list")
-			else:
-				for phrase: Variant in line.phrases:
-					if _is_dict(phrase, file, where + " phrase"):
-						_require(phrase, "vi", TYPE_STRING, file, where + " phrase")
-						_require(phrase, "en", TYPE_STRING, file, where + " phrase")
-		if not _require(line, "choices", TYPE_ARRAY, file, where):
+		if not line.has("speaker"):
+			_require(line, "text", TYPE_STRING, file, where)
+			for field: String in ["replies", "actions", "then", "vi"]:
+				if line.has(field):
+					_error(file, where, "a line without a speaker is a description: it cannot have \"%s\"" % field)
 			continue
-		if line.choices.is_empty():
-			_error(file, where, "a line must have one or more choices")
-		var choice_ids := {}
-		for i in line.choices.size():
-			var choice: Variant = line.choices[i]
-			var cwhere := "%s choice %d" % [where, i]
-			if not _is_dict(choice, file, cwhere):
+		if not speakers.has(line.speaker):
+			_error(file, where, "speaker \"%s\" does not exist" % line.speaker)
+		_require(line, "vi", TYPE_STRING, file, where)
+		_require(line, "en", TYPE_STRING, file, where)
+		if line.has("text"):
+			_error(file, where, "a spoken line has \"vi\" and \"en\", not \"text\"")
+		if line.has("say"):
+			_require(line, "say", TYPE_STRING, file, where)
+		if line.has("voice_style") and (typeof(line.voice_style) != TYPE_STRING \
+				or not String(line.voice_style).begins_with("[") or not String(line.voice_style).ends_with("]")):
+			_error(file, where, "\"voice_style\" must be a tag like \"[cười]\"")
+		if line.has("then"):
+			_check_speech_ref(line.then, kinds, file, where, "then")
+		if line.has("learn"):
+			_check_card_refs(line.learn, card_ids, file, where)
+		_check_replies(line, kinds, card_ids, file, where)
+	return kinds
+
+
+## Checks that a field points to a spoken line.
+func _check_speech_ref(value: Variant, kinds: Dictionary, file: String, where: String, field: String) -> void:
+	if typeof(value) != TYPE_STRING or not kinds.has(value):
+		_error(file, where, "\"%s\" points to line ID \"%s\" that does not exist" % [field, value])
+	elif kinds[value] != "speech":
+		_error(file, where, "\"%s\" points to line \"%s\" that has no speaker" % [field, value])
+
+
+func _check_replies(line: Dictionary, kinds: Dictionary, card_ids: Dictionary, file: String, where: String) -> void:
+	var ids := {}
+	for field: String in ["replies", "actions"]:
+		if not line.has(field):
+			continue
+		if typeof(line[field]) != TYPE_ARRAY:
+			_error(file, where, "\"%s\" must be a list" % field)
+			continue
+		for i in line[field].size():
+			var entry: Variant = line[field][i]
+			var kind := "reply" if field == "replies" else "action"
+			var ewhere := "%s %s %d" % [where, kind, i]
+			if not _is_dict(entry, file, ewhere):
 				continue
-			if _require(choice, "id", TYPE_STRING, file, cwhere):
-				cwhere = "%s choice \"%s\"" % [where, choice.id]
-				if choice_ids.has(choice.id):
-					_error(file, cwhere, "choice ID is not unique in the line")
-				choice_ids[choice.id] = true
-			_require(choice, "label", TYPE_STRING, file, cwhere)
-			_check_choice(choice, ids, card_ids, file, cwhere)
-	return ids
+			if _require(entry, "id", TYPE_STRING, file, ewhere):
+				ewhere = "%s %s \"%s\"" % [where, kind, entry.id]
+				if ids.has(entry.id):
+					_error(file, ewhere, "the ID is not unique in the line")
+				ids[entry.id] = true
+			if entry.has("learn"):
+				_check_card_refs(entry.learn, card_ids, file, ewhere)
+			for next_field: String in ["next", "next_said"]:
+				if entry.has(next_field):
+					_check_speech_ref(entry[next_field], kinds, file, ewhere, next_field)
+			if field == "actions":
+				_require(entry, "verb", TYPE_STRING, file, ewhere)
+				_require(entry, "next", TYPE_STRING, file, ewhere)
+				if _require(entry, "target", TYPE_STRING, file, ewhere) \
+						and not (entry.target.begins_with("spot.") or entry.target.begins_with("npc.")):
+					_error(file, ewhere, "\"target\" must be a test ID like \"spot.pho\" or \"npc.batu\"")
+			elif entry.get("english", false):
+				_require(entry, "en", TYPE_STRING, file, ewhere)
+				if entry.has("vi"):
+					_error(file, ewhere, "an English reply has \"en\" only")
+			else:
+				_require(entry, "vi", TYPE_STRING, file, ewhere)
+				_require(entry, "en", TYPE_STRING, file, ewhere)
 
 
-## Checks the fields that a dialogue choice and a clock choice can have.
-func _check_choice(choice: Dictionary, line_ids: Dictionary, card_ids: Dictionary, file: String,
-		where: String) -> void:
-	if choice.has("style") and not CHOICE_STYLES.has(choice.style):
-		_error(file, where, "style \"%s\" must be one of %s" % [choice.style, CHOICE_STYLES])
-	if choice.has("next"):
-		if typeof(choice.next) != TYPE_STRING:
-			_error(file, where, "\"next\" must be a line ID")
-		elif not SPECIAL_NEXT.has(choice.next) and not line_ids.has(choice.next):
-			_error(file, where, "\"next\" points to line ID \"%s\" that does not exist" % choice.next)
-	if choice.has("learn"):
-		_check_card_refs(choice.learn, card_ids, file, where)
-	if choice.has("minutes"):
-		if typeof(choice.minutes) not in [TYPE_INT, TYPE_FLOAT] or choice.minutes <= 0:
-			_error(file, where, "\"minutes\" must be a number more than 0")
-	if choice.has("until"):
-		_check_minute(choice.until, file, where, "until")
-	if choice.has("open") and choice.open != "clock":
-		_error(file, where, "\"open\" must be \"clock\"")
-
-
-func _check_line_rules(item: Dictionary, card_ids: Dictionary, line_ids: Dictionary, file: String,
-		where: String) -> void:
-	if not _require(item, "lines", TYPE_ARRAY, file, where):
+## Checks a list of time rules in "field". Each rule points to a line of
+## the kind ("speech" or "text"). "speaker" (when it is not "") is the speaker
+## that each spoken line must have.
+func _check_line_rules(item: Dictionary, field: String, kind: String, card_ids: Dictionary,
+		lines: Dictionary, dialogue: Dictionary, file: String, where: String, speaker := "") -> void:
+	if not _require(item, field, TYPE_ARRAY, file, where):
 		return
-	var rules: Array = item.lines
+	var rules: Array = item[field]
 	if rules.is_empty():
-		_error(file, where, "\"lines\" must have one or more rules")
+		_error(file, where, "\"%s\" must have one or more rules" % field)
 		return
 	for i in rules.size():
 		var rule: Variant = rules[i]
-		var rwhere := "%s rule %d" % [where, i]
+		var rwhere := "%s %s rule %d" % [where, field, i]
 		if not _is_dict(rule, file, rwhere):
 			continue
 		if _require(rule, "line", TYPE_STRING, file, rwhere):
-			if not line_ids.has(rule.line):
+			if not lines.has(rule.line):
 				_error(file, rwhere, "line ID \"%s\" does not exist" % rule.line)
+			elif lines[rule.line] != kind:
+				_error(file, rwhere, "line \"%s\" must be %s" % [rule.line,
+						"a spoken line" if kind == "speech" else "a description (no speaker)"])
+			elif speaker != "" and dialogue.lines[rule.line].get("speaker") != speaker:
+				_error(file, rwhere, "line \"%s\" must have the speaker \"%s\"" % [rule.line, speaker])
 		_check_time_rule(rule, file, rwhere)
 		if rule.has("learn"):
 			_check_card_refs(rule.learn, card_ids, file, rwhere)
 	var last: Variant = rules[rules.size() - 1]
 	if typeof(last) == TYPE_DICTIONARY and (last.has("open") or last.has("from") or last.has("before")):
-		_error(file, where, "the last rule in \"lines\" must have no condition")
+		_error(file, where, "the last rule in \"%s\" must have no condition" % field)
 
 
-func _check_spots(spots: Dictionary, card_ids: Dictionary, line_ids: Dictionary) -> Dictionary:
+func _check_spots(spots: Dictionary, dialogue: Dictionary, card_ids: Dictionary, lines: Dictionary) -> Dictionary:
 	var file := "spots.json"
 	var ids := {}
 	if _require(spots, "spots", TYPE_ARRAY, file, "file"):
@@ -279,10 +325,10 @@ func _check_spots(spots: Dictionary, card_ids: Dictionary, line_ids: Dictionary)
 				if ids.has(spot.id):
 					_error(file, where, "spot ID is not unique")
 				ids[spot.id] = spot
-			for field: String in ["name", "en", "look_label", "verb"]:
+			for field: String in ["name", "en"]:
 				_require(spot, field, TYPE_STRING, file, where)
-			if spot.has("verb_open") and typeof(spot.verb_open) != TYPE_STRING:
-				_error(file, where, "field \"verb_open\" has the wrong type")
+			if spot.has("verb"):
+				_require(spot, "verb", TYPE_STRING, file, where)
 			if spot.has("focus"):
 				_check_vector3(spot.focus, file, where, "focus")
 			if _require(spot, "kind", TYPE_STRING, file, where) and not SPOT_KINDS.has(spot.kind):
@@ -298,30 +344,131 @@ func _check_spots(spots: Dictionary, card_ids: Dictionary, line_ids: Dictionary)
 					for rule: Variant in spot.shutter_half:
 						if _is_dict(rule, file, where + " shutter_half"):
 							_check_time_rule(rule, file, where + " shutter_half")
-			_check_line_rules(spot, card_ids, line_ids, file, where)
+			_check_line_rules(spot, "lens", "text", card_ids, lines, dialogue, file, where)
 	if _require(spots, "npcs", TYPE_ARRAY, file, "file"):
+		var speakers: Dictionary = dialogue.get("speakers", {})
 		for i in spots.npcs.size():
 			var npc: Variant = spots.npcs[i]
 			var where := "npc %d" % i
 			if not _is_dict(npc, file, where):
 				continue
+			var npc_id := ""
 			if _require(npc, "id", TYPE_STRING, file, where):
+				npc_id = npc.id
 				where = "npc \"%s\"" % npc.id
+				if not speakers.has(npc.id):
+					_error(file, where, "the person has no speaker \"%s\" in dialogue/hem.json" % npc.id)
 			_require(npc, "name", TYPE_STRING, file, where)
-			_require(npc, "verb", TYPE_STRING, file, where)
 			_check_hours(npc, file, where)
 			_check_status(npc, file, where)
-			_check_line_rules(npc, card_ids, line_ids, file, where)
+			if npc.get("talk", true):
+				_require(npc, "verb", TYPE_STRING, file, where)
+				_check_line_rules(npc, "lines", "speech", card_ids, lines, dialogue, file, where, npc_id)
+			elif npc.has("lines"):
+				_error(file, where, "a person with \"talk\": false has no \"lines\"")
+			for field: String in ["chat", "calls"]:
+				if not npc.has(field):
+					continue
+				var fwhere := "%s %s" % [where, field]
+				if not _is_dict(npc[field], file, fwhere):
+					continue
+				if _require(npc[field], "line", TYPE_STRING, file, fwhere):
+					_check_speech_ref(npc[field].line, lines, file, fwhere, "line")
+				if _require(npc[field], "every_s", TYPE_FLOAT, file, fwhere) and npc[field].every_s <= 0:
+					_error(file, fwhere, "\"every_s\" must be more than 0")
 	if _require(spots, "boats_in", TYPE_DICTIONARY, file, "file"):
 		_check_time_rule(spots.boats_in, file, "boats_in")
-	if _require(spots, "hem_tips", TYPE_ARRAY, file, "file"):
-		var tips := {"lines": spots.hem_tips}
-		_check_line_rules(tips, card_ids, line_ids, file, "hem_tips")
-		for tip: Variant in spots.hem_tips:
-			if typeof(tip) == TYPE_DICTIONARY and tip.has("missing_card") \
-					and not card_ids.has(tip.missing_card):
-				_error(file, "hem_tips", "card ID \"%s\" does not exist" % tip.missing_card)
 	return ids
+
+
+func _check_messages(messages: Dictionary, dialogue: Dictionary, card_ids: Dictionary) -> void:
+	var file := "messages.json"
+	if _require(messages, "sender", TYPE_DICTIONARY, file, "file"):
+		_require(messages.sender, "name", TYPE_STRING, file, "sender")
+		_require(messages.sender, "color", TYPE_STRING, file, "sender")
+		if _require(messages.sender, "speaker", TYPE_STRING, file, "sender") \
+				and not dialogue.get("speakers", {}).has(messages.sender.speaker):
+			_error(file, "sender", "speaker \"%s\" does not exist" % messages.sender.speaker)
+	if not _require(messages, "messages", TYPE_ARRAY, file, "file"):
+		return
+	var ids := {}
+	var lines: Dictionary = dialogue.get("lines", {})
+	for i in messages.messages.size():
+		var message: Variant = messages.messages[i]
+		var where := "message %d" % i
+		if not _is_dict(message, file, where):
+			continue
+		if _require(message, "id", TYPE_STRING, file, where):
+			where = "message \"%s\"" % message.id
+			if ids.has(message.id):
+				_error(file, where, "message ID is not unique")
+			ids[message.id] = true
+		_require(message, "text", TYPE_STRING, file, where)
+		_check_status(message, file, where)
+		if not message.has("at") and not message.has("after"):
+			_error(file, where, "a message must have \"at\" or \"after\"")
+		if message.has("at"):
+			_check_minute(message.at, file, where, "at")
+		if message.has("day") and (typeof(message.day) not in [TYPE_INT, TYPE_FLOAT] or message.day < 1):
+			_error(file, where, "\"day\" must be a day number (1 or more)")
+		if message.has("after"):
+			var after := str(message.after)
+			if after.begins_with("heard:") or after.begins_with("lens:"):
+				if not lines.has(after.get_slice(":", 1)):
+					_error(file, where, "\"after\" points to line ID \"%s\" that does not exist" % after.get_slice(":", 1))
+			elif not MESSAGE_EVENTS.has(after):
+				_error(file, where, "\"after\" must be %s, \"heard:LINE\", or \"lens:LINE\"" % [MESSAGE_EVENTS])
+		if message.has("unless_card") and not card_ids.has(message.unless_card):
+			_error(file, where, "card ID \"%s\" does not exist" % message.unless_card)
+
+
+func _check_voices(voices: Dictionary, dialogue: Dictionary) -> void:
+	var file := "voices.json"
+	for field: String in ["model", "package", "phone"]:
+		_require(voices, field, TYPE_STRING, file, "file")
+	if not _require(voices, "speakers", TYPE_DICTIONARY, file, "file"):
+		return
+	for speaker_id: String in dialogue.get("speakers", {}):
+		if typeof(voices.speakers.get(speaker_id)) != TYPE_STRING:
+			_error(file, "speakers", "the speaker \"%s\" has no voice" % speaker_id)
+
+
+func _check_sounds(sounds: Dictionary) -> void:
+	var file := "sounds.json"
+	if not _require(sounds, "sounds", TYPE_DICTIONARY, file, "file"):
+		return
+	for sound_id: String in sounds.sounds:
+		var where := "sound \"%s\"" % sound_id
+		if not _is_dict(sounds.sounds[sound_id], file, where):
+			continue
+		var sound: Dictionary = sounds.sounds[sound_id]
+		if not sound.has("caption") or typeof(sound.caption) != TYPE_STRING:
+			_error(file, where, "required field \"caption\" is missing")
+		_require(sound, "range_m", TYPE_FLOAT, file, where)
+		_check_status(sound, file, where)
+
+
+## Checks that each clip has an audio file with the correct hash (R4).
+func _check_audio(dialogue: Dictionary, voices: Dictionary, manifest: Dictionary, audio_exists: Callable) -> void:
+	var file := "assets/voices/manifest.json"
+	var clips: Variant = manifest.get("clips")
+	if typeof(clips) != TYPE_DICTIONARY:
+		_error(file, "file", "required field \"clips\" is missing")
+		return
+	if typeof(voices.get("speakers")) != TYPE_DICTIONARY:
+		return
+	for clip: Dictionary in VoiceClips.expected(dialogue, voices):
+		var where := "clip \"%s\"" % clip.id
+		var entry: Variant = clips.get(clip.id)
+		if typeof(entry) != TYPE_DICTIONARY:
+			_error(file, where, "the clip has no audio file. Run tools/voices/build.py (CI: the voices workflow).")
+			continue
+		if entry.get("hash") != clip.hash:
+			_error(file, where, "the text, the voice, or the model changed. Run tools/voices/build.py (CI: the voices workflow).")
+		if typeof(entry.get("duration_s")) not in [TYPE_INT, TYPE_FLOAT] or entry.duration_s <= 0.0:
+			_error(file, where, "\"duration_s\" must be more than 0")
+		if not audio_exists.call(VoiceClips.path(clip.id)):
+			_error(file, where, "the file %s is missing" % VoiceClips.path(clip.id))
 
 
 func _check_sign(item: Dictionary, file: String, where: String) -> void:
@@ -433,12 +580,24 @@ func _check_placed_spot(spot_id: Variant, spot_ids: Dictionary, placed: Dictiona
 
 func _check_ui(ui: Dictionary) -> void:
 	var file := "ui.json"
-	for field: String in ["place_name", "place_sub", "beach_name", "beach_sub", "sound_on",
-			"sound_off", "notebook_button", "notebook_title", "notebook_count", "notebook_locked",
-			"notebook_hint", "close", "toast_new_card", "clack_bubble", "clock_title", "clock_hint",
-			"settings_title", "settings_sensitivity", "settings_invert", "settings_gyro", "settings_fov",
-			"settings_tap_walk", "center_view", "too_far"]:
+	for field: String in ["notebook_title", "notebook_count", "notebook_locked", "notebook_hint",
+			"clock_title", "clock_hint", "settings_title", "settings_sensitivity", "settings_invert",
+			"settings_gyro", "settings_fov", "settings_tap_walk", "center_view", "too_far", "phone_button",
+			"home", "listen_on", "listen_off", "listen_empty", "listen_save_hint", "phrasebook_title",
+			"phrasebook_empty", "reply_play", "reply_say", "reply_english", "said_title", "said_done",
+			"phrase_saved", "lens_empty", "lens_person", "messages_empty", "notify_card", "notify_message",
+			"clock_day", "clock_rest", "clock_sleep_away", "notebook_phrases", "notebook_no_phrases",
+			"settings_sound", "settings_subtitles", "settings_subtitle_size", "settings_subtitle_box"]:
 		_require(ui, field, TYPE_STRING, file, "file")
+	if _require(ui, "apps", TYPE_DICTIONARY, file, "file"):
+		for app: String in ["listen", "lens", "messages", "notebook", "clock", "settings"]:
+			_require(ui.apps, app, TYPE_STRING, file, "apps")
+	if _require(ui, "subtitle_languages", TYPE_DICTIONARY, file, "file"):
+		for language: String in SUBTITLE_IDS:
+			_require(ui.subtitle_languages, language, TYPE_STRING, file, "subtitle_languages")
+	if _require(ui, "tones", TYPE_DICTIONARY, file, "file"):
+		for tone: String in ["ngang", "huyền", "sắc", "hỏi", "ngã", "nặng"]:
+			_require(ui.tones, tone, TYPE_STRING, file, "tones")
 	if _require(ui, "parts_of_day", TYPE_ARRAY, file, "file"):
 		var last := 0
 		for part: Variant in ui.parts_of_day:
@@ -463,7 +622,10 @@ func _check_ui(ui: Dictionary) -> void:
 			_require(choice, "label", TYPE_STRING, file, where)
 			if not (choice.has("minutes") or choice.has("until") or choice.has("sleep")):
 				_error(file, where, "a clock choice must have \"minutes\", \"until\", or \"sleep\"")
-			_check_choice(choice, {}, {}, file, where)
+			if choice.has("minutes") and (typeof(choice.minutes) not in [TYPE_INT, TYPE_FLOAT] or choice.minutes <= 0):
+				_error(file, where, "\"minutes\" must be a number more than 0")
+			if choice.has("until"):
+				_check_minute(choice.until, file, where, "until")
 
 
 ## Records an error for each text that is not in Unicode NFC form.

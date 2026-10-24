@@ -12,7 +12,13 @@ const DEFAULT_SETTINGS := {
 	"gyro": true,
 	"fov": 75.0,
 	"tap_walk": true,
+	# Plan 0003, R28.
+	"subtitles": "vi",
+	"subtitle_size": 1.0,
+	"subtitle_box": 0.75,
 }
+
+const SUBTITLE_LANGUAGES := ["vi", "en", "both", "off"]
 
 
 ## Returns the save data as a JSON text.
@@ -28,6 +34,10 @@ static func to_json(state: Dictionary) -> String:
 		"player": {"x": float(state.player.x), "y": float(state.player.y), "z": float(state.player.z),
 				"yaw": float(state.yaw), "pitch": float(state.pitch)},
 		"settings": Dictionary(state.settings),
+		"met": Array(state.get("met", [])),
+		"phrases": Array(state.get("phrases", [])),
+		"messages": Array(state.get("messages", [])),
+		"unread": int(state.get("unread", 0)),
 	}
 	return JSON.stringify(data, "\t")
 
@@ -75,7 +85,31 @@ static func from_json(text: String) -> Dictionary:
 			elif saved_settings.has(key) and typeof(settings[key]) == TYPE_FLOAT \
 					and typeof(saved_settings[key]) == TYPE_INT:
 				settings[key] = float(saved_settings[key])
+	if not SUBTITLE_LANGUAGES.has(settings.subtitles):
+		settings.subtitles = DEFAULT_SETTINGS.subtitles
+	settings.subtitle_size = clampf(settings.subtitle_size, 1.0, 1.5)
+	settings.subtitle_box = clampf(settings.subtitle_box, 0.0, 1.0)
+	var met: Array[String] = []
+	for speaker: Variant in _array(data.get("met")):
+		if typeof(speaker) == TYPE_STRING and not met.has(speaker):
+			met.append(speaker)
+	var phrases: Array[Dictionary] = []
+	for phrase: Variant in _array(data.get("phrases")):
+		if typeof(phrase) == TYPE_DICTIONARY and typeof(phrase.get("vi")) == TYPE_STRING \
+				and typeof(phrase.get("en")) == TYPE_STRING:
+			phrases.append({"vi": phrase.vi, "en": phrase.en})
+	var messages: Array[Dictionary] = []
+	for message: Variant in _array(data.get("messages")):
+		if typeof(message) == TYPE_DICTIONARY and typeof(message.get("id")) == TYPE_STRING \
+				and typeof(message.get("text")) == TYPE_STRING:
+			messages.append({"id": message.id, "text": message.text, "day": int(message.get("day", 1)),
+					"minutes": int(message.get("minutes", 0))})
 	return {
+		"met": met,
+		"phrases": phrases,
+		"messages": messages,
+		"unread": clampi(int(data.get("unread", 0)) if typeof(data.get("unread")) in [TYPE_INT, TYPE_FLOAT] else 0,
+				0, messages.size()),
 		"day": int(day),
 		"minutes": int(minutes),
 		"walk_m": clampf(float(data.get("walk_m", 0.0)), 0.0, GameClock.METERS_PER_MINUTE),
@@ -87,3 +121,7 @@ static func from_json(text: String) -> Dictionary:
 		"pitch": clampf(float(player.get("pitch", 0.0)), -80.0, 80.0),
 		"settings": settings,
 	}
+
+
+static func _array(value: Variant) -> Array:
+	return value if typeof(value) == TYPE_ARRAY else []

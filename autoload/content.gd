@@ -10,12 +10,21 @@ const SPOTS_PATH := "res://data/spots.json"
 const DIALOGUE_PATH := "res://data/dialogue/hem.json"
 const LAYOUT_PATH := "res://data/world/hem_layout.json"
 const UI_PATH := "res://data/ui.json"
+const MESSAGES_PATH := "res://data/messages.json"
+const VOICES_PATH := "res://data/voices.json"
+const SOUNDS_PATH := "res://data/sounds.json"
+const MANIFEST_PATH := "res://assets/voices/manifest.json"
 
 var cards: Dictionary = {}
 var spots: Dictionary = {}
 var dialogue: Dictionary = {}
 var layout: Dictionary = {}
 var ui: Dictionary = {}
+var messages: Dictionary = {}
+var voices: Dictionary = {}
+var sounds: Dictionary = {}
+## The voice manifest of tools/voices/build.py.
+var manifest: Dictionary = {}
 var errors: PackedStringArray = []
 
 var _cards_by_id: Dictionary = {}
@@ -40,16 +49,22 @@ func _ready() -> void:
 ## Reads and checks all data files. Returns true when the data is correct.
 func load_all() -> bool:
 	errors = []
+	var paths := {"cards": CARDS_PATH, "spots": SPOTS_PATH, "dialogue": DIALOGUE_PATH, "layout": LAYOUT_PATH,
+			"ui": UI_PATH, "messages": MESSAGES_PATH, "voices": VOICES_PATH, "sounds": SOUNDS_PATH,
+			"manifest": MANIFEST_PATH}
 	var parsed := {}
-	for path: String in [CARDS_PATH, SPOTS_PATH, DIALOGUE_PATH, LAYOUT_PATH, UI_PATH]:
-		parsed[path] = read_json(path)
-	cards = _as_dict(parsed[CARDS_PATH])
-	spots = _as_dict(parsed[SPOTS_PATH])
-	dialogue = _as_dict(parsed[DIALOGUE_PATH])
-	layout = _as_dict(parsed[LAYOUT_PATH])
-	ui = _as_dict(parsed[UI_PATH])
-	errors.append_array(ContentChecker.check_all(parsed[CARDS_PATH], parsed[SPOTS_PATH],
-			parsed[DIALOGUE_PATH], parsed[LAYOUT_PATH], parsed[UI_PATH]))
+	for key: String in paths:
+		parsed[key] = read_json(paths[key])
+	cards = _as_dict(parsed.cards)
+	spots = _as_dict(parsed.spots)
+	dialogue = _as_dict(parsed.dialogue)
+	layout = _as_dict(parsed.layout)
+	ui = _as_dict(parsed.ui)
+	messages = _as_dict(parsed.messages)
+	voices = _as_dict(parsed.voices)
+	sounds = _as_dict(parsed.sounds)
+	manifest = _as_dict(parsed.manifest)
+	errors.append_array(ContentChecker.check_all(parsed))
 	_cards_by_id = _index(cards.get("cards", []))
 	_spots_by_id = _index(spots.get("spots", []))
 	_npcs_by_id = _index(spots.get("npcs", []))
@@ -132,11 +147,11 @@ func ui_text(key: String) -> String:
 	return str(ui.get(key, ""))
 
 
-## Returns the first line rule that agrees with the time. "item" is a spot
-## or an NPC. The rule "open" agrees when the open state is the same.
-func line_rule(item: Dictionary, minutes: int) -> Dictionary:
+## Returns the first rule of the list (a spot "lens" or a person "lines")
+## that agrees with the time.
+func rule_for(item: Dictionary, field: String, minutes: int) -> Dictionary:
 	var open := GameClock.is_open(item.get("hours"), minutes)
-	for rule: Dictionary in item.get("lines", []):
+	for rule: Dictionary in item.get(field, []):
 		if rule.has("open") and bool(rule.open) != open:
 			continue
 		if GameClock.in_range(rule, minutes):
@@ -144,14 +159,50 @@ func line_rule(item: Dictionary, minutes: int) -> Dictionary:
 	return {}
 
 
-## Returns the hẻm tip rule for the time and the known cards.
-func hem_tip(minutes: int, known_cards: Array) -> Dictionary:
-	for rule: Dictionary in spots.get("hem_tips", []):
-		if rule.has("missing_card") and known_cards.has(rule.missing_card):
-			continue
-		if GameClock.in_range(rule, minutes):
-			return rule
-	return {}
+func npc_list() -> Array:
+	return spots.get("npcs", [])
+
+
+func is_speech(line_id: String) -> bool:
+	return line(line_id).has("speaker")
+
+
+## The audio clip of a spoken line or a phrase: {file, duration_s, ...} from the manifest.
+func clip(clip_id: String) -> Dictionary:
+	return manifest.get("clips", {}).get(clip_id, {})
+
+
+func clip_duration(clip_id: String) -> float:
+	return float(clip(clip_id).get("duration_s", 1.5))
+
+
+func clip_stream(clip_id: String) -> AudioStream:
+	var path := VoiceClips.path(clip_id)
+	if not ResourceLoader.exists(path):
+		return null
+	return load(path)
+
+
+## The "say again" phrase for the speaker (plan 0003, R20): {vi, en}.
+func say_again(speaker_id: String) -> Dictionary:
+	return {"vi": VoiceClips.say_again_text(dialogue, speaker_id), "en": dialogue.get("say_again", {}).get("en", "")}
+
+
+func message_list() -> Array:
+	return messages.get("messages", [])
+
+
+func sender() -> Dictionary:
+	return messages.get("sender", {})
+
+
+func sound(sound_id: String) -> Dictionary:
+	return sounds.get("sounds", {}).get(sound_id, {})
+
+
+func ui_dict(key: String) -> Dictionary:
+	var value: Variant = ui.get(key, {})
+	return value if typeof(value) == TYPE_DICTIONARY else {}
 
 
 ## Returns the opening hours as text, for example "5:30–10:30".

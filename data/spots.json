@@ -7,13 +7,12 @@
 			"en": "Where you stay",
 			"hours": null,
 			"status": "confirmed",
-			"look_label": "Go in",
-			"lines": [
+			"lens": [
 				{
 					"line": "spot.home.look"
 				}
 			],
-			"verb": "Go in"
+			"verb": "Rest"
 		},
 		{
 			"id": "pho",
@@ -35,9 +34,7 @@
 				}
 			],
 			"status": "check",
-			"look_label": "Take a look",
-			"look_label_open": "Sit down and eat",
-			"lines": [
+			"lens": [
 				{
 					"from": 270,
 					"before": 330,
@@ -63,9 +60,7 @@
 						"shutter"
 					]
 				}
-			],
-			"verb": "Look",
-			"verb_open": "Sit"
+			]
 		},
 		{
 			"id": "banhmi",
@@ -77,16 +72,14 @@
 				"close": 540
 			},
 			"status": "check",
-			"look_label": "Take a look",
-			"lines": [
+			"lens": [
 				{
 					"line": "spot.banhmi.look",
 					"learn": [
 						"banhmi"
 					]
 				}
-			],
-			"verb": "Look"
+			]
 		},
 		{
 			"id": "coc",
@@ -98,8 +91,7 @@
 				"close": 1320
 			},
 			"status": "check",
-			"look_label": "Take a look",
-			"lines": [
+			"lens": [
 				{
 					"open": true,
 					"line": "spot.coc.look",
@@ -110,9 +102,7 @@
 				{
 					"line": "spot.coc.closed"
 				}
-			],
-			"verb": "Look",
-			"verb_open": "Sit"
+			]
 		},
 		{
 			"id": "bac",
@@ -124,8 +114,7 @@
 				"close": 630
 			},
 			"status": "check",
-			"look_label": "Take a look",
-			"lines": [
+			"lens": [
 				{
 					"open": true,
 					"line": "spot.bac.look",
@@ -139,9 +128,7 @@
 						"shutter"
 					]
 				}
-			],
-			"verb": "Look",
-			"verb_open": "Sit"
+			]
 		},
 		{
 			"id": "mia",
@@ -153,16 +140,14 @@
 				"close": 1080
 			},
 			"status": "check",
-			"look_label": "Take a look",
-			"lines": [
+			"lens": [
 				{
 					"line": "spot.mia.look",
 					"learn": [
 						"mia"
 					]
 				}
-			],
-			"verb": "Look"
+			]
 		},
 		{
 			"id": "go",
@@ -174,16 +159,14 @@
 				"close": 1410
 			},
 			"status": "check",
-			"look_label": "Take a look",
-			"lines": [
+			"lens": [
 				{
 					"line": "spot.go.look",
 					"learn": [
 						"clack"
 					]
 				}
-			],
-			"verb": "Look"
+			]
 		},
 		{
 			"id": "banhkhot",
@@ -195,8 +178,7 @@
 				"close": 1200
 			},
 			"status": "check",
-			"look_label": "Take a look",
-			"lines": [
+			"lens": [
 				{
 					"open": true,
 					"line": "spot.banhkhot.look",
@@ -210,9 +192,7 @@
 						"shutter"
 					]
 				}
-			],
-			"verb": "Look",
-			"verb_open": "Sit"
+			]
 		},
 		{
 			"id": "hvl",
@@ -224,16 +204,14 @@
 				"close": 1350
 			},
 			"status": "source",
-			"look_label": "Take a look",
-			"lines": [
+			"lens": [
 				{
 					"line": "spot.hvl.look",
 					"learn": [
 						"hvl"
 					]
 				}
-			],
-			"verb": "Look"
+			]
 		},
 		{
 			"id": "beach",
@@ -242,8 +220,7 @@
 			"en": "Front Beach",
 			"hours": null,
 			"status": "confirmed",
-			"look_label": "Take a look",
-			"lines": [
+			"lens": [
 				{
 					"from": 270,
 					"before": 450,
@@ -266,8 +243,7 @@
 				{
 					"line": "spot.beach.night"
 				}
-			],
-			"verb": "Look"
+			]
 		}
 	],
 	"npcs": [
@@ -279,31 +255,121 @@
 				"close": 540
 			},
 			"status": "check",
+			"verb": "Talk",
 			"lines": [
 				{
 					"line": "batu.greet"
 				}
+			]
+		},
+		{
+			"id": "cosau",
+			"name": "Cô Sáu",
+			"hours": {
+				"open": 270,
+				"close": 720
+			},
+			"status": "check",
+			"verb": "Talk",
+			"lines": [
+				{
+					"from": 270,
+					"before": 330,
+					"line": "cosau.closed_before"
+				},
+				{
+					"from": 330,
+					"before": 630,
+					"line": "cosau.open"
+				},
+				{
+					"line": "cosau.sold_out",
+					"learn": [
+						"breakfast",
+						"shutter"
+					]
+				}
+			]
+		},
+		{
+			"id": "bacha",
+			"name": "Bác Hà",
+			"hours": {
+				"open": 360,
+				"close": 630
+			},
+			"status": "check",
+			"verb": "Talk",
+			"lines": [
+				{
+					"line": "bacha.open",
+					"learn": [
+						"bac"
+					]
+				}
+			]
+		},
+		{
+			"id": "cout",
+			"name": "Cô Út",
+			"hours": {
+				"open": 390,
+				"close": 1200
+			},
+			"status": "check",
+			"verb": "Talk",
+			"lines": [
+				{
+					"line": "cout.call"
+				}
 			],
-			"verb": "Talk"
+			"calls": {
+				"line": "cout.call",
+				"every_s": 45
+			}
+		},
+		{
+			"id": "nga",
+			"name": "Cô Nga",
+			"hours": {
+				"open": 540,
+				"close": 1320
+			},
+			"status": "check",
+			"verb": "Talk",
+			"lines": [
+				{
+					"line": "nga.hello"
+				}
+			]
+		},
+		{
+			"id": "chubay",
+			"name": "Chú Bảy",
+			"hours": {
+				"open": 330,
+				"close": 600
+			},
+			"status": "check",
+			"talk": false,
+			"chat": {
+				"line": "coc.talk.1",
+				"every_s": 30
+			}
+		},
+		{
+			"id": "chuchin",
+			"name": "Chú Chín",
+			"hours": {
+				"open": 330,
+				"close": 600
+			},
+			"status": "check",
+			"talk": false
 		}
 	],
 	"boats_in": {
 		"from": 270,
 		"before": 450
-	},
-	"hem_tips": [
-		{
-			"before": 630,
-			"missing_card": "order",
-			"line": "hem.tip.pho"
-		},
-		{
-			"before": 450,
-			"missing_card": "boats",
-			"line": "hem.tip.beach"
-		},
-		{
-			"line": "hem.tip.walk"
-		}
-	]
+	}
 }

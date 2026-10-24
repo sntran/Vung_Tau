@@ -8,6 +8,8 @@ signal time_changed(minutes: int, day: int)
 signal card_learned(card_id: String)
 signal slept
 signal sound_changed(on: bool)
+## A new message from the host family (plan 0003, R24).
+signal message_received(message: Dictionary)
 
 const DEFAULT_SAVE_PATH := "user://save.json"
 ## The homestay door. The player stands here after "Sleep until morning".
@@ -23,6 +25,15 @@ var player_pos := HOME_DOOR
 var yaw := GameClock.HOME_YAW
 var pitch := 0.0
 var settings: Dictionary = SaveFormat.DEFAULT_SETTINGS.duplicate()
+## The speakers that the player has met (talked with). The Listen app shows
+## their names (plan 0003, R19).
+var met: Array[String] = []
+## The phrases that the player saved from the Listen app to the Sổ tay (R22).
+var phrases: Array[Dictionary] = []
+## The messages that came, in order: {id, text, day, minutes}.
+var messages: Array[Dictionary] = []
+## The number of messages that the player has not read.
+var unread := 0
 ## Meters walked since the last full game minute.
 var walk_m := 0.0
 ## All meters walked in this run of the game. Play tests read this value.
@@ -59,6 +70,10 @@ func new_game() -> void:
 	pitch = 0.0
 	settings = SaveFormat.DEFAULT_SETTINGS.duplicate()
 	walk_m = 0.0
+	met = []
+	phrases = []
+	messages = []
+	unread = 0
 
 
 ## Loads the save file. When there is no correct save, starts a new game.
@@ -80,6 +95,10 @@ func load_game() -> bool:
 	yaw = data.yaw
 	pitch = data.pitch
 	settings = data.settings
+	met = data.met
+	phrases = data.phrases
+	messages = data.messages
+	unread = data.unread
 	cards = []
 	for card_id: String in data.cards:
 		if Content.has_card(card_id):
@@ -91,7 +110,7 @@ func to_dict() -> Dictionary:
 	return {
 		"day": day, "minutes": minutes, "walk_m": walk_m, "cards": cards,
 		"flags": flags, "sound": sound, "player": player_pos, "yaw": yaw, "pitch": pitch,
-		"settings": settings,
+		"settings": settings, "met": met, "phrases": phrases, "messages": messages, "unread": unread,
 	}
 
 
@@ -217,3 +236,49 @@ func set_settings(value: Dictionary) -> void:
 		if settings.has(key):
 			settings[key] = value[key]
 	queue_save()
+
+
+## Records that the player met the speaker. Returns true when it is new.
+func meet(speaker_id: String) -> bool:
+	if met.has(speaker_id):
+		return false
+	met.append(speaker_id)
+	queue_save()
+	return true
+
+
+func has_met(speaker_id: String) -> bool:
+	return met.has(speaker_id)
+
+
+## Saves a phrase to the Sổ tay. Returns false when it is there already.
+func save_phrase(vi: String, en: String) -> bool:
+	for phrase in phrases:
+		if phrase.vi == vi:
+			return false
+	phrases.append({"vi": vi, "en": en})
+	queue_save()
+	return true
+
+
+## Returns true when the message came today (or on any day, for a message that does not repeat).
+func has_message(message_id: String, repeat := false) -> bool:
+	for message in messages:
+		if message.id == message_id and (not repeat or message.day == day):
+			return true
+	return false
+
+
+## Adds a message. The Messages app shows it.
+func add_message(message_id: String, text: String) -> void:
+	var message := {"id": message_id, "text": text, "day": day, "minutes": minutes}
+	messages.append(message)
+	unread += 1
+	message_received.emit(message)
+	queue_save()
+
+
+func read_messages() -> void:
+	if unread != 0:
+		unread = 0
+		queue_save()
