@@ -104,7 +104,7 @@ def read(path, corrections: list[dict] | None = None) -> OsmData:
 
 
 def apply_corrections(data: OsmData, corrections: list[dict]) -> None:
-    """Applies the corrections of overrides.json (plan 0004, R7)."""
+    """Applies the corrections of overrides.json (plan 0005, R7)."""
     by_id = {w.id: w for w in data.ways}
     added = 0
     for c in corrections:

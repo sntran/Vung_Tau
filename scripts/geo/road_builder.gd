@@ -1,6 +1,6 @@
 class_name RoadBuilder
 extends RefCounted
-## Makes the road meshes of one ground chunk (plan 0004, R11).
+## Makes the road meshes of one ground chunk (plan 0005, R11).
 ##
 ## Main roads are asphalt with lane lines. A hẻm is concrete. A road with the
 ## sidewalk flag has a curb of 0.15 m and a sidewalk at each side. The

@@ -1,5 +1,5 @@
 extends RefCounted
-# PT-30 geo_tide. Start at a dry time from R8i, on the beach below Mũi Nghinh
+# PT-38 geo_tide. Start at a dry time from R8i, on the beach below Mũi Nghinh
 # Phong. Walk the ridge to Hòn Bà with tap to walk. Then start 3 hours after the
 # end of the dry time. The ridge is under water, and the player cannot walk on
 # it. Take screenshots of the same view at low tide and high tide.

@@ -1,7 +1,7 @@
 class_name CreditsApp
 extends ScrollContainer
 ## The credits page of the phone: the notices of the map data, the height
-## data, and the assets (plan 0004, acceptance criterion 4). The Settings app
+## data, and the assets (plan 0005, acceptance criterion 4). The Settings app
 ## opens it. The text is in data/credits.json.
 
 const PATH := "res://data/credits.json"

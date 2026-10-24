@@ -1,4 +1,4 @@
-"""Finds the town anchors by type (plan 0004, R6a): bus stations, markets,
+"""Finds the town anchors by type (plan 0005, R6a): bus stations, markets,
 roundabouts, and junctions where five or more roads meet. Their names in OSM
 can differ from the names that people use, so build.py draws them on a map
 with numbers (anchors.png) and lists them in the report."""

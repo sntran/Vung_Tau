@@ -1,4 +1,4 @@
-# The tide report (plan 0004, R8d to R8j)
+# The tide report (plan 0005, R8d to R8j)
 
 Made by `tools/geo/tide.py` on 2026-10-24. Source: EOT20 (Hart-Davis et al., 2021) with pyTMD 3.0.9, FES nodal corrections
 
@@ -35,7 +35,7 @@ Made by `tools/geo/tide.py` on 2026-10-24. Source: EOT20 (Hart-Davis et al., 202
 
 ## The checks
 
-- The game calculation (`geodata/tidecalc.py`, the same as `scripts/geo/tide.gd`) agrees with pyTMD within 0.01 mm for the 200 test values.
+- The game calculation (`geodata/tidecalc.py`, the same as `scripts/geo/tide_model.gd`) agrees with pyTMD within 0.01 mm for the 200 test values.
 - The test values have no minor constituents (pyTMD can infer them from the major constituents). The game uses only the 17 constituents of EOT20.
 
 ## The Hòn Bà ridge (R8h, R8i)

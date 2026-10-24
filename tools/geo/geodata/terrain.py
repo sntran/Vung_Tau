@@ -1,4 +1,4 @@
-"""The ground height grid (plan 0004, D6 and D7).
+"""The ground height grid (plan 0005, D6 and D7).
 
 The grid has one sample each grid_m meters in game coordinates. Row r is at
 game Z = z0 + r * grid_m, and column c is at game X = x0 + c * grid_m. The

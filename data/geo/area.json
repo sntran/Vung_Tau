@@ -1,5 +1,5 @@
 {
-	"note": "The play area of plan 0004 (D4, D5, D6). Correct the box here. Then run tools/geo/fetch.py again in CI.",
+	"note": "The play area of plan 0005 (D4, D5, D6). Correct the box here. Then run tools/geo/fetch.py again in CI.",
 	"bbox": {"south": 10.30, "west": 107.05, "north": 10.42, "east": 107.13},
 	"epsg": 32648,
 	"origin_landmark": "bai_truoc",

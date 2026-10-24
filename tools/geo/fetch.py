@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Downloads the source data to data/geo/raw/ (plan 0004, R2 and R3). CI only.
+"""Downloads the source data to data/geo/raw/ (plan 0005, R2 and R3). CI only.
 
 Usage:
   python tools/geo/fetch.py                 Download the OSM data, the DEM, and the textures.

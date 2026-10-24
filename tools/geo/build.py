@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Builds data/geo/build/ from data/geo/raw/ (plan 0004, R4 to R8c).
+"""Builds data/geo/build/ from data/geo/raw/ (plan 0005, R4 to R8c).
 
 Usage:
   python tools/geo/build.py                Build from data/geo/raw/ to data/geo/build/.

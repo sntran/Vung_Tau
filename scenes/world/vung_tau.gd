@@ -1,6 +1,6 @@
 class_name VungTau
 extends Node3D
-## The real ground of Vũng Tàu (plan 0004): ground chunks, the sea with the
+## The real ground of Vũng Tàu (plan 0005): ground chunks, the sea with the
 ## tide, the sky, the sun, the roads, simple trees, and the landmark markers.
 ##
 ## The ground is in chunks of 256 m. Each chunk with data has a far mesh from
@@ -51,7 +51,7 @@ var sea_level := 0.0
 var ridge_points := PackedVector2Array()
 var ridge_top := -INF
 var ridge_width := 4.0
-## The load time in milliseconds of each near chunk, for PT-29.
+## The load time in milliseconds of each near chunk, for PT-37.
 var load_times: Array[float] = []
 var _ground_material: ShaderMaterial
 var _sea_material: ShaderMaterial

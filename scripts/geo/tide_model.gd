@@ -1,7 +1,7 @@
 class_name TideModel
 extends RefCounted
 ## The sea level from the tide constituents of data/geo/build/tide.json
-## (plan 0004, D12, R8f). This is the same calculation as
+## (plan 0005, D12, R8f). This is the same calculation as
 ## tools/geo/geodata/tidecalc.py and pyTMD with the FES nodal corrections:
 ## the sea level is the sum of f · A · cos(G + u − g) for each constituent.
 

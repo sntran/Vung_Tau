@@ -1,4 +1,4 @@
-"""Draws data/geo/build/homestay_area.png: a top-down map around the homestay hẻm (plan 0004, R8b)."""
+"""Draws data/geo/build/homestay_area.png: a top-down map around the homestay hẻm (plan 0005, R8b)."""
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont

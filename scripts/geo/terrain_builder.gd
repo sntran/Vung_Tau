@@ -1,6 +1,6 @@
 class_name TerrainBuilder
 extends RefCounted
-## Makes the mesh arrays of a ground chunk from a height grid (plan 0004, D6).
+## Makes the mesh arrays of a ground chunk from a height grid (plan 0005, D6).
 ##
 ## The functions are static and use no nodes, so a worker thread can run them.
 ## A skirt (a strip that goes down at each edge) hides the gaps between chunks

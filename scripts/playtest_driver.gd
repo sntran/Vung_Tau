@@ -1090,9 +1090,9 @@ func ui_report() -> Array[Dictionary]:
 	return report
 
 
-# --- The Vũng Tàu world (plan 0004) ------------------------------------------
+# --- The Vũng Tàu world (plan 0005) ------------------------------------------
 
-## The world of plan 0004, or null in the hẻm world.
+## The world of plan 0005, or null in the hẻm world.
 func world() -> VungTau:
 	return main().vung_tau
 
@@ -1108,9 +1108,9 @@ func wait_ground(timeout_s := 30.0) -> bool:
 
 # --- Fixed views (plan 0004) --------------------------------------------------
 
-## Puts the camera at a fixed viewpoint for a screenshot (PT-25, PT-28, PT-32).
-## The player stops: physics does not move it until fly_end(). This is a test
-## setup step, the same as --start-time.
+## Puts the camera at a fixed viewpoint for a screenshot (PT-25, PT-28, PT-32,
+## and PT-33). The player stops: physics does not move it until fly_end(). This
+## is a test setup step, the same as --start-time.
 func fly_to(eye: Vector3, look_at: Vector3) -> void:
 	var player: Player = main().player
 	player.set_physics_process(false)
@@ -1284,7 +1284,7 @@ func pad_select(test_id: String) -> bool:
 	return false
 
 
-## Plays the game faster, for the long walks of PT-26 to PT-29 under lavapipe.
+## Plays the game faster, for the long walks of PT-34 to PT-37 under lavapipe.
 ## The player walks at the same speed in game time.
 func set_time_scale(scale: float) -> void:
 	Engine.time_scale = scale

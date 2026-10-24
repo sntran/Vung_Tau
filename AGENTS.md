@@ -84,7 +84,7 @@ Verified in the development workspace (Linux, 2 CPUs, no GPU, no Vulkan):
 - `Input.parse_input_event()` with an `InputEventScreenTouch` presses a `Button`. Touch-to-mouse emulation is on by default.
 - GUT 9.7.1 runs with `godot --headless -s addons/gut/gut_cmdln.gd`.
 - GitHub, npm, and PyPI are reachable. Google downloads (Android SDK, Maven) and blender.org are not reachable.
-- The Copernicus DEM bucket (`copernicus-dem-30m.s3.amazonaws.com`) and the Poly Haven API are reachable. The Overpass API, Geofabrik, and `dl.polyhaven.org` are not. So `tools/geo/fetch.py` runs in CI only (plan 0004, D1).
+- The Copernicus DEM bucket (`copernicus-dem-30m.s3.amazonaws.com`) and the Poly Haven API are reachable. The Overpass API, Geofabrik, and `dl.polyhaven.org` are not. So `tools/geo/fetch.py` runs in CI only (plan 0005, D1).
 - Godot changes a 16-bit PNG file to 8 bits when it loads it. The game reads the 16-bit height files with `Png16` (`scripts/geo/png16.gd`). An import file with `importer="keep"` makes the export keep a file as it is, and Godot does not change that import file.
 - `PackedByteArray.decompress_dynamic(-1, FileAccess.COMPRESSION_DEFLATE)` reads a zlib stream (the data of a PNG file).
 - A `Vector2` has 32-bit floats. UTM values and degrees need 64 bits, so `GeoProjection` gives them in a `PackedFloat64Array`.

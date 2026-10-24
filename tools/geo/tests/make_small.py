@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Makes the small test extract in tools/geo/tests/data/ (plan 0004, R18).
+"""Makes the small test extract in tools/geo/tests/data/ (plan 0005, R18).
 
 The place is not real. It is a design in meters around the point B
 (10.3466 N, 107.0728 E): x is east and y is north from B. Run this script

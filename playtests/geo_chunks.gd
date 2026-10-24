@@ -1,5 +1,5 @@
 extends RefCounted
-# PT-29 geo_chunks. Walk 2 km with tap to walk. At each frame, a ray down from
+# PT-37 geo_chunks. Walk 2 km with tap to walk. At each frame, a ray down from
 # the camera hits the ground or the sea. Record the time to load each chunk. No
 # chunk takes more than 2 s under lavapipe.
 # The walk is on Thùy Vân, the road along Bãi Sau. The game runs 5 times

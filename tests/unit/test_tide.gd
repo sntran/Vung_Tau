@@ -1,5 +1,5 @@
 extends GutTest
-## Tests for the tide and the calendar (plan 0004, R8f, R17).
+## Tests for the tide and the calendar (plan 0005, R8f, R17).
 
 const LUNAR_DATES := [
 	[[2019, 2, 5], [1, 1, false]], [[2020, 1, 25], [1, 1, false]], [[2021, 2, 12], [1, 1, false]],

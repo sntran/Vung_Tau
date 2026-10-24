@@ -1,5 +1,5 @@
 extends RefCounted
-# PT-28 geo_hill. Walk up the road to the top of Núi Nhỏ. The player never goes
+# PT-36 geo_hill. Walk up the road to the top of Núi Nhỏ. The player never goes
 # through the ground. The player cannot walk up a slope that is steeper than
 # 45° where there is no road.
 # The road from Hạ Long to the lighthouse is about 2.8 km long. The game runs

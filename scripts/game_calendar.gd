@@ -1,6 +1,6 @@
 class_name GameCalendar
 extends RefCounted
-## The real calendar of the game (plan 0004, D13). Day 1 is a real date
+## The real calendar of the game (plan 0005, D13). Day 1 is a real date
 ## (data/calendar.json). The command line argument --start-date=YYYY-MM-DD
 ## makes day 1 another date (the play tests use it, like --start-time).
 

@@ -1,5 +1,5 @@
 extends RefCounted
-# PT-26 geo_walk_road. Walk 500 m along the road beside Bãi Trước with the
+# PT-34 geo_walk_road. Walk 500 m along the road beside Bãi Trước with the
 # joystick. The camera height above the road surface stays 1.6 m ± 0.1 m. The
 # road name on the debug screen is the name from OSM.
 # The game runs 5 times faster, and the walk is in 2 runs of 250 m, so that

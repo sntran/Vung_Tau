@@ -1,5 +1,5 @@
 extends RefCounted
-# PT-31 geo_anchors. Take a screenshot at each town anchor and at each structure
+# PT-39 geo_anchors. Take a screenshot at each town anchor and at each structure
 # in R1, with the marker visible.
 # The places are all the landmarks of data/geo/landmarks.json: the structures
 # of R1 and the town anchors of R6a (the bus station, the markets, the big

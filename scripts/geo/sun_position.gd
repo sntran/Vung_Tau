@@ -1,6 +1,6 @@
 class_name SunPosition
 extends RefCounted
-## The position of the sun for a place and a time (plan 0004, D9).
+## The position of the sun for a place and a time (plan 0005, D9).
 ##
 ## The formulas are the NOAA solar position equations. They are accurate to
 ## about 0.1 degree, which is enough for the light of the game.

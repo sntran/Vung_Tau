@@ -1,5 +1,5 @@
 extends RefCounted
-# PT-27 geo_beach. Walk from the road across the sand to the water. The player
+# PT-35 geo_beach. Walk from the road across the sand to the water. The player
 # stops at the 0.5 m depth and the message shows. The depth is from the sea
 # level of the tide at that time (R13).
 # sizes: 1280x720

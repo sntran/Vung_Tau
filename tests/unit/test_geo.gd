@@ -1,5 +1,5 @@
 extends GutTest
-## Tests for the geodata code of the game (plan 0004, R17). The tests of the
+## Tests for the geodata code of the game (plan 0005, R17). The tests of the
 ## pipeline (road widths, blocks, the homestay hẻm) are in tools/geo/tests/.
 
 

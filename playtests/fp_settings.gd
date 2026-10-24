@@ -115,7 +115,7 @@ func _check(d: PlaytestDriver) -> void:
 	d.expect(absf(float(s.fov) - float(expected.fov)) < 0.5, "after the restart the field of view is %s" % s.fov)
 	await d.open_app("settings")
 	await d.screenshot("settings_after_restart")
-	# The Credits page opens from the Settings app (plan 0004, acceptance criterion 4).
+	# The Credits page opens from the Settings app (plan 0005, acceptance criterion 4).
 	await d.tap_phone_id("settings.credits")
 	d.expect(d.state().app == "credits", "the Credits button opens the credits page: %s" % d.state().app)
 	var text := ""

@@ -1,4 +1,4 @@
-// The sea of the Vũng Tàu world (plan 0004, D8): waves, the reflection of the
+// The sea of the Vũng Tàu world (plan 0005, D8): waves, the reflection of the
 // sky, and foam near the coast. The foam and the shallow color use the
 // distance to the coastline in the alpha channel of the surface mask.
 shader_type spatial;
@@ -8,7 +8,7 @@ uniform sampler2D surface_mask : filter_linear, repeat_disable;
 uniform vec2 mask_origin = vec2(0.0);
 uniform vec2 mask_size = vec2(1.0);
 uniform float coast_range = 64.0;
-// The sea is only near the coast: no water over low ground inland (plan 0004, R13).
+// The sea is only near the coast: no water over low ground inland (plan 0005, R13).
 uniform float inland_limit = 24.0;
 uniform sampler2D wave_normal_a : hint_normal, filter_linear_mipmap, repeat_enable;
 uniform sampler2D wave_normal_b : hint_normal, filter_linear_mipmap, repeat_enable;

@@ -1,4 +1,4 @@
-// The ground of the Vũng Tàu world (plan 0004, R12): sand on beaches, grass
+// The ground of the Vũng Tàu world (plan 0005, R12): sand on beaches, grass
 // on hills, rock on slopes above 35 degrees, and concrete in towns. The
 // surface mask comes from tools/geo/build.py: R is sand, G is town, B is wood,
 // A is the distance to the coastline.
@@ -16,7 +16,7 @@ uniform sampler2D town_texture : source_color, filter_linear_mipmap, repeat_enab
 uniform sampler2D wood_texture : source_color, filter_linear_mipmap, repeat_enable;
 // One texture repeat each 1 / tiling meters.
 uniform float tiling = 0.25;
-// The sea level now (the tide, plan 0004, D12).
+// The sea level now (the tide, plan 0005, D12).
 uniform float sea_level = 0.0;
 // cos(35 degrees) = 0.819.
 uniform float rock_normal_y = 0.819;

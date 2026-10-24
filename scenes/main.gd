@@ -38,7 +38,7 @@ const SUBTITLE_MARGIN := 16.0
 ## See _set_3d_scale().
 const WIDE_WINDOW := 1920
 const WIDE_3D_SCALE := 0.75
-## A message about deep water shows not more often than this (plan 0004, R13).
+## A message about deep water shows not more often than this (plan 0005, R13).
 const WATER_MESSAGE_MS := 3000
 
 ## The test ID of the focus ("spot.pho", "npc.batu"), or "".
@@ -60,7 +60,7 @@ var transcript: Array[Dictionary] = []
 var lens_line := ""
 ## True when a card came that the Sổ tay app did not show yet (R18).
 var new_card := false
-## "hem" (plans 0001 to 0003), or "vung_tau" (plan 0004) with --world=vung_tau.
+## "hem" (plans 0001 to 0003), or "vung_tau" (plan 0005) with --world=vung_tau.
 var world_name := "hem"
 ## The real ground of Vũng Tàu, or null in the hẻm world.
 var vung_tau: VungTau = null
@@ -160,7 +160,7 @@ func _ready() -> void:
 	_update_dot()
 
 
-## Plan 0004: the real ground in place of the hẻm. The hẻm world, its sun,
+## Plan 0005: the real ground in place of the hẻm. The hẻm world, its sun,
 ## and its sky go. The save of the hẻm world stays as it is.
 func _start_vung_tau() -> void:
 	var world: VungTau = load("res://scenes/world/vung_tau.tscn").instantiate()
@@ -1216,7 +1216,7 @@ func _set_3d_scale() -> void:
 		viewport.scaling_3d_scale = render_scale
 
 
-# --- Deep water and the debug overlay (plan 0004) ---------------------------
+# --- Deep water and the debug overlay (plan 0005) ---------------------------
 
 ## The player stops at deep water: a message shows in the subtitle box (R13).
 func _on_blocked() -> void:
@@ -1240,7 +1240,7 @@ func _make_debug_overlay() -> void:
 	ui_root.add_child(debug_overlay)
 
 
-## F3 shows or hides the frame rate and the place (plan 0004, R16).
+## F3 shows or hides the frame rate and the place (plan 0005, R16).
 func _unhandled_key_input(event: InputEvent) -> void:
 	var key := event as InputEventKey
 	if key and key.pressed and not key.echo and key.physical_keycode == KEY_F3:

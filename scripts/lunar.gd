@@ -1,6 +1,6 @@
 class_name Lunar
 extends RefCounted
-## The Vietnamese lunar calendar (âm lịch), plan 0004, D13.
+## The Vietnamese lunar calendar (âm lịch), plan 0005, D13.
 ##
 ## This is the algorithm of Hồ Ngọc Đức ("Thuật toán tính âm lịch"), with the
 ## time zone UTC+7. tools/geo/geodata/lunar.py has the same algorithm.

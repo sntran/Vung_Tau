@@ -1,6 +1,6 @@
 class_name GeoData
 extends RefCounted
-## The game data of plan 0004 in data/geo/build/ (made by tools/geo/build.py).
+## The game data of plan 0005 in data/geo/build/ (made by tools/geo/build.py).
 ##
 ## It reads world.json, the roads, and the landmarks, and decodes the height
 ## chunks when the world asks for them. The decode is safe in a worker thread.

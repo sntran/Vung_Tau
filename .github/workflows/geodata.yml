@@ -2,7 +2,7 @@ name: Geodata
 
 # Downloads the OpenStreetMap data, the Copernicus DEM, the ground textures,
 # and the EOT20 tide model, computes the tide (tide.py), builds
-# data/geo/build/, and commits the changed files (plan 0004, D1, D12, and R8).
+# data/geo/build/, and commits the changed files (plan 0005, D1, D12, and R8).
 # Run this workflow by hand on main. The commit goes to the branch that the
 # workflow runs on.
 on:

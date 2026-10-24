@@ -1,8 +1,8 @@
-"""The sea level from tide constituents (plan 0004, D12, R8f).
+"""The sea level from tide constituents (plan 0005, D12, R8f).
 
 This is the same calculation as pyTMD with the FES nodal corrections, for
 the constituents of EOT20. The game has the same code in
-scripts/geo/tide.gd. tide.py makes sure that this code agrees with pyTMD.
+scripts/geo/tide_model.gd. tide.py makes sure that this code agrees with pyTMD.
 
 The sea level is the sum of f · A · cos(G + u − g) for each constituent:
   A, g  the amplitude and the phase lag from the tide model,

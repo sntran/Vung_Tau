@@ -1,5 +1,5 @@
 {
-	"note": "The places that tools/geo/build.py finds in the OSM data (plan 0004, R1). Each search is a set of OSM tags and a pattern for the names. A tag value of \"*\" matches each value. The hint is a known position. It helps when the data has more than one match, and fetch.py uses it to check the box. \"exact_name\": true accepts only a name that is the same, not a longer name that contains it (for example \"Vi Ba\", not \"Hẻm 14 Vi Ba\").",
+	"note": "The places that tools/geo/build.py finds in the OSM data (plan 0005, R1). Each search is a set of OSM tags and a pattern for the names. A tag value of \"*\" matches each value. The hint is a known position. It helps when the data has more than one match, and fetch.py uses it to check the box. \"exact_name\": true accepts only a name that is the same, not a longer name that contains it (for example \"Vi Ba\", not \"Hẻm 14 Vi Ba\").",
 	"landmarks": [
 		{
 			"id": "bai_truoc",

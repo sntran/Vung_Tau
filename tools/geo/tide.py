@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Computes the tide constituents of Vũng Tàu (plan 0004, D12, R8d to R8j).
+"""Computes the tide constituents of Vũng Tàu (plan 0005, D12, R8d to R8j).
 
 Usage:
   python tools/geo/tide.py                      Download EOT20 (if necessary) and write the tide files.
@@ -138,7 +138,7 @@ def propose_days(windows: list[dict]) -> list[dict]:
 
 
 def report(tide: dict, top: float, windows: list[dict], days: list[dict], check: float) -> str:
-    lines = ["# The tide report (plan 0004, R8d to R8j)", "",
+    lines = ["# The tide report (plan 0005, R8d to R8j)", "",
              f"Made by `tools/geo/tide.py` on {datetime.date.today().isoformat()}. Source: {tide['source']}", "",
              "## The constituents at Hòn Bà", "",
              "| Constituent | Amplitude (m) | Phase (°) | Nearest EOT20 cell (km) |", "|---|---|---|---|"]
@@ -205,7 +205,7 @@ def main() -> int:
     expected, deltat_s = pytmd_levels(constants["hon_ba"], tests_t)
     coefficients = pyTMD.constituents.coefficients_table(CONSTITUENTS, corrections="FES")
     tide = {
-        "note": "The tide at Vũng Tàu (plan 0004, D12). The sea level is the sum of f · A · cos(G + u − g) for each "
+        "note": "The tide at Vũng Tàu (plan 0005, D12). The sea level is the sum of f · A · cos(G + u − g) for each "
                 "constituent. See tools/geo/geodata/tidecalc.py and scripts/geo/tide_model.gd.",
         "source": f"EOT20 (Hart-Davis et al., 2021) with pyTMD {pyTMD.__version__}, FES nodal corrections",
         "license": eot20.LICENSE,
