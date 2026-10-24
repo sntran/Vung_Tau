@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | In progress |
+| Status | Built |
 | Branch | `feat/0003-voices-and-phone` |
 | Depends on | 0002 (status "Built") |
 

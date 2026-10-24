@@ -33,7 +33,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 |---|---|---|
 | 0001 | [Foundation and the walkable hẻm](0001-foundation.md) | Built |
 | 0002 | [First-person walking](0002-first-person.md) | Built |
-| 0003 | [Voices and the phone](0003-voices-and-phone.md) | In progress |
+| 0003 | [Voices and the phone](0003-voices-and-phone.md) | Built |
 | 0004 | [Desktop and the house detail kit](0004-desktop-and-house-detail.md) | Approved |
 | 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Approved |
 
@@ -43,7 +43,7 @@ The order can change.
 
 | Number | Name | Content |
 |---|---|---|
-| 0003 | [Voices and the phone](0003-voices-and-phone.md) | Approved. People speak aloud in Vietnamese with subtitles. The traveler's phone has Listen (transcribe and translate), Lens, Messages, Sổ tay, Clock, and Settings. It replaces the talk panel and the 2D sheets. |
+| 0003 | [Voices and the phone](0003-voices-and-phone.md) | Built. People speak aloud in Vietnamese with subtitles. The traveler's phone has Listen (transcribe and translate), Lens, Messages, Sổ tay, Clock, and Settings. It replaces the talk panel and the 2D sheets. |
 | 0004 | [Desktop and the house detail kit](0004-desktop-and-house-detail.md) | Approved. Desktop becomes the main platform, with the Forward+ renderer and quality presets. Tube houses get depth, brick under plaster and paint, wear, and the clutter of a real street. |
 | 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Approved. The real ground, hills, coast, beaches, sea, and roads, from OpenStreetMap and the Copernicus elevation data. |
 | 0006 | Known structures | Tượng Chúa Kitô Vua, Hải đăng, Bạch Dinh, Tượng Đức Mẹ Bãi Dâu, Miếu Hòn Bà (with its gate and the old bunkers), Chùa Tam Bảo, the ferry pier near Bãi Trước, the park of Bãi Trước, the main bus station, the old markets, the big roundabout, Ngã Năm, and others that I name. Made by code from their real outlines and sizes. |
