@@ -30,6 +30,7 @@ The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0007 puts h
 | D5 | All house parts are made in code and shaders. No model files. Ground textures are CC0 scans that CI downloads. | No artist on the project. The quick test showed that depth, shadows, and a plaster shader made in code change the look the most. |
 | D6 | Houses are brick under plaster and paint. Brick shows only where plaster fell off, or on bare side walls that rise above a shorter neighbor. | I confirm it first-hand. |
 | D7 | Play tests of game logic run on the Mobile renderer. The look review runs on Forward+ with still screenshots only. | Verified in the workspace: Forward+ with SSAO, SSIL, and SDFGI renders under lavapipe, but one frame at 1600 × 900 takes about 2 s. The Mobile renderer is much faster. |
+| D8 | Wall colors are muted and faded: off-white, cream, pale yellow, light grey, and sand. Strong colors are rare on walls. Most strong color in the street comes from signs, awnings, shutters, tiles, plants, and laundry. The palette comes from photos of real houses that I approve. | My review of the first test: the pastel colors looked artificial, and few houses have them. |
 
 ## 4. Requirements
 
@@ -67,7 +68,9 @@ The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0007 puts h
   - Patches where plaster fell off, with red brick and mortar under them. Mostly low on the wall and at edges.
   - A paint age parameter: new houses are clean, old houses are faded and stained.
 - **R9.** Side walls above a shorter neighbor show bare grey plaster or brick (D6).
-- **R10.** Each house in `hem_layout.json` gets: width (3.5 m to 5 m), floors (2 to 5), a style (`old` or `new`), paint color, paint age, and a seed. The old and the new styles mix in one hẻm, as in a real street.
+- **R10.** Each house in `hem_layout.json` gets: width (3.5 m to 5 m), floors (2 to 5), a style (`old` or `new`), a paint color from the palette (R10a), paint age, and a seed. The old and the new styles mix in one hẻm, as in a real street.
+- **R10a.** `data/world/palette.json` holds the wall colors. Each color has a value in sRGB, a weight (how often it is used), and a source. The first values are muted and faded (D8). I replace them with values sampled from the photos that I choose. The house generator picks colors by weight. Two neighbor houses must not have the same color. A rare accent color (for example a faded blue or green) is at most 1 house in 8.
+- **R10b.** The palette also has colors for the accent parts: shutters, rails, window frames, signs, and awnings. These can be stronger than the walls.
 - **R11.** The hẻm floor: concrete with cracks and patches, a drain gutter, and covers. The tiled fronts of the houses differ from house to house.
 - **R12.** `docs/content/reference/houses.md` lists each part of R7 with links to public photos on the web for comparison. Links only. Do not copy photos into the repository. I mark each part as correct or not correct for Vũng Tàu.
 
@@ -105,3 +108,5 @@ The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0007 puts h
 
 - **Q1.** Which computer do I use to test the desktop builds (Windows, macOS, or Linux)?
 - **Q2.** Which parts in R7 are not correct for Vũng Tàu, and which parts are missing? (For example: solar water heaters on roofs, an altar for Ông Địa in shops, numbers painted on the walls.)
+- **Q3.** Which photos of real houses are the source of the palette (R10a)? I send screenshots of typical houses, for example from a street view. The architect samples the wall colors from them. The screenshots are not put in the repository.
+- **Q4.** Do many houses in Vũng Tàu have ceramic tiles on the front wall (ốp gạch)? If yes, add tiled fronts to R7.
