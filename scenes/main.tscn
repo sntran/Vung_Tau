@@ -1,3 +1,86 @@
-[gd_scene format=3]
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scenes/main.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/world/hem.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/actors/player.tscn" id="3"]
+[ext_resource type="Script" path="res://scenes/world/camera_rig.gd" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/ui/top_bar.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/ui/talk_panel.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/ui/notebook_sheet.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/ui/clock_sheet.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/ui/toast.tscn" id="9"]
+
+[sub_resource type="ProceduralSkyMaterial" id="sky_material"]
+sky_top_color = Color(0.498, 0.765, 0.925, 1)
+sky_horizon_color = Color(0.863, 0.937, 0.965, 1)
+ground_bottom_color = Color(0.35, 0.4, 0.42, 1)
+ground_horizon_color = Color(0.863, 0.937, 0.965, 1)
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_material")
+
+[sub_resource type="Environment" id="environment"]
+background_mode = 2
+sky = SubResource("sky")
+ambient_light_source = 2
+ambient_light_color = Color(0.85, 0.88, 0.9, 1)
+ambient_light_energy = 0.7
+tonemap_mode = 2
+fog_enabled = true
+fog_light_color = Color(0.8, 0.88, 0.92, 1)
+fog_density = 0.0025
+fog_sky_affect = 0.0
 
 [node name="Main" type="Node3D"]
+script = ExtResource("1")
+
+[node name="World" type="Node3D" parent="."]
+
+[node name="Environment" type="WorldEnvironment" parent="World"]
+environment = SubResource("environment")
+
+[node name="Sun" type="DirectionalLight3D" parent="World"]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866, 0, -0.866, 0.5, 0, 10, 0)
+shadow_enabled = true
+directional_shadow_mode = 0
+directional_shadow_max_distance = 40.0
+
+[node name="Hem" parent="World" instance=ExtResource("2")]
+
+[node name="Player" parent="World" instance=ExtResource("3")]
+
+[node name="Camera" type="Camera3D" parent="World"]
+script = ExtResource("4")
+current = true
+
+[node name="Sounds" type="Node" parent="."]
+
+[node name="Ting" type="AudioStreamPlayer" parent="Sounds"]
+
+[node name="Clack" type="AudioStreamPlayer" parent="Sounds"]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Root" type="Control" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TalkPanel" parent="UI/Root" instance=ExtResource("6")]
+
+[node name="WalkLeft" type="Button" parent="UI/Root"]
+
+[node name="WalkRight" type="Button" parent="UI/Root"]
+
+[node name="Toast" parent="UI/Root" instance=ExtResource("9")]
+
+[node name="ClockSheet" parent="UI/Root" instance=ExtResource("8")]
+visible = false
+
+[node name="NotebookSheet" parent="UI/Root" instance=ExtResource("7")]
+visible = false
+
+[node name="TopBar" parent="UI/Root" instance=ExtResource("5")]
