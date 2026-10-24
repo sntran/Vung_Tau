@@ -24,7 +24,7 @@ These decisions replace decisions D3, D4, and D5 of plan 0001.
 
 | ID | Decision | Reason |
 |---|---|---|
-| D1 | First-person camera at an eye height of 1.6 m. The player body is not visible. | The owner wants the player to walk around as in real life. |
+| D1 | First-person camera at an eye height of 1.6 m. The player body is not visible. | The player must walk around as in real life. |
 | D2 | Landscape is the main layout. Base viewport 1280 × 720, stretch mode `canvas_items`, aspect `expand`. Phones lock the screen to landscape. The web build works with all window shapes. | A first-person view needs width. A portrait view shows a narrow street and makes the player turn more. |
 | D3 | Move with a floating joystick on the left half of the screen. The joystick appears where the thumb touches. | Standard control for mobile 3D games. |
 | D4 | Look with a drag on the right half of the screen. | Standard control for mobile 3D games. Players prefer two touch controls to tilt controls for aim in a study of a mobile game ([Teather et al. 2017](https://yorku.ca/mack/ec2017.html)). |
@@ -119,6 +119,6 @@ Run all scenarios at 1280×720 and 2400×1080. PT-17 also runs at 1920×1080 and
 
 ## 7. Open questions
 
-- **Q1.** The owner must approve the gyroscope "on" by default (D5).
-- **Q2.** The owner must approve landscape only on phones (D2).
-- **Q3.** Is tap to walk necessary when the joystick is there? Keep both until the owner tries the APK.
+- **Q1.** The gyroscope "on" by default (D5) needs my approval.
+- **Q2.** Landscape only on phones (D2) needs my approval.
+- **Q3.** Is tap to walk necessary when the joystick is there? Keep both until I try the APK.

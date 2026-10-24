@@ -18,9 +18,11 @@ The main STE rules:
 
 Use the Vietnamese words with all diacritics: "phở", not "pho".
 
+All documents speak for the project in my voice. Do not write about me in the third person in documents, plans, or commits. When a document must name the person who approves or confirms, write "I" or "me".
+
 ## Commit rules
 
-- Commit with the identity of the owner:
+- Commit with this identity:
 
   ```sh
   git -c user.name="Sơn Trần-Nguyễn" -c user.email=github@sntran.com -c commit.gpgsign=false commit
@@ -44,7 +46,7 @@ Use a branch prefix for the type of task:
 
 Put the plan number in the branch name when there is a plan: `feat/0001-foundation`.
 
-Do not open a pull request unless the owner asks for one.
+Do not open a pull request unless I ask for one.
 
 ## Assets
 

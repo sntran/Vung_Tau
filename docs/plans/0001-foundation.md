@@ -8,7 +8,7 @@
 
 ## 1. Goal
 
-At the end of this plan, the owner has:
+At the end of this plan, the project has:
 
 - A Godot 4.7.2 project with the name "Vũng Tàu".
 - A play-test system. It drives the game with real touch events, without a screen, and saves screenshots.
@@ -34,7 +34,7 @@ The 3D models in this plan are simple shapes with correct proportions ("greybox"
 | D3 | Portrait phone is the main layout: base viewport 720 × 1280, stretch mode `canvas_items`, aspect `expand`. The game must also work in landscape, for the web build on a computer. | Most players hold a phone in one hand. |
 | D4 | The camera looks at the house fronts from the other side of the hẻm, at about 25° down. It follows the player along the hẻm. | The player must see the shop fronts, the signs, and the shutters. This is the view that worked in the 2D prototype. A free camera can come later. |
 | D5 | Tap to walk. Tap the ground to walk there. Tap a shop, a cart, or a person to walk to it and talk. | One-hand play. Same as the prototype. |
-| D6 | All content is in JSON files in `data/`. Code reads it through one autoload, `Content`. | The owner must be able to edit text, hours, and prices without code. |
+| D6 | All content is in JSON files in `data/`. Code reads it through one autoload, `Content`. | Text, hours, and prices must be easy to edit without code. |
 | D7 | Each node that a player can touch has a test ID in its metadata (`test_id`). | Play tests find nodes by test ID. They do not depend on English text or on screen positions that change. |
 | D8 | Dialogue lines have IDs, for example `spot.pho.closed_after`. Play tests check the ID of the line on screen. | Text can change without a test change. |
 | D9 | Units are meters. The hẻm runs along the X axis. X = 0 is the homestay. Bãi Trước is at the high X end. | One rule for all scenes. |
@@ -95,7 +95,7 @@ tools/
 ### Content and data
 
 - **R5.** Move the content of the prototype (`docs/prototype/hem-2d.html`) into `data/`: the spots, the opening hours, the cards, and the hẻm dialogue. Do not move the phở table content. It is for plan 0003.
-- **R6.** Each fact in the data has a `status` field with the value `owner`, `source`, or `check`, the same as in `docs/content/culture-notes.md`.
+- **R6.** Each fact in the data has a `status` field with the value `confirmed`, `source`, or `check`, the same as in `docs/content/culture-notes.md`.
 - **R7.** `Content` checks the data when the game starts. In a debug build, it stops the game with a clear message when:
   - a dialogue choice points to a line ID that does not exist,
   - a spot or a choice points to a card ID that does not exist,
@@ -118,7 +118,7 @@ tools/
 
 ### The hẻm
 
-- **R14.** Build the hẻm from `data/world/hem_layout.json`. Use these approximate sizes until the owner corrects them (Open question Q3):
+- **R14.** Build the hẻm from `data/world/hem_layout.json`. Use these approximate sizes until I correct them (Open question Q3):
   - Each house front is 4 m to 5 m wide.
   - Each floor is 3.2 m high. Houses have 2 to 4 floors.
   - The hẻm is 3.5 m wide between the house fronts.
@@ -208,7 +208,7 @@ The builder sets the status to "Built" only when all of these are true:
 
 ## 8. Open questions
 
-- **Q1.** Android package name and iOS bundle ID. The proposal is `com.sntran.vungtau`. The owner must approve it.
+- **Q1.** Android package name and iOS bundle ID. The proposal is `com.sntran.vungtau`. It needs my approval.
 - **Q2.** Does the web build fit the limits of GitHub Pages without problems? The builder records the size of the web build here.
-- **Q3.** The owner must check the sizes in R14 against real houses and hẻm in Vũng Tàu.
+- **Q3.** I must check the sizes in R14 against real houses and hẻm in Vũng Tàu.
 - **Q4.** The Compatibility renderer has fewer effects than the Mobile renderer. Plan 0002 must check if it can look real enough. The Mobile renderer needs Vulkan, and the development workspace has no Vulkan driver. A Vulkan software driver (lavapipe) on the CI runner is a possible solution.
