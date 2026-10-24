@@ -98,7 +98,7 @@
 			"vi": "tập thể dục buổi sáng",
 			"body": "Before the heat, the beach fills with people jogging, stretching, and exercising together. Once the sun is high, the sand gets quiet.",
 			"hint": "Go to the beach very early.",
-			"status": "owner"
+			"status": "confirmed"
 		},
 		{
 			"id": "breakfast",
@@ -170,7 +170,7 @@
 			"vi": "chén nước chấm",
 			"body": "Many locals squeeze hoisin and chili sauce into a small dish, not the bowl. They dip the meat and bò viên in it and keep the broth clean. Others put it in the bowl. Both happen here.",
 			"hint": "Try the sauce bottles.",
-			"status": "owner"
+			"status": "confirmed"
 		},
 		{
 			"id": "bac",

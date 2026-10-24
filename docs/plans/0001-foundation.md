@@ -8,7 +8,7 @@
 
 ## 1. Goal
 
-At the end of this plan, the owner has:
+At the end of this plan, the project has:
 
 - A Godot 4.7.2 project with the name "Vũng Tàu".
 - A play-test system. It drives the game with real touch events, without a screen, and saves screenshots.
@@ -34,7 +34,7 @@ The 3D models in this plan are simple shapes with correct proportions ("greybox"
 | D3 | Portrait phone is the main layout: base viewport 720 × 1280, stretch mode `canvas_items`, aspect `expand`. The game must also work in landscape, for the web build on a computer. | Most players hold a phone in one hand. |
 | D4 | The camera looks at the house fronts from the other side of the hẻm, at about 25° down. It follows the player along the hẻm. | The player must see the shop fronts, the signs, and the shutters. This is the view that worked in the 2D prototype. A free camera can come later. |
 | D5 | Tap to walk. Tap the ground to walk there. Tap a shop, a cart, or a person to walk to it and talk. | One-hand play. Same as the prototype. |
-| D6 | All content is in JSON files in `data/`. Code reads it through one autoload, `Content`. | The owner must be able to edit text, hours, and prices without code. |
+| D6 | All content is in JSON files in `data/`. Code reads it through one autoload, `Content`. | Text, hours, and prices must be easy to edit without code. |
 | D7 | Each node that a player can touch has a test ID in its metadata (`test_id`). | Play tests find nodes by test ID. They do not depend on English text or on screen positions that change. |
 | D8 | Dialogue lines have IDs, for example `spot.pho.closed_after`. Play tests check the ID of the line on screen. | Text can change without a test change. |
 | D9 | Units are meters. The hẻm runs along the X axis. X = 0 is the homestay. Bãi Trước is at the high X end. | One rule for all scenes. |
@@ -95,7 +95,7 @@ tools/
 ### Content and data
 
 - **R5.** Move the content of the prototype (`docs/prototype/hem-2d.html`) into `data/`: the spots, the opening hours, the cards, and the hẻm dialogue. Do not move the phở table content. It is for plan 0003.
-- **R6.** Each fact in the data has a `status` field with the value `owner`, `source`, or `check`, the same as in `docs/content/culture-notes.md`.
+- **R6.** Each fact in the data has a `status` field with the value `confirmed`, `source`, or `check`, the same as in `docs/content/culture-notes.md`.
 - **R7.** `Content` checks the data when the game starts. In a debug build, it stops the game with a clear message when:
   - a dialogue choice points to a line ID that does not exist,
   - a spot or a choice points to a card ID that does not exist,
@@ -118,7 +118,7 @@ tools/
 
 ### The hẻm
 
-- **R14.** Build the hẻm from `data/world/hem_layout.json`. Use these approximate sizes until the owner corrects them (Open question Q3):
+- **R14.** Build the hẻm from `data/world/hem_layout.json`. Use these approximate sizes until I correct them (Open question Q3):
   - Each house front is 4 m to 5 m wide.
   - Each floor is 3.2 m high. Houses have 2 to 4 floors.
   - The hẻm is 3.5 m wide between the house fronts.
@@ -208,21 +208,21 @@ The builder sets the status to "Built" only when all of these are true:
 
 ## 8. Open questions
 
-- **Q1.** Android package name and iOS bundle ID. The proposal is `com.sntran.vungtau`. The owner must approve it.
-  - *Builder:* `export_presets.cfg` uses `com.sntran.vungtau` for Android and iOS until the owner approves it or gives another ID.
+- **Q1.** Android package name and iOS bundle ID. The proposal is `com.sntran.vungtau`. It needs my approval.
+  - *Builder:* `export_presets.cfg` uses `com.sntran.vungtau` for Android and iOS until I approve it or give another ID.
 - **Q2.** Does the web build fit the limits of GitHub Pages without problems? The builder records the size of the web build here.
   - *Builder:* The web build is 39 MB: `index.wasm` is 38 MB (10 MB with gzip), `index.pck` is 0.5 MB. GitHub Pages accepts files up to 100 MB and sites up to 1 GB, and it sends the files with gzip. It fits. The repository must have GitHub Pages set to "GitHub Actions" (Settings → Pages → Source). The workflow cannot set this.
-- **Q3.** The owner must check the sizes in R14 against real houses and hẻm in Vũng Tàu.
+- **Q3.** I must check the sizes in R14 against real houses and hẻm in Vũng Tàu.
 - **Q4.** The Compatibility renderer has fewer effects than the Mobile renderer. Plan 0002 must check if it can look real enough. The Mobile renderer needs Vulkan, and the development workspace has no Vulkan driver. A Vulkan software driver (lavapipe) on the CI runner is a possible solution.
 
 ### Builder notes
 
 These notes record how the builder read the parts of the plan that were not fully clear. The architect must check them in the audit.
 
-- **N1. Approval.** The plan had the status "Draft". The owner told the builder to start building. The builder read this as the approval.
+- **N1. Approval.** The plan had the status "Draft". I told the builder to start building. The builder read this as my approval.
 - **N2. "Wait one hour" late in the day (R10, PT-04).** The clock stops at 23:59 until the player sleeps (the same as the prototype). "Wait one hour" shows when it can move the clock forward. From 23:00 it moves the clock to 23:59. Then the only choice is "Go home and sleep".
 - **N3. Line IDs.** Each spot has a list of line rules in `data/spots.json` ("open", "from", "before"). The first rule that agrees with the time gives the line. The cards that the player learns are on the rules ("learn") and on the choices. The panel for a near spot has the line ID `hem.near`. `state().near_spot` tells the spot.
-- **N4. Status of the dialogue lines (R6).** Each card, spot, NPC, and dialogue line has a `status`. Text from the prototype that is not in `culture-notes.md` has the status `check`. Two lines are new and need the owner: `spot.pho.open` ("Vô đây con, ngồi đi!") and the tip `hem.tip.pho`.
+- **N4. Status of the dialogue lines (R6).** Each card, spot, NPC, and dialogue line has a `status`. Text from the prototype that is not in `culture-notes.md` has the status `check`. Two lines are new and need my check: `spot.pho.open` ("Vô đây con, ngồi đi!") and the tip `hem.tip.pho`.
 - **N5. NFC check (R8).** Godot has no Unicode normalization function. All Vietnamese letters have a precomposed NFC form, so `Content` reports each text with a combining mark (U+0300 to U+036F) as "not in NFC form".
 - **N6. Bà Tư.** She is in front of the homestay from 05:30 to 09:00, the same as the prototype. The intro choice "Step outside" always shows her greeting.
 - **N7. Camera (D4, R29).** The camera looks at the house fronts at 25° down from 12 m. It uses a frustum offset (a lens shift) to put the player in the center of the part of the screen that the UI does not cover. Then the talk panel never covers the player. On the beach road, the camera turns 65° to show the sea (R17). The architect must approve this change to D4.
@@ -234,6 +234,6 @@ These notes record how the builder read the parts of the plan that were not full
 - **N13. Anti-aliasing.** MSAA is off. With MSAA, the play tests run at 11 frames per second in the workspace. Without it, they run at 20. Plan 0002 can turn it on for phones only (`msaa_3d.mobile`).
 - **N14. The export workflow (R39).** `workflow_dispatch` works only for a workflow on the default branch. To check the export jobs before the merge, the builder added the branch `feat/0001-foundation` to the push trigger for some commits, then removed it. On commit `eff9b15`, all export jobs passed in CI: the web build, the Android debug APK, the iOS Xcode project, and the iOS Simulator build. The job that publishes to GitHub Pages runs only on `main`, so it did not run yet.
 - **N16. Taps on the ground out of the walk area.** A tap on the ground on the near side of the hẻm, or past the end wall, walks the player to the nearest point of the walk area. PT-02 has a step for this.
-- **N17. Open items for "Built".** All unit tests and all play tests pass in the workspace and in CI. These acceptance criteria are still open: (4) the publish to GitHub Pages needs the merge to `main` and the Pages setting in Q2; (5) the owner must open the web build on a phone. The builder checked the web build only in Chromium with a phone screen size and touch input.
+- **N17. Open items for "Built".** All unit tests and all play tests pass in the workspace and in CI. These acceptance criteria are still open: (4) the publish to GitHub Pages needs the merge to `main` and the Pages setting in Q2; (5) I must open the web build on a phone. The builder checked the web build only in Chromium with a phone screen size and touch input.
 - **N15. iOS export.** Godot exports the Xcode project on Linux. Only the build of an `.ipa` needs macOS. So one Linux job exports the project, and one macOS job builds it for the iOS Simulator. Godot needs an App Store team ID to export. The preset has the placeholder `0000000000`, because the simulator build does no code signing. The simulator library in the official Godot 4.7.2 templates has only x86_64 code. The macOS runner has an arm64 CPU, so the simulator build is for x86_64 (`ARCHS=x86_64`).
 - **N18. No sun shadows.** With the sun shadow on, the Compatibility renderer under llvmpipe makes the surfaces that face up about three times too bright when the sun is high. At noon, the floor and the sand are white. Without the shadow, the same light energy is correct. So the sun has no shadow in plan 0001. Plan 0002 must check the sun shadow on real phones (see Q4).

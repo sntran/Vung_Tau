@@ -21,7 +21,7 @@
 		"intro.welcome": {
 			"text": "[i]Một Ngày Ở Xóm[/i] · A day in a Vũng Tàu hẻm.\nYou're staying at Bà Tư's family homestay in Hẻm 42, a short walk from Bãi Trước. It's 6 in the morning, and the hẻm is already busy. Walk around, eat, and fill your sổ tay (notebook) with what you learn.",
 			"hint": "Tap the street to walk. Tap a shop to go there. Tap the clock to wait.",
-			"status": "owner",
+			"status": "confirmed",
 			"choices": [
 				{
 					"id": "step_outside",
@@ -93,7 +93,7 @@
 		},
 		"hem.near": {
 			"text": "[i]{name}[/i] · {en}\n{status}",
-			"status": "owner",
+			"status": "confirmed",
 			"choices": [
 				{
 					"id": "look",
@@ -112,7 +112,7 @@
 		},
 		"hem.tip.pho": {
 			"text": "Cô Sáu's phở is two doors from the homestay. Go before it sells out.",
-			"status": "owner",
+			"status": "confirmed",
 			"choices": [
 				{
 					"id": "wait",
@@ -125,7 +125,7 @@
 		},
 		"hem.tip.beach": {
 			"text": "Bãi Trước is at the end of the hẻm. Early morning is the time to go.",
-			"status": "owner",
+			"status": "confirmed",
 			"choices": [
 				{
 					"id": "wait",
@@ -138,7 +138,7 @@
 		},
 		"hem.tip.walk": {
 			"text": "Tap a shop to walk there, or tap the street to stroll.",
-			"status": "owner",
+			"status": "confirmed",
 			"choices": [
 				{
 					"id": "wait",
@@ -151,7 +151,7 @@
 		},
 		"hem.late": {
 			"text": "It's late. The hẻm is quiet and the shutters are down. Time to sleep.",
-			"status": "owner",
+			"status": "confirmed",
 			"choices": [
 				{
 					"id": "go_home_sleep",
@@ -176,7 +176,7 @@
 		"spot.home.look": {
 			"text": "Bà Tư's homestay. Your room upstairs has a fan and a window over the hẻm. From the kitchen comes the smell of nước mắm and something frying.",
 			"hint": "Coming in a later version: dinner with the family.",
-			"status": "owner",
+			"status": "confirmed",
 			"choices": [
 				{
 					"id": "rest",
@@ -441,7 +441,7 @@
 		"spot.beach.day": {
 			"text": "The sun is hot. The sand is almost empty, and the boats wait out at sea.",
 			"hint": "Come back very early in the morning.",
-			"status": "owner",
+			"status": "confirmed",
 			"choices": [
 				{
 					"id": "okay",
@@ -454,7 +454,7 @@
 		"spot.beach.evening": {
 			"text": "The heat breaks. Families sit on mats, kids run at the water, and scooters roll along the coast road.",
 			"hint": "Coming in a later version: ride a scooter along the coast. Helmet on.",
-			"status": "owner",
+			"status": "confirmed",
 			"choices": [
 				{
 					"id": "okay",

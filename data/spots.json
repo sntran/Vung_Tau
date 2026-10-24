@@ -6,7 +6,7 @@
 			"name": "Homestay nhà Bà Tư",
 			"en": "Where you stay",
 			"hours": null,
-			"status": "owner",
+			"status": "confirmed",
 			"look_label": "Go in",
 			"lines": [
 				{"line": "spot.home.look"}
@@ -122,7 +122,7 @@
 			"name": "Bãi Trước",
 			"en": "Front Beach",
 			"hours": null,
-			"status": "owner",
+			"status": "confirmed",
 			"look_label": "Take a look",
 			"lines": [
 				{"from": 270, "before": 450, "line": "spot.beach.dawn", "learn": ["boats", "exercise"]},

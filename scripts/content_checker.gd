@@ -3,9 +3,9 @@ extends RefCounted
 ## Checks the content data (data/*.json) and returns a list of error texts.
 ##
 ## An empty list means that the data is correct. Each error text tells the
-## file, the item, and the problem, so that the owner can correct the data.
+## file, the item, and the problem, so that the data is easy to correct.
 
-const STATUS_VALUES := ["owner", "source", "check"]
+const STATUS_VALUES := ["confirmed", "source", "check"]
 const SPOT_KINDS := ["house", "shop", "stall", "cart", "place"]
 const GROUND_TYPES := ["gate", "shop", "wall"]
 const CHOICE_STYLES := ["", "primary", "quiet"]
