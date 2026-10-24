@@ -57,7 +57,7 @@ func run(d: PlaytestDriver) -> void:
 				await d.lower_phone()
 				var nearest := _nearest_target(d, spot_ids)
 				if nearest != "":
-					await d.look_at_id(nearest, 10.0)
+					await d.look_at_id(nearest)
 				on_screen = _visible_targets(d, spot_ids)
 			if on_screen.is_empty():
 				error = "no spot on the screen"

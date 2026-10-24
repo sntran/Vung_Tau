@@ -5,10 +5,17 @@ extends RefCounted
 # and time. Check that a cart that is not present cannot be tapped and has no
 # Lens card. Screenshot each spot. At each start time, also check the
 # shutters (R19) and the boats (R17).
+# Each start time has two runs: the first five spots, then the last five, so
+# that each run is shorter than 180 s at 2400×1080 on a slow computer.
 # phase: --start-time=05:50
+# phase: --start-time=05:50 --fresh-save
+# phase: --start-time=11:00 --fresh-save
 # phase: --start-time=11:00 --fresh-save
 # phase: --start-time=15:00 --fresh-save
+# phase: --start-time=15:00 --fresh-save
 # phase: --start-time=18:30 --fresh-save
+# phase: --start-time=18:30 --fresh-save
+# phase: --start-time=21:40 --fresh-save
 # phase: --start-time=21:40 --fresh-save
 
 ## The expected Lens description for each spot at each start time. "" means that the cart is not there.
@@ -42,16 +49,21 @@ const ORDER := ["home", "pho", "banhmi", "coc", "bac", "mia", "go", "banhkhot", 
 
 
 func run(d: PlaytestDriver) -> void:
+	# Runs 1 and 2 are the first start time, runs 3 and 4 the second, and so on.
+	var time_index := (d.phase + 1) / 2
+	var first_half := d.phase % 2 == 1
 	await d.skip_intro()
 	await d.screenshot("start")
-	var view: Dictionary = START_VIEW[d.phase]
-	var s0 := d.state()
-	d.expect(s0.shutters == view.shutters, "at %s the shutters are %s, not %s" % [s0.time_text, s0.shutters, view.shutters])
-	d.expect(s0.boats_in == view.boats_in and s0.exercisers == view.boats_in,
-			"at %s the boats on the sand and the people: %s, not %s" % [s0.time_text, s0.boats_in, view.boats_in])
-	var expected: Dictionary = EXPECTED[d.phase]
+	if first_half:
+		var view: Dictionary = START_VIEW[time_index]
+		var s0 := d.state()
+		d.expect(s0.shutters == view.shutters, "at %s the shutters are %s, not %s" % [s0.time_text, s0.shutters, view.shutters])
+		d.expect(s0.boats_in == view.boats_in and s0.exercisers == view.boats_in,
+				"at %s the boats on the sand and the people: %s, not %s" % [s0.time_text, s0.boats_in, view.boats_in])
+	var expected: Dictionary = EXPECTED[time_index]
 	var hem: Node = d.main().hem
-	for spot_id: String in ORDER:
+	var half := ORDER.size() / 2
+	for spot_id: String in (ORDER.slice(0, half) if first_half else ORDER.slice(half)):
 		var line: String = expected[spot_id]
 		var stand: Vector3 = hem.stand_points[spot_id]
 		await d.lower_phone()

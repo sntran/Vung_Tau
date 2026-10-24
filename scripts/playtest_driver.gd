@@ -324,7 +324,7 @@ func look_at_point(point: Vector3, tolerance := 2.0, timeout_s := 30.0) -> bool:
 
 
 ## Turns the view until the node with the test ID is at the center dot.
-func look_at_id(test_id: String, timeout_s := 10.0) -> bool:
+func look_at_id(test_id: String, timeout_s := 30.0) -> bool:
 	var node := find(test_id) as Node3D
 	if node == null:
 		fail("look_at_id: no visible 3D node has the test ID \"%s\"" % test_id)
