@@ -8,3 +8,7 @@
 
 # Output of the tests and exports
 build/
+
+# Python
+__pycache__/
+.pytest_cache/

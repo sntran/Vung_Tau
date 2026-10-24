@@ -1,0 +1,68 @@
+{
+	"note": "The places that tools/geo/build.py finds in the OSM data (plan 0003, R1). Each search is a set of OSM tags and a pattern for the names. A tag value of \"*\" matches each value. The hint is a known position. It helps when the data has more than one match, and fetch.py uses it to check the box.",
+	"landmarks": [
+		{
+			"id": "bai_truoc",
+			"name_vi": "Bãi Trước",
+			"other_names": ["Front Beach", "Bãi Tầm Dương"],
+			"search": [{"tags": {"natural": "beach"}}, {"tags": {"place": "*"}}, {"tags": {"tourism": "*"}}],
+			"hint": {"lat": 10.3466, "lon": 107.0728}
+		},
+		{
+			"id": "bai_sau",
+			"name_vi": "Bãi Sau",
+			"other_names": ["Back Beach", "Bãi Thùy Vân", "Thùy Vân"],
+			"search": [{"tags": {"natural": "beach"}}, {"tags": {"place": "*"}}, {"tags": {"tourism": "*"}}],
+			"hint": {"lat": 10.3460, "lon": 107.0960}
+		},
+		{
+			"id": "bai_dau",
+			"name_vi": "Bãi Dâu",
+			"other_names": ["Mulberry Beach"],
+			"search": [{"tags": {"natural": "beach"}}, {"tags": {"place": "*"}}, {"tags": {"tourism": "*"}}],
+			"hint": {"lat": 10.3725, "lon": 107.0625}
+		},
+		{
+			"id": "mui_nghinh_phong",
+			"name_vi": "Mũi Nghinh Phong",
+			"other_names": ["Nghinh Phong Cape", "Mũi Vũng Tàu"],
+			"search": [{"tags": {"natural": "cape"}}, {"tags": {"tourism": "*"}}, {"tags": {"natural": "*"}}],
+			"hint": {"lat": 10.3205, "lon": 107.0845}
+		},
+		{
+			"id": "nui_lon",
+			"name_vi": "Núi Lớn",
+			"other_names": ["Núi Tương Kỳ", "Big Mountain"],
+			"search": [{"tags": {"natural": "peak"}}, {"tags": {"natural": "hill"}}, {"tags": {"natural": "*"}}],
+			"hint": {"lat": 10.3579, "lon": 107.0671}
+		},
+		{
+			"id": "nui_nho",
+			"name_vi": "Núi Nhỏ",
+			"other_names": ["Núi Tao Phùng", "Small Mountain"],
+			"search": [{"tags": {"natural": "peak"}}, {"tags": {"natural": "hill"}}, {"tags": {"natural": "*"}}],
+			"hint": {"lat": 10.3343, "lon": 107.0774}
+		},
+		{
+			"id": "chua_kito_vua",
+			"name_vi": "Tượng Chúa Kitô Vua",
+			"other_names": ["Tượng Chúa Ki-tô Vua", "Tượng Chúa Giang Tay", "Christ of Vũng Tàu", "Christ the King"],
+			"search": [{"tags": {"man_made": "*"}}, {"tags": {"tourism": "*"}}, {"tags": {"historic": "*"}}, {"tags": {"amenity": "*"}}],
+			"hint": {"lat": 10.3258, "lon": 107.0848}
+		},
+		{
+			"id": "hai_dang",
+			"name_vi": "Hải đăng Vũng Tàu",
+			"other_names": ["Ngọn Hải Đăng Vũng Tàu", "Vũng Tàu Lighthouse"],
+			"search": [{"tags": {"man_made": "lighthouse"}}, {"tags": {"tourism": "*"}}],
+			"hint": {"lat": 10.3343, "lon": 107.0776}
+		},
+		{
+			"id": "bach_dinh",
+			"name_vi": "Bạch Dinh",
+			"other_names": ["Villa Blanche", "White Palace", "Bach Dinh"],
+			"search": [{"tags": {"tourism": "*"}}, {"tags": {"historic": "*"}}, {"tags": {"building": "*"}}],
+			"hint": {"lat": 10.3530, "lon": 107.0680}
+		}
+	]
+}

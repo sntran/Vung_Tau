@@ -1,0 +1,25 @@
+{
+	"note": "The road width in meters for each OSM highway type, when the road has no width tag (plan 0003, R5). These are first values. I correct them when the screenshots show a wrong width.",
+	"default": 4.0,
+	"types": {
+		"motorway": 14.0,
+		"trunk": 14.0,
+		"primary": 12.0,
+		"secondary": 10.0,
+		"tertiary": 8.0,
+		"unclassified": 6.0,
+		"residential": 5.0,
+		"living_street": 4.0,
+		"pedestrian": 5.0,
+		"service": 3.5,
+		"alley": 2.5,
+		"track": 3.0,
+		"footway": 2.0,
+		"path": 1.5,
+		"steps": 2.0,
+		"cycleway": 2.0
+	},
+	"hem_types": ["service", "footway", "path", "alley", "residential"],
+	"hem_max_width": 4.0,
+	"sidewalk_types": ["primary", "secondary", "tertiary"]
+}
