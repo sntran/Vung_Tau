@@ -61,6 +61,58 @@ jobs:
         id: deploy
         uses: actions/deploy-pages@v4
 
+  desktop:
+    name: Desktop builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot and the export templates
+        uses: actions/cache@v4
+        with:
+          path: |
+            .tools
+            ~/.local/share/godot/export_templates
+          key: godot-templates-${{ runner.os }}-${{ hashFiles('tools/setup.sh') }}
+
+      - name: Set up the tools
+        run: tools/setup.sh --templates
+
+      # Plan 0004, R6. The builds are not signed. The macOS build has only an
+      # ad-hoc signature, so macOS shows a warning at the first start (see
+      # docs/release-notes.md).
+      - name: Export the Windows, macOS, and Linux builds
+        run: |
+          mkdir -p build/windows build/macos build/linux
+          .tools/godot/godot --headless --path . --import
+          .tools/godot/godot --headless --path . --export-release "Windows" build/windows/VungTau.exe
+          .tools/godot/godot --headless --path . --export-release "macOS" build/macos/VungTau.zip
+          .tools/godot/godot --headless --path . --export-release "Linux" build/linux/vung-tau.x86_64
+          test -f build/windows/VungTau.exe
+          test -f build/macos/VungTau.zip
+          test -f build/linux/vung-tau.x86_64
+          cp docs/release-notes.md build/windows/ build/macos/ build/linux/
+          ls -l build/windows build/macos build/linux
+
+      - name: Upload the Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: build/windows/
+
+      - name: Upload the macOS build
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: build/macos/
+
+      - name: Upload the Linux build
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build
+          path: build/linux/
+
   android:
     name: Android debug APK
     runs-on: ubuntu-latest
