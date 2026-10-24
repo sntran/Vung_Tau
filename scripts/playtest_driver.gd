@@ -313,7 +313,7 @@ func look_at_id(test_id: String, timeout_s := 10.0) -> bool:
 	var m: Node = main()
 	var point := _node_center(node)
 	var parts := test_id.split(".")
-	if parts[0] == "spot" and m.hem.focus_points.has(parts[1]):
+	if parts[0] == "spot" and m.hem != null and m.hem.focus_points.has(parts[1]):
 		point = m.hem.focus_points[parts[1]]
 	return await look_at_point(point, 2.0, timeout_s)
 
@@ -758,11 +758,8 @@ func state() -> Dictionary:
 	var m: Node = main()
 	var player: Node3D = m.player
 	var pos := player.global_position
-	var hem: Node = m.hem
-	var bubble := false
-	if hem.helper:
-		bubble = hem.helper.is_bubble_visible()
-	return {
+	var result := {
+		"world": m.world_name,
 		"time": GameState.minutes,
 		"time_text": GameClock.format_time(GameState.minutes),
 		"day": GameState.day,
@@ -774,10 +771,6 @@ func state() -> Dictionary:
 		"choices": visible_choice_ids(),
 		"near_spot": m.near_spot,
 		"walked_total_m": GameState.walked_total_m,
-		"clack_count": hem.clack_count,
-		"clack_time": hem.clack_time,
-		"bubble_visible": bubble,
-		"lights_on": hem.lights_on().size(),
 		"lights_in_view": m.lights_in_view(),
 		"view_settled": _view_settled(m),
 		"yaw": player.yaw + player.gyro_yaw,
@@ -796,13 +789,37 @@ func state() -> Dictionary:
 		"top_bar_rect": m.top_bar.get_global_rect(),
 		"panel_rect": m.talk_panel.get_global_rect(),
 		"toast_visible": m.toast.visible,
+		"toast_text": m.toast.text() if m.toast.visible else "",
 		"sound": GameState.sound,
 		"intro_done": bool(GameState.flag("intro_done")),
 		"view_size": viewport().get_visible_rect().size,
-		"shutters": _shutters(hem),
-		"boats_in": hem.beach.boats_in.visible,
-		"exercisers": hem.beach.exercisers.visible,
+		"debug_visible": m.debug_overlay.visible,
+		"debug_text": m.debug_overlay.text,
 	}
+	var hem: Node = m.hem
+	if hem != null:
+		result.merge({
+			"clack_count": hem.clack_count,
+			"clack_time": hem.clack_time,
+			"bubble_visible": hem.helper.is_bubble_visible() if hem.helper else false,
+			"lights_on": hem.lights_on().size(),
+			"shutters": _shutters(hem),
+			"boats_in": hem.beach.boats_in.visible,
+			"exercisers": hem.beach.exercisers.visible,
+		})
+	var world: VungTau = m.vung_tau
+	if world != null:
+		var road := world.road_at(pos)
+		result.merge({
+			"ground": world.ground_height(pos.x, pos.z),
+			"road_name": road.get("name", ""),
+			"road_type": road.get("type", ""),
+			"detail_here": world.detail_at(pos),
+			"chunks": world.loaded_counts(),
+			"load_times": world.load_times.duplicate(),
+			"fps": Engine.get_frames_per_second(),
+		})
+	return result
 
 
 ## True when the player does not walk and the view does not turn.
@@ -896,3 +913,197 @@ func ui_report() -> Array[Dictionary]:
 					or rich.get_content_height() > rich.size.y + 1.0
 		report.append(entry)
 	return report
+
+
+# --- The Vũng Tàu world (plan 0003) ------------------------------------------
+
+## The world of plan 0003, or null in the hẻm world.
+func world() -> VungTau:
+	return main().vung_tau
+
+
+## Waits until each chunk has the detail that it needs at the camera position.
+## Returns false at the timeout.
+func wait_ground(timeout_s := 30.0) -> bool:
+	await wait_frames(2)
+	return await wait_until(func() -> bool:
+		var w := world()
+		return w != null and w.is_settled(), timeout_s, "the ground is ready")
+
+
+## Puts the camera at a fixed viewpoint for a screenshot (PT-18). The player
+## stops: physics does not move it until fly_end(). This is a test setup step,
+## the same as --start-time.
+func fly_to(eye: Vector3, look_at: Vector3) -> void:
+	var player: Player = main().player
+	player.set_physics_process(false)
+	var to := look_at - eye
+	var yaw := rad_to_deg(atan2(-to.x, -to.z))
+	var pitch := rad_to_deg(atan2(to.y, Vector2(to.x, to.z).length()))
+	player.place(eye - Vector3(0, Player.EYE_HEIGHT, 0), yaw, pitch)
+	await wait_frames(2)
+
+
+func fly_end() -> void:
+	main().player.set_physics_process(true)
+
+
+## Plays the game faster, for the long walks of PT-19 to PT-22 under lavapipe.
+## The player walks at the same speed in game time.
+func set_time_scale(scale: float) -> void:
+	Engine.time_scale = scale
+
+
+## A setup step at the start of a phase: puts the player at the point, makes
+## the ground there, and waits until it is ready. It is the same kind of step
+## as --start-time: a long walk in phases starts where the last phase stopped.
+func start_at(point: Vector3, yaw: float) -> void:
+	var w := world()
+	w.prepare_at(point)
+	point.y = w.ground_height(point.x, point.z) + 0.05
+	main().player.place(point, yaw)
+	await wait_ground(60.0)
+
+
+## A route along the road with the name, from the point nearest to "start",
+## in the direction with the longer road. The road can be in more than one OSM way.
+func road_route(road_name: String, start: Vector3, length: float) -> PackedVector3Array:
+	var lines: Array[PackedVector3Array] = []
+	for road: Dictionary in world().data.roads:
+		if road.name != road_name:
+			continue
+		var line := PackedVector3Array()
+		for p: Array in road.points:
+			line.append(Vector3(p[0], p[1], p[2]))
+		lines.append(line)
+	if lines.is_empty():
+		return PackedVector3Array()
+	var best_line := 0
+	var best_index := 0
+	var best_distance := INF
+	for l in lines.size():
+		for i in lines[l].size():
+			var d := Vector2(lines[l][i].x - start.x, lines[l][i].z - start.z).length()
+			if d < best_distance:
+				best_distance = d
+				best_line = l
+				best_index = i
+	var forward := _follow(lines, best_line, best_index, 1, length)
+	var backward := _follow(lines, best_line, best_index, -1, length)
+	return forward if _length(forward) >= _length(backward) else backward
+
+
+func _follow(lines: Array[PackedVector3Array], line: int, index: int, step: int, length: float) -> PackedVector3Array:
+	var result := PackedVector3Array()
+	var used := {line: true}
+	var current := lines[line]
+	var i := index
+	while _length(result) < length:
+		while i >= 0 and i < current.size():
+			result.append(current[i])
+			i += step
+		# The next way of the road starts or ends at the last point.
+		var last := result[result.size() - 1]
+		var found := false
+		for l in lines.size():
+			if used.has(l):
+				continue
+			var a := lines[l][0]
+			var b := lines[l][lines[l].size() - 1]
+			if Vector2(a.x - last.x, a.z - last.z).length() < 2.0:
+				current = lines[l]
+				i = 1
+				step = 1
+				found = true
+			elif Vector2(b.x - last.x, b.z - last.z).length() < 2.0:
+				current = lines[l]
+				i = current.size() - 2
+				step = -1
+				found = true
+			if found:
+				used[l] = true
+				break
+		if not found:
+			break
+	return result
+
+
+static func _length(line: PackedVector3Array) -> float:
+	var total := 0.0
+	for i in range(1, line.size()):
+		total += Vector2(line[i].x - line[i - 1].x, line[i].z - line[i - 1].z).length()
+	return total
+
+
+## The point of the route at the distance from its start.
+static func route_point(route: PackedVector3Array, distance: float) -> Vector3:
+	var left := distance
+	for i in range(1, route.size()):
+		var part := Vector2(route[i].x - route[i - 1].x, route[i].z - route[i - 1].z).length()
+		if left <= part and part > 0.0:
+			return route[i - 1].lerp(route[i], left / part)
+		left -= part
+	return route[route.size() - 1]
+
+
+## The distance along the route of the route point nearest to the point.
+static func route_distance(route: PackedVector3Array, point: Vector3) -> float:
+	var best := 0.0
+	var best_gap := INF
+	var walked := 0.0
+	var p := Vector2(point.x, point.z)
+	for i in range(1, route.size()):
+		var a := Vector2(route[i - 1].x, route[i - 1].z)
+		var b := Vector2(route[i].x, route[i].z)
+		var closest := Geometry2D.get_closest_point_to_segment(p, a, b)
+		var gap := p.distance_to(closest)
+		if gap < best_gap:
+			best_gap = gap
+			best = walked + a.distance_to(closest)
+		walked += a.distance_to(b)
+	return best
+
+
+## Walks along the route with the joystick from "from" to "to" meters: it turns
+## the view to a point "ahead" meters further on the route, then holds the
+## joystick forward. "check" runs each frame of the walk. With "may_stop", a
+## stop on the way (for example at deep water) is not a failure.
+func stick_along(route: PackedVector3Array, to: float, check := Callable(), ahead := 12.0,
+		may_stop := false) -> bool:
+	var hook := func() -> void:
+		if check.is_valid():
+			check.call()
+	_tree.process_frame.connect(hook)
+	var stuck := 0
+	var reached := false
+	while true:
+		var pos: Vector3 = state().player
+		var here := route_distance(route, pos)
+		if here >= to - 1.0:
+			reached = true
+			break
+		# Near a sharp turn (a hairpin), the aim point is near, so that the walk does
+		# not cut the corner.
+		# After a step without movement, aim at a near point of the route.
+		var step := ahead if stuck == 0 else 3.0
+		var now := route_point(route, here)
+		var soon := route_point(route, minf(here + 3.0, to))
+		while step > 4.0 and stuck == 0:
+			var far := route_point(route, minf(here + step, to))
+			var a := Vector2(soon.x - now.x, soon.z - now.z)
+			var b := Vector2(far.x - now.x, far.z - now.z)
+			if a.length() < 0.1 or b.length() < 0.1 or absf(a.angle_to(b)) < deg_to_rad(20.0):
+				break
+			step *= 0.5
+		var target := route_point(route, minf(here + step, to))
+		await look_at_point(Vector3(target.x, pos.y + Player.EYE_HEIGHT, target.z), 4.0 if stuck == 0 else 2.0, 15.0)
+		var length := Vector2(target.x - pos.x, target.z - pos.z).length()
+		await hold_stick(Vector2(0, -1), clampf(length / Player.WALK_SPEED, 0.5, 8.0))
+		var moved: float = Vector2(state().player.x - pos.x, state().player.z - pos.z).length()
+		stuck = stuck + 1 if moved < 0.5 else 0
+		if stuck >= 4:
+			if not may_stop:
+				fail("the player does not move on the route at %.0f m" % here)
+			break
+	_tree.process_frame.disconnect(hook)
+	return reached
