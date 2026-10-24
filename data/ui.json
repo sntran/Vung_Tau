@@ -133,5 +133,16 @@
 		"off": "Off"
 	},
 	"settings_subtitle_size": "Subtitle size: {value}",
-	"settings_subtitle_box": "Subtitle box: {value}"
+	"settings_subtitle_box": "Subtitle box: {value}",
+	"settings_quality": "Quality: {value}",
+	"quality_presets": {
+		"low": "Low",
+		"medium": "Medium",
+		"high": "High",
+		"ultra": "Ultra"
+	},
+	"settings_restart_note": "This quality uses another renderer. The change starts after a restart.",
+	"settings_restart": "Restart now",
+	"settings_fullscreen": "Fullscreen",
+	"settings_mouse": "Mouse speed: {value}"
 }

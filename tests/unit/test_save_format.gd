@@ -15,7 +15,8 @@ func _state() -> Dictionary:
 		"flags": {"intro_done": true}, "sound": false, "player": Vector3(13.25, 0, -0.6),
 		"yaw": 35.5, "pitch": -12.0,
 		"settings": {"look_sensitivity": 1.5, "invert_y": true, "gyro": false, "fov": 80.0, "tap_walk": false,
-				"subtitles": "both", "subtitle_size": 1.25, "subtitle_box": 0.5},
+				"subtitles": "both", "subtitle_size": 1.25, "subtitle_box": 0.5,
+				"quality": "high", "mouse_sensitivity": 1.5, "fullscreen": true},
 		"met": ["batu"], "phrases": [{"vi": "Dạ, chưa ạ.", "en": "Not yet."}],
 		"messages": [{"id": "welcome", "text": "Chào con!", "day": 1, "minutes": 360}], "unread": 1,
 	}
@@ -53,6 +54,21 @@ func test_save_of_plan_0002_loads_with_the_new_defaults() -> void:
 	assert_eq(data.unread, 0)
 	json.settings.subtitles = "klingon"
 	assert_eq(SaveFormat.from_json(JSON.stringify(json)).settings.subtitles, "vi", "a bad subtitle language takes the default")
+
+
+func test_save_of_plan_0003_loads_with_the_defaults_of_plan_0004() -> void:
+	var json: Dictionary = JSON.parse_string(SaveFormat.to_json(_state()))
+	for key: String in ["quality", "mouse_sensitivity", "fullscreen"]:
+		json.settings.erase(key)
+	var data := SaveFormat.from_json(JSON.stringify(json))
+	assert_eq(data.settings.quality, "", "no preset: the first start selects one")
+	assert_almost_eq(data.settings.mouse_sensitivity, 1.0, 0.001)
+	assert_false(data.settings.fullscreen)
+	json.settings.quality = "extreme"
+	json.settings.mouse_sensitivity = 9.0
+	data = SaveFormat.from_json(JSON.stringify(json))
+	assert_eq(data.settings.quality, "", "an unknown preset takes the default")
+	assert_almost_eq(data.settings.mouse_sensitivity, SaveFormat.MOUSE_SENSITIVITY_RANGE.y, 0.001)
 
 
 func test_version_1_save_is_not_loaded() -> void:

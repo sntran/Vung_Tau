@@ -2,7 +2,7 @@
 # Run the play tests under Xvfb with real input events.
 #
 # Usage:
-#   tools/playtest.sh NAME [--size=WxH] [--renderer=mobile|compatibility]
+#   tools/playtest.sh NAME [--size=WxH] [--renderer=mobile|forward_plus|compatibility]
 #                                         Run one scenario (default 1280x720, mobile).
 #   tools/playtest.sh --all               Run all scenarios at all their sizes.
 #   tools/playtest.sh NAME --only-phase=N  Run only phase N of a scenario (to
@@ -24,6 +24,10 @@
 #                                          The runs use the same save file.
 #                                          The argument --fresh-save deletes
 #                                          the save file before the run.
+#                                          The argument --renderer=NAME runs
+#                                          this phase with another renderer
+#                                          (mobile, forward_plus, or
+#                                          compatibility).
 #
 # The environment variable PLAYTEST_MAX_FPS limits the frame rate, so that a
 # fast computer can test like a slow one (for example PLAYTEST_MAX_FPS=3).
@@ -44,7 +48,7 @@ if [[ ! -x "$GODOT" ]]; then
 fi
 
 usage() {
-  echo "Usage: tools/playtest.sh NAME [--size=WxH] [--renderer=mobile|compatibility] | --all" >&2
+  echo "Usage: tools/playtest.sh NAME [--size=WxH] [--renderer=mobile|forward_plus|compatibility] | --all" >&2
   exit 2
 }
 
@@ -85,6 +89,7 @@ error_lines() {
 renderer_args() {
   case "$1" in
     mobile) echo "--rendering-driver vulkan --rendering-method mobile" ;;
+    forward_plus) echo "--rendering-driver vulkan --rendering-method forward_plus" ;;
     compatibility) echo "--rendering-driver opengl3 --rendering-method gl_compatibility" ;;
     *) echo "playtest.sh: unknown renderer $1" >&2; exit 2 ;;
   esac
@@ -121,9 +126,14 @@ run_one() {
       rm -f "$out/save.json"
       args="${args/--fresh-save/}"
     fi
+    local phase_renderer_args="$RENDERER_ARGS"
+    if [[ "$args" =~ --renderer=([a-z_]+) ]]; then
+      phase_renderer_args="$(renderer_args "${BASH_REMATCH[1]}")"
+      args="${args/--renderer=${BASH_REMATCH[1]}/}"
+    fi
     # shellcheck disable=SC2086
     timeout "$TIME_LIMIT" xvfb-run -a -s "-screen 0 2560x2560x24" \
-      "$GODOT" --path "$ROOT" $RENDERER_ARGS --audio-driver Dummy ${PLAYTEST_MAX_FPS:+--max-fps "$PLAYTEST_MAX_FPS"} \
+      "$GODOT" --path "$ROOT" $phase_renderer_args --audio-driver Dummy ${PLAYTEST_MAX_FPS:+--max-fps "$PLAYTEST_MAX_FPS"} \
       --resolution "$run_size" -- \
       --playtest="$scenario" --out="$out" --save-path="$out/save.json" --phase="$n" $args \
       >"$log" 2>&1 &

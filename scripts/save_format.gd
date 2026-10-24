@@ -16,7 +16,14 @@ const DEFAULT_SETTINGS := {
 	"subtitles": "vi",
 	"subtitle_size": 1.0,
 	"subtitle_box": 0.75,
+	# Plan 0004, R2 to R4. An empty quality means the first start: the game
+	# selects the preset (Quality.default_preset()).
+	"quality": "",
+	"mouse_sensitivity": 1.0,
+	"fullscreen": false,
 }
+
+const MOUSE_SENSITIVITY_RANGE := Vector2(0.25, 2.0)
 
 const SUBTITLE_LANGUAGES := ["vi", "en", "both", "off"]
 
@@ -89,6 +96,10 @@ static func from_json(text: String) -> Dictionary:
 		settings.subtitles = DEFAULT_SETTINGS.subtitles
 	settings.subtitle_size = clampf(settings.subtitle_size, 1.0, 1.5)
 	settings.subtitle_box = clampf(settings.subtitle_box, 0.0, 1.0)
+	if not Quality.PRESETS.has(settings.quality):
+		settings.quality = DEFAULT_SETTINGS.quality
+	settings.mouse_sensitivity = clampf(settings.mouse_sensitivity, MOUSE_SENSITIVITY_RANGE.x,
+			MOUSE_SENSITIVITY_RANGE.y)
 	var met: Array[String] = []
 	for speaker: Variant in _array(data.get("met")):
 		if typeof(speaker) == TYPE_STRING and not met.has(speaker):

@@ -66,6 +66,8 @@ var phone: Phone
 ## The neutral voice of the phone (the Play button of the Listen app, R21).
 var phone_voice: AudioStreamPlayer
 var clack_player: AudioStreamPlayer3D
+## Mouse look, keys, and the gamepad on a computer (plan 0004).
+var desktop: DesktopControls
 
 ## The touches and the mouse press: id -> {start, last, time, zone, active}.
 var _touches: Dictionary = {}
@@ -101,6 +103,8 @@ func _ready() -> void:
 	phone.request.connect(_on_phone_request)
 	phone.raised.connect(_on_phone_raised)
 	phone.app_changed.connect(_on_app_changed)
+	desktop = DesktopControls.new(self)
+	add_child(desktop)
 	phone_voice = AudioStreamPlayer.new()
 	phone_voice.name = "PhoneVoice"
 	$Sounds.add_child(phone_voice)
@@ -165,7 +169,8 @@ func _process(delta: float) -> void:
 
 # --- Input ---------------------------------------------------------------
 
-## W, A, S, D and the arrow keys move the player (plan 0002, R11).
+## W, A, S, D, the arrow keys, and the left stick of a gamepad move the player
+## (plan 0002, R11, and plan 0004, R2).
 func _read_keys() -> void:
 	if _stick_id != null:
 		return
@@ -178,6 +183,7 @@ func _read_keys() -> void:
 		keys.x += 1.0
 	if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT):
 		keys.x -= 1.0
+	keys += desktop.move_stick()
 	var was_moving := player.move_input.length() > 0.0
 	player.move_input = keys.limit_length(1.0)
 	if was_moving and keys == Vector2.ZERO:
@@ -821,6 +827,13 @@ func _on_phone_request(action: String, args: Dictionary) -> void:
 			_apply_settings()
 		"center":
 			center_view()
+		"restart":
+			# The play tests cannot start the game again: the next run of a
+			# play test is the restart.
+			GameState.save_game()
+			if not Playtest.active:
+				OS.set_restart_on_exit(true, Quality.restart_args(GameState.settings.quality))
+				get_tree().quit()
 
 
 ## A choice of the Clock app: wait, or sleep until morning (R27).
@@ -945,6 +958,22 @@ func _spot_params(spot: Dictionary) -> Dictionary:
 func _apply_settings() -> void:
 	player.camera.fov = float(GameState.settings.fov)
 	subtitles.apply_settings(float(GameState.settings.subtitle_size), float(GameState.settings.subtitle_box))
+	Quality.apply(GameState.settings.quality, environment, sun, get_viewport())
+	_apply_window_mode()
+
+
+## The fullscreen setting of a desktop window (plan 0004, R1). Phones and the
+## web build have no window setting.
+func _apply_window_mode() -> void:
+	if OS.has_feature("mobile") or OS.has_feature("web"):
+		return
+	var fullscreen := bool(GameState.settings.fullscreen)
+	var mode := DisplayServer.window_get_mode()
+	var is_fullscreen := mode in [DisplayServer.WINDOW_MODE_FULLSCREEN, DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]
+	if fullscreen and not is_fullscreen:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+	elif not fullscreen and is_fullscreen:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 
 
 func _on_time_changed(minutes: int, _day: int) -> void:
@@ -974,8 +1003,9 @@ func _apply_time(minutes: int) -> void:
 	sun.rotation_degrees = DayLight.sun_rotation(minutes)
 	sun.light_color = DayLight.sun_color(minutes)
 	sun.light_energy = DayLight.sun_energy(minutes)
-	# No sun shadows: see plan 0001, note N18.
-	sun.shadow_enabled = false
+	# The sun casts shadows on all presets (plan 0004, R5), except in the web
+	# build: see Quality.sun_shadow().
+	sun.shadow_enabled = Quality.sun_shadow()
 
 
 # --- Layout ----------------------------------------------------------------

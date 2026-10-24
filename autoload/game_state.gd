@@ -50,6 +50,26 @@ func _init() -> void:
 	load_game()
 
 
+func _ready() -> void:
+	# The first start selects the quality preset (plan 0004, D3).
+	if settings.quality == "":
+		set_settings({"quality": Quality.default_preset()})
+	restart_for_renderer()
+
+
+## Starts the game again when the quality preset needs another renderer
+## (plan 0004, R4). Not in the play tests, in the editor, or when the command
+## line selects the renderer. Returns true when the game starts again.
+func restart_for_renderer() -> bool:
+	if arg_value("playtest") != "" or OS.has_feature("editor") or Quality.renderer_fixed_by_command_line() \
+			or not Quality.needs_restart(settings.quality):
+		return false
+	save_game()
+	OS.set_restart_on_exit(true, Quality.restart_args(settings.quality))
+	get_tree().quit()
+	return true
+
+
 ## Returns the value of a command line argument "--name=value", or "" when it is not there.
 static func arg_value(arg_name: String) -> String:
 	var prefix := "--%s=" % arg_name
