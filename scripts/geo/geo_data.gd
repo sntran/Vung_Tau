@@ -7,7 +7,7 @@ extends RefCounted
 
 const ROOT := "res://data/geo/build/"
 ## The sea floor where the data has no chunk (far from the land).
-const DEEP_SEA := -15.0
+const DEEP_SEA := -4.0
 
 var root := ROOT
 var world: Dictionary = {}

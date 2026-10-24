@@ -7,8 +7,6 @@ extends RefCounted
 
 ## Vũng Tàu uses UTC+7 (Indochina Time) all year.
 const TIME_ZONE := 7.0
-## The first day of the visit is 15 March (day 74 of the year), in the dry season.
-const FIRST_DAY_OF_YEAR := 74
 
 
 ## Returns {"elevation", "azimuth"} in degrees. The azimuth is clockwise from north.
@@ -27,11 +25,6 @@ static func at(lat: float, lon: float, day_of_year: int, minutes: float) -> Dict
 	var elevation := rad_to_deg(asin(clampf(cos_zenith, -1.0, 1.0)))
 	var azimuth := rad_to_deg(atan2(sin(hour_angle), cos(hour_angle) * sin(phi) - tan(decl) * cos(phi))) + 180.0
 	return {"elevation": elevation, "azimuth": fposmod(azimuth, 360.0)}
-
-
-## The day of the year for a day of the game (day 1 is the first day of the visit).
-static func day_of_year(game_day: int) -> int:
-	return (FIRST_DAY_OF_YEAR + game_day - 2) % 365 + 1
 
 
 ## The unit vector from the ground to the sun, in game coordinates (X east, -Z north).

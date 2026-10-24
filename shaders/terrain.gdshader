@@ -16,6 +16,8 @@ uniform sampler2D town_texture : source_color, filter_linear_mipmap, repeat_enab
 uniform sampler2D wood_texture : source_color, filter_linear_mipmap, repeat_enable;
 // One texture repeat each 1 / tiling meters.
 uniform float tiling = 0.25;
+// The sea level now (the tide, plan 0004, D12).
+uniform float sea_level = 0.0;
 // cos(35 degrees) = 0.819.
 uniform float rock_normal_y = 0.819;
 
@@ -49,7 +51,7 @@ void fragment() {
 	float rock = smoothstep(rock_normal_y + 0.04, rock_normal_y - 0.04, normalize(world_normal).y);
 	color = mix(color, rock_color * luminance(texture(rock_texture, uv * 0.5).rgb) * 2.4, rock);
 	// The ground under the water is darker and wet.
-	float under = smoothstep(0.2, -0.6, world_position.y);
+	float under = smoothstep(sea_level + 0.2, sea_level - 0.6, world_position.y);
 	color = mix(color, color * vec3(0.55, 0.65, 0.7), under);
 	ALBEDO = color;
 	ROUGHNESS = mix(0.92, 0.6, under);

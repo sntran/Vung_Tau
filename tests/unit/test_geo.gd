@@ -61,8 +61,8 @@ func test_height_sampling_on_a_small_grid() -> void:
 
 
 func test_sun_position() -> void:
-	var day := SunPosition.day_of_year(1)
-	assert_eq(day, SunPosition.FIRST_DAY_OF_YEAR)
+	var day := GameCalendar.day_of_year(2)
+	assert_eq(day, GameCalendar.day_of_year(1) % 365 + 1, "the day of the year follows the calendar")
 	var noon := SunPosition.at(10.35, 107.08, 80, 11.0 * 60.0 + 53.0)
 	assert_almost_eq(float(noon.elevation), 79.6, 1.5, "near the equinox, the sun is high at noon")
 	var morning := SunPosition.at(10.35, 107.08, 80, 6.0 * 60.0)

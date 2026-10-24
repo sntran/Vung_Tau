@@ -1,7 +1,7 @@
 class_name VungTau
 extends Node3D
-## The real ground of Vũng Tàu (plan 0003): ground chunks, the sea, the sky,
-## the sun, the roads, simple trees, and the landmark markers.
+## The real ground of Vũng Tàu (plan 0004): ground chunks, the sea with the
+## tide, the sky, the sun, the roads, simple trees, and the landmark markers.
 ##
 ## The ground is in chunks of 256 m. Each chunk with data has a far mesh from
 ## the overview grid all the time, so there is never a hole. Near the player,
@@ -20,6 +20,10 @@ const MID_STRIDE := 4
 const FAR_TILE := 4
 ## The player cannot walk into water deeper than this (R13).
 const MAX_WATER_DEPTH := 0.5
+## A point at this distance or less from the line of the Hòn Bà ridge is on
+## the ridge, when its ground is not higher than the ridge top plus RIDGE_ABOVE.
+const RIDGE_MARGIN := 1.0
+const RIDGE_ABOVE := 0.3
 const MAX_TASKS := 2
 const MAX_APPLY_PER_FRAME := 1
 const TREE_SPACING := 9.0
@@ -39,6 +43,14 @@ var sun: DirectionalLight3D
 var moon: DirectionalLight3D
 var environment: Environment
 var sea: MeshInstance3D
+## The tide model (D12), or null when tide.json is not there.
+var tide: TideModel
+## The sea level now, in meters above mean sea level.
+var sea_level := 0.0
+## The line of the Hòn Bà ridge in game coordinates, its top height, and its width (R8h).
+var ridge_points := PackedVector2Array()
+var ridge_top := -INF
+var ridge_width := 4.0
 ## The load time in milliseconds of each near chunk, for PT-22.
 var load_times: Array[float] = []
 var _ground_material: ShaderMaterial
@@ -60,6 +72,12 @@ func setup(folder := GeoData.ROOT) -> bool:
 	if data == null:
 		push_error("VungTau: no geodata in %s. Run the geodata workflow." % folder)
 		return false
+	tide = TideModel.open(data.root.path_join("tide.json"))
+	var ridge: Dictionary = data.world.get("hon_ba_ridge", {})
+	for p: Array in ridge.get("points", []):
+		ridge_points.append(Vector2(p[0], p[1]))
+	ridge_top = float(ridge.get("top_m", -INF))
+	ridge_width = float(ridge.get("width_m", 4.0))
 	_make_environment()
 	_make_materials()
 	_make_sea()
@@ -96,9 +114,30 @@ func ground_height(x: float, z: float) -> float:
 	return data.height_at(x, z, true)
 
 
-## True when the player can stand at the point: the water is not deeper than 0.5 m.
+## True when the player can stand at the point: the water is not deeper than
+## 0.5 m (R13). On the Hòn Bà ridge, the ridge must be dry.
 func can_stand(point: Vector3) -> bool:
-	return ground_height(point.x, point.z) >= -MAX_WATER_DEPTH
+	var ground := ground_height(point.x, point.z)
+	if is_on_ridge(point) and ground <= ridge_top + RIDGE_ABOVE:
+		return sea_level < ground
+	return ground >= sea_level - MAX_WATER_DEPTH
+
+
+## True when the point is on the line of the Hòn Bà ridge.
+func is_on_ridge(point: Vector3) -> bool:
+	if ridge_points.size() < 2:
+		return false
+	var at := Vector2(point.x, point.z)
+	for i in ridge_points.size() - 1:
+		var closest := Geometry2D.get_closest_point_to_segment(at, ridge_points[i], ridge_points[i + 1])
+		if closest.distance_to(at) <= ridge_width / 2.0 + RIDGE_MARGIN:
+			return true
+	return false
+
+
+## True when the Hòn Bà ridge is dry: the sea is below the ridge top.
+func is_ridge_dry() -> bool:
+	return sea_level < ridge_top
 
 
 ## The road at a game point, or {}.
@@ -156,9 +195,13 @@ func loaded_counts() -> Dictionary:
 
 ## Sets the sun and the sky for the clock time (D9, R14).
 func update_time(minutes: int, day: int) -> void:
+	if tide:
+		sea_level = tide.level(GameCalendar.unix_time(day, minutes))
+	sea.position.y = sea_level
+	_ground_material.set_shader_parameter("sea_level", sea_level)
 	var origin: Dictionary = data.world.get("origin", {})
 	var sun_now := SunPosition.at(float(origin.get("lat", 10.35)), float(origin.get("lon", 107.08)),
-			SunPosition.day_of_year(day), minutes)
+			GameCalendar.day_of_year(day), minutes)
 	var elevation: float = sun_now.elevation
 	var direction := SunPosition.direction(elevation, sun_now.azimuth)
 	_point_light(sun, direction)
@@ -218,7 +261,7 @@ func _process(_delta: float) -> void:
 	var camera := get_viewport().get_camera_3d()
 	if camera:
 		_focus = camera.global_position
-	sea.global_position = Vector3(snappedf(_focus.x, 64.0), 0.0, snappedf(_focus.z, 64.0))
+	sea.global_position = Vector3(snappedf(_focus.x, 64.0), sea_level, snappedf(_focus.z, 64.0))
 	_update_wanted()
 	_start_tasks()
 	_apply_done()

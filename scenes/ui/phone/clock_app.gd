@@ -1,7 +1,8 @@
 class_name ClockApp
 extends ScrollContainer
 ## The Clock app (plan 0003, R27): the time, the part of the day in
-## Vietnamese, the day number, and the "Rest" choices. "Sleep until morning"
+## Vietnamese, the day number with the solar and the lunar date (plan 0004,
+## D13), and the "Rest" choices. "Sleep until morning"
 ## is a choice only at the homestay.
 
 var phone: Phone
@@ -26,7 +27,9 @@ func refresh(state: Dictionary) -> void:
 	title.name = "ClockTitle"
 	title.set_meta("test_id", "clock.title")
 	_column.add_child(title)
-	var day := PhoneUi.label(Content.format(Content.ui_text("clock_day"), params), "Vietnamese")
+	# The solar date and the lunar date (plan 0004, D13).
+	var day := PhoneUi.label("%s · %s" % [Content.format(Content.ui_text("clock_day"), params),
+			GameCalendar.text(int(state.get("day", 1)))], "Vietnamese")
 	day.set_meta("test_id", "clock.day")
 	_column.add_child(day)
 	_column.add_child(PhoneUi.label(Content.format(Content.ui_text("clock_hint"), params), "Hint"))

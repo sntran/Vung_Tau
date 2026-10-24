@@ -8,6 +8,8 @@ uniform sampler2D surface_mask : filter_linear, repeat_disable;
 uniform vec2 mask_origin = vec2(0.0);
 uniform vec2 mask_size = vec2(1.0);
 uniform float coast_range = 64.0;
+// The sea is only near the coast: no water over low ground inland (plan 0004, R13).
+uniform float inland_limit = 24.0;
 uniform sampler2D wave_normal_a : hint_normal, filter_linear_mipmap, repeat_enable;
 uniform sampler2D wave_normal_b : hint_normal, filter_linear_mipmap, repeat_enable;
 uniform sampler2D foam_noise : filter_linear_mipmap, repeat_enable;
@@ -36,7 +38,11 @@ void fragment() {
 	float alpha = texture(surface_mask, uv).a * 0.4
 			+ (texture(surface_mask, uv + vec2(texel.x, 0.0)).a + texture(surface_mask, uv - vec2(texel.x, 0.0)).a
 			+ texture(surface_mask, uv + vec2(0.0, texel.y)).a + texture(surface_mask, uv - vec2(0.0, texel.y)).a) * 0.15;
-	float distance_to_coast = inside ? max(0.0, -(alpha * 2.0 - 1.0) * coast_range) : coast_range;
+	float signed_distance = (alpha * 2.0 - 1.0) * coast_range;
+	if (inside && signed_distance > inland_limit) {
+		discard;
+	}
+	float distance_to_coast = inside ? max(0.0, -signed_distance) : coast_range;
 	float shallow = 1.0 - smoothstep(0.0, coast_range * 0.6, distance_to_coast);
 	vec3 color = mix(deep_color, shallow_color, shallow);
 	float noise = texture(foam_noise, p * 0.08 + vec2(TIME * 0.02, 0.0)).r;
