@@ -84,7 +84,8 @@ func _run() -> void:
 		_finish()
 		return
 	var scenario: Object = load(path).new()
-	var timer := get_tree().create_timer(TIME_LIMIT_S)
+	# The limit is real time, also when a scenario plays the game faster.
+	var timer := get_tree().create_timer(TIME_LIMIT_S, true, false, true)
 	timer.timeout.connect(_on_time_limit)
 	driver.step("start %s, phase %d, %s, %s" % [scenario_name, driver.phase,
 			GameClock.format_time(GameState.minutes), get_window().size])

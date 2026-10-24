@@ -24,10 +24,33 @@ jobs:
       - name: Run the Python tests
         run: python -m pytest -q tools/geo/tests
 
-  test:
-    name: Unit tests and play tests
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot
+        uses: actions/cache@v4
+        with:
+          path: .tools
+          key: godot-${{ runner.os }}-${{ hashFiles('tools/setup.sh') }}
+
+      - name: Set up the tools
+        run: tools/setup.sh
+
+      - name: Unit tests
+        run: tools/test.sh
+
+  playtest:
+    name: Play tests (part ${{ matrix.shard }} of 6)
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6]
     steps:
       - uses: actions/checkout@v4
 
@@ -47,16 +70,13 @@ jobs:
       - name: Set up the tools
         run: tools/setup.sh
 
-      - name: Unit tests
-        run: tools/test.sh
-
       - name: Play tests
-        run: tools/playtest.sh --all
+        run: tools/playtest.sh --all --shard=${{ matrix.shard }}/6
 
       - name: Upload the play-test output
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playtest
+          name: playtest-${{ matrix.shard }}
           path: build/playtest/
           if-no-files-found: warn

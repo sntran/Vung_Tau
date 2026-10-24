@@ -75,3 +75,16 @@ func _check(d: PlaytestDriver) -> void:
 	await d.tap_id("topbar.settings")
 	await d.wait_frames(3)
 	await d.screenshot("settings_after_restart")
+	# The credits sheet opens from the settings sheet (plan 0003, acceptance criterion 4).
+	await d.tap_id("settings.credits")
+	await d.wait_frames(5)
+	d.expect(d.state().mode == "credits", "the Credits button opens the credits sheet: %s" % d.state().mode)
+	var text := ""
+	for node: Node in d.main().credits_sheet.find_children("*", "Label", true, false):
+		text += (node as Label).text + "\n"
+	d.expect(text.contains("© OpenStreetMap contributors"), "the credits show the OpenStreetMap notice")
+	d.expect(text.contains("Copernicus WorldDEM-30 © DLR e.V."), "the credits show the Copernicus notice")
+	await PlaytestLayout.check(d, "credits")
+	await d.tap_id("credits.close")
+	await d.wait_frames(3)
+	d.expect(d.state().mode == "hem", "Close closes the credits sheet")
