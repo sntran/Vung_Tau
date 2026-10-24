@@ -14,47 +14,18 @@ jobs:
   packs:
     name: Copy the packs
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
       - name: Download the packs
         run: |
-          set -euo pipefail
+          set -uo pipefail
           mkdir -p packs
-          python3 - <<'PY'
-          import json, re, hashlib, urllib.request, urllib.parse, sys
-          cfg = json.load(open("tools/people/packs.json"))
-          allowed = {"CC0", "CC-BY"}
-          lock = {}
-          failed = []
-          for name, lic in cfg["packs"].items():
-              if lic not in allowed:
-                  sys.exit(f"{name}: the license {lic} is not permitted")
-              page = cfg["page"].format(name=name)
-              html = urllib.request.urlopen(page, timeout=60).read().decode("utf-8", "replace")
-              links = [urllib.parse.urljoin(page, h) for h in re.findall(r'href="([^"]+\.zip)"', html)]
-              data = None
-              for url in links:
-                  try:
-                      data = urllib.request.urlopen(url, timeout=300).read()
-                      break
-                  except Exception as e:
-                      print(f"{name}: {url} failed: {e}")
-              if data is None:
-                  failed.append(name)
-                  continue
-              path = f"packs/{name}.zip"
-              open(path, "wb").write(data)
-              lock[name] = {"license": lic, "page": page, "source": url,
-                            "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)}
-              print(f"{name}: {len(data)} bytes from {url}")
-          json.dump(lock, open("packs/packs.lock.json", "w"), indent=2)
-          if failed:
-              sys.exit("These packs did not download: " + ", ".join(failed))
-          PY
+          python3 -u tools/people/fetch_packs.py packs 2>&1 | tee packs/download.log
 
       - name: Upload the packs to the release
+        if: always()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -64,4 +35,5 @@ jobs:
             gh release create "$tag" --title "People packs 1" \
               --notes "Copies of the MakeHuman asset packs that the people build uses (plan 0006). Licenses and sources: packs.lock.json."
           fi
-          gh release upload "$tag" packs/*.zip packs/packs.lock.json --clobber
+          gh release upload "$tag" packs/* --clobber
+          test ! -s packs/failed.txt
