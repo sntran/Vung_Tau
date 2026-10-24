@@ -225,6 +225,20 @@ func _build_ground() -> void:
 			Color("#8C897F"), "Curb")
 	Greybox.box(self, Vector3(length + 20.0, 0.1, 40.0), Vector3(mid - 10.0, -0.12, hem_width / 2.0 + 20.3),
 			Color("#9A978E"), "NearGround")
+	# Parked motorbikes and plants on the near side. They are far enough from
+	# the walk area that they do not hide the player from the camera.
+	var scooter_colors := ["#C4362C", "#2F72C4", "#E8E1C8", "#2A2A2A"]
+	var prop_x := start_x + 1.5
+	var prop_index := 0
+	while prop_x < end_x - 1.0:
+		if prop_index % 3 == 2:
+			Greybox.potted_plant(self, Vector3(prop_x, 0, hem_width / 2.0 + 1.8))
+		else:
+			var bike := Greybox.scooter(self, Vector3(prop_x, 0, hem_width / 2.0 + 1.8),
+					Color(scooter_colors[prop_index % scooter_colors.size()]))
+			bike.rotation_degrees.y = 8.0 if prop_index % 2 == 0 else -6.0
+		prop_x += 3.1 + fmod(prop_index * 1.3, 1.4)
+		prop_index += 1
 	# The end of the hẻm at the low X end is a wall.
 	Greybox.box(self, Vector3(0.3, 4.2, hem_width + 0.6), Vector3(start_x - 0.15, 2.1, 0),
 			Color("#B9A98A"), "EndWall")

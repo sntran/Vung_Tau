@@ -11,7 +11,7 @@ extends Camera3D
 
 const PITCH_DEG := 25.0
 const DISTANCE := 12.0
-const LOOK_HEIGHT := 1.7
+const LOOK_HEIGHT := 3.3
 ## The horizontal view angle of the free part of the screen.
 const FREE_HFOV_DEG := 62.0
 const MIN_FREE_VFOV_DEG := 32.0

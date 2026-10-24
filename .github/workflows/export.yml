@@ -169,6 +169,8 @@ jobs:
           name: ios-xcode-project
           path: build/ios
 
+      # The simulator library in the official Godot templates has only
+      # x86_64 code, so the build is for x86_64 (Rosetta on an arm64 Mac).
       - name: Build for the iOS Simulator
         run: |
           set -o pipefail
@@ -176,7 +178,9 @@ jobs:
           xcodebuild -list -project VungTau.xcodeproj
           xcodebuild -project VungTau.xcodeproj -scheme VungTau \
             -sdk iphonesimulator -destination "generic/platform=iOS Simulator" \
-            -configuration Debug CODE_SIGNING_ALLOWED=NO build 2>&1 | tee ../ios-build.log
+            -configuration Debug CODE_SIGNING_ALLOWED=NO \
+            ARCHS=x86_64 ONLY_ACTIVE_ARCH=NO EXCLUDED_ARCHS=arm64 \
+            build 2>&1 | tee ../ios-build.log
 
       - name: Upload the build log
         if: always()

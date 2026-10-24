@@ -74,6 +74,10 @@ func _run() -> void:
 	# Wait for the main scene and some frames, so that the world is ready.
 	await get_tree().process_frame
 	await driver.wait_frames(5)
+	if driver.main() == null:
+		driver.fail("the main scene did not load (see the script errors above)")
+		_finish()
+		return
 	var path := "res://playtests/%s.gd" % scenario_name
 	if not ResourceLoader.exists(path):
 		driver.fail("no scenario file %s" % path)

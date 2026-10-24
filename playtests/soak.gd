@@ -24,7 +24,7 @@ func run(d: PlaytestDriver) -> void:
 		if kind == 0:
 			var pos: Vector3 = s.player
 			var point := Vector3(pos.x + rng.randf_range(-5.0, 5.0), 0, rng.randf_range(-1.5, 1.7))
-			error = await d.try_tap_floor(point)
+			error = await d.try_tap_floor(point, false)
 			counts.floor += 1
 		elif kind == 1:
 			# A random spot from the spots that are on the screen now.

@@ -85,10 +85,14 @@ func wait_until(check: Callable, timeout_s := 10.0, what := "") -> bool:
 
 
 ## Waits until the player stops walking and the camera stops moving.
+## The camera must be still for 5 frames in a row: a new panel needs some
+## frames for its height, and the camera moves when the height changes.
 func wait_idle(timeout_s := 30.0) -> bool:
+	var still := [0]
 	return await wait_until(func() -> bool:
 		var s := state()
-		return not s.walking and s.camera_settled, timeout_s, "the player and the camera stop")
+		still[0] = still[0] + 1 if not s.walking and s.camera_settled else 0
+		return still[0] >= 5, timeout_s, "the player and the camera stop")
 
 
 # --- Input ---------------------------------------------------------------
@@ -295,7 +299,15 @@ func tap_floor(pos: Vector3) -> bool:
 	return true
 
 
-func try_tap_floor(pos: Vector3) -> String:
+## With "wait_camera", it first waits (not more than 3 s) until the camera
+## stops, so that the point on the screen does not move during the tap.
+func try_tap_floor(pos: Vector3, wait_camera := true) -> String:
+	if wait_camera:
+		var end := Time.get_ticks_msec() + 3000
+		var still := 0
+		while still < 5 and Time.get_ticks_msec() < end:
+			still = still + 1 if main().camera.is_settled() else 0
+			await wait_frames(1)
 	var camera := viewport().get_camera_3d()
 	if camera.is_position_behind(pos):
 		return "the point %s is behind the camera" % pos

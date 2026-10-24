@@ -200,3 +200,32 @@ static func boat(parent: Node3D, pos: Vector3, color: Color) -> Node3D:
 	sphere(root, 0.1, Vector3(2.2, 0.5, 0.76), Color("#F2F2E6"))
 	sphere(root, 0.1, Vector3(2.2, 0.5, -0.76), Color("#F2F2E6"))
 	return root
+
+
+## Adds a parked motorbike. "pos" is the floor point under its center.
+## The motorbike points along the X axis.
+static func scooter(parent: Node3D, pos: Vector3, color: Color) -> Node3D:
+	var root := Node3D.new()
+	root.name = "Scooter"
+	root.position = pos
+	parent.add_child(root)
+	var dark := Color("#2A2A2A")
+	cylinder(root, 0.26, 0.1, Vector3(-0.65, 0.26, 0), dark).rotation_degrees.x = 90
+	cylinder(root, 0.26, 0.1, Vector3(0.65, 0.26, 0), dark).rotation_degrees.x = 90
+	box(root, Vector3(1.1, 0.35, 0.36), Vector3(-0.1, 0.5, 0), color, "Body")
+	box(root, Vector3(0.6, 0.12, 0.3), Vector3(-0.25, 0.74, 0), dark, "Seat")
+	box(root, Vector3(0.14, 0.7, 0.3), Vector3(0.55, 0.75, 0), color, "Front")
+	box(root, Vector3(0.06, 0.06, 0.6), Vector3(0.58, 1.1, 0), dark, "Handlebar")
+	return root
+
+
+## Adds a potted plant. "pos" is the floor point under the pot.
+static func potted_plant(parent: Node3D, pos: Vector3) -> Node3D:
+	var root := Node3D.new()
+	root.name = "Plant"
+	root.position = pos
+	parent.add_child(root)
+	cylinder(root, 0.22, 0.4, Vector3(0, 0.2, 0), Color("#B5603A"), "Pot")
+	sphere(root, 0.3, Vector3(0, 0.65, 0), Color("#3F8A4A"))
+	sphere(root, 0.22, Vector3(0.15, 0.85, 0.05), Color("#5FAE5E"))
+	return root
