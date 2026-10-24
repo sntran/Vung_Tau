@@ -3,10 +3,12 @@ extends RefCounted
 # the water, the top of Núi Nhỏ looking north, Mũi Nghinh Phong looking south,
 # and Bãi Sau from the beach road. Take each one at 06:00, 12:00, and 18:00.
 # I compare them with the real places.
+# The fourth run takes the same views at 21:00, for the night light (R14).
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=06:00
 # phase: --world=vung_tau --start-time=12:00
 # phase: --world=vung_tau --start-time=18:00
+# phase: --world=vung_tau --start-time=21:00
 
 
 func run(d: PlaytestDriver) -> void:
@@ -14,7 +16,7 @@ func run(d: PlaytestDriver) -> void:
 	if not d.expect(w != null, "the Vũng Tàu world starts with --world=vung_tau"):
 		return
 	await d.wait_ground()
-	var time: String = ["0600", "1200", "1800"][d.phase - 1]
+	var time: String = ["0600", "1200", "1800", "2100"][d.phase - 1]
 	for view: Dictionary in views(w):
 		if view.is_empty():
 			continue
