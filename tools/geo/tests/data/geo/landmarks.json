@@ -1,0 +1,101 @@
+{
+	"note": "A part of data/geo/landmarks.json for the tests.",
+	"landmarks": [
+		{
+			"id": "bai_truoc",
+			"name_vi": "Bãi Trước",
+			"other_names": [
+				"Front Beach",
+				"Bãi Tầm Dương"
+			],
+			"search": [
+				{
+					"tags": {
+						"natural": "beach"
+					}
+				},
+				{
+					"tags": {
+						"place": "*"
+					}
+				},
+				{
+					"tags": {
+						"tourism": "*"
+					}
+				}
+			]
+		},
+		{
+			"id": "bai_sau",
+			"name_vi": "Bãi Sau",
+			"other_names": [
+				"Back Beach",
+				"Bãi Thùy Vân",
+				"Thùy Vân"
+			],
+			"search": [
+				{
+					"tags": {
+						"natural": "beach"
+					}
+				},
+				{
+					"tags": {
+						"place": "*"
+					}
+				},
+				{
+					"tags": {
+						"tourism": "*"
+					}
+				}
+			]
+		},
+		{
+			"id": "nui_nho",
+			"name_vi": "Núi Nhỏ",
+			"other_names": [
+				"Núi Tao Phùng",
+				"Small Mountain"
+			],
+			"search": [
+				{
+					"tags": {
+						"natural": "peak"
+					}
+				},
+				{
+					"tags": {
+						"natural": "hill"
+					}
+				},
+				{
+					"tags": {
+						"natural": "*"
+					}
+				}
+			]
+		},
+		{
+			"id": "hai_dang",
+			"name_vi": "Hải đăng Vũng Tàu",
+			"other_names": [
+				"Ngọn Hải Đăng Vũng Tàu",
+				"Vũng Tàu Lighthouse"
+			],
+			"search": [
+				{
+					"tags": {
+						"man_made": "lighthouse"
+					}
+				},
+				{
+					"tags": {
+						"tourism": "*"
+					}
+				}
+			]
+		}
+	]
+}

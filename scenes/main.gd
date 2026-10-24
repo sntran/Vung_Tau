@@ -35,6 +35,11 @@ const HOME_DISTANCE := 5.0
 ## The subtitles stay out of it (R13).
 const STICK_ZONE := Vector2(340, 260)
 const SUBTITLE_MARGIN := 16.0
+## See _set_3d_scale().
+const WIDE_WINDOW := 1920
+const WIDE_3D_SCALE := 0.75
+## A message about deep water shows not more often than this (plan 0004, R13).
+const WATER_MESSAGE_MS := 3000
 
 ## The test ID of the focus ("spot.pho", "npc.batu"), or "".
 var focus_id := ""
@@ -55,6 +60,12 @@ var transcript: Array[Dictionary] = []
 var lens_line := ""
 ## True when a card came that the Sổ tay app did not show yet (R18).
 var new_card := false
+## "hem" (plans 0001 to 0003), or "vung_tau" (plan 0004) with --world=vung_tau.
+var world_name := "hem"
+## The real ground of Vũng Tàu, or null in the hẻm world.
+var vung_tau: VungTau = null
+var debug_overlay: Label
+var _water_message_time := -100000
 
 @onready var hem: Hem = $World/Hem
 @onready var player: Player = $World/Player
@@ -115,26 +126,30 @@ func _ready() -> void:
 	phone_voice = AudioStreamPlayer.new()
 	phone_voice.name = "PhoneVoice"
 	$Sounds.add_child(phone_voice)
-	clack_player = AudioStreamPlayer3D.new()
-	clack_player.name = "Clack"
-	clack_player.stream = Tones.clack()
-	clack_player.max_distance = float(Content.sound("clack").get("range_m", 25.0))
-	clack_player.unit_size = 4.0
-	hem.helper.add_child(clack_player)
-	clack_player.position = Vector3(0.3, 1.0, 0.15)
+	_make_debug_overlay()
 	GameState.time_changed.connect(_on_time_changed)
 	GameState.card_learned.connect(_on_card_learned)
 	GameState.message_received.connect(_on_message)
 	player.stepped.connect(GameState.add_walk)
 	player.arrived.connect(_on_arrived)
-	hem.clacked.connect(_on_clacked)
+	player.blocked.connect(_on_blocked)
 	AudioServer.set_bus_mute(0, not GameState.sound)
-	for npc: Dictionary in Content.npc_list():
-		for field: String in ["chat", "calls"]:
-			if npc.has(field):
-				_chat_left[npc.id] = randf_range(2.0, 6.0)
-
-	player.place(GameState.player_pos, GameState.yaw, GameState.pitch)
+	if GameState.arg_value("world") == "vung_tau":
+		_start_vung_tau()
+	if vung_tau == null:
+		clack_player = AudioStreamPlayer3D.new()
+		clack_player.name = "Clack"
+		clack_player.stream = Tones.clack()
+		clack_player.max_distance = float(Content.sound("clack").get("range_m", 25.0))
+		clack_player.unit_size = 4.0
+		hem.helper.add_child(clack_player)
+		clack_player.position = Vector3(0.3, 1.0, 0.15)
+		hem.clacked.connect(_on_clacked)
+		for npc: Dictionary in Content.npc_list():
+			for field: String in ["chat", "calls"]:
+				if npc.has(field):
+					_chat_left[npc.id] = randf_range(2.0, 6.0)
+		player.place(GameState.player_pos, GameState.yaw, GameState.pitch)
 	_apply_settings()
 	_layout()
 	_apply_time(GameState.minutes)
@@ -145,18 +160,44 @@ func _ready() -> void:
 	_update_dot()
 
 
-## Stops all voices. An Ogg stream that still plays when the game quits is
+## Plan 0004: the real ground in place of the hẻm. The hẻm world, its sun,
+## and its sky go. The save of the hẻm world stays as it is.
+func _start_vung_tau() -> void:
+	var world: VungTau = load("res://scenes/world/vung_tau.tscn").instantiate()
+	$World.add_child(world)
+	if not world.setup():
+		world.queue_free()
+		return
+	vung_tau = world
+	world_name = "vung_tau"
+	for node: Node in [$World/Hem, $World/Sun, $World/Environment]:
+		node.queue_free()
+	$World.remove_child($World/Hem)
+	hem = null
+	sun = world.sun
+	environment = world.environment
+	player.use_navigation = false
+	player.walk_limit = world.can_stand
+	player.camera.far = 6000.0
+	var start := world.spawn()
+	world.prepare_at(start.position)
+	player.place(start.position, start.yaw)
+
+
+## Stops all sounds. An Ogg stream that still plays when the game quits is
 ## not freed, so the play-test system calls this some frames before it quits.
 func stop_sounds() -> void:
 	_stopped = true
+	phone_voice.stop()
+	phone_voice.stream = null
+	ting_player.stop()
+	if hem == null:
+		return
 	for npc: Npc in hem.npcs.values():
 		npc.voice.stop()
 		npc.voice.stream = null
-	phone_voice.stop()
-	phone_voice.stream = null
 	clack_player.stop()
 	hem.tv.stop()
-	ting_player.stop()
 
 
 func _process(delta: float) -> void:
@@ -169,6 +210,10 @@ func _process(delta: float) -> void:
 	_update_chats(delta)
 	_update_sounds(delta)
 	_refresh_phone()
+	_update_debug_overlay()
+	# The Vũng Tàu world does not save the position: the save is for the hẻm world.
+	if vung_tau != null:
+		return
 	GameState.player_pos = player.global_position
 	GameState.yaw = player.target_yaw
 	GameState.pitch = player.target_pitch
@@ -305,6 +350,8 @@ func _stop_walk() -> void:
 
 
 func _save_position() -> void:
+	if vung_tau != null:
+		return
 	GameState.set_player_pos(player.global_position, player.target_yaw, player.target_pitch)
 
 
@@ -375,6 +422,12 @@ func _on_arrived() -> void:
 func _update_focus() -> void:
 	var best := ""
 	var best_angle := FOCUS_ANGLE
+	if hem == null:
+		focus_id = ""
+		focus_verb = ""
+		center_dot.set_active(false)
+		action_button.visible = false
+		return
 	var eye := player.eye_position()
 	var forward := player.view_forward()
 	for spot: Dictionary in Content.spot_list():
@@ -735,6 +788,8 @@ func try_action(target: String) -> bool:
 ## of chats: each chat plays one time each day, in order, "every_s" seconds
 ## after the last one. Then they sit quietly (D-0003-03).
 func _update_chats(delta: float) -> void:
+	if hem == null:
+		return
 	if _chat_day != GameState.day:
 		_chat_day = GameState.day
 		_chat_index.clear()
@@ -792,7 +847,7 @@ func _on_clacked(position_3d: Vector3) -> void:
 ## The caption of the TV upstairs shows from time to time while the player hears it (R14).
 func _update_sounds(delta: float) -> void:
 	_tv_caption_left -= delta
-	if not hem.tv.playing or _tv_caption_left > 0.0:
+	if hem == null or not hem.tv.playing or _tv_caption_left > 0.0:
 		return
 	var sound := Content.sound("tv")
 	if player.eye_position().distance_to(hem.tv.global_position) <= float(sound.get("range_m", 8.0)):
@@ -902,6 +957,8 @@ func _rest(choice: Dictionary) -> void:
 
 
 func is_at_home() -> bool:
+	if hem == null:
+		return false
 	var flat := player.global_position - GameState.HOME_DOOR
 	return Vector2(flat.x, flat.z).length() <= HOME_DISTANCE
 
@@ -911,6 +968,8 @@ func sleep_until_morning() -> void:
 	_stop_walk()
 	end_talk(false)
 	GameState.sleep_until_morning()
+	if vung_tau != null:
+		return
 	player.place(GameState.player_pos, GameState.yaw, GameState.pitch)
 	center_view()
 	check_messages("wake")
@@ -1030,6 +1089,8 @@ func _apply_window_mode() -> void:
 
 func _on_time_changed(minutes: int, _day: int) -> void:
 	_apply_time(minutes)
+	if hem == null:
+		return
 	# A shop closes its shutter: a player in the shop room goes out to the hẻm.
 	var room := hem.room_at(player.global_position)
 	if room != "" and hem.shutter_of(room) != TubeHouse.Shutter.OPEN:
@@ -1042,6 +1103,9 @@ func _on_time_changed(minutes: int, _day: int) -> void:
 # --- Time and light --------------------------------------------------------
 
 func _apply_time(minutes: int) -> void:
+	if vung_tau != null:
+		vung_tau.update_time(minutes, GameState.day)
+		return
 	hem.update_time(minutes)
 	var sky := DayLight.sky_colors(minutes)
 	var sky_material := environment.sky.sky_material as ProceduralSkyMaterial
@@ -1071,6 +1135,7 @@ func _apply_time(minutes: int) -> void:
 ## the center dot, and the subtitles at the bottom, out of the joystick zone
 ## and the phone (R13, R16).
 func _layout() -> void:
+	_set_3d_scale()
 	var view := ui_root.get_viewport_rect().size
 	var center := view / 2.0
 	center_dot.position = center - center_dot.size / 2.0
@@ -1125,6 +1190,8 @@ func stick_zone() -> Rect2:
 ## Returns the number of dynamic lights that light a part of the view.
 func lights_in_view() -> int:
 	var count := 1 if sun.visible else 0
+	if hem == null:
+		return count
 	var planes := player.camera.get_frustum()
 	for light in hem.lights_on():
 		var inside := true
@@ -1135,3 +1202,64 @@ func lights_in_view() -> int:
 		if inside:
 			count += 1
 	return count
+
+
+## On a window wider than 1920 pixels (a phone with a 2400 x 1080 screen),
+## the 3D view renders at 0.75 of the window size, so that it is faster. The
+## UI stays at the full size. Godot has FSR only for the Forward+ renderer, so
+## the scale is bilinear.
+func _set_3d_scale() -> void:
+	var viewport := get_viewport()
+	var render_scale := WIDE_3D_SCALE if get_window().size.x > WIDE_WINDOW else 1.0
+	if not is_equal_approx(viewport.scaling_3d_scale, render_scale):
+		viewport.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
+		viewport.scaling_3d_scale = render_scale
+
+
+# --- Deep water and the debug overlay (plan 0004) ---------------------------
+
+## The player stops at deep water: a message shows in the subtitle box (R13).
+func _on_blocked() -> void:
+	if Time.get_ticks_msec() - _water_message_time < WATER_MESSAGE_MS:
+		return
+	_water_message_time = Time.get_ticks_msec()
+	subtitles.show_caption(Content.ui_text("water_too_deep"))
+
+
+func _make_debug_overlay() -> void:
+	debug_overlay = Label.new()
+	debug_overlay.name = "DebugOverlay"
+	debug_overlay.set_meta("test_id", "debug")
+	debug_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	debug_overlay.add_theme_color_override("font_color", Color.WHITE)
+	debug_overlay.add_theme_color_override("font_outline_color", Color.BLACK)
+	debug_overlay.add_theme_constant_override("outline_size", 6)
+	debug_overlay.add_theme_font_size_override("font_size", 18)
+	debug_overlay.visible = OS.get_cmdline_user_args().has("--debug")
+	debug_overlay.position = Vector2(12, 8)
+	ui_root.add_child(debug_overlay)
+
+
+## F3 shows or hides the frame rate and the place (plan 0004, R16).
+func _unhandled_key_input(event: InputEvent) -> void:
+	var key := event as InputEventKey
+	if key and key.pressed and not key.echo and key.physical_keycode == KEY_F3:
+		debug_overlay.visible = not debug_overlay.visible
+
+
+func _update_debug_overlay() -> void:
+	if not debug_overlay.visible:
+		return
+	var pos := player.global_position
+	var lines := ["%d fps, %.1f ms" % [Engine.get_frames_per_second(), 1000.0 / maxf(Engine.get_frames_per_second(), 1.0)],
+			"X %.1f  Y %.2f  Z %.1f" % [pos.x, pos.y, pos.z]]
+	if vung_tau != null:
+		var lonlat := vung_tau.data.projection.game_to_lonlat(pos.x, pos.z)
+		var road := vung_tau.road_at(pos)
+		var counts := vung_tau.loaded_counts()
+		lines.append("%.6f N, %.6f E" % [lonlat[1], lonlat[0]])
+		lines.append("Ground %.2f m" % vung_tau.ground_height(pos.x, pos.z))
+		lines.append("Road: %s" % (road.get("name", "") if not road.is_empty() else "-"))
+		lines.append("Chunks: %d near, %d mid, %d far" % [counts.near, counts.mid, counts.far])
+	debug_overlay.text = "\n".join(lines)
+

@@ -1,0 +1,177 @@
+{
+	"note": "Made by tools/geo/fetch.py. Each file has its source, its date, its SHA-256, and its license.",
+	"bbox": {
+		"south": 10.3,
+		"west": 107.05,
+		"north": 10.42,
+		"east": 107.13
+	},
+	"files": [
+		{
+			"file": "assets/textures/ground/asphalt/diffuse.jpg",
+			"url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/asphalt_02/asphalt_02_diff_1k.jpg",
+			"license": "CC0 (Poly Haven)",
+			"asset": "asphalt_02",
+			"page": "https://polyhaven.com/a/asphalt_02",
+			"date": "2026-10-24",
+			"sha256": "1aa5ce99f58a625c71d48cfc3e68b65ca85ccb00f39e045c0a928608a0ea25ed",
+			"bytes": 731707
+		},
+		{
+			"file": "assets/textures/ground/asphalt/normal.jpg",
+			"url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/asphalt_02/asphalt_02_nor_gl_1k.jpg",
+			"license": "CC0 (Poly Haven)",
+			"asset": "asphalt_02",
+			"page": "https://polyhaven.com/a/asphalt_02",
+			"date": "2026-10-24",
+			"sha256": "42a1c381b53204e83a982db2864479a30bc127bbdeebb1006f8ee51bff099df3",
+			"bytes": 1240122
+		},
+		{
+			"file": "assets/textures/ground/asphalt/roughness.jpg",
+			"url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/asphalt_02/asphalt_02_rough_1k.jpg",
+			"license": "CC0 (Poly Haven)",
+			"asset": "asphalt_02",
+			"page": "https://polyhaven.com/a/asphalt_02",
+			"date": "2026-10-24",
+			"sha256": "70ba3edc65525eb4dc366cf010ca7ae0bd34e0251ff0225c2dad627a873d0712",
+			"bytes": 544032
+		},
+		{
+			"file": "assets/textures/ground/concrete/diffuse.jpg",
+			"url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/brushed_concrete/brushed_concrete_diff_1k.jpg",
+			"license": "CC0 (Poly Haven)",
+			"asset": "brushed_concrete",
+			"page": "https://polyhaven.com/a/brushed_concrete",
+			"date": "2026-10-24",
+			"sha256": "4054ed6eb65cd063356ffb4a88706b7d7b78c5435051c48bf0ee64290f04bc8c",
+			"bytes": 847278
+		},
+		{
+			"file": "assets/textures/ground/concrete/normal.jpg",
+			"url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/brushed_concrete/brushed_concrete_nor_gl_1k.jpg",
+			"license": "CC0 (Poly Haven)",
+			"asset": "brushed_concrete",
+			"page": "https://polyhaven.com/a/brushed_concrete",
+			"date": "2026-10-24",
+			"sha256": "f4953a881f34627cefcc22f780d392314635e31bb41f75cf3888a5af55c21820",
+			"bytes": 849228
+		},
+		{
+			"file": "assets/textures/ground/concrete/roughness.jpg",
+			"url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/brushed_concrete/brushed_concrete_rough_1k.jpg",
+			"license": "CC0 (Poly Haven)",
+			"asset": "brushed_concrete",
+			"page": "https://polyhaven.com/a/brushed_concrete",
+			"date": "2026-10-24",
+			"sha256": "24da5e4c3d17b7db1b4764b3cd1fd5c5680c27ef2c86e0d6a312f74d2d0599bd",
+			"bytes": 701983
+		},
+		{
+			"file": "assets/textures/ground/grass/diffuse.jpg",
+			"url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/leafy_grass/leafy_grass_diff_1k.jpg",
+			"license": "CC0 (Poly Haven)",
+			"asset": "leafy_grass",
+			"page": "https://polyhaven.com/a/leafy_grass",
+			"date": "2026-10-24",
+			"sha256": "cfa40bc9d9417d1852db8753a8d5917f110c40101179f63543c382e39bc05e4a",
+			"bytes": 1195394
+		},
+		{
+			"file": "assets/textures/ground/grass/normal.jpg",
+			"url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/leafy_grass/leafy_grass_nor_gl_1k.jpg",
+			"license": "CC0 (Poly Haven)",
+			"asset": "leafy_grass",
+			"page": "https://polyhaven.com/a/leafy_grass",
+			"date": "2026-10-24",
+			"sha256": "832328216adc0a7e1f70a31d5ee48c9ab7f2152d83816122736cf42ac4b2ebd6",
+			"bytes": 1466049
+		},
+		{
+			"file": "assets/textures/ground/grass/roughness.jpg",
+			"url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/leafy_grass/leafy_grass_rough_1k.jpg",
+			"license": "CC0 (Poly Haven)",
+			"asset": "leafy_grass",
+			"page": "https://polyhaven.com/a/leafy_grass",
+			"date": "2026-10-24",
+			"sha256": "0c2a1d91aacb8e54a496051b59854e51e456fe858abeade778e308359ef16463",
+			"bytes": 511385
+		},
+		{
+			"file": "assets/textures/ground/rock/diffuse.jpg",
+			"url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/rocky_terrain_02/rocky_terrain_02_diff_1k.jpg",
+			"license": "CC0 (Poly Haven)",
+			"asset": "rocky_terrain_02",
+			"page": "https://polyhaven.com/a/rocky_terrain_02",
+			"date": "2026-10-24",
+			"sha256": "d570c10b1d5302f4fde9e0e94f4cbab0d5e112fc3fe2b3b91c38a98bd3ddaf4b",
+			"bytes": 843188
+		},
+		{
+			"file": "assets/textures/ground/rock/normal.jpg",
+			"url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/rocky_terrain_02/rocky_terrain_02_nor_gl_1k.jpg",
+			"license": "CC0 (Poly Haven)",
+			"asset": "rocky_terrain_02",
+			"page": "https://polyhaven.com/a/rocky_terrain_02",
+			"date": "2026-10-24",
+			"sha256": "f4f9d9671c660f4e509e96d5da3091887dfd557e1353e313fa2d1dc789499ffd",
+			"bytes": 993692
+		},
+		{
+			"file": "assets/textures/ground/rock/roughness.jpg",
+			"url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/rocky_terrain_02/rocky_terrain_02_rough_1k.jpg",
+			"license": "CC0 (Poly Haven)",
+			"asset": "rocky_terrain_02",
+			"page": "https://polyhaven.com/a/rocky_terrain_02",
+			"date": "2026-10-24",
+			"sha256": "8652ee05de206888eb77f84df7c8080f6ffef27afadb7917127726570b66c45d",
+			"bytes": 437094
+		},
+		{
+			"file": "assets/textures/ground/sand/diffuse.jpg",
+			"url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/coast_sand_01/coast_sand_01_diff_1k.jpg",
+			"license": "CC0 (Poly Haven)",
+			"asset": "coast_sand_01",
+			"page": "https://polyhaven.com/a/coast_sand_01",
+			"date": "2026-10-24",
+			"sha256": "58af2e40100f7f405703a86d593af64379f822c4786850def23ecfc921450d54",
+			"bytes": 960614
+		},
+		{
+			"file": "assets/textures/ground/sand/normal.jpg",
+			"url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/coast_sand_01/coast_sand_01_nor_gl_1k.jpg",
+			"license": "CC0 (Poly Haven)",
+			"asset": "coast_sand_01",
+			"page": "https://polyhaven.com/a/coast_sand_01",
+			"date": "2026-10-24",
+			"sha256": "fe4d045aec99e71e80f682fcf0ad958d2dff1fe614b73178b304d1bac047b54a",
+			"bytes": 1146826
+		},
+		{
+			"file": "assets/textures/ground/sand/roughness.jpg",
+			"url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/coast_sand_01/coast_sand_01_rough_1k.jpg",
+			"license": "CC0 (Poly Haven)",
+			"asset": "coast_sand_01",
+			"page": "https://polyhaven.com/a/coast_sand_01",
+			"date": "2026-10-24",
+			"sha256": "cbc3e0bf2214e04318a643c9dc81f50f33cc5f7b935a20016c5d9efd9a6d1696",
+			"bytes": 383892
+		},
+		{
+			"file": "dem.tif",
+			"url": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N10_00_E107_00_DEM/Copernicus_DSM_COG_10_N10_00_E107_00_DEM.tif",
+			"license": "Copernicus DEM license, © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018",
+			"date": "2026-10-24",
+			"sha256": "4a212aa18836991384b62f6113393c2f0a6190718fbf2f6b74a97f4df8f492a6",
+			"bytes": 177608
+		},
+		{
+			"file": "osm.pbf",
+			"url": "https://download.geofabrik.de/asia/vietnam-latest.osm.pbf",
+			"license": "ODbL 1.0, © OpenStreetMap contributors",
+			"date": "2026-10-24",
+			"sha256": "862cef84cb27aa2b1d67297e5f75eb13a23549fa6f09dcc5223e348966eadf87",
+			"bytes": 665841
+		}
+	]
+}

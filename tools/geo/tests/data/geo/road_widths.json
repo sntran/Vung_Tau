@@ -1,0 +1,44 @@
+{
+	"note": "The road width in meters for each OSM highway type, when the road has no width tag (plan 0003, R5). These are first values. I correct them when the screenshots show a wrong width. A road whose name starts with one of hem_name_prefixes is a hẻm. Without a width tag, its width is hem_name_width. A one-way road without a width tag is one carriageway of a divided road: its width is oneway_factor times the table width, and its sidewalk is only at the right side. A link road (for example primary_link) without a width tag is link_width wide. A road with a lanes tag and no width tag is lane_width for each lane, plus the sidewalks.",
+	"default": 4.0,
+	"types": {
+		"motorway": 14.0,
+		"trunk": 14.0,
+		"primary": 12.0,
+		"secondary": 10.0,
+		"tertiary": 8.0,
+		"unclassified": 6.0,
+		"residential": 5.0,
+		"living_street": 4.0,
+		"pedestrian": 5.0,
+		"service": 3.5,
+		"alley": 2.5,
+		"track": 3.0,
+		"footway": 2.0,
+		"path": 1.5,
+		"steps": 2.0,
+		"cycleway": 2.0
+	},
+	"hem_types": [
+		"service",
+		"footway",
+		"path",
+		"alley",
+		"residential"
+	],
+	"hem_max_width": 4.0,
+	"sidewalk_types": [
+		"primary",
+		"secondary",
+		"tertiary"
+	],
+	"hem_name_prefixes": [
+		"Hẻm",
+		"Kiệt",
+		"Ngõ"
+	],
+	"hem_name_width": 3.5,
+	"oneway_factor": 0.6,
+	"link_width": 5.0,
+	"lane_width": 3.0
+}

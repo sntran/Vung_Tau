@@ -84,6 +84,10 @@ Verified in the development workspace (Linux, 2 CPUs, no GPU, no Vulkan):
 - `Input.parse_input_event()` with an `InputEventScreenTouch` presses a `Button`. Touch-to-mouse emulation is on by default.
 - GUT 9.7.1 runs with `godot --headless -s addons/gut/gut_cmdln.gd`.
 - GitHub, npm, and PyPI are reachable. Google downloads (Android SDK, Maven) and blender.org are not reachable.
+- The Copernicus DEM bucket (`copernicus-dem-30m.s3.amazonaws.com`) and the Poly Haven API are reachable. The Overpass API, Geofabrik, and `dl.polyhaven.org` are not. So `tools/geo/fetch.py` runs in CI only (plan 0003, D1).
+- Godot changes a 16-bit PNG file to 8 bits when it loads it. The game reads the 16-bit height files with `Png16` (`scripts/geo/png16.gd`). An import file with `importer="keep"` makes the export keep a file as it is, and Godot does not change that import file.
+- `PackedByteArray.decompress_dynamic(-1, FileAccess.COMPRESSION_DEFLATE)` reads a zlib stream (the data of a PNG file).
+- A `Vector2` has 32-bit floats. UTM values and degrees need 64 bits, so `GeoProjection` gives them in a `PackedFloat64Array`.
 - GitHub archive downloads (`github.com/OWNER/REPO/archive/...`) return 403 in the workspace. `git clone` works. So `tools/setup.sh` gets GUT with `git clone`. GitHub release downloads (Godot, the export templates) work.
 - `Camera3D.project_ray_normal()` does not use the frustum offset. The camera uses a frustum offset, so `CameraRig.screen_ray()` calculates the ray. `Camera3D.unproject_position()` is correct.
 - The workspace prints "WARNING: Could not set V-Sync mode" at each start. This warning comes from the Mesa driver. It is not a defect.
@@ -129,6 +133,15 @@ python tools/voices/build.py --check    # only check the files
 python tools/voices/build.py --audition docs/voices   # also the audition page
 python -m pytest -q tools/voices/tests
 
+# Geodata (plan 0005). Python 3.13 with the packages of tools/geo/requirements.txt.
+python -m pip install -r tools/geo/requirements.txt
+python tools/geo/build.py          # data/geo/raw/ to data/geo/build/ (about 2 minutes, no download)
+python -m pytest -q tools/geo/tests
+python tools/geo/fetch.py          # CI only: the "Geodata" workflow runs it by hand on main
+tools/playtest.sh geo_views        # PT-33: the screenshots of the real places
+
+# The Vũng Tàu world (plan 0005): add -- --world=vung_tau to the Godot command. F3 shows the debug screen.
+
 # Exports (they need the export templates)
 godot --headless --path . --export-release "Web" build/web/index.html
 godot --headless --path . --export-debug "iOS" build/ios/VungTau.ipa   # Xcode project only on Linux
@@ -162,6 +175,8 @@ People speak aloud in Vietnamese with subtitles. The player is a traveler with a
 - **Budget** (R14, PT-32, measured under lavapipe at 1280 × 720, at the fixed views "along", "back", and "roofs", after the corrections of report 0004): with the occluders: Low 357 to 465 draw calls and 130 000 to 145 000 triangles (limit 600 and 300 000). Medium 465 to 614 draw calls and 163 000 to 171 000 triangles. High 488 to 891 draw calls and 179 000 to 269 000 triangles (limit 2 000 and 2 000 000). Ultra 492 to 966 draw calls and 178 000 to 292 000 triangles. The roof view has the most parts, because it sees over the occluders.
 - **Desktop builds** (R6): the export workflow makes Windows, macOS (universal), and Linux builds, not signed. `docs/release-notes.md` says what macOS and Windows show at the first start.
 
+A play test in the Vũng Tàu world has `--world=vung_tau` in its phase line. `start_at()` and `fly_to()` are setup steps that put the player or the camera at a point. `set_time_scale()` plays the game faster for a long walk; a check of a time must then use the game time.
+
 The audio driver prints ALSA errors in the workspace. These errors are not defects.
 
 ## 6. Repository map
@@ -179,15 +194,17 @@ The audio driver prints ALSA errors in the workspace. These errors are not defec
 | `docs/prototype/people/` | The people prototype of plan 0006 (Blender and MPFB 2): the approved target look, the values of each person, and how to make clothes by code. |
 | `project.godot`, `export_presets.cfg` | The Godot project and the export presets (Web, Android, iOS, Linux, Windows, macOS). |
 | `autoload/` | `Content` (reads and checks `data/`), `GameState` (clock, notebook, save), `Playtest` (active only with `--playtest=NAME`). |
-| `data/` | All content: cards, spots and opening hours, people, dialogue, messages, voices, sound captions, the hẻm layout, the house palette, UI text. |
-| `scenes/` | `main.tscn` (world, input, talk, and UI), `world/` (hẻm, house, beach, and `parts/`: the house kit, its shaders, and the palette), `actors/` (first-person player, NPC with a voice), `ui/` (phone and its apps, subtitles, joystick, center dot), `desktop_controls.gd` (mouse, keys, gamepad). |
-| `scripts/` | Classes with no scene: clock math, save format, content checks, voice clips, subtitle split, light by time, greybox shapes, mesh batches, quality presets, sounds, UI theme, play-test driver. |
+| `data/` | All content: cards, spots and opening hours, people, dialogue, messages, voices, sound captions, the hẻm layout, the house palette, UI text, credits, the calendar. |
+| `data/geo/` | Plan 0005: the play area, the landmarks, the road widths, the OSM corrections (`overrides.json`), the Hòn Bà ridge (`hon_ba.json`), the raw extracts (`raw/`, with `manifest.json`), and the game data that `tools/geo/build.py` and `tools/geo/tide.py` make (`build/`, with `report.md`, `tide_report.md`, `anchors.png`, and `homestay_area.png`). ODbL, see `LICENSE` there. |
+| `scenes/` | `main.tscn` (world, input, talk, and UI), `world/` (hẻm, house, beach, `parts/`: the house kit, its shaders, and the palette, and `vung_tau.tscn`, the real ground of plan 0005), `actors/` (first-person player, NPC with a voice), `ui/` (phone and its apps, subtitles, joystick, center dot), `desktop_controls.gd` (mouse, keys, gamepad). |
+| `scripts/` | Classes with no scene: clock math, save format, content checks, voice clips, subtitle split, light by time, greybox shapes, mesh batches, quality presets, sounds, UI theme, play-test driver, the lunar calendar, the game calendar. `geo/`: the projection, the geodata reader, the 16-bit PNG reader, the sun position, the tide model, and the ground and road mesh builders. |
+| `shaders/` | The ground shader and the sea shader of the Vũng Tàu world. |
 | `tests/unit/` | GUT unit tests. |
-| `playtests/` | Play-test scenarios PT-01, PT-03 to PT-17, PT-18 to PT-24 of plan 0003, and PT-25 to PT-32 of plan 0004 (PT-02 and PT-07 were removed in plan 0002). |
-| `tools/` | `setup.sh`, `test.sh`, `playtest.sh`, and `voices/` (the voice build and its tests). |
+| `playtests/` | Play-test scenarios PT-01, PT-03 to PT-17, PT-18 to PT-24 of plan 0003, PT-25 to PT-32 of plan 0004, and PT-33 to PT-39 of plan 0005 (PT-02 and PT-07 were removed in plan 0002). |
+| `tools/` | `setup.sh`, `test.sh`, `playtest.sh`, `voices/` (the voice build and its tests), and `geo/` (the geodata pipeline: `fetch.py`, `build.py`, `tide.py`, the `geodata` package, and its tests). |
 | `assets/` | Fonts, icons, voices, and `CREDITS.md`. |
 | `docs/voices/` | The voice audition page (made by the voices workflow). |
-| `.github/workflows/` | `test.yml` (tests on each push), `export.yml` (web, desktop, Android, iOS builds, and GitHub Pages), `voices.yml` (the voice files), and `people-packs.yml` (copies the MakeHuman asset packs to the release `people-packs-1`, by hand only). |
+| `.github/workflows/` | `test.yml` (tests on each push), `export.yml` (web, desktop, Android, iOS builds, and GitHub Pages), `voices.yml` (the voice files), `geodata.yml` (download and build the geodata, by hand), and `people-packs.yml` (copies the MakeHuman asset packs to the release `people-packs-1`, by hand only). |
 
 Plan 0001 adds the Godot project structure. See that plan.
 

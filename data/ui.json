@@ -35,6 +35,10 @@
 	"notebook_count": "{found} of {total} found. Cards you do not know yet show a hint. The hint says where to look.",
 	"notebook_locked": "? ? ?",
 	"notebook_hint": "Hint: {hint}",
+	"credits": "Credits",
+	"world_name": "Vũng Tàu",
+	"world_sub": "Ngày {day}",
+	"water_too_deep": "The water is too deep here.",
 	"clock_title": "{time} · {part}",
 	"clock_hint": "{part} means {part_en}. Shops open and close by the clock.",
 	"clock_choices": [
@@ -92,7 +96,8 @@
 		"messages": "Messages",
 		"notebook": "Sổ tay",
 		"clock": "Clock",
-		"settings": "Settings"
+		"settings": "Settings",
+		"credits": "Credits"
 	},
 	"listen_on": "Listen: on",
 	"listen_off": "Listen: off",

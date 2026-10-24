@@ -29,6 +29,7 @@ var _fullscreen: CheckButton
 var _mouse: HSlider
 var _mouse_label: Label
 var _preset := "low"
+var _credits: TextButton
 var _language := "vi"
 var _quiet := false
 
@@ -67,6 +68,9 @@ func _init() -> void:
 	_center = PhoneUi.button("settings.center", "")
 	_center.pressed.connect(func() -> void: phone.request.emit("center", {}))
 	_column.add_child(_center)
+	_credits = PhoneUi.button("settings.credits", "")
+	_credits.pressed.connect(func() -> void: phone.open_app("credits"))
+	_column.add_child(_credits)
 
 
 func _slider(test_id: String, value_range: Vector2, step: float) -> Array:
@@ -115,6 +119,7 @@ func refresh(state: Dictionary) -> void:
 	_fullscreen.button_pressed = bool(settings.fullscreen)
 	_mouse.value = float(settings.mouse_sensitivity)
 	_preset = Quality.valid(settings.quality)
+	_credits.set_texts(Content.ui_text("credits"))
 	_sound.button_pressed = bool(state.get("sound", true))
 	_sensitivity.value = float(settings.look_sensitivity)
 	_fov.value = float(settings.fov)

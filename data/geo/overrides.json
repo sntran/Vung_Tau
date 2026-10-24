@@ -1,0 +1,16 @@
+{
+	"note": "Corrections to the OSM data (plan 0003, R7). tools/geo/build.py applies them after it reads the OSM data. Each correction must have a reason. Actions: add_node (tags, lon, lat), add_way (tags and coords as [lon, lat]), set_tags (way and tags; a null value removes the tag), remove_way (way).",
+	"corrections": [
+		{
+			"action": "add_node",
+			"tags": {
+				"natural": "peak",
+				"name": "Núi Nhỏ",
+				"alt_name": "Núi Tao Phùng"
+			},
+			"lon": 107.0774,
+			"lat": 10.3343,
+			"reason": "OSM has no object for Núi Nhỏ. The position is the highest point of the Copernicus DEM on the hill (177.9 m), next to the lighthouse."
+		}
+	]
+}

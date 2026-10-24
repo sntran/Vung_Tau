@@ -1,0 +1,43 @@
+{
+	"note": "Corrections for the tests.",
+	"corrections": [
+		{
+			"action": "set_tags",
+			"way": 1003,
+			"tags": {
+				"width": "6"
+			},
+			"reason": "The test checks a set_tags correction."
+		},
+		{
+			"action": "add_way",
+			"tags": {
+				"highway": "footway",
+				"name": "Lối đi thử"
+			},
+			"coords": [
+				[
+					107.0735,
+					10.344
+				],
+				[
+					107.074,
+					10.3445
+				]
+			],
+			"reason": "The test checks an add_way correction."
+		},
+		{
+			"action": "remove_way",
+			"way": 999999,
+			"reason": "The test checks a correction for a way that does not exist."
+		},
+		{
+			"action": "set_tags",
+			"way": 1003,
+			"tags": {
+				"surface": "asphalt"
+			}
+		}
+	]
+}

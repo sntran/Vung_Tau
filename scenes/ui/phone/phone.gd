@@ -160,6 +160,8 @@ func _build_device() -> void:
 	apps.notebook = NotebookApp.new()
 	apps.clock = ClockApp.new()
 	apps.settings = SettingsApp.new()
+	# The credits page has no icon on the home screen: the Settings app opens it.
+	apps.credits = CreditsApp.new()
 	for app_id: String in apps:
 		var page: Control = apps[app_id]
 		page.name = "App_" + app_id
