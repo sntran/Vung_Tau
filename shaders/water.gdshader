@@ -31,12 +31,18 @@ void fragment() {
 	vec2 uv = (p - mask_origin) / mask_size;
 	bool inside = uv.x >= 0.0 && uv.y >= 0.0 && uv.x <= 1.0 && uv.y <= 1.0;
 	// The alpha is (distance + range) / (2 * range). At sea, the distance is negative.
-	float distance_to_coast = inside ? max(0.0, -(texture(surface_mask, uv).a * 2.0 - 1.0) * coast_range) : coast_range;
+	// Five samples make the 8 m mask smooth, so that the foam has no squares.
+	vec2 texel = 1.0 / vec2(textureSize(surface_mask, 0));
+	float alpha = texture(surface_mask, uv).a * 0.4
+			+ (texture(surface_mask, uv + vec2(texel.x, 0.0)).a + texture(surface_mask, uv - vec2(texel.x, 0.0)).a
+			+ texture(surface_mask, uv + vec2(0.0, texel.y)).a + texture(surface_mask, uv - vec2(0.0, texel.y)).a) * 0.15;
+	float distance_to_coast = inside ? max(0.0, -(alpha * 2.0 - 1.0) * coast_range) : coast_range;
 	float shallow = 1.0 - smoothstep(0.0, coast_range * 0.6, distance_to_coast);
 	vec3 color = mix(deep_color, shallow_color, shallow);
 	float noise = texture(foam_noise, p * 0.08 + vec2(TIME * 0.02, 0.0)).r;
 	float wave = 0.5 + 0.5 * sin(distance_to_coast * 0.9 - TIME * 1.4);
-	float foam = (1.0 - smoothstep(0.0, foam_width, distance_to_coast)) * smoothstep(0.35, 0.75, noise * 0.7 + wave * 0.5);
+	float edge = 1.0 - smoothstep(0.0, foam_width, distance_to_coast + (noise - 0.5) * 4.0);
+	float foam = edge * smoothstep(0.35, 0.75, noise * 0.7 + wave * 0.5);
 	color = mix(color, foam_color, foam * 0.85);
 	ALBEDO = color;
 	ROUGHNESS = mix(0.06, 0.6, foam);

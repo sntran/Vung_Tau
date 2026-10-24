@@ -23,6 +23,9 @@ const MAX_WATER_DEPTH := 0.5
 const MAX_TASKS := 2
 const MAX_APPLY_PER_FRAME := 1
 const TREE_SPACING := 9.0
+const NIGHT_AMBIENT := Color("#2B3754")
+const TWILIGHT_AMBIENT := Color("#C8A48E")
+const DAY_AMBIENT := Color("#BCD0E2")
 const MARKER_HEIGHT := 30.0
 const MARKER_SPACING := 120.0
 const MARKER_STACK := 16.0
@@ -160,17 +163,46 @@ func update_time(minutes: int, day: int) -> void:
 	var direction := SunPosition.direction(elevation, sun_now.azimuth)
 	_point_light(sun, direction)
 	# The light starts before sunrise: at civil twilight (-6 degrees), people see well.
-	var sun_up := smoothstep(-2.0, 10.0, elevation)
-	var twilight := smoothstep(-9.0, 2.0, elevation)
-	sun.visible = elevation > -2.0
+	var sun_up := smoothstep(-3.0, 6.0, elevation)
+	var twilight := smoothstep(-9.0, 1.0, elevation)
+	var high := smoothstep(4.0, 25.0, elevation)
+	sun.visible = elevation > -3.0
 	sun.light_energy = 1.2 * sun_up
-	sun.light_color = Color("#FFA45C").lerp(Color("#FFF6E8"), smoothstep(2.0, 25.0, elevation))
+	sun.light_color = Color("#FFA45C").lerp(Color("#FFF6E8"), high)
 	moon.visible = elevation < 2.0
 	moon.light_energy = 0.15 * (1.0 - twilight)
-	environment.ambient_light_energy = lerpf(0.35, 1.0, twilight)
-	environment.background_energy_multiplier = lerpf(0.12, 1.0, twilight)
-	environment.tonemap_exposure = lerpf(1.7, 1.0, sun_up)
-	environment.fog_light_color = Color("#1A2236").lerp(Color("#C2D3E2"), twilight)
+	# The physical sky gives almost no light near sunrise, so the ambient light
+	# is a color: blue at night, warm in the twilight, the sky color in the day.
+	var ambient := NIGHT_AMBIENT.lerp(TWILIGHT_AMBIENT, twilight).lerp(DAY_AMBIENT, high)
+	environment.ambient_light_color = ambient
+	environment.ambient_light_energy = lerpf(0.35, 0.75, twilight)
+	environment.tonemap_exposure = lerpf(1.5, 1.0, high)
+	environment.fog_light_color = ambient.darkened(0.15)
+	environment.fog_light_energy = lerpf(0.25, 1.0, twilight)
+	var colors := sky_colors(elevation)
+	var sky_material := environment.sky.sky_material as ProceduralSkyMaterial
+	sky_material.sky_top_color = colors[0]
+	sky_material.sky_horizon_color = colors[1]
+	sky_material.ground_horizon_color = colors[1].darkened(0.2)
+	sky_material.ground_bottom_color = colors[0].darkened(0.6)
+
+
+## The colors of the sky (the top and the horizon) for the sun elevation in degrees.
+static func sky_colors(elevation: float) -> Array[Color]:
+	var keys := [
+		[-12.0, Color("#03070F"), Color("#0A1324")],
+		[-6.0, Color("#16234A"), Color("#4B4A6A")],
+		[-1.0, Color("#33528A"), Color("#E0875A")],
+		[6.0, Color("#4D7DBE"), Color("#F0B07C")],
+		[20.0, Color("#4C8BD0"), Color("#BCD6EA")],
+	]
+	if elevation <= keys[0][0]:
+		return [keys[0][1], keys[0][2]]
+	for i in range(1, keys.size()):
+		if elevation <= keys[i][0]:
+			var t: float = (elevation - keys[i - 1][0]) / (keys[i][0] - keys[i - 1][0])
+			return [(keys[i - 1][1] as Color).lerp(keys[i][1], t), (keys[i - 1][2] as Color).lerp(keys[i][2], t)]
+	return [keys[-1][1], keys[-1][2]]
 
 
 static func _point_light(light: DirectionalLight3D, toward_light: Vector3) -> void:
@@ -405,22 +437,23 @@ func _add_trees(node: Node3D, transforms: Array[Transform3D]) -> void:
 # --- Setup -------------------------------------------------------------------
 
 func _make_environment() -> void:
-	var sky_material := PhysicalSkyMaterial.new()
-	sky_material.rayleigh_coefficient = 2.0
-	sky_material.mie_coefficient = 0.004
-	sky_material.turbidity = 5.0
-	sky_material.ground_color = Color("#3A4A55")
+	# The physical sky is black at sunrise and sunset under the Mobile renderer,
+	# so the sky is procedural, with colors for the real sun elevation.
+	var sky_material := ProceduralSkyMaterial.new()
+	sky_material.sun_angle_max = 20.0
+	sky_material.sun_curve = 0.1
 	var sky := Sky.new()
 	sky.sky_material = sky_material
 	environment = Environment.new()
 	environment.background_mode = Environment.BG_SKY
+	environment.background_color = Color("#0B1426")
 	environment.sky = sky
-	environment.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
+	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
 	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	environment.fog_enabled = true
 	environment.fog_density = 0.00008
-	environment.fog_sky_affect = 0.1
+	environment.fog_sky_affect = 0.0
 	var world_environment := WorldEnvironment.new()
 	world_environment.name = "Environment"
 	world_environment.environment = environment
