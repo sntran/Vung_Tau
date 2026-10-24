@@ -1,0 +1,152 @@
+{
+	"spots": [
+		{
+			"id": "home",
+			"kind": "house",
+			"name": "Homestay nhà Bà Tư",
+			"en": "Where you stay",
+			"hours": null,
+			"status": "owner",
+			"look_label": "Go in",
+			"lines": [
+				{"line": "spot.home.look"}
+			]
+		},
+		{
+			"id": "pho",
+			"kind": "shop",
+			"name": "Phở Cô Sáu",
+			"en": "Southern-style phở",
+			"hours": {"open": 330, "close": 630},
+			"shutter_half": [{"from": 270, "before": 330}, {"from": 630, "before": 720}],
+			"status": "check",
+			"look_label": "Take a look",
+			"look_label_open": "Sit down and eat",
+			"lines": [
+				{"from": 270, "before": 330, "line": "spot.pho.closed_before"},
+				{"open": true, "line": "spot.pho.open"},
+				{"from": 630, "before": 720, "line": "spot.pho.sold_out", "learn": ["breakfast", "shutter"]},
+				{"line": "spot.pho.closed_after", "learn": ["breakfast", "shutter"]}
+			]
+		},
+		{
+			"id": "banhmi",
+			"kind": "cart",
+			"name": "Xe bánh mì",
+			"en": "Bánh mì cart",
+			"hours": {"open": 300, "close": 540},
+			"status": "check",
+			"look_label": "Take a look",
+			"lines": [
+				{"line": "spot.banhmi.look", "learn": ["banhmi"]}
+			]
+		},
+		{
+			"id": "coc",
+			"kind": "stall",
+			"name": "Cà phê cóc",
+			"en": "Sidewalk coffee",
+			"hours": {"open": 330, "close": 1320},
+			"status": "check",
+			"look_label": "Take a look",
+			"lines": [
+				{"open": true, "line": "spot.coc.look", "learn": ["coc"]},
+				{"line": "spot.coc.closed"}
+			]
+		},
+		{
+			"id": "bac",
+			"kind": "shop",
+			"name": "Phở Bắc Bác Hà",
+			"en": "Northern-style phở",
+			"hours": {"open": 360, "close": 630},
+			"status": "check",
+			"look_label": "Take a look",
+			"lines": [
+				{"open": true, "line": "spot.bac.look", "learn": ["bac"]},
+				{"line": "spot.bac.closed", "learn": ["shutter"]}
+			]
+		},
+		{
+			"id": "mia",
+			"kind": "cart",
+			"name": "Xe nước mía",
+			"en": "Sugarcane juice",
+			"hours": {"open": 600, "close": 1080},
+			"status": "check",
+			"look_label": "Take a look",
+			"lines": [
+				{"line": "spot.mia.look", "learn": ["mia"]}
+			]
+		},
+		{
+			"id": "go",
+			"kind": "cart",
+			"name": "Hủ tiếu gõ",
+			"en": "Night noodle cart",
+			"hours": {"open": 1080, "close": 1410},
+			"status": "check",
+			"look_label": "Take a look",
+			"lines": [
+				{"line": "spot.go.look", "learn": ["clack"]}
+			]
+		},
+		{
+			"id": "banhkhot",
+			"kind": "shop",
+			"name": "Bánh khọt Cô Út",
+			"en": "Vũng Tàu's crispy little cakes",
+			"hours": {"open": 390, "close": 1200},
+			"status": "check",
+			"look_label": "Take a look",
+			"lines": [
+				{"open": true, "line": "spot.banhkhot.look", "learn": ["banhkhot"]},
+				{"line": "spot.banhkhot.closed", "learn": ["shutter"]}
+			]
+		},
+		{
+			"id": "hvl",
+			"kind": "cart",
+			"name": "Hột vịt lộn",
+			"en": "Egg cart",
+			"hours": {"open": 900, "close": 1350},
+			"status": "source",
+			"look_label": "Take a look",
+			"lines": [
+				{"line": "spot.hvl.look", "learn": ["hvl"]}
+			]
+		},
+		{
+			"id": "beach",
+			"kind": "place",
+			"name": "Bãi Trước",
+			"en": "Front Beach",
+			"hours": null,
+			"status": "owner",
+			"look_label": "Take a look",
+			"lines": [
+				{"from": 270, "before": 450, "line": "spot.beach.dawn", "learn": ["boats", "exercise"]},
+				{"from": 450, "before": 960, "line": "spot.beach.day"},
+				{"from": 960, "before": 1290, "line": "spot.beach.evening"},
+				{"line": "spot.beach.night"}
+			]
+		}
+	],
+	"npcs": [
+		{
+			"id": "batu",
+			"name": "Bà Tư",
+			"hours": {"open": 330, "close": 540},
+			"status": "check",
+			"lines": [
+				{"line": "batu.greet"}
+			]
+		}
+	],
+	"boats_in": {"from": 270, "before": 450},
+	"hem_tips": [
+		{"before": 630, "missing_card": "order", "line": "hem.tip.pho"},
+		{"before": 450, "missing_card": "boats", "line": "hem.tip.beach"},
+		{"line": "hem.tip.walk"}
+	]
+}

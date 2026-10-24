@@ -1,0 +1,103 @@
+{
+	"hem_width": 3.5,
+	"floor_height": 3.2,
+	"lots": [
+		{
+			"id": "homestay",
+			"spot": "home",
+			"width": 5.0,
+			"floors": 3,
+			"wall_color": "#E8D27A",
+			"trim_color": "#B8963A",
+			"balcony": true,
+			"shutter_color": "#3F7FA6",
+			"ground": "gate",
+			"sign": {"text": "HOMESTAY · 42/7", "bg": "#FFF8E0", "fg": "#8A5A34"}
+		},
+		{
+			"id": "pho_co_sau",
+			"spot": "pho",
+			"width": 4.5,
+			"floors": 3,
+			"wall_color": "#8FCBB8",
+			"trim_color": "#3D8B79",
+			"balcony": true,
+			"shutter_color": "#3D6E8A",
+			"ground": "shop",
+			"sign": {"text": "PHỞ CÔ SÁU", "bg": "#C4362C", "fg": "#F2C33C"}
+		},
+		{
+			"id": "house_banhmi",
+			"width": 4.0,
+			"floors": 2,
+			"wall_color": "#E8A6A1",
+			"trim_color": "#B56A64",
+			"balcony": false,
+			"shutter_color": "#5E7F45",
+			"ground": "gate"
+		},
+		{
+			"id": "coc",
+			"spot": "coc",
+			"width": 4.5,
+			"floors": 2,
+			"wall_color": "#8DB3D9",
+			"trim_color": "#4F7DA8",
+			"balcony": true,
+			"shutter_color": "#C78B3A",
+			"ground": "wall",
+			"sign": {"text": "CÀ PHÊ", "bg": "#C7A574", "fg": "#4A2E1A"}
+		},
+		{
+			"id": "pho_bac",
+			"spot": "bac",
+			"width": 4.5,
+			"floors": 4,
+			"wall_color": "#D9A35B",
+			"trim_color": "#9C6B2C",
+			"balcony": true,
+			"shutter_color": "#2F6E5A",
+			"ground": "shop",
+			"sign": {"text": "PHỞ BẮC GIA TRUYỀN", "bg": "#1F4A3C", "fg": "#F2C33C"}
+		},
+		{
+			"id": "house_mia",
+			"width": 4.0,
+			"floors": 2,
+			"wall_color": "#B9D58C",
+			"trim_color": "#7C9A4A",
+			"balcony": false,
+			"shutter_color": "#B35A3A",
+			"ground": "gate"
+		},
+		{
+			"id": "banhkhot",
+			"spot": "banhkhot",
+			"width": 5.0,
+			"floors": 3,
+			"wall_color": "#F0C9A0",
+			"trim_color": "#B9824E",
+			"balcony": true,
+			"shutter_color": "#3F7FA6",
+			"ground": "shop",
+			"sign": {"text": "BÁNH KHỌT CÔ ÚT", "bg": "#2E6B3A", "fg": "#F2C33C"}
+		}
+	],
+	"carts": [
+		{"spot": "banhmi", "lot": "house_banhmi", "offset": 0.0, "color": "#E9EEF0", "sign": {"text": "BÁNH MÌ", "bg": "#C4362C", "fg": "#F2C33C"}},
+		{"spot": "mia", "lot": "house_mia", "offset": 0.0, "color": "#3F9A5A", "sign": {"text": "NƯỚC MÍA", "bg": "#F2F2E6", "fg": "#2E7A44"}},
+		{"spot": "go", "lot": "house_mia", "offset": 0.0, "color": "#8A5A34", "sign": {"text": "HỦ TIẾU", "bg": "#E7D3A0", "fg": "#6B3A1E"}},
+		{"spot": "hvl", "lot": "banhkhot", "offset": 1.6, "color": "#C9A86A", "sign": {"text": "HỘT VỊT LỘN", "bg": "#F2E6C8", "fg": "#8A3A1E"}}
+	],
+	"npcs": [
+		{"npc": "batu", "lot": "homestay", "offset": -1.4}
+	],
+	"beach": {
+		"spot": "beach",
+		"road_width": 7.0,
+		"road_depth": 4.0,
+		"sand_width": 14.0,
+		"wall_height": 0.7,
+		"boat_colors": ["#2F72C4", "#C4362C", "#2F9C5A"]
+	}
+}

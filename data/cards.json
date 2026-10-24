@@ -1,0 +1,194 @@
+{
+	"groups": ["Phở", "Xóm", "Vũng Tàu"],
+	"cards": [
+		{
+			"id": "anSang",
+			"group": "Xóm",
+			"title": "“Ăn sáng chưa?”",
+			"vi": "Have you eaten breakfast yet?",
+			"body": "Neighbors greet you this way in the morning. It works like “How are you?”. Say “Dạ, chưa” (not yet) or “Dạ, rồi” (yes, I have).",
+			"hint": "Say hi to a neighbor in the morning.",
+			"status": "check"
+		},
+		{
+			"id": "names",
+			"group": "Xóm",
+			"title": "Names by birth order",
+			"vi": "Hai, Ba, Tư, Năm, Sáu, Bảy…",
+			"body": "In the South, people often call you by your birth order. The oldest child is Hai (two), not Một (one), and the youngest is Út. So Cô Sáu is the fifth child in her family, and Chú Bảy is the sixth in his.",
+			"hint": "Ask about the names at the phở shop.",
+			"status": "check"
+		},
+		{
+			"id": "shutter",
+			"group": "Xóm",
+			"title": "The metal shutter",
+			"vi": "cửa cuốn",
+			"body": "Many quán are the front room of a family home. When the food is gone, the rolling shutter comes down and the room is a home again.",
+			"hint": "Find a shop that is closed.",
+			"status": "check"
+		},
+		{
+			"id": "banhmi",
+			"group": "Xóm",
+			"title": "Bánh mì at dawn",
+			"vi": "xe bánh mì",
+			"body": "The cart is out before sunrise. People grab one on the way to work or school. Gone by mid-morning.",
+			"hint": "Visit the bánh mì cart early.",
+			"status": "check"
+		},
+		{
+			"id": "coc",
+			"group": "Xóm",
+			"title": "Cà phê cóc",
+			"vi": "cà phê ghế đẩu",
+			"body": "Small plastic stools, a wall ledge as a table, and cà phê sữa đá dripping through a phin. People in office clothes sit next to students.",
+			"hint": "Stop at the coffee stools.",
+			"status": "source"
+		},
+		{
+			"id": "mia",
+			"group": "Xóm",
+			"title": "Xe nước mía",
+			"vi": "sugarcane juice cart",
+			"body": "In the afternoon heat, the cane press runs all day. Sellers often squeeze a few tắc (kumquats) in with the cane.",
+			"hint": "Find the sugarcane cart in the afternoon.",
+			"status": "source"
+		},
+		{
+			"id": "clack",
+			"group": "Xóm",
+			"title": "Hủ tiếu gõ",
+			"vi": "lóc cóc, lóc cóc",
+			"body": "You don't walk to it. It comes to you. A helper walks the hẻm at night, clacking two bamboo sticks. You call out, and the bowl comes to your door.",
+			"hint": "Listen at night.",
+			"status": "source"
+		},
+		{
+			"id": "hvl",
+			"group": "Xóm",
+			"title": "Hột vịt lộn",
+			"vi": "a brave bite",
+			"body": "A duck egg with a partly grown duckling inside. Locals eat it from the shell with salt, pepper, kumquat, chili, and rau răm. Some like it out of the shell, fried in tamarind sauce (xào me). An afternoon or late-night snack.",
+			"hint": "Find the egg cart after 3 in the afternoon.",
+			"status": "source"
+		},
+		{
+			"id": "banhkhot",
+			"group": "Vũng Tàu",
+			"title": "Bánh khọt",
+			"vi": "Vũng Tàu's little crispy cakes",
+			"body": "Rice batter with a little curry powder for color, cooked in a mold full of small cups and topped with shrimp or squid. Wrap one in lettuce and herbs, then dip it in nước mắm.",
+			"hint": "Visit the corner shop.",
+			"status": "source"
+		},
+		{
+			"id": "boats",
+			"group": "Vũng Tàu",
+			"title": "The catch on the sand",
+			"vi": "ghe về, cá tươi",
+			"body": "Before sunrise the fishing boats come in. The catch is sorted right on the sand, and neighbors buy their fish there.",
+			"hint": "Go to the beach very early.",
+			"status": "source"
+		},
+		{
+			"id": "exercise",
+			"group": "Vũng Tàu",
+			"title": "Morning at Bãi Trước",
+			"vi": "tập thể dục buổi sáng",
+			"body": "Before the heat, the beach fills with people jogging, stretching, and exercising together. Once the sun is high, the sand gets quiet.",
+			"hint": "Go to the beach very early.",
+			"status": "owner"
+		},
+		{
+			"id": "breakfast",
+			"group": "Phở",
+			"title": "Phở is breakfast",
+			"vi": "ăn sáng",
+			"body": "Abroad, phở is lunch or dinner. Here, the busy time is 6 to 8 in the morning, and many shops sell out by 10 or 11.",
+			"hint": "Eat a bowl, or come back late.",
+			"status": "check"
+		},
+		{
+			"id": "order",
+			"group": "Phở",
+			"title": "Build your bowl",
+			"vi": "“Một tô phở tái nạm gầu bò viên”",
+			"body": "People don't just say “phở tái.” They name every cut they want, in one breath: tái (thin raw beef that cooks in the broth), nạm (flank), gầu (fatty brisket), gân (tendon), sách (tripe), bò viên (meatballs). Want it all? Say “đặc biệt.”",
+			"hint": "Order a bowl.",
+			"status": "source"
+		},
+		{
+			"id": "beo",
+			"group": "Phở",
+			"title": "Nước béo hành trần",
+			"vi": "broth fat with blanched onion",
+			"body": "A small bowl of fat from the top of the pot, with scallion. Many people put the onion in the bowl and use the fat as a dip for the meat, often with a little hoisin and chili mixed in. You have to ask for it.",
+			"hint": "Ask about Chú Bảy's order.",
+			"status": "source"
+		},
+		{
+			"id": "trung",
+			"group": "Phở",
+			"title": "Chén trứng",
+			"vi": "a small bowl with an egg",
+			"body": "Ask for an egg in its own small bowl. Spoon hot broth over it so it cooks soft, then eat it on the side or slide it into your phở.",
+			"hint": "Ask about Chú Bảy's order.",
+			"status": "check"
+		},
+		{
+			"id": "taste",
+			"group": "Phở",
+			"title": "Taste the broth first",
+			"vi": "nếm nước lèo",
+			"body": "The broth simmered for hours. Taste it before you add anything. Then you know what you are changing.",
+			"hint": "Taste before you add sauce.",
+			"status": "check"
+		},
+		{
+			"id": "rau",
+			"group": "Phở",
+			"title": "The herb plate is part of the dish",
+			"vi": "dĩa rau: húng quế, ngò gai, giá, chanh, ớt",
+			"body": "Thai basil, sawtooth herb, bean sprouts, lime, and chili. Pick the leaves off the stem, tear them, and push them into the hot broth. Some people ask for giá trụng, blanched sprouts.",
+			"hint": "Use the herb plate.",
+			"status": "check"
+		},
+		{
+			"id": "tai",
+			"group": "Phở",
+			"title": "Push the tái under",
+			"vi": "nhận thịt tái xuống",
+			"body": "Tái comes raw on top. Push it under the hot broth right away so it cooks pink-brown and tender.",
+			"hint": "Order tái and watch the color.",
+			"status": "source"
+		},
+		{
+			"id": "saucer",
+			"group": "Phở",
+			"title": "Sauce goes in the little dish",
+			"vi": "chén nước chấm",
+			"body": "Many locals squeeze hoisin and chili sauce into a small dish, not the bowl. They dip the meat and bò viên in it and keep the broth clean. Others put it in the bowl. Both happen here.",
+			"hint": "Try the sauce bottles.",
+			"status": "owner"
+		},
+		{
+			"id": "bac",
+			"group": "Phở",
+			"title": "Phở Bắc and phở Nam",
+			"vi": "North and South",
+			"body": "Phở came South with Northern families after 1954. In the South the broth got richer and the herb plate bigger. A Northern-style bowl has clear broth, wide noodles, few herbs, and often no hoisin on the table.",
+			"hint": "Ask about the hoisin, or visit Bác Hà.",
+			"status": "source"
+		},
+		{
+			"id": "pay",
+			"group": "Phở",
+			"title": "Pay at the end, no tip",
+			"vi": "“Cô ơi, tính tiền!”",
+			"body": "You pay after you eat. Call out to the owner and she comes to you. Many shops also take bank QR. Tips are not expected at a quán. A warm “cảm ơn cô” is enough.",
+			"hint": "Finish a bowl and pay.",
+			"status": "check"
+		}
+	]
+}

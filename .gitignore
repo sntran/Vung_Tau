@@ -1,0 +1,10 @@
+# Godot
+.godot/
+/android/
+*.translation
+
+# Tools from tools/setup.sh
+.tools/
+
+# Output of the tests and exports
+build/

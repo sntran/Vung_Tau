@@ -1,0 +1,480 @@
+{
+	"speakers": {
+		"batu": {
+			"name": "Bà Tư",
+			"color": "#2C7A6E"
+		},
+		"cosau": {
+			"name": "Cô Sáu",
+			"color": "#C4362C"
+		},
+		"bacha": {
+			"name": "Bác Hà",
+			"color": "#1F4A3C"
+		}
+	},
+	"strings": {
+		"status_open": "Open now · {hours}",
+		"status_closed": "Closed now · open {hours}"
+	},
+	"lines": {
+		"intro.welcome": {
+			"text": "[i]Một Ngày Ở Xóm[/i] · A day in a Vũng Tàu hẻm.\nYou're staying at Bà Tư's family homestay in Hẻm 42, a short walk from Bãi Trước. It's 6 in the morning, and the hẻm is already busy. Walk around, eat, and fill your sổ tay (notebook) with what you learn.",
+			"hint": "Tap the street to walk. Tap a shop to go there. Tap the clock to wait.",
+			"status": "owner",
+			"choices": [
+				{
+					"id": "step_outside",
+					"label": "Step outside",
+					"style": "primary",
+					"flag": "intro_done",
+					"next": "batu.greet"
+				}
+			]
+		},
+		"batu.greet": {
+			"speaker": "batu",
+			"text": "Ủa, con dậy rồi hả? [i]Ăn sáng chưa con?[/i]",
+			"phrases": [
+				{
+					"vi": "Ăn sáng chưa con?",
+					"en": "Have you had breakfast yet, dear?"
+				}
+			],
+			"status": "check",
+			"choices": [
+				{
+					"id": "chua",
+					"label": "Dạ, chưa ạ.",
+					"sub": "“Not yet.”",
+					"learn": [
+						"anSang"
+					],
+					"next": "batu.reply_chua"
+				},
+				{
+					"id": "good_morning",
+					"label": "Good morning!",
+					"sub": "Answer in English",
+					"learn": [
+						"anSang"
+					],
+					"next": "batu.reply_english"
+				}
+			]
+		},
+		"batu.reply_chua": {
+			"speaker": "batu",
+			"text": "Chưa hả? Đi qua Cô Sáu ăn tô phở đi, kẻo hết!\n(Not yet? Go have a bowl at Cô Sáu's before it runs out!)",
+			"hint": "“Ăn sáng chưa?” is a greeting. She's saying good morning, and she's also telling you where to eat.",
+			"status": "check",
+			"choices": [
+				{
+					"id": "thanks",
+					"label": "Thanks, Bà Tư",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"batu.reply_english": {
+			"speaker": "batu",
+			"text": "Haha, good morning! She smiles and points down the hẻm. “Phở, phở! Cô Sáu.”",
+			"hint": "“Ăn sáng chưa?” is how neighbors say hi in the morning. Try “Dạ, chưa” (not yet) next time.",
+			"status": "check",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"hem.near": {
+			"text": "[i]{name}[/i] · {en}\n{status}",
+			"status": "owner",
+			"choices": [
+				{
+					"id": "look",
+					"label": "{look}",
+					"style": "primary",
+					"next": "@spot"
+				},
+				{
+					"id": "wait",
+					"label": "Wait or sleep",
+					"sub": "Tap the clock any time",
+					"style": "quiet",
+					"open": "clock"
+				}
+			]
+		},
+		"hem.tip.pho": {
+			"text": "Cô Sáu's phở is next door. Go before it sells out.",
+			"status": "owner",
+			"choices": [
+				{
+					"id": "wait",
+					"label": "Wait or sleep",
+					"sub": "Tap the clock any time",
+					"style": "quiet",
+					"open": "clock"
+				}
+			]
+		},
+		"hem.tip.beach": {
+			"text": "Bãi Trước is at the end of the hẻm. Early morning is the time to go.",
+			"status": "owner",
+			"choices": [
+				{
+					"id": "wait",
+					"label": "Wait or sleep",
+					"sub": "Tap the clock any time",
+					"style": "quiet",
+					"open": "clock"
+				}
+			]
+		},
+		"hem.tip.walk": {
+			"text": "Tap a shop to walk there, or tap the street to stroll.",
+			"status": "owner",
+			"choices": [
+				{
+					"id": "wait",
+					"label": "Wait or sleep",
+					"sub": "Tap the clock any time",
+					"style": "quiet",
+					"open": "clock"
+				}
+			]
+		},
+		"hem.late": {
+			"text": "It's late. The hẻm is quiet and the shutters are down. Time to sleep.",
+			"status": "owner",
+			"choices": [
+				{
+					"id": "go_home_sleep",
+					"label": "Go home and sleep",
+					"style": "primary",
+					"sleep": true
+				}
+			]
+		},
+		"home.morning": {
+			"text": "[i]Ngày {day}.[/i] You sleep. At {time} the hẻm is already awake: a broom on the concrete, a scooter warming up, sea wind, and the smell of broth from Cô Sáu's.",
+			"status": "check",
+			"choices": [
+				{
+					"id": "step_outside",
+					"label": "Step outside",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.home.look": {
+			"text": "Bà Tư's homestay. Your room upstairs has a fan and a window over the hẻm. From the kitchen comes the smell of nước mắm and something frying.",
+			"hint": "Coming in a later version: dinner with the family.",
+			"status": "owner",
+			"choices": [
+				{
+					"id": "rest",
+					"label": "Rest one hour",
+					"minutes": 60,
+					"next": "@hem"
+				},
+				{
+					"id": "sleep",
+					"label": "Sleep until morning",
+					"sleep": true
+				},
+				{
+					"id": "go_out",
+					"label": "Go back out",
+					"style": "quiet",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.pho.closed_before": {
+			"speaker": "cosau",
+			"text": "The shutter is half up. Cô Sáu is tending the pot. “Chưa mở con ơi, chút nữa nghen.” (Not open yet, a little later.)",
+			"phrases": [
+				{
+					"vi": "Chưa mở con ơi, chút nữa nghen.",
+					"en": "Not open yet, dear. A little later, okay?"
+				}
+			],
+			"status": "check",
+			"choices": [
+				{
+					"id": "wait_open",
+					"label": "Wait until {open}",
+					"until": 330,
+					"next": "@hem"
+				},
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "quiet",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.pho.open": {
+			"speaker": "cosau",
+			"text": "Steam rises from the big pot. Cô Sáu waves you to a low table. [i]Vô đây con, ngồi đi![/i]",
+			"phrases": [
+				{
+					"vi": "Vô đây con, ngồi đi!",
+					"en": "Come in, dear, sit down!"
+				}
+			],
+			"hint": "Coming in a later version: order a bowl and eat it the local way.",
+			"status": "check",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.pho.sold_out": {
+			"speaker": "cosau",
+			"text": "Cô Sáu is washing the last bowls. [i]Hết rồi con ơi![/i] Sáng mai đi sớm sớm nghen.",
+			"phrases": [
+				{
+					"vi": "Hết rồi con ơi!",
+					"en": "It's all gone, dear!"
+				},
+				{
+					"vi": "Sáng mai đi sớm sớm nghen.",
+					"en": "Come early tomorrow morning, okay?"
+				}
+			],
+			"hint": "Phở is a morning food here. Most bowls are sold by 10 or 11.",
+			"status": "check",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.pho.closed_after": {
+			"text": "The shutter is down. Upstairs, a TV is on. Cô Sáu sells phở in the morning only, from {open} until it runs out.",
+			"hint": "Phở is a morning food here. Come back early tomorrow.",
+			"status": "check",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.banhmi.look": {
+			"text": "Warm loaves stacked behind glass. A line of people in work clothes and school uniforms.",
+			"hint": "Coming in a later version: build your own bánh mì.",
+			"status": "check",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.coc.look": {
+			"text": "Plastic stools along the wall, glasses with a phin dripping on top. Two men argue about football. Nobody is in a hurry.",
+			"hint": "Coming in a later version: order a cà phê sữa đá and wait for the drip.",
+			"status": "source",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.coc.closed": {
+			"text": "The stools are stacked against the wall. Coffee starts again at {open}.",
+			"status": "check",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.bac.look": {
+			"speaker": "bacha",
+			"text": "Mời cháu vào ăn phở! (Come in for phở!) Bác Hà speaks with a Northern accent. On her table: chili, lime, garlic vinegar. No bean sprouts. No hoisin.",
+			"phrases": [
+				{
+					"vi": "Mời cháu vào ăn phở!",
+					"en": "Come in and eat phở!"
+				}
+			],
+			"hint": "Coming in a later version. We want Northern cooks to help write this shop.",
+			"status": "source",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.bac.closed": {
+			"text": "Shutter down. Bác Hà sells in the morning only.",
+			"status": "check",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.mia.look": {
+			"text": "The press squeaks. Cane goes in, green-gold juice comes out over ice, with a squeeze of tắc.",
+			"hint": "Coming in a later version.",
+			"status": "source",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.banhkhot.look": {
+			"text": "Cô Út pours rice batter into a hot mold full of little cups, drops a shrimp in each, and covers it. They come out crispy and yellow, one bite each. At the table: lettuce, herbs, and a bowl of nước mắm.",
+			"phrases": [
+				{
+					"vi": "Bánh khọt nè!",
+					"en": "Bánh khọt, here!"
+				}
+			],
+			"hint": "Coming in a later version: eat a plate. Vũng Tàu is known for bánh khọt.",
+			"status": "source",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.banhkhot.closed": {
+			"text": "Shutter down. Cô Út starts the fire at {open} in the morning.",
+			"status": "check",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.hvl.look": {
+			"text": "A basket of warm duck eggs under a cloth. A man cracks the top of one, sips the broth, adds salt and pepper, and eats it with rau răm. Next to him, a girl orders hers fried in tamarind sauce.",
+			"phrases": [
+				{
+					"vi": "Hột vịt lộn nè!",
+					"en": "Duck eggs, here!"
+				}
+			],
+			"hint": "Coming in a later version: try one, if you dare.",
+			"status": "source",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.go.look": {
+			"text": "[i]Lóc cóc, lóc cóc.[/i] The helper clacks two bamboo sticks as he walks. Call out from your door, and the bowl comes to you.",
+			"hint": "Coming in a later version.",
+			"status": "source",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.beach.dawn": {
+			"text": "The boats are in. Fish are sorted on the sand, and neighbors buy them right there. Behind them, people jog, stretch, and swing their arms before the sun gets hot.",
+			"hint": "Coming in a later version: buy fish for Bà Tư's kitchen.",
+			"status": "source",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.beach.day": {
+			"text": "The sun is hot. The sand is almost empty, and the boats wait out at sea.",
+			"hint": "Come back very early in the morning.",
+			"status": "owner",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.beach.evening": {
+			"text": "The heat breaks. Families sit on mats, kids run at the water, and scooters roll along the coast road.",
+			"hint": "Coming in a later version: ride a scooter along the coast. Helmet on.",
+			"status": "owner",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		},
+		"spot.beach.night": {
+			"text": "Dark water and the sound of waves. Far out, the lights of fishing boats.",
+			"status": "check",
+			"choices": [
+				{
+					"id": "okay",
+					"label": "Okay",
+					"style": "primary",
+					"next": "@hem"
+				}
+			]
+		}
+	}
+}
