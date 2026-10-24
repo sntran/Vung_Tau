@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Branch | `feat/0003-voices-and-phone` |
 | Depends on | 0002 (status "Built") |
 
@@ -37,7 +37,7 @@ The talk panel, the top bar, the toast, and the 2D sheets go away. The phone is 
 |---|---|
 | Spoken lines of people (`speaker` is set) | Voice audio, subtitle, and the Listen app. |
 | Description of a place (`spot.*.look`, open or closed status, hours) | The Lens app. Point the phone at the place. The app shows the name, the English name, open or closed now, the hours, and a short description. |
-| Hints and tips (`hint`, `hem.tip.*`) | Messages from the host family. A young person of the family writes in English. |
+| Hints and tips (`hint`, `hem.tip.*`) | Messages from cô Nga of the host family. She writes in English. |
 | Intro (`intro.welcome`) | The first message from the host family. |
 | Choices of a spoken line | The phrasebook of the Listen app, and actions in the world. |
 | Choices that are not speech ("Okay", "Rest one hour", "Go in") | The action button and actions in the world. "Okay" goes away. |
@@ -105,8 +105,8 @@ The talk panel, the top bar, the toast, and the 2D sheets go away. The phone is 
 
 #### Messages
 
-- **R24.** A thread with the homestay family. The messages come at fixed times and after events (data in `data/messages.json`). They hold the intro and the hints. Write them in friendly, plain English, with Vietnamese words where they are natural.
-- **R25.** The name of the young person who writes is in `data/messages.json`. I choose it.
+- **R24.** A thread with cô Nga of the homestay family. The messages come at fixed times and after events (data in `data/messages.json`). They hold the intro and the hints. Write them in friendly, plain English, with Vietnamese words where they are natural.
+- **R25.** The sender is cô Nga. Put her name and her speaker color in `data/messages.json`. She is also a person in the world, at the homestay, with a Southern voice.
 
 #### Sổ tay, Clock, Settings
 
@@ -124,7 +124,7 @@ The play-test driver needs: `raise_phone()`, `lower_phone()`, `open_app(name)`, 
 
 Run each scenario at 1280×720 and 2400×1080.
 
-- **PT-18 `talk_listen`.** Start at 06:00. The first message from the host family arrives. Go to Bà Tư and talk with the phone down. Her audio plays, and the Vietnamese subtitle shows. Raise the phone, open Listen. The transcript is empty. Choose "Dạ, cô nói lại được không ạ?". She says the line again. Turn on Listen, and ask again. The transcript shows the line in Vietnamese and English. Answer with **Play**, then on a second visit with **I'll say it**. Check the two different answers.
+- **PT-18 `talk_listen`.** Start at 06:00. The first message from cô Nga arrives. Go to Bà Tư and talk with the phone down. Her audio plays, and the Vietnamese subtitle shows. Raise the phone, open Listen. The transcript is empty. Choose "Dạ, cô nói lại được không ạ?". She says the line again. Turn on Listen, and ask again. The transcript shows the line in Vietnamese and English. Answer with **Play**, then on a second visit with **I'll say it**. Check the two different answers.
 - **PT-19 `overhear`.** Two neighbors talk. Turn on Listen at 4 m. The lines go into the transcript. Walk to 15 m. No new line goes into the transcript, and no subtitle shows.
 - **PT-20 `reply_modes`.** For each reply type (phrase with Play, phrase with I'll say it, English, action in the world): give the reply and check the line ID of the answer.
 - **PT-21 `phone_apps`.** Open each app. Lens: point at Phở Cô Sáu at 06:00 and at 11:00, and check "Open now" and "Closed now". Clock: rest until 11:00. Sổ tay: the card count. Settings: change each setting, quit, start again, and check that they stay.
@@ -146,5 +146,5 @@ Change PT-01, PT-03, PT-04, PT-06, PT-08, PT-14, PT-16, and PT-17 to use the pho
 ## 8. Open questions
 
 - **Q1.** Do the VieNeu-TTS voices sound like people in Vũng Tàu? I decide after the audition. If no voice is good enough, the next choice is to record real people with their written consent.
-- **Q2.** The name of the young person of the host family who writes the messages (R25).
-- **Q3.** Which form of address does the player use with each person? The traveler is an adult. The first proposal: "cô" for Cô Sáu, "bà" for Bà Tư, "chú" for Chú Bảy, "bác" for Bác Hà, and "con" or "cháu" for the player in their answers.
+- **Q2.** Answered: cô Nga of the host family writes the messages (R25).
+- **Q3.** Answered for now: the forms of address below are correct. The traveler is an adult. "cô" for Cô Sáu, "bà" for Bà Tư, "chú" for Chú Bảy, "bác" for Bác Hà, and "con" or "cháu" for the player in their answers.

@@ -33,6 +33,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 |---|---|---|
 | 0001 | [Foundation and the walkable hẻm](0001-foundation.md) | Built |
 | 0002 | [First-person walking](0002-first-person.md) | Built |
+| 0003 | [Voices and the phone](0003-voices-and-phone.md) | Approved |
 
 ## Proposed order of the next plans
 
@@ -40,7 +41,7 @@ The order can change.
 
 | Number | Name | Content |
 |---|---|---|
-| 0003 | [Voices and the phone](0003-voices-and-phone.md) | Written, status "Draft". People speak aloud in Vietnamese with subtitles. The traveler's phone has Listen (transcribe and translate), Lens, Messages, Sổ tay, Clock, and Settings. It replaces the talk panel and the 2D sheets. |
+| 0003 | [Voices and the phone](0003-voices-and-phone.md) | Approved. People speak aloud in Vietnamese with subtitles. The traveler's phone has Listen (transcribe and translate), Lens, Messages, Sổ tay, Clock, and Settings. It replaces the talk panel and the 2D sheets. |
 | 0004 | [Real geography of Vũng Tàu](0004-real-geography.md) | Written, status "Draft". The real ground, hills, coast, beaches, sea, and roads, from OpenStreetMap and the Copernicus elevation data. |
 | 0005 | Known structures | Tượng Chúa Kitô Vua, Hải đăng, Bạch Dinh, Miếu Hòn Bà, Chùa Tam Bảo, the main bus station, the old markets, the big roundabout, Ngã Năm, and others that I name. Made by code from their real outlines and sizes. |
 | 0006 | Houses on the lots | A house generator with real proportions and a detail kit (shutters, balconies, wires, signs, plants). It puts houses on the lots between the roads. The homestay hẻm moves to its real place. |
