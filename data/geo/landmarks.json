@@ -1,68 +1,464 @@
 {
-	"note": "The places that tools/geo/build.py finds in the OSM data (plan 0003, R1). Each search is a set of OSM tags and a pattern for the names. A tag value of \"*\" matches each value. The hint is a known position. It helps when the data has more than one match, and fetch.py uses it to check the box.",
+	"note": "The places that tools/geo/build.py finds in the OSM data (plan 0003, R1). Each search is a set of OSM tags and a pattern for the names. A tag value of \"*\" matches each value. The hint is a known position. It helps when the data has more than one match, and fetch.py uses it to check the box. \"exact_name\": true accepts only a name that is the same, not a longer name that contains it (for example \"Vi Ba\", not \"Hẻm 14 Vi Ba\").",
 	"landmarks": [
 		{
 			"id": "bai_truoc",
 			"name_vi": "Bãi Trước",
-			"other_names": ["Front Beach", "Bãi Tầm Dương"],
-			"search": [{"tags": {"natural": "beach"}}, {"tags": {"place": "*"}}, {"tags": {"tourism": "*"}}],
-			"hint": {"lat": 10.3466, "lon": 107.0728}
+			"other_names": [
+				"Front Beach",
+				"Bãi Tầm Dương"
+			],
+			"search": [
+				{
+					"tags": {
+						"natural": "beach"
+					}
+				},
+				{
+					"tags": {
+						"place": "*"
+					}
+				},
+				{
+					"tags": {
+						"tourism": "*"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3466,
+				"lon": 107.0728
+			}
 		},
 		{
 			"id": "bai_sau",
 			"name_vi": "Bãi Sau",
-			"other_names": ["Back Beach", "Bãi Thùy Vân", "Thùy Vân"],
-			"search": [{"tags": {"natural": "beach"}}, {"tags": {"place": "*"}}, {"tags": {"tourism": "*"}}],
-			"hint": {"lat": 10.3460, "lon": 107.0960}
+			"other_names": [
+				"Back Beach",
+				"Bãi Thùy Vân",
+				"Thùy Vân"
+			],
+			"search": [
+				{
+					"tags": {
+						"natural": "beach"
+					}
+				},
+				{
+					"tags": {
+						"place": "*"
+					}
+				},
+				{
+					"tags": {
+						"tourism": "*"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.346,
+				"lon": 107.096
+			}
 		},
 		{
 			"id": "bai_dau",
 			"name_vi": "Bãi Dâu",
-			"other_names": ["Mulberry Beach"],
-			"search": [{"tags": {"natural": "beach"}}, {"tags": {"place": "*"}}, {"tags": {"tourism": "*"}}],
-			"hint": {"lat": 10.3725, "lon": 107.0625}
+			"other_names": [
+				"Mulberry Beach"
+			],
+			"search": [
+				{
+					"tags": {
+						"natural": "beach"
+					}
+				},
+				{
+					"tags": {
+						"place": "*"
+					}
+				},
+				{
+					"tags": {
+						"tourism": "*"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3725,
+				"lon": 107.0625
+			}
 		},
 		{
 			"id": "mui_nghinh_phong",
 			"name_vi": "Mũi Nghinh Phong",
-			"other_names": ["Nghinh Phong Cape", "Mũi Vũng Tàu"],
-			"search": [{"tags": {"natural": "cape"}}, {"tags": {"tourism": "*"}}, {"tags": {"natural": "*"}}],
-			"hint": {"lat": 10.3205, "lon": 107.0845}
+			"other_names": [
+				"Nghinh Phong Cape",
+				"Mũi Vũng Tàu"
+			],
+			"search": [
+				{
+					"tags": {
+						"natural": "cape"
+					}
+				},
+				{
+					"tags": {
+						"tourism": "*"
+					}
+				},
+				{
+					"tags": {
+						"natural": "*"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3205,
+				"lon": 107.0845
+			}
 		},
 		{
 			"id": "nui_lon",
 			"name_vi": "Núi Lớn",
-			"other_names": ["Núi Tương Kỳ", "Tương Kỳ", "Big Mountain"],
-			"search": [{"tags": {"natural": "peak"}}, {"tags": {"natural": "hill"}}, {"tags": {"natural": "*"}}],
-			"hint": {"lat": 10.3579, "lon": 107.0671}
+			"other_names": [
+				"Núi Tương Kỳ",
+				"Tương Kỳ",
+				"Big Mountain"
+			],
+			"search": [
+				{
+					"tags": {
+						"natural": "peak"
+					}
+				},
+				{
+					"tags": {
+						"natural": "hill"
+					}
+				},
+				{
+					"tags": {
+						"natural": "*"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3579,
+				"lon": 107.0671
+			}
 		},
 		{
 			"id": "nui_nho",
 			"name_vi": "Núi Nhỏ",
-			"other_names": ["Núi Tao Phùng", "Small Mountain"],
-			"search": [{"tags": {"natural": "peak"}}, {"tags": {"natural": "hill"}}, {"tags": {"natural": "*"}}],
-			"hint": {"lat": 10.3343, "lon": 107.0774}
+			"other_names": [
+				"Núi Tao Phùng",
+				"Small Mountain"
+			],
+			"search": [
+				{
+					"tags": {
+						"natural": "peak"
+					}
+				},
+				{
+					"tags": {
+						"natural": "hill"
+					}
+				},
+				{
+					"tags": {
+						"natural": "*"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3343,
+				"lon": 107.0774
+			}
 		},
 		{
 			"id": "chua_kito_vua",
 			"name_vi": "Tượng Chúa Kitô Vua",
-			"other_names": ["Tượng Chúa Ki-tô Vua", "Tượng Chúa Giang Tay", "Christ of Vũng Tàu", "Christ the King"],
-			"search": [{"tags": {"man_made": "*"}}, {"tags": {"tourism": "*"}}, {"tags": {"historic": "*"}}, {"tags": {"amenity": "*"}}],
-			"hint": {"lat": 10.3258, "lon": 107.0848}
+			"other_names": [
+				"Tượng Chúa Ki-tô Vua",
+				"Tượng Chúa Giang Tay",
+				"Christ of Vũng Tàu",
+				"Christ the King"
+			],
+			"search": [
+				{
+					"tags": {
+						"man_made": "*"
+					}
+				},
+				{
+					"tags": {
+						"tourism": "*"
+					}
+				},
+				{
+					"tags": {
+						"historic": "*"
+					}
+				},
+				{
+					"tags": {
+						"amenity": "*"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3258,
+				"lon": 107.0848
+			}
 		},
 		{
 			"id": "hai_dang",
 			"name_vi": "Hải đăng Vũng Tàu",
-			"other_names": ["Ngọn Hải Đăng Vũng Tàu", "Vũng Tàu Lighthouse"],
-			"search": [{"tags": {"man_made": "lighthouse"}}, {"tags": {"tourism": "*"}}],
-			"hint": {"lat": 10.3343, "lon": 107.0776}
+			"other_names": [
+				"Ngọn Hải Đăng Vũng Tàu",
+				"Vũng Tàu Lighthouse"
+			],
+			"search": [
+				{
+					"tags": {
+						"man_made": "lighthouse"
+					}
+				},
+				{
+					"tags": {
+						"tourism": "*"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3343,
+				"lon": 107.0776
+			}
 		},
 		{
 			"id": "bach_dinh",
 			"name_vi": "Bạch Dinh",
-			"other_names": ["Villa Blanche", "White Palace", "Bach Dinh"],
-			"search": [{"tags": {"tourism": "*"}}, {"tags": {"historic": "*"}}, {"tags": {"building": "*"}}],
-			"hint": {"lat": 10.3530, "lon": 107.0680}
+			"other_names": [
+				"Villa Blanche",
+				"White Palace",
+				"Bach Dinh"
+			],
+			"search": [
+				{
+					"tags": {
+						"tourism": "*"
+					}
+				},
+				{
+					"tags": {
+						"historic": "*"
+					}
+				},
+				{
+					"tags": {
+						"building": "*"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.353,
+				"lon": 107.068
+			}
+		},
+		{
+			"id": "mieu_hon_ba",
+			"name_vi": "Miếu Hòn Bà",
+			"other_names": [
+				"Miếu Bà",
+				"Hon Ba Temple"
+			],
+			"search": [
+				{
+					"tags": {
+						"amenity": "place_of_worship"
+					}
+				},
+				{
+					"tags": {
+						"building": "*"
+					}
+				},
+				{
+					"tags": {
+						"historic": "*"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3239,
+				"lon": 107.0893
+			}
+		},
+		{
+			"id": "chua_tam_bao",
+			"name_vi": "Chùa Tam Bảo",
+			"other_names": [
+				"Chùa Khỉ"
+			],
+			"search": [
+				{
+					"tags": {
+						"amenity": "place_of_worship"
+					}
+				},
+				{
+					"tags": {
+						"building": "*"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3553,
+				"lon": 107.0673
+			}
+		},
+		{
+			"id": "duong_vi_ba",
+			"name_vi": "Vi Ba",
+			"other_names": [
+				"Đường Vi Ba"
+			],
+			"exact_name": true,
+			"search": [
+				{
+					"tags": {
+						"highway": "*"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.356,
+				"lon": 107.069
+			}
+		},
+		{
+			"id": "duong_hai_dang",
+			"name_vi": "Hải Đăng",
+			"other_names": [
+				"Đường Hải Đăng"
+			],
+			"exact_name": true,
+			"search": [
+				{
+					"tags": {
+						"highway": "*"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3355,
+				"lon": 107.0765
+			}
+		},
+		{
+			"id": "ben_xe",
+			"name_vi": "Bến xe Vũng Tàu",
+			"other_names": [
+				"Vũng Tàu Bus Station"
+			],
+			"search": [
+				{
+					"tags": {
+						"amenity": "bus_station"
+					}
+				},
+				{
+					"tags": {
+						"public_transport": "station"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3505,
+				"lon": 107.087
+			}
+		},
+		{
+			"id": "cho_vung_tau",
+			"name_vi": "Chợ Vũng Tàu",
+			"other_names": [
+				"Chợ Mới"
+			],
+			"search": [
+				{
+					"tags": {
+						"amenity": "marketplace"
+					}
+				},
+				{
+					"tags": {
+						"landuse": "retail"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.35,
+				"lon": 107.079
+			}
+		},
+		{
+			"id": "cho_xom_luoi",
+			"name_vi": "Chợ Xóm Lưới",
+			"other_names": [],
+			"search": [
+				{
+					"tags": {
+						"amenity": "marketplace"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3415,
+				"lon": 107.0761
+			}
+		},
+		{
+			"id": "vong_xoay_lon",
+			"name_vi": "Vòng xoay Đài tưởng niệm Liệt sĩ",
+			"other_names": [
+				"Vòng xoay Đài Liệt sĩ"
+			],
+			"search": [
+				{
+					"tags": {
+						"junction": "roundabout"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.346,
+				"lon": 107.085
+			}
+		},
+		{
+			"id": "nga_nam",
+			"name_vi": "Ngã Năm",
+			"other_names": [
+				"Ngã 5"
+			],
+			"exact_name": true,
+			"search": [
+				{
+					"tags": {
+						"junction": "*"
+					}
+				},
+				{
+					"tags": {
+						"place": "*"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3549,
+				"lon": 107.0849
+			}
 		}
 	]
 }

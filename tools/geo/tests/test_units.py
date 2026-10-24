@@ -208,3 +208,38 @@ def test_lunar_date(solar, expected):
     year, month, day = solar
     d, m, _y, leap = lunar.solar_to_lunar(day, month, year)
     assert (d, m, leap) == expected
+
+
+def test_town_anchors():
+    """A bus station, a market, a roundabout of two ways, and a junction of 5 arms (R6a)."""
+    from types import SimpleNamespace as NS
+
+    import numpy as np
+
+    from geodata import anchors
+
+    class Identity:
+        def to_map(self, lon, lat):
+            return np.asarray(lon, dtype=float), np.asarray(lat, dtype=float)
+
+    def road(ref_list, points, kind="residential", name="A"):
+        return NS(type=kind, refs=ref_list, node_points=np.array(points, dtype=float), name=name)
+
+    data = NS(
+        nodes=[NS(id=1, lon=0.0, lat=0.0, tags={"amenity": "bus_station", "name": "Bến xe"}),
+               NS(id=2, lon=10.0, lat=0.0, tags={"amenity": "marketplace", "name": "Chợ"}),
+               NS(id=50, lon=100.0, lat=100.0, tags={"junction": "yes", "name": "Ngã Năm"})],
+        areas=[],
+        ways=[NS(id=7, tags={"junction": "roundabout", "name": "Vòng xoay"}, refs=[20, 21, 22], coords=[(0, 50), (5, 55), (10, 50)]),
+              NS(id=8, tags={"junction": "roundabout"}, refs=[22, 23, 20], coords=[(10, 50), (5, 45), (0, 50)])],
+    )
+    roads = [road([40, 50, 41], [(90, 100), (100, 100), (110, 100)]),
+             road([42, 50, 43], [(100, 90), (100, 100), (100, 110)], name="B"),
+             road([50, 44], [(100, 100), (120, 120)], name="C"),
+             road([60, 61, 62], [(0, 0), (1, 1), (2, 2)])]
+    found = anchors.find(data, Identity(), roads)
+    kinds = [a["kind"] for a in found]
+    assert kinds == ["bus_station", "marketplace", "roundabout", "junction"]
+    assert found[2]["name"] == "Vòng xoay"
+    assert found[3]["name"] == "Ngã Năm" and found[3]["osm"] == "node/50"
+    assert [a["number"] for a in found] == [1, 2, 3, 4]

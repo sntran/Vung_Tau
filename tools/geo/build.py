@@ -23,6 +23,7 @@ from shapely.geometry import Polygon
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from geodata import blocks as blocks_module  # noqa: E402
+from geodata import anchors as anchors_module  # noqa: E402
 from geodata import coast, homestay, landmarks, mapdraw, osm, roads as roads_module, terrain  # noqa: E402
 from geodata.config import BUILD, GEO, RAW, Config, load_json, write_json  # noqa: E402
 from geodata.projection import Projection, map_to_game  # noqa: E402
@@ -150,6 +151,8 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     log("ground done")
 
     found = landmarks.find_all(config, data, projection, grid)
+    anchor_list = anchors_module.find(data, projection, roads)
+    log(f"{len(anchor_list)} town anchor candidates")
     found_by_id = {r["id"]: r for r in found}
     block_list = blocks_module.make_blocks(roads, land, buildings, landuse)
     log(f"{len(block_list)} blocks")
@@ -218,8 +221,11 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     if center is not None:
         mapdraw.draw(out / "homestay_area.png", center, roads, land, beaches, block_list, buildings, home)
         write_keep_import(out / "homestay_area.png")
+    anchors_module.draw(out / "anchors.png", anchor_list, roads, land)
+    write_keep_import(out / "anchors.png")
+    write_json(out / "anchors.json", {"anchors": [{k: v for k, v in a.items() if k != "map"} for a in anchor_list]})
     write_report(out / "report.md", world, data, roads, block_list, buildings, found, home, problems,
-                 town_change, dem_max, raw, rock_cells, out)
+                 town_change, dem_max, raw, rock_cells, out, anchor_list)
     log(f"done in {time.time() - started:.0f} s")
     return 0
 
@@ -305,7 +311,7 @@ def homestay_record(home: dict) -> dict:
 
 
 def write_report(path, world, data, roads, block_list, buildings, found, home, problems, town_change, dem_max, raw,
-                 rock_cells=0, out=None):
+                 rock_cells=0, out=None, anchor_list=None):
     manifest = load_json(raw / "manifest.json") if (raw / "manifest.json").exists() else {"files": []}
     lines = ["# Geodata report", "", f"Made by `tools/geo/build.py` on {datetime.date.today().isoformat()}.", ""]
     lines += ["## Extents", "", "| Item | Value |", "|---|---|",
@@ -370,7 +376,8 @@ def write_report(path, world, data, roads, block_list, buildings, found, home, p
     else:
         lines.append("- The tide: `tide.json` is not there. Run tools/geo/tide.py before build.py.")
         problems = problems + ["tide.json is not there"]
-    lines += ["", "## Corrections from overrides.json", ""]
+    lines += [""] + anchors_module.report_lines(anchor_list or [])
+    lines += ["## Corrections from overrides.json", ""]
     lines += [f"- {c}" for c in data.corrections] or ["None."]
     lines += ["", "## Problems with the data", ""]
     lines += [f"- {p}" for p in problems[:200]] or ["None."]

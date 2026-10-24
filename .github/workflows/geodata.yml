@@ -1,14 +1,12 @@
 name: Geodata
 
-# Downloads the OpenStreetMap data, the Copernicus DEM, and the ground textures,
-# builds data/geo/build/, and commits the changed files (plan 0003, D1 and R8).
-# The development workspace cannot reach these sources. Run this workflow by
-# hand on main. The commit goes to the branch that the workflow runs on.
+# Downloads the OpenStreetMap data, the Copernicus DEM, the ground textures,
+# and the EOT20 tide model, computes the tide (tide.py), builds
+# data/geo/build/, and commits the changed files (plan 0004, D1, D12, and R8).
+# Run this workflow by hand on main. The commit goes to the branch that the
+# workflow runs on.
 on:
   workflow_dispatch:
-  push:
-    branches: [feat/0003-real-geography]
-    paths: [".github/workflows/geodata.yml", "tools/geo/fetch.py", "data/geo/area.json"]
 
 permissions:
   contents: write
@@ -21,7 +19,7 @@ jobs:
   geodata:
     name: Fetch and build the geodata
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
@@ -42,6 +40,15 @@ jobs:
       - name: Download the source data
         run: python tools/geo/fetch.py
 
+      - name: Cache the EOT20 tide model
+        uses: actions/cache@v4
+        with:
+          path: build/eot
+          key: eot20-ocean-tides-v1
+
+      - name: Compute the tide
+        run: python tools/geo/tide.py --eot build/eot
+
       - name: Build the game data
         run: python tools/geo/build.py
 
@@ -55,7 +62,9 @@ jobs:
           name: geodata-report
           path: |
             data/geo/build/report.md
+            data/geo/build/tide_report.md
             data/geo/build/homestay_area.png
+            data/geo/build/anchors.png
             data/geo/raw/manifest.json
           if-no-files-found: warn
 

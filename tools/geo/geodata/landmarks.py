@@ -22,9 +22,10 @@ def _matches_tags(tags: dict, wanted: dict) -> bool:
 
 def _matches_name(tags: dict, landmark: dict) -> bool:
     wanted = [fold(landmark["name_vi"])] + [fold(n) for n in landmark.get("other_names", [])]
+    exact = landmark.get("exact_name", False)
     for name in names(tags):
         folded = fold(name)
-        if any(w == folded or w in folded for w in wanted):
+        if any(w == folded or (not exact and w in folded) for w in wanted):
             return True
     return False
 
