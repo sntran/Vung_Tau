@@ -188,3 +188,23 @@ def test_grade_limit():
     limited = terrain.limit_grade(profile, spacing, 0.25)
     assert np.all(np.abs(np.diff(limited)) <= 0.5 + 0.01)
     assert limited.mean() == pytest.approx(profile.mean(), abs=0.01)
+
+
+# The lunar calendar (D13): Tết (1/1), mid-autumn (15/8), and leap months.
+LUNAR_DATES = [
+    ((2019, 2, 5), (1, 1, False)), ((2020, 1, 25), (1, 1, False)), ((2021, 2, 12), (1, 1, False)),
+    ((2022, 2, 1), (1, 1, False)), ((2023, 1, 22), (1, 1, False)), ((2024, 2, 10), (1, 1, False)),
+    ((2025, 1, 29), (1, 1, False)), ((2026, 2, 17), (1, 1, False)), ((2027, 2, 6), (1, 1, False)),
+    ((2024, 9, 17), (15, 8, False)), ((2025, 10, 6), (15, 8, False)), ((2023, 9, 29), (15, 8, False)),
+    ((2023, 3, 22), (1, 2, True)), ((2020, 5, 23), (1, 4, True)), ((2025, 7, 25), (1, 6, True)),
+    ((2025, 8, 23), (1, 7, False)), ((2026, 10, 24), (15, 9, False)), ((2000, 2, 5), (1, 1, False)),
+    ((2033, 12, 22), (1, 11, True)), ((2024, 2, 9), (30, 12, False)),
+]
+
+
+@pytest.mark.parametrize("solar, expected", LUNAR_DATES)
+def test_lunar_date(solar, expected):
+    from geodata import lunar
+    year, month, day = solar
+    d, m, _y, leap = lunar.solar_to_lunar(day, month, year)
+    assert (d, m, leap) == expected

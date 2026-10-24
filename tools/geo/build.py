@@ -29,6 +29,9 @@ from geodata.projection import Projection, map_to_game  # noqa: E402
 
 ROAD_POINT_STEP_M = 4.0
 WOOD_TAGS = {("natural", "wood"), ("landuse", "forest"), ("natural", "scrub")}
+SEA_ROCK_TAGS = {"rock", "reef", "bare_rock"}
+# tide.py writes these files before build.py runs. build.py keeps them.
+TIDE_FILES = ("tide.json", "tide_report.md")
 BUILT_LANDUSE = {"residential", "commercial", "retail", "industrial", "construction", "military", "religious"}
 # A place where the roads cover more than this part of the ground (in a
 # Gaussian of TOWN_ROAD_SIGMA_M) is town.
@@ -87,7 +90,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
 
     box = coast.box_polygon(config.bbox, projection)
     land = coast.land_polygon(coast.coastline_lines(data.ways, projection), box, problems)
-    beaches, beach_records, buildings, landuse, woods, water = [], [], [], [], [], []
+    beaches, beach_records, buildings, landuse, woods, water, rocks = [], [], [], [], [], [], []
     for a in data.areas:
         shape = to_map_geometry(a.geometry, projection).intersection(box)
         if shape.is_empty:
@@ -103,9 +106,16 @@ def build(raw: Path, out: Path, geo: Path) -> int:
             woods.append(shape)
         if a.tags.get("natural") == "water" or "water" in a.tags:
             water.append(shape)
+        if a.tags.get("natural") in SEA_ROCK_TAGS:
+            rocks.append(shape)
+    for n in data.nodes:
+        if n.tags.get("natural") in SEA_ROCK_TAGS:
+            x, y = projection.to_map(np.array([n.lon]), np.array([n.lat]))
+            rocks.append(shapely.Point(float(x[0]), float(y[0])).buffer(terrain.SEA_ROCK_NODE_RADIUS_M))
     log(f"land {land.area / 1e6:.2f} km2, {len(beaches)} beaches, {len(buildings)} buildings")
 
-    roads = roads_module.make_roads(data.ways, projection, config.road_widths)
+    ridge_way = find_ridge(config, data, problems)
+    roads = roads_module.make_roads([w for w in data.ways if w is not ridge_way], projection, config.road_widths)
     for road in roads:
         road.points = roads_module.densify(road.points, ROAD_POINT_STEP_M)
     network = roads_module.Network(roads)
@@ -122,6 +132,18 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     land_mask = terrain.rasterize(grid, polygons_of(land))
     beach_mask = terrain.rasterize(grid, [p for b in beaches for p in polygons_of(b)]) & land_mask
     terrain.shape_coast(grid, land_mask, beach_mask)
+    rock_cells = terrain.raise_sea_rocks(grid, land_mask, terrain.rasterize(grid, [p for r in rocks for p in polygons_of(r)]))
+    ridge = None
+    if ridge_way is not None:
+        lon, lat = zip(*ridge_way.coords)
+        x, y = projection.to_map(np.array(lon), np.array(lat))
+        line = shapely.LineString(np.column_stack([x, y]))
+        top, width = float(config.hon_ba["ridge_top_m"]), float(config.hon_ba["ridge_width_m"])
+        cells = terrain.make_ridge(grid, land_mask, line, top, width)
+        ridge = {"name": config.hon_ba["ridge_name"], "osm": f"way/{ridge_way.id}", "top_m": top, "width_m": width,
+                 "length_m": round(line.length, 1), "sea_cells": cells, "points": map_to_game(line.coords)}
+        log(f"Hòn Bà ridge {line.length:.0f} m at {top:+.2f} m")
+    log(f"{len(rocks)} rocks, {rock_cells} sea rock cells")
     terrain.flatten_roads(grid, roads, ROAD_POINT_STEP_M)
     for road in roads:
         road.heights = grid.sample(road.points[:, 0], -road.points[:, 1]).tolist()
@@ -137,9 +159,13 @@ def build(raw: Path, out: Path, geo: Path) -> int:
         beach_outline = to_map_geometry(beach_outline_lonlat, projection)
     home = homestay.find(roads, network, found_by_id, beach_outline, block_list)
 
-    # Write the files.
+    # Write the files. Keep the files of tide.py.
+    kept = {name: (out / name).read_bytes() for name in TIDE_FILES if (out / name).exists()}
     if out.exists():
         shutil.rmtree(out)
+    out.mkdir(parents=True)
+    for name, content in kept.items():
+        (out / name).write_bytes(content)
     (out / "height").mkdir(parents=True)
     chunks = terrain.write_chunks(grid, land_mask, area["chunk_size_m"], area["sea_chunk_margin_m"],
                                   area["height_offset_m"], area["height_step_m"], out / "height")
@@ -169,7 +195,11 @@ def build(raw: Path, out: Path, geo: Path) -> int:
         "chunks": chunks,
         "overview": overview,
         "surface": surface,
+        "sea_floor": {"coast_m": terrain.LAND_MIN_HEIGHT, "depth_m": -terrain.SEA_FLOOR_DEPTH,
+                      "slope_m": terrain.SEA_FLOOR_SLOPE_M, "rock_m": terrain.SEA_ROCK_HEIGHT},
     }
+    if ridge is not None:
+        world["hon_ba_ridge"] = ridge
     write_json(out / "world.json", world)
     write_json(out / "coastline.json", {"lines": [map_to_game(l.coords) for l in coast.coastline_lines(data.ways, projection)]}, None)
     write_json(out / "land.json", {"polygons": [blocks_module.polygon_to_game(p.simplify(1.0)) for p in polygons_of(land)]}, None)
@@ -189,9 +219,20 @@ def build(raw: Path, out: Path, geo: Path) -> int:
         mapdraw.draw(out / "homestay_area.png", center, roads, land, beaches, block_list, buildings, home)
         write_keep_import(out / "homestay_area.png")
     write_report(out / "report.md", world, data, roads, block_list, buildings, found, home, problems,
-                 town_change, dem_max, raw)
+                 town_change, dem_max, raw, rock_cells, out)
     log(f"done in {time.time() - started:.0f} s")
     return 0
+
+
+def find_ridge(config: Config, data, problems: list[str]):
+    """The way of the Hòn Bà ridge (R8h): the OSM way in hon_ba.json, or a way of overrides.json with that name."""
+    if config.hon_ba is None:
+        return None
+    for way in data.ways:
+        if way.id == config.hon_ba["ridge_way"] or (way.source != "osm" and way.tags.get("name") == config.hon_ba["ridge_name"]):
+            return way
+    problems.append(f"the Hòn Bà ridge (way {config.hon_ba['ridge_way']}) is not in the data. Put it in overrides.json.")
+    return None
 
 
 def road_record(road) -> dict:
@@ -235,7 +276,8 @@ def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods,
         return np.clip(np.round(smooth[::every, ::every] * 255), 0, 255).astype(np.uint8)
 
     alpha = np.clip(np.round((signed[::every, ::every] + limit) / (2 * limit) * 255), 0, 255).astype(np.uint8)
-    image = np.dstack([channel(beach_mask), channel(town), channel(wood), alpha])
+    # The sea floor is sand: the low tide shows it.
+    image = np.dstack([channel(beach_mask | ~land_mask), channel(town), channel(wood), alpha])
     Image.fromarray(image, "RGBA").save(path)
     return {"x0": grid.x0, "z0": grid.z0, "step": grid.step * every, "columns": image.shape[1], "rows": image.shape[0],
             "coast_range_m": limit}
@@ -262,7 +304,8 @@ def homestay_record(home: dict) -> dict:
     return record
 
 
-def write_report(path, world, data, roads, block_list, buildings, found, home, problems, town_change, dem_max, raw):
+def write_report(path, world, data, roads, block_list, buildings, found, home, problems, town_change, dem_max, raw,
+                 rock_cells=0, out=None):
     manifest = load_json(raw / "manifest.json") if (raw / "manifest.json").exists() else {"files": []}
     lines = ["# Geodata report", "", f"Made by `tools/geo/build.py` on {datetime.date.today().isoformat()}.", ""]
     lines += ["## Extents", "", "| Item | Value |", "|---|---|",
@@ -307,6 +350,26 @@ def write_report(path, world, data, roads, block_list, buildings, found, home, p
         lines.append(f"- Candidate {i}: way {c['road'].id} ({c['road'].name or 'no name'}), {c['angle_diff_deg']}° from the direction before the curve.")
     for p in home["problems"]:
         lines.append(f"- Problem: {p}")
+    floor = world["sea_floor"]
+    lines += ["", "## The sea floor, the rocks, and the Hòn Bà ridge (R8g, R8h)", "",
+              f"- The sea floor slopes from {floor['coast_m']:+.1f} m at the coastline to {floor['depth_m']:+.1f} m "
+              f"over {floor['slope_m']:.0f} m, then stays at {floor['depth_m']:+.1f} m.",
+              f"- Rocks in the sea: {rock_cells} grid cells at {floor['rock_m']:+.1f} m."]
+    ridge = world.get("hon_ba_ridge")
+    if ridge:
+        lines.append(f"- The ridge {ridge['name']} ({ridge['osm']}): {ridge['length_m']:.0f} m long, "
+                     f"{ridge['width_m']:.0f} m wide, top at {ridge['top_m']:+.2f} m.")
+    else:
+        lines.append("- The Hòn Bà ridge is not in the data.")
+    tide_report = out / "tide_report.md" if out else None
+    if tide_report and tide_report.exists():
+        lines.append("- The tide: see `tide_report.md`.")
+        text = tide_report.read_text(encoding="utf-8")
+        tide_problems = text.split("## Problems", 1)[1].strip().splitlines() if "## Problems" in text else []
+        problems = problems + [f"tide: {p[2:]}" for p in tide_problems if p.startswith("- ")]
+    else:
+        lines.append("- The tide: `tide.json` is not there. Run tools/geo/tide.py before build.py.")
+        problems = problems + ["tide.json is not there"]
     lines += ["", "## Corrections from overrides.json", ""]
     lines += [f"- {c}" for c in data.corrections] or ["None."]
     lines += ["", "## Problems with the data", ""]

@@ -34,6 +34,8 @@ class Config:
         self.road_widths = load_json(geo / "road_widths.json")
         overrides = geo / "overrides.json"
         self.overrides = load_json(overrides)["corrections"] if overrides.exists() else []
+        hon_ba = geo / "hon_ba.json"
+        self.hon_ba = load_json(hon_ba) if hon_ba.exists() else None
 
     @property
     def bbox(self) -> tuple[float, float, float, float]:

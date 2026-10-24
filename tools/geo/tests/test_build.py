@@ -5,7 +5,7 @@ import json
 import numpy as np
 import pytest
 
-from geodata import pngio
+from geodata import pngio, terrain
 
 
 def load(build, name):
@@ -126,8 +126,10 @@ def test_beach_slopes_to_the_water(small_build):
     x, z = found["bai_truoc"]["position"]
     # The beach is from about x = -23 (the water line) to x = +27 near the origin.
     assert ground.height(x - 20, z) < ground.height(x + 10, z)
-    assert 0.0 < ground.height(x - 20, z) < 0.6
-    assert ground.height(x - 40, z) < -0.5, "the sea is deeper than 0.5 m at 20 m from the beach"
+    assert terrain.LAND_MIN_HEIGHT <= ground.height(x - 20, z) < terrain.LAND_MIN_HEIGHT + 0.6
+    # The sea floor slopes down to SEA_FLOOR_DEPTH over 80 m (R8g).
+    assert ground.height(x - 40, z) < ground.height(x - 23, z) - 0.5
+    assert ground.height(x - 120, z) == pytest.approx(-terrain.SEA_FLOOR_DEPTH, abs=0.05)
 
 
 def test_blocks(small_build):

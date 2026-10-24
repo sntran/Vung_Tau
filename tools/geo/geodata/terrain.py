@@ -17,15 +17,23 @@ from scipy import ndimage
 
 from . import pngio
 
-# The ground slope of a beach from the water line, and of the sea floor.
+# The ground slope of a beach from the water line.
 BEACH_SLOPE = 1.0 / 20.0
-SEA_SLOPE_BEACH = 1.0 / 25.0
-SEA_SLOPE_ROCK = 1.0 / 6.0
-SEA_MAX_DEPTH = 15.0
+# The DEM has no sea floor (R8g). From the coastline, the sea floor slopes
+# down to SEA_FLOOR_DEPTH over SEA_FLOOR_SLOPE_M, then stays at that depth.
+SEA_FLOOR_DEPTH = 4.0
+SEA_FLOOR_SLOPE_M = 80.0
+# Rocks in the sea (natural=rock, reef, bare_rock) rise to this height.
+SEA_ROCK_HEIGHT = 0.5
+# A rock that is only a node in OSM has this radius.
+SEA_ROCK_NODE_RADIUS_M = 3.0
+# The side slope of the Hòn Bà ridge (1 m down for each meter out).
+RIDGE_SIDE_SLOPE = 1.0
 # The width of the band at the land side of a beach, where the beach slope meets the ground.
 BEACH_BLEND_M = 10.0
-# The lowest ground height on land, so that the sea does not cover the land.
-LAND_MIN_HEIGHT = 0.25
+# The lowest ground height on land. The OSM coastline is the line of the
+# mean high water, so the land is above most high tides (D12).
+LAND_MIN_HEIGHT = 1.2
 # The width at each side of a road where the flat road meets the ground.
 ROAD_SHOULDER_M = 1.5
 # The length of the moving average of the road height along a road.
@@ -126,11 +134,10 @@ def remove_buildings(grid: Grid, town: np.ndarray) -> float:
 
 
 def shape_coast(grid: Grid, land: np.ndarray, beach: np.ndarray) -> None:
-    """Makes the land higher than the sea, the beaches slope down to the water, and the sea floor (D7)."""
+    """Makes the land higher than the sea, the beaches slope down to the water, and the sea floor (D7, R8g)."""
     h = grid.heights
     to_sea = ndimage.distance_transform_edt(land).astype(np.float32) * grid.step
     to_land = ndimage.distance_transform_edt(~land).astype(np.float32) * grid.step
-    to_beach = ndimage.distance_transform_edt(~beach).astype(np.float32) * grid.step
     np.maximum(h, LAND_MIN_HEIGHT, out=h, where=land)
     # A beach: the slope from the water line, with a blend band at the land side.
     to_dry_land = ndimage.distance_transform_edt(beach | ~land).astype(np.float32) * grid.step
@@ -138,11 +145,29 @@ def shape_coast(grid: Grid, land: np.ndarray, beach: np.ndarray) -> None:
     slope = np.minimum(h, LAND_MIN_HEIGHT + to_sea * BEACH_SLOPE)
     shaped = h * (1 - weight) + slope * weight
     h[beach & land] = shaped[beach & land]
-    # The sea floor: a gentle slope near a beach, a steep slope near rocks.
-    near_beach = np.clip(1.0 - to_beach / 150.0, 0.0, 1.0)
-    sea_slope = SEA_SLOPE_ROCK * (1 - near_beach) + SEA_SLOPE_BEACH * near_beach
+    # The sea floor: from the coastline down to SEA_FLOOR_DEPTH, then flat.
     sea = ~land
-    h[sea] = -np.minimum(SEA_MAX_DEPTH, to_land[sea] * sea_slope[sea])
+    part = np.minimum(1.0, to_land[sea] / SEA_FLOOR_SLOPE_M)
+    h[sea] = LAND_MIN_HEIGHT - (LAND_MIN_HEIGHT + SEA_FLOOR_DEPTH) * part
+
+
+def raise_sea_rocks(grid: Grid, land: np.ndarray, rocks: np.ndarray) -> int:
+    """Rocks in the sea rise to SEA_ROCK_HEIGHT (R8g). Returns the number of grid cells."""
+    cells = rocks & ~land
+    np.maximum(grid.heights, SEA_ROCK_HEIGHT, out=grid.heights, where=cells)
+    return int(cells.sum())
+
+
+def make_ridge(grid: Grid, land: np.ndarray, line, top: float, width: float) -> int:
+    """The rock ridge to Hòn Bà (R8h): a flat top at the height top, with sides
+    down to the sea floor. line is a shapely LineString in map coordinates.
+    Returns the number of grid cells at the top height."""
+    core = rasterize(grid, [line.buffer(width / 2.0 + grid.step / 2.0)])
+    distance = ndimage.distance_transform_edt(~core).astype(np.float32) * grid.step
+    ridge = top - distance * RIDGE_SIDE_SLOPE
+    sea = ~land
+    np.maximum(grid.heights, ridge, out=grid.heights, where=sea)
+    return int((core & sea).sum())
 
 
 def smooth_profile(heights: np.ndarray, spacing: float, length: float) -> np.ndarray:

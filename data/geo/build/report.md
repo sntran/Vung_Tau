@@ -17,7 +17,7 @@ Made by `tools/geo/build.py` on 2026-10-24.
 
 ## Roads
 
-Total road length: 692.5 km. Roads with a width tag: 7 of 4124. Hẻm: 2365.
+Total road length: 692.3 km. Roads with a width tag: 7 of 4123. Hẻm: 2365.
 
 | Type | Roads | Length (km) |
 |---|---|---|
@@ -30,7 +30,7 @@ Total road length: 692.5 km. Roads with a width tag: 7 of 4124. Hẻm: 2365.
 | footway | 251 | 17.46 |
 | unclassified | 41 | 17.21 |
 | path | 50 | 16.90 |
-| track | 25 | 4.63 |
+| track | 24 | 4.42 |
 | steps | 88 | 2.21 |
 | pedestrian | 5 | 0.56 |
 | cycleway | 1 | 0.14 |
@@ -38,18 +38,18 @@ Total road length: 692.5 km. Roads with a width tag: 7 of 4124. Hẻm: 2365.
 
 ## Blocks and buildings
 
-- Blocks: 1976.
-- Blocks with OSM building outlines: 410.
+- Blocks: 1975.
+- Blocks with OSM building outlines: 409.
 - Buildings: 2193.
 
 ## Landmarks
 
 | Landmark | Found | OSM | Position (game X, Z) | Height (m) | Note |
 |---|---|---|---|---|---|
-| Bãi Trước | yes | way/220821647 | -2.55, -1.31 | 0.25 | 3 candidates, 347.9 m from the hint |
-| Bãi Sau | yes | way/234800751 | 2463.57, 115.52 | -4.16 | 5 candidates, 391.9 m from the hint |
-| Bãi Dâu | yes | way/895756059 | -1377.16, -2753.98 | 0.19 | 3 candidates, 435.3 m from the hint |
-| Mũi Nghinh Phong | yes | node/2435353682 | 1076.55, 2561.69 | 0.44 | 1 candidates, 85.4 m from the hint |
+| Bãi Trước | yes | way/220821647 | -2.55, -1.31 | 1.2 | 3 candidates, 347.9 m from the hint |
+| Bãi Sau | yes | way/234800751 | 2463.57, 115.52 | -2.07 | 5 candidates, 391.9 m from the hint |
+| Bãi Dâu | yes | way/895756059 | -1377.16, -2753.98 | 1.12 | 3 candidates, 435.3 m from the hint |
+| Mũi Nghinh Phong | yes | node/2435353682 | 1076.55, 2561.69 | 1.2 | 1 candidates, 85.4 m from the hint |
 | Núi Lớn | yes | node/2452682527 | -649.2, -1712.32 | 238.42 | 1 candidates, 188.9 m from the hint |
 | Núi Nhỏ | yes | node/-1 | 374.1, 1035.7 | 175.6 | 1 candidates, 0.0 m from the hint |
 | Tượng Chúa Kitô Vua | yes | way/235008112 | 1159.87, 1893.39 | 138.33 | 1 candidates, 83.3 m from the hint |
@@ -61,6 +61,13 @@ Total road length: 692.5 km. Roads with a width tag: 7 of 4124. Hẻm: 2365.
 Found: way 1408726731 (Hẻm 2 Hải Đăng, unclassified, 3.5 m wide, 567 m long). Check it on `homestay_area.png`.
 The first curve of the lighthouse road turns -172° between 116 m and 138 m from the bottom.
 - Candidate 1: way 1408726731 (Hẻm 2 Hải Đăng), 2.6° from the direction before the curve.
+
+## The sea floor, the rocks, and the Hòn Bà ridge (R8g, R8h)
+
+- The sea floor slopes from +1.2 m at the coastline to -4.0 m over 80 m, then stays at -4.0 m.
+- Rocks in the sea: 58 grid cells at +0.5 m.
+- The ridge Đường ra Hòn Bà (way/221906223): 206 m long, 4 m wide, top at -1.70 m.
+- The tide: see `tide_report.md`.
 
 ## Corrections from overrides.json
 

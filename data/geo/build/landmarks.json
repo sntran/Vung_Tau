@@ -15,7 +15,7 @@
 				-1.31
 			],
 			"candidates": 3,
-			"height": 0.25,
+			"height": 1.2,
 			"outline": [
 				[
 					-69.96,
@@ -128,7 +128,7 @@
 				115.52
 			],
 			"candidates": 5,
-			"height": -4.16,
+			"height": -2.07,
 			"outline": [
 				[
 					1541.93,
@@ -1461,7 +1461,7 @@
 				-2753.98
 			],
 			"candidates": 3,
-			"height": 0.19,
+			"height": 1.12,
 			"outline": [
 				[
 					-1497.5,
@@ -1642,7 +1642,7 @@
 				2561.69
 			],
 			"candidates": 1,
-			"height": 0.44,
+			"height": 1.2,
 			"distance_to_hint_m": 85.4
 		},
 		{
