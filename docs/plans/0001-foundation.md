@@ -20,7 +20,7 @@ The 3D models in this plan are simple shapes with correct proportions ("greybox"
 ## 2. Out of scope
 
 - Realistic models, textures, and people. (Plan 0002.)
-- The phở table and the eating flow. (Plan 0003.)
+- The phở table and the eating flow. (Plan 0007.)
 - Coffee, homestay meals, street snacks. (Later plans.)
 - Music and recorded sound.
 - Signed builds for the app stores.
@@ -94,7 +94,7 @@ tools/
 
 ### Content and data
 
-- **R5.** Move the content of the prototype (`docs/prototype/hem-2d.html`) into `data/`: the spots, the opening hours, the cards, and the hẻm dialogue. Do not move the phở table content. It is for plan 0003.
+- **R5.** Move the content of the prototype (`docs/prototype/hem-2d.html`) into `data/`: the spots, the opening hours, the cards, and the hẻm dialogue. Do not move the phở table content. It is for plan 0007.
 - **R6.** Each fact in the data has a `status` field with the value `confirmed`, `source`, or `check`, the same as in `docs/content/culture-notes.md`.
 - **R7.** `Content` checks the data when the game starts. In a debug build, it stops the game with a clear message when:
   - a dialogue choice points to a line ID that does not exist,

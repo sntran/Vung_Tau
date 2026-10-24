@@ -14,7 +14,7 @@ Plan 0001 stays the foundation: the data, the clock, the notebook, the talk pane
 
 ## 2. Out of scope
 
-- Models from photos of real places. (Plan 0003.)
+- Real places. (Plan 0004 and the plans after it.)
 - The phở table and the eating flow.
 - Running, jumping, and vehicles.
 
