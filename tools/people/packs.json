@@ -1,0 +1,32 @@
+{
+  "note": "The MakeHuman asset packs that the people build uses (plan 0006, R11). The license of each pack is from https://static.makehumancommunity.org/assets/assetpacks/index.html. The workflow people-packs.yml copies the packs to the release people-packs-1 of this repository. The build downloads them only from that release.",
+  "release": "people-packs-1",
+  "page": "https://static.makehumancommunity.org/assets/assetpacks/{name}.html",
+  "packs": {
+    "makehuman_system_assets": "CC0",
+    "makehuman_system_poses": "CC0",
+    "system_eye_materials01": "CC0",
+    "system_hair_materials01": "CC0",
+    "system_hair_materials02": "CC0",
+    "system_clothes_materials01": "CC0",
+    "skins01": "CC0",
+    "skins02": "CC0",
+    "skins03": "CC0",
+    "eyebrows01": "CC0",
+    "eyelashes01": "CC0",
+    "hair01": "CC0",
+    "hair02": "CC-BY",
+    "hair03": "CC-BY",
+    "shirts01": "CC0",
+    "shirts02": "CC-BY",
+    "pants01": "CC0",
+    "pants02": "CC-BY",
+    "shoes01": "CC0",
+    "hats01": "CC0",
+    "dress01": "CC0",
+    "skirts01": "CC0",
+    "poses01": "CC0",
+    "faceunits01": "CC0",
+    "visemes02": "CC0"
+  }
+}
