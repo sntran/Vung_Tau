@@ -13,7 +13,7 @@ Vũng Tàu is a 3D game about Vietnamese food and daily life. The player is a tr
 - **Audience:** adults who are not Vietnamese. They know phở from restaurants abroad. They do not know how people eat it in Vietnam.
 - **Goal:** the player learns how people in Vietnam really eat, order, and live around food. The player does not learn recipes.
 - **Setting:** Vũng Tàu today, with its real geography. The player stays at a family homestay in a small hẻm (alley) at the foot of Núi Nhỏ, near Bãi Trước (Front Beach).
-- **Platforms:** Android and iPhone apps. A web build is for quick review.
+- **Platforms:** desktop (Windows, macOS, Linux) is the main platform. Android and iPhone apps stay, with lower settings. A web build is for quick review (plan 0004, D1).
 - **Engine:** Godot 4.7.2-stable. See section 5.
 
 ## 2. Roles and workflow
@@ -67,13 +67,14 @@ These decisions are fixed. To change one, write the change in a plan and get my 
 | Topic | Decision | Reason |
 |---|---|---|
 | Engine | Godot 4.7.2-stable, GDScript | Free and open source. Exports to Android, iOS, and web. Runs without a GPU in a Linux workspace. |
-| Renderer | Mobile (Vulkan) on Android and iOS. Compatibility (WebGL 2) for the web build (plan 0002, D10). | The Mobile renderer gives better light on phones. It renders in the workspace with the Mesa software Vulkan driver (lavapipe), so the play tests take screenshots. Godot web exports support only the Compatibility renderer. |
+| Renderer | Forward+ on desktop. Mobile (Vulkan) on Android and iOS. Compatibility (WebGL 2) for the web build (plan 0004, D2). Quality presets Low, Medium, High, Ultra (plan 0004, D3). | A desktop graphics card shows more light and detail. The Mobile renderer gives better light on phones. Both render in the workspace with the Mesa software Vulkan driver (lavapipe). Forward+ with SSAO, SSIL, and SDFGI takes about 2 s for one frame there, so the logic play tests use the Mobile renderer. Godot web exports support only the Compatibility renderer. |
 | View and controls | First person at 1.6 m, landscape, base viewport 1280 × 720. Floating joystick on the left half, look drag on the right half, gyroscope look, tap to walk, a center dot and an action button (plan 0002). | The player walks around as in real life. |
 | Unit tests | GUT 9.7.1, kept in `addons/gut/` | Standard test addon for Godot 4. |
 | Play tests | Scenario scripts in `playtests/`, run by `tools/playtest.sh` under Xvfb | See plan 0001. |
 | Text language | English with Vietnamese terms | The audience reads English. |
 | Font | Be Vietnam Pro (SIL Open Font License) | Full Vietnamese diacritics. |
 | CI | GitHub Actions | The repository is public, so CI is free. |
+| Desktop builds | GitHub Actions: Windows, macOS (universal), Linux | Plan 0004. Not signed until the release plan. |
 | Android build | GitHub Actions, Ubuntu runner | The Android SDK cannot download in the development workspace. |
 | iOS build | GitHub Actions, macOS runner with Xcode | An iOS build always needs macOS and Xcode. Signed builds need a paid Apple Developer account. |
 

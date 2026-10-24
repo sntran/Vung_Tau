@@ -71,6 +71,13 @@ Status values:
 | Wild monkeys on Núi Lớn sometimes go into houses and bite people. | Source | [Tuổi Trẻ](https://tuoitre.vn/nui-lon.html) |
 | Town anchors that have been in the same place for a long time: the main bus station, the old markets, the big roundabout, and Ngã Năm. | Confirmed | First-hand. I will name the markets and the roundabout. |
 
+## Houses
+
+| Fact | Status | Source |
+|---|---|---|
+| Houses in Vũng Tàu are brick under plaster and paint. Brick shows only where plaster fell off, or on bare side walls that rise above a shorter neighbor. | Confirmed | First-hand |
+| A tube house is narrow (about 3 m to 4 m) and deep. It has 2 to 4 floors. The ground floor opens to the street with a roll-up shutter or a gate. It is often a small shop by day and a garage for scooters at night. The roof is flat, with laundry and plants. | Source | [Local Vietnam](https://localvietnam.com/?p=92926) |
+
 ## Daily life
 
 | Fact | Status | Source |

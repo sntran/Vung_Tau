@@ -1,16 +1,16 @@
-# 0004 Real geography of Vũng Tàu
+# 0005 Real geography of Vũng Tàu
 
 | Field | Value |
 |---|---|
 | Status | Draft |
-| Branch | `feat/0004-real-geography` |
-| Depends on | 0003 (status "Built") |
+| Branch | `feat/0005-real-geography` |
+| Depends on | 0004 (status "Built") |
 
 ## 1. Goal
 
 The player walks in first person on the real ground of Vũng Tàu: the real hills, the real coast, the real beaches, and the real roads.
 
-All shapes in this plan come from open data. Nothing comes from photos or from an artist. Plan 0005 adds the known structures (for example Bãi Trước, Mũi Nghinh Phong, Bãi Sau). Plan 0006 makes houses and puts them on the lots between the roads. This plan prepares the data for these two plans.
+All shapes in this plan come from open data. Nothing comes from photos or from an artist. Plan 0006 adds the known structures (for example Bãi Trước, Mũi Nghinh Phong, Bãi Sau). Plan 0007 makes houses and puts them on the lots between the roads. This plan prepares the data for these two plans.
 
 ## 2. Out of scope
 
@@ -18,7 +18,7 @@ All shapes in this plan come from open data. Nothing comes from photos or from a
 - People, cars, and scooters.
 - Swimming and boats.
 - The walk to Miếu Hòn Bà, the Vi Ba road activities, and the shops. Later plans add them. This plan only prepares their ground, their paths, and the tide.
-- A change to the hẻm of plans 0001 and 0002. That hẻm stays the main game scene until plan 0006. This plan makes a separate scene.
+- A change to the hẻm of plans 0001 and 0002. That hẻm stays the main game scene until plan 0007. This plan makes a separate scene.
 
 ## 3. Data sources
 
@@ -113,8 +113,8 @@ Required notices. Show them on a "Credits" screen in the game and in `assets/CRE
 - **R12.** Ground materials: sand on beaches, grass and trees on hills (use simple tree shapes for now), rock on steep slopes above 35°, and concrete on blocks. Use the CC0 scanned textures. Record each texture in `assets/CREDITS.md`.
 - **R13.** The sea follows D8 and D12. The sea surface moves up and down with the tide. The player cannot walk into water deeper than 0.5 m. A message says "The water is too deep here." The player can walk on the Hòn Bà ridge only when it is dry.
 - **R14.** The sun follows D9. Light at 06:00, 12:00, 18:00, and 21:00 must look different and correct for the time.
-- **R15.** Put a marker with the Vietnamese name above each landmark that the data found. Plan 0005 replaces the markers with structures.
-- **R16.** Performance on phones: the target is 30 frames per second on a mid-range Android phone from 2022. Show the frame rate with a debug key. The play tests record the frame time under lavapipe. That number is only for comparison between builds, not a phone result.
+- **R15.** Put a marker with the Vietnamese name above each landmark that the data found. Plan 0006 replaces the markers with structures.
+- **R16.** Performance: the targets of the quality presets in plan 0004 apply. On phones, the target is 30 frames per second on a mid-range Android phone from 2022, on the Low preset. Show the frame rate with a debug key. The play tests record the frame time under lavapipe. That number is only for comparison between builds.
 
 ### Tests
 
@@ -131,19 +131,19 @@ Required notices. Show them on a "Credits" screen in the game and in `assets/CRE
 
 Run each scenario at 1280×720.
 
-- **PT-25 `geo_views`.** Take screenshots from fixed viewpoints: Bãi Trước seen from the water, the top of Núi Nhỏ looking north, Mũi Nghinh Phong looking south, and Bãi Sau from the beach road. Take each one at 06:00, 12:00, and 18:00. The architect and I compare them with the real places.
-- **PT-26 `geo_walk_road`.** Walk 500 m along the road beside Bãi Trước with the joystick. The camera height above the road surface stays 1.6 m ± 0.1 m. The road name on the debug screen is the name from OSM.
-- **PT-27 `geo_beach`.** Walk from the road across the sand to the water. The player stops at the 0.5 m depth and the message shows.
-- **PT-28 `geo_hill`.** Walk up the road to the top of Núi Nhỏ. The player never goes through the ground. The player cannot walk up a slope that is steeper than 45° where there is no road.
-- **PT-29 `geo_chunks`.** Walk 2 km with tap to walk. At each frame, a ray down from the camera hits the ground or the sea. Record the time to load each chunk. No chunk takes more than 2 s under lavapipe.
-- **PT-30 `geo_tide`.** Start at a dry time from R8i, on the beach below Mũi Nghinh Phong. Walk the ridge to Hòn Bà with tap to walk. Then start 3 hours after the end of the dry time. The ridge is under water, and the player cannot walk on it. Take screenshots of the same view at low tide and high tide.
-- **PT-31 `geo_anchors`.** Take a screenshot at each town anchor and at each structure in R1, with the marker visible.
+- **PT-33 `geo_views`.** Take screenshots from fixed viewpoints: Bãi Trước seen from the water, the top of Núi Nhỏ looking north, Mũi Nghinh Phong looking south, and Bãi Sau from the beach road. Take each one at 06:00, 12:00, and 18:00. The architect and I compare them with the real places.
+- **PT-34 `geo_walk_road`.** Walk 500 m along the road beside Bãi Trước with the joystick. The camera height above the road surface stays 1.6 m ± 0.1 m. The road name on the debug screen is the name from OSM.
+- **PT-35 `geo_beach`.** Walk from the road across the sand to the water. The player stops at the 0.5 m depth and the message shows.
+- **PT-36 `geo_hill`.** Walk up the road to the top of Núi Nhỏ. The player never goes through the ground. The player cannot walk up a slope that is steeper than 45° where there is no road.
+- **PT-37 `geo_chunks`.** Walk 2 km with tap to walk. At each frame, a ray down from the camera hits the ground or the sea. Record the time to load each chunk. No chunk takes more than 2 s under lavapipe.
+- **PT-38 `geo_tide`.** Start at a dry time from R8i, on the beach below Mũi Nghinh Phong. Walk the ridge to Hòn Bà with tap to walk. Then start 3 hours after the end of the dry time. The ridge is under water, and the player cannot walk on it. Take screenshots of the same view at low tide and high tide.
+- **PT-39 `geo_anchors`.** Take a screenshot at each town anchor and at each structure in R1, with the marker visible.
 
 ## 7. Acceptance criteria
 
 1. The geodata workflow ran in CI. `anchors.png`, `homestay_area.png`, and the tide report exist. `data/geo/build/report.md` exists, and all landmarks in R1 are found, or the report says why not.
 2. All unit tests, Python tests, and play tests pass.
-3. I looked at the PT-25 screenshots and agree that the shapes of the hills, the coast, and the beaches are correct.
+3. I looked at the PT-33 screenshots and agree that the shapes of the hills, the coast, and the beaches are correct.
 4. The credits screen shows the OSM and Copernicus notices.
 5. `AGENTS.md` describes the geodata pipeline and the commands.
 
