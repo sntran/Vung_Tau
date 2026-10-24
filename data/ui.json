@@ -4,12 +4,36 @@
 	"beach_name": "Bãi Trước",
 	"beach_sub": "Front Beach · Ngày {day}",
 	"parts_of_day": [
-		{"before": 240, "vi": "đêm", "en": "night"},
-		{"before": 630, "vi": "sáng", "en": "morning"},
-		{"before": 780, "vi": "trưa", "en": "noon"},
-		{"before": 1080, "vi": "chiều", "en": "afternoon"},
-		{"before": 1320, "vi": "tối", "en": "evening"},
-		{"before": 1440, "vi": "đêm", "en": "night"}
+		{
+			"before": 240,
+			"vi": "đêm",
+			"en": "night"
+		},
+		{
+			"before": 630,
+			"vi": "sáng",
+			"en": "morning"
+		},
+		{
+			"before": 780,
+			"vi": "trưa",
+			"en": "noon"
+		},
+		{
+			"before": 1080,
+			"vi": "chiều",
+			"en": "afternoon"
+		},
+		{
+			"before": 1320,
+			"vi": "tối",
+			"en": "evening"
+		},
+		{
+			"before": 1440,
+			"vi": "đêm",
+			"en": "night"
+		}
 	],
 	"sound_on": "Sound: on",
 	"sound_off": "Sound: off",
@@ -24,11 +48,50 @@
 	"clock_title": "{time} · {part}",
 	"clock_hint": "{part} means {part_en}. Shops open and close by the clock.",
 	"clock_choices": [
-		{"id": "wait_hour", "label": "Wait one hour", "sub": "Sit on the stoop and watch the hẻm", "minutes": 60},
-		{"id": "wait_1100", "label": "Wait until 11:00", "sub": "Late morning", "until": 660},
-		{"id": "wait_1500", "label": "Wait until 15:00", "sub": "Hot afternoon", "until": 900},
-		{"id": "wait_1830", "label": "Wait until 18:30", "sub": "Evening", "until": 1110},
-		{"id": "wait_2030", "label": "Wait until 20:30", "sub": "Night", "until": 1230},
-		{"id": "sleep", "label": "Sleep until morning", "sub": "Next day, {wake}", "sleep": true, "style": "primary"}
-	]
+		{
+			"id": "wait_hour",
+			"label": "Wait one hour",
+			"sub": "Sit on the stoop and watch the hẻm",
+			"minutes": 60
+		},
+		{
+			"id": "wait_1100",
+			"label": "Wait until 11:00",
+			"sub": "Late morning",
+			"until": 660
+		},
+		{
+			"id": "wait_1500",
+			"label": "Wait until 15:00",
+			"sub": "Hot afternoon",
+			"until": 900
+		},
+		{
+			"id": "wait_1830",
+			"label": "Wait until 18:30",
+			"sub": "Evening",
+			"until": 1110
+		},
+		{
+			"id": "wait_2030",
+			"label": "Wait until 20:30",
+			"sub": "Night",
+			"until": 1230
+		},
+		{
+			"id": "sleep",
+			"label": "Sleep until morning",
+			"sub": "Next day, {wake}",
+			"sleep": true,
+			"style": "primary"
+		}
+	],
+	"settings_title": "Settings",
+	"settings_sensitivity": "Look speed: {value}",
+	"settings_invert": "Invert up and down",
+	"settings_gyro": "Look with the phone (gyroscope)",
+	"settings_fov": "Field of view: {value}",
+	"settings_tap_walk": "Tap to walk",
+	"center_view": "Center the view",
+	"too_far": "That is far. You walk part of the way."
 }

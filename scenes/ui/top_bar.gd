@@ -6,16 +6,22 @@ extends PanelContainer
 signal clock_pressed
 signal sound_pressed
 signal notebook_pressed
+signal settings_pressed
+signal center_pressed
 
 const ICON_SOUND_ON := preload("res://assets/icons/sound_on.svg")
 const ICON_SOUND_OFF := preload("res://assets/icons/sound_off.svg")
 const ICON_BOOK := preload("res://assets/icons/book.svg")
+const ICON_GEAR := preload("res://assets/icons/gear.svg")
+const ICON_CENTER := preload("res://assets/icons/center.svg")
 
 var clock_button: TextButton
 var place_label: Label
 var sub_label: Label
 var sound_button: Button
 var notebook_button: Button
+var settings_button: Button
+var center_button: Button
 
 
 func _ready() -> void:
@@ -61,6 +67,12 @@ func _ready() -> void:
 	sub_label.clip_text = true
 	place.add_child(sub_label)
 
+	center_button = _icon_button("Center", "topbar.center", ICON_CENTER)
+	center_button.pressed.connect(center_pressed.emit)
+	row.add_child(center_button)
+	settings_button = _icon_button("Settings", "topbar.settings", ICON_GEAR)
+	settings_button.pressed.connect(settings_pressed.emit)
+	row.add_child(settings_button)
 	sound_button = _icon_button("Sound", "topbar.sound", ICON_SOUND_ON)
 	sound_button.pressed.connect(sound_pressed.emit)
 	row.add_child(sound_button)
@@ -76,6 +88,7 @@ func _icon_button(node_name: String, test_id: String, icon: Texture2D) -> Button
 	button.theme_type_variation = "BarButton"
 	button.icon = icon
 	button.custom_minimum_size = Vector2(88, UiTheme.BUTTON_MIN_HEIGHT)
+	button.focus_mode = Control.FOCUS_NONE
 	button.add_theme_constant_override("h_separation", 8)
 	return button
 
@@ -90,3 +103,10 @@ func show_state(time_text: String, part: String, place: String, sub: String, sou
 	sound_button.tooltip_text = Content.ui_text("sound_on" if sound_on else "sound_off")
 	notebook_button.text = "%d/%d" % [found, total]
 	notebook_button.tooltip_text = Content.ui_text("notebook_button")
+	settings_button.tooltip_text = Content.ui_text("settings_title")
+	center_button.tooltip_text = Content.ui_text("center_view")
+
+
+## Shows the center button only when the gyroscope look is on.
+func show_center(on: bool) -> void:
+	center_button.visible = on

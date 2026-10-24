@@ -11,6 +11,8 @@ if [[ ! -x "$GODOT" ]]; then
 fi
 
 mkdir -p "$ROOT/build"
+# Godot must not import the screenshots in build/.
+touch "$ROOT/build/.gdignore"
 LOG="$ROOT/build/unit-tests.log"
 
 echo "Import the project."

@@ -7,6 +7,7 @@
 # - With --templates, the export templates for 4.7.2 go to the
 #   Godot template folder (~/.local/share/godot/export_templates/).
 # - GUT 9.7.1 goes to addons/gut/ when that folder is missing.
+# - The Mesa Vulkan drivers (package mesa-vulkan-drivers) when lavapipe is missing.
 #
 # The script does nothing for the files that are already there.
 set -euo pipefail
@@ -33,6 +34,17 @@ done
 download() { # url, output file
   curl --fail --location --retry 4 --retry-delay 2 --silent --show-error -o "$2" "$1"
 }
+
+# The Mobile renderer needs Vulkan. The workspace and CI have no GPU, so the
+# play tests use the Mesa software Vulkan driver (lavapipe).
+if [[ ! -f /usr/share/vulkan/icd.d/lvp_icd.json ]]; then
+  echo "Install the Mesa Vulkan drivers (lavapipe)."
+  if [[ "$(id -u)" == 0 ]]; then
+    apt-get install -y mesa-vulkan-drivers || { apt-get update && apt-get install -y mesa-vulkan-drivers; }
+  else
+    sudo apt-get install -y mesa-vulkan-drivers || { sudo apt-get update && sudo apt-get install -y mesa-vulkan-drivers; }
+  fi
+fi
 
 mkdir -p "$GODOT_DIR"
 

@@ -41,11 +41,7 @@ const ORDER := ["home", "pho", "banhmi", "coc", "bac", "mia", "go", "banhkhot", 
 
 
 func run(d: PlaytestDriver) -> void:
-	await d.wait_idle()
-	await d.tap_id("choice.step_outside")
-	await d.tap_id("choice.good_morning")
-	await d.tap_id("choice.okay")
-	await d.wait_idle()
+	await d.skip_intro()
 	await d.screenshot("start")
 	var view: Dictionary = START_VIEW[d.phase]
 	var s0 := d.state()

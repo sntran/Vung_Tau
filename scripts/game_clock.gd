@@ -11,6 +11,8 @@ const START_MINUTES := 360
 const WAKE_MINUTES := 345
 ## At 23:30 or later, the only choice is "Go home and sleep".
 const LATE_MINUTES := 1410
+## At the homestay door, the player looks along the hẻm toward Bãi Trước (+X).
+const HOME_YAW := -90.0
 ## Walking: 1 game minute for each 8 m.
 const METERS_PER_MINUTE := 8.0
 

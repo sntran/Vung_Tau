@@ -120,6 +120,16 @@ func _check_time_rule(rule: Dictionary, file: String, where: String) -> void:
 			_check_minute(rule[field], file, where, field)
 
 
+func _check_vector3(value: Variant, file: String, where: String, field: String) -> void:
+	if typeof(value) != TYPE_ARRAY or value.size() != 3:
+		_error(file, where, "\"%s\" must be a list of 3 numbers (meters)" % field)
+		return
+	for number: Variant in value:
+		if typeof(number) not in [TYPE_INT, TYPE_FLOAT]:
+			_error(file, where, "\"%s\" must be a list of 3 numbers (meters)" % field)
+			return
+
+
 func _check_card_refs(refs: Variant, card_ids: Dictionary, file: String, where: String) -> void:
 	if typeof(refs) != TYPE_ARRAY:
 		_error(file, where, "\"learn\" must be a list of card IDs")
@@ -269,8 +279,12 @@ func _check_spots(spots: Dictionary, card_ids: Dictionary, line_ids: Dictionary)
 				if ids.has(spot.id):
 					_error(file, where, "spot ID is not unique")
 				ids[spot.id] = spot
-			for field: String in ["name", "en", "look_label"]:
+			for field: String in ["name", "en", "look_label", "verb"]:
 				_require(spot, field, TYPE_STRING, file, where)
+			if spot.has("verb_open") and typeof(spot.verb_open) != TYPE_STRING:
+				_error(file, where, "field \"verb_open\" has the wrong type")
+			if spot.has("focus"):
+				_check_vector3(spot.focus, file, where, "focus")
 			if _require(spot, "kind", TYPE_STRING, file, where) and not SPOT_KINDS.has(spot.kind):
 				_error(file, where, "kind \"%s\" must be one of %s" % [spot.kind, SPOT_KINDS])
 			_check_hours(spot, file, where)
@@ -294,6 +308,7 @@ func _check_spots(spots: Dictionary, card_ids: Dictionary, line_ids: Dictionary)
 			if _require(npc, "id", TYPE_STRING, file, where):
 				where = "npc \"%s\"" % npc.id
 			_require(npc, "name", TYPE_STRING, file, where)
+			_require(npc, "verb", TYPE_STRING, file, where)
 			_check_hours(npc, file, where)
 			_check_status(npc, file, where)
 			_check_line_rules(npc, card_ids, line_ids, file, where)
@@ -321,6 +336,17 @@ func _check_layout(layout: Dictionary, spot_ids: Dictionary, spots: Dictionary) 
 	var file := "world/hem_layout.json"
 	_require(layout, "hem_width", TYPE_FLOAT, file, "file")
 	_require(layout, "floor_height", TYPE_FLOAT, file, "file")
+	if _require(layout, "house_depth", TYPE_FLOAT, file, "file") and layout.house_depth < TubeHouse.ROOM_DEPTH + 1.0:
+		_error(file, "file", "\"house_depth\" must be more than the shop room depth plus 1 m")
+	for row: String in ["opposite_lots", "beach_road_lots"]:
+		if _require(layout, row, TYPE_ARRAY, file, "file"):
+			for i in layout[row].size():
+				var lot: Variant = layout[row][i]
+				var where := "%s %d" % [row, i]
+				if _is_dict(lot, file, where):
+					_check_lot_shape(lot, file, where)
+					if lot.has("spot"):
+						_error(file, where, "a lot in \"%s\" cannot have a spot" % row)
 	var placed := {}
 	var lot_ids := {}
 	if _require(layout, "lots", TYPE_ARRAY, file, "file"):
@@ -332,16 +358,7 @@ func _check_layout(layout: Dictionary, spot_ids: Dictionary, spots: Dictionary) 
 			if _require(lot, "id", TYPE_STRING, file, where):
 				where = "lot \"%s\"" % lot.id
 				lot_ids[lot.id] = true
-			if _require(lot, "width", TYPE_FLOAT, file, where) and lot.width <= 0.0:
-				_error(file, where, "\"width\" must be more than 0")
-			if _require(lot, "floors", TYPE_INT, file, where) and lot.floors < 1:
-				_error(file, where, "\"floors\" must be 1 or more")
-			for field: String in ["wall_color", "trim_color", "shutter_color"]:
-				_require(lot, field, TYPE_STRING, file, where)
-			_require(lot, "balcony", TYPE_BOOL, file, where)
-			if _require(lot, "ground", TYPE_STRING, file, where) and not GROUND_TYPES.has(lot.ground):
-				_error(file, where, "ground \"%s\" must be one of %s" % [lot.ground, GROUND_TYPES])
-			_check_sign(lot, file, where)
+			_check_lot_shape(lot, file, where)
 			if lot.has("spot"):
 				_check_placed_spot(lot.spot, spot_ids, placed, file, where)
 	if _require(layout, "carts", TYPE_ARRAY, file, "file"):
@@ -377,7 +394,8 @@ func _check_layout(layout: Dictionary, spot_ids: Dictionary, spots: Dictionary) 
 			_require(npc, "offset", TYPE_FLOAT, file, where)
 	if _require(layout, "beach", TYPE_DICTIONARY, file, "file"):
 		var beach: Dictionary = layout.beach
-		for field: String in ["road_width", "road_depth", "sand_width", "wall_height"]:
+		for field: String in ["road_width", "road_depth", "sand_width", "wall_height", "play_half_length",
+				"steps_width"]:
 			_require(beach, field, TYPE_FLOAT, file, "beach")
 		_require(beach, "boat_colors", TYPE_ARRAY, file, "beach")
 		if _require(beach, "spot", TYPE_STRING, file, "beach"):
@@ -385,6 +403,22 @@ func _check_layout(layout: Dictionary, spot_ids: Dictionary, spots: Dictionary) 
 	for spot_id: String in spot_ids:
 		if not placed.has(spot_id):
 			_error(file, "spot \"%s\"" % spot_id, "the spot has no place in the layout")
+
+
+## Checks the fields that give the shape and the colors of a house.
+func _check_lot_shape(lot: Dictionary, file: String, where: String) -> void:
+	if _require(lot, "id", TYPE_STRING, file, where):
+		where = "lot \"%s\"" % lot.id
+	if _require(lot, "width", TYPE_FLOAT, file, where) and lot.width <= 0.0:
+		_error(file, where, "\"width\" must be more than 0")
+	if _require(lot, "floors", TYPE_INT, file, where) and lot.floors < 1:
+		_error(file, where, "\"floors\" must be 1 or more")
+	for field: String in ["wall_color", "trim_color", "shutter_color"]:
+		_require(lot, field, TYPE_STRING, file, where)
+	_require(lot, "balcony", TYPE_BOOL, file, where)
+	if _require(lot, "ground", TYPE_STRING, file, where) and not GROUND_TYPES.has(lot.ground):
+		_error(file, where, "ground \"%s\" must be one of %s" % [lot.ground, GROUND_TYPES])
+	_check_sign(lot, file, where)
 
 
 func _check_placed_spot(spot_id: Variant, spot_ids: Dictionary, placed: Dictionary, file: String,
@@ -401,7 +435,9 @@ func _check_ui(ui: Dictionary) -> void:
 	var file := "ui.json"
 	for field: String in ["place_name", "place_sub", "beach_name", "beach_sub", "sound_on",
 			"sound_off", "notebook_button", "notebook_title", "notebook_count", "notebook_locked",
-			"notebook_hint", "close", "toast_new_card", "clack_bubble", "clock_title", "clock_hint"]:
+			"notebook_hint", "close", "toast_new_card", "clack_bubble", "clock_title", "clock_hint",
+			"settings_title", "settings_sensitivity", "settings_invert", "settings_gyro", "settings_fov",
+			"settings_tap_walk", "center_view", "too_far"]:
 		_require(ui, field, TYPE_STRING, file, "file")
 	if _require(ui, "parts_of_day", TYPE_ARRAY, file, "file"):
 		var last := 0

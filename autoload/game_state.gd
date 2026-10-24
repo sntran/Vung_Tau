@@ -19,6 +19,10 @@ var cards: Array[String] = []
 var flags: Dictionary = {}
 var sound := true
 var player_pos := HOME_DOOR
+## The view direction of the player in degrees. The yaw turns around the vertical axis.
+var yaw := GameClock.HOME_YAW
+var pitch := 0.0
+var settings: Dictionary = SaveFormat.DEFAULT_SETTINGS.duplicate()
 ## Meters walked since the last full game minute.
 var walk_m := 0.0
 ## All meters walked in this run of the game. Play tests read this value.
@@ -51,6 +55,9 @@ func new_game() -> void:
 	flags = {}
 	sound = true
 	player_pos = HOME_DOOR
+	yaw = GameClock.HOME_YAW
+	pitch = 0.0
+	settings = SaveFormat.DEFAULT_SETTINGS.duplicate()
 	walk_m = 0.0
 
 
@@ -70,6 +77,9 @@ func load_game() -> bool:
 	flags = data.flags
 	sound = data.sound
 	player_pos = data.player
+	yaw = data.yaw
+	pitch = data.pitch
+	settings = data.settings
 	cards = []
 	for card_id: String in data.cards:
 		if Content.has_card(card_id):
@@ -80,7 +90,8 @@ func load_game() -> bool:
 func to_dict() -> Dictionary:
 	return {
 		"day": day, "minutes": minutes, "walk_m": walk_m, "cards": cards,
-		"flags": flags, "sound": sound, "player": player_pos,
+		"flags": flags, "sound": sound, "player": player_pos, "yaw": yaw, "pitch": pitch,
+		"settings": settings,
 	}
 
 
@@ -150,6 +161,8 @@ func sleep_until_morning() -> void:
 	minutes = GameClock.WAKE_MINUTES
 	walk_m = 0.0
 	player_pos = HOME_DOOR
+	yaw = GameClock.HOME_YAW
+	pitch = 0.0
 	time_changed.emit(minutes, day)
 	slept.emit()
 	queue_save()
@@ -190,7 +203,17 @@ func set_sound(on: bool) -> void:
 	queue_save()
 
 
-## Records the player position. The world calls this when the player stops.
-func set_player_pos(pos: Vector3) -> void:
-	player_pos = Vector3(pos.x, 0.0, pos.z)
+## Records the player position and the view. The world calls this when the player stops.
+func set_player_pos(pos: Vector3, view_yaw: float, view_pitch: float) -> void:
+	player_pos = pos
+	yaw = view_yaw
+	pitch = view_pitch
+	queue_save()
+
+
+## Changes the settings and saves them.
+func set_settings(value: Dictionary) -> void:
+	for key: String in value:
+		if settings.has(key):
+			settings[key] = value[key]
 	queue_save()

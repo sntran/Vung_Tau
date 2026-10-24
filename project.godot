@@ -13,7 +13,7 @@ config_version=5
 config/name="Vũng Tàu"
 config/description="A game about Vietnamese food and daily life in a hẻm in Vũng Tàu."
 run/main_scene="res://scenes/main.tscn"
-config/features=PackedStringArray("4.7", "GL Compatibility")
+config/features=PackedStringArray("4.7", "Mobile")
 boot_splash/bg_color=Color(0.0627451, 0.129412, 0.117647, 1)
 config/icon="res://icon.svg"
 
@@ -29,11 +29,11 @@ Playtest="*res://autoload/playtest.gd"
 
 [display]
 
-window/size/viewport_width=720
-window/size/viewport_height=1280
+window/size/viewport_width=1280
+window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
-window/handheld/orientation=1
+window/handheld/orientation=4
 
 [gui]
 
@@ -47,11 +47,13 @@ pointing/emulate_mouse_from_touch=true
 [physics]
 
 common/physics_interpolation=false
+common/max_physics_steps_per_frame=16
 
 [rendering]
 
-renderer/rendering_method="gl_compatibility"
-renderer/rendering_method.mobile="gl_compatibility"
+renderer/rendering_method="mobile"
+renderer/rendering_method.mobile="mobile"
+renderer/rendering_method.web="gl_compatibility"
 textures/vram_compression/import_etc2_astc=true
 anti_aliasing/quality/msaa_3d=0
 

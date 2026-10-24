@@ -2,14 +2,18 @@
 # Run the play tests under Xvfb with real input events.
 #
 # Usage:
-#   tools/playtest.sh NAME [--size=WxH]   Run one scenario (default size 720x1280).
+#   tools/playtest.sh NAME [--size=WxH] [--renderer=mobile|compatibility]
+#                                         Run one scenario (default 1280x720, mobile).
 #   tools/playtest.sh --all               Run all scenarios at all their sizes.
 #
 # Output goes to build/playtest/NAME/WxH/: numbered screenshots, log.json,
 # and godot-N.log (the Godot output of run N).
 #
 # A scenario file can have these header lines:
-#   # sizes: 720x1280 1080x2400 1280x720   The sizes for --all.
+#   # sizes: 1280x720 2400x1080            The sizes for --all.
+#   # compatibility: 1280x720              With --all, also one run at this size
+#                                          with the Compatibility renderer (the
+#                                          renderer of the web build).
 #   # phase: ARGS                          One run with these arguments. Each
 #                                          phase line is one run, in order.
 #                                          The runs use the same save file.
@@ -23,7 +27,7 @@ set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 GODOT="${GODOT:-$ROOT/.tools/godot/godot}"
-DEFAULT_SIZES="720x1280 1080x2400"
+DEFAULT_SIZES="1280x720 2400x1080"
 TIME_LIMIT=200
 
 if [[ ! -x "$GODOT" ]]; then
@@ -32,17 +36,19 @@ if [[ ! -x "$GODOT" ]]; then
 fi
 
 usage() {
-  echo "Usage: tools/playtest.sh NAME [--size=WxH] | --all" >&2
+  echo "Usage: tools/playtest.sh NAME [--size=WxH] [--renderer=mobile|compatibility] | --all" >&2
   exit 2
 }
 
 all=0
 name=""
 size=""
+renderer="mobile"
 for arg in "$@"; do
   case "$arg" in
     --all) all=1 ;;
     --size=*) size="${arg#--size=}" ;;
+    --renderer=*) renderer="${arg#--renderer=}" ;;
     -*) usage ;;
     *) name="$arg" ;;
   esac
@@ -63,11 +69,23 @@ error_lines() {
   ' "$1"
 }
 
+# The renderer arguments for each renderer name.
+renderer_args() {
+  case "$1" in
+    mobile) echo "--rendering-driver vulkan --rendering-method mobile" ;;
+    compatibility) echo "--rendering-driver opengl3 --rendering-method gl_compatibility" ;;
+    *) echo "playtest.sh: unknown renderer $1" >&2; exit 2 ;;
+  esac
+}
+
 # Runs one scenario at one size. Returns 0 when it passes.
 run_one() {
-  local scenario="$1" run_size="$2"
+  local scenario="$1" run_size="$2" renderer="${3:-mobile}"
   local file="$ROOT/playtests/$scenario.gd"
   local out="$ROOT/build/playtest/$scenario/$run_size"
+  [[ "$renderer" == mobile ]] || out="$out-$renderer"
+  local RENDERER_ARGS
+  RENDERER_ARGS="$(renderer_args "$renderer")"
   if [[ ! -f "$file" ]]; then
     echo "playtest.sh: no scenario $file" >&2
     return 1
@@ -90,10 +108,22 @@ run_one() {
     fi
     # shellcheck disable=SC2086
     timeout "$TIME_LIMIT" xvfb-run -a -s "-screen 0 2560x2560x24" \
-      "$GODOT" --path "$ROOT" --rendering-driver opengl3 --audio-driver Dummy \
+      "$GODOT" --path "$ROOT" $RENDERER_ARGS --audio-driver Dummy \
       --resolution "$run_size" -- \
       --playtest="$scenario" --out="$out" --save-path="$out/save.json" --phase="$n" $args \
-      >"$log" 2>&1
+      >"$log" 2>&1 &
+    local pid=$!
+    # A script that does not parse never ends the run. Stop it at once.
+    while kill -0 "$pid" 2>/dev/null; do
+      if grep -q "Parse Error" "$log" 2>/dev/null; then
+        sleep 2
+        pkill -P "$pid" 2>/dev/null
+        kill "$pid" 2>/dev/null
+        break
+      fi
+      sleep 1
+    done
+    wait "$pid"
     local status=$?
     if [[ $status == 124 ]]; then
       echo "  FAIL: run $n takes more than $TIME_LIMIT seconds" >&2
@@ -125,6 +155,8 @@ sizes_of() {
 }
 
 mkdir -p "$ROOT/build/playtest"
+# Godot must not import the screenshots in build/.
+touch "$ROOT/build/.gdignore"
 echo "Import the project."
 "$GODOT" --headless --path "$ROOT" --import >"$ROOT/build/playtest/import.log" 2>&1
 
@@ -143,16 +175,29 @@ for scenario in "${scenarios[@]}"; do
   if [[ "$all" == 1 ]]; then
     run_sizes="$(sizes_of "$scenario")"
   else
-    run_sizes="${size:-720x1280}"
+    run_sizes="${size:-1280x720}"
   fi
+  runs=()
   for s in $run_sizes; do
+    runs+=("$s:$renderer")
+  done
+  if [[ "$all" == 1 ]]; then
+    for s in $(grep -E '^# compatibility:' "$ROOT/playtests/$scenario.gd" | head -1 | sed 's/^# compatibility://'); do
+      runs+=("$s:compatibility")
+    done
+  fi
+  for run in "${runs[@]}"; do
+    s="${run%%:*}"
+    r="${run##*:}"
+    label="$scenario $s"
+    [[ "$r" == mobile ]] || label="$label $r"
     start=$(date +%s)
-    if run_one "$scenario" "$s"; then
-      echo "PASS $scenario $s ($(( $(date +%s) - start )) s)"
+    if run_one "$scenario" "$s" "$r"; then
+      echo "PASS $label ($(( $(date +%s) - start )) s)"
       passed=$((passed + 1))
     else
-      echo "FAIL $scenario $s ($(( $(date +%s) - start )) s)"
-      failed+=("$scenario $s")
+      echo "FAIL $label ($(( $(date +%s) - start )) s)"
+      failed+=("$label")
     fi
   done
 done

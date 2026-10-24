@@ -1,14 +1,16 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scenes/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/world/hem.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/actors/player.tscn" id="3"]
-[ext_resource type="Script" path="res://scenes/world/camera_rig.gd" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/ui/top_bar.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://scenes/ui/talk_panel.tscn" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/ui/notebook_sheet.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://scenes/ui/clock_sheet.tscn" id="8"]
 [ext_resource type="PackedScene" path="res://scenes/ui/toast.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://scenes/ui/settings_sheet.tscn" id="10"]
+[ext_resource type="Script" path="res://scenes/ui/joystick.gd" id="11"]
+[ext_resource type="Script" path="res://scenes/ui/center_dot.gd" id="12"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_material"]
 sky_top_color = Color(0.498, 0.765, 0.925, 1)
@@ -50,10 +52,6 @@ directional_shadow_max_distance = 40.0
 
 [node name="Player" parent="World" instance=ExtResource("3")]
 
-[node name="Camera" type="Camera3D" parent="World"]
-script = ExtResource("4")
-current = true
-
 [node name="Sounds" type="Node" parent="."]
 
 [node name="Ting" type="AudioStreamPlayer" parent="Sounds"]
@@ -70,11 +68,18 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
+[node name="Joystick" type="Control" parent="UI/Root"]
+mouse_filter = 2
+script = ExtResource("11")
+
+[node name="CenterDot" type="Control" parent="UI/Root"]
+mouse_filter = 2
+script = ExtResource("12")
+
+[node name="ActionButton" type="Button" parent="UI/Root"]
+visible = false
+
 [node name="TalkPanel" parent="UI/Root" instance=ExtResource("6")]
-
-[node name="WalkLeft" type="Button" parent="UI/Root"]
-
-[node name="WalkRight" type="Button" parent="UI/Root"]
 
 [node name="Toast" parent="UI/Root" instance=ExtResource("9")]
 
@@ -82,6 +87,9 @@ mouse_filter = 2
 visible = false
 
 [node name="NotebookSheet" parent="UI/Root" instance=ExtResource("7")]
+visible = false
+
+[node name="SettingsSheet" parent="UI/Root" instance=ExtResource("10")]
 visible = false
 
 [node name="TopBar" parent="UI/Root" instance=ExtResource("5")]

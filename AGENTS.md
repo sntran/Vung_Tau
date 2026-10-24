@@ -67,7 +67,8 @@ These decisions are fixed. To change one, write the change in a plan and get my 
 | Topic | Decision | Reason |
 |---|---|---|
 | Engine | Godot 4.7.2-stable, GDScript | Free and open source. Exports to Android, iOS, and web. Runs without a GPU in a Linux workspace. |
-| Renderer | Compatibility (OpenGL 3 / OpenGL ES 3 / WebGL 2) | It renders in a headless Linux workspace with Mesa llvmpipe. The play tests can take screenshots. It also runs on older phones and in web browsers. |
+| Renderer | Mobile (Vulkan) on Android and iOS. Compatibility (WebGL 2) for the web build (plan 0002, D10). | The Mobile renderer gives better light on phones. It renders in the workspace with the Mesa software Vulkan driver (lavapipe), so the play tests take screenshots. Godot web exports support only the Compatibility renderer. |
+| View and controls | First person at 1.6 m, landscape, base viewport 1280 × 720. Floating joystick on the left half, look drag on the right half, gyroscope look, tap to walk, a center dot and an action button (plan 0002). | The player walks around as in real life. |
 | Unit tests | GUT 9.7.1, kept in `addons/gut/` | Standard test addon for Godot 4. |
 | Play tests | Scenario scripts in `playtests/`, run by `tools/playtest.sh` under Xvfb | See plan 0001. |
 | Text language | English with Vietnamese terms | The audience reads English. |
@@ -87,10 +88,11 @@ Verified in the development workspace (Linux, 2 CPUs, no GPU, no Vulkan):
 - The workspace prints "WARNING: Could not set V-Sync mode" at each start. This warning comes from the Mesa driver. It is not a defect.
 - With `--audio-driver Dummy`, Godot prints no ALSA errors. `tools/playtest.sh` and `tools/test.sh` use it.
 - Godot 4.7 has the `Logger` class (`OS.add_logger()`). The play-test system uses it to record each engine error and script error as a failure in `log.json`.
-- The renderer is slow under llvmpipe: about 20 frames per second at 720×1280 and 10 at 1080×2400. MSAA halves these numbers, so it is off.
+- The Mobile renderer under lavapipe (package `mesa-vulkan-drivers`) runs at about 15 frames per second at 1280×720 and 6 at 2400×1080, with no shadows and no MSAA. The Compatibility renderer under llvmpipe runs at about 20 frames per second at 720×1280. MSAA halves these numbers, so it is off.
+- Without the package `mesa-vulkan-drivers`, Godot cannot make a Vulkan surface and falls back to OpenGL. `tools/setup.sh` installs the package.
 - An Xvfb screen of 1280×720 is too small for a 1080×2400 window. `tools/playtest.sh` uses `-screen 0 2560x2560x24`.
 - Godot exports the iOS Xcode project on Linux. Only the build of an `.ipa` needs macOS.
-- With the sun shadow on, the Compatibility renderer under llvmpipe makes up-facing surfaces about three times too bright when the sun is high. The sun has no shadow until plan 0002 checks it on phones.
+- With the sun shadow on, the Compatibility renderer under llvmpipe makes up-facing surfaces about three times too bright when the sun is high. The sun has no shadow until a plan checks it on phones.
 - The web export (thread support off) starts in the pre-installed Chromium with WebGL 2.
 
 Commands that work:
@@ -103,14 +105,15 @@ godot --headless --path . --import
 godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -gexit
 
 # Run the game with a picture, without a screen
-xvfb-run -a -s "-screen 0 2560x2560x24" godot --path . --rendering-driver opengl3 --audio-driver Dummy --resolution 720x1280 -- --playtest=boot_intro
+xvfb-run -a -s "-screen 0 2560x2560x24" godot --path . --rendering-driver vulkan --rendering-method mobile --audio-driver Dummy --resolution 1280x720 -- --playtest=boot_intro
 
 # The project scripts (they do the commands above)
 tools/setup.sh               # Godot 4.7.2 in .tools/godot/, GUT in addons/gut/
 tools/setup.sh --templates   # also the export templates
 tools/test.sh                # all unit tests
-tools/playtest.sh walk_hem   # one play test at 720x1280
-tools/playtest.sh walk_hem --size=1080x2400
+tools/playtest.sh fp_walk    # one play test at 1280x720 with the Mobile renderer
+tools/playtest.sh fp_walk --size=2400x1080
+tools/playtest.sh fp_layout --renderer=compatibility   # the renderer of the web build
 tools/playtest.sh --all      # all play tests at all sizes (about 20 minutes)
 
 # Exports (they need the export templates)
@@ -118,7 +121,7 @@ godot --headless --path . --export-release "Web" build/web/index.html
 godot --headless --path . --export-debug "iOS" build/ios/VungTau.ipa   # Xcode project only on Linux
 ```
 
-A play-test scenario is `playtests/NAME.gd`. It extends `RefCounted` and has `func run(d: PlaytestDriver) -> void`. The header lines `# phase: ARGS` and `# sizes: WxH ...` tell `tools/playtest.sh` how to run it. See `scripts/playtest_driver.gd` for the API.
+A play-test scenario is `playtests/NAME.gd`. It extends `RefCounted` and has `func run(d: PlaytestDriver) -> void`. The header lines `# phase: ARGS`, `# sizes: WxH ...`, and `# compatibility: WxH` tell `tools/playtest.sh` how to run it. See `scripts/playtest_driver.gd` for the API. The first-person functions are `hold_stick()`, `drag()`, `look_at_id()`, `look_at_point()`, and `gyro()`. `gyro()` replaces the sensor source of the game with a `ScriptedSensorSource`, because a workspace has no gyroscope.
 
 The audio driver prints ALSA errors in the workspace. These errors are not defects.
 
@@ -135,10 +138,10 @@ The audio driver prints ALSA errors in the workspace. These errors are not defec
 | `project.godot`, `export_presets.cfg` | The Godot project and the export presets (Web, Android, iOS). |
 | `autoload/` | `Content` (reads and checks `data/`), `GameState` (clock, notebook, save), `Playtest` (active only with `--playtest=NAME`). |
 | `data/` | All content: cards, spots and opening hours, dialogue, the hẻm layout, UI text. |
-| `scenes/` | `main.tscn` (world and UI), `world/` (hẻm, tube house, beach, camera), `actors/` (player, NPC), `ui/` (top bar, talk panel, sheets, toast). |
+| `scenes/` | `main.tscn` (world, input, and UI), `world/` (hẻm, tube house, beach), `actors/` (first-person player, NPC), `ui/` (top bar, talk panel, sheets, toast, joystick, center dot). |
 | `scripts/` | Classes with no scene: clock math, save format, content checks, light by time, greybox shapes, sounds, UI theme, play-test driver. |
 | `tests/unit/` | GUT unit tests. |
-| `playtests/` | Play-test scenarios PT-01 to PT-10. |
+| `playtests/` | Play-test scenarios PT-01 and PT-03 to PT-17 (PT-02 and PT-07 were removed in plan 0002). |
 | `tools/` | `setup.sh`, `test.sh`, `playtest.sh`. |
 | `assets/` | Fonts, icons, and `CREDITS.md`. |
 | `.github/workflows/` | `test.yml` (tests on each push) and `export.yml` (web, Android, iOS builds). |

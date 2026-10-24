@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft |
+| Status | In progress |
 | Branch | `feat/0002-first-person` |
 | Depends on | 0001 (status "Built") |
 
@@ -122,3 +122,24 @@ Run all scenarios at 1280×720 and 2400×1080. PT-17 also runs at 1920×1080 and
 - **Q1.** The gyroscope "on" by default (D5) needs my approval.
 - **Q2.** Landscape only on phones (D2) needs my approval.
 - **Q3.** Is tap to walk necessary when the joystick is there? Keep both until I try the APK.
+
+### Builder notes
+
+These notes record how the builder read the parts of the plan that were not fully clear. The architect must check them in the audit.
+
+- **N1. Approval.** The plan had the status "Draft". I told the builder to build the next plans. The builder read this as my approval. Q1 and Q2 are still open: the builder built them as the plan proposes (gyroscope on by default, landscape on phones).
+- **N2. Houses on both sides.** In first person, a hẻm with houses on one side looks wrong. The hẻm now has a second row of houses (`opposite_lots` in `data/world/hem_layout.json`), so it is 3.5 m wide between house fronts (plan 0001, R14). Rows of houses also face the beach road at both sides of the end of the hẻm (`beach_road_lots`). All houses are 14 m deep (`house_depth`), so there is no gap between the rows.
+- **N3. Steps to the sand.** PT-12 pushes into the palm trees, which are on the sand. The beach wall now has an opening with steps (a ramp) down to the sand. Walls that the player cannot see stop the player at the ends of the beach road (30 m) and at the edge of the water.
+- **N4. Shop rooms (R15).** The ground floor of each shop is an open room 4 m deep with a counter, a table, and stools. A closed or half open shutter stops the player. When a shutter closes with the player in the room, the player goes out to the stand point in front of the shop.
+- **N5. Navigation mesh.** The game bakes the navigation mesh from the collision shapes when it starts, and again when a cart, a person, the stall, the boats, or a shutter changes. People that move (the hủ tiếu gõ helper) are on a separate layer that the bake does not use.
+- **N6. Tap to walk turns the view.** During a tap walk, the view turns to the walk direction, as a person looks where they walk.
+- **N7. "Walk back with tap to walk only" (PT-11).** The homestay is behind the player at the beach. In PT-11, look drags turn the view, and only taps move the player.
+- **N8. Gyroscope axes.** `SensorSource` turns the view around the vertical axis of the world, which it finds from the gravity sensor. Then the gyroscope look works in each screen orientation. It assumes that Godot gives the gravity as the reaction force (up), as Android does. This needs a check on a real Android phone and a real iPhone (acceptance criterion 3).
+- **N9. The center button (R7).** It puts the gyroscope offset back to zero and makes the view level. It shows only when the gyroscope setting is on and the phone gives gyroscope data.
+- **N10. Action verbs (R12).** Each spot has `verb` and an optional `verb_open` in `data/spots.json` (for example "Look", and "Sit" when the shop is open). Each NPC has `verb`. A spot can have a `focus` offset. Without it, the focus point is the center of the shop front or of the cart.
+- **N11. Layout (R17).** The talk panel is at the right side, at most 42% of the width and not wider than 600 px. In a portrait window (the web build), it is at the bottom, at most 40% of the height. The clock sheet and the settings sheet use two columns in landscape, so that they fit on the screen.
+- **N12. Save version 2.** The save has the view direction and the settings. A save of version 1 starts a new game (plan 0001, R13).
+- **N13. Web layout (R25).** The play-test system runs inside the game, and the web build has no command line. So `tools/playtest.sh --all` runs PT-17 one more time at 1280×720 with the Compatibility renderer (the renderer of the web build) on the desktop Godot.
+- **N14. Speed under lavapipe (R24).** The Mobile renderer runs at about 15 frames per second at 1280×720 and 6 at 2400×1080, with no shadows. The night lights make it slower. PT-09 has 4 runs of 50 taps, so that each run is shorter than 180 s at 2400×1080.
+- **N15. Sun shadows.** The sun still has no shadow (plan 0001, N18). With the Mobile renderer, the shadow costs more time under lavapipe. A plan must check shadows on real phones.
+

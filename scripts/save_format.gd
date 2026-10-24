@@ -3,7 +3,16 @@ extends RefCounted
 ## The format of the save file. The file is JSON with a "version" field.
 ## A save with a different version is not loaded. The game then starts new.
 
-const VERSION := 1
+const VERSION := 2
+
+## The settings of a new game (plan 0002, R18).
+const DEFAULT_SETTINGS := {
+	"look_sensitivity": 1.0,
+	"invert_y": false,
+	"gyro": true,
+	"fov": 75.0,
+	"tap_walk": true,
+}
 
 
 ## Returns the save data as a JSON text.
@@ -16,7 +25,9 @@ static func to_json(state: Dictionary) -> String:
 		"cards": Array(state.cards),
 		"flags": Dictionary(state.flags),
 		"sound": bool(state.sound),
-		"player": {"x": float(state.player.x), "z": float(state.player.z)},
+		"player": {"x": float(state.player.x), "y": float(state.player.y), "z": float(state.player.z),
+				"yaw": float(state.yaw), "pitch": float(state.pitch)},
+		"settings": Dictionary(state.settings),
 	}
 	return JSON.stringify(data, "\t")
 
@@ -55,6 +66,15 @@ static func from_json(text: String) -> Dictionary:
 		if typeof(card) == TYPE_STRING and not card_list.has(card):
 			card_list.append(card)
 	var flags: Variant = data.get("flags", {})
+	var settings := DEFAULT_SETTINGS.duplicate()
+	var saved_settings: Variant = data.get("settings", {})
+	if typeof(saved_settings) == TYPE_DICTIONARY:
+		for key: String in settings:
+			if saved_settings.has(key) and typeof(saved_settings[key]) == typeof(settings[key]):
+				settings[key] = saved_settings[key]
+			elif saved_settings.has(key) and typeof(settings[key]) == TYPE_FLOAT \
+					and typeof(saved_settings[key]) == TYPE_INT:
+				settings[key] = float(saved_settings[key])
 	return {
 		"day": int(day),
 		"minutes": int(minutes),
@@ -62,5 +82,8 @@ static func from_json(text: String) -> Dictionary:
 		"cards": card_list,
 		"flags": flags if typeof(flags) == TYPE_DICTIONARY else {},
 		"sound": bool(data.get("sound", true)),
-		"player": Vector3(float(player.x), 0.0, float(player.z)),
+		"player": Vector3(float(player.x), float(player.get("y", 0.0)), float(player.z)),
+		"yaw": float(player.get("yaw", GameClock.HOME_YAW)),
+		"pitch": clampf(float(player.get("pitch", 0.0)), -80.0, 80.0),
+		"settings": settings,
 	}

@@ -10,7 +10,7 @@ var panel: PanelContainer
 var _dim: ColorRect
 var _title: Label
 var _hint: Label
-var _choices: VBoxContainer
+var _choices: GridContainer
 var _close: Button
 
 
@@ -54,8 +54,9 @@ func _ready() -> void:
 	_hint.theme_type_variation = "Hint"
 	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(_hint)
-	_choices = VBoxContainer.new()
-	_choices.add_theme_constant_override("separation", 12)
+	_choices = GridContainer.new()
+	_choices.add_theme_constant_override("h_separation", 12)
+	_choices.add_theme_constant_override("v_separation", 12)
 	column.add_child(_choices)
 
 
@@ -65,8 +66,9 @@ func _on_dim_input(event: InputEvent) -> void:
 		closed.emit()
 
 
-## Fills the sheet for the time.
-func show_time(minutes: int) -> void:
+## Fills the sheet for the time. "columns" is 2 in landscape, so that the sheet fits.
+func show_time(minutes: int, columns := 1) -> void:
+	_choices.columns = columns
 	var part := GameClock.part_of_day(minutes, Content.ui.parts_of_day)
 	var params := {"time": GameClock.format_time(minutes), "part": part.vi, "part_en": part.en,
 			"wake": GameClock.format_time(GameClock.WAKE_MINUTES)}
@@ -82,5 +84,6 @@ func show_time(minutes: int) -> void:
 		button.set_meta("test_id", "clock.%s" % choice.id)
 		button.set_style("PrimaryButton" if choice.get("style", "") == "primary" else "Button")
 		button.set_texts(Content.format(choice.label, params), Content.format(choice.get("sub", ""), params))
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.pressed.connect(choice_pressed.emit.bind(choice))
 		_choices.add_child(button)

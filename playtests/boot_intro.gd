@@ -55,6 +55,7 @@ func _path_chua(d: PlaytestDriver) -> void:
 	await d.wait_frames(3)
 	d.expect(d.state().mode == "hem", "the notebook closes")
 	# A second visit to Bà Tư does not add the card again.
+	await d.bring_into_view("npc.batu")
 	await d.tap_id("npc.batu")
 	await d.wait_idle()
 	d.expect(d.state().line == "batu.greet", "a tap on Bà Tư shows her greeting")

@@ -1,23 +1,35 @@
 extends RefCounted
 # PT-09 soak. Use seed 1. Do 200 random taps on the floor, the spots, and
-# the visible choices. Check that there is no script error and that the
-# player never leaves the floor.
+# the visible choices. Between the taps, do random joystick touches and look
+# drags. Check that there is no script error, and that the player is always
+# on the floor and never in a wall.
+# The 200 taps are in 4 runs of 50, so that each run is shorter than 180 s at
+# 2400×1080 under lavapipe. The random number state goes from one run to the
+# next, so the taps are one sequence with seed 1. The game starts again
+# between the runs, from the same save file.
 # phase: --start-time=06:00 --seed=1
+# phase: --seed=1
+# phase: --seed=1
+# phase: --seed=1
 
 const TAPS := 200
+const RUNS := 4
 
 
 func run(d: PlaytestDriver) -> void:
 	await d.wait_idle()
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 1
+	var state_path := d.out_dir.path_join("rng_state.txt")
+	if d.phase > 1:
+		rng.state = FileAccess.get_file_as_string(state_path).to_int()
 	var spot_ids: Array[String] = []
 	for spot: Dictionary in Content.spot_list():
 		spot_ids.append("spot." + spot.id)
-	var counts := {"floor": 0, "spot": 0, "choice": 0, "skipped": 0}
+	var counts := {"floor": 0, "spot": 0, "choice": 0, "skipped": 0, "stick": 0, "look": 0}
 	var reasons := {}
-	var map: RID = d.main().get_world_3d().navigation_map
-	for i in TAPS:
+	var per_run := TAPS / RUNS
+	for i in range((d.phase - 1) * per_run, d.phase * per_run):
 		var s := d.state()
 		var kind := rng.randi_range(0, 2)
 		# A sheet covers the world. Then only its choices can be tapped.
@@ -25,21 +37,17 @@ func run(d: PlaytestDriver) -> void:
 			kind = 2
 		var error := ""
 		if kind == 0:
-			# A random floor point in the free part of the screen.
-			var pos: Vector3 = s.player
-			var point := Vector3.ZERO
-			for attempt in 10:
-				point = Vector3(pos.x + rng.randf_range(-5.0, 5.0), 0, rng.randf_range(-1.5, 1.7))
-				if _in_free_part(d, s, point):
-					break
-			error = await d.try_tap_floor(point, false)
+			# A random floor point near the player, in the view and not under a control.
+			var point: Variant = _floor_point(d, s, rng)
+			if point == null:
+				error = "no ground in the view"
+			else:
+				await d.tap(d.to_screen(point))
 			counts.floor += 1
 		elif kind == 1:
-			# A random spot from the spots that are on the screen now.
 			var on_screen: Array[String] = []
 			for id in spot_ids:
-				var where := d.locate(id)
-				if where.error == "" and _in_free_part_2d(s, where.point):
+				if d.locate(id).error == "":
 					on_screen.append(id)
 			if on_screen.is_empty():
 				error = "no spot on the screen"
@@ -57,26 +65,53 @@ func run(d: PlaytestDriver) -> void:
 			counts.skipped += 1
 			var reason := error.get_slice(" at ", 0).get_slice("(", 0)
 			reasons[reason] = reasons.get(reason, 0) + 1
-		await d.wait_frames(rng.randi_range(1, 4))
-		var p: Vector3 = d.state().player
-		var on_mesh := NavigationServer3D.map_get_closest_point(map, p)
-		if absf(p.y) > 0.1 or Vector2(p.x - on_mesh.x, p.z - on_mesh.z).length() > 0.1:
-			d.fail("tap %d: the player left the floor at %s" % [i + 1, p])
+		# Some joystick touches and look drags between the taps.
+		if d.state().mode == "hem" and rng.randf() < 0.15:
+			var direction := Vector2(rng.randf_range(-1, 1), rng.randf_range(-1, 1))
+			await d.hold_stick(direction, rng.randf_range(0.2, 0.8))
+			counts.stick += 1
+		elif d.state().mode == "hem" and rng.randf() < 0.15:
+			var start := d.to_screen(await d._free_point("look"))
+			await d.drag(start, start + Vector2(rng.randf_range(-150, 150), rng.randf_range(-60, 60)), 0.2)
+			counts.look += 1
+		await d.wait_frames(rng.randi_range(0, 1))
+		if not _check_body(d, i):
 			break
 		if (i + 1) % 25 == 0:
 			await d.screenshot("tap_%03d" % (i + 1))
-	d.step("taps: %s" % [counts])
+	var file := FileAccess.open(state_path, FileAccess.WRITE)
+	file.store_string(str(rng.state))
+	file.close()
+	d.step("actions: %s" % [counts])
 	d.step("reasons for the taps that were not possible: %s" % [reasons])
-	d.expect(counts.skipped < TAPS / 4, "more than a quarter of the random taps were not possible: %s" % [counts])
+	d.expect(counts.skipped < per_run / 4, "more than a quarter of the random taps were not possible: %s" % [counts])
 
 
-## Returns true when the 3D point is in the free part of the screen, away from the walk buttons.
-func _in_free_part(d: PlaytestDriver, s: Dictionary, point: Vector3) -> bool:
-	return _in_free_part_2d(s, d.world_to_view(point))
+## Returns a random screen point (base coordinates) where a tap reaches the
+## floor, not under a control, or null. It only reads the game.
+func _floor_point(d: PlaytestDriver, s: Dictionary, rng: RandomNumberGenerator) -> Variant:
+	var view: Vector2 = s.view_size
+	var blocked: Array[Rect2] = [s.top_bar_rect, s.panel_rect]
+	for attempt in 30:
+		var point := Vector2(rng.randf_range(0.05, 0.95) * view.x, rng.randf_range(0.5, 0.97) * view.y)
+		var free := true
+		for rect in blocked:
+			if rect.has_point(point):
+				free = false
+		if not free:
+			continue
+		var hit: Dictionary = d.main().pick(point)
+		if hit.kind == "floor" and (hit.node as CollisionObject3D).collision_layer & Layers.FLOOR:
+			return point
+	return null
 
 
-func _in_free_part_2d(s: Dictionary, view_point: Vector2) -> bool:
-	var free: Rect2 = s.free_rect
-	# The walk buttons are in the low corners of the free part.
-	var inner := Rect2(free.position, free.size - Vector2(0, 130))
-	return inner.has_point(view_point)
+## The player is on a floor (the hẻm, the road, the steps, or the sand) and not in a wall.
+func _check_body(d: PlaytestDriver, i: int) -> bool:
+	var s := d.state()
+	var p: Vector3 = s.player
+	var overlaps := d.player_overlaps()
+	if p.y > 0.25 or p.y < Beach.SAND_Y - 0.1 or not overlaps.is_empty():
+		d.fail("action %d: the player left the floor or is in a wall at %s %s" % [i + 1, p, overlaps])
+		return false
+	return true

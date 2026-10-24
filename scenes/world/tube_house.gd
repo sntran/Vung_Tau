@@ -3,7 +3,8 @@ extends Node3D
 ## One tube house (nhà ống), built from parameters.
 ##
 ## The origin is the center of the front wall at the floor. The front faces +Z.
-## A shop has a rolling metal shutter (cửa cuốn) with three positions.
+## A shop has a rolling metal shutter (cửa cuốn) with three positions. The
+## ground floor of a shop is an open room that the player can walk into.
 
 enum Shutter { OPEN, HALF, CLOSED }
 
@@ -13,6 +14,10 @@ const OPENING_HEIGHT := 2.6
 const ROLL_HEIGHT := 0.3
 ## The height of the shutter in the HALF position.
 const HALF_HEIGHT := 1.1
+## The depth of the open room on the ground floor of a shop.
+const ROOM_DEPTH := 4.0
+## The thickness of the walls of the room.
+const WALL := 0.2
 
 @export var width := 4.5
 @export var floors := 3
@@ -28,7 +33,10 @@ const HALF_HEIGHT := 1.1
 @export var sign_fg := Color("#F2C33C")
 
 var shutter := Shutter.CLOSED
+## The static body with the collision shapes of the house.
+var solid: StaticBody3D
 var _shutter_node: MeshInstance3D
+var _shutter_shape: CollisionShape3D
 var _glow_nodes: Array[Node3D] = []
 var _built := false
 
@@ -37,14 +45,19 @@ func _ready() -> void:
 	build()
 
 
-## Makes the geometry. The function does nothing when the house is already built.
+## Makes the geometry and the collision shapes. The function does nothing
+## when the house is already built.
 func build() -> void:
 	if _built:
 		return
 	_built = true
+	solid = Greybox.solid_body(self)
 	var height := floors * floor_height
-	Greybox.box(self, Vector3(width, height, depth), Vector3(0, height / 2.0, -depth / 2.0),
-			wall_color, "Body")
+	if ground == "shop":
+		_build_shop_body(height)
+	else:
+		Greybox.solid_box(self, solid, Vector3(width, height, depth),
+				Vector3(0, height / 2.0, -depth / 2.0), wall_color, "Body")
 	# Parapet at the top of the front wall.
 	Greybox.box(self, Vector3(width, 0.5, 0.25), Vector3(0, height + 0.25, -0.12), trim_color,
 			"Parapet")
@@ -65,21 +78,43 @@ func build() -> void:
 	set_glow(false)
 
 
+## The body of a shop: the floors above the room, the side walls and the back
+## wall of the room, and the part of the house behind the room.
+func _build_shop_body(height: float) -> void:
+	var upper := height - OPENING_HEIGHT
+	Greybox.solid_box(self, solid, Vector3(width, upper, depth),
+			Vector3(0, OPENING_HEIGHT + upper / 2.0, -depth / 2.0), wall_color, "Body")
+	var back := depth - ROOM_DEPTH
+	Greybox.solid_box(self, solid, Vector3(width, OPENING_HEIGHT, back),
+			Vector3(0, OPENING_HEIGHT / 2.0, -ROOM_DEPTH - back / 2.0), wall_color, "Back")
+	for side: float in [-1.0, 1.0]:
+		Greybox.solid_box(self, solid, Vector3(WALL, OPENING_HEIGHT, ROOM_DEPTH),
+				Vector3(side * (width - WALL) / 2.0, OPENING_HEIGHT / 2.0, -ROOM_DEPTH / 2.0),
+				wall_color.darkened(0.05), "SideWall")
+
+
 func _build_shop() -> void:
-	var w := width - 0.5
+	var w := width - WALL * 2.0
 	var interior := Node3D.new()
 	interior.name = "Interior"
 	add_child(interior)
-	Greybox.box(interior, Vector3(w, OPENING_HEIGHT, 0.04), Vector3(0, OPENING_HEIGHT / 2.0, 0.02),
-			Color("#6B5240"), "Back")
-	Greybox.box(interior, Vector3(w * 0.4, 0.9, 0.5), Vector3(-w * 0.25, 0.45, 0.3),
+	# The inside faces of the room: a tile floor, a back wall, and a ceiling.
+	Greybox.box(interior, Vector3(w, 0.02, ROOM_DEPTH), Vector3(0, 0.01, -ROOM_DEPTH / 2.0),
+			Color("#D8CFC0"), "RoomFloor")
+	Greybox.box(interior, Vector3(w, OPENING_HEIGHT, 0.02), Vector3(0, OPENING_HEIGHT / 2.0, -ROOM_DEPTH + 0.01),
+			Color("#E8DCC8"), "RoomBack")
+	Greybox.box(interior, Vector3(w, 0.02, ROOM_DEPTH), Vector3(0, OPENING_HEIGHT - 0.01, -ROOM_DEPTH / 2.0),
+			Color("#F2EEE6"), "RoomCeiling")
+	# The counter with the pot at the back, a table, and stools.
+	Greybox.solid_box(interior, solid, Vector3(w * 0.45, 0.9, 0.6), Vector3(-w * 0.2, 0.45, -ROOM_DEPTH + 0.5),
 			Color("#C9D1D3"), "Counter")
-	Greybox.cylinder(interior, 0.22, 0.4, Vector3(-w * 0.25, 1.1, 0.3), Color("#B7BFC1"), "Pot")
-	Greybox.box(interior, Vector3(0.8, 0.05, 0.6), Vector3(w * 0.22, 0.6, 0.35), Color("#C9D1D3"),
-			"Table")
-	Greybox.stool(interior, Vector3(w * 0.1, 0, 0.75), Color("#D8433A"))
-	Greybox.stool(interior, Vector3(w * 0.34, 0, 0.75), Color("#2F72C4"))
-	var lamp := Greybox.lamp(interior, Vector3(w * 0.8, 0.06, 0.06), Vector3(0, OPENING_HEIGHT - 0.15, 0.08),
+	Greybox.cylinder(interior, 0.22, 0.4, Vector3(-w * 0.2, 1.1, -ROOM_DEPTH + 0.5), Color("#B7BFC1"), "Pot")
+	Greybox.solid_box(interior, solid, Vector3(0.9, 0.62, 0.6), Vector3(w * 0.18, 0.31, -1.8),
+			Color("#C9D1D3"), "Table")
+	for x: float in [w * 0.18 - 0.6, w * 0.18 + 0.6]:
+		Greybox.stool(interior, Vector3(x, 0, -1.8), Color("#D8433A") if x < w * 0.18 else Color("#2F72C4"))
+		Greybox.solid_shape(solid, Vector3(0.3, 0.32, 0.3), Vector3(x, 0.16, -1.8))
+	var lamp := Greybox.lamp(interior, Vector3(w * 0.6, 0.06, 0.06), Vector3(0, OPENING_HEIGHT - 0.1, -2.0),
 			Color("#FFE7A0"), "Lamp")
 	_glow_nodes.append(lamp)
 	Greybox.box(self, Vector3(w + 0.2, ROLL_HEIGHT, 0.3), Vector3(0, OPENING_HEIGHT + ROLL_HEIGHT / 2.0 - 0.15, 0.15),
@@ -91,6 +126,9 @@ func _build_shop() -> void:
 	_shutter_node.mesh = mesh
 	_shutter_node.material_override = Greybox.material(Color("#A7AFB2"))
 	add_child(_shutter_node)
+	# The shutter stops the player when it is closed or half open.
+	_shutter_shape = Greybox.solid_shape(solid, Vector3(w, OPENING_HEIGHT, 0.1),
+			Vector3(0, OPENING_HEIGHT / 2.0, 0.05))
 
 
 func _build_gate() -> void:
@@ -134,6 +172,7 @@ func _build_floor(index: int) -> void:
 
 
 ## Moves the shutter. A house that is not a shop has no shutter.
+## A closed or half open shutter stops the player.
 func set_shutter(value: Shutter) -> void:
 	shutter = value
 	if _shutter_node == null:
@@ -149,6 +188,7 @@ func set_shutter(value: Shutter) -> void:
 	_shutter_node.visible = h > 0.0
 	_shutter_node.scale = Vector3(1, maxf(h, 0.01), 1)
 	_shutter_node.position = Vector3(0, OPENING_HEIGHT - h / 2.0, 0.08)
+	_shutter_shape.set_deferred("disabled", value == Shutter.OPEN)
 
 
 ## Turns the lamps of the house on or off.

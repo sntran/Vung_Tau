@@ -84,15 +84,15 @@ func wait_until(check: Callable, timeout_s := 10.0, what := "") -> bool:
 	return false
 
 
-## Waits until the player stops walking and the camera stops moving.
-## The camera must be still for 5 frames in a row: a new panel needs some
-## frames for its height, and the camera moves when the height changes.
+## Waits until the player stops walking and the view stops turning.
+## The view must be still for 5 frames in a row: a new panel needs some
+## frames for its height.
 func wait_idle(timeout_s := 30.0) -> bool:
 	var still := [0]
 	return await wait_until(func() -> bool:
 		var s := state()
-		still[0] = still[0] + 1 if not s.walking and s.camera_settled else 0
-		return still[0] >= 5, timeout_s, "the player and the camera stop")
+		still[0] = still[0] + 1 if s.view_settled else 0
+		return still[0] >= 5, timeout_s, "the player and the view stop")
 
 
 # --- Input ---------------------------------------------------------------
@@ -108,19 +108,20 @@ func to_viewport(screen_pos: Vector2) -> Vector2:
 
 
 ## Sends an InputEventScreenTouch press and release at a screen (window) pixel position.
+## The press and the release go in the same frame: under lavapipe, one frame
+## can take longer than the tap time limit (0.25 s).
 func tap(pos: Vector2) -> void:
 	var press := InputEventScreenTouch.new()
 	press.index = 0
 	press.position = pos
 	press.pressed = true
 	Input.parse_input_event(press)
-	await wait_frames(1)
 	var release := InputEventScreenTouch.new()
 	release.index = 0
 	release.position = pos
 	release.pressed = false
 	Input.parse_input_event(release)
-	await wait_frames(1)
+	await wait_frames(2)
 
 
 ## Sends a key press and release.
@@ -134,6 +135,172 @@ func key(keycode: Key) -> void:
 	var release := press.duplicate() as InputEventKey
 	release.pressed = false
 	Input.parse_input_event(release)
+	await wait_frames(2)
+
+
+## A drag with a drag event at each frame (plan 0002, R26). "from" and "to"
+## are screen (window) pixel positions.
+func drag(from: Vector2, to: Vector2, seconds: float, index := 0) -> void:
+	var press := InputEventScreenTouch.new()
+	press.index = index
+	press.position = from
+	press.pressed = true
+	Input.parse_input_event(press)
+	await wait_frames(1)
+	var start := Time.get_ticks_msec()
+	var last := from
+	while true:
+		var t := clampf((Time.get_ticks_msec() - start) / maxf(seconds * 1000.0, 1.0), 0.0, 1.0)
+		var pos := from.lerp(to, t)
+		var event := InputEventScreenDrag.new()
+		event.index = index
+		event.position = pos
+		event.relative = pos - last
+		event.screen_relative = event.relative
+		Input.parse_input_event(event)
+		last = pos
+		await wait_frames(1)
+		if t >= 1.0:
+			break
+	var release := InputEventScreenTouch.new()
+	release.index = index
+	release.position = to
+	release.pressed = false
+	Input.parse_input_event(release)
+	await wait_frames(1)
+
+
+## Touches a point on the left half, drags in the direction, holds, then
+## releases (plan 0002, R26). A direction of length 1 is full speed.
+func hold_stick(direction: Vector2, seconds: float) -> void:
+	var start := await _free_point("stick")
+	var radius := Joystick.RADIUS
+	var target := start + direction.limit_length(1.0) * radius
+	var s_start := to_screen(start)
+	var s_target := to_screen(target)
+	var press := InputEventScreenTouch.new()
+	press.index = 0
+	press.position = s_start
+	press.pressed = true
+	Input.parse_input_event(press)
+	await wait_frames(1)
+	var end := Time.get_ticks_msec() + int(seconds * 1000.0)
+	var last := s_start
+	var first := true
+	while Time.get_ticks_msec() < end or first:
+		var event := InputEventScreenDrag.new()
+		event.index = 0
+		event.position = s_target
+		event.relative = s_target - last
+		event.screen_relative = event.relative
+		Input.parse_input_event(event)
+		last = s_target
+		first = false
+		await wait_frames(1)
+	var release := InputEventScreenTouch.new()
+	release.index = 0
+	release.position = s_target
+	release.pressed = false
+	Input.parse_input_event(release)
+	await wait_frames(1)
+
+
+## Returns a point (base coordinates) in the zone ("stick" or "look") that no control covers.
+func _free_point(zone: String) -> Vector2:
+	var points: Array[Vector2] = await _free_points(zone)
+	if points.is_empty():
+		fail("no free point in the %s zone" % zone)
+		return main().input_zones()[zone].get_center()
+	return points[0]
+
+
+## Returns the points of a grid in the zone that no control covers.
+func _free_points(zone: String) -> Array[Vector2]:
+	var rect: Rect2 = main().input_zones()[zone]
+	var result: Array[Vector2] = []
+	var fractions := [Vector2(0.45, 0.7), Vector2(0.5, 0.4), Vector2(0.3, 0.25), Vector2(0.15, 0.6),
+			Vector2(0.7, 0.15), Vector2(0.1, 0.9)]
+	if zone == "look":
+		fractions = [Vector2(0.5, 0.2), Vector2(0.1, 0.15), Vector2(0.9, 0.1), Vector2(0.1, 0.5),
+				Vector2(0.1, 0.85), Vector2(0.5, 0.08), Vector2(0.3, 0.3)]
+	for f: Vector2 in fractions:
+		var point := rect.position + rect.size * f
+		var motion := InputEventMouseMotion.new()
+		motion.position = to_screen(point)
+		motion.global_position = motion.position
+		Input.parse_input_event(motion)
+		await wait_frames(1)
+		if viewport().gui_get_hovered_control() == null:
+			result.append(point)
+	return result
+
+
+## Turns the view with drags on the right half until the 3D point is at the
+## center dot (within "tolerance" degrees). Returns true when it is there.
+func look_at_point(point: Vector3, tolerance := 2.0, timeout_s := 10.0) -> bool:
+	var end := Time.get_ticks_msec() + int(timeout_s * 1000.0)
+	while Time.get_ticks_msec() < end:
+		var s := state()
+		var to: Vector3 = point - s.eye
+		var want_yaw := rad_to_deg(atan2(-to.x, -to.z))
+		var want_pitch := rad_to_deg(atan2(to.y, Vector2(to.x, to.z).length()))
+		var error_yaw: float = wrapf(want_yaw - float(s.yaw), -180.0, 180.0)
+		var error_pitch: float = clampf(want_pitch, -Player.PITCH_LIMIT, Player.PITCH_LIMIT) - float(s.pitch)
+		if absf(error_yaw) <= tolerance and absf(error_pitch) <= tolerance:
+			return true
+		var settings: Dictionary = s.settings
+		var per_pixel := float(settings.look_sensitivity) * 0.2
+		var invert := -1.0 if settings.invert_y else 1.0
+		# look(-relative.x * k, -relative.y * k * invert): the drag that gives the error.
+		var move := Vector2(-error_yaw / per_pixel, -error_pitch / per_pixel * invert)
+		var view := viewport().get_visible_rect().size
+		# Start at the free point with the most room for the drag.
+		var from := Vector2.ZERO
+		var best_room := -1.0
+		for candidate: Vector2 in await _free_points("look"):
+			var drag_end := (candidate + move).clamp(Vector2(5, 5), view - Vector2(5, 5))
+			var room := (drag_end - candidate).length()
+			if room > best_room:
+				best_room = room
+				from = candidate
+		if best_room < 0.0:
+			fail("no free point in the look zone")
+			return false
+		move = (from + move).clamp(Vector2(5, 5), view - Vector2(5, 5)) - from
+		# A drag needs more than 12 px to turn the view.
+		if move.length() < 14.0:
+			move = move.normalized() * 14.0
+			if (from + move).x > view.x - 5.0 or (from + move).y > view.y - 5.0 or (from + move).x < 5.0 or (from + move).y < 5.0:
+				move = -move
+		await drag(to_screen(from), to_screen(from + move), 0.25)
+		await wait_idle(5.0)
+	fail("the view does not turn to %s" % point)
+	return false
+
+
+## Turns the view until the node with the test ID is at the center dot.
+func look_at_id(test_id: String, timeout_s := 10.0) -> bool:
+	var node := find(test_id) as Node3D
+	if node == null:
+		fail("look_at_id: no visible 3D node has the test ID \"%s\"" % test_id)
+		return false
+	var m: Node = main()
+	var point := _node_center(node)
+	var parts := test_id.split(".")
+	if parts[0] == "spot" and m.hem.focus_points.has(parts[1]):
+		point = m.hem.focus_points[parts[1]]
+	return await look_at_point(point, 2.0, timeout_s)
+
+
+## Sends gyroscope data through the sensor source of the game (plan 0002, R26).
+## "rate" is in radians per second: x is the pitch rate, y is the yaw rate.
+func gyro(rate: Vector3, seconds: float) -> void:
+	var m: Node = main()
+	if not m.sensor is ScriptedSensorSource:
+		m.sensor = ScriptedSensorSource.new()
+		m._apply_settings()
+	(m.sensor as ScriptedSensorSource).play(Vector2(rate.y, rate.x), seconds)
+	await wait_seconds(seconds)
 	await wait_frames(2)
 
 
@@ -259,14 +426,52 @@ func _scroll_parent(control: Control) -> ScrollContainer:
 ## It does not record a failure. Use tap_id() for a normal step.
 func try_tap_id(test_id: String) -> String:
 	await _wait_stable(test_id)
-	var where := locate(test_id)
+	var where: Dictionary = await _tap_point(test_id)
 	if where.error != "":
 		return where.error
-	var cover: String = await _check_cover(where.node, where.point, test_id)
-	if cover != "":
-		return cover
 	await tap(to_screen(where.point))
 	return ""
+
+
+## Finds a point of the node that no other object or control covers.
+## Returns {error, point}. The error is "" when there is a point.
+func _tap_point(test_id: String) -> Dictionary:
+	var where := locate(test_id)
+	if where.error != "":
+		return where
+	var cover: String = await _check_cover(where.node, where.point, test_id)
+	if cover != "" and where.node is Node3D:
+		# A player taps a part of the object that they can see. Try the center
+		# dot and the corners of the shape.
+		for point: Vector2 in _other_points(where.node):
+			var other: String = await _check_cover(where.node, point, test_id)
+			if other == "":
+				where.point = point
+				cover = ""
+				break
+	where.error = cover
+	return where
+
+
+## Returns other screen points (base coordinates) on a 3D node: the center of
+## the screen, and points between the center and the corners of its box shape.
+func _other_points(node: Node3D) -> Array[Vector2]:
+	var view := viewport().get_visible_rect()
+	var camera := viewport().get_camera_3d()
+	var result: Array[Vector2] = [view.get_center()]
+	for child in node.get_children():
+		var shape := child as CollisionShape3D
+		if shape == null or not shape.shape is BoxShape3D:
+			continue
+		var half: Vector3 = (shape.shape as BoxShape3D).size * 0.35
+		for corner: Vector3 in [Vector3(-1, 1, 1), Vector3(1, 1, 1), Vector3(-1, -1, 1), Vector3(1, -1, 1),
+				Vector3(-1, 1, -1), Vector3(1, 1, -1)]:
+			var world := shape.global_transform * (corner * half)
+			if not camera.is_position_behind(world):
+				var point := camera.unproject_position(world)
+				if view.has_point(point):
+					result.append(point)
+	return result
 
 
 ## Waits until a control is shown and its screen position does not change
@@ -308,15 +513,25 @@ func tap_floor(pos: Vector3) -> bool:
 	return true
 
 
-## With "wait_camera", it first waits (not more than 3 s) until the camera
+## With "wait_camera", it first waits (not more than 3 s) until the view
 ## stops, so that the point on the screen does not move during the tap.
 func try_tap_floor(pos: Vector3, wait_camera := true) -> String:
 	if wait_camera:
 		var end := Time.get_ticks_msec() + 3000
 		var still := 0
 		while still < 5 and Time.get_ticks_msec() < end:
-			still = still + 1 if main().camera.is_settled() else 0
+			still = still + 1 if state().view_settled else 0
 			await wait_frames(1)
+	var error: String = await check_floor_point(pos)
+	if error != "":
+		return error
+	await tap(to_screen(viewport().get_camera_3d().unproject_position(pos)))
+	return ""
+
+
+## Returns "" when a tap can reach the floor at the 3D point, or the reason why not.
+## It does not tap.
+func check_floor_point(pos: Vector3) -> String:
 	var camera := viewport().get_camera_3d()
 	if camera.is_position_behind(pos):
 		return "the point %s is behind the camera" % pos
@@ -334,47 +549,151 @@ func try_tap_floor(pos: Vector3, wait_camera := true) -> String:
 	var hit: Dictionary = main().pick(point)
 	if hit.kind != "floor":
 		return "the point %s is covered by %s" % [pos, _describe(hit.get("node"))]
-	await tap(to_screen(point))
 	return ""
 
 
-## Walks with floor taps of 5 m or less until the player is at the X position.
-func walk_toward(x: float, z := 0.5) -> bool:
-	for i in 12:
+## Walks with tap to walk until the player is at the point (±0.5 m).
+## It turns the view to the point with look drags first. Each tap goes not
+## farther than "step" meters.
+func walk_toward(x: float, z := 0.0, step := 6.0) -> bool:
+	for i in 16:
 		var pos: Vector3 = state().player
-		var step := clampf(x - pos.x, -5.0, 5.0)
-		if absf(x - pos.x) < 0.5:
+		var to := Vector2(x - pos.x, z - pos.z)
+		if to.length() < 0.5:
 			return true
-		if not await tap_floor(Vector3(pos.x + step, 0, z)):
-			return false
+		var length := minf(to.length(), step)
+		var target := Vector3(pos.x, pos.y, pos.z) + Vector3(to.x, 0, to.y).normalized() * length
+		if to.length() > step:
+			# On the way, walk on the middle line of the hẻm, away from the carts.
+			target.z = clampf(target.z, -0.2, 0.6) if absf(target.x) < 30.0 else target.z
+		await look_at_point(target + Vector3(0, 0.05, 0), 6.0, 25.0)
+		# A cart or a person can cover the point. Then try a nearer point.
+		var tapped := false
+		for fraction: float in [1.0, 0.7, 0.45]:
+			var point := Vector3(pos.x, pos.y, pos.z).lerp(target, fraction)
+			if await check_floor_point(point) == "":
+				await tap(to_screen(viewport().get_camera_3d().unproject_position(point)))
+				tapped = true
+				break
+		if not tapped:
+			# No floor point is free to tap: walk this part with the joystick.
+			await stick_to(point_on_way(pos, target))
 		await wait_idle()
-	fail("the player does not come to x=%.2f" % x)
+	fail("the player does not come to (%.2f, %.2f)" % [x, z])
 	return false
 
 
-## Walks with floor taps until the node with the test ID is in the free part of the screen.
-func bring_into_view(test_id: String) -> bool:
-	for i in 8:
-		var where := locate(test_id)
-		if where.error == "" and state().free_rect.has_point(where.point):
+## Walks to the point with the joystick only: it turns the view to the point
+## with look drags, then holds the joystick forward for the time of the walk.
+func stick_to(point: Vector3) -> bool:
+	for attempt in 3:
+		var pos: Vector3 = state().player
+		var flat := Vector2(point.x - pos.x, point.z - pos.z)
+		if flat.length() < 0.4:
 			return true
+		await look_at_point(Vector3(point.x, pos.y + Player.EYE_HEIGHT, point.z), 1.5)
+		await hold_stick(Vector2(0, -1), flat.length() / Player.WALK_SPEED)
+		await wait_idle()
+	var end: Vector3 = state().player
+	return Vector2(point.x - end.x, point.z - end.z).length() < 0.6
+
+
+func point_on_way(from: Vector3, to: Vector3) -> Vector3:
+	return Vector3(to.x, from.y, to.z)
+
+
+## Returns the joystick direction that walks in the world direction (on the ground).
+func stick_for(world_direction: Vector3) -> Vector2:
+	var yaw := deg_to_rad(float(state().yaw))
+	var forward := Vector3(-sin(yaw), 0, -cos(yaw))
+	var right := Vector3(cos(yaw), 0, -sin(yaw))
+	# hold_stick() takes screen directions: up (negative y) is forward.
+	return Vector2(world_direction.dot(right), -world_direction.dot(forward))
+
+
+## Turns the view and walks until the node with the test ID is at 12 m or
+## less and free to tap.
+func bring_into_view(test_id: String) -> bool:
+	var last_error := ""
+	for i in 8:
 		var node := find(test_id) as Node3D
 		if node == null:
 			break
+		var center := _node_center(node)
 		var pos: Vector3 = state().player
-		var step := clampf(node.global_position.x - pos.x, -5.0, 5.0)
-		if absf(step) < 0.5:
-			break
-		if not await tap_floor(Vector3(pos.x + step, 0, 0.5)):
-			return false
-		await wait_idle()
-	fail("\"%s\" does not come into the free part of the screen" % test_id)
+		var flat := Vector2(center.x - pos.x, center.z - pos.z)
+		if flat.length() > 12.0:
+			var target := Vector3(pos.x, 0, pos.z) + Vector3(flat.x, 0, flat.y).normalized() * 8.0
+			if not await walk_toward(target.x, target.z, 8.0):
+				return false
+			continue
+		await look_at_id(test_id)
+		var where: Dictionary = await _tap_point(test_id)
+		last_error = where.error
+		if where.error == "":
+			return true
+		# Something covers the node: walk to a point in front of it, then try again.
+		var main_node: Node = main()
+		if center.x < main_node.hem.end_x:
+			var front_z := 0.4 if i % 2 == 0 else -0.3
+			await walk_toward(center.x + (1.5 if i % 2 == 0 else -1.5), front_z, 6.0)
+		else:
+			var near := Vector3(pos.x, 0, pos.z) + Vector3(flat.x, 0, flat.y).normalized() * minf(3.0, flat.length() - 2.0)
+			await walk_toward(near.x, near.z, 6.0)
+	fail("\"%s\" does not come into the view (%s)" % [test_id, last_error])
 	return false
+
+
+func _node_center(node: Node3D) -> Vector3:
+	for child in node.get_children():
+		if child is CollisionShape3D:
+			return (child as CollisionShape3D).global_position
+	return node.global_position
 
 
 ## Returns the screen point of a 3D position in viewport (base) coordinates.
 func world_to_view(pos: Vector3) -> Vector2:
 	return viewport().get_camera_3d().unproject_position(pos)
+
+
+## Answers the intro and the greeting of Bà Tư with taps (the path in English).
+func skip_intro() -> void:
+	await wait_idle()
+	await tap_id("choice.step_outside")
+	await tap_id("choice.good_morning")
+	await tap_id("choice.okay")
+	await wait_idle()
+
+
+## Returns the collision objects that the player capsule goes into by more
+## than 2 cm. A correct game returns an empty list. It only reads the physics.
+func player_overlaps() -> Array:
+	var player: Player = main().player
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = Player.RADIUS - 0.02
+	capsule.height = Player.HEIGHT - 0.04
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = capsule
+	query.transform = Transform3D(Basis(), player.global_position + Vector3(0, Player.HEIGHT / 2.0, 0))
+	query.collision_mask = Layers.SOLID | Layers.MOVING
+	var hits := player.get_world_3d().direct_space_state.intersect_shape(query, 8)
+	var names := []
+	for hit: Dictionary in hits:
+		names.append(str((hit.collider as Node).get_path()))
+	return names
+
+
+## Returns the distance from the eyes to the first solid object in the view
+## direction, or INF. It only reads the physics.
+func view_distance_to_solid() -> float:
+	var player: Player = main().player
+	var from := player.eye_position()
+	var query := PhysicsRayQueryParameters3D.create(from, from + player.view_forward() * 50.0,
+			Layers.SOLID | Layers.MOVING)
+	var hit := player.get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		return INF
+	return from.distance_to(hit.position)
 
 
 # --- Screenshots ---------------------------------------------------------
@@ -417,9 +736,20 @@ func state() -> Dictionary:
 		"bubble_visible": bubble,
 		"lights_on": hem.lights_on().size(),
 		"lights_in_view": m.lights_in_view(),
-		"camera_settled": m.camera.is_settled(),
-		"player_screen_rect": m.player_screen_rect(),
-		"free_rect": m.free_rect,
+		"view_settled": _view_settled(m),
+		"yaw": player.yaw + player.gyro_yaw,
+		"pitch": player.pitch + player.gyro_pitch,
+		"target_yaw": player.target_yaw,
+		"gyro_yaw": player.gyro_yaw,
+		"gyro_pitch": player.gyro_pitch,
+		"eye": player.eye_position(),
+		"on_floor": player.is_on_floor(),
+		"focus": m.focus_id,
+		"action_visible": m.action_button.visible,
+		"action_verb": m.action_button.text if m.action_button.visible else "",
+		"joystick_visible": m.joystick.visible,
+		"settings": GameState.settings.duplicate(),
+		"fov": player.camera.fov,
 		"top_bar_rect": m.top_bar.get_global_rect(),
 		"panel_rect": m.talk_panel.get_global_rect(),
 		"toast_visible": m.toast.visible,
@@ -430,6 +760,14 @@ func state() -> Dictionary:
 		"boats_in": hem.beach.boats_in.visible,
 		"exercisers": hem.beach.exercisers.visible,
 	}
+
+
+## True when the player does not walk and the view does not turn.
+func _view_settled(m: Node) -> bool:
+	var player: Player = m.player
+	return not player.walking and player.move_input == Vector2.ZERO \
+			and absf(wrapf(player.target_yaw - player.yaw, -180.0, 180.0)) < 0.2 \
+			and absf(player.target_pitch - player.pitch) < 0.2 and player.velocity.length() < 0.05
 
 
 ## Returns the shutter position of each shop: "open", "half", or "closed".

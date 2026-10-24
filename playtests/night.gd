@@ -6,11 +6,7 @@ extends RefCounted
 
 
 func run(d: PlaytestDriver) -> void:
-	await d.wait_idle()
-	await d.tap_id("choice.step_outside")
-	await d.tap_id("choice.good_morning")
-	await d.tap_id("choice.okay")
-	await d.wait_idle()
+	await d.skip_intro()
 	var s := d.state()
 	d.expect(s.lights_on > 0, "at 20:30 the lights are on")
 	d.expect(s.lights_in_view <= 8, "not more than 8 dynamic lights in view: %d" % s.lights_in_view)

@@ -24,6 +24,37 @@ static func material(color: Color, emission := 0.0) -> StandardMaterial3D:
 	return mat
 
 
+## Returns a new static body on the solid layer, as a child of the parent.
+static func solid_body(parent: Node, node_name := "Solid") -> StaticBody3D:
+	var body := StaticBody3D.new()
+	body.name = node_name
+	body.collision_layer = Layers.SOLID
+	body.collision_mask = 0
+	parent.add_child(body)
+	return body
+
+
+## Adds a box collision shape to the body. "pos" is the center of the box,
+## in the coordinates of the body.
+static func solid_shape(body: CollisionObject3D, size: Vector3, pos: Vector3) -> CollisionShape3D:
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = size
+	shape.shape = box
+	shape.position = pos
+	body.add_child(shape)
+	return shape
+
+
+## Adds a box that the player cannot walk through: a mesh and a collision shape.
+## The body must be a child of the parent with no transform of its own.
+static func solid_box(parent: Node3D, body: StaticBody3D, size: Vector3, pos: Vector3,
+		color: Color, node_name := "") -> MeshInstance3D:
+	var mesh := box(parent, size, pos, color, node_name)
+	solid_shape(body, size, pos)
+	return mesh
+
+
 ## Adds a box. "pos" is the center of the box.
 static func box(parent: Node3D, size: Vector3, pos: Vector3, color: Color,
 		node_name := "") -> MeshInstance3D:

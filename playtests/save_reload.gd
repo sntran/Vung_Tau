@@ -41,7 +41,7 @@ func _play(d: PlaytestDriver) -> void:
 	await d.screenshot("before_quit")
 	var file := FileAccess.open(_expected_path(d), FileAccess.WRITE)
 	file.store_string(JSON.stringify({"cards": s.cards, "day": s.day, "time": s.time,
-			"x": s.player.x, "z": s.player.z}))
+			"x": s.player.x, "z": s.player.z, "yaw": s.target_yaw}))
 	file.close()
 	# Wait some frames. Then the scenario ends and the game quits.
 	await d.wait_frames(5)
@@ -56,6 +56,8 @@ func _reload(d: PlaytestDriver) -> void:
 			GameClock.format_time(int(expected.time))])
 	var miss := Vector2(s.player.x - expected.x, s.player.z - expected.z).length()
 	d.expect(miss < 0.05, "after the restart the player is %.3f m from the old position" % miss)
+	d.expect(absf(wrapf(float(s.yaw) - float(expected.yaw), -180.0, 180.0)) < 0.5,
+			"after the restart the player looks in the same direction: %.1f, not %.1f" % [s.yaw, expected.yaw])
 	d.expect(s.intro_done and s.line == "hem.near" and s.near_spot == "coc",
 			"after the restart the panel shows the cà phê cóc, not the intro: %s %s" % [s.line, s.near_spot])
 	await d.screenshot("after_restart")
