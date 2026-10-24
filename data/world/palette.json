@@ -1,0 +1,238 @@
+{
+	"note": "The colors of the houses (plan 0004, R10a to R10c). \"walls\" are the muted wall colors measured from aerial photos of Vũng Tàu: about 85 % of the walls. \"bold_walls\" are the strong colors of a few walls, more on mini-hotels and shops near the beach. A bold wall is at most 1 house in 6 in a hẻm of homes, and at most 1 in 3 on a street near the beach. Two neighbor houses do not have the same color. The colors with the source \"builder\" are first values that the owner checks.",
+	"walls": [
+		{
+			"color": "#D4D5D6",
+			"measured": "#C1C2C3",
+			"weight": 0.132,
+			"source": "aerial photos, 2026-10-24",
+			"note": "grey: the value is 10 % higher for the haze (R10a)"
+		},
+		{
+			"color": "#C3C0C2",
+			"measured": "#B1AFB0",
+			"weight": 0.128,
+			"source": "aerial photos, 2026-10-24",
+			"note": "grey: the value is 10 % higher for the haze (R10a)"
+		},
+		{
+			"color": "#E9E4DC",
+			"measured": "#E9E4DC",
+			"weight": 0.123,
+			"source": "aerial photos, 2026-10-24"
+		},
+		{
+			"color": "#B5A497",
+			"measured": "#B5A497",
+			"weight": 0.12,
+			"source": "aerial photos, 2026-10-24"
+		},
+		{
+			"color": "#E7E9E9",
+			"measured": "#D2D4D4",
+			"weight": 0.117,
+			"source": "aerial photos, 2026-10-24",
+			"note": "grey: the value is 10 % higher for the haze (R10a)"
+		},
+		{
+			"color": "#FEFFFB",
+			"measured": "#F5F6F2",
+			"weight": 0.101,
+			"source": "aerial photos, 2026-10-24",
+			"note": "grey: the value is 10 % higher for the haze (R10a)"
+		},
+		{
+			"color": "#D1B7A6",
+			"measured": "#D1B7A6",
+			"weight": 0.096,
+			"source": "aerial photos, 2026-10-24"
+		},
+		{
+			"color": "#E8CFB9",
+			"measured": "#E8CFB9",
+			"weight": 0.093,
+			"source": "aerial photos, 2026-10-24"
+		},
+		{
+			"color": "#B88C7C",
+			"measured": "#B88C7C",
+			"weight": 0.054,
+			"source": "aerial photos, 2026-10-24"
+		},
+		{
+			"color": "#939DB4",
+			"measured": "#939DB4",
+			"weight": 0.036,
+			"source": "aerial photos, 2026-10-24"
+		}
+	],
+	"bold_share": 0.15,
+	"bold_max_homes": 0.1667,
+	"bold_max_beach": 0.3333,
+	"bold_walls": [
+		{
+			"color": "#CE9E74",
+			"name": "salmon",
+			"source": "street photos, 2026-10-24"
+		},
+		{
+			"color": "#06ACC0",
+			"name": "turquoise",
+			"source": "street photos, 2026-10-24"
+		},
+		{
+			"color": "#7DB3DC",
+			"name": "sky blue",
+			"source": "builder, check"
+		},
+		{
+			"color": "#E6C440",
+			"name": "bright yellow",
+			"source": "builder, check"
+		},
+		{
+			"color": "#CE9E74",
+			"stripe": "#F2EFE6",
+			"name": "salmon and white stripes",
+			"source": "builder, check"
+		}
+	],
+	"villa_wall": {
+		"color": "#D3CFB4",
+		"name": "cream villa wall",
+		"source": "street photos, 2026-10-24"
+	},
+	"unpainted": {
+		"color": "#A3A799",
+		"name": "unpainted grey plaster",
+		"source": "street photos, 2026-10-24"
+	},
+	"brick": {
+		"color": "#A8553A",
+		"mortar": "#B9B1A2",
+		"name": "red hollow clay brick (gạch ống)",
+		"source": "builder, check"
+	},
+	"accents": {
+		"note": "The colors of the accent parts (R10b). They can be stronger than the walls. Source: builder, check.",
+		"shutters": [
+			"#3F6F8E",
+			"#5E7F45",
+			"#7A8A8C",
+			"#A0522D",
+			"#2F5E57",
+			"#9A9F9C"
+		],
+		"rails": [
+			"#2B2B2B",
+			"#4A4A44",
+			"#C7CBCC",
+			"#6B3E2E"
+		],
+		"frames": [
+			"#C9CDCE",
+			"#6B4A33",
+			"#F0EEE8",
+			"#3A3A3A"
+		],
+		"signs": [
+			"#C4362C",
+			"#F2C33C",
+			"#1F5FA8",
+			"#2E8B57",
+			"#FFFFFF",
+			"#1F4A3C"
+		],
+		"awnings": [
+			"#2E7D4F",
+			"#1F5FA8",
+			"#C4362C",
+			"#E07B2A",
+			"#D9D2C0"
+		],
+		"tiles": [
+			"#B7B2A8",
+			"#8E8A80",
+			"#C9B79C",
+			"#6E7476",
+			"#D8D2C8",
+			"#9B5E4A"
+		]
+	},
+	"roof_tiles": {
+		"colors": [
+			"#D39B83",
+			"#B28469",
+			"#634D3C"
+		],
+		"sunlit": "#E19C61",
+		"share": 0.06,
+		"source": "aerial photos, 2026-10-24"
+	},
+	"metal_roofs": {
+		"note": "Corrugated metal and roof terrace colors in a dense hẻm (R10c). Kind: grey (concrete roof, wall, faded metal), orange (terracotta or orange metal), rust, or teal (mint or teal metal).",
+		"source": "top-down photo of a dense hẻm, 2026-10-24",
+		"colors": [
+			{
+				"color": "#CBCAC0",
+				"weight": 0.132,
+				"kind": "grey"
+			},
+			{
+				"color": "#BCAF9A",
+				"weight": 0.114,
+				"kind": "orange"
+			},
+			{
+				"color": "#DDE5E4",
+				"weight": 0.112,
+				"kind": "grey"
+			},
+			{
+				"color": "#91968E",
+				"weight": 0.104,
+				"kind": "grey"
+			},
+			{
+				"color": "#7A7A71",
+				"weight": 0.086,
+				"kind": "grey"
+			},
+			{
+				"color": "#5C3E36",
+				"weight": 0.086,
+				"kind": "rust"
+			},
+			{
+				"color": "#94B8B8",
+				"weight": 0.082,
+				"kind": "teal"
+			},
+			{
+				"color": "#92574A",
+				"weight": 0.081,
+				"kind": "rust"
+			},
+			{
+				"color": "#B98265",
+				"weight": 0.063,
+				"kind": "orange"
+			},
+			{
+				"color": "#505E5B",
+				"weight": 0.061,
+				"kind": "teal"
+			},
+			{
+				"color": "#B0D8D8",
+				"weight": 0.053,
+				"kind": "teal"
+			},
+			{
+				"color": "#4FA9A9",
+				"weight": 0.027,
+				"kind": "teal"
+			}
+		]
+	}
+}

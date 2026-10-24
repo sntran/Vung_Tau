@@ -95,6 +95,13 @@ static func apply(preset: String, environment: Environment, sun: DirectionalLigh
 	environment.ssil_enabled = forward and bool(values.ssil)
 	environment.sdfgi_enabled = forward and bool(values.sdfgi)
 	environment.volumetric_fog_enabled = forward and bool(values.fog)
+	# A narrow hẻm gets little sky light. Without these values, SDFGI and SSAO
+	# made the street almost black at noon in the look review (PT-25).
+	environment.sdfgi_energy = 4.0
+	environment.sdfgi_bounce_feedback = 0.6
+	environment.ssao_intensity = 1.2
+	environment.ssil_intensity = 1.4
+	environment.volumetric_fog_density = 0.004
 	sun.directional_shadow_max_distance = float(values.shadow_distance)
 	viewport.scaling_3d_scale = float(values.scale)
 

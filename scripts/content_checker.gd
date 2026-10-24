@@ -8,6 +8,10 @@ extends RefCounted
 const STATUS_VALUES := ["confirmed", "source", "check"]
 const SPOT_KINDS := ["house", "shop", "stall", "cart", "place"]
 const GROUND_TYPES := ["gate", "shop", "wall"]
+const HOUSE_KINDS := ["tube", "villa", "hotel"]
+const HOUSE_STYLES := ["old", "new"]
+const ROOF_KINDS := ["flat", "metal", "tiles"]
+const FRONT_TILES := ["none", "ground", "full"]
 ## The forms of address of plan 0003 (R20).
 const ADDRESS_FORMS := ["bà", "cô", "chú", "bác", "anh", "chị", "em"]
 ## The events that start a message (data/messages.json).
@@ -551,18 +555,63 @@ func _check_layout(layout: Dictionary, spot_ids: Dictionary, spots: Dictionary) 
 	for spot_id: String in spot_ids:
 		if not placed.has(spot_id):
 			_error(file, "spot \"%s\"" % spot_id, "the spot has no place in the layout")
+	_check_paints(layout, file)
+
+
+## Two neighbor houses do not have the same color. A bold wall is at most 1
+## house in 6 in the hẻm of homes, and 1 in 3 on the beach road (R10a).
+func _check_paints(layout: Dictionary, file: String) -> void:
+	var palette := HousePalette.data()
+	var homes := 0
+	var homes_bold := 0
+	for row: String in ["lots", "opposite_lots", "beach_road_lots"]:
+		var lots: Variant = layout.get(row)
+		if typeof(lots) != TYPE_ARRAY:
+			continue
+		var bold := 0
+		var count := 0
+		for i in lots.size():
+			var lot: Variant = lots[i]
+			if typeof(lot) != TYPE_DICTIONARY or typeof(lot.get("paint")) != TYPE_STRING:
+				continue
+			count += 1
+			if HousePalette.is_bold(Color(lot.paint)):
+				bold += 1
+			if i > 0 and typeof(lots[i - 1]) == TYPE_DICTIONARY and lots[i - 1].get("paint") == lot.paint:
+				_error(file, "%s %d" % [row, i], "a house has the same color as its neighbor")
+		if row == "beach_road_lots":
+			if bold > floori(count * float(palette.bold_max_beach) + 0.001):
+				_error(file, row, "too many bold walls: %d of %d" % [bold, count])
+		else:
+			homes += count
+			homes_bold += bold
+	if homes_bold > floori(homes * float(palette.bold_max_homes) + 0.001):
+		_error(file, "lots", "too many bold walls in the hẻm: %d of %d" % [homes_bold, homes])
 
 
 ## Checks the fields that give the shape and the colors of a house.
 func _check_lot_shape(lot: Dictionary, file: String, where: String) -> void:
 	if _require(lot, "id", TYPE_STRING, file, where):
 		where = "lot \"%s\"" % lot.id
-	if _require(lot, "width", TYPE_FLOAT, file, where) and lot.width <= 0.0:
-		_error(file, where, "\"width\" must be more than 0")
-	if _require(lot, "floors", TYPE_INT, file, where) and lot.floors < 1:
-		_error(file, where, "\"floors\" must be 1 or more")
-	for field: String in ["wall_color", "trim_color", "shutter_color"]:
-		_require(lot, field, TYPE_STRING, file, where)
+	# Plan 0004, R10: the width, the floors, the kind, the style, the paint,
+	# the paint age, and the seed of each house.
+	if _require(lot, "width", TYPE_FLOAT, file, where) and (lot.width < 3.5 or lot.width > 5.0):
+		_error(file, where, "\"width\" must be from 3.5 to 5 m")
+	if _require(lot, "floors", TYPE_INT, file, where) and (lot.floors < 2 or lot.floors > 5):
+		_error(file, where, "\"floors\" must be from 2 to 5")
+	if _require(lot, "kind", TYPE_STRING, file, where) and not HOUSE_KINDS.has(lot.kind):
+		_error(file, where, "kind \"%s\" must be one of %s" % [lot.kind, HOUSE_KINDS])
+	if _require(lot, "style", TYPE_STRING, file, where) and not HOUSE_STYLES.has(lot.style):
+		_error(file, where, "style \"%s\" must be one of %s" % [lot.style, HOUSE_STYLES])
+	if _require(lot, "paint", TYPE_STRING, file, where) and not HousePalette.is_wall_color(Color(lot.paint)):
+		_error(file, where, "paint \"%s\" is not a wall color of palette.json" % lot.paint)
+	if _require(lot, "paint_age", TYPE_FLOAT, file, where) and (lot.paint_age < 0.0 or lot.paint_age > 1.0):
+		_error(file, where, "\"paint_age\" must be from 0 to 1")
+	_require(lot, "seed", TYPE_INT, file, where)
+	if lot.has("roof") and not ROOF_KINDS.has(lot.roof):
+		_error(file, where, "roof \"%s\" must be one of %s" % [lot.roof, ROOF_KINDS])
+	if lot.has("front_tiles") and not FRONT_TILES.has(lot.front_tiles):
+		_error(file, where, "front_tiles \"%s\" must be one of %s" % [lot.front_tiles, FRONT_TILES])
 	_require(lot, "balcony", TYPE_BOOL, file, where)
 	if _require(lot, "ground", TYPE_STRING, file, where) and not GROUND_TYPES.has(lot.ground):
 		_error(file, where, "ground \"%s\" must be one of %s" % [lot.ground, GROUND_TYPES])
@@ -588,11 +637,15 @@ func _check_ui(ui: Dictionary) -> void:
 			"phrasebook_empty", "reply_play", "reply_say", "reply_english", "said_title", "said_done",
 			"phrase_saved", "lens_empty", "lens_person", "messages_empty", "notify_card", "notify_message",
 			"clock_day", "clock_rest", "clock_sleep_away", "notebook_phrases", "notebook_no_phrases",
-			"settings_sound", "settings_subtitles", "settings_subtitle_size", "settings_subtitle_box"]:
+			"settings_sound", "settings_subtitles", "settings_subtitle_size", "settings_subtitle_box",
+			"settings_quality", "settings_restart_note", "settings_restart", "settings_fullscreen", "settings_mouse"]:
 		_require(ui, field, TYPE_STRING, file, "file")
 	if _require(ui, "apps", TYPE_DICTIONARY, file, "file"):
 		for app: String in ["listen", "lens", "messages", "notebook", "clock", "settings"]:
 			_require(ui.apps, app, TYPE_STRING, file, "apps")
+	if _require(ui, "quality_presets", TYPE_DICTIONARY, file, "file"):
+		for preset: String in Quality.NAMES:
+			_require(ui.quality_presets, preset, TYPE_STRING, file, "quality_presets")
 	if _require(ui, "subtitle_languages", TYPE_DICTIONARY, file, "file"):
 		for language: String in SUBTITLE_IDS:
 			_require(ui.subtitle_languages, language, TYPE_STRING, file, "subtitle_languages")

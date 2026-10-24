@@ -57,5 +57,6 @@ renderer/rendering_method.web="gl_compatibility"
 textures/vram_compression/import_etc2_astc=true
 anti_aliasing/quality/msaa_3d=0
 
+global_illumination/sdfgi/frames_to_converge=0
 lights_and_shadows/directional_shadow/size=2048
 lights_and_shadows/directional_shadow/size.mobile=2048

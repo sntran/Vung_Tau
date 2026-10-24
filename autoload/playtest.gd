@@ -3,7 +3,8 @@ extends Node
 ## --playtest=NAME (R32). Without it, it does nothing.
 ##
 ## Before the scenario starts, it can set only the start state (R33):
-## --start-time=HH:MM, --day=N, --save-path=PATH (read by GameState), --seed=N.
+## --start-time=HH:MM, --day=N, --save-path=PATH (read by GameState), --seed=N,
+## --quality=NAME (a quality preset, plan 0004).
 ## After the start, the scenario changes the game only through input events.
 ##
 ## Other arguments: --out=DIR (the folder for the screenshots and log.json)
@@ -32,6 +33,12 @@ func _ready() -> void:
 			push_error("Playtest: --start-time=%s is not a time HH:MM." % start_time)
 		else:
 			GameState.minutes = minutes
+	var quality := GameState.arg_value("quality")
+	if quality != "":
+		if Quality.PRESETS.has(quality):
+			GameState.settings.quality = quality
+		else:
+			push_error("Playtest: --quality=%s is not a preset." % quality)
 	var day := GameState.arg_value("day")
 	if day.is_valid_int():
 		GameState.day = maxi(day.to_int(), 1)

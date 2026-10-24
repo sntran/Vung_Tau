@@ -1048,3 +1048,36 @@ func ui_report() -> Array[Dictionary]:
 					or rich.get_content_height() > rich.size.y + 1.0
 		report.append(entry)
 	return report
+
+
+# --- Fixed views (plan 0004) --------------------------------------------------
+
+## Puts the camera at a fixed viewpoint for a screenshot (PT-25, PT-28, PT-32).
+## The player stops: physics does not move it until fly_end(). This is a test
+## setup step, the same as --start-time.
+func fly_to(eye: Vector3, look_at: Vector3) -> void:
+	var player: Player = main().player
+	player.set_physics_process(false)
+	var to := look_at - eye
+	var yaw := rad_to_deg(atan2(-to.x, -to.z))
+	var pitch := rad_to_deg(atan2(to.y, Vector2(to.x, to.z).length()))
+	player.place(eye - Vector3(0, Player.EYE_HEIGHT, 0), yaw, pitch)
+	await wait_frames(2)
+
+
+func fly_end() -> void:
+	main().player.set_physics_process(true)
+
+
+## The fixed views of the hẻm for the look review and the budget (PT-25, PT-32):
+## [{name, eye, target}].
+func hem_views() -> Array[Dictionary]:
+	var hem: Hem = main().hem
+	var half := hem.hem_width / 2.0
+	var mid := (hem.start_x + hem.end_x) / 2.0
+	return [
+		{"name": "along", "eye": Vector3(hem.start_x + 1.0, 1.6, 0.2), "target": Vector3(hem.end_x, 3.0, -0.2)},
+		{"name": "back", "eye": Vector3(hem.end_x - 1.0, 1.6, -0.2), "target": Vector3(hem.start_x, 4.0, 0.2)},
+		{"name": "fronts", "eye": Vector3(mid, 1.6, half - 0.4), "target": Vector3(mid + 3.0, 6.0, -half)},
+		{"name": "roofs", "eye": Vector3(mid - 14.0, 26.0, 18.0), "target": Vector3(mid, 4.0, 0.0)},
+	]

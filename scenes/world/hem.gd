@@ -16,18 +16,23 @@ const BeachScene := preload("res://scenes/world/beach.tscn")
 
 const FLOOR_LAYER := Layers.FLOOR
 const TOUCH_LAYER := Layers.TOUCH
-const CART_Z := -1.3
-const LOT_STAND_Z := -0.75
-const CART_STAND_Z := 0.0
-const NPC_STAND_Z := -0.55
-const HELPER_Z := 0.9
 ## The collision height of a stool of the cà phê cóc (see _build_stall).
 const STOOL_SOLID_HEIGHT := 0.6
 const HELPER_SPEED := 0.9
 ## The navigation mesh uses this cell size. The map cell size must be the same.
 const NAV_CELL := 0.15
 
-var hem_width := 3.5
+var hem_width := 2.8
+## The places across the hẻm, from its width (plan 0004, R11a): the carts on
+## the street in front of the steps, and where the player stands.
+var cart_z := -0.68
+var lot_stand_z := -0.75
+var cart_stand_z := 0.42
+var npc_z := -0.95
+var npc_stand_z := -0.2
+var helper_z := 0.3
+## The repeated small parts of all houses (rail bars, pots, AC units).
+var parts: HouseParts
 var house_depth := 14.0
 var start_x := 0.0
 var end_x := 0.0
@@ -75,17 +80,29 @@ func build() -> void:
 	var layout: Dictionary = Content.layout
 	hem_width = float(layout.hem_width)
 	house_depth = float(layout.house_depth)
+	var half := hem_width / 2.0
+	cart_z = -half + TubeHouse.STEP_DEPTH + 0.42
+	lot_stand_z = -half + 0.65
+	cart_stand_z = cart_z + 1.1
+	npc_z = -half + 0.45
+	npc_stand_z = npc_z + 0.75
+	helper_z = 0.3
+	parts = HouseParts.new()
+	parts.name = "HouseParts"
+	add_child(parts)
 	var floor_height := float(layout.floor_height)
 	var lots: Array = layout.lots
 	start_x = -float(lots[0].width) / 2.0
 	var x := start_x
+	var row: Array[TubeHouse] = []
 	for lot: Dictionary in lots:
 		var w := float(lot.width)
 		var center := x + w / 2.0
 		lot_x[lot.id] = center
-		_build_lot(lot, center, floor_height)
+		row.append(_build_lot(lot, center, floor_height))
 		x += w
 	end_x = x
+	_add_row(row)
 	_build_opposite_row(layout.opposite_lots, floor_height)
 	for cart: Dictionary in layout.carts:
 		_build_cart(cart)
@@ -103,6 +120,8 @@ func build() -> void:
 	stand_points[beach.spot_id] = beach.position + beach.stand_point()
 	focus_points[beach.spot_id] = beach.position + beach.focus_point()
 	_build_beach_road_rows(layout.beach_road_lots, floor_height)
+	_build_cables()
+	parts.commit()
 	_build_floor_collider()
 	_build_navigation()
 	_clack_left = randf_range(4.0, 5.0)
@@ -114,12 +133,17 @@ func _make_house(lot: Dictionary, floor_height: float) -> TubeHouse:
 	house.width = float(lot.width)
 	house.floors = int(lot.floors)
 	house.floor_height = floor_height
-	house.wall_color = Color(lot.wall_color)
-	house.trim_color = Color(lot.trim_color)
+	house.kind = lot.get("kind", "tube")
+	house.style = lot.get("style", "old")
+	house.paint = Color(lot.paint)
+	house.paint_age = float(lot.get("paint_age", 0.4))
+	house.seed = int(lot.get("seed", 0))
+	house.roof = lot.get("roof", "")
+	house.front_tiles = lot.get("front_tiles", "none")
 	house.balcony = bool(lot.balcony)
-	house.shutter_color = Color(lot.shutter_color)
 	house.ground = lot.ground
 	house.depth = house_depth
+	house.parts = parts
 	if lot.has("sign"):
 		house.sign_text = lot.sign.text
 		house.sign_bg = Color(lot.sign.bg)
@@ -127,16 +151,26 @@ func _make_house(lot: Dictionary, floor_height: float) -> TubeHouse:
 	return house
 
 
-func _build_lot(lot: Dictionary, center: float, floor_height: float) -> void:
+## Gives each house of a row the heights of its neighbors (the part of a side
+## wall above a shorter neighbor is bare, R9), then builds the houses.
+func _add_row(row: Array[TubeHouse]) -> void:
+	for i in row.size():
+		row[i].left_neighbor_height = row[i - 1].top_height() if i > 0 else 0.0
+		row[i].right_neighbor_height = row[i + 1].top_height() if i < row.size() - 1 else 0.0
+	for house in row:
+		add_child(house)
+
+
+## Makes the house of a lot of the main row. The house is built later, in _add_row().
+func _build_lot(lot: Dictionary, center: float, floor_height: float) -> TubeHouse:
 	var house := _make_house(lot, floor_height)
 	house.position = Vector3(center, 0, -hem_width / 2.0)
-	add_child(house)
 	houses[lot.id] = house
 	if not lot.has("spot"):
-		return
+		return house
 	var spot_id: String = lot.spot
 	_spot_lots[spot_id] = lot.id
-	stand_points[spot_id] = Vector3(center, 0, LOT_STAND_Z)
+	stand_points[spot_id] = Vector3(center, 0, lot_stand_z)
 	var area := _make_touch_area("spot_id", spot_id, Vector3(float(lot.width) - 0.3, 2.9, 0.4))
 	area.position = Vector3(center, 1.45, -hem_width / 2.0 + 0.2)
 	focus_points[spot_id] = _focus_point(spot_id, Vector3(center, 1.6, -hem_width / 2.0))
@@ -152,6 +186,7 @@ func _build_lot(lot: Dictionary, center: float, floor_height: float) -> void:
 	_spot_lights[spot_id] = light
 	if lot.ground == "wall":
 		_build_stall(spot_id, center, float(lot.width))
+	return house
 
 
 ## Returns the focus point of a spot: the "focus" offset in spots.json from
@@ -167,14 +202,18 @@ func _focus_point(spot_id: String, default: Vector3) -> Vector3:
 ## The row of houses on the other side of the hẻm. They face the main row.
 func _build_opposite_row(lots: Array, floor_height: float) -> void:
 	var x := start_x
+	var row: Array[TubeHouse] = []
 	for lot: Dictionary in lots:
 		var w := float(lot.width)
 		var house := _make_house(lot, floor_height)
 		house.position = Vector3(x + w / 2.0, 0, hem_width / 2.0)
 		house.rotation_degrees.y = 180.0
-		add_child(house)
 		houses[lot.id] = house
+		row.append(house)
 		x += w
+	# The row faces -Z, so its left side is at the high X end.
+	row.reverse()
+	_add_row(row)
 
 
 ## The rows of houses along the beach road, at both sides of the end of the
@@ -182,6 +221,7 @@ func _build_opposite_row(lots: Array, floor_height: float) -> void:
 func _build_beach_road_rows(lots: Array, floor_height: float) -> void:
 	for side: float in [-1.0, 1.0]:
 		var z := side * (hem_width / 2.0 + house_depth)
+		var row: Array[TubeHouse] = []
 		for lot: Dictionary in lots:
 			var w := float(lot.width)
 			var house := _make_house(lot, floor_height)
@@ -189,8 +229,12 @@ func _build_beach_road_rows(lots: Array, floor_height: float) -> void:
 			house.depth = 12.0
 			house.position = Vector3(end_x, 0, z + side * w / 2.0)
 			house.rotation_degrees.y = 90.0
-			add_child(house)
+			row.append(house)
 			z += side * w
+		# The houses face +X: the left side is at the low Z end.
+		if side > 0.0:
+			row.reverse()
+		_add_row(row)
 
 
 ## A sidewalk stall (cà phê cóc): stools and people when open, a stack of stools when closed.
@@ -234,7 +278,7 @@ func _build_cart(cart: Dictionary) -> void:
 	var x := float(lot_x[cart.lot]) + float(cart.offset)
 	var root := Node3D.new()
 	root.name = "Cart_%s" % spot_id
-	root.position = Vector3(x, 0, CART_Z)
+	root.position = Vector3(x, 0, cart_z)
 	add_child(root)
 	Greybox.cart(root, Vector3.ZERO, Color(cart.color), cart.sign.text, Color(cart.sign.bg),
 			Color(cart.sign.fg))
@@ -244,12 +288,12 @@ func _build_cart(cart: Dictionary) -> void:
 	Greybox.solid_shape(body, Vector3(1.4, 1.8, 0.75), Vector3(0, 0.9, 0))
 	Greybox.solid_shape(body, Vector3(0.45, 1.55, 0.35), Vector3(0.35, 0.78, -0.55))
 	var area := _make_touch_area("spot_id", spot_id, Vector3(1.5, 1.9, 0.9))
-	area.position = Vector3(x, 0.95, CART_Z)
+	area.position = Vector3(x, 0.95, cart_z)
 	carts[spot_id] = root
 	_cart_areas[spot_id] = area
 	_cart_bodies[spot_id] = body
-	stand_points[spot_id] = Vector3(x, 0, CART_STAND_Z)
-	focus_points[spot_id] = _focus_point(spot_id, Vector3(x, 1.2, CART_Z))
+	stand_points[spot_id] = Vector3(x, 0, cart_stand_z)
+	focus_points[spot_id] = _focus_point(spot_id, Vector3(x, 1.2, cart_z))
 
 
 func _build_npc(data: Dictionary) -> void:
@@ -263,10 +307,10 @@ func _build_npc(data: Dictionary) -> void:
 	if data.has("height"):
 		npc.height = float(data.height)
 	var x := float(lot_x[data.lot]) + float(data.offset)
-	npc.position = Vector3(x, 0, -hem_width / 2.0 + 0.45)
+	npc.position = Vector3(x, 0, npc_z)
 	add_child(npc)
 	npcs[data.npc] = npc
-	npc_stand_points[data.npc] = Vector3(x, 0, NPC_STAND_Z)
+	npc_stand_points[data.npc] = Vector3(x, 0, npc_stand_z)
 
 
 func _build_helper() -> void:
@@ -277,7 +321,7 @@ func _build_helper() -> void:
 	helper.hair = Color("#1B1B1B")
 	helper.height = 1.45
 	helper.moving = true
-	helper.position = Vector3(10, 0, HELPER_Z)
+	helper.position = Vector3(10, 0, helper_z)
 	add_child(helper)
 	# The two bamboo sticks.
 	Greybox.box(helper, Vector3(0.04, 0.04, 0.3), Vector3(0.3, 0.95, 0.15), Color("#C8A24A"))
@@ -322,10 +366,24 @@ func _make_touch_area(meta_key: String, item_id: String, size: Vector3) -> Area3
 func _build_ground() -> void:
 	var length := end_x - start_x
 	var mid := (start_x + end_x) / 2.0
-	Greybox.box(self, Vector3(length, 0.1, hem_width), Vector3(mid, -0.05, 0), Color("#A9A69C"), "HemFloor")
-	for side: float in [-1.0, 1.0]:
-		Greybox.box(self, Vector3(length, 0.02, 0.25), Vector3(mid, 0.01, side * (hem_width / 2.0 - 0.125)),
-				Color("#77746B"), "Gutter")
+	# The concrete floor with cracks and patches (R11).
+	var hem_floor := Greybox.box(self, Vector3(length, 0.1, hem_width), Vector3(mid, -0.05, 0), Color("#A9A69C"), "HemFloor")
+	var concrete := ShaderMaterial.new()
+	concrete.shader = load("res://scenes/world/parts/concrete_floor.gdshader")
+	concrete.set_shader_parameter("half_width", hem_width / 2.0)
+	hem_floor.material_override = concrete
+	# A drain gutter in the middle of the hẻm, with a cover each 3 m.
+	var drain := MeshBatch.new()
+	drain.box("detail", Vector3(length, 0.012, 0.18), Vector3(mid, 0.006, 0), Color("#6F6C64"))
+	var cover_x := start_x + 1.5
+	while cover_x < end_x - 0.5:
+		drain.box("metal", Vector3(0.5, 0.02, 0.3), Vector3(cover_x, 0.01, 0), Color("#4A4842"))
+		for i in 5:
+			drain.box("detail", Vector3(0.04, 0.022, 0.26), Vector3(cover_x - 0.2 + i * 0.1, 0.012, 0), Color("#2A2925"))
+		cover_x += 3.0
+	var drain_meshes := drain.commit(self, HouseMaterials.all(), "Drain")
+	for instance: MeshInstance3D in drain_meshes.values():
+		instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var body := Greybox.solid_body(self, "HemSolid")
 	# The end of the hẻm at the low X end is a wall.
 	Greybox.solid_box(self, body, Vector3(0.3, 4.2, hem_width + 0.6), Vector3(start_x - 0.15, 2.1, 0),
@@ -349,11 +407,63 @@ func _build_ground() -> void:
 		for side: float in [-1.0, 1.0]:
 			Greybox.box(self, Vector3(5.5, h, 4.0),
 					Vector3(start_x - 4.0 + i * 4.4, h / 2.0, side * (22.0 + fmod(i * 13.0, 6.0))), far)
-	# Overhead wires.
-	for i in 3:
-		var wire := Greybox.box(self, Vector3(length, 0.025, 0.025),
-				Vector3(mid, 5.6 + i * 0.18, -hem_width / 2.0 + 0.6 + i * 0.25), Color("#222222"))
-		wire.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+
+## Concrete poles with thick, sagging bundles of many cables along the hẻm and
+## across it (R7). They are one of the strongest features of the street.
+func _build_cables() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 4207
+	var batch := MeshBatch.new()
+	var body := Greybox.solid_body(self, "PoleSolid")
+	var half := hem_width / 2.0
+	var poles: Array[Vector3] = []
+	var x := start_x + 1.2
+	var side := 1.0
+	while x < end_x:
+		poles.append(Vector3(x, 0, side * (half - 0.14)))
+		x += rng.randf_range(7.0, 9.0)
+		side = -side
+	var pole_height := 7.2
+	for pole in poles:
+		# A concrete pole: square, narrower at the top.
+		batch.box("detail", Vector3(0.22, pole_height * 0.5, 0.22), pole + Vector3(0, pole_height * 0.25, 0), Color("#9C9A92"))
+		batch.box("detail", Vector3(0.16, pole_height * 0.5, 0.16), pole + Vector3(0, pole_height * 0.75, 0), Color("#A6A49C"))
+		batch.box("detail", Vector3(0.9, 0.08, 0.08), pole + Vector3(0, pole_height - 0.5, 0), Color("#8A8880"))
+		Greybox.solid_shape(body, Vector3(0.22, 3.0, 0.22), pole + Vector3(0, 1.5, 0))
+		# A coil of spare cable on the pole.
+		batch.cylinder("cable", 0.22, 0.12, pole + Vector3(0, 5.2, 0), Color("#1C1C1C"), 10)
+	var cable_colors := [Color("#151515"), Color("#202020"), Color("#2A2A2A"), Color("#3A3A3A"), Color("#4A4A48")]
+	for i in poles.size():
+		var a := poles[i] + Vector3(0, pole_height - 0.7, 0)
+		# Along the hẻm to the next pole.
+		if i + 1 < poles.size():
+			var b := poles[i + 1] + Vector3(0, pole_height - 0.7, 0)
+			_cable_bundle(batch, a, b, rng.randi_range(10, 18), rng, cable_colors)
+		# Across the hẻm to the houses at the other side, for the homes.
+		var other := Vector3(poles[i].x + rng.randf_range(-1.5, 1.5), pole_height - 2.0, -signf(poles[i].z) * (half + 0.05))
+		_cable_bundle(batch, a + Vector3(0, -0.3, 0), other, rng.randi_range(3, 7), rng, cable_colors)
+	var instances := batch.commit(self, HouseMaterials.all(), "Cables")
+	if instances.has("cable"):
+		(instances["cable"] as MeshInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+
+## A bundle of cables from a to b. Each cable sags a little more or less, so the
+## bundle is thick and untidy.
+func _cable_bundle(batch: MeshBatch, a: Vector3, b: Vector3, count: int, rng: RandomNumberGenerator,
+		colors: Array) -> void:
+	var length := a.distance_to(b)
+	for c in count:
+		var offset := Vector3(rng.randf_range(-0.12, 0.12), rng.randf_range(-0.12, 0.12), rng.randf_range(-0.12, 0.12))
+		var sag := length * rng.randf_range(0.035, 0.07)
+		var points := PackedVector3Array()
+		var steps := maxi(6, int(length / 0.7))
+		for s in steps + 1:
+			var t := float(s) / steps
+			var point := a.lerp(b, t) + offset * (1.0 - absf(t - 0.5) * 1.2)
+			point.y -= sag * 4.0 * t * (1.0 - t)
+			points.append(point)
+		batch.tube("cable", points, rng.randf_range(0.007, 0.016), colors[rng.randi() % colors.size()], 4)
 
 
 func _build_street_lamps() -> void:
@@ -483,7 +593,8 @@ func update_time(minutes: int) -> void:
 			for rule: Dictionary in spot.get("shutter_half", []):
 				if GameClock.in_range(rule, minutes):
 					shutter = TubeHouse.Shutter.HALF
-		house.set_shutter(shutter)
+		# The shutter rolls when it changes during the game (R7), not at the start.
+		house.set_shutter(shutter, _present_key != "")
 		house.set_glow(dark and (open or spot.hours == null))
 		_spot_lights[spot_id].visible = dark and (open or spot.hours == null)
 		if _stall_open.has(spot_id):
