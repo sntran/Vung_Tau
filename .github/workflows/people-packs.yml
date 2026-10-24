@@ -14,26 +14,31 @@ jobs:
   packs:
     name: Copy the packs
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
 
       - name: Download the packs
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -uo pipefail
           mkdir -p packs
-          python3 -u tools/people/fetch_packs.py packs 2>&1 | tee packs/download.log
+          tag=$(python3 -c 'import json;print(json.load(open("tools/people/packs.json"))["release"])')
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            gh release create "$tag" --title "People packs 1" \
+              --notes "Copies of the MakeHuman asset packs that the people build uses (plan 0006). Licenses, sources, and SHA-256: the files packs.lock.*.json."
+          fi
+          gh release view "$tag" --json assets --jq '.assets[].name' 2>/dev/null \
+            | sed -n 's/\.zip$//p' > skip.txt || true
+          UPLOAD_TAG="$tag" python3 -u tools/people/fetch_packs.py packs skip.txt 2>&1 | tee "packs/download.$(wc -l < skip.txt).log"
 
-      - name: Upload the packs to the release
+      - name: Upload the log
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           tag=$(python3 -c 'import json;print(json.load(open("tools/people/packs.json"))["release"])')
-          if ! gh release view "$tag" >/dev/null 2>&1; then
-            gh release create "$tag" --title "People packs 1" \
-              --notes "Copies of the MakeHuman asset packs that the people build uses (plan 0006). Licenses and sources: packs.lock.json."
-          fi
-          gh release upload "$tag" packs/* --clobber
+          gh release upload "$tag" packs/*.log --clobber
           test ! -s packs/failed.txt
