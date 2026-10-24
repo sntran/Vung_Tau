@@ -33,6 +33,7 @@ These decisions replace decisions D3, D4, and D5 of plan 0001.
 | D7 | Comfort: walk speed 1.4 m/s, no head bob, horizontal field of view 75° (a setting from 60° to 90°), smooth look with a limit on the turn speed. | A normal walk speed. Less motion sickness for players who do not play 3D games. |
 | D8 | A small dot at the screen center shows the focus. The focus is the touchable object nearest to the dot, at 3 m or less. An action button shows the verb for the focus ("Talk", "Look", "Sit"). | One clear way to start an action without a precise tap. |
 | D9 | Sensor data (gyroscope) is input. Play tests can send sensor data through the play-test driver. | Rule R33 of plan 0001 permits input only. The gyroscope is input. |
+| D10 | Use the Mobile renderer (Vulkan) on Android and iOS. This replaces decision D2 of plan 0001. The web build stays on the Compatibility renderer, because Godot web exports support only that renderer. | The Mobile renderer gives better light on phones. It now renders in the development workspace with the Mesa software Vulkan driver (lavapipe), so the play tests can still take screenshots. Verified with Godot 4.7.2: "Vulkan 1.4.318 - Forward Mobile - Using Device: llvmpipe". |
 
 The time cost of walking does not change: 1 game minute for each 8 m.
 
@@ -75,9 +76,16 @@ The time cost of walking does not change: 1 game minute for each 8 m.
 - **R18.** A settings sheet has: look sensitivity, invert up and down, gyroscope on or off, field of view, and tap to walk on or off. The settings are saved in the save file.
 - **R19.** All buttons are at least 88 px high at the 720 px base height.
 
+### Renderer
+
+- **R22.** Set `rendering/renderer/rendering_method` and `rendering/renderer/rendering_method.mobile` to `mobile`.
+- **R23.** `tools/setup.sh` installs the package `mesa-vulkan-drivers` when `/usr/share/vulkan/icd.d/lvp_icd.json` is missing. The command is `apt-get install -y mesa-vulkan-drivers`. The CI workflow does the same.
+- **R24.** `tools/playtest.sh` runs Godot with `--rendering-driver vulkan --rendering-method mobile`. Record the frame rate under lavapipe in `AGENTS.md`.
+- **R25.** Run PT-17 one time on the web build too, with the Compatibility renderer. The web screenshots can look different, but the layout must be correct.
+
 ### Play-test system
 
-- **R20.** Add these functions to `PlaytestDriver`:
+- **R26.** Add these functions to `PlaytestDriver`:
 
   | Function | What it does |
   |---|---|
@@ -86,7 +94,7 @@ The time cost of walking does not change: 1 game minute for each 8 m.
   | `look_at_id(test_id: String, timeout_s := 10.0)` | Drags on the right half until the node is at the center dot. |
   | `gyro(rate: Vector3, seconds: float)` | Sends gyroscope data through the sensor source of the game. |
 
-- **R21.** The game reads the gyroscope through one sensor source object. Normally it reads `Input.get_gyroscope()`. The play-test system can replace it with a scripted source.
+- **R27.** The game reads the gyroscope through one sensor source object. Normally it reads `Input.get_gyroscope()`. The play-test system can replace it with a scripted source.
 
 ## 5. Play-test scenarios
 
