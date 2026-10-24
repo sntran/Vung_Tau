@@ -51,7 +51,7 @@ var sea_level := 0.0
 var ridge_points := PackedVector2Array()
 var ridge_top := -INF
 var ridge_width := 4.0
-## The load time in milliseconds of each near chunk, for PT-22.
+## The load time in milliseconds of each near chunk, for PT-29.
 var load_times: Array[float] = []
 var _ground_material: ShaderMaterial
 var _sea_material: ShaderMaterial

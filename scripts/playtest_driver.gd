@@ -994,6 +994,9 @@ func state() -> Dictionary:
 			"chunks": world.loaded_counts(),
 			"load_times": world.load_times.duplicate(),
 			"fps": Engine.get_frames_per_second(),
+			"sea_level": world.sea_level,
+			"ridge_dry": world.is_ridge_dry(),
+			"on_ridge": world.is_on_ridge(pos),
 		})
 	return result
 
@@ -1281,7 +1284,7 @@ func pad_select(test_id: String) -> bool:
 	return false
 
 
-## Plays the game faster, for the long walks of PT-19 to PT-22 under lavapipe.
+## Plays the game faster, for the long walks of PT-26 to PT-29 under lavapipe.
 ## The player walks at the same speed in game time.
 func set_time_scale(scale: float) -> void:
 	Engine.time_scale = scale

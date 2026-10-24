@@ -1,4 +1,4 @@
-"""Tests for build.py with the small test extract (plan 0003, R18)."""
+"""Tests for build.py with the small test extract (plan 0004, R18)."""
 
 import json
 

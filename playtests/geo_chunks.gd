@@ -1,5 +1,5 @@
 extends RefCounted
-# PT-22 geo_chunks. Walk 2 km with tap to walk. At each frame, a ray down from
+# PT-29 geo_chunks. Walk 2 km with tap to walk. At each frame, a ray down from
 # the camera hits the ground or the sea. Record the time to load each chunk. No
 # chunk takes more than 2 s under lavapipe.
 # The walk is on Thùy Vân, the road along Bãi Sau. The game runs 5 times
@@ -45,7 +45,7 @@ func run(d: PlaytestDriver) -> void:
 		frame_ms[0] += Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0
 		var hit: Dictionary = space.intersect_ray(PhysicsRayQueryParameters3D.create(eye, eye - Vector3(0, 500, 0),
 				Layers.FLOOR))
-		var over_sea := eye.y > 0.0 and w.ground_height(eye.x, eye.z) < 0.0
+		var over_sea := eye.y > w.sea_level and w.ground_height(eye.x, eye.z) < w.sea_level
 		if hit.is_empty() and not over_sea:
 			misses[0] += 1
 	d.main().get_tree().process_frame.connect(check)

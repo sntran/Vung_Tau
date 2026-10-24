@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Computes the tide constituents of Vũng Tàu (plan 0003, D12, R8d to R8j).
+"""Computes the tide constituents of Vũng Tàu (plan 0004, D12, R8d to R8j).
 
 Usage:
   python tools/geo/tide.py                      Download EOT20 (if necessary) and write the tide files.
@@ -138,7 +138,7 @@ def propose_days(windows: list[dict]) -> list[dict]:
 
 
 def report(tide: dict, top: float, windows: list[dict], days: list[dict], check: float) -> str:
-    lines = ["# The tide report (plan 0003, R8d to R8j)", "",
+    lines = ["# The tide report (plan 0004, R8d to R8j)", "",
              f"Made by `tools/geo/tide.py` on {datetime.date.today().isoformat()}. Source: {tide['source']}", "",
              "## The constituents at Hòn Bà", "",
              "| Constituent | Amplitude (m) | Phase (°) | Nearest EOT20 cell (km) |", "|---|---|---|---|"]
@@ -157,7 +157,7 @@ def report(tide: dict, top: float, windows: list[dict], days: list[dict], check:
             problems.append(f"{c.upper()} differs by {diff:+.0%} from the station")
         lines.append(f"| {c.upper()} | {value:.3f} | {ours:.3f} | {diff:+.1%} | {'ok' if ok else 'PROBLEM'} |")
     lines += ["", "## The checks", "",
-              f"- The game calculation (`geodata/tidecalc.py`, the same as `scripts/geo/tide.gd`) agrees with pyTMD "
+              f"- The game calculation (`geodata/tidecalc.py`, the same as `scripts/geo/tide_model.gd`) agrees with pyTMD "
               f"within {check * 1000:.2f} mm for the {TESTS} test values.",
               "- The test values have no minor constituents (pyTMD can infer them from the major constituents). "
               "The game uses only the 17 constituents of EOT20."]
@@ -205,8 +205,8 @@ def main() -> int:
     expected, deltat_s = pytmd_levels(constants["hon_ba"], tests_t)
     coefficients = pyTMD.constituents.coefficients_table(CONSTITUENTS, corrections="FES")
     tide = {
-        "note": "The tide at Vũng Tàu (plan 0003, D12). The sea level is the sum of f · A · cos(G + u − g) for each "
-                "constituent. See tools/geo/geodata/tidecalc.py and scripts/geo/tide.gd.",
+        "note": "The tide at Vũng Tàu (plan 0004, D12). The sea level is the sum of f · A · cos(G + u − g) for each "
+                "constituent. See tools/geo/geodata/tidecalc.py and scripts/geo/tide_model.gd.",
         "source": f"EOT20 (Hart-Davis et al., 2021) with pyTMD {pyTMD.__version__}, FES nodal corrections",
         "license": eot20.LICENSE,
         "datum": "mean sea level",

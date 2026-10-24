@@ -1,4 +1,4 @@
-"""The projection of plan 0003, D4.
+"""The projection of plan 0004, D4.
 
 Map coordinates are meters in UTM zone 48N (EPSG:32648) from the game origin:
 x is east and y is north. Game coordinates are X east, Y up, and Z south

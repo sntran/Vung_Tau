@@ -12,7 +12,7 @@
 
 The 3D shapes in plan 0001 are made in code (`scripts/greybox.gd`). They use no model files.
 
-## Geodata (plan 0003)
+## Geodata (plan 0004)
 
 | Asset | Path | Source | License |
 |---|---|---|---|

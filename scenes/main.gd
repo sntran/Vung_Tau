@@ -1261,5 +1261,7 @@ func _update_debug_overlay() -> void:
 		lines.append("Ground %.2f m" % vung_tau.ground_height(pos.x, pos.z))
 		lines.append("Road: %s" % (road.get("name", "") if not road.is_empty() else "-"))
 		lines.append("Chunks: %d near, %d mid, %d far" % [counts.near, counts.mid, counts.far])
+		lines.append("Sea %+.2f m, ridge %s" % [vung_tau.sea_level, "dry" if vung_tau.is_ridge_dry() else "under water"])
+		lines.append(GameCalendar.text(GameState.day))
 	debug_overlay.text = "\n".join(lines)
 

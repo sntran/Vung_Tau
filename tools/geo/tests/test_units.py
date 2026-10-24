@@ -1,4 +1,4 @@
-"""Unit tests for the parts of the pipeline (plan 0003, R17 and R18)."""
+"""Unit tests for the parts of the pipeline (plan 0004, R17 and R18)."""
 
 import math
 

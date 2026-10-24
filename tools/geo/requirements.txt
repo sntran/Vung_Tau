@@ -1,4 +1,4 @@
-# The packages of the geodata pipeline (plan 0003, D3).
+# The packages of the geodata pipeline (plan 0004, D3).
 numpy==2.5.4
 scipy==1.18.1
 rasterio==1.5.2

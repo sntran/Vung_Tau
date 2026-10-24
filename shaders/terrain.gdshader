@@ -1,4 +1,4 @@
-// The ground of the Vũng Tàu world (plan 0003, R12): sand on beaches, grass
+// The ground of the Vũng Tàu world (plan 0004, R12): sand on beaches, grass
 // on hills, rock on slopes above 35 degrees, and concrete in towns. The
 // surface mask comes from tools/geo/build.py: R is sand, G is town, B is wood,
 // A is the distance to the coastline.

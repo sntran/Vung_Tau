@@ -1,6 +1,6 @@
 class_name GeoProjection
 extends RefCounted
-## The projection of plan 0003 (D4): WGS 84 degrees to UTM zone 48N
+## The projection of plan 0004 (D4): WGS 84 degrees to UTM zone 48N
 ## (EPSG:32648), and UTM to game coordinates.
 ##
 ## The game origin is a UTM point. Game X is east, game -Z is north, 1 unit is 1 m.

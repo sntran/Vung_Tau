@@ -1,4 +1,4 @@
-# The tide report (plan 0003, R8d to R8j)
+# The tide report (plan 0004, R8d to R8j)
 
 Made by `tools/geo/tide.py` on 2026-10-24. Source: EOT20 (Hart-Davis et al., 2021) with pyTMD 3.0.9, FES nodal corrections
 

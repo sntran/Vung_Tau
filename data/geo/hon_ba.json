@@ -1,5 +1,5 @@
 {
-	"note": "The rock ridge from the beach below Mũi Nghinh Phong to the islet Hòn Bà (plan 0003, R8h). The line is the OSM way \"Đường ra Hòn Bà\". The ridge is dry only when the sea level is below ridge_top_m (meters above mean sea level). tools/geo/tide.py shows the dry times for this height. The islet point is the center of the OSM islet. The tide constants of the game are for this point.",
+	"note": "The rock ridge from the beach below Mũi Nghinh Phong to the islet Hòn Bà (plan 0004, R8h). The line is the OSM way \"Đường ra Hòn Bà\". The ridge is dry only when the sea level is below ridge_top_m (meters above mean sea level). tools/geo/tide.py shows the dry times for this height. The islet point is the center of the OSM islet. The tide constants of the game are for this point.",
 	"ridge_way": 221906223,
 	"ridge_name": "Đường ra Hòn Bà",
 	"ridge_top_m": -1.7,

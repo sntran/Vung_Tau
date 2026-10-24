@@ -1,4 +1,4 @@
-// The sea of the Vũng Tàu world (plan 0003, D8): waves, the reflection of the
+// The sea of the Vũng Tàu world (plan 0004, D8): waves, the reflection of the
 // sky, and foam near the coast. The foam and the shallow color use the
 // distance to the coastline in the alpha channel of the surface mask.
 shader_type spatial;

@@ -1,4 +1,4 @@
-"""Downloads the ocean tide files of EOT20 (plan 0003, D12).
+"""Downloads the ocean tide files of EOT20 (plan 0004, D12).
 
 The EOT20 file on SEANOE is a zip file (2.3 GB) with two zip files in it:
 the ocean tides and the load tides. The game needs only the ocean tides, so

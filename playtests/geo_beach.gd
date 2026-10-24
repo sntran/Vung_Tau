@@ -1,6 +1,7 @@
 extends RefCounted
-# PT-20 geo_beach. Walk from the road across the sand to the water. The player
-# stops at the 0.5 m depth and the message shows.
+# PT-27 geo_beach. Walk from the road across the sand to the water. The player
+# stops at the 0.5 m depth and the message shows. The depth is from the sea
+# level of the tide at that time (R13).
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=09:00
 
@@ -34,7 +35,7 @@ func run(d: PlaytestDriver) -> void:
 	d.set_time_scale(1.0)
 	var s := d.state()
 	d.expect(sand[0], "the player walks on the sand")
-	var depth: float = -float(s.ground)
+	var depth: float = float(s.sea_level) - float(s.ground)
 	d.expect(depth > 0.3 and depth <= VungTau.MAX_WATER_DEPTH + 0.02,
 			"the player stops at the 0.5 m depth: the water is %.2f m deep" % depth)
 	d.expect(message[0], "the message \"%s\" shows when the water stops the player" % water)
@@ -47,7 +48,8 @@ func run(d: PlaytestDriver) -> void:
 	await d.screenshot("water_too_deep")
 	await d.wait_idle()
 	var after: Vector3 = d.state().player
-	d.expect(-float(d.state().ground) <= VungTau.MAX_WATER_DEPTH + 0.02, "the player does not go into deeper water")
+	d.expect(float(d.state().sea_level) - float(d.state().ground) <= VungTau.MAX_WATER_DEPTH + 0.02,
+			"the player does not go into deeper water")
 	d.expect(Vector2(after.x - before.x, after.z - before.z).length() < 1.0, "the player stays at the edge")
 	# The player can walk back to the beach.
 	await d.look_at_point(Vector3(start.x, after.y + Player.EYE_HEIGHT, start.z), 5.0)

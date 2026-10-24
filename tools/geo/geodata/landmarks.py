@@ -1,4 +1,4 @@
-"""Finds the landmarks of data/geo/landmarks.json in the OSM data (plan 0003, R1 and R4)."""
+"""Finds the landmarks of data/geo/landmarks.json in the OSM data (plan 0004, R1 and R4)."""
 
 import math
 import unicodedata

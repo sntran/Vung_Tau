@@ -1,5 +1,5 @@
 {
-	"note": "The tide at Vũng Tàu (plan 0003, D12). The sea level is the sum of f · A · cos(G + u − g) for each constituent. See tools/geo/geodata/tidecalc.py and scripts/geo/tide.gd.",
+	"note": "The tide at Vũng Tàu (plan 0004, D12). The sea level is the sum of f · A · cos(G + u − g) for each constituent. See tools/geo/geodata/tidecalc.py and scripts/geo/tide_model.gd.",
 	"source": "EOT20 (Hart-Davis et al., 2021) with pyTMD 3.0.9, FES nodal corrections",
 	"license": "CC BY 4.0. Hart-Davis, M. G. et al. (2021): EOT20 - A global Empirical Ocean Tide model from multi-mission satellite altimetry. SEANOE. https://doi.org/10.17882/79489",
 	"datum": "mean sea level",

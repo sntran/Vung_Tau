@@ -1,4 +1,4 @@
-"""Blocks: the areas between the roads, without the road surfaces (plan 0003, R4)."""
+"""Blocks: the areas between the roads, without the road surfaces (plan 0004, R4)."""
 
 import numpy as np
 from shapely import STRtree, ops

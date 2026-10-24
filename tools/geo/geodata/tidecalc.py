@@ -1,4 +1,4 @@
-"""The sea level from tide constituents (plan 0003, D12, R8f).
+"""The sea level from tide constituents (plan 0004, D12, R8f).
 
 This is the same calculation as pyTMD with the FES nodal corrections, for
 the constituents of EOT20. The game has the same code in

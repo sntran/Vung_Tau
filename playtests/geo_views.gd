@@ -1,5 +1,5 @@
 extends RefCounted
-# PT-18 geo_views. Take screenshots from fixed viewpoints: Bãi Trước seen from
+# PT-25 geo_views. Take screenshots from fixed viewpoints: Bãi Trước seen from
 # the water, the top of Núi Nhỏ looking north, Mũi Nghinh Phong looking south,
 # and Bãi Sau from the beach road. Take each one at 06:00, 12:00, and 18:00.
 # I compare them with the real places.
