@@ -59,6 +59,17 @@ Status values:
 | Bánh khọt: small crisp cakes of rice flour with curry powder, topped with shrimp or squid. People wrap them in lettuce and herbs and dip them in a fish sauce mix. | Source | [Vietnam Travel](https://vietnam.travel/jp/node/745) |
 | In the evening, people drive scooters along the coast road. | Confirmed | First-hand |
 | Helmets are required on motorbikes on all roads since December 2007. | Check | Not verified |
+| People walk to Miếu Hòn Bà when the tide is low. | Confirmed | First-hand |
+| Hòn Bà is an islet in the Bãi Sau area, about 200 m from Mũi Nghinh Phong and the foot of Núi Nhỏ. A rock path of a few hundred meters shows only at low tide. It is slippery, with pebbles and oyster shells. Boats go to the east side of the islet at high tide. | Source | [Báo Lào Cai](https://baolaocai.vn/hon-dao-co-duong-di-luc-an-luc-hien-o-vung-tau-khach-ghe-tham-phai-canh-ngay-post389986.html) |
+| The path shows for a few hours on a few days each month. The sea goes down most on the 14th to the 16th of the lunar month. Visitors start from the Thùy Vân slope, walk about 10 minutes on the sand, then 15 to 20 minutes to the islet. | Source | [Báo Lào Cai](https://baolaocai.vn/hon-dao-co-duong-di-luc-an-luc-hien-o-vung-tau-khach-ghe-tham-phai-canh-ngay-post389986.html); [VinWonders](https://vinwonders.com/vi/wonderpedia/news/hon-ba-vung-tau/) |
+| Miếu Hòn Bà honors the Water Dragon Goddess (Thủy Long Thần nữ), who helps fishermen. People gather there on the 15th of the 1st, 4th, 7th, and 10th lunar months. | Source | [Báo Lào Cai](https://baolaocai.vn/hon-dao-co-duong-di-luc-an-luc-hien-o-vung-tau-khach-ghe-tham-phai-canh-ngay-post389986.html) |
+| The tide at Vũng Tàu is mixed, mainly semi-diurnal. The mean range is about 2.5 m. | Source | [Vimaru JMST](https://jmst.vimaru.edu.vn/index.php/jmst/article/download/891/646/1911) |
+| Many people jog or ride scooters up the Vi Ba road (núi Viba) in the middle and the end of the afternoon. | Confirmed | First-hand |
+| At the end of the Vi Ba road, a few small shops sell yogurt (sữa chua) and soft-boiled eggs (trứng lòng đào). | Confirmed | First-hand |
+| In the middle of the Vi Ba road is a pagoda with many monkeys. People stop to watch them. | Confirmed | First-hand |
+| The pagoda with the monkeys is Chùa Tam Bảo (chùa Khỉ), 72 Vi Ba. | Source | [Foody](https://www.foody.vn/vung-tau/chua-tam-bao); [VinWonders](https://vinwonders.com/vi/wonderpedia/news/nui-lon-vung-tau/) |
+| Wild monkeys on Núi Lớn sometimes go into houses and bite people. | Source | [Tuổi Trẻ](https://tuoitre.vn/nui-lon.html) |
+| Town anchors that have been in the same place for a long time: the main bus station, the old markets, the big roundabout, and Ngã Năm. | Confirmed | First-hand. I will name the markets and the roundabout. |
 
 ## Daily life
 

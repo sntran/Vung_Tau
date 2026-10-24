@@ -41,12 +41,14 @@ The order can change.
 | Number | Name | Content |
 |---|---|---|
 | 0003 | [Real geography of Vũng Tàu](0003-real-geography.md) | Written, status "Draft". The real ground, hills, coast, beaches, sea, and roads, from OpenStreetMap and the Copernicus elevation data. |
-| 0004 | Known structures | Bãi Trước, Bãi Sau, Mũi Nghinh Phong, Tượng Chúa Kitô Vua, Hải đăng, Bạch Dinh, and others that I name. Made by code from their real outlines and sizes. |
+| 0004 | Known structures | Tượng Chúa Kitô Vua, Hải đăng, Bạch Dinh, Miếu Hòn Bà, Chùa Tam Bảo, the main bus station, the old markets, the big roundabout, Ngã Năm, and others that I name. Made by code from their real outlines and sizes. |
 | 0005 | Houses on the lots | A house generator with real proportions and a detail kit (shutters, balconies, wires, signs, plants). It puts houses on the lots between the roads. The homestay hẻm moves to its real place. |
 | 0006 | Phở shop | Sit at the table. Order with the cuts ("một tô phở tái nạm gầu bò viên"), the extras, the herb plate, the sauces, eating, and paying. Port the flow from `docs/prototype/hem-2d.html`. |
 | 0007 | Cà phê cóc | Order "đen đá", "sữa đá" or "nâu đá", "bạc sỉu". Watch the phin drip. |
 | 0008 | Homestay meal | Eat with the host family. Home dishes and strong-smelling sauces. I name the dishes. |
 | 0009 | Street snacks | Bánh mì at dawn, bánh khọt, hột vịt lộn, hủ tiếu gõ at night. |
 | 0010 | Beach mornings and evenings | Morning exercise, the boats, the fish, the evening on the coast road. |
-| 0011 | Scooter | Wear a helmet and ride along the coast in the evening. |
-| 0012 | Store release | Signed Android and iOS builds, store pages, privacy text. |
+| 0011 | Hòn Bà at low tide | Check the tide, walk the rock path to Miếu Hòn Bà, and come back before the sea covers it. Locals warn the player about the time. |
+| 0012 | Afternoon on the Vi Ba road | Jog or ride up Núi Lớn in the afternoon. Stop at Chùa Tam Bảo to watch the monkeys (and keep your bag closed). At the top, eat sữa chua and trứng lòng đào. |
+| 0013 | Scooter | Wear a helmet and ride along the coast in the evening, and up the Vi Ba road. |
+| 0014 | Store release | Signed Android and iOS builds, store pages, privacy text. |
