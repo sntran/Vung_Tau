@@ -1,0 +1,991 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Một Ngày Ở Xóm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Be+Vietnam+Pro:wght@400;500;700&family=Patrick+Hand&display=swap">
+<style>
+[hidden]{display:none!important}
+/* Layout: one screen. Top bar, then the alley or the phở table, then the talk panel at the bottom. */
+:root{
+  --night:#10211E;      /* frame around the scene */
+  --ink:#1D2725;        /* text */
+  --paper:#E6EEE7;      /* talk panel, celadon like old bowls */
+  --paper-2:#D2E0D5;    /* chips and cards */
+  --line:#9CB4A5;
+  --sign:#C4362C;       /* phở sign red */
+  --gold:#F2C33C;       /* sign letters */
+  --jade:#2C7A6E;       /* shutters and buttons */
+  --muted:#4E615C;
+  --f-sign:"Barlow Condensed","Arial Narrow",sans-serif;
+  --f-body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-hand:"Patrick Hand","Comic Sans MS",cursive;
+  color-scheme: light;
+}
+html,body{height:100%}
+body{margin:0;background:var(--night);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;overflow:hidden;-webkit-tap-highlight-color:transparent}
+#app{height:100%;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* Top bar */
+.bar{display:flex;align-items:center;gap:10px;padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:var(--night);color:#EAF2EC}
+.clock{display:flex;align-items:baseline;gap:6px;background:none;border:1px solid #3B5A53;border-radius:10px;padding:4px 10px;color:#EAF2EC}
+.clock b{font-family:var(--f-sign);font-size:24px;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.clock span{font-size:12px;color:#A9C4BA}
+.place{flex:1;min-width:0;font-family:var(--f-sign);font-size:18px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#CFE0D8}
+.place small{display:block;font-family:var(--f-body);font-size:11px;letter-spacing:0;text-transform:none;color:#8FAFA3}
+.iconbtn{display:flex;align-items:center;gap:6px;background:#1C3732;border:1px solid #3B5A53;border-radius:10px;padding:6px 10px;color:#EAF2EC;font-size:13px}
+.iconbtn svg{width:18px;height:18px;flex:none}
+.iconbtn .count{font-variant-numeric:tabular-nums;font-weight:700}
+
+/* Scene */
+.stage{position:relative;flex:1 1 auto;min-height:0;overflow:hidden;background:#0B1530}
+#table{background:#5A4636}
+.stage svg{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.walk{position:absolute;bottom:10px;width:46px;height:46px;border-radius:50%;border:2px solid rgba(255,255,255,.75);background:rgba(16,33,30,.55);color:#fff;display:grid;place-items:center}
+.walk svg{position:static;width:22px;height:22px}
+.walk.l{left:max(10px,env(safe-area-inset-left,0px))}
+.walk.r{right:max(10px,env(safe-area-inset-right,0px))}
+.toast{position:absolute;left:50%;top:10px;transform:translateX(-50%);max-width:calc(100% - 32px);background:var(--gold);color:var(--ink);border-radius:12px;padding:8px 14px;font-size:13px;font-weight:500;box-shadow:0 6px 18px rgba(0,0,0,.3);display:flex;gap:8px;align-items:center}
+.toast b{font-family:var(--f-hand);font-size:17px;font-weight:400}
+
+/* Talk panel */
+.panel{flex:0 0 auto;max-height:52%;overflow-y:auto;background:var(--paper);border-top:4px solid var(--sign);overscroll-behavior:contain}
+.panel-in{max-width:680px;margin:0 auto;padding-block:12px 14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:10px}
+.who{display:inline-block;align-self:flex-start;font-family:var(--f-sign);font-weight:700;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--jade);border-radius:6px;padding:1px 8px}
+.who.cosau{background:var(--sign)}
+.who.chubay{background:#3E5C9A}
+.who.batu{background:#7A4E8C}
+.who.bacha{background:#6B5A2E}
+.who.you{background:var(--muted)}
+.say{margin:0;font-size:15px;max-width:62ch}
+.say em{font-style:normal;font-weight:700}
+.phrases{display:flex;flex-wrap:wrap;gap:8px}
+.phrase{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 10px;min-width:0}
+.phrase .vi{font-weight:700}
+.phrase .en{font-size:12px;color:var(--muted)}
+.phrase button{border:none;background:var(--paper-2);border-radius:50%;width:30px;height:30px;display:grid;place-items:center;flex:none}
+.phrase button svg{width:16px;height:16px}
+.choices{display:grid;gap:8px;grid-template-columns:1fr}
+.choices.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.choice{text-align:left;background:#fff;border:2px solid var(--jade);border-radius:12px;padding:9px 12px;min-height:46px;display:flex;flex-direction:column;justify-content:center;gap:1px}
+.choice:hover{background:#F4FAF6}
+.choice .sub{font-size:12px;color:var(--muted)}
+.choice.primary{background:var(--jade);color:#fff}
+.choice.primary .sub{color:#D6EDE6}
+.choice.quiet{border-color:var(--line)}
+.choice.on{background:#FFF6D8;border-color:#C79A12}
+.hint{font-size:12px;color:var(--muted);margin:0}
+
+/* Sheets */
+.sheet{position:fixed;inset:0;background:rgba(8,18,16,.62);display:flex;align-items:flex-end;justify-content:center;z-index:20;padding-top:env(safe-area-inset-top,0px)}
+.sheet-card{width:100%;max-width:560px;max-height:86%;overflow-y:auto;background:var(--paper);border-radius:18px 18px 0 0;padding-block:16px calc(18px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:12px}
+.sheet h2{margin:0;font-family:var(--f-hand);font-weight:400;font-size:28px;line-height:1.1}
+.sheet .x{align-self:flex-end;margin-top:-6px;background:none;border:1px solid var(--line);border-radius:10px;padding:4px 12px}
+.group-title{font-family:var(--f-sign);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:14px;color:var(--sign);margin:6px 0 0}
+.cards{display:grid;gap:10px}
+.card{background:#FFFDF6;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background-image:repeating-linear-gradient(transparent 0 23px,#E3ECE6 23px 24px)}
+.card h3{margin:0;font-family:var(--f-hand);font-weight:400;font-size:21px;line-height:1.15}
+.card .vi{font-weight:700;color:var(--jade);font-size:13px}
+.card p{margin:4px 0 0;font-size:14px}
+.card.locked{background:transparent;border-style:dashed;color:var(--muted)}
+.card.locked h3{color:var(--muted)}
+
+@media (max-width:440px){ .iconbtn .lbl{display:none} .place{font-size:16px} .clock b{font-size:21px} .bar{gap:8px} }
+@media (min-width:720px){ .choices.grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@media (prefers-reduced-motion:reduce){ .anim{animation:none!important} }
+@keyframes steam{0%{transform:translateY(0);opacity:.0}30%{opacity:.75}100%{transform:translateY(-34px);opacity:0}}
+.steam{animation:steam 2.6s ease-out infinite}
+.steam.d2{animation-delay:.9s}.steam.d3{animation-delay:1.7s}
+</style>
+
+</head>
+<body>
+<div id="app">
+  <header class="bar">
+    <button class="clock" id="clockBtn" aria-label="Time of day. Tap to wait or sleep."><b id="clockTime">6:00</b><span id="clockPart">sáng</span></button>
+    <div class="place" id="place">Hẻm 42<small id="placeSub">A hẻm in Vũng Tàu · Ngày 1</small></div>
+    <button class="iconbtn" id="soundBtn" aria-label="Sound on or off" aria-pressed="true"></button>
+    <button class="iconbtn" id="bookBtn" aria-label="Open your notebook">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg>
+      <span class="lbl">Sổ tay</span><span class="count" id="bookCount">0</span>
+    </button>
+  </header>
+  <main class="stage" id="stage">
+    <svg id="alley" role="img" aria-label="The alley"></svg>
+    <svg id="table" role="img" aria-label="Your table at the phở shop" viewBox="0 0 400 420" preserveAspectRatio="xMidYMid meet" hidden></svg>
+    <button class="walk l" id="walkL" aria-label="Walk left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <button class="walk r" id="walkR" aria-label="Walk right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M9 5l7 7-7 7"/></svg></button>
+    <div class="toast" id="toast" hidden></div>
+  </main>
+  <section class="panel" id="panel" aria-live="polite"><div class="panel-in" id="panelIn"></div></section>
+</div>
+<div class="sheet" id="sheet" hidden><div class="sheet-card" id="sheetCard"></div></div>
+
+<script>
+/* ======================================================================
+   Một Ngày Ở Xóm — first playable slice.
+   All food and culture text is in the CARDS, SPOTS and phở script below,
+   so a cook or a family member can check and edit it in one place.
+   ====================================================================== */
+
+// ---------- Content: the notebook cards ----------
+const CARDS = {
+  // Xóm
+  anSang:{g:"Xóm",t:"“Ăn sáng chưa?”",vi:"Have you eaten breakfast yet?",b:"Neighbors greet you this way in the morning. It works like “How are you?”. Say “Dạ, chưa” (not yet) or “Dạ, rồi” (yes, I have).",h:"Say hi to a neighbor in the morning."},
+  names:{g:"Xóm",t:"Names by birth order",vi:"Hai, Ba, Tư, Năm, Sáu, Bảy…",b:"In the South, people often call you by your birth order. The oldest child is Hai (two), not Một (one), and the youngest is Út. So Cô Sáu is the fifth child in her family, and Chú Bảy is the sixth in his.",h:"Ask about the names at the phở shop."},
+  shutter:{g:"Xóm",t:"The metal shutter",vi:"cửa cuốn",b:"Many quán are the front room of a family home. When the food is gone, the rolling shutter comes down and the room is a home again.",h:"Find a shop that is closed."},
+  banhmi:{g:"Xóm",t:"Bánh mì at dawn",vi:"xe bánh mì",b:"The cart is out before sunrise. People grab one on the way to work or school. Gone by mid-morning.",h:"Visit the bánh mì cart early."},
+  coc:{g:"Xóm",t:"Cà phê cóc",vi:"cà phê ghế đẩu",b:"Small plastic stools, a wall ledge as a table, and cà phê sữa đá dripping through a phin. People in office clothes sit next to students.",h:"Stop at the coffee stools."},
+  mia:{g:"Xóm",t:"Xe nước mía",vi:"sugarcane juice cart",b:"In the afternoon heat, the cane press runs all day. Sellers often squeeze a few tắc (kumquats) in with the cane.",h:"Find the sugarcane cart in the afternoon."},
+  clack:{g:"Xóm",t:"Hủ tiếu gõ",vi:"lóc cóc, lóc cóc",b:"You don't walk to it. It comes to you. A helper walks the hẻm at night, clacking two bamboo sticks. You call out, and the bowl comes to your door.",h:"Listen at night."},
+  hvl:{g:"Xóm",t:"Hột vịt lộn",vi:"a brave bite",b:"A duck egg with a partly grown duckling inside. Locals eat it from the shell with salt, pepper, kumquat, chili, and rau răm. Some like it out of the shell, fried in tamarind sauce (xào me). An afternoon or late-night snack.",h:"Find the egg cart after 3 in the afternoon."},
+  // Vũng Tàu
+  banhkhot:{g:"Vũng Tàu",t:"Bánh khọt",vi:"Vũng Tàu's little crispy cakes",b:"Rice batter with a little curry powder for color, cooked in a mold full of small cups and topped with shrimp or squid. Wrap one in lettuce and herbs, then dip it in nước mắm.",h:"Visit the corner shop."},
+  boats:{g:"Vũng Tàu",t:"The catch on the sand",vi:"ghe về, cá tươi",b:"Before sunrise the fishing boats come in. The catch is sorted right on the sand, and neighbors buy their fish there.",h:"Go to the beach very early."},
+  exercise:{g:"Vũng Tàu",t:"Morning at Bãi Trước",vi:"tập thể dục buổi sáng",b:"Before the heat, the beach fills with people jogging, stretching, and exercising together. Once the sun is high, the sand gets quiet.",h:"Go to the beach very early."},
+  // Phở
+  breakfast:{g:"Phở",t:"Phở is breakfast",vi:"ăn sáng",b:"In America, phở is lunch or dinner. Here, the busy time is 6 to 8 in the morning, and many shops sell out by 10 or 11.",h:"Eat a bowl, or come back late."},
+  order:{g:"Phở",t:"Build your bowl",vi:"“Một tô phở tái nạm gầu bò viên”",b:"People don't just say “phở tái.” They name every cut they want, in one breath: tái (thin raw beef that cooks in the broth), nạm (flank), gầu (fatty brisket), gân (tendon), sách (tripe), bò viên (meatballs). Want it all? Say “đặc biệt.”",h:"Order a bowl."},
+  beo:{g:"Phở",t:"Nước béo hành trần",vi:"broth fat with blanched onion",b:"A small bowl of fat from the top of the pot, with scallion. Many people put the onion in the bowl and use the fat as a dip for the meat, often with a little hoisin and chili mixed in. You have to ask for it.",h:"Ask about Chú Bảy's order."},
+  trung:{g:"Phở",t:"Chén trứng",vi:"a small bowl with an egg",b:"Ask for an egg in its own small bowl. Spoon hot broth over it so it cooks soft, then eat it on the side or slide it into your phở.",h:"Ask about Chú Bảy's order."},
+  taste:{g:"Phở",t:"Taste the broth first",vi:"nếm nước lèo",b:"The broth simmered for hours. Taste it before you add anything. Then you know what you are changing.",h:"Taste before you add sauce."},
+  rau:{g:"Phở",t:"The herb plate is part of the dish",vi:"dĩa rau: húng quế, ngò gai, giá, chanh, ớt",b:"Thai basil, sawtooth herb, bean sprouts, lime, and chili. Pick the leaves off the stem, tear them, and push them into the hot broth. Some people ask for giá trụng, blanched sprouts.",h:"Use the herb plate."},
+  tai:{g:"Phở",t:"Push the tái under",vi:"nhận thịt tái xuống",b:"Tái comes raw on top. Push it under the hot broth right away so it cooks pink-brown and tender.",h:"Order tái and watch the color."},
+  saucer:{g:"Phở",t:"Sauce goes in the little dish",vi:"chén nước chấm",b:"Many locals squeeze hoisin and chili sauce into a small dish, not the bowl. They dip the meat and bò viên in it and keep the broth clean. Others put it in the bowl. Both happen here.",h:"Try the sauce bottles."},
+  bac:{g:"Phở",t:"Phở Bắc and phở Nam",vi:"North and South",b:"Phở came South with Northern families after 1954. In the South the broth got richer and the herb plate bigger. A Northern-style bowl has clear broth, wide noodles, few herbs, and often no hoisin on the table.",h:"Ask about the hoisin, or visit Bác Hà."},
+  pay:{g:"Phở",t:"Pay at the end, no tip",vi:"“Cô ơi, tính tiền!”",b:"You pay after you eat. Call out to the owner and she comes to you. Many shops also take bank QR. Tips are not expected at a quán. A warm “cảm ơn cô” is enough.",h:"Finish a bowl and pay."}
+};
+const CARD_ORDER = ["anSang","names","shutter","banhmi","coc","mia","clack","hvl","banhkhot","boats","exercise","breakfast","order","beo","trung","taste","rau","tai","saucer","bac","pay"];
+
+// ---------- Content: places in the hẻm ----------
+// Opening hours are minutes since midnight: [open, close].
+// Carts are only there while open. Buildings stay, open or closed.
+const SPOTS = [
+  {id:"home",    x:110,  name:"Homestay nhà Bà Tư", en:"Where you stay", hours:null},
+  {id:"pho",     x:350,  name:"Phở Cô Sáu",         en:"Southern-style phở", hours:[330,630]},
+  {id:"banhmi",  x:590,  name:"Xe bánh mì",         en:"Bánh mì cart", hours:[300,540], cart:true},
+  {id:"coc",     x:835,  name:"Cà phê cóc",         en:"Sidewalk coffee", hours:[330,1320]},
+  {id:"bac",     x:1095, name:"Phở Bắc Bác Hà",     en:"Northern-style phở", hours:[360,630]},
+  {id:"mia",     x:1340, name:"Xe nước mía",        en:"Sugarcane juice", hours:[600,1080], cart:true},
+  {id:"go",      x:1335, name:"Hủ tiếu gõ",         en:"Night noodle cart", hours:[1080,1410], cart:true},
+  {id:"banhkhot",x:1580, name:"Bánh khọt Cô Út",    en:"Vũng Tàu's crispy little cakes", hours:[390,1200]},
+  {id:"hvl",     x:1795, name:"Hột vịt lộn",        en:"Egg cart", hours:[900,1350], cart:true},
+  {id:"beach",   x:1980, name:"Bãi Trước",          en:"Front Beach", hours:null}
+];
+const SPOT = Object.fromEntries(SPOTS.map(s=>[s.id,s]));
+
+// ---------- Constants ----------
+const WORLD_W = 2150, H = 400, GROUND = 330;
+const DAY_START = 345;           // 5:45 after sleep
+const WALK_SPEED = 170;         // world units per second
+const MIN_PER_WORLD = 6;        // game minutes to walk the whole hẻm
+const SAVE_KEY = "xom.v1";
+
+// ---------- State ----------
+const S = { minutes:360, day:1, cards:[], introDone:false, sound:true,
+            mode:"alley", px:110, target:null, pending:null, facing:1, walkT:0, frac:0 };
+
+function load(){
+  try{ const d = JSON.parse(localStorage.getItem(SAVE_KEY)||"null");
+    if(d && d.v===1){ S.minutes=d.minutes; S.day=d.day; S.bowls=d.bowls||0; S.cards=d.cards||[]; S.introDone=!!d.introDone; S.sound=d.sound!==false; S.px=typeof d.px==="number"?d.px:110; }
+  }catch(e){}
+}
+function save(){
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify({v:1,minutes:Math.round(S.minutes),day:S.day,cards:S.cards,introDone:S.introDone,sound:S.sound,px:S.px,bowls:S.bowls||0})); }catch(e){}
+}
+
+// ---------- Small helpers ----------
+const $ = id => document.getElementById(id);
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const vnd = n => n.toLocaleString("de-DE")+"₫";
+function hhmm(m){ m=Math.floor(m)%1440; const h=Math.floor(m/60), mm=m%60; return h+":"+String(mm).padStart(2,"0"); }
+function partOfDay(m){ const h=m/60; if(h<4) return ["đêm","night"]; if(h<10.5) return ["sáng","morning"]; if(h<13) return ["trưa","noon"]; if(h<18) return ["chiều","afternoon"]; if(h<22) return ["tối","evening"]; return ["đêm","night"]; }
+function isOpen(spot,m=S.minutes){ if(!spot.hours) return true; return m>=spot.hours[0] && m<spot.hours[1]; }
+function hoursText(spot){ return spot.hours ? hhmm(spot.hours[0])+"–"+hhmm(spot.hours[1]) : ""; }
+
+// ---------- Sound (made in the browser, no files) ----------
+let AC=null;
+function ac(){ if(!S.sound) return null; try{ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume(); }catch(e){ AC=null; } return AC; }
+function tone(freq,dur,type="sine",vol=.15,when=0){ const a=ac(); if(!a) return; const t=a.currentTime+when; const o=a.createOscillator(), g=a.createGain(); o.type=type; o.frequency.setValueAtTime(freq,t); g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+dur); o.connect(g).connect(a.destination); o.start(t); o.stop(t+dur+.02); }
+function ting(){ tone(1046,.35,"sine",.12); tone(1568,.5,"sine",.09,.09); }
+function clack(){ [0,.22].forEach(d=>{ tone(980,.07,"triangle",.32,d); tone(1960,.04,"square",.05,d); }); }
+
+// Vietnamese voice, if the device has one.
+let viVoice=null;
+function findVoice(){ try{ const vs=speechSynthesis.getVoices(); viVoice = vs.find(v=>/^vi/i.test(v.lang))||null; }catch(e){ viVoice=null; } }
+try{ findVoice(); speechSynthesis.onvoiceschanged = ()=>{ findVoice(); }; }catch(e){}
+function speak(text){ if(!viVoice) return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.voice=viVoice; u.lang=viVoice.lang; u.rate=.85; speechSynthesis.speak(u);}catch(e){} }
+
+// ---------- Notebook ----------
+function learn(id){
+  if(!CARDS[id] || S.cards.includes(id)) return false;
+  S.cards.push(id); save(); updateBar(); ting();
+  showToast(`<span>New in your sổ tay:</span><b>${esc(CARDS[id].t)}</b>`);
+  return true;
+}
+let toastTimer=null;
+function showToast(html){ const t=$("toast"); t.innerHTML=html; t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>{t.hidden=true},2800); }
+
+function openBook(){
+  const groups=["Phở","Xóm","Vũng Tàu"];
+  let h=`<button class="x" id="sheetX">Close</button><h2>Sổ tay — what you learned</h2><p class="hint">${S.cards.length} of ${CARD_ORDER.length} found. Dashed cards are still waiting. The hint says where to look.</p>`;
+  for(const g of groups){
+    h+=`<div class="group-title">${g}</div><div class="cards">`;
+    for(const id of CARD_ORDER){ const c=CARDS[id]; if(c.g!==g) continue;
+      if(S.cards.includes(id)) h+=`<div class="card"><h3>${esc(c.t)}</h3><div class="vi">${esc(c.vi)}</div><p>${esc(c.b)}</p></div>`;
+      else h+=`<div class="card locked"><h3>? ? ?</h3><p>Hint: ${esc(c.h)}</p></div>`;
+    }
+    h+=`</div>`;
+  }
+  openSheet(h);
+}
+function openSheet(html){ $("sheetCard").innerHTML=html; $("sheet").hidden=false; $("sheetX").onclick=closeSheet; $("sheetX").focus(); }
+function closeSheet(){ $("sheet").hidden=true; }
+$("sheet").addEventListener("click",e=>{ if(e.target.id==="sheet") closeSheet(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !$("sheet").hidden) closeSheet(); });
+
+// ---------- Talk panel ----------
+const SPEAKER = {cosau:"Cô Sáu",chubay:"Chú Bảy",batu:"Bà Tư",bacha:"Bác Hà",you:"You"};
+const SPEAK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>`;
+function say(o){
+  const p=$("panelIn"); let h="";
+  if(o.who) h+=`<span class="who ${o.who}">${SPEAKER[o.who]}</span>`;
+  if(o.text) h+=`<p class="say">${o.text}</p>`;
+  if(o.phrases && o.phrases.length){
+    h+=`<div class="phrases">`+o.phrases.map((ph,i)=>`<div class="phrase">${viVoice?`<button data-say="${i}" aria-label="Hear it">${SPEAK_ICON}</button>`:""}<div><div class="vi">${esc(ph[0])}</div><div class="en">${esc(ph[1])}</div></div></div>`).join("")+`</div>`;
+  }
+  const ch=o.choices||[];
+  if(ch.length){
+    h+=`<div class="choices ${o.grid?"grid":""}">`+ch.map((c,i)=>`<button class="choice ${c.cls||""}" data-c="${i}"><span>${c.label}</span>${c.sub?`<span class="sub">${c.sub}</span>`:""}</button>`).join("")+`</div>`;
+  }
+  if(o.hint) h+=`<p class="hint">${o.hint}</p>`;
+  p.innerHTML=h;
+  p.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{ ac(); const c=ch[+b.dataset.c]; c.act(); });
+  p.querySelectorAll("[data-say]").forEach(b=>b.onclick=()=>speak(o.phrases[+b.dataset.say][0]));
+  $("panel").scrollTop=0;
+}
+
+// ---------- Top bar ----------
+function updateBar(){
+  $("clockTime").textContent=hhmm(S.minutes);
+  $("clockPart").textContent=partOfDay(S.minutes)[0];
+  $("bookCount").textContent=S.cards.length+"/"+CARD_ORDER.length;
+  const snd=$("soundBtn");
+  snd.setAttribute("aria-pressed",String(S.sound));
+  snd.innerHTML = S.sound
+    ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>`
+    : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>`;
+  if(S.mode==="alley"){ $("place").firstChild.textContent="Hẻm 42"; $("placeSub").textContent="A hẻm in Vũng Tàu · Ngày "+S.day; }
+  else { $("place").firstChild.textContent="Phở Cô Sáu"; $("placeSub").textContent="Hẻm 42 · Vũng Tàu · Ngày "+S.day; }
+}
+$("soundBtn").onclick=()=>{ S.sound=!S.sound; save(); updateBar(); if(S.sound) ting(); };
+$("bookBtn").onclick=openBook;
+
+// ======================================================================
+//  THE ALLEY
+// ======================================================================
+const SKY = [ // hour, top, bottom
+  [0,"#0B1530","#1C2A4A"],[5,"#1A2550","#4B4A72"],[6,"#6E86C2","#F2B48A"],[7.5,"#8EC5E8","#F4E3C0"],
+  [12,"#7FC3EC","#DCEFF6"],[16,"#86B8DF","#F3D9A6"],[18,"#4E5D9A","#F29A5E"],[19,"#25305E","#8A4E6A"],
+  [20,"#0E1838","#22305A"],[24,"#0B1530","#1C2A4A"]];
+function hexLerp(a,b,t){ const pa=parseInt(a.slice(1),16), pb=parseInt(b.slice(1),16); const r=n=>Math.round(((pa>>n)&255)+(((pb>>n)&255)-((pa>>n)&255))*t); return "#"+[16,8,0].map(n=>r(n).toString(16).padStart(2,"0")).join(""); }
+function skyAt(m){ const h=m/60; for(let i=0;i<SKY.length-1;i++){ const a=SKY[i],b=SKY[i+1]; if(h>=a[0]&&h<=b[0]){ const t=(h-a[0])/(b[0]-a[0]); return [hexLerp(a[1],b[1],t),hexLerp(a[2],b[2],t)]; } } return [SKY[0][1],SKY[0][2]]; }
+function darkness(m){ const h=m/60; if(h<5) return .55; if(h<7) return .55-(h-5)/2*.55; if(h<17) return 0; if(h<19.5) return (h-17)/2.5*.55; return .55; }
+
+// Drawing helpers (return SVG strings)
+function person(x,y,o={}){ // y = feet
+  const skin=o.skin||"#E2B48C", shirt=o.shirt||"#3E7C9A", pants=o.pants||"#2B3340", hair=o.hair||"#1E1A18";
+  let s=`<g ${o.id?`id="${o.id}"`:""} transform="translate(${x},${y})">`;
+  s+=`<g class="legs"><rect x="-7" y="-26" width="6" height="26" rx="2" fill="${pants}"/><rect x="1" y="-26" width="6" height="26" rx="2" fill="${pants}"/></g>`;
+  s+=`<rect x="-10" y="-52" width="20" height="28" rx="6" fill="${shirt}"/>`;
+  if(o.apron) s+=`<rect x="-8" y="-44" width="16" height="22" rx="3" fill="${o.apron}"/>`;
+  if(o.pack) s+=`<rect x="-17" y="-50" width="9" height="20" rx="3" fill="${o.pack}"/>`;
+  if(o.arms==="up") s+=`<path d="M-8 -48 L-16 -78 M8 -48 L16 -78" stroke="${skin}" stroke-width="5" stroke-linecap="round"/>`;
+  if(o.arms==="out") s+=`<path d="M-8 -46 L-26 -50 M8 -46 L26 -50" stroke="${skin}" stroke-width="5" stroke-linecap="round"/>`;
+  s+=`<circle cx="0" cy="-62" r="10" fill="${skin}"/>`;
+  if(o.hat==="cap") s+=`<path d="M-10 -64 a10 9 0 0 1 20 0 z" fill="${o.hatColor||"#D9A23A"}"/><rect x="6" y="-66" width="10" height="3" rx="1.5" fill="${o.hatColor||"#D9A23A"}"/>`;
+  else if(o.hat==="non") s+=`<path d="M-17 -64 L0 -80 L17 -64 Z" fill="#E7D3A0" stroke="#B89A5A" stroke-width="1"/>`;
+  else if(o.bun) s+=`<path d="M-10 -64 a10 10 0 0 1 20 0 z" fill="${hair}"/><circle cx="-9" cy="-67" r="4.5" fill="${hair}"/>`;
+  else s+=`<path d="M-10 -63 a10 10 0 0 1 20 0 z" fill="${hair}"/>`;
+  if(o.broom) s+=`<line x1="12" y1="-44" x2="22" y2="0" stroke="#8B5E34" stroke-width="2.5"/><path d="M16 -4 L30 2 L22 6 Z" fill="#C9A14A"/>`;
+  s+=`</g>`; return s;
+}
+function stool(x,y,c){ return `<g transform="translate(${x},${y})"><rect x="-9" y="-16" width="18" height="4" rx="2" fill="${c}"/><path d="M-8 -12 L-10 0 M8 -12 L10 0 M0 -12 L0 0" stroke="${c}" stroke-width="3"/></g>`; }
+function plant(x,y){ return `<g transform="translate(${x},${y})"><path d="M-7 0 L-5 -10 L5 -10 L7 0Z" fill="#B5603A"/><circle cx="-4" cy="-15" r="6" fill="#3F8A4A"/><circle cx="4" cy="-17" r="7" fill="#4C9A52"/><circle cx="0" cy="-22" r="5" fill="#5FAE5E"/></g>`; }
+function windowUnit(x,y,w,h,c){ // wooden louvered shutters
+  let s=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#2D3B3A"/>`;
+  const half=w/2; for(const ox of [0,half]){ s+=`<rect x="${x+ox+2}" y="${y+2}" width="${half-4}" height="${h-4}" fill="${c}"/>`; for(let yy=y+7;yy<y+h-4;yy+=6) s+=`<line x1="${x+ox+4}" y1="${yy}" x2="${x+ox+half-4}" y2="${yy}" stroke="rgba(0,0,0,.22)" stroke-width="1.2"/>`; }
+  return s;
+}
+function upperFloors(x,w,base,trim,opts={}){
+  let s=`<rect x="${x}" y="58" width="${w}" height="${GROUND-58}" fill="${base}"/>`;
+  s+=`<rect x="${x-3}" y="50" width="${w+6}" height="12" fill="${trim}"/>`;
+  // third floor
+  s+=windowUnit(x+w*.2,78,w*.6,48,opts.shutter||"#4E8F6E");
+  // balcony on second floor
+  s+=`<rect x="${x+8}" y="150" width="${w-16}" height="62" fill="rgba(0,0,0,.12)"/>`;
+  s+=windowUnit(x+w*.28,154,w*.44,56,opts.shutter||"#4E8F6E");
+  s+=`<rect x="${x+4}" y="208" width="${w-8}" height="6" fill="${trim}"/>`;
+  for(let bx=x+10;bx<x+w-6;bx+=10) s+=`<line x1="${bx}" y1="188" x2="${bx}" y2="208" stroke="${trim}" stroke-width="2"/>`;
+  s+=`<rect x="${x+6}" y="186" width="${w-12}" height="3" fill="${trim}"/>`;
+  s+=plant(x+22,208)+plant(x+w-24,208);
+  if(opts.ac) s+=`<rect x="${x+w-46}" y="96" width="34" height="22" rx="2" fill="#D9DDD8" stroke="#9AA3A0"/><circle cx="${x+w-36}" cy="107" r="6" fill="none" stroke="#9AA3A0"/>`;
+  if(opts.laundry){ s+=`<path d="M${x+14} 160 Q${x+w/2} 172 ${x+w-14} 160" stroke="#555" fill="none"/>`; ["#E86A5B","#F2C33C","#6FA8DC","#FFFFFF"].forEach((c,i)=>{ const lx=x+30+i*((w-60)/3); s+=`<rect x="${lx-7}" y="${164+Math.sin(i)*2}" width="14" height="18" fill="${c}"/>`; }); }
+  return s;
+}
+function shutterRect(id,x,y,w,h){ // rolling metal shutter
+  // The clip keeps a half-raised shutter inside the door frame.
+  let s=`<clipPath id="${id}Clip"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath><g clip-path="url(#${id}Clip)"><g id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#9BA5A3"/>`;
+  for(let yy=y+5;yy<y+h;yy+=7) s+=`<line x1="${x}" y1="${yy}" x2="${x+w}" y2="${yy}" stroke="#7F8987" stroke-width="1.5"/>`;
+  s+=`<rect x="${x+w/2-12}" y="${y+h-8}" width="24" height="5" rx="2" fill="#5E6866"/></g></g>`; return s;
+}
+function tapRect(id,x,y,w){ return `<rect data-spot="${id}" x="${x}" y="${y}" width="${w}" height="${GROUND+4-y}" fill="transparent"/>`; }
+function boat(x,y,c){ // a wooden fishing boat with painted eyes on the bow
+  return `<g transform="translate(${x},${y})"><path d="M-50 -14 Q-44 6 0 8 Q42 6 56 -20 L44 -16 L-50 -16 Z" fill="${c}" stroke="#2A2A2A" stroke-width="1.5"/><path d="M-50 -16 H46" stroke="#F2F2E6" stroke-width="3"/><ellipse cx="36" cy="-7" rx="6" ry="4" fill="#fff"/><circle cx="37" cy="-7" r="2.4" fill="#111"/><rect x="-8" y="-50" width="3" height="36" fill="#6B4A2E"/><path d="M-5 -48 L18 -24 L-5 -24 Z" fill="#E9E1D0" opacity=".9"/></g>`; }
+function palm(x,y){ let s=`<path d="M${x} ${y} Q${x+4} ${y-60} ${x+16} ${y-118}" stroke="#7A5A3A" stroke-width="8" fill="none"/>`;
+  [[-46,-10],[-30,-30],[0,-38],[30,-28],[46,-6]].forEach(([dx,dy])=>{ s+=`<path d="M${x+16} ${y-118} q${dx/2} ${dy-10} ${dx} ${dy+14}" stroke="#3E8A46" stroke-width="7" fill="none" stroke-linecap="round"/>`; });
+  return s+`<circle cx="${x+14}" cy="${y-112}" r="5" fill="#6B4A2E"/><circle cx="${x+20}" cy="${y-110}" r="5" fill="#6B4A2E"/>`; }
+function bulbs(id,x1,x2,y){ let s=`<g id="${id}" class="lights"><path d="M${x1} ${y} Q${(x1+x2)/2} ${y+14} ${x2} ${y}" stroke="#333" fill="none"/>`; for(let i=0;i<=6;i++){ const t=i/6, bx=x1+(x2-x1)*t, by=y+Math.sin(Math.PI*t)*13; s+=`<circle cx="${bx}" cy="${by+4}" r="14" fill="url(#glow)"/><circle cx="${bx}" cy="${by+4}" r="3.5" fill="#FFE7A0"/>`; } return s+`</g>`; }
+
+function buildAlley(){
+  let s=`<defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop id="skyTop" offset="0"/><stop id="skyBot" offset="1"/></linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#FFD978" stop-opacity=".85"/><stop offset="1" stop-color="#FFD978" stop-opacity="0"/></radialGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A9A69C"/><stop offset="1" stop-color="#8C897F"/></linearGradient>
+  </defs>`;
+  s+=`<rect x="-3000" y="-50" width="${WORLD_W+6000}" height="${H+100}" fill="url(#sky)"/>`;
+  s+=`<circle id="sun" r="16" fill="#FFE39A"/>`;
+  // far skyline
+  s+=`<g fill="#5D7A86" opacity=".35">`; for(let x=-400;x<1640;x+=90){ const h=40+((x*37)%60+60)%60; s+=`<rect x="${x}" y="${60-h}" width="70" height="${h+20}"/>`; } s+=`</g>`;
+  // ground
+  s+=`<rect x="-3000" y="${GROUND}" width="${WORLD_W+6000}" height="${H-GROUND+60}" fill="url(#road)"/>`;
+  s+=`<rect x="-3000" y="${GROUND}" width="${WORLD_W+6000}" height="6" fill="#77746B"/>`;
+  s+=`<line x1="-3000" y1="${GROUND+48}" x2="${WORLD_W+3000}" y2="${GROUND+48}" stroke="#6E6B63" stroke-width="2" stroke-dasharray="14 10"/>`;
+  // wall at the far left end of the hẻm
+  s+=`<rect x="-300" y="40" width="300" height="${GROUND-40}" fill="#B9A98A"/><rect x="-300" y="34" width="300" height="10" fill="#8F8166"/>`;
+
+  // 1. Bà Tư's homestay
+  s+=upperFloors(0,220,"#E8D27A","#B8963A",{laundry:true,shutter:"#3F7FA6"});
+  s+=`<rect x="20" y="236" width="180" height="${GROUND-236}" fill="#3A3A34"/>`;
+  for(let x=24;x<198;x+=9) s+=`<line x1="${x}" y1="240" x2="${x}" y2="${GROUND}" stroke="#8E8A7A" stroke-width="2"/>`;
+  s+=`<path d="M20 252 L200 252" stroke="#8E8A7A" stroke-width="2"/>`;
+  s+=`<rect x="160" y="222" width="36" height="12" rx="2" fill="#2E5E8C"/><text x="178" y="231" text-anchor="middle" class="t-num" fill="#fff">42/7</text>`;
+  s+=`<rect x="34" y="218" width="82" height="16" rx="2" fill="#FFF8E0" stroke="#B8963A"/><text x="75" y="230" text-anchor="middle" class="t-tiny" fill="#8A5A34">HOMESTAY</text>`;
+
+  // 2. Phở Cô Sáu
+  s+=upperFloors(220,260,"#8FCBB8","#3D8B79",{ac:true,shutter:"#3D6E8A"});
+  s+=`<rect x="232" y="214" width="236" height="30" fill="${"#C4362C"}"/><text x="350" y="236" text-anchor="middle" class="t-sign" fill="#F2C33C">PHỞ CÔ SÁU</text>`;
+  s+=`<rect x="232" y="244" width="236" height="${GROUND-244}" fill="#4A3A2C"/>`;
+  s+=`<g id="phoOpen">`;
+  s+=`<rect x="240" y="248" width="220" height="${GROUND-248}" fill="#6B5240"/>`;
+  s+=`<rect x="250" y="262" width="90" height="56" rx="3" fill="#C9D1D3" stroke="#8F9A9C"/><rect x="254" y="266" width="82" height="22" fill="#E8F2F4" opacity=".8"/><text x="295" y="282" text-anchor="middle" class="t-tiny" fill="#C4362C">PHỞ BÒ</text>`;
+  s+=`<rect x="300" y="236" width="34" height="28" rx="4" fill="#B7BFC1" stroke="#7F898B"/>`;
+  s+=`<g class="anim"><path class="steam anim" d="M309 234 q-6 -10 0 -18 q6 -8 0 -16" stroke="#fff" stroke-width="3" fill="none" opacity=".7"/><path class="steam d2 anim" d="M318 234 q-6 -10 0 -18 q6 -8 0 -16" stroke="#fff" stroke-width="3" fill="none" opacity=".7"/><path class="steam d3 anim" d="M326 234 q-6 -10 0 -18 q6 -8 0 -16" stroke="#fff" stroke-width="3" fill="none" opacity=".7"/></g>`;
+  s+=person(274,262,{shirt:"#E7E2D6",apron:"#C4362C",hair:"#2A211C",bun:true});
+  s+=`<rect x="360" y="296" width="80" height="6" rx="2" fill="#C9D1D3"/><path d="M366 302 L364 ${GROUND} M434 302 L436 ${GROUND}" stroke="#8F9A9C" stroke-width="3"/>`;
+  s+=stool(372,GROUND,"#D8433A")+stool(400,GROUND,"#2F72C4")+stool(428,GROUND,"#D8433A");
+  s+=person(398,GROUND-6,{shirt:"#E8E1C8",pants:"#5A4A3A",hair:"#B9B4AA"});
+  s+=`</g>`;
+  s+=shutterRect("phoShut",232,244,236,GROUND-244);
+  s+=bulbs("phoLights",236,464,246);
+
+  // 3. Pink house with the bánh mì cart in front
+  s+=upperFloors(480,220,"#E8A6A1","#B56A64",{shutter:"#5E7F45"});
+  s+=`<rect x="500" y="240" width="180" height="${GROUND-240}" fill="#3E3532"/>`;
+  for(let x=504;x<678;x+=9) s+=`<line x1="${x}" y1="244" x2="${x}" y2="${GROUND}" stroke="#7C716C" stroke-width="2"/>`;
+  s+=`<g id="banhmiCart">`;
+  s+=person(612,GROUND-2,{shirt:"#F0D6A0",hat:"non"});
+  s+=`<rect x="548" y="270" width="96" height="40" rx="3" fill="#E9EEF0" stroke="#9AA3A6"/><rect x="552" y="274" width="88" height="20" fill="#FFFFFF" opacity=".7"/>`;
+  for(let i=0;i<5;i++) s+=`<ellipse cx="${562+i*17}" cy="290" rx="9" ry="4" fill="#D99A3E"/>`;
+  s+=`<rect x="548" y="250" width="96" height="18" fill="#C4362C"/><text x="596" y="264" text-anchor="middle" class="t-tiny" fill="#F2C33C">BÁNH MÌ</text>`;
+  s+=`<rect x="550" y="310" width="92" height="8" fill="#8E6B48"/><circle cx="560" cy="${GROUND-6}" r="7" fill="#333"/><circle cx="632" cy="${GROUND-6}" r="7" fill="#333"/>`;
+  s+=tapRect("banhmi",540,240,110)+`</g>`;
+
+  // 4. Cà phê cóc against a blue wall
+  s+=upperFloors(700,260,"#8DB3D9","#4F7DA8",{ac:true,shutter:"#C78B3A"});
+  s+=`<rect x="700" y="214" width="260" height="${GROUND-214}" fill="#7FA5CC"/>`;
+  s+=`<rect x="712" y="284" width="236" height="8" fill="#5C7FA5"/>`;
+  s+=`<g id="cocOpen">`;
+  s+=`<rect x="726" y="252" width="44" height="26" fill="#C7A574"/><text x="748" y="270" text-anchor="middle" class="t-tiny" fill="#4A2E1A">CÀ PHÊ</text>`;
+  s+=`<rect x="900" y="292" width="34" height="${GROUND-292}" rx="3" fill="#D84C3A"/><rect x="900" y="292" width="34" height="8" fill="#FFFFFF" opacity=".5"/>`;
+  s+=stool(760,GROUND,"#2F72C4")+stool(800,GROUND,"#D8433A")+stool(842,GROUND,"#2F72C4")+stool(874,GROUND,"#2F9C5A");
+  s+=person(800,GROUND-8,{shirt:"#F2F2F2",pants:"#273445",hair:"#151515"});
+  s+=person(842,GROUND-8,{shirt:"#E9C7D8",pants:"#3D3D55",hair:"#2B1C14"});
+  s+=`<rect x="790" y="276" width="10" height="8" fill="#6B3E1E"/><rect x="852" y="276" width="10" height="8" fill="#D9B58C"/>`;
+  s+=`</g>`;
+  s+=`<g id="cocClosed">`+[0,1,2].map(i=>stool(930,GROUND-i*5,"#2F72C4")).join("")+`</g>`;
+  s+=bulbs("cocLights",716,944,218);
+
+  // 5. Phở Bắc Bác Hà
+  s+=upperFloors(960,260,"#D9A35B","#9C6B2C",{laundry:true,shutter:"#2F6E5A"});
+  s+=`<rect x="972" y="214" width="236" height="30" fill="#1F4A3C"/><text x="1090" y="236" text-anchor="middle" class="t-sign" fill="#F2C33C" textLength="214" lengthAdjust="spacingAndGlyphs">PHỞ BẮC GIA TRUYỀN</text>`;
+  s+=`<rect x="972" y="244" width="236" height="${GROUND-244}" fill="#4A3A2C"/>`;
+  s+=`<g id="bacOpen"><rect x="980" y="248" width="220" height="${GROUND-248}" fill="#6E5644"/><rect x="990" y="266" width="80" height="50" rx="3" fill="#C9D1D3" stroke="#8F9A9C"/>`;
+  s+=person(1040,262,{shirt:"#DCE3E8",apron:"#1F4A3C"});
+  s+=stool(1130,GROUND,"#D8433A")+stool(1160,GROUND,"#D8433A")+`</g>`;
+  s+=shutterRect("bacShut",972,244,236,GROUND-244);
+
+  // 6. Building with a tree, sugarcane cart in front
+  s+=upperFloors(1220,240,"#B9D58C","#7C9A4A",{shutter:"#B35A3A"});
+  s+=`<rect x="1236" y="238" width="208" height="${GROUND-238}" fill="#3D3A30"/>`;
+  s+=`<rect x="1428" y="150" width="14" height="${GROUND-150}" fill="#6B4A2E"/><circle cx="1420" cy="140" r="38" fill="#3E8A46"/><circle cx="1450" cy="160" r="30" fill="#4C9A52"/>`;
+  s+=`<g id="miaCart">`;
+  s+=`<rect x="1290" y="268" width="100" height="44" rx="4" fill="#3F9A5A"/><rect x="1290" y="254" width="100" height="16" fill="#F2F2E6"/><text x="1340" y="266" text-anchor="middle" class="t-tiny" fill="#2E7A44">NƯỚC MÍA</text>`;
+  s+=`<circle cx="1306" cy="290" r="14" fill="none" stroke="#C9D1D3" stroke-width="4"/><path d="M1306 276 V304 M1292 290 H1320" stroke="#C9D1D3" stroke-width="3"/>`;
+  for(let i=0;i<4;i++) s+=`<line x1="${1372+i*5}" y1="214" x2="${1366+i*5}" y2="268" stroke="#B9A24A" stroke-width="4"/>`;
+  s+=`<circle cx="1302" cy="${GROUND-6}" r="7" fill="#333"/><circle cx="1378" cy="${GROUND-6}" r="7" fill="#333"/>`;
+  s+=person(1408,GROUND-4,{shirt:"#F3E3A8",hat:"non"});
+  s+=tapRect("mia",1280,200,140)+`</g>`;
+
+  // At night the hủ tiếu gõ cart parks where the sugarcane cart stands by day.
+  s+=`<g id="goCart">`;
+  s+=`<rect x="1290" y="270" width="80" height="42" rx="3" fill="#8A5A34"/><rect x="1296" y="276" width="68" height="20" fill="#E7D3A0"/><text x="1330" y="290" text-anchor="middle" class="t-tiny" fill="#6B3A1E">HỦ TIẾU</text>`;
+  s+=`<rect x="1340" y="250" width="22" height="20" rx="3" fill="#B7BFC1"/><circle cx="1296" cy="246" r="16" fill="url(#glow)"/><rect x="1292" y="240" width="8" height="12" fill="#FFE7A0"/>`;
+  s+=`<circle cx="1302" cy="${GROUND-6}" r="8" fill="#333"/><circle cx="1360" cy="${GROUND-6}" r="8" fill="#333"/>`;
+  s+=person(1392,GROUND-4,{shirt:"#7A8F6A",hair:"#1E1A18"});
+  s+=tapRect("go",1280,230,130)+`</g>`;
+
+  // 7. Bánh khọt shop on the corner
+  s+=upperFloors(1460,240,"#F0C9A0","#B9824E",{ac:true,shutter:"#3F7FA6"});
+  s+=`<rect x="1472" y="214" width="216" height="30" fill="#2E6B3A"/><text x="1580" y="236" text-anchor="middle" class="t-sign" fill="#F2C33C" textLength="196" lengthAdjust="spacingAndGlyphs">BÁNH KHỌT CÔ ÚT</text>`;
+  s+=`<rect x="1472" y="244" width="216" height="${GROUND-244}" fill="#4A3A2C"/>`;
+  s+=`<g id="bkOpen"><rect x="1478" y="248" width="204" height="${GROUND-248}" fill="#6E5644"/>`;
+  s+=person(1530,GROUND,{shirt:"#F2E6CF",hat:"non"});
+  s+=`<rect x="1490" y="270" width="88" height="14" rx="2" fill="#3A3A3A"/>`;
+  for(let i=0;i<8;i++) s+=`<circle cx="${1497+i*10.5}" cy="277" r="4" fill="#E9B23A" stroke="#7A4A1A"/>`;
+  s+=`<rect x="1486" y="284" width="96" height="26" fill="#2B2420"/><rect x="1490" y="288" width="88" height="6" fill="#E0662A" opacity=".85"/>`;
+  s+=`<g class="anim"><path class="steam anim" d="M1510 266 q-6 -10 0 -18" stroke="#fff" stroke-width="3" fill="none" opacity=".6"/><path class="steam d2 anim" d="M1540 266 q-6 -10 0 -18" stroke="#fff" stroke-width="3" fill="none" opacity=".6"/><path class="steam d3 anim" d="M1566 266 q-6 -10 0 -18" stroke="#fff" stroke-width="3" fill="none" opacity=".6"/></g>`;
+  s+=`<rect x="1604" y="300" width="70" height="5" rx="2" fill="#C9D1D3"/><path d="M1610 305 L1608 ${GROUND} M1668 305 L1670 ${GROUND}" stroke="#8F9A9C" stroke-width="3"/>`;
+  s+=stool(1616,GROUND,"#2F72C4")+stool(1660,GROUND,"#D8433A")+person(1638,GROUND-6,{shirt:"#F6D25A",pants:"#2C3A55",hair:"#24180F"});
+  s+=`</g>`;
+  s+=shutterRect("bkShut",1472,244,216,GROUND-244);
+  s+=bulbs("bkLights",1466,1694,246);
+
+  // 8. Bãi Trước at the end of the hẻm
+  s+=`<rect x="1700" y="20" width="9" height="${GROUND-20}" fill="#6D6A62"/>`;
+  s+=`<rect x="1709" y="196" width="${WORLD_W+3000}" height="80" fill="#3E8FB0"/><rect x="1709" y="196" width="${WORLD_W+3000}" height="10" fill="#7DB8CF"/>`;
+  s+=`<g stroke="#D7EEF5" stroke-width="2" fill="none" opacity=".7">`+[1760,1900,2040,2180].map((x,i)=>`<path d="M${x} ${232+i%2*14} q14 -6 28 0 t28 0"/>`).join("")+`</g>`;
+  s+=`<rect x="1709" y="268" width="${WORLD_W+3000}" height="40" fill="#E3CF9B"/><path d="M1709 268 q60 8 120 0 t120 0 t120 0 t120 0 t120 0" stroke="#F4F0E2" stroke-width="3" fill="none"/>`;
+  s+=palm(1736,300)+palm(2104,300);
+  s+=`<g id="boatsOut">`+[1880,2010,2130].map(x=>`<g transform="translate(${x},202) scale(.35)">${boat(0,0,"#2F6FB5")}</g>`).join("")+`</g>`;
+  s+=`<g id="boatsIn">`+boat(1890,290,"#2F6FB5")+boat(2030,294,"#C4362C");
+  s+=`<ellipse cx="1958" cy="300" rx="30" ry="7" fill="#7A6A4A" opacity=".5"/>`;
+  for(let i=0;i<9;i++) s+=`<ellipse cx="${1940+(i%3)*12}" cy="${296-Math.floor(i/3)*4}" rx="7" ry="2.5" fill="#C9D4DC" stroke="#7E8C96" stroke-width=".8"/>`;
+  s+=`<ellipse cx="1980" cy="300" rx="13" ry="6" fill="#8B6A3A"/>`;
+  s+=`<g transform="translate(1966,300) scale(.8)">`+person(0,0,{shirt:"#E86A5B",hat:"non"})+`</g><g transform="translate(1996,302) scale(.8)">`+person(0,0,{shirt:"#6FA8DC",hair:"#2B1C14",bun:true})+`</g>`;
+  s+=`</g>`;
+  s+=`<g id="exercise">`+[[1790,"#F2F2F2"],[1830,"#F6D25A"],[2080,"#E9C7D8"],[2120,"#9BD39A"]].map(([x,c],i)=>`<g transform="translate(${x},306) scale(.8)">`+person(0,0,{shirt:c,arms:i%2?"out":"up",hair:i===2?"#B9B4AA":"#1E1A18"})+`</g>`).join("")+`</g>`;
+  s+=`<g id="strollers">`+[[1850,"#E86A5B"],[1876,"#6FA8DC"],[2060,"#F2C33C"]].map(([x,c])=>`<g transform="translate(${x},306) scale(.8)">`+person(0,0,{shirt:c})+`</g>`).join("")+`</g>`;
+  s+=`<g fill="none" stroke="#7E7A70" stroke-width="3"><path d="M1709 314 H${WORLD_W+3000}"/></g>`;
+  for(let x=1714;x<WORLD_W+400;x+=36) s+=`<rect x="${x}" y="312" width="5" height="18" fill="#7E7A70"/>`;
+  // the egg cart at the start of the beach road
+  s+=`<g id="hvlCart">`;
+  s+=`<rect x="1766" y="292" width="62" height="20" rx="2" fill="#B07A3E"/><ellipse cx="1786" cy="290" rx="16" ry="8" fill="#C9A14A"/>`;
+  for(let i=0;i<6;i++) s+=`<ellipse cx="${1778+(i%3)*8}" cy="${288-Math.floor(i/3)*4}" rx="4" ry="5" fill="#F3EDDC" stroke="#B9A98A" stroke-width=".8"/>`;
+  s+=`<rect x="1806" y="280" width="18" height="12" rx="2" fill="#B7BFC1"/>`;
+  s+=`<rect x="1762" y="262" width="70" height="16" fill="#E9D8B8" stroke="#8A6A3A"/><text x="1797" y="274" text-anchor="middle" class="t-tiny" fill="#6B3A1E">HỘT VỊT LỘN</text>`;
+  s+=person(1860,GROUND-2,{shirt:"#B97AB0",hat:"non"})+stool(1836,GROUND+2,"#2F72C4");
+  s+=tapRect("hvl",1756,250,110)+`</g>`;
+  s+=`<g id="goBoy">`+person(0,0,{shirt:"#D9D2C0",pants:"#3B3A36"})+`<g transform="translate(10,-46)"><rect x="0" y="-2" width="14" height="4" rx="2" fill="#C9A14A"/><rect x="2" y="3" width="14" height="4" rx="2" fill="#B98F3A"/></g></g>`;
+  s+=`<g id="clackBubble"><rect x="-42" y="-30" width="84" height="26" rx="13" fill="#FFF8E0" stroke="#8A5A34"/><text x="0" y="-12" text-anchor="middle" class="t-tiny" fill="#6B3A1E">lóc cóc…</text></g>`;
+
+  // overhead wires and poles
+  s+=`<rect x="696" y="20" width="8" height="${GROUND-20}" fill="#6D6A62"/>`;
+  s+=`<g stroke="#1E2422" stroke-width="1.6" fill="none">`;
+  for(let i=0;i<6;i++){ const y=26+i*7; s+=`<path d="M-300 ${y} Q 200 ${y+40} 700 ${y+4} Q 1080 ${y+40} 1466 ${y+2} Q 1585 ${y+30} 1704 ${y+4}"/>`; }
+  s+=`<path d="M700 30 q30 30 10 50 q-20 20 20 34" /></g>`;
+
+  // neighbors
+  s+=`<g id="batu" data-npc="batu">`+person(178,GROUND+2,{shirt:"#7A4E8C",pants:"#2B2B33",hair:"#B9B4AA",bun:true,broom:true})+`</g>`;
+  // night overlay, then lights on top
+  s+=`<rect id="nightLayer" x="-3000" y="-50" width="${WORLD_W+6000}" height="${H+100}" fill="#0A1230" pointer-events="none"/>`;
+  s+=`<g id="lightsTop"></g>`;
+  // player
+  s+=`<g id="player" pointer-events="none"><g id="playerBody">`+person(0,0,{shirt:"#2C7A6E",pants:"#3A4A6A",pack:"#E08A3C",hat:"cap",hatColor:"#F2C33C",skin:"#E9C2A0",hair:"#6B4A2E"})+`</g></g>`;
+  s+=`<g id="markers"></g>`;
+  // tap areas for each place
+  // [x, top, width]. Each area stops at the ground line, so the street stays free for walking.
+  const AREAS={home:[0,60,220],pho:[220,60,260],coc:[700,60,260],bac:[960,60,260],banhkhot:[1460,60,240],beach:[1880,190,WORLD_W-1880]};
+  for(const [id,[x,y,w]] of Object.entries(AREAS)) s+=`<rect data-spot="${id}" x="${x}" y="${y}" width="${w}" height="${GROUND+4-y}" fill="transparent"/>`;
+  s+=`<rect data-npc="batu" x="160" y="${GROUND-80}" width="44" height="86" fill="transparent"/>`;
+  s+=`<style>
+    .t-sign{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:22px;letter-spacing:1px}
+    .t-small{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:12px}
+    .t-tiny{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:12px;letter-spacing:.5px}
+    .t-num{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:10px}
+    .t-label{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:13px}
+  </style>`;
+  $("alley").innerHTML=s;
+  // move light strings above the night layer so they glow
+  const top=$("lightsTop"); ["phoLights","cocLights","bkLights"].forEach(id=>top.appendChild($(id)));
+}
+
+let camX=0, vw=600;
+function layoutAlley(){
+  const r=$("stage").getBoundingClientRect(); if(!r.width||!r.height) return;
+  vw = H * r.width / r.height;
+  if(vw>=WORLD_W) camX=(WORLD_W-vw)/2;
+  else camX=clamp(S.px-vw/2,0,WORLD_W-vw);
+  $("alley").setAttribute("viewBox",`${camX} 0 ${vw} ${H}`);
+}
+function paintAlley(){
+  const m=S.minutes, [top,bot]=skyAt(m), dk=darkness(m), dark=dk>.22;
+  $("skyTop").setAttribute("stop-color",top); $("skyBot").setAttribute("stop-color",bot);
+  $("nightLayer").setAttribute("opacity",dk.toFixed(3));
+  // sun by day, moon by night
+  const h=m/60, sun=$("sun");
+  if(h>=6&&h<=18.5){ const t=(h-6)/12.5; sun.setAttribute("cx",camX+vw*(.1+.8*t)); sun.setAttribute("cy",40-Math.sin(Math.PI*t)*30+10); sun.setAttribute("fill","#FFE39A"); }
+  else { const t=((h<6?h+24:h)-18.5)/11.5; sun.setAttribute("cx",camX+vw*(.15+.7*t)); sun.setAttribute("cy",30); sun.setAttribute("fill","#E6ECF5"); }
+  const vis=(id,on)=>{ const e=$(id); if(e) e.style.display=on?"":"none"; };
+  const pho=isOpen(SPOT.pho), bac=isOpen(SPOT.bac);
+  // The shutter is half up just before opening and while Cô Sáu cleans up after.
+  vis("phoOpen",pho); vis("phoShut",!pho);
+  const halfUp = !pho && ((m>=270 && m<330) || (m>=630 && m<720));
+  if(halfUp) $("phoShut").setAttribute("transform","translate(0,-40)"); else $("phoShut").removeAttribute("transform");
+  vis("bacOpen",bac); vis("bacShut",!bac);
+  vis("banhmiCart",isOpen(SPOT.banhmi));
+  vis("cocOpen",isOpen(SPOT.coc)); vis("cocClosed",!isOpen(SPOT.coc));
+  vis("miaCart",isOpen(SPOT.mia));
+  const go=isOpen(SPOT.go); vis("goCart",go); vis("goBoy",go); vis("clackBubble",false);
+  const bk=isOpen(SPOT.banhkhot); vis("bkOpen",bk); vis("bkShut",!bk); vis("bkLights",bk&&dark);
+  vis("hvlCart",isOpen(SPOT.hvl));
+  const dawn = m>=270 && m<450, evening = m>=960 && m<1290;
+  vis("boatsIn",dawn); vis("boatsOut",!dawn); vis("exercise",dawn); vis("strollers",evening);
+  vis("batu", m>=330 && m<540);
+  document.querySelectorAll('[data-npc="batu"]').forEach(e=>e.style.pointerEvents=(m>=330&&m<540)?"":"none");
+  vis("phoLights",pho&&dark); vis("cocLights",isOpen(SPOT.coc)&&dark);
+}
+function placePlayer(){
+  $("player").setAttribute("transform",`translate(${S.px.toFixed(1)},${GROUND+30}) scale(${S.facing},1)`);
+}
+
+// Walking
+let rafId=null, lastT=0;
+function walkTo(x,pending=null){
+  if(S.mode!=="alley") return;
+  S.target=clamp(x,30,WORLD_W-40); S.pending=pending;
+  if(!rafId){ lastT=performance.now(); rafId=requestAnimationFrame(step); }
+}
+function step(t){
+  const dt=Math.min(.05,(t-lastT)/1000); lastT=t;
+  if(S.target==null){ rafId=null; return; }
+  const d=S.target-S.px, mv=WALK_SPEED*dt;
+  if(Math.abs(d)<=mv){ S.px=S.target; S.target=null; }
+  else { S.px+=Math.sign(d)*mv; S.facing=d<0?-1:1; }
+  // time passes as you walk
+  S.frac+=mv/WORLD_W*MIN_PER_WORLD; if(S.frac>=1){ const add=Math.floor(S.frac); S.frac-=add; addMinutes(add,true); }
+  S.walkT+=dt;
+  const legs=document.querySelector("#playerBody .legs"); const sw=Math.sin(S.walkT*14)*4;
+  if(legs && !reduceMotion) legs.setAttribute("transform",`skewX(${sw})`);
+  layoutAlley(); placePlayer(); paintAlley();
+  if(S.target==null){ rafId=null; if(legs) legs.removeAttribute("transform"); save(); arrived(); return; }
+  rafId=requestAnimationFrame(step);
+}
+function arrived(){
+  const p=S.pending; S.pending=null;
+  if(p==="batu") return greetBaTu();
+  if(p) return interact(SPOT[p]);
+  alleyPanel();
+}
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// Taps in the alley
+$("alley").addEventListener("click",e=>{
+  ac();
+  const npc=e.target.closest("[data-npc]"); const spot=e.target.closest("[data-spot]");
+  if(npc){ walkTo(186-30,"batu"); return; }
+  if(spot){ const s=SPOT[spot.dataset.spot]; walkTo(s.x,s.id); return; }
+  const r=$("alley").getBoundingClientRect(); const x=camX+(e.clientX-r.left)/r.width*vw; walkTo(x);
+});
+function nudge(dir){ ac(); if(S.mode!=="alley") return; walkTo(S.px+dir*180); }
+$("walkL").onclick=()=>nudge(-1); $("walkR").onclick=()=>nudge(1);
+document.addEventListener("keydown",e=>{ if(!$("sheet").hidden||S.mode!=="alley") return; if(e.key==="ArrowLeft") nudge(-1); if(e.key==="ArrowRight") nudge(1); });
+// The talk panel grows and shrinks, so watch the stage size, not only the window.
+function relayout(){ if(S.mode==="alley"){ layoutAlley(); paintAlley(); } }
+addEventListener("resize",relayout);
+try{ new ResizeObserver(relayout).observe($("stage")); }catch(e){}
+
+// Time
+function addMinutes(n,quiet=false){
+  S.minutes+=n;
+  if(S.minutes>=1440){ S.minutes=1439; }
+  updateBar(); if(S.mode==="alley") paintAlley();
+  if(!quiet) save();
+}
+function sleepTillMorning(){
+  S.day+=1; S.minutes=DAY_START; S.px=110; S.facing=1; S.target=null; S.pending=null;
+  save(); layoutAlley(); placePlayer(); paintAlley(); updateBar();
+  say({text:`<em>Ngày ${S.day}.</em> You sleep. At 5:45 the hẻm is already awake: a broom on the concrete, a scooter warming up, sea wind, and the smell of broth from Cô Sáu's.`,
+       choices:[{label:"Step outside",cls:"primary",act:alleyPanel}]});
+}
+function openClock(){
+  if(S.mode!=="alley"){ showToast("<span>Finish your bowl first.</span>"); return; }
+  const m=S.minutes, opts=[];
+  const w=(label,sub,to)=>opts.push(`<button class="choice" data-to="${to}"><span>${label}</span><span class="sub">${sub}</span></button>`);
+  if(m+60<1440) w("Wait one hour","Sit on the stoop and watch the hẻm",m+60);
+  if(m<660) w("Wait until 11:00","Late morning",660);
+  if(m<900) w("Wait until 15:00","Hot afternoon",900);
+  if(m<1110) w("Wait until 18:30","Evening",1110);
+  if(m<1230) w("Wait until 20:30","Night",1230);
+  opts.push(`<button class="choice primary" data-to="sleep"><span>Sleep until morning</span><span class="sub">Next day, 5:45</span></button>`);
+  openSheet(`<button class="x" id="sheetX">Close</button><h2>${hhmm(m)} · ${partOfDay(m)[0]}</h2><p class="hint">${partOfDay(m)[0]} means ${partOfDay(m)[1]}. Shops open and close by the clock.</p><div class="choices">${opts.join("")}</div>`);
+  $("sheetCard").querySelectorAll("[data-to]").forEach(b=>b.onclick=()=>{ closeSheet(); const to=b.dataset.to; if(to==="sleep") sleepTillMorning(); else { addMinutes(+to-S.minutes); alleyPanel(); } });
+}
+$("clockBtn").onclick=openClock;
+
+// Hủ tiếu gõ at night: the helper walks the hẻm and clacks.
+let goTimer=null, lastClack=0;
+function goTick(){
+  if(S.mode!=="alley" || !isOpen(SPOT.go)) return;
+  const t=performance.now()/1000;
+  const bx=1180+Math.sin(t*.25)*300; const boy=$("goBoy"); if(boy) boy.setAttribute("transform",`translate(${bx.toFixed(1)},${GROUND+26})`);
+  if(t-lastClack>4.5){ lastClack=t; clack(); const b=$("clackBubble"); b.style.display=""; b.setAttribute("transform",`translate(${bx.toFixed(1)},${GROUND-60})`); setTimeout(()=>{ b.style.display="none"; },1100); }
+}
+goTimer=setInterval(goTick,120);
+
+// ---------- Alley panel and places ----------
+function nearSpot(){ let best=null,bd=1e9; for(const s of SPOTS){ if(s.cart && !isOpen(s)) continue; const d=Math.abs(s.x-S.px); if(d<bd){bd=d;best=s;} } return bd<=80?best:null; }
+function waitChoice(){ return {label:"Wait or sleep",sub:"Tap the clock any time",cls:"quiet",act:openClock}; }
+function alleyPanel(){
+  S.mode="alley"; updateBar();
+  if(S.minutes>=1410){
+    return say({text:"It's late. The hẻm is quiet and the shutters are down. Time to sleep.",choices:[{label:"Go home and sleep",cls:"primary",act:sleepTillMorning}]});
+  }
+  const n=nearSpot();
+  if(n){
+    const open=isOpen(n);
+    const status = n.hours ? (open?`Open now · ${hoursText(n)}`:`Closed now · open ${hoursText(n)}`) : "";
+    return say({text:`<em>${esc(n.name)}</em> · ${esc(n.en)}${status?`<br><span class="hint">${status}</span>`:""}`,
+      choices:[{label:n.id==="home"?"Go in":(n.id==="pho"&&open?"Sit down and eat":"Take a look"),cls:"primary",act:()=>interact(n)},waitChoice()]});
+  }
+  const tip = S.minutes<630 && !S.cards.includes("order") ? "Cô Sáu's phở is two doors down. Go before it sells out."
+    : S.minutes<450 && !S.cards.includes("boats") ? "Bãi Trước is at the end of the hẻm. Early morning is the time to go."
+    : "Tap a shop to walk there, or tap the street to stroll.";
+  say({text:tip,choices:[waitChoice()]});
+}
+
+function greetBaTu(){
+  say({who:"batu",text:"Ủa, con dậy rồi hả? <em>Ăn sáng chưa con?</em>",phrases:[["Ăn sáng chưa con?","Have you had breakfast yet, dear?"]],
+    choices:[
+      {label:"Dạ, chưa ạ.",sub:"“Not yet.”",act:()=>{ learn("anSang"); say({who:"batu",text:"Chưa hả? Đi qua Cô Sáu ăn tô phở đi, kẻo hết! <br>(Not yet? Go have a bowl at Cô Sáu's before it runs out!)",hint:"Ăn sáng chưa? is a greeting. She's saying good morning, and she's also telling you where to eat.",choices:[{label:"Thanks, Bà Tư",cls:"primary",act:alleyPanel}]}); }},
+      {label:"Good morning!",sub:"Answer in English",act:()=>{ learn("anSang"); say({who:"batu",text:"Haha, good morning! She smiles and points down the hẻm. “Phở, phở! Cô Sáu.”",hint:"Ăn sáng chưa? is how neighbors say hi in the morning. Try “Dạ, chưa” (not yet) next time.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]}); }}
+    ]});
+}
+
+function interact(s){
+  const m=S.minutes, open=isOpen(s);
+  switch(s.id){
+    case "home":
+      return say({text:"Bà Tư's homestay. Your room upstairs has a fan and a window over the hẻm. From the kitchen comes the smell of nước mắm and something frying.",hint:"Coming in a later version: dinner with the family.",choices:[
+        {label:"Rest one hour",act:()=>{ addMinutes(60); alleyPanel(); }},
+        {label:"Sleep until morning",act:sleepTillMorning},
+        {label:"Go back out",cls:"quiet",act:alleyPanel}]});
+    case "pho":
+      if(open) return enterPho();
+      if(m<330) return say({who:"cosau",text:"The shutter is half up. Cô Sáu is tending the pot. “Chưa mở con ơi, chút nữa nghen.” (Not open yet, a little later.)",choices:[{label:"Wait until 5:30",act:()=>{ addMinutes(330-m); alleyPanel(); }},{label:"Okay",cls:"quiet",act:alleyPanel}]});
+      learn("breakfast"); learn("shutter");
+      if(m>=720) return say({text:"The shutter is down. Upstairs, a TV is on. Cô Sáu sells phở in the morning only, from 5:30 until it runs out.",
+        hint:"Phở is a morning food here. Come back early tomorrow.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+      return say({who:"cosau",text:"Cô Sáu is washing the last bowls. <em>Hết rồi con ơi!</em> Sáng mai đi sớm sớm nghen.",phrases:[["Hết rồi con ơi!","It's all gone, dear!"],["Sáng mai đi sớm sớm nghen.","Come early tomorrow morning, okay?"]],
+        hint:"Phở is a morning food here. Most bowls are sold by 10 or 11.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+    case "banhmi":
+      if(!open) return say({text:"No cart here now. The bánh mì cart comes before sunrise and leaves by 9.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+      learn("banhmi");
+      return say({text:"Warm loaves stacked behind glass. A line of people in work clothes and school uniforms.",hint:"Coming in a later version: build your own bánh mì.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+    case "coc":
+      if(!open) return say({text:"The stools are stacked against the wall. Coffee starts again at 5:30.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+      learn("coc");
+      return say({text:"Plastic stools along the wall, glasses with a phin dripping on top. Two men argue about football. Nobody is in a hurry.",hint:"Coming in a later version: order a cà phê sữa đá and wait for the drip.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+    case "bac":
+      if(!open){ learn("shutter"); return say({text:"Shutter down. Bác Hà sells in the morning only.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]}); }
+      learn("bac");
+      return say({who:"bacha",text:"Mời cháu vào ăn phở! (Come in for phở!) Bác Hà speaks with a Northern accent. On her table: chili, lime, garlic vinegar. No bean sprouts. No hoisin.",phrases:[["Mời cháu vào ăn phở!","Come in and eat phở!"]],
+        hint:"Coming in a later version. We want Northern cooks to help write this shop.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+    case "mia":
+      if(!open) return say({text:"The sugarcane cart comes out from 10 in the morning to 6 in the evening.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+      learn("mia");
+      return say({text:"The press squeaks. Cane goes in, green-gold juice comes out over ice, with a squeeze of tắc.",hint:"Coming in a later version.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+    case "banhkhot":
+      if(!open){ learn("shutter"); return say({text:"Shutter down. Cô Út starts the fire at 6:30 in the morning.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]}); }
+      learn("banhkhot");
+      return say({text:"Cô Út pours rice batter into a hot mold full of little cups, drops a shrimp in each, and covers it. They come out crispy and yellow, one bite each. At the table: lettuce, herbs, and a bowl of nước mắm.",phrases:[["Bánh khọt nè!","Bánh khọt, here!"]],
+        hint:"Coming in a later version: eat a plate. Vũng Tàu is known for bánh khọt.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+    case "hvl":
+      if(!open) return say({text:"The egg cart comes out in the afternoon and stays into the night.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+      learn("hvl");
+      return say({text:"A basket of warm duck eggs under a cloth. A man cracks the top of one, sips the broth, adds salt and pepper, and eats it with rau răm. Next to him, a girl orders hers fried in tamarind sauce.",phrases:[["Hột vịt lộn nè!","Duck eggs, here!"]],
+        hint:"Coming in a later version: try one, if you dare.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+    case "beach":
+      if(m>=270 && m<450){ learn("boats"); learn("exercise");
+        return say({text:"The boats are in. Fish are sorted on the sand, and neighbors buy them right there. Behind them, people jog, stretch, and swing their arms before the sun gets hot.",
+          hint:"Coming in a later version: buy fish for Bà Tư's kitchen.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]}); }
+      if(m>=450 && m<960) return say({text:"The sun is hot. The sand is almost empty, and the boats wait out at sea.",hint:"Come back very early in the morning.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+      if(m>=960 && m<1290) return say({text:"The heat breaks. Families sit on mats, kids run at the water, and scooters roll along the coast road.",
+        hint:"Coming in a later version: ride a scooter along the coast. Helmet on.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+      return say({text:"Dark water and the sound of waves. Far out, the lights of fishing boats.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+    case "go":
+      if(!open) return say({text:"Nothing here now. Come back after dark and listen.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+      learn("clack");
+      return say({text:"<em>Lóc cóc, lóc cóc.</em> The helper clacks two bamboo sticks as he walks. Call out from your door, and the bowl comes to you.",hint:"Coming in a later version.",choices:[{label:"Okay",cls:"primary",act:alleyPanel}]});
+  }
+}
+
+// ======================================================================
+//  THE PHỞ SHOP
+// ======================================================================
+// You build your bowl from these, in this order: "một tô phở tái nạm gầu bò viên".
+const CUTS = {
+  tai:{vi:"tái",en:"thin raw beef, cooks in the bowl"},
+  nam:{vi:"nạm",en:"flank"},
+  gau:{vi:"gầu",en:"fatty brisket"},
+  gan:{vi:"gân",en:"tendon"},
+  sach:{vi:"sách",en:"tripe"},
+  bv:{vi:"bò viên",en:"beef meatballs"}
+};
+const CUT_KEYS = Object.keys(CUTS);
+function isDacBiet(){ return P.cuts.length===CUT_KEYS.length; }
+function bowlName(){ return isDacBiet() ? "phở đặc biệt" : "phở "+CUT_KEYS.filter(k=>P.cuts.includes(k)).map(k=>CUTS[k].vi).join(" "); }
+// Placeholder prices for the draft. Check with real shops.
+const PRICE = {nho:50000, lon:60000, dacbiet:10000, beo:5000, trung:7000};
+let P=null;
+function newVisit(){ return {cuts:[],size:null,beo:false,trung:false,tasted:false,herbs:false,gia:false,lime:false,chili:false,taiDone:false,hoisin:false,sri:false,saucer:false,beoUsed:false,eggDone:false,dipped:false,eaten:false,served:false}; }
+function total(){ let t=PRICE[P.size]||0; if(isDacBiet()) t+=PRICE.dacbiet; if(P.beo) t+=PRICE.beo; if(P.trung) t+=PRICE.trung; return t; }
+
+function enterPho(){
+  S.mode="pho"; S.target=null; P=newVisit();
+  S.bowls=(S.bowls||0)+1;
+  if(S.bowls>1){ showScene("table"); updateBar(); drawTable();
+    return say({who:"chubay",text:S.bowls===2?"Ủa, lại nữa hả? Back again? Haha. Sit, sit.":"You again! Cô Sáu, this one is a regular now!",phrases:[["Lại nữa hả?","Again?"]],
+      choices:[{label:"Sit down on the little red stool",cls:"primary",act:askOrder}].concat(S.cards.includes("names")?[]:[namesChoice()])}); }
+  showScene("table");
+  updateBar(); drawTable();
+  say({who:"chubay",text:"Ê, ngồi đây nè! Sit with me. I'm Chú Bảy, I eat here every morning. That's Cô Sáu. She lit the stove at 3.",phrases:[["Ngồi đây nè!","Sit here!"]],
+    choices:[{label:"Sit down on the little red stool",cls:"primary",act:askOrder},namesChoice()]});
+}
+function namesChoice(){ return {label:"Why “Sáu” and “Bảy”?",sub:"Ask about the names",act:()=>{ learn("names"); say({who:"chubay",text:"Birth order! In the South the oldest is Hai, two. Nobody is Một. So Cô Sáu is the fifth child, and me, Bảy, the sixth. Easy, no?",choices:[{label:"Sit down",cls:"primary",act:askOrder}]}); }}; }
+function askOrder(){
+  const n=P.cuts.length;
+  const ch=CUT_KEYS.map(k=>{ const on=P.cuts.includes(k);
+    return {label:(on?"✓ ":"")+CUTS[k].vi,sub:CUTS[k].en,cls:on?"on":"",act:()=>{ if(on) P.cuts=P.cuts.filter(x=>x!==k); else P.cuts.push(k); askOrder(); }}; });
+  ch.push({label:isDacBiet()?"✓ Đặc biệt":"Đặc biệt",sub:"a bit of everything",cls:isDacBiet()?"on":"",act:()=>{ P.cuts=isDacBiet()?[]:CUT_KEYS.slice(); askOrder(); }});
+  if(n) ch.push({label:"Say it",sub:`“Một tô ${bowlName()}”`,cls:"primary",act:()=>{ learn("order"); askSize(); }});
+  say({who:"cosau",text:"<em>Ăn gì con?</em> "+(n?`You'll say: <em>“Cô ơi, một tô ${esc(bowlName())}!”</em>`:"Pick what goes in your bowl. Most people pick two or three."),
+    phrases:n?[["Ăn gì con?","What will you have, dear?"],[`Một tô ${bowlName()}`,"One bowl of "+CUT_KEYS.filter(k=>P.cuts.includes(k)).map(k=>CUTS[k].en.split(",")[0]).join(", ")]]:[["Ăn gì con?","What will you have, dear?"]],
+    grid:true,choices:ch});
+}
+function askSize(){
+  say({who:"cosau",text:`<em>${esc(bowlName()[0].toUpperCase()+bowlName().slice(1))} hả?</em> Tô nhỏ hay tô lớn?`,phrases:[["Tô nhỏ hay tô lớn?","Small bowl or large bowl?"]],grid:true,
+    choices:[{label:"Tô nhỏ",sub:"Small · "+vnd(PRICE.nho+(isDacBiet()?PRICE.dacbiet:0)),act:()=>{P.size="nho";askExtras();}},
+             {label:"Tô lớn",sub:"Large · "+vnd(PRICE.lon+(isDacBiet()?PRICE.dacbiet:0)),act:()=>{P.size="lon";askExtras();}}]});
+}
+function askExtras(explained=false){
+  const ch=[
+    {label:(P.beo?"✓ ":"")+"Nước béo hành trần",sub:(P.beo?"Added · ":"Add · +")+vnd(PRICE.beo),cls:P.beo?"on":"",act:()=>{ P.beo=!P.beo; if(P.beo) learn("beo"); askExtras(explained); }},
+    {label:(P.trung?"✓ ":"")+"Chén trứng",sub:(P.trung?"Added · ":"Add · +")+vnd(PRICE.trung),cls:P.trung?"on":"",act:()=>{ P.trung=!P.trung; if(P.trung) learn("trung"); askExtras(explained); }}
+  ];
+  if(!explained) ch.push({label:"What are those?",sub:"Ask Chú Bảy",cls:"quiet",act:()=>{ learn("beo"); learn("trung");
+    say({who:"chubay",text:"Nước béo: the fat Cô Sáu skims off the pot, with scallion. I dip my meat in it. Chén trứng: an egg in a little bowl. You spoon hot broth on it. Not on the menu. You just know to ask.",choices:[{label:"Got it",cls:"primary",act:()=>askExtras(true)}]}); }});
+  ch.push({label:"That's my order",cls:"primary",act:serve});
+  say({who:"chubay",text:"Chú Bảy calls out his own order: <em>“Cho chú tô tái nạm, thêm chén nước béo với chén trứng nghen!”</em> Want anything extra?",
+    phrases:[["Cho chú tô tái nạm…","A bowl of tái nạm for me…"],["…thêm chén nước béo với chén trứng nghen!","…plus a dish of broth fat and an egg, okay!"]],grid:true,choices:ch});
+}
+function serve(){
+  P.served=true; drawTable();
+  say({who:"cosau",text:"<em>Nè con.</em> A steaming bowl, a plate piled with herbs, and two squeeze bottles already on the table.",phrases:[["Nè con.","Here you go, dear."]],
+    choices:[{label:"Look at the table",cls:"primary",act:()=>{ say({who:"chubay",text:"Before you touch anything, taste the nước lèo. That's the broth. Then do what you like. Tap things on the table, or pick below.",choices:tableChoices()}); }}]});
+}
+
+// Every action at the table. Each one changes the bowl and gets a reaction.
+function hasTai(){ return P.cuts.includes("tai"); }
+function tableChoices(){
+  const c=[], A=(label,sub,act)=>c.push({label,sub,act});
+  if(!P.tasted) A("Taste the broth","nếm nước lèo",act.taste);
+  if(hasTai() && !P.taiDone) A("Push the tái under","the raw beef on top",act.tai);
+  if(!P.herbs) A("Add the herbs","húng quế, ngò gai",act.herbs);
+  if(!P.gia) A("Add bean sprouts","giá",act.gia);
+  if(!P.lime) A("Squeeze the lime","chanh",act.lime);
+  if(!P.chili) A("Add fresh chili","ớt",act.chili);
+  if(!P.hoisin) A("Hoisin into the bowl","tương đen",act.hoisin);
+  if(!P.sri) A("Chili sauce into the bowl","tương ớt",act.sri);
+  if(!P.saucer) A("Make a dipping dish","sauce in the small dish",act.saucer);
+  if(P.beo && !P.beoUsed) A("Use the nước béo","the fat dish",act.beo);
+  if(P.trung && !P.eggDone) A("The egg","chén trứng",act.egg);
+  if((P.saucer||P.beoUsed) && !P.dipped) A("Dip a piece of meat","chấm thịt",act.dip);
+  c.push({label:"Start eating",sub:"when you're ready",cls:"primary",act:act.eat});
+  return c;
+}
+function react(who,text,extra={}){ drawTable(); say(Object.assign({who,text,grid:true,choices:tableChoices()},extra)); }
+const act = {
+  taste(){ P.tasted=true; learn("taste");
+    if(P.hoisin) react("chubay","Haha. Now you taste hoisin, not Cô Sáu's broth. Next bowl, taste first.");
+    else react("you","Clear, beefy, a little sweet. Star anise and something warm, like cinnamon. Chú Bảy nods. “Good, right? Now you know what you're changing.”"); },
+  tai(){ P.taiDone=true; learn("tai"); react("chubay","Good. Push it under the hot broth and watch: the pink turns brown. If you leave it on top, it stays raw."); },
+  herbs(){ say({who:"chubay",text:"The plate isn't decoration. How do you add the basil?",choices:[
+      {label:"Drop whole sprigs in",act:()=>{ P.herbs=true; learn("rau"); react("chubay","Ê, the stems are tough! Pick the leaves off and tear them a little. The smell comes out. Here, like this.");} },
+      {label:"Pick the leaves and tear them",act:()=>{ P.herbs=true; learn("rau"); react("chubay","That's it. Tear, drop, push them into the hot broth. Do the ngò gai too.");} }]}); },
+  gia(){ P.gia=true; learn("rau"); react("chubay","Push the giá under so it softens a little but stays crunchy. Some people ask Cô Sáu for giá trụng, blanched."); },
+  lime(){ P.lime=true; react("you","A squeeze of lime. The broth gets brighter. Chú Bảy uses two wedges. Everyone has their own way."); },
+  chili(){ P.chili=true; react("chubay","Careful, those are the small ones. Spicy!"); },
+  hoisin(){ P.hoisin=true; learn("saucer"); learn("bac");
+    react("chubay","Lots of people here do that too. Nobody will stop you. But the broth turns brown and sweet, and you lose what Cô Sáu cooked. Me, I put the sauce in the little dish. And down the hẻm, Bác Hà serves phở Bắc. She doesn't even put hoisin on the table!"); },
+  sri(){ P.sri=true; learn("saucer"); react("chubay","Hot, hot! Plenty of people do it. I keep mine in the little dish for dipping, so the broth stays clean."); },
+  saucer(){ P.saucer=true; learn("saucer"); react("chubay","That's how I do it. Hoisin on one side, chili sauce on the other. Dip the meat and the bò viên, and the broth stays Cô Sáu's."); },
+  beo(){ say({who:"chubay",text:"What do you do with the nước béo?",choices:[
+      {label:"Pour it all into the bowl",act:()=>{ P.beoUsed=true; react("chubay","Rich! Some people do that. I put the scallion in my bowl and keep the fat for dipping.");} },
+      {label:"Onion in the bowl, fat for dipping",act:()=>{ P.beoUsed=true; react("chubay","Like me! Mix a little hoisin and chili into the fat and dip your meat. Ngon lắm.",{phrases:[["Ngon lắm!","So good!"]]});} }]}); },
+  egg(){ say({who:"chubay",text:"The egg is in its own small bowl. What now?",choices:[
+      {label:"Spoon hot broth over it",act:()=>{ P.eggDone=true; react("chubay","Yes. A few spoons, wait a little, it cooks soft. Eat it on the side or slide it in.");} },
+      {label:"Slide it straight into the phở",act:()=>{ P.eggDone=true; react("chubay","That works too. The hot broth cooks it. Stir it gently.");} }]}); },
+  dip(){ P.dipped=true; react("you","A slice of beef, through the sauce, into your mouth. Chú Bảy raises his spoon. “Ngon không?” (Good?)",{phrases:[["Ngon không?","Is it good?"]]}); },
+  eat(){ P.eaten=true; drawTable(); const notes=[];
+    if(hasTai() && !P.taiDone){ notes.push("Your tái sat on top and stayed pink. Push it under next time, the hot broth cooks it."); learn("tai"); }
+    if(!P.herbs && !P.gia){ notes.push("You didn't touch the rau! The plate is part of the bowl."); learn("rau"); }
+    if(!P.tasted){ notes.push("And you never tasted the broth by itself. Try it first next time."); learn("taste"); }
+    say({who:"chubay",text:(notes.length?notes.join(" ")+" ":"")+"Chopsticks in one hand, spoon in the other. Slurping is fine here.",
+      choices:[{label:"Finish the bowl",cls:"primary",act:finish}]}); }
+};
+function finish(){
+  learn("breakfast");
+  say({who:"chubay",text:"Ah, no bowl is ever too big. In America you eat phở for dinner, right? Here most shops are busiest at 6 and sold out by 10. That's why I come early.",
+    choices:[{label:"Pay",cls:"primary",act:askPay}]});
+}
+function askPay(){
+  say({who:null,text:"How do you pay?",choices:[
+    {label:"Call out: “Cô ơi, tính tiền!”",sub:"Auntie, the bill please!",act:()=>bill("call")},
+    {label:"Walk up to Cô Sáu to pay",act:()=>bill("walk")},
+    {label:"Leave some cash on the table and go",act:()=>{ say({who:"chubay",text:"Ê, wait! You don't know the total yet. Just call out, she'll come to you.",phrases:[["Cô ơi, tính tiền!","Auntie, the bill please!"]],choices:[{label:"Call out: “Cô ơi, tính tiền!”",cls:"primary",act:()=>bill("call")}]}); }}]});
+}
+function bill(how){
+  const t=total();
+  const lead = how==="walk" ? "Cô Sáu waves you back to your stool. “Ngồi đi con, cô tới liền.” (Sit, I'm coming.) " : "";
+  say({who:"cosau",text:lead+`<em>Của con ${vnd(t)}.</em>`,phrases:[[`Của con ${vnd(t).replace("₫"," đồng")}.`,"That's yours, dear."]],
+    hint:how==="walk"?"At a quán you can stay seated. Call out and the owner comes to you.":"",
+    choices:[{label:"Pay cash",sub:vnd(t),act:()=>tip("cash")},{label:"Scan the QR code",sub:"bank transfer",act:()=>tip("qr")}]});
+}
+function tip(method){
+  const t=total();
+  say({who:null,text:method==="qr"?"You scan the QR code taped to the cart. Ting! Paid.":`You hand over ${vnd(Math.ceil(t/50000)*50000)} and get your change.`,
+    choices:[
+      {label:"Leave a tip",sub:"like at home",act:()=>{ learn("pay"); say({who:"cosau",text:"Cô Sáu laughs and pushes it back. <em>Thôi thôi, khỏi con!</em>",phrases:[["Thôi thôi, khỏi con!","No, no, no need, dear!"]],hint:"Tips are not expected at a quán. A thank-you is enough.",choices:[{label:"Say “Cảm ơn cô!”",cls:"primary",act:goodbye}]}); }},
+      {label:"Say “Cảm ơn cô!”",sub:"Thank you, auntie!",act:()=>{ learn("pay"); goodbye(); }}]});
+}
+function goodbye(){
+  say({who:"cosau",text:"<em>Mai ghé nữa nghen!</em>",phrases:[["Mai ghé nữa nghen!","Come again tomorrow, okay?"]],
+    choices:[{label:"Back to the hẻm",cls:"primary",act:leavePho}]});
+}
+function leavePho(){
+  S.mode="alley"; P=null; showScene("alley");
+  addMinutes(40); layoutAlley(); placePlayer(); paintAlley(); alleyPanel();
+}
+
+// SVG elements have no "hidden" property, so set the attribute.
+function showScene(which){
+  $("alley").toggleAttribute("hidden", which!=="alley");
+  $("table").toggleAttribute("hidden", which!=="table");
+  $("walkL").hidden = $("walkR").hidden = which!=="alley";
+}
+
+// Draw the table from above
+function drawTable(){
+  if(!P) return; let s="";
+  s+=`<defs><linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#D7DEE0"/><stop offset=".5" stop-color="#C3CCCF"/><stop offset="1" stop-color="#B3BDC0"/></linearGradient></defs>`;
+  s+=`<rect x="0" y="0" width="400" height="420" fill="#5A4636"/>`;
+  s+=`<rect x="10" y="10" width="380" height="400" rx="14" fill="url(#steel)" stroke="#8F9A9C" stroke-width="3"/>`;
+  s+=`<path d="M40 30 L120 30 M300 400 L360 400" stroke="#fff" stroke-width="3" opacity=".35"/>`;
+  // herb plate
+  s+=`<g data-t="herbs"><circle cx="86" cy="92" r="66" fill="#F6F6F2" stroke="#D5D5CF" stroke-width="3"/>`;
+  if(!P.herbs){ for(let i=0;i<7;i++){ const a=i*0.9, x=70+Math.cos(a)*24, y=80+Math.sin(a)*20; s+=`<ellipse cx="${x}" cy="${y}" rx="11" ry="6" transform="rotate(${i*40} ${x} ${y})" fill="#3E8E41"/>`; } s+=`<path d="M52 70 L92 104 M60 62 L98 96" stroke="#6B3A6E" stroke-width="2"/>`; for(let i=0;i<4;i++) s+=`<ellipse cx="${108+i*4}" cy="${62+i*9}" rx="16" ry="4" transform="rotate(-30 ${108+i*4} ${62+i*9})" fill="#4C9A2A"/>`; }
+  else s+=`<path d="M60 70 L88 98 M66 64 L94 92 M58 80 L80 102" stroke="#6B3A6E" stroke-width="2"/>`;
+  if(!P.gia){ for(let i=0;i<14;i++){ const x=58+(i%7)*8, y=118+Math.floor(i/7)*8; s+=`<path d="M${x} ${y} q4 -6 9 -2" stroke="#F4F1DE" stroke-width="3" fill="none"/><circle cx="${x}" cy="${y}" r="2" fill="#E6E0B0"/>`; } }
+  if(!P.lime) s+=`<path d="M122 110 a14 14 0 0 1 28 0 z" fill="#8CC63F" stroke="#5E8F25" stroke-width="2"/><path d="M126 110 a10 10 0 0 1 20 0" fill="#D7EFA6"/>`;
+  else s+=`<path d="M126 112 a10 6 0 0 1 20 0 z" fill="#A9C97A"/>`;
+  if(!P.chili) s+=`<circle cx="118" cy="136" r="5" fill="#D8352A"/><circle cx="130" cy="140" r="5" fill="#D8352A"/><circle cx="124" cy="148" r="5" fill="#E04A2F"/>`;
+  s+=`<text x="86" y="174" text-anchor="middle" class="tl">dĩa rau</text></g>`;
+  // condiments
+  s+=`<g data-t="hoisin"><rect x="256" y="34" width="34" height="78" rx="10" fill="#4A2A1C"/><rect x="266" y="22" width="14" height="16" rx="3" fill="#E9E1D0"/><rect x="258" y="62" width="30" height="20" fill="#E9E1D0"/><text x="273" y="76" text-anchor="middle" class="tt" fill="#4A2A1C">đen</text><text x="273" y="130" text-anchor="middle" class="tl">tương đen</text></g>`;
+  s+=`<g data-t="sri"><rect x="330" y="34" width="34" height="78" rx="10" fill="#C7281F"/><rect x="340" y="22" width="14" height="16" rx="3" fill="#2E8B3A"/><rect x="332" y="62" width="30" height="20" fill="#F2F2E6"/><text x="347" y="76" text-anchor="middle" class="tt" fill="#C7281F">ớt</text><text x="347" y="130" text-anchor="middle" class="tl">tương ớt</text></g>`;
+  // little dipping dish
+  s+=`<g data-t="saucer"><circle cx="340" cy="266" r="34" fill="#F7F7F3" stroke="#D5D5CF" stroke-width="3"/>`;
+  if(P.saucer) s+=`<path d="M340 242 a24 24 0 0 0 0 48 z" fill="#5A321F"/><path d="M340 242 a24 24 0 0 1 0 48 z" fill="#C7281F"/>`;
+  s+=`<text x="340" y="316" text-anchor="middle" class="tl">chén nhỏ</text></g>`;
+  // fat dish
+  if(P.beo){ s+=`<g data-t="beo"><circle cx="56" cy="262" r="32" fill="#F7F7F3" stroke="#D5D5CF" stroke-width="3"/>`;
+    s+=`<circle cx="56" cy="262" r="23" fill="${P.beoUsed?"#B98A3A":"#E8C35A"}" opacity=".9"/>`;
+    if(!P.beoUsed) for(let i=0;i<8;i++) s+=`<rect x="${44+(i%4)*7}" y="${254+Math.floor(i/4)*9}" width="5" height="3" fill="#4C9A2A"/>`;
+    s+=`<text x="56" y="310" text-anchor="middle" class="tl">nước béo</text></g>`; }
+  // egg dish
+  if(P.trung){ s+=`<g data-t="egg"><circle cx="56" cy="360" r="28" fill="#F7F7F3" stroke="#D5D5CF" stroke-width="3"/>`;
+    if(!P.eggDone) s+=`<ellipse cx="56" cy="360" rx="15" ry="12" fill="#FFFDF4" opacity=".85"/><circle cx="56" cy="358" r="8" fill="#F2A81D"/>`;
+    else s+=`<circle cx="56" cy="360" r="20" fill="#D9A75A" opacity=".8"/><ellipse cx="56" cy="359" rx="12" ry="9" fill="#FFF6E0"/><circle cx="56" cy="358" r="6" fill="#F5C04A"/>`;
+    s+=`<text x="56" y="404" text-anchor="middle" class="tl">chén trứng</text></g>`; }
+  // the bowl
+  s+=`<g data-t="bowl"><circle cx="200" cy="238" r="104" fill="#000" opacity=".08"/><circle cx="198" cy="234" r="102" fill="#FBFBF8" stroke="#D5D5CF" stroke-width="2"/>`;
+  s+=`<circle cx="198" cy="234" r="94" fill="none" stroke="#2D5FA8" stroke-width="5" stroke-dasharray="10 6"/>`;
+  if(!P.served){ s+=`<circle cx="198" cy="234" r="82" fill="#ECECE6"/><text x="198" y="240" text-anchor="middle" class="tl">waiting…</text>`; }
+  else {
+    const broth = P.eaten ? "#D9B47A" : (P.hoisin && P.sri ? "#8E4A2A" : P.hoisin ? "#7A4A2A" : P.sri ? "#C0572E" : "#D49A4C");
+    s+=`<circle cx="198" cy="234" r="82" fill="${broth}" opacity="${P.eaten?.35:.95}"/>`;
+    if(!P.eaten){
+      for(let i=0;i<9;i++) s+=`<path d="M${150+i*10} ${200+(i%3)*14} q20 18 40 4 t40 6" stroke="#FAF5E8" stroke-width="4" fill="none" opacity=".85"/>`;
+      // Each cut has its own look and its own place in the bowl.
+      const has=k=>P.cuts.includes(k), tc=P.taiDone?"#8A5A44":"#D86C78";
+      if(has("tai")) [[170,190],[205,182],[232,200]].forEach(([x,y],i)=>s+=`<ellipse cx="${x}" cy="${y}" rx="22" ry="12" transform="rotate(${i*25-20} ${x} ${y})" fill="${tc}"/>`);
+      if(has("nam")) [[158,248],[240,252]].forEach(([x,y],i)=>s+=`<ellipse cx="${x}" cy="${y}" rx="20" ry="11" transform="rotate(${i*40-10} ${x} ${y})" fill="#9A6B4E"/>`);
+      if(has("gau")) [[226,226],[176,222]].forEach(([x,y])=>s+=`<g transform="rotate(-15 ${x} ${y})"><ellipse cx="${x}" cy="${y}" rx="18" ry="10" fill="#A0705A"/><rect x="${x-16}" y="${y-2}" width="32" height="4" fill="#F1E6D2"/></g>`);
+      if(has("gan")) [[150,222],[248,232]].forEach(([x,y])=>s+=`<ellipse cx="${x}" cy="${y}" rx="11" ry="8" fill="#E8D7B8" stroke="#C9B48E" opacity=".95"/>`);
+      if(has("sach")) [[200,214],[182,250]].forEach(([x,y])=>s+=`<g><rect x="${x-12}" y="${y-7}" width="24" height="14" rx="3" fill="#E9E4D8"/><path d="M${x-10} ${y-3} h20 M${x-10} ${y+1} h20 M${x-10} ${y+5} h20" stroke="#CFC6B2" stroke-width="1.5"/></g>`);
+      if(has("bv")) [[190,268],[215,274],[172,282]].forEach(([x,y])=>s+=`<circle cx="${x}" cy="${y}" r="9" fill="#6E4B3A"/><circle cx="${x-3}" cy="${y-3}" r="2.5" fill="#8C6550"/>`);
+      for(let i=0;i<14;i++){ const a=i*2.3, r=30+(i*13)%40; s+=`<rect x="${198+Math.cos(a)*r}" y="${234+Math.sin(a)*r}" width="6" height="3" fill="#3E9A3A"/>`; }
+      [[180,222],[226,228],[205,262]].forEach(([x,y])=>s+=`<circle cx="${x}" cy="${y}" r="7" fill="none" stroke="#F6F3EA" stroke-width="2.5"/>`);
+      if(P.herbs) for(let i=0;i<6;i++){ const x=160+i*14, y=218+((i*17)%30); s+=`<ellipse cx="${x}" cy="${y}" rx="8" ry="5" transform="rotate(${i*30} ${x} ${y})" fill="#2F7A33"/>`; }
+      if(P.gia) for(let i=0;i<8;i++) s+=`<path d="M${168+i*9} ${270-(i%2)*8} q5 -6 10 -1" stroke="#F4F1DE" stroke-width="3" fill="none"/>`;
+      if(P.lime) s+=`<circle cx="240" cy="230" r="9" fill="#C9E08A" stroke="#8CB43F" stroke-width="2"/>`;
+      if(P.chili) [[170,240],[178,246],[226,250]].forEach(([x,y])=>s+=`<circle cx="${x}" cy="${y}" r="3.5" fill="#E0301F"/>`);
+      if(P.hoisin) s+=`<path d="M170 210 q30 20 60 0 q-10 30 -40 30" stroke="#3B1E12" stroke-width="5" fill="none" opacity=".6"/>`;
+      if(P.sri) s+=`<path d="M175 250 q25 -14 50 6" stroke="#B5161A" stroke-width="5" fill="none" opacity=".7"/>`;
+    }
+  }
+  s+=`<text x="198" y="356" text-anchor="middle" class="tl">${P.cuts.length?esc(bowlName()):"tô phở"}</text></g>`;
+  // chopsticks and spoon
+  s+=`<g><rect x="142" y="374" width="120" height="5" rx="2" fill="#B07A3E" transform="rotate(-4 200 376)"/><rect x="142" y="384" width="120" height="5" rx="2" fill="#B07A3E" transform="rotate(-2 200 386)"/><ellipse cx="300" cy="384" rx="16" ry="10" fill="#FBFBF8" stroke="#D5D5CF"/><rect x="246" y="381" width="40" height="6" rx="3" fill="#FBFBF8" stroke="#D5D5CF"/></g>`;
+  s+=`<style>.tl{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:15px;fill:#1D2725}.tt{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:11px}</style>`;
+  $("table").innerHTML=s;
+}
+// Taps on the table run the matching action, when it makes sense now.
+$("table").addEventListener("click",e=>{
+  ac(); const g=e.target.closest("[data-t]"); if(!g||!P||!P.served||P.eaten) return;
+  const t=g.dataset.t;
+  if(t==="bowl"){ if(!P.tasted) act.taste(); else if(hasTai()&&!P.taiDone) act.tai(); return; }
+  if(t==="herbs"){ if(!P.herbs) act.herbs(); else if(!P.gia) act.gia(); else if(!P.lime) act.lime(); else if(!P.chili) act.chili(); return; }
+  if(t==="hoisin"||t==="sri"){ const into = t==="hoisin"?act.hoisin:act.sri; const done = t==="hoisin"?P.hoisin:P.sri;
+    const ch=[]; if(!done) ch.push({label:"Into the bowl",act:into}); if(!P.saucer) ch.push({label:"Into the little dish",act:act.saucer});
+    ch.push({label:"Never mind",cls:"quiet",act:()=>react(null,"What next?")});
+    if(ch.length>1) say({who:null,text:t==="hoisin"?"Tương đen (hoisin). Where does it go?":"Tương ớt (chili sauce). Where does it go?",choices:ch}); return; }
+  if(t==="saucer"&&!P.saucer) return act.saucer();
+  if(t==="beo"&&!P.beoUsed) return act.beo();
+  if(t==="egg"&&!P.eggDone) return act.egg();
+});
+
+// ---------- Boot ----------
+function snapshot(){ return {minutes:S.minutes,day:S.day,cards:S.cards,introDone:S.introDone,sound:S.sound,px:S.px}; }
+function start(data){
+  load();
+  if(data && typeof data.minutes==="number"){ Object.assign(S,data); }
+  buildAlley(); updateBar(); layoutAlley(); placePlayer(); paintAlley();
+  if(!S.introDone){
+    say({text:"<em>Một Ngày Ở Xóm</em> · A day in a Vũng Tàu hẻm.<br>You're staying at Bà Tư's family homestay in Hẻm 42, a short walk from Bãi Trước. It's 6 in the morning, and the hẻm is already busy. Walk around, eat, and fill your sổ tay (notebook) with what you learn.",
+      hint:"Tap the street to walk. Tap a shop to go there. Tap the clock to wait.",
+      choices:[{label:"Step outside",cls:"primary",act:()=>{ S.introDone=true; save(); greetBaTu(); }}]});
+  } else alleyPanel();
+}
+start({});
+</script>
+
+</body>
+</html>
