@@ -53,13 +53,16 @@ def land_polygon(lines: list[LineString], box: Polygon, problems: list[str]) -> 
         return box
     merged = ops.linemerge(MultiLineString(lines))
     parts = list(merged.geoms) if hasattr(merged, "geoms") else [merged]
-    clipped = [p.intersection(box) for p in parts]
-    pieces = list(ops.polygonize(ops.unary_union([box.boundary] + [c for c in clipped if not c.is_empty])))
+    # The full lines cross the edge of the box, so the union cuts the box at the
+    # crossings. Lines clipped to the box end near the edge, but not exactly on
+    # it, so they do not cut the box.
+    near = [p for p in parts if p.intersects(box)]
+    pieces = list(ops.polygonize(ops.unary_union([box.boundary] + near)))
     land = []
     for piece in pieces:
-        if piece.area < 1.0:
-            continue
         point = piece.representative_point()
+        if piece.area < 1.0 or not box.contains(point):
+            continue
         nearest = min(parts, key=lambda p: p.distance(point))
         if _side(nearest, point) > 0:
             land.append(piece)

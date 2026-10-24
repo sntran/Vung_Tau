@@ -30,8 +30,13 @@ LAND_MIN_HEIGHT = 0.25
 ROAD_SHOULDER_M = 1.5
 # The length of the moving average of the road height along a road.
 ROAD_SMOOTH_M = 16.0
+# The steepest road: 25 % (14 degrees). Steep streets in Vũng Tàu are near this value.
+MAX_ROAD_GRADE = 0.25
+# The most that a road goes into the ground or above it.
+MAX_ROAD_CUT_M = 4.0
 # Road types that follow the natural ground: the pipeline does not make them flat.
-NATURAL_ROADS = {"path", "footway", "steps", "track"}
+# A footway and steps are for walking, so they are flat like the other roads.
+NATURAL_ROADS = {"path", "track"}
 # The size of the filter that removes buildings and trees from the surface model in towns.
 URBAN_FILTER_M = 60.0
 # Below LOW_GROUND_TOP_M - LOW_GROUND_BLEND_M, the filter changes the ground fully. Above
@@ -148,41 +153,138 @@ def smooth_profile(heights: np.ndarray, spacing: float, length: float) -> np.nda
     return np.convolve(padded, np.ones(n) / n, mode="valid")
 
 
+def limit_grade(profile: np.ndarray, spacing: np.ndarray, grade: float, max_change: float = MAX_ROAD_CUT_M,
+                fixed: np.ndarray | None = None) -> np.ndarray:
+    """Makes the steep parts of a road less steep: a short steep part (for
+    example trees in the surface model) becomes a ramp of "grade". The road
+    goes not more than "max_change" above or below the first profile, so a road
+    that is steep for a long distance stays steep."""
+    original = profile.astype(np.float64)
+    h = original.copy()
+    limit = spacing * grade
+    for _ in range(200):
+        diff = np.diff(h)
+        excess = np.abs(diff) - limit
+        if excess.max(initial=0.0) <= 0.005:
+            break
+        change = np.where(excess > 0, np.sign(diff) * excess / 2.0, 0.0)
+        h[:-1] += change
+        h[1:] -= change
+        np.clip(h, original - max_change, original + max_change, out=h)
+        if fixed is not None:
+            h[fixed] = original[fixed]
+    return h
+
+
+def _profile(grid: Grid, road, step: float, locked: np.ndarray | None = None):
+    """The height profile of a road. A point on a surface that is set already
+    (a junction with a more important road) keeps the height of that surface."""
+    x = road.points[:, 0]
+    z = -road.points[:, 1]
+    raw = grid.sample(x, z)
+    profile = smooth_profile(raw, step, ROAD_SMOOTH_M if not road.hem else ROAD_SMOOTH_M / 2)
+    fixed = None
+    if locked is not None:
+        cols = np.clip(np.round((x - grid.x0) / grid.step).astype(int), 0, grid.shape[1] - 1)
+        rows = np.clip(np.round((z - grid.z0) / grid.step).astype(int), 0, grid.shape[0] - 1)
+        fixed = locked[rows, cols]
+        profile = np.where(fixed, raw, profile)
+    spacing = np.hypot(np.diff(x), np.diff(z))
+    profile = limit_grade(np.maximum(profile, LAND_MIN_HEIGHT + 0.05), spacing, MAX_ROAD_GRADE, fixed=fixed)
+    return profile, x, z
+
+
 def flatten_roads(grid: Grid, roads, step: float) -> None:
-    """Makes the ground flat across each road (D7). A more important road is
-    the last to change the ground, so it sets the height at a junction."""
+    """Makes the ground flat across each road (D7).
+
+    1. The shoulders of all roads blend into the ground.
+    2. The road surfaces are set, the most important road first, and a set cell
+       does not change again. Each road takes its height profile from this
+       ground, so a side road starts at the height of the main road.
+    3. All road surfaces are set again with these profiles, without locks, the
+       least important first. So each road surface is continuous, and a more
+       important road wins only where the two surfaces really cover the same cells."""
+    flat = [r for r in sorted(roads, key=lambda r: r.importance)
+            if r.type not in NATURAL_ROADS and not r.bridge and not r.tunnel]
+    for road in reversed(flat):
+        profile, x, z = _profile(grid, road, step)
+        _flatten(grid, road, profile, x, z, "shoulder")
+    locked = np.zeros(grid.shape, dtype=bool)
+    profiles = []
+    for road in flat:
+        profile, x, z = _profile(grid, road, step, locked)
+        _flatten(grid, road, profile, x, z, "surface", locked)
+        profiles.append((road, profile, x, z))
+    mix = (np.zeros(grid.shape, dtype=np.float32), np.zeros(grid.shape, dtype=np.float32))
+    for road, profile, x, z in reversed(profiles):
+        _flatten(grid, road, profile, x, z, "mix", mix=mix)
+
+
+def _flatten(grid: Grid, road, profile, x, z, mode: str, locked: np.ndarray | None = None, mix=None) -> None:
+    """"shoulder" blends the shoulders. "surface" sets the surface cells; with
+    "locked", only the cells that are not locked, and then it locks them.
+    "mix" sets the surface cells to a mean of the parts of the road that cover
+    them, with more weight for a nearer part: the two legs of a hairpin then join
+    with a slope, not with a step. "mix" needs two empty arrays for the sums."""
     h = grid.heights
     rows, cols = h.shape
-    for road in sorted(roads, key=lambda r: -r.importance):
-        if road.type in NATURAL_ROADS or road.bridge or road.tunnel:
+    half = road.width / 2.0
+    reach = half + ROAD_SHOULDER_M
+    new_lock = []
+    touched = []
+    for i in range(len(x) - 1):
+        ax, az, bx, bz = x[i], z[i], x[i + 1], z[i + 1]
+        c0 = max(0, int((min(ax, bx) - reach - grid.x0) / grid.step))
+        c1 = min(cols - 1, int((max(ax, bx) + reach - grid.x0) / grid.step) + 1)
+        r0 = max(0, int((min(az, bz) - reach - grid.z0) / grid.step))
+        r1 = min(rows - 1, int((max(az, bz) + reach - grid.z0) / grid.step) + 1)
+        if c1 < c0 or r1 < r0:
             continue
-        x = road.points[:, 0]
-        z = -road.points[:, 1]
-        profile = smooth_profile(grid.sample(x, z), step, ROAD_SMOOTH_M if not road.hem else ROAD_SMOOTH_M / 2)
-        profile = np.maximum(profile, LAND_MIN_HEIGHT + 0.05)
-        half = road.width / 2.0
-        reach = half + ROAD_SHOULDER_M
-        for i in range(len(x) - 1):
-            ax, az, bx, bz = x[i], z[i], x[i + 1], z[i + 1]
-            c0 = max(0, int((min(ax, bx) - reach - grid.x0) / grid.step))
-            c1 = min(cols - 1, int((max(ax, bx) + reach - grid.x0) / grid.step) + 1)
-            r0 = max(0, int((min(az, bz) - reach - grid.z0) / grid.step))
-            r1 = min(rows - 1, int((max(az, bz) + reach - grid.z0) / grid.step) + 1)
-            if c1 < c0 or r1 < r0:
-                continue
-            px = grid.x0 + np.arange(c0, c1 + 1) * grid.step
-            pz = grid.z0 + np.arange(r0, r1 + 1) * grid.step
-            gx, gz = np.meshgrid(px, pz)
-            dx, dz = bx - ax, bz - az
-            length2 = dx * dx + dz * dz
-            t = np.clip(((gx - ax) * dx + (gz - az) * dz) / length2, 0.0, 1.0) if length2 > 0 else np.zeros_like(gx)
-            d = np.hypot(gx - (ax + t * dx), gz - (az + t * dz))
+        px = grid.x0 + np.arange(c0, c1 + 1) * grid.step
+        pz = grid.z0 + np.arange(r0, r1 + 1) * grid.step
+        gx, gz = np.meshgrid(px, pz)
+        dx, dz = bx - ax, bz - az
+        length2 = dx * dx + dz * dz
+        if length2 <= 0.0:
+            continue
+        raw_t = ((gx - ax) * dx + (gz - az) * dz) / length2
+        t = np.clip(raw_t, 0.0, 1.0)
+        d = np.hypot(gx - (ax + t * dx), gz - (az + t * dz))
+        target = profile[i] + t * (profile[i + 1] - profile[i])
+        block = h[r0:r1 + 1, c0:c1 + 1]
+        # A segment changes only the cells that are beside it. Else the round end of
+        # each segment puts the height of one point on the slope of the next segment.
+        # The first and the last segment also change the cells at the ends of the road.
+        beside = (raw_t >= (-np.inf if i == 0 else -0.02)) & (raw_t <= (np.inf if i == len(x) - 2 else 1.02))
+        if mode == "mix":
+            core = (d <= half + grid.step / 2.0) & beside
+            weight = 1.0 / (d + 0.5) ** 2
+            mix[0][r0:r1 + 1, c0:c1 + 1][core] += (target * weight)[core]
+            mix[1][r0:r1 + 1, c0:c1 + 1][core] += weight[core]
+            touched.append((r0, r1, c0, c1))
+        elif mode == "surface":
+            # The road surface and a band of half a grid step, so that the edge sample is flat too.
+            core = (d <= half + grid.step / 2.0) & beside
+            if locked is not None:
+                core &= ~locked[r0:r1 + 1, c0:c1 + 1]
+                new_lock.append((r0, r1, c0, c1, core))
+            block[core] = target[core]
+        else:
             weight = np.clip((reach - d) / ROAD_SHOULDER_M, 0.0, 1.0)
-            if not weight.any():
-                continue
-            target = profile[i] + t * (profile[i + 1] - profile[i])
-            block = h[r0:r1 + 1, c0:c1 + 1]
-            block[:] = block * (1 - weight) + target * weight
+            shoulder = (d > half) & (weight > 0.0) & beside
+            block[shoulder] = block[shoulder] * (1 - weight[shoulder]) + target[shoulder] * weight[shoulder]
+    if mode == "mix":
+        for r0, r1, c0, c1 in touched:
+            total, weights = mix[0][r0:r1 + 1, c0:c1 + 1], mix[1][r0:r1 + 1, c0:c1 + 1]
+            covered = weights > 0.0
+            h[r0:r1 + 1, c0:c1 + 1][covered] = total[covered] / weights[covered]
+        for r0, r1, c0, c1 in touched:
+            mix[0][r0:r1 + 1, c0:c1 + 1] = 0.0
+            mix[1][r0:r1 + 1, c0:c1 + 1] = 0.0
+    # The cells lock after the whole road, so that the parts of one road join.
+    if locked is not None:
+        for r0, r1, c0, c1, core in new_lock:
+            locked[r0:r1 + 1, c0:c1 + 1] |= core
 
 
 def encode(heights: np.ndarray, offset: float, step: float) -> np.ndarray:

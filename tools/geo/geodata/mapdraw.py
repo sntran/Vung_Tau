@@ -76,7 +76,10 @@ def draw(path, center, roads, land, beaches, blocks, buildings, homestay: dict) 
 def center_of(homestay: dict) -> np.ndarray | None:
     if homestay.get("found"):
         pts = homestay["hem"].points
-        return pts[len(pts) // 2]
+        middle = pts[len(pts) // 2]
+        if "curve" in homestay:
+            return (middle + np.array(homestay["curve"]["end"])) / 2.0
+        return middle
     if "curve" in homestay:
         return np.array(homestay["curve"]["end"])
     return None
