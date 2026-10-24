@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Approved |
+| Status | In progress |
 | Branch | `feat/0003-voices-and-phone` |
 | Depends on | 0002 (status "Built") |
 
@@ -148,3 +148,19 @@ Change PT-01, PT-03, PT-04, PT-06, PT-08, PT-14, PT-16, and PT-17 to use the pho
 - **Q1.** Do the VieNeu-TTS voices sound like people in Vũng Tàu? I decide after the audition. If no voice is good enough, the next choice is to record real people with their written consent.
 - **Q2.** Answered: cô Nga of the host family writes the messages (R25).
 - **Q3.** Answered for now: the forms of address below are correct. The traveler is an adult. "cô" for Cô Sáu, "bà" for Bà Tư, "chú" for Chú Bảy, "bác" for Bác Hà, and "con" or "cháu" for the player in their answers.
+- **Q4.** The builder added a second neighbor for PT-19: Chú Chín, who argues about football with Chú Bảy at the cà phê cóc (`coc.talk.1` to `coc.talk.4`). Is the name correct for a neighbor of Chú Bảy, and is the talk natural?
+- **Q5.** The neutral phone voice (the Play button) is "Mai Anh" (Northern, news style), because a phone voice is usually standard and neutral. A Southern voice is the other choice. Which one do I want?
+
+## 9. Builder notes
+
+- **N1. New lines.** The plan permits new lines only where it says so. The builder wrote these, all with the status "check": the warmer answers for "I'll say it" (`next_said`), the answers to the replies of Cô Sáu, Bác Hà, and cô Nga, the calls after a player who walks away (R15), the talk of the two neighbors (PT-19), the call of Cô Út ("Bánh khọt nè!" was a phrase in her description), and the messages of cô Nga (R24). The old lines without a speaker went to their new places (R2): the descriptions of the spots are in the Lens app, the hints are messages, "Upstairs, a TV is on" is a TV sound with the caption "[a TV upstairs]", and the "lóc cóc" bubble is the caption "[lóc cóc]". The hints "Coming in a later version" had no place, so they are not in the game.
+- **N2. People in the world.** Each speaker is a person in the hẻm: Cô Sáu and Bác Hà at their shops, Cô Út at the bánh khọt shop, cô Nga at the homestay (09:00 to 22:00, after Bà Tư), and Chú Bảy and Chú Chín at the cà phê cóc (05:30 to 10:00). The first line of each person depends on the time (`lines` in `data/spots.json`), as before.
+- **N3. The voices in the workspace.** D2 says that the workspace cannot download the weights. In this workspace, Hugging Face is reachable, and VieNeu-TTS runs on the CPU (about 2 s for each line). So the builder made the first voice files and the audition page in the workspace, with the same script as the workflow. The workflow makes them again when the dialogue or the voices change. The audition page is in `docs/voices/`, and the export workflow publishes it at `/voices/`. GitHub Pages must be on in the repository settings (source: GitHub Actions).
+- **N4. The talk.** A tap on a person, or the action "Talk", starts a talk. The person turns to the player, and the view turns to the person. After a line with replies, the phrasebook shows them until the player answers. "I'll say it" shows the phrase large, with the tone of each syllable, and a button "I said it": the person answers when the player taps it. A talk ends at 6 m (R15), after 45 s with no answer, or when the player starts a talk with another person. After a talk ends, a tap on the person starts it again.
+- **N5. Subtitles.** The joystick zone for R13 is the bottom left corner where the left thumb holds the joystick: 340 × 260 base pixels. The subtitles are at the bottom, at the right of this zone, when there is room. Else they are above the zone, at the left of the phone. On a narrow screen (the web build in portrait), a line has fewer than 38 characters, so that the box fits beside the phone. The speaker name is on the first line of each part, and it counts in the 38 characters. The "Both" setting shows one Vietnamese line and one English line in each part. The "Off" setting hides the spoken lines. The sound captions still show.
+- **N6. The Lens app.** A second camera follows the camera of the player and renders the view at a half of the size, only while the app shows. The frame is the focus of plan 0002 (3 m, 18°). A person in the frame shows the name, or "Someone" before the player met that person.
+- **N7. The Clock app and the homestay.** The action at the homestay is "Rest". It opens the Clock app. "Sleep until morning" is a choice at 5 m or less from the homestay door. At 23:30, cô Nga sends the "late" message. The clock stops at 23:59 until the player sleeps.
+- **N8. Messages and notifications.** A message has a time (`at`, `before`, `day`) or an event (`start`, `wake`, `heard:LINE`, `lens:LINE`). A new message or a new card shows a banner on the phone when it is up, or vibrates when it is down, and puts the dot on the phone button. The dot goes away when the player opens Messages or the Sổ tay.
+- **N9. Save file.** The save stays version 2. It has new fields with defaults: the people that the player met, the saved phrases, the messages, the unread count, and the subtitle settings. A save of plan 0002 loads.
+- **N10. Play tests.** PT-22 shows each line in the subtitle box at 4 times the speed of the audio, because the rules are about the layout. The old scenarios PT-01, PT-03 to PT-06, PT-08 to PT-10, and PT-13 to PT-17 use the phone now. Plan 0004 has its scenarios as PT-25 to PT-32, and the geography plan (now 0005) has PT-33 to PT-39, so the numbers do not conflict.
+

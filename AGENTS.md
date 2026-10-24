@@ -96,6 +96,8 @@ Verified in the development workspace (Linux, 2 CPUs, no GPU, no Vulkan):
 - Godot exports the iOS Xcode project on Linux. Only the build of an `.ipa` needs macOS.
 - With the sun shadow on, the Compatibility renderer under llvmpipe makes up-facing surfaces about three times too bright when the sun is high. The sun has no shadow until a plan checks it on phones.
 - The web export (thread support off) starts in the pre-installed Chromium with WebGL 2.
+- Hugging Face is reachable from the workspace. VieNeu-TTS v3 Turbo (`vieneu==3.8.3`) runs on the CPU with ONNX Runtime: about 2 s for each line with 4 CPUs. ONNX Runtime 1.23 and later refuse the model files in the Hugging Face cache ("External data path escapes model directory"), so `tools/voices/requirements.txt` pins 1.22.1.
+- An Ogg stream that still plays when Godot quits is not freed ("resources still in use at exit"). The play-test system stops the voices some frames before it quits (`stop_sounds()` in `scenes/main.gd`).
 
 Commands that work:
 
@@ -118,12 +120,30 @@ tools/playtest.sh fp_walk --size=2400x1080
 tools/playtest.sh fp_layout --renderer=compatibility   # the renderer of the web build
 tools/playtest.sh --all      # all play tests at all sizes (about 20 minutes)
 
+# Voices (plan 0003): a Python 3.10+ venv with tools/voices/requirements.txt
+python tools/voices/build.py            # make the missing and the changed voice files
+python tools/voices/build.py --check    # only check the files
+python tools/voices/build.py --audition docs/voices   # also the audition page
+python -m pytest -q tools/voices/tests
+
 # Exports (they need the export templates)
 godot --headless --path . --export-release "Web" build/web/index.html
 godot --headless --path . --export-debug "iOS" build/ios/VungTau.ipa   # Xcode project only on Linux
 ```
 
-A play-test scenario is `playtests/NAME.gd`. It extends `RefCounted` and has `func run(d: PlaytestDriver) -> void`. The header lines `# phase: ARGS`, `# sizes: WxH ...`, and `# compatibility: WxH` tell `tools/playtest.sh` how to run it. See `scripts/playtest_driver.gd` for the API. The first-person functions are `hold_stick()`, `drag()`, `look_at_id()`, `look_at_point()`, and `gyro()`. `gyro()` replaces the sensor source of the game with a `ScriptedSensorSource`, because a workspace has no gyroscope.
+A play-test scenario is `playtests/NAME.gd`. It extends `RefCounted` and has `func run(d: PlaytestDriver) -> void`. The header lines `# phase: ARGS`, `# sizes: WxH ...`, and `# compatibility: WxH` tell `tools/playtest.sh` how to run it. See `scripts/playtest_driver.gd` for the API. The first-person functions are `hold_stick()`, `drag()`, `look_at_id()`, `look_at_point()`, and `gyro()`. `gyro()` replaces the sensor source of the game with a `ScriptedSensorSource`, because a workspace has no gyroscope. The phone functions (plan 0003) are `raise_phone()`, `lower_phone()`, `open_app(name)`, `tap_phone_id(test_id)`, `subtitle()`, `transcript()`, `audio_playing(npc_id)`, `talk_to(npc_id)`, `answer(reply_id, mode)`, `wait_line()`, `wait_answer()`, and `wait_quiet()`. `tools/playtest.sh NAME --only-phase=N` runs one phase, `--all --shard=I/N` runs a part of all scenarios (CI runs 6 parts at the same time), and `PLAYTEST_MAX_FPS=3` makes a fast computer test like a slow one.
+
+## 5a. Voices, dialogue, and the phone (plan 0003)
+
+People speak aloud in Vietnamese with subtitles. The player is a traveler with a phone. The phone is the only flat thing on the screen, with the subtitles and the action button.
+
+- **Dialogue format** (`data/dialogue/hem.json`). A line with a `speaker` is speech: `vi` is the subtitle, `en` is the meaning in the Listen app, `say` (optional) is the text that the voice reads (write numbers and prices as Southern words), and `voice_style` (optional) is a VieNeu-TTS tag such as `[cười]`. `replies` are the phrasebook answers (`vi`, `en`, `next`, optional `next_said` for "I'll say it", or `"english": true` with `en`). `actions` are answers by an action in the world (`target` is a test ID such as `spot.pho`, `verb`, `next`). `then` is the next line of the same talk. A line without a speaker is a description for the Lens app (`text`). Each speaker has a form of address (`bà`, `cô`, `chú`, `bác`, ...) for "Dạ, cô nói lại được không ạ?" and an optional `call_after` line.
+- **People and places** (`data/spots.json`). A spot has `lens` rules (descriptions by time). A person has `lines` rules (the first line of a talk by time), and optional `chat` (a talk between neighbors) or `calls` (a seller who calls out).
+- **Messages** (`data/messages.json`): the texts of cô Nga, by time (`at`, `before`, `day`) or by event (`start`, `wake`, `heard:LINE`, `lens:LINE`).
+- **Voices** (`data/voices.json`): the VieNeu-TTS preset voice of each speaker and the neutral phone voice. `tools/voices/build.py` makes `assets/voices/CLIP.ogg` (mono, 48 kHz, −16 LUFS, no silence at the ends) and `assets/voices/manifest.json`. A clip is a spoken line, a phrasebook phrase (`reply.LINE.REPLY`), or the "say again" phrase (`say_again.SPEAKER`). The hash of each clip is from the text that the voice reads, the voice, and the model version. `Content` checks at start that each clip has a file with the correct hash (R4). After a change of the dialogue or the voices, run the build (or the voices workflow).
+- **Voices workflow** (`.github/workflows/voices.yml`): by hand, or on a push to `main` that changes `data/dialogue/` or `data/voices.json`. It makes the voice files and the audition page (`docs/voices/`), commits them with the message "Update the voices", and starts the export workflow, which publishes the audition page at `/voices/` on GitHub Pages.
+- **Sounds** (`data/sounds.json`): the captions of the sounds that are not speech, such as "[lóc cóc]".
+- **The phone** (`scenes/ui/phone/`): Listen (transcript and phrasebook), Lens (camera view and the card of the place in the frame), Messages, Sổ tay, Clock (rest and sleep), and Settings. The talk flow, the speech, and the data of each app are in `scenes/main.gd`. The subtitle split is `scripts/subtitle_text.gd`.
 
 The audio driver prints ALSA errors in the workspace. These errors are not defects.
 
@@ -139,14 +159,15 @@ The audio driver prints ALSA errors in the workspace. These errors are not defec
 | `docs/prototype/hem-2d.html` | The first 2D prototype. Use it as a reference for content and flow only. Do not copy its look. |
 | `project.godot`, `export_presets.cfg` | The Godot project and the export presets (Web, Android, iOS). |
 | `autoload/` | `Content` (reads and checks `data/`), `GameState` (clock, notebook, save), `Playtest` (active only with `--playtest=NAME`). |
-| `data/` | All content: cards, spots and opening hours, dialogue, the hẻm layout, UI text. |
-| `scenes/` | `main.tscn` (world, input, and UI), `world/` (hẻm, tube house, beach), `actors/` (first-person player, NPC), `ui/` (top bar, talk panel, sheets, toast, joystick, center dot). |
-| `scripts/` | Classes with no scene: clock math, save format, content checks, light by time, greybox shapes, sounds, UI theme, play-test driver. |
+| `data/` | All content: cards, spots and opening hours, people, dialogue, messages, voices, sound captions, the hẻm layout, UI text. |
+| `scenes/` | `main.tscn` (world, input, talk, and UI), `world/` (hẻm, tube house, beach), `actors/` (first-person player, NPC with a voice), `ui/` (phone and its apps, subtitles, joystick, center dot). |
+| `scripts/` | Classes with no scene: clock math, save format, content checks, voice clips, subtitle split, light by time, greybox shapes, sounds, UI theme, play-test driver. |
 | `tests/unit/` | GUT unit tests. |
-| `playtests/` | Play-test scenarios PT-01 and PT-03 to PT-17 (PT-02 and PT-07 were removed in plan 0002). |
-| `tools/` | `setup.sh`, `test.sh`, `playtest.sh`. |
-| `assets/` | Fonts, icons, and `CREDITS.md`. |
-| `.github/workflows/` | `test.yml` (tests on each push) and `export.yml` (web, Android, iOS builds). |
+| `playtests/` | Play-test scenarios PT-01, PT-03 to PT-17, and PT-18 to PT-24 of plan 0003 (PT-02 and PT-07 were removed in plan 0002). |
+| `tools/` | `setup.sh`, `test.sh`, `playtest.sh`, and `voices/` (the voice build and its tests). |
+| `assets/` | Fonts, icons, voices, and `CREDITS.md`. |
+| `docs/voices/` | The voice audition page (made by the voices workflow). |
+| `.github/workflows/` | `test.yml` (tests on each push), `export.yml` (web, Android, iOS builds, and GitHub Pages), and `voices.yml` (the voice files). |
 
 Plan 0001 adds the Godot project structure. See that plan.
 

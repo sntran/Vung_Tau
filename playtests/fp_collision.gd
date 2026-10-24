@@ -3,41 +3,51 @@ extends RefCounted
 # the beach wall for 3 s. After each push, the capsule must not intersect a
 # collision shape. The player must stay on the floor. Look at a wall from
 # 0.3 m. The screenshot must not show the inside of the wall.
-# Run 1: the house walls of the hẻm and the bánh mì cart (06:00). Run 2: the
-# beach wall, the palm trees, and the water. Runs 3 and 4: the carts of 15:00
-# (nước mía, hột vịt lộn) and of 18:30 (hủ tiếu gõ). Run 5: the other walls.
+# Runs 1 to 3: the house walls of the hẻm and the bánh mì cart (06:00). Run 4:
+# the beach wall, the palm trees, and the water. Runs 5 and 6: the carts of
+# 15:00 (nước mía, hột vịt lộn) and of 18:30 (hủ tiếu gõ). Runs 7 and 8: the
+# other walls. Each run has few pushes, so that it is shorter than 180 s at
+# 2400×1080 on a slow computer.
 # phase: --start-time=06:00
+# phase: --start-time=06:00 --fresh-save
+# phase: --start-time=06:00 --fresh-save
 # phase: --start-time=06:00 --fresh-save
 # phase: --start-time=15:00 --fresh-save
 # phase: --start-time=18:30 --fresh-save
 # phase: --start-time=12:00 --fresh-save
+# phase: --start-time=12:00 --fresh-save
 
-const CARTS := {1: ["banhmi"], 2: [], 3: ["mia", "hvl"], 4: ["go"], 5: []}
+const CARTS := {1: ["banhmi"], 5: ["mia", "hvl"], 6: ["go"]}
+## The house walls of the main row (not the open shops) in runs 1 to 3.
+const WALL_RUNS := {1: [0, 1], 2: [1, 3], 3: [3, 99]}
 
 
 func run(d: PlaytestDriver) -> void:
 	await d.skip_intro()
 	var hem: Node = d.main().hem
 	var half: float = hem.hem_width / 2.0
-	for spot_id: String in CARTS[d.phase]:
+	for spot_id: String in CARTS.get(d.phase, []):
 		var cart: Node3D = hem.carts[spot_id]
 		var from := Vector3(cart.global_position.x, 0, 0.6)
 		await _push(d, "cart " + spot_id, from, cart.global_position + Vector3(0, 1.0, 0))
-	if d.phase == 2:
+	if d.phase == 4:
 		await _beach(d)
-	if d.phase == 1:
+	if WALL_RUNS.has(d.phase):
 		# The house walls of the main row (not the open shops).
-		for lot: Dictionary in Content.layout.lots:
-			if lot.has("spot") and lot.ground == "shop":
-				continue
+		var walls := Content.layout.lots.filter(func(lot: Dictionary) -> bool:
+			return not (lot.has("spot") and lot.ground == "shop"))
+		var part: Array = WALL_RUNS[d.phase]
+		for lot: Dictionary in walls.slice(part[0], part[1]):
 			var x: float = hem.lot_x[lot.id]
 			await _push(d, "wall of " + lot.id, Vector3(x + 0.8, 0, 0), Vector3(x + 0.8, 1.6, -half))
-	if d.phase != 5:
+	if d.phase == 7:
+		# The opposite row and the end wall.
+		var opposite_x: float = hem.start_x + 6.0
+		await _push(d, "opposite wall", Vector3(opposite_x, 0, 0), Vector3(opposite_x, 1.6, half))
+		await _push(d, "end wall", Vector3(hem.start_x + 1.5, 0, 0), Vector3(hem.start_x - 1.0, 1.6, 0))
+	if d.phase != 8:
 		return
-	# The opposite row, the end wall, a closed shutter, and the back wall of an open shop room.
-	var opposite_x: float = hem.start_x + 6.0
-	await _push(d, "opposite wall", Vector3(opposite_x, 0, 0), Vector3(opposite_x, 1.6, half))
-	await _push(d, "end wall", Vector3(hem.start_x + 1.5, 0, 0), Vector3(hem.start_x - 1.0, 1.6, 0))
+	# A closed shutter and the back wall of an open shop room.
 	var pho_x: float = hem.lot_x["pho_co_sau"]
 	await _push(d, "closed shutter", Vector3(pho_x - 1.0, 0, 0), Vector3(pho_x - 1.0, 1.6, -half))
 	var banhkhot_x: float = hem.lot_x["banhkhot"]

@@ -33,7 +33,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 |---|---|---|
 | 0001 | [Foundation and the walkable hẻm](0001-foundation.md) | Built |
 | 0002 | [First-person walking](0002-first-person.md) | Built |
-| 0003 | [Voices and the phone](0003-voices-and-phone.md) | Approved |
+| 0003 | [Voices and the phone](0003-voices-and-phone.md) | In progress |
 | 0004 | [Desktop and the house detail kit](0004-desktop-and-house-detail.md) | Approved |
 | 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Approved |
 

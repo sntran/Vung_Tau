@@ -78,6 +78,8 @@ var _chat_left: Dictionary = {}
 ## ("talk" is true) stops when the talk ends.
 var _steps: Array[Dictionary] = []
 var _tv_caption_left := 0.0
+## True after stop_sounds(): no new sound starts.
+var _stopped := false
 
 
 func _ready() -> void:
@@ -135,11 +137,15 @@ func _ready() -> void:
 ## Stops all voices. An Ogg stream that still plays when the game quits is
 ## not freed, so the play-test system calls this some frames before it quits.
 func stop_sounds() -> void:
+	_stopped = true
 	for npc: Npc in hem.npcs.values():
 		npc.voice.stop()
 		npc.voice.stream = null
 	phone_voice.stop()
 	phone_voice.stream = null
+	clack_player.stop()
+	hem.tv.stop()
+	ting_player.stop()
 
 
 func _process(delta: float) -> void:
@@ -424,7 +430,7 @@ func _on_action() -> void:
 ## shows when the player hears it (R11, R12).
 func speak(npc_id: String, line_id: String) -> void:
 	var npc: Npc = hem.npcs.get(npc_id)
-	if npc == null:
+	if npc == null or _stopped:
 		return
 	var line := Content.line(line_id)
 	npc.voice.stop()
@@ -710,6 +716,8 @@ func _chat_busy(first_line: String) -> bool:
 # --- Sounds ----------------------------------------------------------------
 
 func _on_clacked(position_3d: Vector3) -> void:
+	if _stopped:
+		return
 	clack_player.play()
 	var sound := Content.sound("clack")
 	if player.eye_position().distance_to(position_3d) <= float(sound.get("range_m", 25.0)):
