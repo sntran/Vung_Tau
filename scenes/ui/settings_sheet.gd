@@ -5,12 +5,14 @@ extends PanelContainer
 
 signal closed
 signal changed(settings: Dictionary)
+signal credits_pressed
 
 const SENSITIVITY_RANGE := Vector2(0.25, 2.0)
 const FOV_RANGE := Vector2(60.0, 90.0)
 
 var _title: Label
 var _close: Button
+var _credits: Button
 var _sensitivity: HSlider
 var _sensitivity_label: Label
 var _fov: HSlider
@@ -44,6 +46,13 @@ func _ready() -> void:
 	_title.theme_type_variation = "Title"
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(_title)
+	_credits = Button.new()
+	_credits.name = "Credits"
+	_credits.set_meta("test_id", "settings.credits")
+	_credits.custom_minimum_size = Vector2(140, UiTheme.BUTTON_MIN_HEIGHT)
+	_credits.focus_mode = Control.FOCUS_NONE
+	_credits.pressed.connect(credits_pressed.emit)
+	header.add_child(_credits)
 	_close = Button.new()
 	_close.name = "Close"
 	_close.set_meta("test_id", "settings.close")
@@ -105,6 +114,7 @@ func show_settings(settings: Dictionary, columns := 1) -> void:
 	_quiet = true
 	_title.text = Content.ui_text("settings_title")
 	_close.text = Content.ui_text("close")
+	_credits.text = Content.ui_text("credits")
 	_invert.text = Content.ui_text("settings_invert")
 	_gyro.text = Content.ui_text("settings_gyro")
 	_tap_walk.text = Content.ui_text("settings_tap_walk")

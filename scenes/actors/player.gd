@@ -8,6 +8,8 @@ extends CharacterBody3D
 
 ## The player stopped at the end of a tap walk.
 signal arrived
+## walk_limit stopped the player.
+signal blocked
 ## The player walked some meters. The clock uses this to move forward.
 signal stepped(meters: float)
 
@@ -16,7 +18,7 @@ const EYE_HEIGHT := 1.6
 const RADIUS := 0.25
 const HEIGHT := 1.7
 ## The player steps up on a curb or a doorstep of this height or less.
-const STEP_HEIGHT := 0.2
+const STEP_HEIGHT := 0.25
 const GRAVITY := 9.8
 const PITCH_LIMIT := 80.0
 ## The view turns not faster than this, so that the look is smooth (D7).
@@ -31,6 +33,10 @@ const WALK_TURN_RATE := 3.0
 var move_input := Vector2.ZERO
 ## True during a tap walk.
 var walking := false
+## False in a world without a navigation mesh: a tap walk then goes straight to the point.
+var use_navigation := true
+## When it is set, the player cannot go to a point where walk_limit.call(point) is false.
+var walk_limit: Callable
 ## The view direction that the input asks for, in degrees.
 var target_yaw := -90.0
 var target_pitch := 0.0
@@ -113,6 +119,11 @@ func nearest_walk_point(point: Vector3) -> Vector3:
 
 ## Walks to the point on the navigation mesh (tap to walk).
 func walk_to(point: Vector3) -> void:
+	if not use_navigation:
+		_target = point
+		walking = true
+		_stuck_time = 0.0
+		return
 	var map := get_world_3d().navigation_map
 	if NavigationServer3D.map_get_iteration_id(map) == 0:
 		await get_tree().physics_frame
@@ -160,8 +171,16 @@ func _physics_process(delta: float) -> void:
 		velocity.y -= GRAVITY * delta
 	var wanted := horizontal * delta
 	move_and_slide()
-	# Step up on a curb or a doorstep when a low wall stops the player.
-	if horizontal.length() > 0.01 and is_on_wall():
+	if walk_limit.is_valid() and not walk_limit.call(global_position):
+		global_position = Vector3(start.x, global_position.y, start.z)
+		velocity = Vector3.ZERO
+		if walking:
+			walking = false
+			arrived.emit()
+		blocked.emit()
+	# Step up on a curb or a doorstep when a low wall stops the player. A steep
+	# slope of the ground (a height map) is not a step.
+	if horizontal.length() > 0.01 and is_on_wall() and _wall_is_step():
 		var moved := Vector3(global_position.x - start.x, 0, global_position.z - start.z)
 		if moved.length() < wanted.length() * 0.5:
 			_try_step(wanted - moved)
@@ -173,9 +192,11 @@ func _physics_process(delta: float) -> void:
 
 
 func _walk_velocity(_delta: float) -> Vector3:
-	if _agent.is_navigation_finished():
-		return Vector3.ZERO
-	var next := _agent.get_next_path_position()
+	var next := _target
+	if use_navigation:
+		if _agent.is_navigation_finished():
+			return Vector3.ZERO
+		next = _agent.get_next_path_position()
 	var to_next := Vector3(next.x - global_position.x, 0, next.z - global_position.z)
 	if to_next.length() < 0.001:
 		return Vector3.ZERO
@@ -192,7 +213,7 @@ func _walk_velocity(_delta: float) -> Vector3:
 
 func _check_arrival(walked: float, delta: float) -> void:
 	var left := Vector2(_target.x - global_position.x, _target.z - global_position.z).length()
-	if left < 0.12 or _agent.is_navigation_finished():
+	if left < 0.12 or (use_navigation and _agent.is_navigation_finished()):
 		walking = false
 		arrived.emit()
 		return
@@ -200,6 +221,21 @@ func _check_arrival(walked: float, delta: float) -> void:
 	if _stuck_time > STUCK_SECONDS:
 		walking = false
 		arrived.emit()
+
+
+func _wall_is_step() -> bool:
+	for i in get_slide_collision_count():
+		var collision := get_slide_collision(i)
+		if collision.get_normal().y > 0.7:
+			continue
+		var owner_id := collision.get_collider_shape_index()
+		var body := collision.get_collider() as CollisionObject3D
+		if body == null:
+			continue
+		var shape := body.shape_owner_get_shape(body.shape_find_owner(owner_id), 0)
+		if not shape is HeightMapShape3D:
+			return true
+	return false
 
 
 func _try_step(motion: Vector3) -> void:

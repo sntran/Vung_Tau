@@ -34,3 +34,8 @@ func _process(delta: float) -> void:
 		_left -= delta
 		if _left <= 0.0:
 			visible = false
+
+
+## The text without the BBCode tags, for the play tests.
+func text() -> String:
+	return _label.get_parsed_text()
