@@ -124,20 +124,6 @@ func tap(pos: Vector2) -> void:
 	await wait_frames(2)
 
 
-## Sends a key press and release.
-func key(keycode: Key) -> void:
-	var press := InputEventKey.new()
-	press.keycode = keycode
-	press.physical_keycode = keycode
-	press.pressed = true
-	Input.parse_input_event(press)
-	await wait_frames(2)
-	var release := press.duplicate() as InputEventKey
-	release.pressed = false
-	Input.parse_input_event(release)
-	await wait_frames(2)
-
-
 ## A drag with a drag event at each frame (plan 0002, R26). "from" and "to"
 ## are screen (window) pixel positions.
 func drag(from: Vector2, to: Vector2, seconds: float, index := 0) -> void:
@@ -1081,3 +1067,141 @@ func hem_views() -> Array[Dictionary]:
 		{"name": "fronts", "eye": Vector3(mid, 1.6, half - 0.4), "target": Vector3(mid + 3.0, 6.0, -half)},
 		{"name": "roofs", "eye": Vector3(mid - 14.0, 26.0, 18.0), "target": Vector3(mid, 4.0, 0.0)},
 	]
+
+
+# --- Keyboard, mouse, and gamepad (plan 0004) ----------------------------------
+
+## Presses a key. With "hold_s", the key stays down for that time.
+func key(keycode: Key, hold_s := 0.0) -> void:
+	var down := InputEventKey.new()
+	down.physical_keycode = keycode
+	down.keycode = keycode
+	down.pressed = true
+	Input.parse_input_event(down)
+	if hold_s > 0.0:
+		await wait_seconds(hold_s)
+	else:
+		await wait_frames(2)
+	var up := down.duplicate() as InputEventKey
+	up.pressed = false
+	Input.parse_input_event(up)
+	await wait_frames(2)
+	step("key %s" % OS.get_keycode_string(keycode))
+
+
+## A click of a real mouse (not a touch) at a screen point.
+func mouse_click(screen: Vector2, button := MOUSE_BUTTON_LEFT) -> void:
+	for pressed: bool in [true, false]:
+		var event := InputEventMouseButton.new()
+		event.device = 0
+		event.button_index = button
+		event.pressed = pressed
+		event.position = screen
+		event.global_position = screen
+		Input.parse_input_event(event)
+		await wait_frames(2)
+	step("mouse click %s at (%d, %d)" % ["right" if button == MOUSE_BUTTON_RIGHT else "left", screen.x, screen.y])
+
+
+## A movement of a real mouse, in pixels.
+func mouse_move(relative: Vector2, steps := 6) -> void:
+	for i in steps:
+		var event := InputEventMouseMotion.new()
+		event.device = 0
+		event.relative = relative / steps
+		event.position = to_screen(viewport().get_visible_rect().size / 2.0)
+		Input.parse_input_event(event)
+		await wait_frames(1)
+	step("mouse move (%d, %d)" % [relative.x, relative.y])
+
+
+## Presses a gamepad button.
+func pad_button(button: JoyButton) -> void:
+	for pressed: bool in [true, false]:
+		var event := InputEventJoypadButton.new()
+		event.device = 0
+		event.button_index = button
+		event.pressed = pressed
+		Input.parse_input_event(event)
+		await wait_frames(2)
+	step("gamepad button %d" % button)
+
+
+## Holds a gamepad stick (left or right) in a direction for a time.
+func pad_stick(right: bool, direction: Vector2, seconds: float) -> void:
+	var axes := [JOY_AXIS_RIGHT_X, JOY_AXIS_RIGHT_Y] if right else [JOY_AXIS_LEFT_X, JOY_AXIS_LEFT_Y]
+	for value: Vector2 in [direction, Vector2.ZERO]:
+		for i in 2:
+			var event := InputEventJoypadMotion.new()
+			event.device = 0
+			event.axis = axes[i]
+			event.axis_value = value[i]
+			Input.parse_input_event(event)
+		if value != Vector2.ZERO:
+			await wait_seconds(seconds)
+	await wait_frames(2)
+	step("gamepad %s stick (%.1f, %.1f) for %.1f s" % ["right" if right else "left", direction.x, direction.y, seconds])
+
+
+## Turns the view with a real mouse (the cursor is captured) until the 3D
+## point is at the center dot. Returns true when it is there.
+func mouse_look_at(point: Vector3, tolerance := 2.0, timeout_s := 30.0) -> bool:
+	var end := Time.get_ticks_msec() + int(timeout_s * 1000.0)
+	while Time.get_ticks_msec() < end:
+		var s := state()
+		var to: Vector3 = point - s.eye
+		var want_yaw := rad_to_deg(atan2(-to.x, -to.z))
+		var want_pitch := rad_to_deg(atan2(to.y, Vector2(to.x, to.z).length()))
+		var error_yaw: float = wrapf(want_yaw - float(s.yaw), -180.0, 180.0)
+		var error_pitch: float = clampf(want_pitch, -Player.PITCH_LIMIT, Player.PITCH_LIMIT) - float(s.pitch)
+		if absf(error_yaw) <= tolerance and absf(error_pitch) <= tolerance:
+			return true
+		var per_pixel := float(s.settings.mouse_sensitivity) * DesktopControls.MOUSE_DEG_PER_PIXEL
+		var invert := -1.0 if s.settings.invert_y else 1.0
+		await mouse_move(Vector2(-error_yaw / per_pixel, -error_pitch / per_pixel * invert))
+		await wait_idle(5.0)
+	fail("the mouse does not turn the view to %s" % point)
+	return false
+
+
+## The center of a control with the test ID, in screen coordinates.
+func screen_center_of(test_id: String) -> Vector2:
+	var control := find(test_id) as Control
+	return to_screen(control.get_global_rect().get_center()) if control else Vector2(-1, -1)
+
+
+## Turns the view with the right stick of a gamepad until the 3D point is at
+## the center dot. Returns true when it is there.
+func pad_look_at(point: Vector3, tolerance := 3.0, timeout_s := 40.0) -> bool:
+	var end := Time.get_ticks_msec() + int(timeout_s * 1000.0)
+	while Time.get_ticks_msec() < end:
+		var s := state()
+		var to: Vector3 = point - s.eye
+		var want_yaw := rad_to_deg(atan2(-to.x, -to.z))
+		var want_pitch := rad_to_deg(atan2(to.y, Vector2(to.x, to.z).length()))
+		var error_yaw: float = wrapf(want_yaw - float(s.yaw), -180.0, 180.0)
+		var error_pitch: float = clampf(want_pitch, -Player.PITCH_LIMIT, Player.PITCH_LIMIT) - float(s.pitch)
+		if absf(error_yaw) <= tolerance and absf(error_pitch) <= tolerance:
+			return true
+		var speed := float(s.settings.look_sensitivity) * DesktopControls.STICK_DEG_PER_SECOND
+		var invert := -1.0 if s.settings.invert_y else 1.0
+		# One axis at a time, at half the speed, so that the turn does not go too far.
+		if absf(error_yaw) > tolerance:
+			await pad_stick(true, Vector2(-signf(error_yaw) * 0.5, 0), absf(error_yaw) / (speed * 0.5))
+		else:
+			await pad_stick(true, Vector2(0, -signf(error_pitch) * invert * 0.5), absf(error_pitch) / (speed * 0.5))
+		await wait_idle(5.0)
+	fail("the right stick does not turn the view to %s" % point)
+	return false
+
+
+## Presses the D-pad until the gamepad selects the phone button with the test ID.
+func pad_select(test_id: String) -> bool:
+	var phone: Phone = main().phone
+	for i in phone.pad_buttons().size() + 1:
+		var selected := phone.pad_selected()
+		if selected != null and selected.get_meta("test_id", "") == test_id:
+			return true
+		await pad_button(JOY_BUTTON_DPAD_DOWN)
+	fail("the D-pad does not select %s" % test_id)
+	return false

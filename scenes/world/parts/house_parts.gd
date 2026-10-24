@@ -34,6 +34,16 @@ func count(kind: String) -> int:
 	return total
 
 
+## The boxes of the parts of a kind, in the space of this node (for PT-31).
+func boxes(kind: String) -> Array[AABB]:
+	var result: Array[AABB] = []
+	var unit := mesh(kind).get_aabb()
+	for chunk: int in _parts.get(kind, {}):
+		for entry: Array in _parts[kind][chunk]:
+			result.append((entry[0] as Transform3D) * unit)
+	return result
+
+
 ## Makes the MultiMesh instances. Call it after all houses added their parts.
 func commit() -> void:
 	var material := StandardMaterial3D.new()

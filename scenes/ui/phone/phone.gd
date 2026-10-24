@@ -283,3 +283,62 @@ func _on_device_input(event: InputEvent) -> void:
 		_swipe_start = pos
 	elif released:
 		_swipe_start = Vector2.INF
+
+
+# --- Gamepad (plan 0004, R2) --------------------------------------------------
+
+## The button that the gamepad selected (its index in pad_buttons()).
+var _pad_index := -1
+
+
+## The buttons on the screen of the phone that a player can press now, from
+## the top to the bottom.
+func pad_buttons() -> Array[BaseButton]:
+	var result: Array[BaseButton] = []
+	for node: Node in device.find_children("*", "BaseButton", true, false):
+		var b := node as BaseButton
+		if b.is_visible_in_tree() and not b.disabled:
+			result.append(b)
+	result.sort_custom(func(a: BaseButton, b: BaseButton) -> bool:
+		var pa := a.get_global_rect().position
+		var pb := b.get_global_rect().position
+		return pa.y < pb.y - 4.0 or (absf(pa.y - pb.y) <= 4.0 and pa.x < pb.x))
+	return result
+
+
+## Moves the selection of the gamepad to the next (+1) or the last (-1) button.
+func pad_move(step: int) -> void:
+	var buttons := pad_buttons()
+	if buttons.is_empty():
+		return
+	_pad_index = wrapi(_pad_index + step, 0, buttons.size()) if _pad_index >= 0 else (0 if step > 0 else buttons.size() - 1)
+	var b := buttons[_pad_index]
+	b.focus_mode = Control.FOCUS_ALL
+	b.grab_focus()
+
+
+## The button that the gamepad selected, or null.
+func pad_selected() -> BaseButton:
+	var focused := get_viewport().gui_get_focus_owner() as BaseButton
+	return focused if focused != null and pad_buttons().has(focused) else null
+
+
+## Presses the selected button.
+func pad_press() -> void:
+	var b := pad_selected()
+	if b == null:
+		return
+	if b.toggle_mode:
+		b.button_pressed = not b.button_pressed
+	else:
+		b.pressed.emit()
+	_pad_index = -1
+
+
+## B on the gamepad: back to the home screen, or down when the home screen shows.
+func pad_back() -> void:
+	_pad_index = -1
+	if app != "":
+		open_app("")
+	else:
+		lower_phone()

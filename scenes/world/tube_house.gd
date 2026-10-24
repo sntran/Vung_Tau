@@ -460,7 +460,12 @@ func _build_balcony(index: int) -> void:
 	var y0 := index * floor_height
 	var out := _rng.randf_range(0.6, 1.2) if kind != "hotel" else 0.6
 	var w := width - 0.2
-	_box(HouseMaterials.DETAIL, Vector3(w, 0.12, out), Vector3(0, y0 + 0.06, out / 2.0), paint.darkened(0.08), "balcony_%d" % index)
+	var cx := 0.0
+	if kind == "hotel":
+		# Narrow balconies, with room for the vertical sign at the right corner.
+		w = width - 1.1
+		cx = -0.45
+	_box(HouseMaterials.DETAIL, Vector3(w, 0.12, out), Vector3(cx, y0 + 0.06, out / 2.0), paint.darkened(0.08), "balcony_%d" % index)
 	var rail_height := 1.0
 	var style_index := _rng.randi() % 3
 	if kind == "villa":
@@ -473,33 +478,41 @@ func _build_balcony(index: int) -> void:
 			var count := int(w / 0.11)
 			for i in count + 1:
 				var x := -w / 2.0 + w * i / count
-				parts.add("rail_bar", _part_xform(Vector3(x, y0 + 0.12 + rail_height / 2.0, front_z), Vector3(0.02, rail_height, 0.02)), color)
+				parts.add("rail_bar", _part_xform(Vector3(cx + x, y0 + 0.12 + rail_height / 2.0, front_z), Vector3(0.02, rail_height, 0.02)), color)
 			if style_index == 1:
 				for i in count:
 					var x := -w / 2.0 + w * (i + 0.5) / count
-					parts.add("rail_bar", _part_xform(Vector3(x, y0 + 0.62, front_z), Vector3(0.014, 0.14, 0.014),
+					parts.add("rail_bar", _part_xform(Vector3(cx + x, y0 + 0.62, front_z), Vector3(0.014, 0.14, 0.014),
 							Basis(Vector3.FORWARD, deg_to_rad(45.0 if i % 2 == 0 else -45.0))), color)
-			_box(HouseMaterials.METAL, Vector3(w, 0.05, 0.06), Vector3(0, y0 + 0.12 + rail_height, front_z), color)
+			_box(HouseMaterials.METAL, Vector3(w, 0.05, 0.06), Vector3(cx, y0 + 0.12 + rail_height, front_z), color)
 		2:
 			# Stainless steel tubes.
 			for i in 3:
-				_batch.cylinder(HouseMaterials.METAL, 0.022, w, Vector3(0, y0 + 0.45 + i * 0.3, front_z), Color("#C7CBCC"), 8,
+				_batch.cylinder(HouseMaterials.METAL, 0.022, w, Vector3(cx, y0 + 0.45 + i * 0.3, front_z), Color("#C7CBCC"), 8,
 						Basis(Vector3.FORWARD, PI / 2.0))
 			for x: float in [-w / 2.0, 0.0, w / 2.0]:
-				_batch.cylinder(HouseMaterials.METAL, 0.025, rail_height, Vector3(x, y0 + 0.12 + rail_height / 2.0, front_z),
+				_batch.cylinder(HouseMaterials.METAL, 0.025, rail_height, Vector3(cx + x, y0 + 0.12 + rail_height / 2.0, front_z),
 						Color("#C7CBCC"), 8)
 		3:
 			# Vase balusters (con tiện) with a top rail, on a villa.
 			var count := int(w / 0.18)
 			for i in count + 1:
 				var x := -w / 2.0 + w * i / count
-				parts.add("baluster", Transform3D(global_basis_for_parts(), to_global_part(Vector3(x, y0 + 0.12, front_z))), Color("#EDE8DC"))
-			_box(HouseMaterials.DETAIL, Vector3(w, 0.08, 0.16), Vector3(0, y0 + 0.12 + 0.82, front_z), Color("#EDE8DC"))
-	# Plants on the balcony.
-	if _rng.randf() < 0.6:
-		for i in _rng.randi_range(1, 3):
-			parts.add("pot", Transform3D(global_basis_for_parts(), to_global_part(Vector3(_rng.randf_range(-w / 2.0 + 0.3, w / 2.0 - 0.3), y0 + 0.12,
-					_rng.randf_range(0.2, out - 0.2)))), Color("#B4634A"))
+				parts.add("baluster", Transform3D(global_basis_for_parts(), to_global_part(Vector3(cx + x, y0 + 0.12, front_z))), Color("#EDE8DC"))
+			_box(HouseMaterials.DETAIL, Vector3(w, 0.08, 0.16), Vector3(cx, y0 + 0.12 + 0.82, front_z), Color("#EDE8DC"))
+	# Plants on a deep balcony: away from the wall, where the AC units hang,
+	# and away from the rail. Each pot has its own place along the balcony.
+	if out >= 0.9 and _rng.randf() < 0.7:
+		var slots := int((w - 0.4) / 0.45)
+		var used := {}
+		for i in _rng.randi_range(1, mini(3, slots)):
+			var slot := _rng.randi() % slots
+			if used.has(slot):
+				continue
+			used[slot] = true
+			var pot_x := cx - w / 2.0 + 0.2 + 0.225 + slot * 0.45
+			parts.add("pot", Transform3D(global_basis_for_parts(), to_global_part(Vector3(pot_x, y0 + 0.12,
+					_rng.randf_range(0.52, out - 0.26)))), Color("#B4634A"))
 
 
 # --- The roof ---------------------------------------------------------------------------
@@ -589,7 +602,8 @@ func _metal_roof(height: float) -> void:
 	var back_y := height + 0.15
 	var z0 := -FRONT
 	var z1 := -depth - 0.2
-	var h := width / 2.0 + 0.1
+	# The roof does not go past the side walls, into the house next door.
+	var h := width / 2.0
 	_batch.quad(HouseMaterials.METAL_ROOF, [Vector3(-h, back_y, z1), Vector3(h, back_y, z1), Vector3(h, front_y, z0), Vector3(-h, front_y, z0)] as Array[Vector3], Color.WHITE)
 	part_boxes["roof"] = AABB(Vector3(-h, back_y, z1), Vector3(h * 2.0, front_y - back_y, z0 - z1))
 	_metal_roof_color = color.color
@@ -606,7 +620,8 @@ func _tile_roof(height: float) -> void:
 	var color := HousePalette.roof_tile(_rng)
 	_tile_roof_color = color
 	var top := height + 1.6
-	var h := width / 2.0 + 0.3
+	# The eaves go out at the front and the back, not into the houses next door.
+	var h := width / 2.0
 	var z0 := 0.3
 	var z1 := -depth - 0.3
 	var eave := height + 0.2
@@ -682,7 +697,9 @@ func _build_clutter() -> void:
 	for i in range(1, floors):
 		if _rng.randf() < (0.55 if style == "new" or kind == "hotel" else 0.3):
 			var w: float = _windows[0][1]
-			var x: float = _windows[0][0] + (w / 2.0 + 0.5) * (1.0 if _rng.randf() < 0.5 else -1.0)
+			# A hotel has its vertical sign at the right corner: the AC units are at the left.
+			var to_right := _rng.randf() < 0.5 and kind != "hotel"
+			var x: float = _windows[0][0] + (w / 2.0 + 0.5) * (1.0 if to_right else -1.0)
 			x = clampf(x, -width / 2.0 + 0.45, width / 2.0 - 0.45)
 			parts.add("ac_unit", Transform3D(global_basis_for_parts(), to_global_part(Vector3(x, i * floor_height + 0.35, 0.16))), Color("#E6E6E0"))
 	# Potted plants on the step of a home.

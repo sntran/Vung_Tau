@@ -83,6 +83,25 @@ func _unhandled_input(event: InputEvent) -> void:
 		var pad := event as InputEventJoypadButton
 		if not pad.pressed:
 			return
+		# With the phone up, the D-pad selects a button, A presses it, and B goes back.
+		if _main.phone.up:
+			match pad.button_index:
+				JOY_BUTTON_DPAD_DOWN, JOY_BUTTON_DPAD_RIGHT:
+					_main.phone.pad_move(1)
+					_handled()
+					return
+				JOY_BUTTON_DPAD_UP, JOY_BUTTON_DPAD_LEFT:
+					_main.phone.pad_move(-1)
+					_handled()
+					return
+				JOY_BUTTON_A:
+					_main.phone.pad_press()
+					_handled()
+					return
+				JOY_BUTTON_B:
+					_main.phone.pad_back()
+					_handled()
+					return
 		match pad.button_index:
 			JOY_BUTTON_A:
 				_main._on_action()

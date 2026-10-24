@@ -92,7 +92,7 @@ func _check_absent(d: PlaytestDriver, spot_id: String, stand: Vector3) -> void:
 	# Walk to the place of the cart with floor taps.
 	await d.walk_toward(stand.x, stand.z)
 	await d.open_app("lens")
-	await d.look_at_point(stand + Vector3(0, 1.2, -1.3), 4.0)
+	await d.look_at_point(Vector3(stand.x, 1.2, d.main().hem.cart_z), 4.0)
 	await d.wait_frames(3)
 	var card: Dictionary = d.main().lens_card()
 	d.expect(card.get("id", "") != spot_id, "the cart %s is not there, but the Lens shows it" % spot_id)
