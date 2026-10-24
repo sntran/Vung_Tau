@@ -18,7 +18,7 @@ All shapes in this plan come from open data. Nothing comes from photos or from a
 - People, cars, and scooters.
 - Swimming, and boats that move. (R13a puts boats at anchor on the sea.)
 - The walk to Miếu Hòn Bà, the Vi Ba road activities, and the shops. Later plans add them. This plan only prepares their ground, their paths, and the tide.
-- A change to the hẻm of plans 0001 and 0002. That hẻm stays the main game scene until plan 0007. This plan makes a separate scene.
+- A change to the hẻm of plans 0001 and 0002. That hẻm stays the main game scene until plan 0008. This plan makes a separate scene.
 
 ## 3. Data sources
 

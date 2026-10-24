@@ -36,6 +36,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 | 0003 | [Voices and the phone](0003-voices-and-phone.md) | Built |
 | 0004 | [Desktop and the house detail kit](0004-desktop-and-house-detail.md) | Approved |
 | 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Approved |
+| 0006 | [People](0006-people.md) | Draft |
 
 ## Proposed order of the next plans
 
@@ -46,14 +47,15 @@ The order can change.
 | 0003 | [Voices and the phone](0003-voices-and-phone.md) | Built. People speak aloud in Vietnamese with subtitles. The traveler's phone has Listen (transcribe and translate), Lens, Messages, Sổ tay, Clock, and Settings. It replaces the talk panel and the 2D sheets. |
 | 0004 | [Desktop and the house detail kit](0004-desktop-and-house-detail.md) | Approved. Desktop becomes the main platform, with the Forward+ renderer and quality presets. Tube houses get depth, brick under plaster and paint, wear, and the clutter of a real street. |
 | 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Approved. The real ground, hills, coast, beaches, sea, and roads, from OpenStreetMap and the Copernicus elevation data. |
-| 0006 | Known structures | Tượng Chúa Kitô Vua, Hải đăng, Bạch Dinh, Tượng Đức Mẹ Bãi Dâu, Miếu Hòn Bà (with its gate and the old bunkers), Chùa Tam Bảo, the ferry pier near Bãi Trước, the park of Bãi Trước, the main bus station, the old markets, the big roundabout, Ngã Năm, and others that I name. Made by code from their real outlines and sizes. |
-| 0007 | Houses on the lots | A house generator that uses the kit of plan 0004 and puts houses on the lots between the roads. The homestay hẻm moves to its real place. |
-| 0008 | Phở shop | Sit at the table. Order with the cuts ("một tô phở tái nạm gầu bò viên"), the extras, the herb plate, the sauces, eating, and paying. Port the flow from `docs/prototype/hem-2d.html`. |
-| 0009 | Cà phê cóc | Order "đen đá", "sữa đá" or "nâu đá", "bạc sỉu". Watch the phin drip. |
-| 0010 | Homestay meal | Eat with the host family. Home dishes and strong-smelling sauces. I name the dishes. |
-| 0011 | Street snacks | Bánh mì at dawn, bánh khọt, hột vịt lộn, hủ tiếu gõ at night. |
-| 0012 | Beach mornings and evenings | Morning exercise, the boats, the fish, the evening on the coast road. |
-| 0013 | Hòn Bà at low tide | Check the tide, walk the rock path to Miếu Hòn Bà, and come back before the sea covers it. Locals warn the player about the time. |
-| 0014 | Afternoon on the Vi Ba road | Jog or ride up Núi Lớn in the afternoon. Stop at Chùa Tam Bảo to watch the monkeys (and keep your bag closed). At the top, eat sữa chua and trứng lòng đào. |
-| 0015 | Scooter | Wear a helmet and ride along the coast in the evening, and up the Vi Ba road. |
-| 0016 | Release | Signed desktop builds (Windows, macOS, Linux), signed Android and iOS builds, store pages, privacy text. |
+| 0006 | [People](0006-people.md) | Draft. People with real bodies, faces, hair, and clothes, made by code with MPFB 2. Library animations, head and eye movement, blinks, faces for each line, and lip sync from the voice audio. |
+| 0007 | Known structures | Tượng Chúa Kitô Vua, Hải đăng, Bạch Dinh, Tượng Đức Mẹ Bãi Dâu, Miếu Hòn Bà (with its gate and the old bunkers), Chùa Tam Bảo, the ferry pier near Bãi Trước, the park of Bãi Trước, the main bus station, the old markets, the big roundabout, Ngã Năm, and others that I name. Made by code from their real outlines and sizes. |
+| 0008 | Houses on the lots | A house generator that uses the kit of plan 0004 and puts houses on the lots between the roads. The homestay hẻm moves to its real place. |
+| 0009 | Phở shop | Sit at the table. Order with the cuts ("một tô phở tái nạm gầu bò viên"), the extras, the herb plate, the sauces, eating, and paying. Port the flow from `docs/prototype/hem-2d.html`. |
+| 0010 | Cà phê cóc | Order "đen đá", "sữa đá" or "nâu đá", "bạc sỉu". Watch the phin drip. |
+| 0011 | Homestay meal | Eat with the host family. Home dishes and strong-smelling sauces. I name the dishes. |
+| 0012 | Street snacks | Bánh mì at dawn, bánh khọt, hột vịt lộn, hủ tiếu gõ at night. |
+| 0013 | Beach mornings and evenings | Morning exercise, the boats, the fish, the evening on the coast road. |
+| 0014 | Hòn Bà at low tide | Check the tide, walk the rock path to Miếu Hòn Bà, and come back before the sea covers it. Locals warn the player about the time. |
+| 0015 | Afternoon on the Vi Ba road | Jog or ride up Núi Lớn in the afternoon. Stop at Chùa Tam Bảo to watch the monkeys (and keep your bag closed). At the top, eat sữa chua and trứng lòng đào. |
+| 0016 | Scooter | Wear a helmet and ride along the coast in the evening, and up the Vi Ba road. |
+| 0017 | Release | Signed desktop builds (Windows, macOS, Linux), signed Android and iOS builds, store pages, privacy text. |
