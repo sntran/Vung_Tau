@@ -24,12 +24,12 @@ float hash(vec2 p) {
 	return fract(p.x * p.y);
 }
 
+uniform sampler2D noise_smooth : filter_linear_mipmap, repeat_enable;
+uniform sampler2D noise_detail : filter_linear_mipmap, repeat_enable;
+
+// Detailed noise from 0 to 1, from a texture (fast without a graphics card).
 float noise(vec2 p) {
-	vec2 i = floor(p);
-	vec2 f = fract(p);
-	vec2 u = f * f * (3.0 - 2.0 * f);
-	return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
-			mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+	return texture(noise_detail, p * 0.08).r;
 }
 
 void fragment() {

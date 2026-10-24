@@ -103,6 +103,12 @@ static func apply(preset: String, environment: Environment, sun: DirectionalLigh
 	environment.ssil_intensity = 1.4
 	environment.volumetric_fog_density = 0.004
 	sun.directional_shadow_max_distance = float(values.shadow_distance)
+	# Low: one shadow split and hard shadows, the cost of a phone. The other
+	# presets: more splits and soft shadows.
+	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL if preset == "low" \
+			else (DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS if preset == "medium" else DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS)
+	RenderingServer.directional_soft_shadow_filter_set_quality(
+			RenderingServer.SHADOW_QUALITY_HARD if preset == "low" else RenderingServer.SHADOW_QUALITY_SOFT_MEDIUM)
 	viewport.scaling_3d_scale = float(values.scale)
 
 

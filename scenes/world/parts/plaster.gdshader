@@ -35,29 +35,23 @@ void vertex() {
 	local_normal = NORMAL;
 }
 
+uniform sampler2D noise_smooth : filter_linear_mipmap, repeat_enable;
+uniform sampler2D noise_detail : filter_linear_mipmap, repeat_enable;
+
 float hash(vec2 p) {
 	p = fract(p * vec2(123.34, 456.21));
 	p += dot(p, p + 45.32);
 	return fract(p.x * p.y);
 }
 
-float noise(vec2 p) {
-	vec2 i = floor(p);
-	vec2 f = fract(p);
-	vec2 u = f * f * (3.0 - 2.0 * f);
-	return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
-			mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+// Smooth noise from 0 to 1. The scale 1 gives features of about 1 m.
+float smooth_noise(vec2 p) {
+	return texture(noise_smooth, p * 0.25).r;
 }
 
-float fbm(vec2 p) {
-	float value = 0.0;
-	float amplitude = 0.5;
-	for (int i = 0; i < 4; i++) {
-		value += amplitude * noise(p);
-		p *= 2.03;
-		amplitude *= 0.5;
-	}
-	return value;
+// Detailed noise from 0 to 1. The scale 1 gives features of about 0.1 m.
+float detail_noise(vec2 p) {
+	return texture(noise_detail, p * 0.08).r;
 }
 
 // Red hollow clay bricks with thick, uneven mortar. "holes" from 0 to 1 shows
@@ -67,7 +61,7 @@ vec3 brick(vec2 w, float holes) {
 	float offset = mod(row, 2.0) * 0.1;
 	float column = floor((w.x + offset) / 0.2);
 	vec2 cell = vec2(fract((w.x + offset) / 0.2), fract(w.y / 0.1));
-	float joint = 0.07 + noise(w * 9.0) * 0.06;
+	float joint = 0.07 + detail_noise(w * 0.8) * 0.06;
 	float mortar = 1.0 - step(joint, cell.x) * step(cell.x, 1.0 - joint * 0.5)
 			* step(joint * 1.6, cell.y) * step(cell.y, 1.0 - joint);
 	vec3 one = brick_color * (0.82 + 0.3 * hash(vec2(row, column) + seed));
@@ -75,7 +69,7 @@ vec3 brick(vec2 w, float holes) {
 	vec2 hole_cell = vec2(fract(cell.x * 4.0), cell.y);
 	float hole = step(0.25, hole_cell.x) * step(hole_cell.x, 0.75) * step(0.3, hole_cell.y) * step(hole_cell.y, 0.7);
 	one = mix(one, one * 0.25, hole * holes);
-	return mix(one, mortar_color * (0.9 + 0.2 * noise(w * 3.0)), mortar);
+	return mix(one, mortar_color * (0.9 + 0.2 * detail_noise(w * 0.3)), mortar);
 }
 
 void fragment() {
@@ -92,15 +86,15 @@ void fragment() {
 		paint = bare_color;
 	}
 	// Small changes in tone.
-	paint *= 1.0 + (fbm(s * 0.7) - 0.5) * 0.1;
+	paint *= 1.0 + (smooth_noise(s * 0.7) - 0.5) * 0.12;
 	// Age: the paint fades and gets stains.
 	float lum = dot(paint, vec3(0.299, 0.587, 0.114));
 	paint = mix(paint, mix(vec3(lum), vec3(1.0), 0.2), paint_age * 0.35);
-	float blot = smoothstep(0.6, 0.82, fbm(s * 0.45 + 3.1)) * paint_age;
+	float blot = smoothstep(0.6, 0.82, smooth_noise(s * 0.45 + 3.1)) * paint_age;
 	paint *= 1.0 - blot * 0.22;
 
 	// Rain streaks from the parapet and below each sill.
-	float streak = smoothstep(0.42, 0.78, noise(vec2(s.x * 7.0, s.y * 0.35)));
+	float streak = smoothstep(0.45, 0.8, detail_noise(vec2(s.x * 0.9, s.y * 0.05)));
 	float from_top = clamp(1.0 - (wall_info.x - w.y) / 2.2, 0.0, 1.0);
 	float floor_height = max(wall_info.y, 0.5);
 	float sill_y = ceil((w.y - sill_height) / floor_height) * floor_height + sill_height;
@@ -114,7 +108,7 @@ void fragment() {
 	paint *= 1.0 - rain * 0.32;
 
 	// Damp and dirt at the base.
-	float base = 1.0 - smoothstep(0.15, 0.7 + fbm(s * 1.7) * 0.5, w.y);
+	float base = 1.0 - smoothstep(0.15, 0.7 + smooth_noise(s * 1.7) * 0.5, w.y);
 	paint = mix(paint, paint * vec3(0.55, 0.56, 0.5), base * (0.35 + 0.5 * paint_age));
 
 	// Patches where the plaster fell off, mostly low on the wall and at edges.
@@ -124,7 +118,7 @@ void fragment() {
 	if (bare > 0.5) {
 		threshold -= 0.03;
 	}
-	float mask = fbm(s * 0.95 + 11.0);
+	float mask = smooth_noise(s * 0.95 + 11.0) * 0.75 + detail_noise(s * 0.4) * 0.25;
 	float patch = smoothstep(threshold, threshold + 0.015, mask);
 	float rim = smoothstep(threshold - 0.02, threshold, mask) * (1.0 - patch);
 	float bricks_here = bare > 1.5 ? 1.0 : patch;

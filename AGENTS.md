@@ -118,6 +118,7 @@ tools/test.sh                # all unit tests
 tools/playtest.sh fp_walk    # one play test at 1280x720 with the Mobile renderer
 tools/playtest.sh fp_walk --size=2400x1080
 tools/playtest.sh fp_layout --renderer=compatibility   # the renderer of the web build
+tools/playtest.sh look_review   # plan 0004: still screenshots on Forward+ (High) and Mobile (Low)
 tools/playtest.sh --all      # all play tests at all sizes (about 20 minutes)
 
 # Voices (plan 0003): a Python 3.10+ venv with tools/voices/requirements.txt
@@ -129,6 +130,9 @@ python -m pytest -q tools/voices/tests
 # Exports (they need the export templates)
 godot --headless --path . --export-release "Web" build/web/index.html
 godot --headless --path . --export-debug "iOS" build/ios/VungTau.ipa   # Xcode project only on Linux
+godot --headless --path . --export-release "Linux" build/linux/vung-tau.x86_64      # plan 0004
+godot --headless --path . --export-release "Windows" build/windows/VungTau.exe
+godot --headless --path . --export-release "macOS" build/macos/VungTau.zip          # ad-hoc signature only
 ```
 
 A play-test scenario is `playtests/NAME.gd`. It extends `RefCounted` and has `func run(d: PlaytestDriver) -> void`. The header lines `# phase: ARGS`, `# sizes: WxH ...`, and `# compatibility: WxH` tell `tools/playtest.sh` how to run it. See `scripts/playtest_driver.gd` for the API. The first-person functions are `hold_stick()`, `drag()`, `look_at_id()`, `look_at_point()`, and `gyro()`. `gyro()` replaces the sensor source of the game with a `ScriptedSensorSource`, because a workspace has no gyroscope. The phone functions (plan 0003) are `raise_phone()`, `lower_phone()`, `open_app(name)`, `tap_phone_id(test_id)`, `subtitle()`, `transcript()`, `audio_playing(npc_id)`, `talk_to(npc_id)`, `answer(reply_id, mode)`, `wait_line()`, `wait_answer()`, and `wait_quiet()`. `tools/playtest.sh NAME --only-phase=N` runs one phase, `--all --shard=I/N` runs a part of all scenarios (CI runs 6 parts at the same time), and `PLAYTEST_MAX_FPS=3` makes a fast computer test like a slow one.
@@ -145,6 +149,16 @@ People speak aloud in Vietnamese with subtitles. The player is a traveler with a
 - **Sounds** (`data/sounds.json`): the captions of the sounds that are not speech, such as "[lóc cóc]".
 - **The phone** (`scenes/ui/phone/`): Listen (transcript and phrasebook), Lens (camera view and the card of the place in the frame), Messages, Sổ tay, Clock (rest and sleep), and Settings. The talk flow, the speech, and the data of each app are in `scenes/main.gd`. The subtitle split is `scripts/subtitle_text.gd`.
 
+## 5b. Desktop, quality presets, and the house kit (plan 0004)
+
+- **Renderers** (D2). `project.godot` sets Forward+ for desktop, Mobile for Android and iOS, and Compatibility for the web. The Godot documentation ([Overview of renderers](https://docs.godotengine.org/en/stable/tutorials/rendering/renderers.html)) says that the Mobile renderer does not have these Forward+ features: SSAO, SSIL, SDFGI, VoxelGI, volumetric fog, screen-space reflections, and FSR 2. Glow and MSAA work in both.
+- **Quality presets** (D3, R4, `scripts/quality.gd`). Low (Mobile renderer, sun shadow 25 m, render scale 0.75), Medium (Forward+, 50 m, SSAO), High (Forward+, 80 m, SSAO, SSIL, SDFGI), Ultra (High plus volumetric fog, 120 m). The first start selects Low without a graphics card (lavapipe), Medium with a graphics chip in the processor, and High with a separate graphics card. Godot selects the renderer when it starts, and a settings file in `user://` cannot change it (verified), so a preset with another renderer starts the game again with `--rendering-method`. The play tests and the editor do not start again. The play-test argument `--quality=NAME` sets the preset, and a phase line with `--renderer=forward_plus` runs that phase on Forward+.
+- **Sun shadows** (R5): on, on all presets, with the shadow distance of the preset. The web build (Compatibility) keeps them off: see the result in section 5.
+- **Desktop controls** (D4, R2, R3, `scenes/desktop_controls.gd`). A click of a real mouse on the world captures the cursor. Then the mouse turns the view and a click acts. W, A, S, D move. E acts. Tab raises and lowers the phone. Esc shows the home screen of the phone (the menu). With the phone up, the cursor is free, W, A, S, D still move, and a right click lowers the phone. A gamepad: left stick to move, right stick to look, A to act, Y for the phone. With the phone up, the D-pad selects a button, A presses it, and B goes back. Touches make emulated mouse events, and the desktop controls do not read them.
+- **The house kit** (R7 to R13, `scenes/world/parts/`, `scenes/world/tube_house.gd`). A house is built from parameters and a seed: the kind (tube house, villa, mini-hotel), the style (old or new), the paint, the paint age, the roof (flat terrace, corrugated metal, terracotta tiles), and the front tiles. `data/world/palette.json` has the colors. `plaster.gdshader` makes the paint, the rain streaks, the damp, and the patches of brick. Each house has one plaster mesh and a few vertex-colored meshes (`scripts/mesh_batch.gd`), and its values are instance uniforms. The rail bars, the balusters, the pots, and the AC units are MultiMeshes for each 15 m of the hẻm (`house_parts.gd`), with a visibility range of 70 m.
+- **Budget** (R14, PT-32, measured under lavapipe at 1280 × 720, at the fixed views "along", "back", and "roofs"): Low 401 to 551 draw calls and 133 000 to 152 000 triangles (limit 600 and 300 000). High 453 to 654 draw calls and 138 000 to 172 000 triangles (limit 2 000 and 2 000 000). Medium and Ultra are near High.
+- **Desktop builds** (R6): the export workflow makes Windows, macOS (universal), and Linux builds, not signed. `docs/release-notes.md` says what macOS and Windows show at the first start.
+
 The audio driver prints ALSA errors in the workspace. These errors are not defects.
 
 ## 6. Repository map
@@ -156,19 +170,21 @@ The audio driver prints ALSA errors in the workspace. These errors are not defec
 | `docs/plans/` | Plans. `README.md` there lists all plans and their status. |
 | `docs/playtests/` | Play-test reports from the architect. |
 | `docs/content/culture-notes.md` | What we know about the food and customs, with sources and check status. |
+| `docs/content/reference/houses.md` | Links to public photos for each part of the house kit (plan 0004, R12). |
+| `docs/release-notes.md` | Notes for the desktop builds. |
 | `docs/prototype/hem-2d.html` | The first 2D prototype. Use it as a reference for content and flow only. Do not copy its look. |
 | `docs/prototype/people/` | The people prototype of plan 0006 (Blender and MPFB 2): the approved target look, the values of each person, and how to make clothes by code. |
-| `project.godot`, `export_presets.cfg` | The Godot project and the export presets (Web, Android, iOS). |
+| `project.godot`, `export_presets.cfg` | The Godot project and the export presets (Web, Android, iOS, Linux, Windows, macOS). |
 | `autoload/` | `Content` (reads and checks `data/`), `GameState` (clock, notebook, save), `Playtest` (active only with `--playtest=NAME`). |
-| `data/` | All content: cards, spots and opening hours, people, dialogue, messages, voices, sound captions, the hẻm layout, UI text. |
-| `scenes/` | `main.tscn` (world, input, talk, and UI), `world/` (hẻm, tube house, beach), `actors/` (first-person player, NPC with a voice), `ui/` (phone and its apps, subtitles, joystick, center dot). |
-| `scripts/` | Classes with no scene: clock math, save format, content checks, voice clips, subtitle split, light by time, greybox shapes, sounds, UI theme, play-test driver. |
+| `data/` | All content: cards, spots and opening hours, people, dialogue, messages, voices, sound captions, the hẻm layout, the house palette, UI text. |
+| `scenes/` | `main.tscn` (world, input, talk, and UI), `world/` (hẻm, house, beach, and `parts/`: the house kit, its shaders, and the palette), `actors/` (first-person player, NPC with a voice), `ui/` (phone and its apps, subtitles, joystick, center dot), `desktop_controls.gd` (mouse, keys, gamepad). |
+| `scripts/` | Classes with no scene: clock math, save format, content checks, voice clips, subtitle split, light by time, greybox shapes, mesh batches, quality presets, sounds, UI theme, play-test driver. |
 | `tests/unit/` | GUT unit tests. |
-| `playtests/` | Play-test scenarios PT-01, PT-03 to PT-17, and PT-18 to PT-24 of plan 0003 (PT-02 and PT-07 were removed in plan 0002). |
+| `playtests/` | Play-test scenarios PT-01, PT-03 to PT-17, PT-18 to PT-24 of plan 0003, and PT-25 to PT-32 of plan 0004 (PT-02 and PT-07 were removed in plan 0002). |
 | `tools/` | `setup.sh`, `test.sh`, `playtest.sh`, and `voices/` (the voice build and its tests). |
 | `assets/` | Fonts, icons, voices, and `CREDITS.md`. |
 | `docs/voices/` | The voice audition page (made by the voices workflow). |
-| `.github/workflows/` | `test.yml` (tests on each push), `export.yml` (web, Android, iOS builds, and GitHub Pages), `voices.yml` (the voice files), and `people-packs.yml` (copies the MakeHuman asset packs to the release `people-packs-1`, by hand only). |
+| `.github/workflows/` | `test.yml` (tests on each push), `export.yml` (web, desktop, Android, iOS builds, and GitHub Pages), `voices.yml` (the voice files), and `people-packs.yml` (copies the MakeHuman asset packs to the release `people-packs-1`, by hand only). |
 
 Plan 0001 adds the Godot project structure. See that plan.
 

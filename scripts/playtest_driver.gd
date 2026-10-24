@@ -1185,11 +1185,15 @@ func pad_look_at(point: Vector3, tolerance := 3.0, timeout_s := 40.0) -> bool:
 			return true
 		var speed := float(s.settings.look_sensitivity) * DesktopControls.STICK_DEG_PER_SECOND
 		var invert := -1.0 if s.settings.invert_y else 1.0
-		# One axis at a time, at half the speed, so that the turn does not go too far.
+		# One axis at a time. A small error uses a small push of the stick, so
+		# that one frame at a low frame rate does not turn too far.
+		var error := error_yaw if absf(error_yaw) > tolerance else error_pitch
+		var push := clampf(absf(error) / 40.0, DesktopControls.STICK_DEADZONE + 0.02, 0.6)
+		var seconds := absf(error) / (speed * push)
 		if absf(error_yaw) > tolerance:
-			await pad_stick(true, Vector2(-signf(error_yaw) * 0.5, 0), absf(error_yaw) / (speed * 0.5))
+			await pad_stick(true, Vector2(-signf(error_yaw) * push, 0), seconds)
 		else:
-			await pad_stick(true, Vector2(0, -signf(error_pitch) * invert * 0.5), absf(error_pitch) / (speed * 0.5))
+			await pad_stick(true, Vector2(0, -signf(error_pitch) * invert * push), seconds)
 		await wait_idle(5.0)
 	fail("the right stick does not turn the view to %s" % point)
 	return false

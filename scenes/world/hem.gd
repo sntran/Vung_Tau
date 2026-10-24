@@ -371,6 +371,9 @@ func _build_ground() -> void:
 	var concrete := ShaderMaterial.new()
 	concrete.shader = load("res://scenes/world/parts/concrete_floor.gdshader")
 	concrete.set_shader_parameter("half_width", hem_width / 2.0)
+	var noise := HouseMaterials.noise_textures()
+	concrete.set_shader_parameter("noise_smooth", noise[0])
+	concrete.set_shader_parameter("noise_detail", noise[1])
 	hem_floor.material_override = concrete
 	# A drain gutter in the middle of the hẻm, with a cover each 3 m.
 	var drain := MeshBatch.new()

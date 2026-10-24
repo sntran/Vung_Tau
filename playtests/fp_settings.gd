@@ -1,6 +1,6 @@
 extends RefCounted
-# PT-16 fp_settings. In the Settings app (plan 0003, R28), change each
-# setting. Quit and start again. All settings are the same. Also check that
+# PT-16 fp_settings. In the Settings app (plan 0003, R28, and plan 0004, R1
+# to R4), change each setting. Quit and start again. All settings are the same. Also check that
 # each setting has its effect.
 # phase: --start-time=06:00
 # phase:
@@ -40,9 +40,22 @@ func _change(d: PlaytestDriver) -> void:
 	await d.tap_phone_id("settings.gyro")
 	await _tap_slider(d, "settings.fov", 0.25)
 	await d.tap_phone_id("settings.tap_walk")
+	# Plan 0004: the quality preset, the mouse speed, and fullscreen. Fullscreen
+	# goes on and off again, because a fullscreen window under Xvfb has the
+	# size of the whole virtual screen.
+	await d.tap_phone_id("settings.quality")
+	await _tap_slider(d, "settings.mouse_sensitivity", 0.8)
+	await d.tap_phone_id("settings.fullscreen")
+	await d.wait_frames(10)
+	d.expect(DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN, "the fullscreen setting makes the window fullscreen")
+	await d.tap_phone_id("settings.fullscreen")
+	await d.wait_frames(10)
+	d.expect(DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_WINDOWED, "the fullscreen setting off makes a window again")
 	await d.wait_frames(3)
 	var after: Dictionary = d.state().settings
 	for key: String in before:
+		if key == "fullscreen":
+			continue
 		d.expect(after[key] != before[key], "the setting %s changed: %s" % [key, after[key]])
 	d.expect(after.subtitles == "en", "the subtitles are in English: %s" % after.subtitles)
 	d.expect(absf(float(d.state().fov) - float(after.fov)) < 0.5, "the field of view changes the camera")

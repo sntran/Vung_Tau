@@ -53,7 +53,10 @@ func _apps(d: PlaytestDriver) -> void:
 	var sound_before: bool = d.state().sound
 	await d.tap_phone_id("settings.sound")
 	await d.tap_phone_id("settings.subtitles")
-	for id: String in ["settings.subtitle_size", "settings.subtitle_box", "settings.sensitivity", "settings.fov"]:
+	# Plan 0004: the quality preset and the mouse speed. Fullscreen is in PT-16.
+	await d.tap_phone_id("settings.quality")
+	for id: String in ["settings.subtitle_size", "settings.subtitle_box", "settings.sensitivity", "settings.fov",
+			"settings.mouse_sensitivity"]:
 		await d.show_in_phone(id)
 		var slider := d.find(id) as Control
 		var rect := slider.get_global_rect()
@@ -63,6 +66,8 @@ func _apps(d: PlaytestDriver) -> void:
 		await d.tap_phone_id(id)
 	var after: Dictionary = d.state().settings
 	for key: String in before:
+		if key == "fullscreen":
+			continue
 		d.expect(after[key] != before[key], "the setting %s changed: %s" % [key, after[key]])
 	d.expect(d.state().sound != sound_before, "the sound setting changed")
 	await d.screenshot("settings_changed")

@@ -17,11 +17,31 @@ const CLOTH := "cloth"
 const CABLE := "cable"
 
 static var _materials: Dictionary = {}
+static var _noise: Array[Texture2D] = []
+
+
+## Two tileable noise textures (256 × 256): a smooth one and a detailed one.
+## The shaders read them, because many noise functions in a shader are slow
+## on a computer without a graphics card (the play tests under lavapipe).
+static func noise_textures() -> Array[Texture2D]:
+	if not _noise.is_empty():
+		return _noise
+	for settings: Array in [[0.012, 4, 11], [0.05, 3, 23]]:
+		var noise := FastNoiseLite.new()
+		noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
+		noise.frequency = settings[0]
+		noise.fractal_octaves = settings[1]
+		noise.seed = settings[2]
+		var image := noise.get_seamless_image(256, 256)
+		image.generate_mipmaps()
+		_noise.append(ImageTexture.create_from_image(image))
+	return _noise
 
 
 static func all() -> Dictionary:
 	if not _materials.is_empty():
 		return _materials
+	var noise := noise_textures()
 	var plaster := ShaderMaterial.new()
 	plaster.shader = load("res://scenes/world/parts/plaster.gdshader")
 	_materials[PLASTER] = plaster
@@ -35,6 +55,9 @@ static func all() -> Dictionary:
 	var tiles := ShaderMaterial.new()
 	tiles.shader = load("res://scenes/world/parts/tiles.gdshader")
 	_materials[TILES] = tiles
+	for material: ShaderMaterial in [plaster, metal_roof, tile_roof]:
+		material.set_shader_parameter("noise_smooth", noise[0])
+		material.set_shader_parameter("noise_detail", noise[1])
 	_materials[DETAIL] = _vertex_color(0.85, 0.0)
 	_materials[METAL] = _vertex_color(0.35, 0.65)
 	var glass := _vertex_color(0.12, 0.3)

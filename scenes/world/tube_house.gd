@@ -138,6 +138,7 @@ func build() -> void:
 	if sign_text != "":
 		_build_sign()
 	meshes = _batch.commit(self, HouseMaterials.all(), "House")
+	_build_occluder()
 	_set_instance_values()
 	if _own_parts:
 		parts.commit()
@@ -747,6 +748,19 @@ func _vertical_sign() -> void:
 			label.rotation_degrees.y = 0.0 if side > 0.0 else 180.0
 			root.add_child(label)
 	part_boxes["sign"] = AABB(Vector3(width / 2.0 - 0.2, root.position.y - height / 2.0, 0.15), Vector3(0.1, height, 0.6))
+
+
+## A box occluder inside the house (R13): the house hides what is behind it,
+## so the renderer does not draw it.
+func _build_occluder() -> void:
+	var occluder := OccluderInstance3D.new()
+	occluder.name = "Occluder"
+	var box := BoxOccluder3D.new()
+	var height := wall_height()
+	box.size = Vector3(width - 0.3, height - 0.4, depth - FRONT - 0.6)
+	occluder.occluder = box
+	occluder.position = Vector3(0, height / 2.0 + 0.1, -FRONT - (depth - FRONT) / 2.0)
+	add_child(occluder)
 
 
 # --- Values of the materials -----------------------------------------------------------------

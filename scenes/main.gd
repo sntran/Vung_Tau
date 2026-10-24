@@ -381,7 +381,11 @@ func _update_focus() -> void:
 		var npc: Npc = hem.npcs[npc_id]
 		if not npc.visible or not npc.touchable:
 			continue
-		var angle := _focus_angle(eye, forward, npc.global_position + Vector3(0, npc.height - 0.2, 0))
+		# A look at the face, the chest, or the hips of a person: in a narrow
+		# hẻm (plan 0004, R11a) people stand near, and the face alone is high.
+		var angle := 999.0
+		for y: float in [npc.height - 0.2, npc.height * 0.65, npc.height * 0.45]:
+			angle = minf(angle, _focus_angle(eye, forward, npc.global_position + Vector3(0, y, 0)))
 		if angle < best_angle:
 			best_angle = angle
 			best = "npc." + npc_id
