@@ -59,7 +59,7 @@ The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0007 puts h
   - Window: recessed 0.15 m to 0.25 m, with a frame and a sill. Styles: wooden louvered shutters (older houses), glass with aluminum frames (newer houses), iron security bars.
   - Balcony: a slab that sticks out 0.6 m to 1.2 m, with a rail. Rail styles: plain vertical bars, iron patterns, stainless steel.
   - Ground floor: roll-up metal shutter (open, half, closed, with a short animation), folding iron gate (cửa xếp), or a wall with a door. A tiled step in front.
-  - Roof: parapet, rebar that sticks up for a future floor, a steel water tank, laundry lines, foam boxes with plants.
+  - Roof, three types: a flat concrete roof with a parapet (the most common), a pitched roof of terracotta tiles (villa style, common in some neighborhoods), and a corrugated metal roof (tôn). Flat roofs have rebar that sticks up for a future floor, a steel water tank, laundry lines, and foam boxes with plants. The players see roofs from Núi Lớn and Núi Nhỏ, so roofs matter.
   - Clutter: AC units, potted plants, shop signs with Vietnamese text, canvas or corrugated awnings, electric meter boxes, down pipes, wires, and cable bundles at the poles.
 - **R8.** Plaster shader (`plaster.gdshader`), with a seed for each house:
   - Paint color with small changes in tone.
@@ -69,8 +69,24 @@ The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0007 puts h
   - A paint age parameter: new houses are clean, old houses are faded and stained.
 - **R9.** Side walls above a shorter neighbor show bare grey plaster or brick (D6).
 - **R10.** Each house in `hem_layout.json` gets: width (3.5 m to 5 m), floors (2 to 5), a style (`old` or `new`), a paint color from the palette (R10a), paint age, and a seed. The old and the new styles mix in one hẻm, as in a real street.
-- **R10a.** `data/world/palette.json` holds the wall colors. Each color has a value in sRGB, a weight (how often it is used), and a source. The first values are muted and faded (D8). I replace them with values sampled from the photos that I choose. The house generator picks colors by weight. Two neighbor houses must not have the same color. A rare accent color (for example a faded blue or green) is at most 1 house in 8.
+- **R10a.** `data/world/palette.json` holds the wall colors. Each color has a value in sRGB, a weight (how often it is used), and a source. Use these first values. The architect measured them from three aerial photos of Vũng Tàu that I chose (from Núi Lớn and Núi Nhỏ). The method: only the town area near the camera, only sunlit pixels, without trees, water, and terracotta roof tiles, then 10 color clusters:
+
+  | sRGB | Weight | Saturation | Value |
+  |---|---|---|---|
+  | `#C1C2C3` | 0.132 | 0.01 | 0.76 |
+  | `#B1AFB0` | 0.128 | 0.01 | 0.70 |
+  | `#E9E4DC` | 0.123 | 0.06 | 0.91 |
+  | `#B5A497` | 0.120 | 0.16 | 0.71 |
+  | `#D2D4D4` | 0.117 | 0.01 | 0.83 |
+  | `#F5F6F2` | 0.101 | 0.02 | 0.96 |
+  | `#D1B7A6` | 0.096 | 0.21 | 0.82 |
+  | `#E8CFB9` | 0.093 | 0.20 | 0.91 |
+  | `#B88C7C` | 0.054 | 0.33 | 0.72 |
+  | `#939DB4` | 0.036 | 0.18 | 0.71 |
+
+  The photos have haze, which makes white walls look grey. So the builder makes each grey (saturation 0.02 or less) 10% lighter. Most walls have a saturation of 0.06 or less. Cream and peach walls have about 0.2. The test colors of the first probe had 0.3 to 0.4, which is why they looked artificial. The source of each value is "aerial photos, 2026-10-24". The photos are not in the repository. The house generator picks colors by weight. Two neighbor houses must not have the same color. A rare accent color (for example a faded blue or green) is at most 1 house in 8.
 - **R10b.** The palette also has colors for the accent parts: shutters, rails, window frames, signs, and awnings. These can be stronger than the walls.
+- **R10c.** Roof colors: terracotta tiles from `#D39B83`, `#B28469`, and `#634D3C` (measured in the same photos), with a seed for age and moss. Terracotta is about 6% of the town area in the photos.
 - **R11.** The hẻm floor: concrete with cracks and patches, a drain gutter, and covers. The tiled fronts of the houses differ from house to house.
 - **R12.** `docs/content/reference/houses.md` lists each part of R7 with links to public photos on the web for comparison. Links only. Do not copy photos into the repository. I mark each part as correct or not correct for Vũng Tàu.
 
@@ -108,5 +124,5 @@ The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0007 puts h
 
 - **Q1.** Which computer do I use to test the desktop builds (Windows, macOS, or Linux)?
 - **Q2.** Which parts in R7 are not correct for Vũng Tàu, and which parts are missing? (For example: solar water heaters on roofs, an altar for Ông Địa in shops, numbers painted on the walls.)
-- **Q3.** Which photos of real houses are the source of the palette (R10a)? I send screenshots of typical houses, for example from a street view. The architect samples the wall colors from them. The screenshots are not put in the repository.
+- **Q3.** Answered in part: the first palette comes from aerial photos (R10a). Street-level photos can make it better, because aerial photos show roofs and haze. Which roof type is the most common in the hẻm near the homestay?
 - **Q4.** Do many houses in Vũng Tàu have ceramic tiles on the front wall (ốp gạch)? If yes, add tiled fronts to R7.
