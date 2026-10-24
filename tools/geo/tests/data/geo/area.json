@@ -1,0 +1,20 @@
+{
+	"note": "The test area of tools/geo/tests. It is the box of make_small.py.",
+	"bbox": {
+		"south": 10.3406,
+		"west": 107.0668,
+		"north": 10.3526,
+		"east": 107.0788
+	},
+	"epsg": 32648,
+	"origin_landmark": "bai_truoc",
+	"origin_round_m": 10,
+	"chunk_size_m": 256,
+	"grid_m": 2,
+	"overview_grid_m": 16,
+	"sea_chunk_margin_m": 400,
+	"height_offset_m": -20.0,
+	"height_step_m": 0.01,
+	"land_mask_grid_m": 8,
+	"land_mask_range_m": 64.0
+}
