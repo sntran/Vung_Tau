@@ -151,5 +151,5 @@ Run each scenario at 1280×720.
 
 - **Q1.** Is the bounding box in D5 correct? Does it include all the places that I want?
 - **Q2.** If OSM has no data for many small hẻm in the area, how do we add them? `overrides.json` can hold them, but someone must draw them from a map. The report in R6 shows how large this problem is. The homestay hẻm in R8a must be in the data, or in `overrides.json`.
-- **Q3.** Is Chùa Tam Bảo the pagoda with the monkeys on the Vi Ba road? A source gives its address as 72 Vi Ba ([Foody](https://www.foody.vn/vung-tau/chua-tam-bao)).
+- **Q3.** Answered: the pagoda with the monkeys on the Vi Ba road is Chùa Tam Bảo (chùa Khỉ).
 - **Q4.** Which markets are "the old markets"? `anchors.png` shows all of them. I name them there.
