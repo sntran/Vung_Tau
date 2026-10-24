@@ -28,7 +28,7 @@ func run(d: PlaytestDriver) -> void:
 		var s := d.state()
 		if float(s.ground) < 2.0 and str(s.road_name).is_empty():
 			sand[0] = true
-		if s.toast_visible and str(s.toast_text) == water:
+		if s.subtitle.get("lines", [""])[0] == water:
 			message[0] = true
 	await d.stick_along(route, 400.0, check, 15.0, true)
 	d.set_time_scale(1.0)
@@ -43,7 +43,7 @@ func run(d: PlaytestDriver) -> void:
 	var before: Vector3 = s.player
 	await d.hold_stick(Vector2(0, -1), 1.5)
 	s = d.state()
-	d.expect(s.toast_visible and str(s.toast_text) == water, "the message shows again: \"%s\"" % s.toast_text)
+	d.expect(s.subtitle.get("lines", [""])[0] == water, "the message shows again: %s" % [s.subtitle])
 	await d.screenshot("water_too_deep")
 	await d.wait_idle()
 	var after: Vector3 = d.state().player

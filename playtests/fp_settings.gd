@@ -115,16 +115,14 @@ func _check(d: PlaytestDriver) -> void:
 	d.expect(absf(float(s.fov) - float(expected.fov)) < 0.5, "after the restart the field of view is %s" % s.fov)
 	await d.open_app("settings")
 	await d.screenshot("settings_after_restart")
-	# The credits sheet opens from the settings sheet (plan 0003, acceptance criterion 4).
-	await d.tap_id("settings.credits")
-	await d.wait_frames(5)
-	d.expect(d.state().mode == "credits", "the Credits button opens the credits sheet: %s" % d.state().mode)
+	# The Credits page opens from the Settings app (plan 0004, acceptance criterion 4).
+	await d.tap_phone_id("settings.credits")
+	d.expect(d.state().app == "credits", "the Credits button opens the credits page: %s" % d.state().app)
 	var text := ""
-	for node: Node in d.main().credits_sheet.find_children("*", "Label", true, false):
+	for node: Node in d.main().phone.apps.credits.find_children("*", "Label", true, false):
 		text += (node as Label).text + "\n"
 	d.expect(text.contains("© OpenStreetMap contributors"), "the credits show the OpenStreetMap notice")
 	d.expect(text.contains("Copernicus WorldDEM-30 © DLR e.V."), "the credits show the Copernicus notice")
 	await PlaytestLayout.check(d, "credits")
-	await d.tap_id("credits.close")
-	await d.wait_frames(3)
-	d.expect(d.state().mode == "hem", "Close closes the credits sheet")
+	await d.tap_phone_id("phone.home")
+	d.expect(d.state().app == "", "Home closes the credits page")
