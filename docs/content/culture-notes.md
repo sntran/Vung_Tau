@@ -57,6 +57,10 @@ Status values:
 | Fishing boats come in early. People buy fresh fish from the boats. | Confirmed | First-hand |
 | Before sunrise, the catch is sorted on the sand at the Bến Đình fishing village. | Source | [Vietnam Travel](https://vietnam.travel/jp/node/745) |
 | Bánh khọt: small crisp cakes of rice flour with curry powder, topped with shrimp or squid. People wrap them in lettuce and herbs and dip them in a fish sauce mix. | Source | [Vietnam Travel](https://vietnam.travel/jp/node/745) |
+| Bánh khọt is cooked in a large round metal pan with many small cups. The cook pours the batter with a spoon, adds a shrimp to each, and tops them with scallion. On the plate, they have shrimp floss on top. They come with mustard greens and herbs, pickled green papaya and carrot, and nước mắm with chili. Plates and bowls often have a printed flower pattern. | Source | Photos that I chose, 2026-10-24 |
+| In the late afternoon and evening, many local families swim at Bãi Trước. Fishing boats stay at anchor in the bay. | Source | Photos that I chose, 2026-10-24 |
+| The small fishing boats are wooden, painted blue with red trim, with worn paint. They carry coils of rope, nets, and plastic baskets. | Source | Photos that I chose, 2026-10-24 |
+| Fast ferries stop at a pier near Bãi Trước. | Check | Photos that I chose, 2026-10-24 |
 | In the evening, people drive scooters along the coast road. | Confirmed | First-hand |
 | Helmets are required on motorbikes on all roads since December 2007. | Check | Not verified |
 | People walk to Miếu Hòn Bà when the tide is low. | Confirmed | First-hand |
@@ -83,6 +87,10 @@ Status values:
 | Near the beach there are many mini-hotels of 5 to 8 floors with vertical "KHÁCH SẠN" signs. | Source | Photos that I chose, 2026-10-24 |
 | Ground floor fronts often have polished granite or ceramic tiles. Some fronts are fully covered with patterned tiles. Sidewalks are tiled. | Source | Photos that I chose, 2026-10-24 |
 | Older women often wear đồ bộ (a matching printed shirt and trousers) and a nón lá, and ride bicycles with a basket. | Source | Photos that I chose, 2026-10-24 |
+| In a dense hẻm, most roofs are corrugated metal (faded mint or teal, rusty brown, some red), between flat concrete roof terraces. Many terraces have stainless steel water tanks and solar water heaters. Villa areas have terracotta tile roofs. Schools and offices have long blocks with deep red tile roofs. | Source | Photos that I chose, 2026-10-24 |
+| The walls are red hollow clay bricks (gạch ống) under the plaster. | Source | Photos that I chose, 2026-10-24 |
+| The hẻm between dense houses can be only about 2 m wide. | Source | Photos that I chose, 2026-10-24 |
+| In the dry season, the hills of Vũng Tàu turn partly brown and orange. In the rainy season, they are green. Flame trees (phượng vĩ) bloom red on the hills. | Check | Photos that I chose, 2026-10-24. The months are not confirmed. |
 
 ## Daily life
 

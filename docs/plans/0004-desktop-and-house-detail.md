@@ -59,7 +59,12 @@ The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0007 puts h
   - Window: recessed 0.15 m to 0.25 m, with a frame and a sill. Styles: wooden louvered shutters (older houses), glass with aluminum frames (newer houses), iron security bars.
   - Balcony: a slab that sticks out 0.6 m to 1.2 m, with a rail. Rail styles: plain vertical bars, iron patterns, stainless steel.
   - Ground floor: roll-up metal shutter (open, half, closed, with a short animation), folding iron gate (cửa xếp), or a wall with a door. A tiled step in front.
-  - Roof, three types: a flat concrete roof with a parapet (the most common), a pitched roof of terracotta tiles (villa style, common in some neighborhoods), and a corrugated metal roof (tôn). Flat roofs have rebar that sticks up for a future floor, a steel water tank, laundry lines, and foam boxes with plants. The players see roofs from Núi Lớn and Núi Nhỏ, so roofs matter.
+  - Roof types. The mix depends on the area:
+    - Dense hẻm of homes: mostly corrugated metal roofs (tôn), faded mint or teal, rusty brown, and some red or maroon. Between them, flat concrete roof terraces with a parapet. Few tile roofs.
+    - Villa areas: pitched roofs of terracotta tiles.
+    - Schools and offices: long blocks with deep red tile roofs.
+    - Flat roof terraces have rebar that sticks up for a future floor, stainless steel water tanks, solar water heaters (flat panels or glass tubes), laundry lines, and foam boxes with plants. Metal roofs often have a round turbine vent.
+    - The players see roofs from Núi Lớn and Núi Nhỏ, so roofs matter.
   - Clutter: AC units, potted plants, shop signs with Vietnamese text, canvas or corrugated awnings, electric meter boxes, and down pipes.
   - Overhead cables: concrete poles with thick, sagging bundles of many cables across the street and along it. In the street photos they are one of the strongest features. Make them dense, not a few thin lines.
   - Rooftop: stainless steel water tanks (horizontal and vertical), satellite dishes, TV antennas, and sometimes a cell tower.
@@ -72,7 +77,7 @@ The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0007 puts h
   - Damp and dirt at the base.
   - Patches where plaster fell off, with red brick and mortar under them. Mostly low on the wall and at edges.
   - A paint age parameter: new houses are clean, old houses are faded and stained.
-- **R9.** Side walls above a shorter neighbor show bare grey plaster or brick (D6).
+- **R9.** Side walls above a shorter neighbor show bare grey plaster or brick (D6). Where brick shows, it is red hollow clay brick (gạch ống): the holes show at broken ends and edges. Mortar joints are thick and uneven.
 - **R10.** Each house in `hem_layout.json` gets: width (3.5 m to 5 m), floors (2 to 5), a style (`old` or `new`), a paint color from the palette (R10a), paint age, and a seed. The old and the new styles mix in one hẻm, as in a real street.
 - **R10a.** `data/world/palette.json` holds the wall colors. Each color has a value in sRGB, a weight (how often it is used), and a source. Use these first values. The architect measured them from three aerial photos of Vũng Tàu that I chose (from Núi Lớn and Núi Nhỏ). The method: only the town area near the camera, only sunlit pixels, without trees, water, and terracotta roof tiles, then 10 color clusters:
 
@@ -104,7 +109,26 @@ The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0007 puts h
   So strong colors do exist, but on few buildings, and more on mini-hotels and shops than on homes. The rule: about 85% of walls come from the measured muted palette. About 15% are "bold": salmon, turquoise, sky blue, bright yellow, or two-color stripes. Bold walls are at most 1 house in 6 in a hẻm of homes, and up to 1 in 3 on a street near the beach with hotels. The house generator picks colors by weight. Two neighbor houses must not have the same color.
 - **R10b.** The palette also has colors for the accent parts: shutters, rails, window frames, signs, and awnings. These can be stronger than the walls.
 - **R10c.** Roof colors: terracotta tiles from `#D39B83`, `#B28469`, and `#634D3C` (measured in the same photos), with a seed for age and moss. Terracotta is about 6% of the town area in the photos.
+  Corrugated metal and roof terrace colors, measured in a top-down photo of a dense hẻm that I chose (12 clusters, without the dark alleys):
+
+    | sRGB | Weight | Kind |
+    |---|---|---|
+    | `#CBCAC0` | 0.132 | grey/white (concrete roof, wall, faded metal) |
+    | `#BCAF9A` | 0.114 | terracotta or orange metal |
+    | `#DDE5E4` | 0.112 | grey/white (concrete roof, wall, faded metal) |
+    | `#91968E` | 0.104 | grey/white (concrete roof, wall, faded metal) |
+    | `#7A7A71` | 0.086 | grey/white (concrete roof, wall, faded metal) |
+    | `#5C3E36` | 0.086 | rusty metal |
+    | `#94B8B8` | 0.082 | mint/teal corrugated metal |
+    | `#92574A` | 0.081 | rusty metal |
+    | `#B98265` | 0.063 | terracotta or orange metal |
+    | `#505E5B` | 0.061 | mint/teal corrugated metal |
+    | `#B0D8D8` | 0.053 | mint/teal corrugated metal |
+    | `#4FA9A9` | 0.027 | mint/teal corrugated metal |
+
+  In that photo: grey and white (concrete terraces and faded metal) 43%, mint and teal metal 22%, orange and tan metal 18%, rusty metal 17%. Rust shows in streaks along the ridges of the metal sheets.
 - **R11.** The hẻm floor: concrete with cracks and patches, a drain gutter, and covers. The tiled fronts of the houses differ from house to house.
+- **R11a.** A hẻm of homes is narrow: 2 m to 3.5 m between the house fronts. Change the homestay hẻm from 3.5 m to 2.8 m until the map data of plan 0005 gives its real width. Check that first-person walking, tap to walk, and the phone still work in it.
 - **R12.** `docs/content/reference/houses.md` lists each part of R7 with links to public photos on the web for comparison. Links only. Do not copy photos into the repository. I mark each part as correct or not correct for Vũng Tàu.
 
 ### Performance
@@ -140,6 +164,6 @@ The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0007 puts h
 ## 7. Open questions
 
 - **Q1.** Which computer do I use to test the desktop builds (Windows, macOS, or Linux)?
-- **Q2.** Which parts in R7 are not correct for Vũng Tàu, and which parts are missing? (For example: solar water heaters on roofs, an altar for Ông Địa in shops, numbers painted on the walls.)
-- **Q3.** Answered in part: the first palette comes from aerial photos (R10a). Street-level photos can make it better, because aerial photos show roofs and haze. Which roof type is the most common in the hẻm near the homestay?
+- **Q2.** Which parts in R7 are not correct for Vũng Tàu, and which parts are missing? (For example: solar water heaters on roofs, an altar for Ông Địa in shops, numbers painted on the walls.) Answered in part: the photos show solar water heaters on many flat roofs (now in R7).
+- **Q3.** Answered: in a dense hẻm, corrugated metal roofs and flat concrete terraces are the most common. Tile roofs are common in villa areas (R7, R10c).
 - **Q4.** Answered: the street photos show granite or tiled ground floor fronts and some fully tiled fronts with patterns. They are in R7.
