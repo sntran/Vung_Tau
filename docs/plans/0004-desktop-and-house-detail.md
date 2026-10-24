@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Branch | `feat/0004-desktop-and-house-detail` |
 | Depends on | 0003 (status "Built") |
 
