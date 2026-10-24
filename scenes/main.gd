@@ -20,6 +20,9 @@ const LOOK_DEG_PER_PIXEL := 0.2
 const PANEL_MAX_FRACTION := 0.42
 const PORTRAIT_PANEL_FRACTION := 0.4
 const ACTION_SIZE := Vector2(180, 88)
+## See _set_3d_scale().
+const WIDE_WINDOW := 1920
+const WIDE_3D_SCALE := 0.75
 
 ## "hem" (the talk panel is the active UI), "notebook", "clock", or "settings".
 var mode := "hem"
@@ -33,8 +36,17 @@ var focus_id := ""
 var focus_verb := ""
 ## The sensor source of the gyroscope. The play-test system can replace it.
 var sensor: SensorSource = SensorSource.new()
+## "hem" (plans 0001 and 0002), or "vung_tau" (plan 0003) with --world=vung_tau.
+var world_name := "hem"
+## The real ground of Vũng Tàu, or null in the hẻm world.
+var vung_tau: VungTau = null
+var debug_overlay: Label
+var credits_sheet: CreditsSheet
+var _water_message_time := -100000
 
 @onready var hem: Hem = $World/Hem
+## A message about deep water shows not more often than this.
+const WATER_MESSAGE_MS := 3000
 @onready var player: Player = $World/Player
 @onready var sun: DirectionalLight3D = $World/Sun
 @onready var environment: Environment = $World/Environment.environment
@@ -76,21 +88,58 @@ func _ready() -> void:
 	clock_sheet.choice_pressed.connect(_on_clock_choice)
 	settings_sheet.closed.connect(_close_sheets)
 	settings_sheet.changed.connect(_on_settings_changed)
+	settings_sheet.credits_pressed.connect(open_credits)
+	credits_sheet = CreditsSheet.new()
+	credits_sheet.name = "CreditsSheet"
+	credits_sheet.visible = false
+	credits_sheet.closed.connect(_close_sheets)
+	ui_root.add_child(credits_sheet)
+	ui_root.move_child(credits_sheet, settings_sheet.get_index() + 1)
+	_make_debug_overlay()
 	GameState.time_changed.connect(_on_time_changed)
 	GameState.card_learned.connect(_on_card_learned)
 	player.stepped.connect(GameState.add_walk)
 	player.arrived.connect(_on_arrived)
-	hem.clacked.connect(_on_clacked)
+	player.blocked.connect(_on_blocked)
 	AudioServer.set_bus_mute(0, not GameState.sound)
-
-	player.place(GameState.player_pos, GameState.yaw, GameState.pitch)
+	if GameState.arg_value("world") == "vung_tau":
+		_start_vung_tau()
+	if vung_tau == null:
+		hem.clacked.connect(_on_clacked)
+		player.place(GameState.player_pos, GameState.yaw, GameState.pitch)
 	_apply_settings()
 	_layout()
 	_apply_time(GameState.minutes)
-	if not GameState.flag("intro_done"):
+	if vung_tau != null:
+		talk_panel.visible = false
+	elif not GameState.flag("intro_done"):
 		show_line("intro.welcome")
 	else:
 		show_hem_panel()
+
+
+## Plan 0003: the real ground in place of the hẻm. The hẻm world, its sun,
+## and its sky go. The save of the hẻm world stays as it is.
+func _start_vung_tau() -> void:
+	var world: VungTau = load("res://scenes/world/vung_tau.tscn").instantiate()
+	$World.add_child(world)
+	if not world.setup():
+		world.queue_free()
+		return
+	vung_tau = world
+	world_name = "vung_tau"
+	for node: Node in [$World/Hem, $World/Sun, $World/Environment]:
+		node.queue_free()
+	$World.remove_child($World/Hem)
+	hem = null
+	sun = world.sun
+	environment = world.environment
+	player.use_navigation = false
+	player.walk_limit = world.can_stand
+	player.camera.far = 6000.0
+	var start := world.spawn()
+	world.prepare_at(start.position)
+	player.place(start.position, start.yaw)
 
 
 func _process(delta: float) -> void:
@@ -99,6 +148,10 @@ func _process(delta: float) -> void:
 	_read_gyro(delta)
 	_update_focus()
 	_refresh_hem_panel()
+	_update_debug_overlay()
+	if vung_tau != null:
+		_update_top_bar()
+		return
 	GameState.player_pos = player.global_position
 	GameState.yaw = player.target_yaw
 	GameState.pitch = player.target_pitch
@@ -234,6 +287,9 @@ func _stop_walk() -> void:
 
 
 func _save_position() -> void:
+	# The Vũng Tàu world does not save the position: the save is for the hẻm world.
+	if vung_tau != null:
+		return
 	GameState.set_player_pos(player.global_position, player.target_yaw, player.target_pitch)
 
 
@@ -306,7 +362,7 @@ func _update_focus() -> void:
 	var best := ""
 	var best_angle := FOCUS_ANGLE
 	var verb := ""
-	if mode == "hem":
+	if mode == "hem" and hem != null:
 		var eye := player.eye_position()
 		var forward := player.view_forward()
 		for spot: Dictionary in Content.spot_list():
@@ -375,6 +431,8 @@ func open_npc(npc_id: String) -> void:
 
 ## Shows the panel for the place where the player stands: the near spot, or a tip.
 func show_hem_panel() -> void:
+	if vung_tau != null:
+		return
 	if GameState.is_late():
 		show_line("hem.late")
 		return
@@ -389,7 +447,7 @@ func show_hem_panel() -> void:
 ## The hẻm panel (a near spot or a tip) follows the player during a walk with
 ## the joystick or the keys. A dialogue line stays until the player answers it.
 func _refresh_hem_panel() -> void:
-	if mode != "hem" or player.walking:
+	if mode != "hem" or player.walking or hem == null:
 		return
 	if line_id != "hem.near" and not line_id.begins_with("hem.tip."):
 		return
@@ -402,6 +460,8 @@ func _refresh_hem_panel() -> void:
 func find_near_spot() -> String:
 	var best := ""
 	var best_distance := NEAR_DISTANCE
+	if hem == null:
+		return best
 	var pos := player.global_position
 	for spot: Dictionary in Content.spot_list():
 		if not hem.is_present(spot.id, GameState.minutes):
@@ -508,6 +568,8 @@ func _learn(card_ids: Array) -> void:
 func sleep_until_morning() -> void:
 	_stop_walk()
 	GameState.sleep_until_morning()
+	if vung_tau != null:
+		return
 	player.place(GameState.player_pos, GameState.yaw, GameState.pitch)
 	center_view()
 	show_line("home.morning")
@@ -583,6 +645,14 @@ func _close_sheets() -> void:
 	notebook_sheet.visible = false
 	clock_sheet.visible = false
 	settings_sheet.visible = false
+	credits_sheet.visible = false
+
+
+## The credits sheet opens from the settings sheet (plan 0003).
+func open_credits() -> void:
+	_open_sheet("credits")
+	credits_sheet.show_credits()
+	credits_sheet.visible = true
 
 
 ## Ends all touches: a sheet covers the world, so the joystick and the look stop.
@@ -614,6 +684,8 @@ func _on_clacked(_position: Vector3) -> void:
 
 func _on_time_changed(minutes: int, _day: int) -> void:
 	_apply_time(minutes)
+	if hem == null:
+		return
 	# A shop closes its shutter: a player in the shop room goes out to the hẻm.
 	var room := hem.room_at(player.global_position)
 	if room != "" and hem.shutter_of(room) != TubeHouse.Shutter.OPEN:
@@ -626,10 +698,17 @@ func _on_time_changed(minutes: int, _day: int) -> void:
 
 func _update_top_bar() -> void:
 	var part := GameClock.part_of_day(GameState.minutes, Content.ui.parts_of_day)
-	var at_beach := player.global_position.x > hem.end_x
-	var place := Content.ui_text("beach_name" if at_beach else "place_name")
-	var sub := Content.format(Content.ui_text("beach_sub" if at_beach else "place_sub"),
-			{"day": GameState.day})
+	var place: String
+	var sub: String
+	if vung_tau != null:
+		# The name of the road under the player, from OpenStreetMap.
+		var road := vung_tau.road_at(player.global_position)
+		place = road.get("name", "") if road.get("name", "") != "" else Content.ui_text("world_name")
+		sub = Content.format(Content.ui_text("world_sub"), {"day": GameState.day})
+	else:
+		var at_beach := player.global_position.x > hem.end_x
+		place = Content.ui_text("beach_name" if at_beach else "place_name")
+		sub = Content.format(Content.ui_text("beach_sub" if at_beach else "place_sub"), {"day": GameState.day})
 	top_bar.show_state(GameClock.format_time(GameState.minutes), part.vi, place, sub, GameState.sound,
 			GameState.cards.size(), Content.card_list().size())
 
@@ -637,6 +716,10 @@ func _update_top_bar() -> void:
 # --- Time and light --------------------------------------------------------
 
 func _apply_time(minutes: int) -> void:
+	if vung_tau != null:
+		vung_tau.update_time(minutes, GameState.day)
+		_update_top_bar()
+		return
 	hem.update_time(minutes)
 	var sky := DayLight.sky_colors(minutes)
 	var sky_material := environment.sky.sky_material as ProceduralSkyMaterial
@@ -660,6 +743,7 @@ func _apply_time(minutes: int) -> void:
 ## The parts of the screen. Landscape: the talk panel is at the right side.
 ## Portrait (the web build in a narrow window): the talk panel is at the bottom.
 func _layout() -> void:
+	_set_3d_scale()
 	var view := ui_root.get_viewport_rect().size
 	var safe_top := _safe_top_inset()
 	var bar_height := UiTheme.TOP_BAR_HEIGHT + safe_top
@@ -681,7 +765,7 @@ func _layout() -> void:
 	action_button.position = Vector2(center.x - ACTION_SIZE.x / 2.0, center.y + 80.0)
 	joystick.position = Vector2.ZERO
 	joystick.size = view
-	for sheet: Control in [notebook_sheet, clock_sheet, settings_sheet]:
+	for sheet: Control in [notebook_sheet, clock_sheet, settings_sheet, credits_sheet]:
 		sheet.position = Vector2(0, bar_height)
 		sheet.size = Vector2(view.x, view.y - bar_height)
 	var clock_width := minf(view.x, 900.0 if landscape else 760.0)
@@ -691,6 +775,18 @@ func _layout() -> void:
 	var toast_width := minf(free_width - 32.0, 640.0)
 	toast.size = Vector2(toast_width, 0)
 	toast.position = Vector2((free_width - toast_width) / 2.0, bar_height + 16.0)
+
+
+## On a window wider than 1920 pixels (a phone with a 2400 x 1080 screen),
+## the 3D view renders at 0.75 of the window size, so that it is faster. The
+## UI stays at the full size. Godot has FSR only for the Forward+ renderer, so
+## the scale is bilinear.
+func _set_3d_scale() -> void:
+	var viewport := get_viewport()
+	var render_scale := WIDE_3D_SCALE if get_window().size.x > WIDE_WINDOW else 1.0
+	if not is_equal_approx(viewport.scaling_3d_scale, render_scale):
+		viewport.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
+		viewport.scaling_3d_scale = render_scale
 
 
 ## Returns the top inset of the phone screen (a notch or a camera cutout) in base pixels.
@@ -719,6 +815,8 @@ func input_zones() -> Dictionary:
 ## Returns the number of dynamic lights that light a part of the view.
 func lights_in_view() -> int:
 	var count := 1 if sun.visible else 0
+	if hem == null:
+		return count
 	var planes := player.camera.get_frustum()
 	for light in hem.lights_on():
 		var inside := true
@@ -729,3 +827,50 @@ func lights_in_view() -> int:
 		if inside:
 			count += 1
 	return count
+
+
+# --- Deep water and the debug overlay (plan 0003) ---------------------------
+
+func _on_blocked() -> void:
+	if Time.get_ticks_msec() - _water_message_time < WATER_MESSAGE_MS:
+		return
+	_water_message_time = Time.get_ticks_msec()
+	toast.show_text(Content.ui_text("water_too_deep"))
+
+
+func _make_debug_overlay() -> void:
+	debug_overlay = Label.new()
+	debug_overlay.name = "DebugOverlay"
+	debug_overlay.set_meta("test_id", "debug")
+	debug_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	debug_overlay.add_theme_color_override("font_color", Color.WHITE)
+	debug_overlay.add_theme_color_override("font_outline_color", Color.BLACK)
+	debug_overlay.add_theme_constant_override("outline_size", 6)
+	debug_overlay.add_theme_font_size_override("font_size", 18)
+	debug_overlay.visible = OS.get_cmdline_user_args().has("--debug")
+	ui_root.add_child(debug_overlay)
+
+
+## F3 shows or hides the frame rate and the place (R16).
+func _unhandled_key_input(event: InputEvent) -> void:
+	var key := event as InputEventKey
+	if key and key.pressed and not key.echo and key.physical_keycode == KEY_F3:
+		debug_overlay.visible = not debug_overlay.visible
+
+
+func _update_debug_overlay() -> void:
+	if not debug_overlay.visible:
+		return
+	var pos := player.global_position
+	var lines := ["%d fps, %.1f ms" % [Engine.get_frames_per_second(), 1000.0 / maxf(Engine.get_frames_per_second(), 1.0)],
+			"X %.1f  Y %.2f  Z %.1f" % [pos.x, pos.y, pos.z]]
+	if vung_tau != null:
+		var lonlat := vung_tau.data.projection.game_to_lonlat(pos.x, pos.z)
+		var road := vung_tau.road_at(pos)
+		var counts := vung_tau.loaded_counts()
+		lines.append("%.6f N, %.6f E" % [lonlat[1], lonlat[0]])
+		lines.append("Ground %.2f m" % vung_tau.ground_height(pos.x, pos.z))
+		lines.append("Road: %s" % (road.get("name", "") if not road.is_empty() else "-"))
+		lines.append("Chunks: %d near, %d mid, %d far" % [counts.near, counts.mid, counts.far])
+	debug_overlay.text = "\n".join(lines)
+	debug_overlay.position = Vector2(12, top_bar.size.y + 8)
