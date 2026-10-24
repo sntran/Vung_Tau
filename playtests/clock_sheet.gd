@@ -5,7 +5,11 @@ extends RefCounted
 # player at the homestay door, and the morning message. The action "Rest" at
 # the homestay opens the Clock app. Start at 23:00, wait one hour: the clock
 # stops at 23:59, and cô Nga sends the "late" message.
+# Run 1 uses the wait choices of the day. Run 2 starts at 18:30: away from
+# the homestay, then back at the homestay to sleep. Each run is shorter than
+# 180 s at 2400×1080 on a slow computer.
 # phase: --start-time=06:00
+# phase: --start-time=18:30 --fresh-save
 # phase: --start-time=23:00 --fresh-save
 
 const ALL_WAITS := ["clock.wait_hour", "clock.wait_1100", "clock.wait_1500", "clock.wait_1830",
@@ -14,10 +18,13 @@ const ALL_WAITS := ["clock.wait_hour", "clock.wait_1100", "clock.wait_1500", "cl
 
 func run(d: PlaytestDriver) -> void:
 	await d.skip_intro()
-	if d.phase == 1:
-		await _day(d)
-	else:
-		await _late(d)
+	match d.phase:
+		1:
+			await _day(d)
+		2:
+			await _evening(d)
+		_:
+			await _late(d)
 
 
 ## The test IDs of the choices that the Clock app shows.
@@ -43,6 +50,8 @@ func _day(d: PlaytestDriver) -> void:
 	await _wait(d, "clock.wait_1830", 1110, ["clock.wait_hour", "clock.wait_1830", "clock.wait_2030", "clock.sleep"])
 	await d.lower_phone()
 
+
+func _evening(d: PlaytestDriver) -> void:
 	# Away from the homestay, the app does not show "Sleep until morning".
 	await d.stick_to(Vector3(12.0, 0.0, 0.2))
 	await d.open_app("clock")

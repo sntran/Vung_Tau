@@ -3,12 +3,11 @@ extends RefCounted
 # the beach wall for 3 s. After each push, the capsule must not intersect a
 # collision shape. The player must stay on the floor. Look at a wall from
 # 0.3 m. The screenshot must not show the inside of the wall.
-# Runs 1 to 3: the house walls of the hẻm, the bánh mì cart, and the stools of
-# the cà phê cóc (06:00). Run 4:
+# Runs 1 to 3: the house walls of the hẻm and the bánh mì cart (06:00). Run 4:
 # the beach wall, the palm trees, and the water. Runs 5 and 6: the carts of
 # 15:00 (nước mía, hột vịt lộn) and of 18:30 (hủ tiếu gõ). Runs 7 and 8: the
-# other walls. Each run has few pushes, so that it is shorter than 180 s at
-# 2400×1080 on a slow computer.
+# other walls. Run 9: the stools of the cà phê cóc (06:00). Each run has few
+# pushes, so that it is shorter than 180 s at 2400×1080 on a slow computer.
 # phase: --start-time=06:00
 # phase: --start-time=06:00 --fresh-save
 # phase: --start-time=06:00 --fresh-save
@@ -17,6 +16,7 @@ extends RefCounted
 # phase: --start-time=18:30 --fresh-save
 # phase: --start-time=12:00 --fresh-save
 # phase: --start-time=12:00 --fresh-save
+# phase: --start-time=06:00 --fresh-save
 
 const CARTS := {1: ["banhmi"], 5: ["mia", "hvl"], 6: ["go"]}
 ## The house walls of the main row (not the open shops) in runs 1 to 3.
@@ -41,7 +41,7 @@ func run(d: PlaytestDriver) -> void:
 		for lot: Dictionary in walls.slice(part[0], part[1]):
 			var x: float = hem.lot_x[lot.id]
 			await _push(d, "wall of " + lot.id, Vector3(x + 0.8, 0, 0), Vector3(x + 0.8, 1.6, -half))
-	if d.phase == 3:
+	if d.phase == 9:
 		# The stools of the cà phê cóc (open at 06:00): the player walks into
 		# them but does not step up on them (they are higher than a step).
 		var stall: Node3D = hem.get_node("StallOpen_coc")
