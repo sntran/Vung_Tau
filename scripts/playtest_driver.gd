@@ -277,11 +277,27 @@ func look_at_point(point: Vector3, tolerance := 2.0, timeout_s := 30.0) -> bool:
 		# look(-relative.x * k, -relative.y * k * invert): the drag that gives the error.
 		var move := Vector2(-error_yaw / per_pixel, -error_pitch / per_pixel * invert)
 		var view := viewport().get_visible_rect().size
+		# The drag must end on the world, not on the top bar or the talk panel:
+		# at a low frame rate, the drag has only its first and last points, and
+		# a control under the last point takes the touch.
+		var blocked: Array[Rect2] = [Rect2(s.top_bar_rect.position, s.top_bar_rect.size + Vector2(0, 10))]
+		if s.mode == "hem" and main().talk_panel.visible:
+			blocked.append((s.panel_rect as Rect2).grow(10.0))
+		var free_end := func(end: Vector2) -> Vector2:
+			end = end.clamp(Vector2(5, 5), view - Vector2(5, 5))
+			for rect: Rect2 in blocked:
+				if rect.has_point(end):
+					# Out of the control on the shorter way: down, or to the left.
+					if rect.end.y - end.y < end.x - rect.position.x or rect.position.x <= 5.0:
+						end.y = rect.end.y + 1.0
+					else:
+						end.x = rect.position.x - 1.0
+			return end
 		# Start at the free point with the most room for the drag.
 		var from := Vector2.ZERO
 		var best_room := -1.0
 		for candidate: Vector2 in await _free_points("look"):
-			var drag_end := (candidate + move).clamp(Vector2(5, 5), view - Vector2(5, 5))
+			var drag_end: Vector2 = free_end.call(candidate + move)
 			var room := (drag_end - candidate).length()
 			if room > best_room:
 				best_room = room
@@ -289,7 +305,7 @@ func look_at_point(point: Vector3, tolerance := 2.0, timeout_s := 30.0) -> bool:
 		if best_room < 0.0:
 			fail("no free point in the look zone")
 			return false
-		move = (from + move).clamp(Vector2(5, 5), view - Vector2(5, 5)) - from
+		move = free_end.call(from + move) - from
 		# A drag needs more than 12 px to turn the view. The turn is the
 		# distance from the press to the release, so a short turn goes out
 		# 16 px first and then back to the end point.
@@ -472,11 +488,17 @@ func _tap_point(test_id: String) -> Dictionary:
 	if where.error != "":
 		return where
 	var cover: String = await _check_cover(where.node, where.point, test_id)
+	# The check waits some frames. At a low frame rate, the UI can change in that
+	# time (for example the choices of a new line).
+	if not is_instance_valid(where.node):
+		return {"error": "%s is gone" % test_id, "point": Vector2.ZERO}
 	if cover != "" and where.node is Node3D:
 		# A player taps a part of the object that they can see. Try the center
 		# dot and the corners of the shape.
 		for point: Vector2 in _other_points(where.node):
 			var other: String = await _check_cover(where.node, point, test_id)
+			if not is_instance_valid(where.node):
+				return {"error": "%s is gone" % test_id, "point": Vector2.ZERO}
 			if other == "":
 				where.point = point
 				cover = ""
@@ -1084,11 +1106,13 @@ func stick_along(route: PackedVector3Array, to: float, check := Callable(), ahea
 			break
 		# Near a sharp turn (a hairpin), the aim point is near, so that the walk does
 		# not cut the corner.
-		# After a step without movement, aim at a near point of the route.
-		var step := ahead if stuck == 0 else 3.0
+		# After a step without movement, or away from the middle of the route,
+		# aim at a near point of the route.
 		var now := route_point(route, here)
+		var off := Vector2(pos.x - now.x, pos.z - now.z).length()
+		var step := ahead if stuck == 0 and off < 1.0 else 4.0
 		var soon := route_point(route, minf(here + 3.0, to))
-		while step > 4.0 and stuck == 0:
+		while step > 4.0:
 			var far := route_point(route, minf(here + step, to))
 			var a := Vector2(soon.x - now.x, soon.z - now.z)
 			var b := Vector2(far.x - now.x, far.z - now.z)

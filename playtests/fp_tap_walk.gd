@@ -46,8 +46,10 @@ func run(d: PlaytestDriver) -> void:
 	var goal := Vector3(at.x - 10.0, 0, 0)
 	await d.look_at_point(goal, 5.0)
 	await d.tap_floor(goal)
-	await d.wait_frames(10)
-	d.expect(d.state().walking, "the tap walk starts")
+	# Wait only until the walk starts: at a low frame rate, ten frames are a
+	# long walk.
+	d.expect(await d.wait_until(func() -> bool: return d.state().walking, 10.0, "the tap walk starts"),
+			"the tap walk starts")
 	await d.hold_stick(Vector2(1, 0), 0.3)
 	await d.wait_idle()
 	s = d.state()
@@ -55,10 +57,10 @@ func run(d: PlaytestDriver) -> void:
 	d.expect(Vector2(s.player.x - goal.x, s.player.z - goal.z).length() > 3.0, "the player did not walk to the goal: %s" % s.player)
 	# A look drag also stops a tap walk.
 	at = s.player
-	goal = Vector3(at.x + 8.0, 0, 0)
+	goal = Vector3(at.x + 12.0, 0, 0)
 	await d.look_at_point(goal, 5.0)
 	await d.tap_floor(goal)
-	await d.wait_frames(10)
+	await d.wait_until(func() -> bool: return d.state().walking, 10.0, "the second tap walk starts")
 	var start := d.to_screen(await d._free_point("look"))
 	await d.drag(start, start + Vector2(0, 40), 0.3)
 	await d.wait_idle()

@@ -25,6 +25,9 @@
 #                                          The argument --fresh-save deletes
 #                                          the save file before the run.
 #
+# The environment variable PLAYTEST_MAX_FPS limits the frame rate, so that a
+# fast computer can test like a slow one (for example PLAYTEST_MAX_FPS=3).
+#
 # A play test fails when an expect() fails or a wait times out, when Godot
 # prints "SCRIPT ERROR" or "ERROR:" (not the audio driver lines), or when the
 # scenario takes more than 180 seconds.
@@ -120,7 +123,7 @@ run_one() {
     fi
     # shellcheck disable=SC2086
     timeout "$TIME_LIMIT" xvfb-run -a -s "-screen 0 2560x2560x24" \
-      "$GODOT" --path "$ROOT" $RENDERER_ARGS --audio-driver Dummy \
+      "$GODOT" --path "$ROOT" $RENDERER_ARGS --audio-driver Dummy ${PLAYTEST_MAX_FPS:+--max-fps "$PLAYTEST_MAX_FPS"} \
       --resolution "$run_size" -- \
       --playtest="$scenario" --out="$out" --save-path="$out/save.json" --phase="$n" $args \
       >"$log" 2>&1 &
