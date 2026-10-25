@@ -243,3 +243,63 @@ def test_town_anchors():
     assert found[2]["name"] == "Vòng xoay"
     assert found[3]["name"] == "Ngã Năm" and found[3]["osm"] == "node/50"
     assert [a["number"] for a in found] == [1, 2, 3, 4]
+
+
+def _sea_grid(size=200, step=2.0, floor=-4.0):
+    """A grid of sea at the height floor, from game (0, 0), with land at x < 20 m."""
+    n = int(size / step) + 1
+    grid = terrain.Grid(0.0, 0.0, step, np.full((n, n), floor, dtype=np.float32))
+    cols = np.arange(n) * step
+    land = np.broadcast_to(cols < 20.0, (n, n)).copy()
+    grid.heights[land] = 2.0
+    return grid, land
+
+
+def test_rock_band():
+    """R8h: the path is from top - rough to top, the band has outcrops and pools, and the land does not change."""
+    grid, land = _sea_grid()
+    # Map y is -game z: the band goes east along game z = 100.
+    line = LineString([(10.0, -100.0), (180.0, -100.0)])
+    band = line.buffer(15.0, cap_style="flat")
+    before = grid.heights.copy()
+    stats = terrain.make_rock_band(grid, land, line, band, -1.7, 4.0, 0.08, 0.35, -0.45)
+    path = grid.sample(np.linspace(30, 170, 50), np.full(50, 100.0))
+    assert path.max() <= -1.7 + 1e-3 and path.min() >= -1.7 - 0.08 - 0.02
+    rows = slice(int(88 / 2), int(112 / 2))
+    sides = grid.heights[rows, 15:85]
+    assert sides.max() > -1.7 + 0.2, "outcrops rise above the path"
+    assert sides.min() < -1.7 - 0.25, "tide pools go below the path"
+    assert sides.max() <= -1.7 + 0.35 + 1e-3
+    assert np.array_equal(grid.heights[land], before[land])
+    assert grid.heights[int(150 / 2), 50] == pytest.approx(-4.0), "far from the band, the sea floor stays"
+    assert stats["band_cells"] > 0 and stats["path_cells"] > 0
+
+
+def test_sand_flat():
+    """R8h: a sand flat at the height near the center, and the sea floor at the radius."""
+    grid, land = _sea_grid()
+    cells = terrain.make_sand_flat(grid, land, (60.0, -100.0), 60.0, -1.3)
+    assert grid.sample(np.array([60.0]), np.array([100.0]))[0] == pytest.approx(-1.3)
+    assert grid.sample(np.array([60.0]), np.array([165.0]))[0] == pytest.approx(-4.0)
+    assert grid.heights[0, 0] == 2.0 and cells > 0
+
+
+def test_roadworks_chain_starts_at_the_bottom():
+    """R11a: two ways of a road join at a shared node, and the cut starts at the lowest end."""
+    from types import SimpleNamespace as NS
+
+    from geodata import roadworks
+
+    def road(refs, points, heights):
+        return NS(name="Hải Đăng", refs=refs, points=np.array(points, dtype=float), heights=heights, width=6.0)
+
+    upper = road([2, 3], [(100, 0), (200, 0)], [10.0, 30.0])
+    lower = road([2, 1], [(100, 0), (0, 0)], [10.0, 2.0])
+    line = roadworks.chain([upper, lower])
+    assert line[0].tolist() == [0.0, 0.0, 2.0] and line[-1].tolist() == [200.0, 0.0, 30.0]
+    part = roadworks.cut(line, 150.0)
+    assert part[-1][0] == pytest.approx(150.0) and part[-1][2] == pytest.approx(20.0)
+    record, problems = roadworks.make({"road": "Hải Đăng", "from": "bottom", "length_m": 150, "widen_m": 3.0,
+                                       "planned_end": "2027", "contractor": "X", "sign": "Y", "work_hours": {}},
+                                      [upper, lower])
+    assert not problems and record["width_m"] == 9.0 and record["length_m"] == pytest.approx(150.0)

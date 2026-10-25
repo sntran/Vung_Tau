@@ -267,6 +267,40 @@
 			}
 		},
 		{
+			"id": "duc_me_bai_dau",
+			"name_vi": "Tượng Đức Mẹ Bãi Dâu",
+			"other_names": [
+				"Đức Mẹ Bãi Dâu",
+				"Bai Dau Virgin Mary Statue"
+			],
+			"search": [
+				{
+					"tags": {
+						"historic": "monument"
+					}
+				},
+				{
+					"tags": {
+						"memorial": "statue"
+					}
+				},
+				{
+					"tags": {
+						"tourism": "*"
+					}
+				},
+				{
+					"tags": {
+						"building": "*"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3715,
+				"lon": 107.0624
+			}
+		},
+		{
 			"id": "mieu_hon_ba",
 			"name_vi": "Miếu Hòn Bà",
 			"other_names": [

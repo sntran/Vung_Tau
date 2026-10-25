@@ -134,6 +134,19 @@
     <tag k="man_made" v="lighthouse" />
     <tag k="name" v="Hải đăng Vũng Tàu" />
   </node>
+  <node id="128" version="1" lat="10.34842296" lon="107.07043850" />
+  <node id="129" version="1" lat="10.34435214" lon="107.07095952" />
+  <node id="130" version="1" lat="10.34435448" lon="107.07059439" />
+  <node id="131" version="1" lat="10.34823455" lon="107.07162400" />
+  <node id="132" version="1" lat="10.34823044" lon="107.07226298" />
+  <node id="133" version="1" lat="10.34895352" lon="107.07226773" />
+  <node id="134" version="1" lat="10.34895763" lon="107.07162874" />
+  <node id="135" version="1" lat="10.34930271" lon="107.07418706" />
+  <node id="136" version="1" lat="10.34929683" lon="107.07509989" />
+  <node id="137" version="1" lat="10.34949817" lon="107.07190615">
+    <tag k="natural" v="tree" />
+    <tag k="genus" v="Delonix" />
+  </node>
   <way id="1000" version="1">
     <nd ref="1" />
     <nd ref="2" />
@@ -312,5 +325,29 @@
     <nd ref="125" />
     <nd ref="122" />
     <tag k="building" v="house" />
+  </way>
+  <way id="1012" version="1">
+    <nd ref="8" />
+    <nd ref="128" />
+    <tag k="man_made" v="pier" />
+  </way>
+  <way id="1013" version="1">
+    <nd ref="129" />
+    <nd ref="130" />
+    <tag k="man_made" v="groyne" />
+  </way>
+  <way id="1014" version="1">
+    <nd ref="131" />
+    <nd ref="132" />
+    <nd ref="133" />
+    <nd ref="134" />
+    <nd ref="131" />
+    <tag k="leisure" v="park" />
+    <tag k="name" v="Công viên thử" />
+  </way>
+  <way id="1015" version="1">
+    <nd ref="135" />
+    <nd ref="136" />
+    <tag k="natural" v="tree_row" />
   </way>
 </osm>

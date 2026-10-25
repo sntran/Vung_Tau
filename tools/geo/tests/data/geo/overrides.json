@@ -38,6 +38,23 @@
 			"tags": {
 				"surface": "asphalt"
 			}
+		},
+		{
+			"action": "roadworks",
+			"road": "Đường lên Hải Đăng",
+			"from": "bottom",
+			"length_m": 250,
+			"widen_m": 3.0,
+			"planned_end": "2027",
+			"contractor": "Công ty thử",
+			"sign": "CÔNG TRÌNH THỬ",
+			"work_hours": {
+				"start": "07:00",
+				"lunch": "11:00",
+				"after_lunch": "13:00",
+				"end": "17:00"
+			},
+			"reason": "The test checks the roadworks."
 		}
 	]
 }

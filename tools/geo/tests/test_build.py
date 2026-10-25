@@ -15,7 +15,7 @@ def load(build, name):
 def test_all_files_exist(small_build):
     for name in ["world.json", "roads.json", "blocks.json", "buildings.json", "landmarks.json", "homestay.json",
                  "coastline.json", "land.json", "beaches.json", "report.md", "surface.png", "homestay_area.png",
-                 "height/overview.png"]:
+                 "height/overview.png", "roadworks.json", "sea_objects.json", "trees.json"]:
         assert (small_build / name).exists(), name
 
 
@@ -149,8 +149,66 @@ def test_homestay_hem(small_build):
     assert home["blocks"], "the blocks along the hẻm are in the record"
 
 
+def test_roadworks(small_build):
+    """R11a: the first part of the road from its lowest end, with the homestay hẻm at the corner."""
+    works = load(small_build, "roadworks.json")["roadworks"]
+    assert len(works) == 1
+    work = works[0]
+    assert work["road"] == "Đường lên Hải Đăng"
+    assert work["length_m"] == pytest.approx(250.0, abs=0.5)
+    pts = np.array(work["points"])
+    assert pts[0, 1] < pts[-1, 1], "the roadworks start at the bottom"
+    # The game origin is the center of the beach, at about x = -180 in the design of make_small.py.
+    assert pts[0, 0] == pytest.approx(-140.0 + 180.0, abs=8.0), "the bottom is at the coast road"
+    assert work["width_m"] > 3.0
+    assert work["corner"]["hem"] == "Hẻm 42"
+    assert work["corner"]["distance_m"] == pytest.approx(211.2, abs=5.0)
+    assert work["work_hours"]["start"] == "07:00"
+
+
+def test_sea_objects(small_build):
+    """R13a: the ships and the boats are in the sea, the pier and the groyne come from OSM."""
+    sea = load(small_build, "sea_objects.json")
+    ground = Ground(small_build)
+    assert len(sea["cargo_ships"]) == 3 and len(sea["fishing_boats"]) == 4
+    for ship in sea["cargo_ships"]:
+        x, z = ship["position"]
+        assert x < -20.0 and ground.height(x, z) <= -3.5
+        assert 120 <= ship["length_m"] <= 200 and ship["kind"] in ("container", "bulk", "tanker")
+    for a in sea["cargo_ships"]:
+        for b in sea["cargo_ships"]:
+            if a is not b:
+                assert np.hypot(a["position"][0] - b["position"][0], a["position"][1] - b["position"][1]) >= 150
+    for boat in sea["fishing_boats"]:
+        x, z = boat["position"]
+        assert x < -20.0 and ground.height(x, z) <= -1.5
+    assert [p["osm"] for p in sea["ferry_pier"]["parts"]] == ["way/1012"]
+    assert [g["osm"] for g in sea["groynes"]["lines"]] == ["way/1013"]
+
+
+def test_trees(small_build):
+    """R12a: trees along the main roads and in the park, not on a road or in the sea."""
+    trees = load(small_build, "trees.json")["types"]
+    roads = load(small_build, "roads.json")["roads"]
+    assert "flame" in trees, "the OSM tree with the genus Delonix is a flame tree"
+    assert "casuarina" in trees, "the coast road has casuarinas"
+    assert any(k in trees for k in ("coconut", "fan_palm")), "the park near Bãi Trước has palms"
+    for points in trees.values():
+        for x, h, z in points:
+            assert x > -20.0, "no tree is in the sea"
+    # No tree stands on a road that is not its own sidewalk road.
+    narrow = [r for r in roads if r["sidewalk"] == "" and r["type"] != "footway"]
+    for points in trees.values():
+        for x, _h, z in points:
+            for road in narrow:
+                pts = np.array(road["points"])[:, [0, 2]]
+                d = np.min(np.linalg.norm(pts - np.array([x, z]), axis=1))
+                assert d > road["width"] / 2.0 - 0.5, (road["name"], x, z)
+
+
 def test_report(small_build):
     report = (small_build / "report.md").read_text(encoding="utf-8")
     for text in ["## Extents", "## Roads", "## Blocks and buildings", "## Landmarks", "## Homestay hẻm",
-                 "## Problems with the data", "Bãi Sau | **no**", "has no reason", "finds no way"]:
+                 "## Problems with the data", "Bãi Sau | **no**", "has no reason", "finds no way", "## Roadworks (R11a)",
+                 "## Objects on the sea (R13a)", "## Trees (R12a)", "the pier way 999998"]:
         assert text in report, text

@@ -170,6 +170,75 @@ def make_ridge(grid: Grid, land: np.ndarray, line, top: float, width: float) -> 
     return int((core & sea).sum())
 
 
+def _window(grid: Grid, bounds, margin: float) -> tuple[slice, slice]:
+    """The rows and the columns of the grid around map bounds (min_x, min_y, max_x, max_y)."""
+    min_x, min_y, max_x, max_y = bounds
+    rows, cols = grid.shape
+    c0 = max(0, int((min_x - margin - grid.x0) / grid.step))
+    c1 = min(cols, int((max_x + margin - grid.x0) / grid.step) + 2)
+    r0 = max(0, int((-max_y - margin - grid.z0) / grid.step))
+    r1 = min(rows, int((-min_y + margin - grid.z0) / grid.step) + 2)
+    return slice(r0, r1), slice(c0, c1)
+
+
+def _smooth_noise(shape, rng: np.random.Generator, sigma: float) -> np.ndarray:
+    """Smooth noise from -1 to 1, with the detail size sigma in cells."""
+    noise = ndimage.gaussian_filter(rng.standard_normal(shape), sigma=sigma, mode="nearest")
+    scale = float(np.percentile(np.abs(noise), 97)) or 1.0
+    return np.clip(noise / scale, -1.0, 1.0).astype(np.float32)
+
+
+def make_rock_band(grid: Grid, land: np.ndarray, line, band, top: float, width: float, rough: float,
+                   outcrop: float, pool: float, seed: int = 8) -> dict:
+    """The rock path to Hòn Bà (R8h): a rough band of rocks in the sea. On
+    the path (width around line), the rocks are from top - rough to top, so the
+    path is dry when the sea is below top. In the rest of the band, outcrops
+    rise up to top + outcrop, and tide pools go down to top + pool. Out of the
+    band, the rocks slope down to the sea floor. line and band are shapely
+    shapes in map coordinates. Only the sea cells change."""
+    rows, cols = _window(grid, band.bounds, 12.0)
+    core = rasterize(grid, [line.buffer(width / 2.0)])[rows, cols]
+    inside = rasterize(grid, [band])[rows, cols]
+    rng = np.random.default_rng(seed)
+    big = _smooth_noise(core.shape, rng, 2.0)
+    small = _smooth_noise(core.shape, rng, 0.7)
+    rocks = np.where(big > 0, big * outcrop, -big * pool) + small * 0.08
+    rocks = np.minimum(top + rocks, top + outcrop)
+    path = top - rough * (0.5 + 0.5 * small)
+    heights = np.where(core, path, np.where(inside, rocks, -np.inf)).astype(np.float32)
+    distance = ndimage.distance_transform_edt(~(inside | core)).astype(np.float32) * grid.step
+    side = np.where(inside | core, heights, top - 0.3 - distance * RIDGE_SIDE_SLOPE)
+    h = grid.heights[rows, cols]
+    sea = ~land[rows, cols]
+    band_cells = (inside | core) & sea
+    h[band_cells] = side[band_cells]
+    outer = ~(inside | core) & sea
+    h[outer] = np.maximum(h[outer], side[outer])
+    grid.heights[rows, cols] = h
+    return {"band_cells": int(band_cells.sum()), "path_cells": int((core & sea).sum()),
+            "min_m": round(float(h[band_cells].min()), 2) if band_cells.any() else None,
+            "max_m": round(float(h[band_cells].max()), 2) if band_cells.any() else None}
+
+
+def make_sand_flat(grid: Grid, land: np.ndarray, center: tuple[float, float], radius: float, height: float) -> int:
+    """A sand flat in the sea around a map point (R8h): flat at height to 60 %
+    of the radius, then down to the sea floor at the radius. Returns the
+    number of sea cells at the flat height."""
+    x, y = center
+    rows, cols = _window(grid, (x - radius, y - radius, x + radius, y + radius), 4.0)
+    r_index, c_index = np.mgrid[rows, cols]
+    gx = grid.x0 + c_index * grid.step
+    gz = grid.z0 + r_index * grid.step
+    d = np.hypot(gx - x, gz + y)
+    part = np.clip((d - radius * 0.6) / (radius * 0.4), 0.0, 1.0)
+    flat = height - part * (height + SEA_FLOOR_DEPTH)
+    h = grid.heights[rows, cols]
+    sea = ~land[rows, cols]
+    np.maximum(h, flat, out=h, where=sea)
+    grid.heights[rows, cols] = h
+    return int((sea & (part == 0)).sum())
+
+
 def smooth_profile(heights: np.ndarray, spacing: float, length: float) -> np.ndarray:
     n = max(1, int(round(length / max(spacing, 0.1))))
     if n <= 1 or len(heights) < 3:

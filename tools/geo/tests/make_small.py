@@ -13,6 +13,8 @@ again only when the design changes, and commit the files.
   near (20, -180), and goes up to the lighthouse.
 - "Hẻm 42" leaves the curve end (42, -150) to the east: it is the homestay hẻm.
   Two other hẻm are wrong candidates.
+- Plan 0005, R12a and R13a: a pier (way 1012) and a groyne (way 1013) in the
+  sea, a park near the beach (way 1014), an OSM tree, and a tree row (way 1015).
 """
 
 import math
@@ -107,6 +109,11 @@ def make_osm(path: Path):
     w.way([(60, -140), (75, -140), (75, -125), (60, -125)], {"building": "house"}, closed=True)
     w.node(245, 0, {"natural": "peak", "name": "Núi Nhỏ", "ele": "180"})
     w.node(250, 5, {"man_made": "lighthouse", "name": "Hải đăng Vũng Tàu"})
+    w.way([(-200, 200), (-260, 200)], {"man_made": "pier"})
+    w.way([(-200, -250), (-240, -250)], {"man_made": "groyne"})
+    w.way([(-130, 180), (-60, 180), (-60, 260), (-130, 260)], {"leisure": "park", "name": "Công viên thử"}, closed=True)
+    w.way([(150, 300), (250, 300)], {"natural": "tree_row"})
+    w.node(-100, 320, {"natural": "tree", "genus": "Delonix"})
     w.write(path)
 
 

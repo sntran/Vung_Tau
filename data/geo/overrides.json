@@ -1,5 +1,5 @@
 {
-	"note": "Corrections to the OSM data (plan 0005, R7). tools/geo/build.py applies them after it reads the OSM data. Each correction must have a reason. Actions: add_node (tags, lon, lat), add_way (tags and coords as [lon, lat]), set_tags (way and tags; a null value removes the tag), remove_way (way).",
+	"note": "Corrections to the OSM data (plan 0005, R7). tools/geo/build.py applies them after it reads the OSM data. Each correction must have a reason. Actions: add_node (tags, lon, lat), add_way (tags and coords as [lon, lat]; closed: true for an area), set_tags (way and tags; a null value removes the tag), remove_way (way). The action roadworks (R11a) adds no shape: it puts roadworks on a part of a road. A later plan removes it when the work ends.",
 	"corrections": [
 		{
 			"action": "add_node",
@@ -11,6 +11,80 @@
 			"lon": 107.0774,
 			"lat": 10.3343,
 			"reason": "OSM has no object for Núi Nhỏ. The position is the highest point of the Copernicus DEM on the hill (177.9 m), next to the lighthouse."
+		},
+		{
+			"action": "add_way",
+			"closed": true,
+			"tags": {
+				"name": "Bãi đá ra Hòn Bà",
+				"natural": "shoal",
+				"surface": "rock",
+				"tidal": "yes"
+			},
+			"coords": [
+				[
+					107.08883,
+					10.323906
+				],
+				[
+					107.088224,
+					10.324171
+				],
+				[
+					107.087976,
+					10.324309
+				],
+				[
+					107.087577,
+					10.324579
+				],
+				[
+					107.087034,
+					10.325024
+				],
+				[
+					107.087208,
+					10.325233
+				],
+				[
+					107.087741,
+					10.324796
+				],
+				[
+					107.088121,
+					10.324539
+				],
+				[
+					107.088341,
+					10.324416
+				],
+				[
+					107.088941,
+					10.324154
+				],
+				[
+					107.08883,
+					10.323906
+				]
+			],
+			"reason": "R8h: OSM has only the line of the path (way 221906223, a track), with no outline of the rocks. This band is 30 m wide: the path line with 15 m on each side, and 12 m more at each end, so that it touches the beach below Mũi Nghinh Phong and the islet. The heights of the rocks are in hon_ba.json."
+		},
+		{
+			"action": "roadworks",
+			"road": "Hải Đăng",
+			"from": "bottom",
+			"length_m": 220,
+			"widen_m": 3.0,
+			"planned_end": "2027",
+			"contractor": "Công ty TNHH Xây dựng Gió Biển",
+			"sign": "CÔNG TRÌNH MỞ RỘNG ĐƯỜNG HẢI ĐĂNG",
+			"work_hours": {
+				"start": "07:00",
+				"lunch": "11:00",
+				"after_lunch": "13:00",
+				"end": "17:00"
+			},
+			"reason": "R11a: the first 220 m of the Hải Đăng road from the bottom are being widened, and the work is planned to end in 2027 (Zing: https://lifestyle.zingnews.vn/mo-rong-duong-len-ngon-hai-dang-song-ao-164-nam-tuoi-o-vung-tau-post1668055.html). The contractor name is fictional. The width added to the road (widen_m) and the lunch break are builder values: check."
 		}
 	]
 }

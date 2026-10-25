@@ -36,6 +36,10 @@ class Config:
         self.overrides = load_json(overrides)["corrections"] if overrides.exists() else []
         hon_ba = geo / "hon_ba.json"
         self.hon_ba = load_json(hon_ba) if hon_ba.exists() else None
+        sea_objects = geo / "sea_objects.json"
+        self.sea_objects = load_json(sea_objects) if sea_objects.exists() else None
+        trees = geo / "trees.json"
+        self.trees = load_json(trees) if trees.exists() else None
 
     @property
     def bbox(self) -> tuple[float, float, float, float]:

@@ -1,0 +1,44 @@
+{
+	"note": "The sea objects for the tests.",
+	"seed": 5,
+	"cargo_ships": {
+		"count": 3,
+		"length_m": [120, 200],
+		"kinds": ["container", "bulk", "tanker"],
+		"heading_deg": 200,
+		"heading_spread_deg": 25,
+		"min_spacing_m": 150,
+		"min_floor_m": -3.5,
+		"areas": [
+			{
+				"name": "Test anchorage",
+				"share": 1.0,
+				"polygon": [[107.067108, 10.341665], [107.069299, 10.341651], [107.069364, 10.351593], [107.067173, 10.351608], [107.067108, 10.341665]]
+			}
+		]
+	},
+	"fishing_boats": {
+		"count": 4,
+		"length_m": [8, 14],
+		"min_spacing_m": 15,
+		"min_floor_m": -1.5,
+		"areas": [
+			{
+				"name": "Test bay",
+				"share": 1.0,
+				"polygon": [[107.069507, 10.345537], [107.070511, 10.34553], [107.070525, 10.347699], [107.069521, 10.347706], [107.069507, 10.345537]]
+			}
+		]
+	},
+	"ferry_pier": {
+		"name": "Bến thử",
+		"osm_ways": [1012, 999998],
+		"width_m": 6.0,
+		"deck_m": 2.8
+	},
+	"groynes": {
+		"tags": [["man_made", "groyne"], ["man_made", "breakwater"]],
+		"width_m": 4.0,
+		"height_m": 1.6
+	}
+}

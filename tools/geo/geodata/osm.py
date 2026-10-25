@@ -50,6 +50,8 @@ class OsmData:
     lat_range: tuple[float, float] = (0.0, 0.0)
     problems: list[str] = field(default_factory=list)
     corrections: list[str] = field(default_factory=list)
+    # The roadworks of overrides.json (R11a). They are not shapes.
+    roadworks: list[dict] = field(default_factory=list)
 
 
 class _Handler(osmium.SimpleHandler):
@@ -127,6 +129,9 @@ def apply_corrections(data: OsmData, corrections: list[dict]) -> None:
                 way.refs[-1] = way.refs[0]
             data.ways.append(way)
             data.corrections.append(f"add way {way.id} ({c['tags']}): {reason}")
+        elif action == "roadworks":
+            data.roadworks.append(c)
+            data.corrections.append(f"roadworks on {c['road']} ({c['length_m']} m from the {c['from']}): {reason}")
         elif action in ("set_tags", "remove_way"):
             way = by_id.get(int(c["way"]))
             if way is None:

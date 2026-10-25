@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from geodata import blocks as blocks_module  # noqa: E402
 from geodata import anchors as anchors_module  # noqa: E402
 from geodata import coast, homestay, landmarks, mapdraw, osm, roads as roads_module, terrain  # noqa: E402
+from geodata import roadworks as roadworks_module, sea as sea_module, trees as trees_module  # noqa: E402
 from geodata.config import BUILD, GEO, RAW, Config, load_json, write_json  # noqa: E402
 from geodata.projection import Projection, map_to_game  # noqa: E402
 
@@ -91,7 +92,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
 
     box = coast.box_polygon(config.bbox, projection)
     land = coast.land_polygon(coast.coastline_lines(data.ways, projection), box, problems)
-    beaches, beach_records, buildings, landuse, woods, water, rocks = [], [], [], [], [], [], []
+    beaches, beach_records, buildings, landuse, woods, water, rocks, parks = [], [], [], [], [], [], [], []
     for a in data.areas:
         shape = to_map_geometry(a.geometry, projection).intersection(box)
         if shape.is_empty:
@@ -109,6 +110,8 @@ def build(raw: Path, out: Path, geo: Path) -> int:
             water.append(shape)
         if a.tags.get("natural") in SEA_ROCK_TAGS:
             rocks.append(shape)
+        if a.tags.get("leisure") == "park":
+            parks.extend(polygons_of(shape))
     for n in data.nodes:
         if n.tags.get("natural") in SEA_ROCK_TAGS:
             x, y = projection.to_map(np.array([n.lon]), np.array([n.lat]))
@@ -135,14 +138,34 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     terrain.shape_coast(grid, land_mask, beach_mask)
     rock_cells = terrain.raise_sea_rocks(grid, land_mask, terrain.rasterize(grid, [p for r in rocks for p in polygons_of(r)]))
     ridge = None
+    rock_band = None
     if ridge_way is not None:
         lon, lat = zip(*ridge_way.coords)
         x, y = projection.to_map(np.array(lon), np.array(lat))
         line = shapely.LineString(np.column_stack([x, y]))
         top, width = float(config.hon_ba["ridge_top_m"]), float(config.hon_ba["ridge_width_m"])
-        cells = terrain.make_ridge(grid, land_mask, line, top, width)
         ridge = {"name": config.hon_ba["ridge_name"], "osm": f"way/{ridge_way.id}", "top_m": top, "width_m": width,
-                 "length_m": round(line.length, 1), "sea_cells": cells, "points": map_to_game(line.coords)}
+                 "length_m": round(line.length, 1), "points": map_to_game(line.coords)}
+        band_way = find_band(config, data)
+        if band_way is None:
+            ridge["sea_cells"] = terrain.make_ridge(grid, land_mask, line, top, width)
+        else:
+            band = to_map_geometry(Polygon(band_way.coords), projection)
+            h = config.hon_ba
+            stats = terrain.make_rock_band(grid, land_mask, line, band, top, width, float(h["path_rough_m"]),
+                                           float(h["outcrop_m"]), float(h["pool_m"]))
+            beach_end = shore_end(line, h["islet"], projection)
+            flat_cells = terrain.make_sand_flat(grid, land_mask, beach_end, float(h["sand_flat_radius_m"]),
+                                                float(h["sand_flat_m"]))
+            sea_band = band.difference(land)
+            ridge |= {"sea_cells": stats["path_cells"], "band": {
+                "name": h["band_name"], "width_m": round(band.area / max(line.length, 1.0), 1),
+                "polygons": [blocks_module.polygon_to_game(p) for p in polygons_of(band)],
+                "sea_cells": stats["band_cells"], "min_m": stats["min_m"], "max_m": stats["max_m"]},
+                "sand_flat": {"center": map_to_game([beach_end])[0], "radius_m": float(h["sand_flat_radius_m"]),
+                              "height_m": float(h["sand_flat_m"]), "cells": flat_cells}}
+            rock_band = sea_band
+            log(f"Hòn Bà rock band {sea_band.area:.0f} m2 from {stats['min_m']:+.2f} to {stats['max_m']:+.2f} m")
         log(f"Hòn Bà ridge {line.length:.0f} m at {top:+.2f} m")
     log(f"{len(rocks)} rocks, {rock_cells} sea rock cells")
     terrain.flatten_roads(grid, roads, ROAD_POINT_STEP_M)
@@ -162,6 +185,41 @@ def build(raw: Path, out: Path, geo: Path) -> int:
         beach_outline = to_map_geometry(beach_outline_lonlat, projection)
     home = homestay.find(roads, network, found_by_id, beach_outline, block_list)
 
+    def floor_at(x, y):
+        return float(grid.sample(np.array([x]), np.array([-y]))[0])
+
+    works = []
+    for spec in data.roadworks:
+        record, found_problems = roadworks_module.make(spec, roads, home.get("hem"))
+        problems += found_problems
+        if record is not None:
+            works.append(record)
+            log(f"roadworks on {record['road']}: {record['length_m']} m")
+    sea_objects = None
+    if config.sea_objects is not None:
+        sea_objects, found_problems = sea_module.make(config.sea_objects, data.ways, projection, land, floor_at)
+        problems += found_problems
+        log(f"{len(sea_objects['cargo_ships'])} cargo ships, {len(sea_objects['fishing_boats'])} fishing boats, "
+            f"{len(sea_objects['groynes']['lines'])} groynes")
+    tree_record, tree_counts = None, {}
+    if config.trees is not None:
+        osm_trees, osm_rows = [], []
+        for n in data.nodes:
+            if n.tags.get("natural") == "tree":
+                x, y = projection.to_map(np.array([n.lon]), np.array([n.lat]))
+                osm_trees.append((float(x[0]), float(y[0]), n.tags))
+        for w in data.ways:
+            if w.tags.get("natural") == "tree_row":
+                lon, lat = zip(*w.coords)
+                x, y = projection.to_map(np.array(lon), np.array(lat))
+                osm_rows.append((shapely.LineString(np.column_stack([x, y])), w.tags))
+        near = found_by_id.get(config.trees["parks"]["near_landmark"])
+        near_point = shapely.Point(near["position"][0], -near["position"][1]) if near and near.get("found") else None
+        tree_record, tree_counts = trees_module.make(
+            config.trees, roads, land, beaches, parks, osm_trees, osm_rows, home.get("coast_road", ""), beach_outline,
+            near_point, lambda x, y: grid.sample(np.asarray(x), -np.asarray(y)))
+        log(f"{sum(len(v) for v in tree_record['types'].values())} trees: {tree_counts}")
+
     # Write the files. Keep the files of tide.py.
     kept = {name: (out / name).read_bytes() for name in TIDE_FILES if (out / name).exists()}
     if out.exists():
@@ -176,8 +234,9 @@ def build(raw: Path, out: Path, geo: Path) -> int:
                                       area["height_step_m"], out / "height" / "overview.png")
     for png in (out / "height").glob("*.png"):
         write_keep_import(png)
+    sea_rocks = terrain.rasterize(grid, [p for r in rocks + [rock_band] if r is not None for p in polygons_of(r)])
     surface = write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods, landuse, roads, area,
-                            out / "surface.png")
+                            out / "surface.png", sea_rocks & ~land_mask)
     write_keep_import(out / "surface.png")
 
     lon_min, lat_min = projection.map_to_lonlat(box.bounds[0], box.bounds[1])
@@ -217,6 +276,12 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     write_json(out / "buildings.json", {"buildings": [blocks_module.polygon_to_game(b.simplify(0.2)) for b in buildings]}, None)
     write_json(out / "landmarks.json", {"landmarks": found})
     write_json(out / "homestay.json", homestay_record(home))
+    write_json(out / "roadworks.json", {"note": "Made by tools/geo/build.py from overrides.json (R11a). Do not change by hand.",
+                                        "roadworks": works})
+    if sea_objects is not None:
+        write_json(out / "sea_objects.json", sea_objects)
+    if tree_record is not None:
+        write_json(out / "trees.json", tree_record, None)
     center = mapdraw.center_of(home)
     if center is not None:
         mapdraw.draw(out / "homestay_area.png", center, roads, land, beaches, block_list, buildings, home)
@@ -225,7 +290,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     write_keep_import(out / "anchors.png")
     write_json(out / "anchors.json", {"anchors": [{k: v for k, v in a.items() if k != "map"} for a in anchor_list]})
     write_report(out / "report.md", world, data, roads, block_list, buildings, found, home, problems,
-                 town_change, dem_max, raw, rock_cells, out, anchor_list)
+                 town_change, dem_max, raw, rock_cells, out, anchor_list, works, sea_objects, tree_record, tree_counts)
     log(f"done in {time.time() - started:.0f} s")
     return 0
 
@@ -239,6 +304,24 @@ def find_ridge(config: Config, data, problems: list[str]):
             return way
     problems.append(f"the Hòn Bà ridge (way {config.hon_ba['ridge_way']}) is not in the data. Put it in overrides.json.")
     return None
+
+
+def find_band(config: Config, data):
+    """The band of rocks around the Hòn Bà path (R8h): an area of overrides.json with the band name."""
+    name = config.hon_ba.get("band_name")
+    for way in data.ways:
+        if name and way.closed and way.tags.get("name") == name:
+            return way
+    return None
+
+
+def shore_end(line, islet: dict, projection) -> tuple[float, float]:
+    """The end of the path line that is farther from the islet: the beach end."""
+    x, y = projection.to_map(np.array([islet["lon"]]), np.array([islet["lat"]]))
+    point = shapely.Point(float(x[0]), float(y[0]))
+    first, last = shapely.Point(line.coords[0]), shapely.Point(line.coords[-1])
+    end = first if first.distance(point) > last.distance(point) else last
+    return (end.x, end.y)
 
 
 def road_record(road) -> dict:
@@ -256,9 +339,11 @@ def road_record(road) -> dict:
     return record
 
 
-def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods, landuse, roads, area, path) -> dict:
-    """An RGBA image for the ground materials: R is sand, G is town, B is wood,
-    A is the distance to the coastline (positive on land).
+def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods, landuse, roads, area, path,
+                  sea_rocks) -> dict:
+    """An RGBA image for the ground materials: R is sand, G is town, B is wood
+    on land and bare rock in the sea (R8h), A is the distance to the coastline
+    (positive on land).
 
     OSM has few building outlines in Vũng Tàu, so a place with many roads is
     also town: there, the roads cover more than TOWN_ROAD_COVER of the ground."""
@@ -283,7 +368,7 @@ def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods,
 
     alpha = np.clip(np.round((signed[::every, ::every] + limit) / (2 * limit) * 255), 0, 255).astype(np.uint8)
     # The sea floor is sand: the low tide shows it.
-    image = np.dstack([channel(beach_mask | ~land_mask), channel(town), channel(wood), alpha])
+    image = np.dstack([channel(beach_mask | (~land_mask & ~sea_rocks)), channel(town), channel(wood | sea_rocks), alpha])
     Image.fromarray(image, "RGBA").save(path)
     return {"x0": grid.x0, "z0": grid.z0, "step": grid.step * every, "columns": image.shape[1], "rows": image.shape[0],
             "coast_range_m": limit}
@@ -311,7 +396,8 @@ def homestay_record(home: dict) -> dict:
 
 
 def write_report(path, world, data, roads, block_list, buildings, found, home, problems, town_change, dem_max, raw,
-                 rock_cells=0, out=None, anchor_list=None):
+                 rock_cells=0, out=None, anchor_list=None, works=None, sea_objects=None, tree_record=None,
+                 tree_counts=None):
     manifest = load_json(raw / "manifest.json") if (raw / "manifest.json").exists() else {"files": []}
     lines = ["# Geodata report", "", f"Made by `tools/geo/build.py` on {datetime.date.today().isoformat()}.", ""]
     lines += ["## Extents", "", "| Item | Value |", "|---|---|",
@@ -365,6 +451,14 @@ def write_report(path, world, data, roads, block_list, buildings, found, home, p
     if ridge:
         lines.append(f"- The ridge {ridge['name']} ({ridge['osm']}): {ridge['length_m']:.0f} m long, "
                      f"{ridge['width_m']:.0f} m wide, top at {ridge['top_m']:+.2f} m.")
+        band = ridge.get("band")
+        if band:
+            lines.append(f"- The band of rocks {band['name']}: about {band['width_m']:.0f} m wide, {band['sea_cells']} "
+                         f"grid cells in the sea, from {band['min_m']:+.2f} m (tide pools) to {band['max_m']:+.2f} m "
+                         f"(outcrops).")
+            flat = ridge["sand_flat"]
+            lines.append(f"- The sand flat in front of the path: {flat['radius_m']:.0f} m around the beach end, at "
+                         f"{flat['height_m']:+.2f} m ({flat['cells']} grid cells).")
     else:
         lines.append("- The Hòn Bà ridge is not in the data.")
     tide_report = out / "tide_report.md" if out else None
@@ -376,6 +470,25 @@ def write_report(path, world, data, roads, block_list, buildings, found, home, p
     else:
         lines.append("- The tide: `tide.json` is not there. Run tools/geo/tide.py before build.py.")
         problems = problems + ["tide.json is not there"]
+    lines += ["", "## Roadworks (R11a)", ""]
+    for w in works or []:
+        corner = f" The homestay hẻm ({w['corner']['hem']}) is at {w['corner']['distance_m']:.0f} m." if "corner" in w else ""
+        lines.append(f"- {w['road']}: the first {w['length_m']:.0f} m from the {w['from']}, {w['width_m']:.1f} m wide, "
+                     f"planned to end in {w['planned_end']}.{corner}")
+    if not works:
+        lines.append("None.")
+    if sea_objects is not None:
+        pier = sea_objects["ferry_pier"]
+        lines += ["", "## Objects on the sea (R13a)", "",
+                  f"- {len(sea_objects['cargo_ships'])} cargo ships at anchor and "
+                  f"{len(sea_objects['fishing_boats'])} fishing boats.",
+                  f"- The ferry pier {pier['name']}: {', '.join(p['osm'] for p in pier['parts']) or 'not found'}.",
+                  f"- Groynes and breakwaters from OSM: "
+                  f"{', '.join(g['osm'] for g in sea_objects['groynes']['lines']) or 'none'}."]
+    if tree_record is not None:
+        lines += ["", "## Trees (R12a)", ""]
+        lines += [f"- {kind}: {len(points)}" for kind, points in tree_record["types"].items()]
+        lines.append("- From: " + ", ".join(f"{k} {v}" for k, v in sorted((tree_counts or {}).items())) + ".")
     lines += [""] + anchors_module.report_lines(anchor_list or [])
     lines += ["## Corrections from overrides.json", ""]
     lines += [f"- {c}" for c in data.corrections] or ["None."]

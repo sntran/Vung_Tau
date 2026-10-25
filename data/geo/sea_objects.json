@@ -1,0 +1,49 @@
+{
+	"note": "The objects on the sea (plan 0005, R13a). tools/geo/build.py puts the ships and the boats at random points in their areas (with the seed, so the result is always the same) and writes data/geo/build/sea_objects.json. A point on land, or where the sea floor is higher than min_floor_m, is not used. The pier and the groynes come from OSM. Areas are [lon, lat] points. The areas of the cargo ships and of the fishing boats are builder estimates from photos of the coast: check. The ships are 2 to 6 km from the beaches, because the camera sees 6 km in this world.",
+	"seed": 13,
+	"cargo_ships": {
+		"count": 20,
+		"length_m": [120, 230],
+		"kinds": ["container", "bulk", "tanker"],
+		"heading_deg": 200,
+		"heading_spread_deg": 25,
+		"min_spacing_m": 450,
+		"min_floor_m": -3.5,
+		"areas": [
+			{
+				"name": "Off Mũi Nghinh Phong and the mouth of the Gành Rái bay, seen from Bãi Trước and Bãi Dâu",
+				"share": 0.55,
+				"polygon": [[107.02, 10.285], [107.065, 10.29], [107.065, 10.322], [107.04, 10.334], [107.02, 10.322], [107.02, 10.285]]
+			},
+			{
+				"name": "Off Bãi Sau, seen from the beach road",
+				"share": 0.45,
+				"polygon": [[107.128, 10.305], [107.16, 10.305], [107.16, 10.365], [107.14, 10.372], [107.128, 10.34], [107.128, 10.305]]
+			}
+		]
+	},
+	"fishing_boats": {
+		"count": 18,
+		"length_m": [8, 14],
+		"min_spacing_m": 18,
+		"min_floor_m": -1.5,
+		"areas": [
+			{
+				"name": "The bay of Bãi Trước, in front of the Quang Trung road",
+				"share": 1.0,
+				"polygon": [[107.064, 10.3425], [107.0695, 10.3425], [107.07, 10.353], [107.065, 10.3535], [107.064, 10.3425]]
+			}
+		]
+	},
+	"ferry_pier": {
+		"name": "Cầu Đá",
+		"osm_ways": [200554633, 200554614],
+		"width_m": 6.0,
+		"deck_m": 2.8
+	},
+	"groynes": {
+		"tags": [["man_made", "groyne"], ["man_made", "breakwater"]],
+		"width_m": 4.0,
+		"height_m": 1.6
+	}
+}
