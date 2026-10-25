@@ -92,7 +92,7 @@ jobs:
           test -f build/windows/VungTau.exe
           test -f build/macos/VungTau.zip
           test -f build/linux/vung-tau.x86_64
-          cp docs/release-notes.md build/windows/ build/macos/ build/linux/
+          for dir in build/windows build/macos build/linux; do cp docs/release-notes.md "$dir/"; done
           ls -l build/windows build/macos build/linux
 
       - name: Upload the Windows build
