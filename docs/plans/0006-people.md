@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Branch | `feat/0006-people` |
 | Depends on | 0003 (status "Built"). Uses the quality presets of 0004 when 0004 is built. |
 
