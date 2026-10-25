@@ -632,7 +632,9 @@ func walk_toward(x: float, z := 0.0, step := 6.0) -> bool:
 		stuck = stuck + 1 if Vector2(now.x - pos.x, now.z - pos.z).length() < 0.2 else 0
 		if stuck >= 3:
 			break
-	fail("the player does not come to (%.2f, %.2f)" % [x, z])
+	var end: Vector3 = state().player
+	fail("the player does not come to (%.2f, %.2f): it stops at (%.2f, %.2f)" % [x, z, end.x, end.z])
+	await screenshot("walk_stops")
 	return false
 
 
@@ -695,6 +697,10 @@ func bring_into_view(test_id: String) -> bool:
 		var flat := Vector2(center.x - pos.x, center.z - pos.z)
 		if flat.length() > 12.0:
 			var target := Vector3(pos.x, 0, pos.z) + Vector3(flat.x, 0, flat.y).normalized() * 8.0
+			# On the way, walk on the middle line of the hẻm: a point near the
+			# house fronts can be behind a cart.
+			if target.x < main().hem.end_x:
+				target.z = clampf(target.z, -0.2, 0.6)
 			if not await walk_toward(target.x, target.z, 8.0):
 				return false
 			continue

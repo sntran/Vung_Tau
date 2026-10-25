@@ -3,8 +3,8 @@ extends RefCounted
 # the beach wall for 3 s. After each push, the capsule must not intersect a
 # collision shape. The player must stay on the floor. Look at a wall from
 # 0.3 m. The screenshot must not show the inside of the wall.
-# Run 1: the bánh mì cart (06:00), after the intro. Runs 2, 3, and 10: the
-# house walls of the hẻm (06:00). Run 4: the beach wall, the palm trees, and
+# Run 1: the bánh mì cart (06:00), after the intro. Runs 2, 3, 10, and 11:
+# the house walls of the hẻm (06:00), one wall in each run. Run 4: the beach wall, the palm trees, and
 # the water. Runs 5 and 6: the carts of 15:00 (nước mía, hột vịt lộn) and of
 # 18:30 (hủ tiếu gõ). Runs 7 and 8: the other walls. Run 9: the stools of the
 # cà phê cóc (06:00). Each run has few pushes, so that it is shorter than
@@ -19,10 +19,11 @@ extends RefCounted
 # phase: --start-time=12:00 --fresh-save
 # phase: --start-time=06:00 --fresh-save
 # phase: --start-time=06:00 --fresh-save
+# phase: --start-time=06:00 --fresh-save
 
 const CARTS := {1: ["banhmi"], 5: ["mia", "hvl"], 6: ["go"]}
-## The house walls of the main row (not the open shops) in runs 10, 2, and 3.
-const WALL_RUNS := {10: [0, 1], 2: [1, 3], 3: [3, 99]}
+## The house walls of the main row (not the open shops) in runs 10, 2, 11, and 3.
+const WALL_RUNS := {10: [0, 1], 2: [1, 2], 11: [2, 3], 3: [3, 99]}
 
 
 func run(d: PlaytestDriver) -> void:
