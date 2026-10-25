@@ -107,6 +107,8 @@ Status values:
 | In the South, people use birth-order names. The oldest child is Hai, not Một. The youngest is Út. | Check | Prototype text |
 | Many quán are the front room of a family home. A rolling metal shutter (cửa cuốn) closes the shop. | Check | Prototype text |
 | Homestay meals are different from shop food. They include strong-smelling dishes and sauces. | Confirmed | First-hand. I will name the dishes. |
+| Forms of address depend on age. Older people (about 50 and more) can call an adult traveler "con". A seller of about 40 does not: sellers call a foreigner "you", or "anh" or "chị". In this game, a seller of that age says "anh" to the traveler. | Confirmed | First-hand, 2026-10-24 |
+| The player does not know the name of a person until they talk and the person is introduced. | Confirmed | My decision for the game, 2026-10-24 |
 
 ## Games for reference
 

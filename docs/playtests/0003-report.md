@@ -59,7 +59,19 @@ The other scenarios (PT-01, PT-03 to PT-17) ran in CI. The workspace has 2 CPUs,
 - **Steps:** Start at 06:00. Stand near the cà phê cóc with Listen on.
 - **Expected:** The same name rule in the subtitles and in the Listen app.
 - **Actual:** The subtitle shows "Chú Chín:" and "Chú Bảy:". The Listen app shows "Someone" for the same lines (R19), because the player has not met them. Chú Bảy and Chú Chín cannot be met (`"talk": false`), so the Listen app never shows their names.
-- **Question for me:** Which rule do I want? Subtitles show "Someone" (or the role, such as "A neighbor") before the player meets the person, or the player "meets" a person by hearing their name.
+- **My decision:** The player does not know a name until the player talks with the person and the person is introduced. Before that, the subtitle and the Listen app both show "Someone" (the subtitle in a neutral color). The Lens app also shows "Someone" (R23, builder note N6).
+- **Correction:**
+  - Today `GameState.meet()` runs at the start of a talk (`start_talk()`), before any introduction. Move it to an introduction: a spoken line with the new field `"introduces": "SPEAKER"`. The name shows from that line on.
+  - Add a short introduction to the first talk with each person who can talk (Bà Tư, Cô Sáu, Bác Hà, Cô Út). The person says who they are, for example "Bà là bà Tư." or "Cô là Cô Sáu, bán phở ở đây nè." Write the lines with the status "check". I approve them.
+  - Cô Nga is known from the start: she introduces herself in her first message.
+  - Chú Bảy and Chú Chín cannot talk with the player in this plan, so they stay "Someone".
+- **Play-test step to add:** Before the first talk with Bà Tư, her subtitle and her Listen entries show "Someone". After her introduction line, they show "Bà Tư". The lines of Chú Bảy and Chú Chín show "Someone".
+
+### D-0003-09: Cô Út calls the traveler "con" (medium, content)
+
+- **Actual:** `cout.call` is "Bánh khọt nè! Ăn thử đi con!".
+- **Expected:** "Bánh khọt nè! Ăn thử đi anh!". A seller of about 40 does not call a foreign adult "con" (my decision, see section 4).
+- **Correction:** Change the line and its English meaning ("Bánh khọt here! Try some!"). The voices workflow makes the audio again. Check the other lines of people younger than about 50 for the same fault. The traveler in this game is a man ("anh").
 
 ### D-0003-05: The play tests in CI fail at random (medium)
 
@@ -107,7 +119,7 @@ The other scenarios (PT-01, PT-03 to PT-17) ran in CI. The workspace has 2 CPUs,
 | R14 | Pass | "[lóc cóc]" and "[a TV upstairs]". |
 | R15 | Pass | PT-23. The call after the player is a line of the person. |
 | R16, R17, R18 | Pass | 38% width, swipe down, status-bar time, dot. See D-0003-07. |
-| R19 | Defect | D-0003-01, D-0003-04. |
+| R19 | Defect | D-0003-01, D-0003-04 (the name rule is now my decision). |
 | R20 | Defect | Works, but see D-0003-02. |
 | R21, R22 | Pass | Play, I'll say it (with the tone of each syllable), English, actions, save to the Sổ tay. |
 | R23 | Pass | Lens shows the card of the place in the frame, with "Open now" and "Closed now". |
@@ -131,12 +143,13 @@ The other scenarios (PT-01, PT-03 to PT-17) ran in CI. The workspace has 2 CPUs,
 All new lines have the status "check". These need my ear or my decision:
 
 - **Voices that say English.** `batu.reply_english` ("Good morning! Phở, phở! Cô Sáu."), `bacha.english` ("Welcome, welcome!"), `nga.english` ("Good, good!"), and `cosau.english` ("Ô kê, ô kê!") are read by a Vietnamese voice model. Listen to them in the game: English words can sound wrong.
-- **Cô Út calls the traveler "con".** "Bánh khọt nè! Ăn thử đi con!" A seller of about 40 who calls an adult stranger usually says "em" or "anh/chị", not "con". Bà Tư (about 70) and the older people can say "con".
+- **Decided: Cô Út calls the traveler "anh".** A seller of about 40 does not call a foreign adult "con". Foreigners are often taller and bigger than most Vietnamese people, and sellers usually say "you". In this game she says "anh". Change `cout.call` to "Bánh khọt nè! Ăn thử đi anh!" (D-0003-09).
 - **Plan 0003, Q5:** the phone voice is Northern ("Mai Anh"). A Southern voice is the other choice.
 
 ## 5. Order of the corrections
 
 1. D-0003-02 (wrong answers are a "wrong answer" moment that the player did not choose).
 2. D-0003-05 (CI must be stable before the next plans).
-3. D-0003-01, D-0003-03.
-4. D-0003-04 after my answer, then D-0003-06 and D-0003-07.
+3. D-0003-04 and D-0003-09 (my decisions).
+4. D-0003-01, D-0003-03.
+5. D-0003-06, D-0003-07, D-0003-08.
