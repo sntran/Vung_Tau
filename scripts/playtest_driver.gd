@@ -1434,6 +1434,10 @@ func stick_along(route: PackedVector3Array, to: float, check := Callable(), ahea
 				break
 			step *= 0.5
 		var target := route_point(route, minf(here + step, to))
+		# After a stop away from the middle of the route (at the steep edge of
+		# a road in a hairpin), go back to the middle first, as a player does.
+		if stuck > 0 and off > 0.4:
+			target = now
 		await look_at_point(Vector3(target.x, pos.y + Player.EYE_HEIGHT, target.z), 4.0 if stuck == 0 else 2.0, 15.0)
 		var length := Vector2(target.x - pos.x, target.z - pos.z).length()
 		await hold_stick(Vector2(0, -1), clampf(length / Player.WALK_SPEED, 0.5, 8.0))
