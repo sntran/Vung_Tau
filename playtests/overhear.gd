@@ -27,8 +27,9 @@ func run(d: PlaytestDriver) -> void:
 	d.expect(distance <= 5.0, "the player is about 4 m from the neighbors: %.1f m" % distance)
 	await d.open_app("listen")
 	await d.tap_phone_id("listen.toggle")
-	# Wait for two lines of the neighbors.
-	d.expect(await d.wait_until(func() -> bool: return d.transcript().size() >= 2, 60.0, "two lines of the neighbors"),
+	# Wait for two lines of the neighbors. A chat can end just before Listen
+	# is on: the next chat comes 60 s later.
+	d.expect(await d.wait_until(func() -> bool: return d.transcript().size() >= 2, 100.0, "two lines of the neighbors"),
 			"the lines of the neighbors go into the transcript")
 	var transcript := d.transcript()
 	d.expect(transcript.size() >= 2 and transcript[0].speaker == Content.string("someone"),
@@ -81,10 +82,8 @@ func run(d: PlaytestDriver) -> void:
 func _no_repeats(d: PlaytestDriver) -> void:
 	await d.wait_idle()
 	var chu_bay: Npc = d.main().hem.npcs["chubay"]
-	await d.stick_to(Vector3(chu_bay.global_position.x + 3.0, 0.0, 0.6))
-	await d.open_app("listen")
-	await d.tap_phone_id("listen.toggle")
-	await d.lower_phone()
+	# Record the chat lines from the start of the run: on a slow computer, the
+	# walk takes more than one chat (D-0003-03).
 	var heard: Array[String] = []
 	var record := func() -> void:
 		for npc_id: String in ["chubay", "chuchin"]:
@@ -92,6 +91,10 @@ func _no_repeats(d: PlaytestDriver) -> void:
 			if not item.is_empty() and (heard.is_empty() or heard[heard.size() - 1] != item.line):
 				heard.append(item.line)
 	d.main().get_tree().process_frame.connect(record)
+	await d.stick_straight(Vector3(chu_bay.global_position.x + 3.0, 0.0, 0.6))
+	await d.open_app("listen")
+	await d.tap_phone_id("listen.toggle")
+	await d.lower_phone()
 	Engine.time_scale = 3.0
 	await d.wait_seconds(180.0)
 	Engine.time_scale = 1.0

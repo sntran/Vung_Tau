@@ -35,11 +35,6 @@ const HOME_DISTANCE := 5.0
 ## The subtitles stay out of it (R13).
 const STICK_ZONE := Vector2(340, 260)
 const SUBTITLE_MARGIN := 16.0
-## See _set_3d_scale().
-const WIDE_WINDOW := 1920
-const WIDE_3D_SCALE := 0.75
-## A message about deep water shows not more often than this (plan 0005, R13).
-const WATER_MESSAGE_MS := 3000
 
 ## The test ID of the focus ("spot.pho", "npc.batu"), or "".
 var focus_id := ""
@@ -65,7 +60,6 @@ var world_name := "hem"
 ## The real ground of Vũng Tàu, or null in the hẻm world.
 var vung_tau: VungTau = null
 var debug_overlay: Label
-var _water_message_time := -100000
 
 @onready var hem: Hem = $World/Hem
 @onready var player: Player = $World/Player
@@ -1152,7 +1146,6 @@ func _apply_time(minutes: int) -> void:
 ## the center dot, and the subtitles at the bottom, out of the joystick zone
 ## and the phone (R13, R16).
 func _layout() -> void:
-	_set_3d_scale()
 	var view := ui_root.get_viewport_rect().size
 	var center := view / 2.0
 	center_dot.position = center - center_dot.size / 2.0
@@ -1221,25 +1214,13 @@ func lights_in_view() -> int:
 	return count
 
 
-## On a window wider than 1920 pixels (a phone with a 2400 x 1080 screen),
-## the 3D view renders at 0.75 of the window size, so that it is faster. The
-## UI stays at the full size. Godot has FSR only for the Forward+ renderer, so
-## the scale is bilinear.
-func _set_3d_scale() -> void:
-	var viewport := get_viewport()
-	var render_scale := WIDE_3D_SCALE if get_window().size.x > WIDE_WINDOW else 1.0
-	if not is_equal_approx(viewport.scaling_3d_scale, render_scale):
-		viewport.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
-		viewport.scaling_3d_scale = render_scale
-
-
 # --- Deep water and the debug overlay (plan 0005) ---------------------------
 
 ## The player stops at deep water: a message shows in the subtitle box (R13).
+## Each stop shows it again, so it stays while the player pushes into the
+## water and goes some seconds after. (A gap in real time between two messages
+## did not work when the game runs faster: the caption went before the gap.)
 func _on_blocked() -> void:
-	if Time.get_ticks_msec() - _water_message_time < WATER_MESSAGE_MS:
-		return
-	_water_message_time = Time.get_ticks_msec()
 	subtitles.show_caption(Content.ui_text("water_too_deep"))
 
 

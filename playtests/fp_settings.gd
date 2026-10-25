@@ -126,3 +126,5 @@ func _check(d: PlaytestDriver) -> void:
 	await PlaytestLayout.check(d, "credits")
 	await d.tap_phone_id("phone.home")
 	d.expect(d.state().app == "", "Home closes the credits page")
+	# The next steps start in the Settings app, as before the credits check.
+	await d.open_app("settings")

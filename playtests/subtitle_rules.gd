@@ -65,7 +65,8 @@ func run(d: PlaytestDriver) -> void:
 func _check(d: PlaytestDriver, subtitles: Subtitles, speaker: String) -> Array[String]:
 	var result: Array[String] = []
 	var s := d.state()
-	var part: PackedStringArray = subtitles.current.lines
+	# The subtitle can hide between two frames: then it has no lines.
+	var part: PackedStringArray = subtitles.current.get("lines", PackedStringArray())
 	if part.size() > 2:
 		result.append("%d lines: %s" % [part.size(), part])
 	for i in part.size():
