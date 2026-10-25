@@ -42,24 +42,24 @@ The player gives the age and the gender in the game world: cô Nga asks for a ph
 ### The forms of address
 
 - **R6.** `data/address.json` has the rules. For each person (the speaker ID), the age, the gender, and a role (`elder`, `host`, `seller`, `neighbor`). For each pair of person and traveler, the rules give:
-  - `you`: what the person calls the traveler (con, cháu, em, anh, chị, chú, cô, bác, ông, bà),
-  - `me`: what the person calls themself (bà, bác, cô, chú, chị, anh, em, con, cháu, or `tôi`),
+  - `you`: what the person calls the traveler (con, cháu, em, anh, chị, chú, cô, dì, bác, ông, bà),
+  - `me`: what the person calls themself (bà, bác, cô, dì, chú, chị, anh, em, con, cháu, or tui),
   - `them`: what the traveler calls the person,
   - `self`: what the traveler calls themself.
   The rules select by the age difference (the person minus the traveler) and the gender of each. A rule for one role or one person can override the general rule.
-- **R7.** The first values of the general rules (I check them, see Q1):
+- **R7.** The general rules (I approved the table, see Q1):
 
   | Age difference (person − traveler) | `you` | `me` | `them` | `self` |
   |---|---|---|---|---|
   | 35 or more | con (cháu in the North) | bà, ông, bác | bà, ông, bác | con, cháu |
   | 15 to 34 | con (cháu in the North) | cô, chú, bác | cô, chú, bác | con, cháu |
   | 5 to 14 | em | chị, anh | chị, anh | em |
-  | −4 to 4 | anh, chị | tôi, em | anh, chị | tôi, em |
+  | −4 to 4 | anh, chị | tui | anh, chị | tui |
   | −5 to −14 | anh, chị | em | em | anh, chị |
   | −15 or less | chú, cô | con, cháu, em | con, cháu, em | chú, cô |
 
   Role rules: a `seller` younger than 50 calls a traveler of 25 or more "anh" or "chị", and calls themself "em" or "chị" (my decision, 2026-10-24). The `host` (cô Nga) knows the traveler's age from the passport and uses the general rules.
-- **R8.** The display name of a person is the traveler's word for them and the given name: "Cô Sáu" for a traveler of 30, "Chị Sáu" for a traveler of 50. When the traveler's word is "em", "con", or "cháu", see Q4. Put the display name rules in `data/address.json`. The subtitles, the Listen app, the Lens app, and the Sổ tay use the display name, after the introduction (D-0003-04).
+- **R8.** The display name of a person is the traveler's word for them and the given name: "Cô Sáu" for a traveler of 30, "Chị Sáu" for a traveler of 50. When the traveler's word is "em", "con", or "cháu", the display name is the name that the neighbors use (`name` in the data, for example "Cô Út"), see Q4. Put the display name rules in `data/address.json`. The subtitles, the Listen app, the Lens app, and the Sổ tay use the display name, after the introduction (D-0003-04).
 - **R9.** Dialogue text has the fields `{you}`, `{me}`, `{them}`, and `{self}`, with a capital letter form (`{You}`, `{Me}`, `{Them}`, `{Self}`) at the start of a sentence. `Content` replaces them for the current traveler. The English meaning does not depend on them, except an optional `{dear}` that is "dear" for `con` and `cháu` and empty for the others.
 - **R10.** Change the lines of plan 0003 to use the fields. For example "Ủa, con dậy rồi hả? Ăn sáng chưa con?" becomes "Ủa, {you} dậy rồi hả? Ăn sáng chưa {you}?", and the "say again" phrase becomes "Dạ, {them} nói lại được không ạ?". Check that each line reads correctly for each variant. Some sentences change more than one word: "Dạ, con cảm ơn cô" for a traveler of 30, "Dạ, em cảm ơn chị" for 50, "Cảm ơn em" for 65. A line can have a `variants` object for these cases.
 
@@ -93,7 +93,7 @@ Unit tests: each row of R7 and each role rule, the capital letter forms, the `{d
 
 ## 7. Open questions
 
-- **Q1.** Are the rules of R7 and the role rule correct? Correct the table.
-- **Q2.** The North: Bác Hà says "cháu", not "con", to a younger traveler. Are there other Northern differences for his lines?
-- **Q3.** Does the traveler say "tôi" to people of the same age? "Tôi" can sound cold. "Em" or the given name is warmer.
-- **Q4.** What is the display name of a person who is younger than the traveler? For example Cô Út (about 40) for a traveler of 65: "Út", "Em Út", or "Cô Út" (the name that the neighbors use)?
+- **Q1.** Answered: the table of R7 is correct.
+- **Q2.** Partly answered. Bác Hà (from the North) says "cháu", not "con", to a younger traveler. In the South, people can say "dì" where the North says "cô" for a woman of about the age of one's mother. I am not sure, because my family has relatives from the North and the South, and many people from the North live in Vũng Tàu. So the word is a value for each person in `data/address.json` (`aunt_word`: "cô" or "dì"). The first value is "cô" for all, with the status "check".
+- **Q3.** Answered: with people of about the same age, the traveler and the person say "tui" (the Southern spoken form of "tôi"). It is friendlier than "tôi".
+- **Q4.** Answered: a person who is younger than the traveler keeps the name that the neighbors use, for example "Cô Út" (R8).

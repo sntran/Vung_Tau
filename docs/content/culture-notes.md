@@ -109,6 +109,9 @@ Status values:
 | Homestay meals are different from shop food. They include strong-smelling dishes and sauces. | Confirmed | First-hand. I will name the dishes. |
 | Forms of address depend on age. Older people (about 50 and more) can call an adult traveler "con". A seller of about 40 does not: sellers call a foreigner "you", or "anh" or "chị". In this game, a seller of that age says "anh" to the traveler. | Confirmed | First-hand, 2026-10-24 |
 | The player does not know the name of a person until they talk and the person is introduced. | Confirmed | My decision for the game, 2026-10-24 |
+| Between people of about the same age, Southerners say "tui" (spoken "tôi"). It is friendlier than "tôi". | Confirmed | First-hand, 2026-10-24 |
+| In the South, people can say "dì" where the North says "cô" for a woman of about the age of one's mother. Many people from the North live in Vũng Tàu, so both are heard. | Check | My memory, 2026-10-24. Not sure. |
+| A younger person keeps the name that the neighbors use: "Cô Út" stays "Cô Út" for an older traveler. | Confirmed | My decision for the game, 2026-10-24 |
 
 ## Games for reference
 
