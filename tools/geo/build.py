@@ -39,6 +39,10 @@ BUILT_LANDUSE = {"residential", "commercial", "retail", "industrial", "construct
 # Gaussian of TOWN_ROAD_SIGMA_M) is town.
 TOWN_ROAD_COVER = 0.12
 TOWN_ROAD_SIGMA_M = 40.0
+# A land polygon smaller than this is a small island (for example Hòn Bà).
+ISLAND_MAX_M2 = 1_000_000.0
+# The DEM shows an island a little larger than the OSM coastline.
+ISLAND_MARGIN_M = 20.0
 KEEP_IMPORT = '[remap]\n\nimporter="keep"\n'
 
 
@@ -132,10 +136,14 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     dem_max = float(grid.heights.max())
     building_mask = terrain.rasterize(grid, buildings)
     town_mask = building_mask | terrain.rasterize(grid, [p for _k, s in landuse for p in polygons_of(s)])
-    town_change = terrain.remove_buildings(grid, town_mask)
+    # Small islands keep the heights of the DEM: the filter would make them flat.
+    islands = [p for p in polygons_of(land) if p.area < ISLAND_MAX_M2]
+    island_mask = terrain.rasterize(grid, [p.buffer(ISLAND_MARGIN_M) for p in islands])
+    town_change = terrain.remove_buildings(grid, town_mask, island_mask)
     land_mask = terrain.rasterize(grid, polygons_of(land))
     beach_mask = terrain.rasterize(grid, [p for b in beaches for p in polygons_of(b)]) & land_mask
     terrain.shape_coast(grid, land_mask, beach_mask)
+    terrain.roughen_islands(grid, island_mask & land_mask)
     rock_cells = terrain.raise_sea_rocks(grid, land_mask, terrain.rasterize(grid, [p for r in rocks for p in polygons_of(r)]))
     ridge = None
     rock_band = None
@@ -152,11 +160,11 @@ def build(raw: Path, out: Path, geo: Path) -> int:
         else:
             band = to_map_geometry(Polygon(band_way.coords), projection)
             h = config.hon_ba
-            stats = terrain.make_rock_band(grid, land_mask, line, band, top, width, float(h["path_rough_m"]),
-                                           float(h["outcrop_m"]), float(h["pool_m"]))
             beach_end = shore_end(line, h["islet"], projection)
             flat_cells = terrain.make_sand_flat(grid, land_mask, beach_end, float(h["sand_flat_radius_m"]),
                                                 float(h["sand_flat_m"]))
+            stats = terrain.make_rock_band(grid, land_mask, line, band, top, width, float(h["path_rough_m"]),
+                                           float(h["outcrop_m"]), float(h["pool_m"]))
             sea_band = band.difference(land)
             ridge |= {"sea_cells": stats["path_cells"], "band": {
                 "name": h["band_name"], "width_m": round(band.area / max(line.length, 1.0), 1),
@@ -234,10 +242,12 @@ def build(raw: Path, out: Path, geo: Path) -> int:
                                       area["height_step_m"], out / "height" / "overview.png")
     for png in (out / "height").glob("*.png"):
         write_keep_import(png)
-    sea_rocks = terrain.rasterize(grid, [p for r in rocks + [rock_band] if r is not None for p in polygons_of(r)])
+    rock_mask = terrain.rasterize(grid, [p for r in rocks + [rock_band] + islands if r is not None
+                                         for p in polygons_of(r)])
     surface = write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods, landuse, roads, area,
-                            out / "surface.png", sea_rocks & ~land_mask)
+                            out / "surface.png", rock_mask, out / "rock.png")
     write_keep_import(out / "surface.png")
+    write_keep_import(out / "rock.png")
 
     lon_min, lat_min = projection.map_to_lonlat(box.bounds[0], box.bounds[1])
     lon_max, lat_max = projection.map_to_lonlat(box.bounds[2], box.bounds[3])
@@ -340,10 +350,11 @@ def road_record(road) -> dict:
 
 
 def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods, landuse, roads, area, path,
-                  sea_rocks) -> dict:
-    """An RGBA image for the ground materials: R is sand, G is town, B is wood
-    on land and bare rock in the sea (R8h), A is the distance to the coastline
-    (positive on land).
+                  rock_mask, rock_path) -> dict:
+    """An RGBA image for the ground materials: R is sand, G is town, B is wood,
+    A is the distance to the coastline (positive on land). A second gray
+    image (rock_path) is bare rock: the Hòn Bà rock path, the rocks in the
+    sea, and the small islands (R8h).
 
     OSM has few building outlines in Vũng Tàu, so a place with many roads is
     also town: there, the roads cover more than TOWN_ROAD_COVER of the ground."""
@@ -368,10 +379,11 @@ def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods,
 
     alpha = np.clip(np.round((signed[::every, ::every] + limit) / (2 * limit) * 255), 0, 255).astype(np.uint8)
     # The sea floor is sand: the low tide shows it.
-    image = np.dstack([channel(beach_mask | (~land_mask & ~sea_rocks)), channel(town), channel(wood | sea_rocks), alpha])
+    image = np.dstack([channel((beach_mask | ~land_mask) & ~rock_mask), channel(town), channel(wood & ~rock_mask), alpha])
     Image.fromarray(image, "RGBA").save(path)
+    Image.fromarray(channel(rock_mask), "L").save(rock_path)
     return {"x0": grid.x0, "z0": grid.z0, "step": grid.step * every, "columns": image.shape[1], "rows": image.shape[0],
-            "coast_range_m": limit}
+            "coast_range_m": limit, "rock": rock_path.name}
 
 
 def homestay_record(home: dict) -> dict:

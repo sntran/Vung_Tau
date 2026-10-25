@@ -303,3 +303,19 @@ def test_roadworks_chain_starts_at_the_bottom():
                                        "planned_end": "2027", "contractor": "X", "sign": "Y", "work_hours": {}},
                                       [upper, lower])
     assert not problems and record["width_m"] == 9.0 and record["length_m"] == pytest.approx(150.0)
+
+
+def test_small_island_keeps_its_height():
+    """The filter of the surface model makes a small hump flat, but not a small island (Hòn Bà)."""
+    n = 101
+    heights = np.full((n, n), 2.0, dtype=np.float32)
+    heights[45:56, 45:56] = 12.0
+    no_town = np.zeros((n, n), dtype=bool)
+    grid = terrain.Grid(0.0, 0.0, 2.0, heights.copy())
+    terrain.remove_buildings(grid, no_town)
+    assert grid.heights[50, 50] == pytest.approx(2.0, abs=0.01), "low ground: the hump goes"
+    grid = terrain.Grid(0.0, 0.0, 2.0, heights.copy())
+    keep = np.zeros((n, n), dtype=bool)
+    keep[40:61, 40:61] = True
+    terrain.remove_buildings(grid, no_town, keep)
+    assert grid.heights[50, 50] == pytest.approx(12.0), "the island keeps its height"

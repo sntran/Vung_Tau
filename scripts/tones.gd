@@ -95,3 +95,46 @@ static func tv(seconds := 4.0) -> AudioStreamWAV:
 	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
 	stream.loop_end = count
 	return stream
+
+
+## The sound of the machines at the roadworks (plan 0005, R11a): a diesel
+## engine that goes up and down, with the clank of the excavator bucket.
+static func machine(seconds := 6.0) -> AudioStreamWAV:
+	var count := int(seconds * MIX_RATE)
+	var samples := PackedFloat32Array()
+	samples.resize(count)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7
+	var rumble := 0.0
+	var phase := 0.0
+	for i in count:
+		var t := float(i) / MIX_RATE
+		# The engine: about 30 firings each second, faster when the arm moves.
+		var load := 0.5 + 0.5 * sin(TAU * t / seconds * 2.0)
+		phase = fmod(phase + (28.0 + 10.0 * load) / MIX_RATE, 1.0)
+		var firing := exp(-8.0 * phase) - 0.2
+		rumble += (rng.randf_range(-1.0, 1.0) - rumble) * 0.05
+		samples[i] = firing * 0.5 + rumble * 1.2 * (0.6 + 0.4 * load)
+	# The bucket hits stones two times in the loop.
+	for hit: float in [1.3, 4.1]:
+		var start := int(hit * MIX_RATE)
+		for i in int(0.25 * MIX_RATE):
+			if start + i < count:
+				var t := float(i) / MIX_RATE
+				samples[start + i] += 0.5 * sin(TAU * 410.0 * t) * exp(-18.0 * t) + 0.3 * rng.randf_range(-1.0, 1.0) * exp(-30.0 * t)
+	var fade := int(0.05 * MIX_RATE)
+	for i in fade:
+		samples[i] *= float(i) / fade
+		samples[count - 1 - i] *= float(i) / fade
+	var data := PackedByteArray()
+	data.resize(count * 2)
+	for i in count:
+		data.encode_s16(i * 2, int(clampf(samples[i] * 0.5, -1.0, 1.0) * 32767.0))
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = MIX_RATE
+	stream.stereo = false
+	stream.data = data
+	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	stream.loop_end = count
+	return stream

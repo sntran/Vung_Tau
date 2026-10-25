@@ -163,6 +163,6 @@ func _finish() -> void:
 	await get_tree().create_timer(QUIT_WAIT_S, true).timeout
 	var main := get_tree().get_first_node_in_group("main")
 	var end := Time.get_ticks_msec() + 30000
-	while main != null and main.hem.is_baking() and Time.get_ticks_msec() < end:
+	while main != null and main.hem != null and main.hem.is_baking() and Time.get_ticks_msec() < end:
 		await get_tree().process_frame
 	get_tree().quit(0 if passed else 1)

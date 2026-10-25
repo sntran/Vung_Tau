@@ -1,5 +1,5 @@
 {
-	"note": "The rock path from the beach below Mũi Nghinh Phong to the islet Hòn Bà (plan 0005, R8h). The line is the OSM way \"Đường ra Hòn Bà\", and the band of rocks around it (band_name) is in overrides.json. The path is dry only when the sea level is below ridge_top_m (meters above mean sea level). tools/geo/tide.py shows the dry times for this height. On the path (ridge_width_m), the rocks are within path_rough_m of the top. In the rest of the band, rock outcrops rise up to outcrop_m above the top, and tide pools go down to pool_m below it. In front of the path, a sand flat (sand_flat_radius_m around the beach end) is at sand_flat_m, so that a low tide shows it. The islet point is the center of the OSM islet. The tide constants of the game are for this point.",
+	"note": "The rock path from the beach below Mũi Nghinh Phong to the islet Hòn Bà (plan 0005, R8h). The line is the OSM way \"Đường ra Hòn Bà\", and the band of rocks around it (band_name) is in overrides.json. The path is dry only when the sea level is below ridge_top_m (meters above mean sea level). tools/geo/tide.py shows the dry times for this height. On the path (ridge_width_m), the rocks are within path_rough_m of the top. In the rest of the band, rock outcrops rise up to outcrop_m above the top, and tide pools go down to pool_m below it. In front of the path, a sand flat (sand_flat_radius_m around the beach end) is at sand_flat_m, a little below the path, so that the lowest tides show it. The islet point is the center of the OSM islet. The tide constants of the game are for this point.",
 	"ridge_way": 221906223,
 	"ridge_name": "Đường ra Hòn Bà",
 	"band_name": "Bãi đá ra Hòn Bà",
@@ -10,6 +10,6 @@
 	"path_rough_m": 0.08,
 	"outcrop_m": 0.35,
 	"pool_m": -0.45,
-	"sand_flat_m": -1.3,
+	"sand_flat_m": -1.85,
 	"sand_flat_radius_m": 110.0
 }

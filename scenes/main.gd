@@ -98,6 +98,7 @@ var _chat_day := -1
 ## ("talk" is true) stops when the talk ends.
 var _steps: Array[Dictionary] = []
 var _tv_caption_left := 0.0
+var _machine_caption_left := 0.0
 ## True after stop_sounds(): no new sound starts.
 var _stopped := false
 
@@ -847,12 +848,28 @@ func _on_clacked(position_3d: Vector3) -> void:
 ## The caption of the TV upstairs shows from time to time while the player hears it (R14).
 func _update_sounds(delta: float) -> void:
 	_tv_caption_left -= delta
+	_update_machine_caption(delta)
 	if hem == null or not hem.tv.playing or _tv_caption_left > 0.0:
 		return
 	var sound := Content.sound("tv")
 	if player.eye_position().distance_to(hem.tv.global_position) <= float(sound.get("range_m", 8.0)):
 		subtitles.show_caption(sound.get("caption", ""))
 		_tv_caption_left = 6.0
+
+
+## The caption of the roadworks machines shows from time to time while the
+## player hears them (plan 0005, R11a).
+func _update_machine_caption(delta: float) -> void:
+	_machine_caption_left -= delta
+	if vung_tau == null or vung_tau.roadworks == null or _machine_caption_left > 0.0:
+		return
+	var machine := vung_tau.roadworks.machine
+	if not machine.playing:
+		return
+	var sound := Content.sound("machine")
+	if player.eye_position().distance_to(machine.global_position) <= float(sound.get("range_m", 40.0)):
+		subtitles.show_caption(sound.get("caption", ""))
+		_machine_caption_left = 8.0
 
 
 # --- Messages and notifications ----------------------------------------------

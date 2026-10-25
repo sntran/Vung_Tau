@@ -29,6 +29,10 @@ SEA_ROCK_HEIGHT = 0.5
 SEA_ROCK_NODE_RADIUS_M = 3.0
 # The side slope of the Hòn Bà ridge (1 m down for each meter out).
 RIDGE_SIDE_SLOPE = 1.0
+# The rocks of the Hòn Bà band blend into the sea floor over this distance from the band edge.
+BAND_BLEND_M = 4.0
+# The boulders on the small islands (roughen_islands).
+ISLAND_ROCK_M = 0.6
 # The width of the band at the land side of a beach, where the beach slope meets the ground.
 BEACH_BLEND_M = 10.0
 # The lowest ground height on land. The OSM coastline is the line of the
@@ -116,17 +120,21 @@ def rasterize(grid: Grid, geometries, value: int = 1) -> np.ndarray:
                               dtype=np.uint8, all_touched=False).astype(bool)
 
 
-def remove_buildings(grid: Grid, town: np.ndarray) -> float:
+def remove_buildings(grid: Grid, town: np.ndarray, keep: np.ndarray | None = None) -> float:
     """The DEM is a surface model: it has the tops of buildings and trees. An
     opening filter (a minimum, then a maximum) removes shapes that are smaller
     than URBAN_FILTER_M. A slope stays as it is. The filter changes the towns
-    and the low ground, but not the hills. Returns the mean change in meters
-    where the filter changes the ground fully."""
+    and the low ground, but not the hills, and not the cells in keep (small
+    islands such as Hòn Bà: they are smaller than the filter, so the filter
+    makes them flat). Returns the mean change in meters where the filter
+    changes the ground fully."""
     size = int(URBAN_FILTER_M / grid.step) | 1
     opened = ndimage.maximum_filter(ndimage.minimum_filter(grid.heights, size=size), size=size)
     density = ndimage.gaussian_filter(town.astype(np.float32), sigma=20.0 / grid.step)
     low = np.clip((LOW_GROUND_TOP_M - opened) / LOW_GROUND_BLEND_M, 0.0, 1.0)
     weight = np.maximum(np.clip(density * 3.0, 0.0, 1.0), low)
+    if keep is not None:
+        weight[keep] = 0.0
     change = (grid.heights - opened) * weight
     grid.heights -= change
     full = weight > 0.99
@@ -193,31 +201,49 @@ def make_rock_band(grid: Grid, land: np.ndarray, line, band, top: float, width: 
     """The rock path to Hòn Bà (R8h): a rough band of rocks in the sea. On
     the path (width around line), the rocks are from top - rough to top, so the
     path is dry when the sea is below top. In the rest of the band, outcrops
-    rise up to top + outcrop, and tide pools go down to top + pool. Out of the
-    band, the rocks slope down to the sea floor. line and band are shapely
-    shapes in map coordinates. Only the sea cells change."""
+    rise up to top + outcrop, and tide pools go down to top + pool. The rocks
+    blend into the sea floor in the first BAND_BLEND_M of the band, and they
+    never go below the sea floor that was there (the slope from the beach).
+    line and band are shapely shapes in map coordinates. Only the sea cells
+    change. Call it after make_sand_flat."""
     rows, cols = _window(grid, band.bounds, 12.0)
     core = rasterize(grid, [line.buffer(width / 2.0)])[rows, cols]
-    inside = rasterize(grid, [band])[rows, cols]
+    inside = rasterize(grid, [band])[rows, cols] | core
     rng = np.random.default_rng(seed)
     big = _smooth_noise(core.shape, rng, 2.0)
     small = _smooth_noise(core.shape, rng, 0.7)
     rocks = np.where(big > 0, big * outcrop, -big * pool) + small * 0.08
     rocks = np.minimum(top + rocks, top + outcrop)
     path = top - rough * (0.5 + 0.5 * small)
-    heights = np.where(core, path, np.where(inside, rocks, -np.inf)).astype(np.float32)
-    distance = ndimage.distance_transform_edt(~(inside | core)).astype(np.float32) * grid.step
-    side = np.where(inside | core, heights, top - 0.3 - distance * RIDGE_SIDE_SLOPE)
     h = grid.heights[rows, cols]
     sea = ~land[rows, cols]
-    band_cells = (inside | core) & sea
-    h[band_cells] = side[band_cells]
-    outer = ~(inside | core) & sea
-    h[outer] = np.maximum(h[outer], side[outer])
+    depth = ndimage.distance_transform_edt(inside).astype(np.float32) * grid.step
+    weight = np.clip(depth / BAND_BLEND_M, 0.0, 1.0)
+    blended = h + (rocks - h) * weight
+    new = np.where(core, path, blended)
+    cells = inside & sea
+    h[cells] = np.maximum(new[cells], h[cells])
     grid.heights[rows, cols] = h
-    return {"band_cells": int(band_cells.sum()), "path_cells": int((core & sea).sum()),
-            "min_m": round(float(h[band_cells].min()), 2) if band_cells.any() else None,
-            "max_m": round(float(h[band_cells].max()), 2) if band_cells.any() else None}
+    return {"band_cells": int(cells.sum()), "path_cells": int((core & sea).sum()),
+            "min_m": round(float(h[cells].min()), 2) if cells.any() else None,
+            "max_m": round(float(h[cells].max()), 2) if cells.any() else None}
+
+
+def roughen_islands(grid: Grid, islands: np.ndarray, amplitude: float = ISLAND_ROCK_M, seed: int = 9) -> int:
+    """Boulders on the small islands: the DEM has a cell of 30 m, so a small
+    island is a smooth hump. Smooth noise of +/- amplitude on the land cells
+    above LAND_MIN_HEIGHT keeps the mean height. Returns the number of cells."""
+    rows, cols = np.nonzero(islands)
+    if rows.size == 0:
+        return 0
+    window = (slice(rows.min(), rows.max() + 1), slice(cols.min(), cols.max() + 1))
+    h = grid.heights[window]
+    noise = _smooth_noise(h.shape, np.random.default_rng(seed), 1.5)
+    above = islands[window] & (h > LAND_MIN_HEIGHT + 0.3)
+    fade = np.clip((h - LAND_MIN_HEIGHT - 0.3) / 2.0, 0.0, 1.0)
+    h[above] = (h + noise * amplitude * fade)[above]
+    grid.heights[window] = h
+    return int(above.sum())
 
 
 def make_sand_flat(grid: Grid, land: np.ndarray, center: tuple[float, float], radius: float, height: float) -> int:

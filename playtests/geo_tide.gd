@@ -52,7 +52,7 @@ func run(d: PlaytestDriver) -> void:
 	if d.phase == 1:
 		await _tap_walk(d, route, length)
 		var walked := PlaytestDriver.route_distance(route, d.state().player)
-		d.expect(walked >= length - 6.0, "the player walks the ridge to Hòn Bà: %.0f m of %.0f m" % [walked, length])
+		d.expect(_on_islet(d), "the player walks the ridge to Hòn Bà: %.0f m of %.0f m, and stands on the islet" % [walked, length])
 		d.expect(w.is_ridge_dry(), "the ridge is still dry at the end of the walk: the sea is at %+.2f m" % w.sea_level)
 		await d.screenshot("at_hon_ba")
 	else:
@@ -96,9 +96,12 @@ func _tap_walk(d: PlaytestDriver, route: PackedVector3Array, length: float) -> v
 	var taps := 0
 	while true:
 		var here := PlaytestDriver.route_distance(route, d.state().player)
-		if here >= length - 2.0:
+		if here >= length - 2.0 or _on_islet(d):
 			break
 		var target := PlaytestDriver.route_point(route, minf(here + STEP, length - 1.0))
+		# The islet rises between the last points of the line: use the ground height there.
+		var w := d.world()
+		target.y = w.ground_height(target.x, target.z)
 		var view := d.world_to_view(target + Vector3(0, 0.05, 0))
 		var camera: Camera3D = d.main().player.camera
 		if camera.is_position_behind(target) or not Rect2(Vector2(40, 140), d.state().view_size - Vector2(80, 180)).has_point(view):
@@ -115,6 +118,16 @@ func _tap_walk(d: PlaytestDriver, route: PackedVector3Array, length: float) -> v
 			return
 
 
+## True when the player stands on the land of Hòn Bà, at the end of the
+## path. The steps up to Miếu Hòn Bà come with the structures (plan 0007).
+func _on_islet(d: PlaytestDriver) -> bool:
+	var w := d.world()
+	var player: Vector3 = d.state().player
+	var hon_ba: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/geo/hon_ba.json"))
+	var islet := w.data.projection.to_game(float(hon_ba.islet.lon), float(hon_ba.islet.lat))
+	return Vector2(player.x, player.z).distance_to(islet) < 90.0 and w.ground_height(player.x, player.z) > 1.0
+
+
 ## The time of the game as text: "2026-12-24 06:30".
 static func _now_text() -> String:
 	var date := GameCalendar.date_of(GameState.day)
@@ -127,8 +140,8 @@ static func _dry_time(low: bool) -> Dictionary:
 	var tide: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(TideModel.PATH))
 	var now := GameCalendar.unix_time(GameState.day, GameState.minutes)
 	for dry: Dictionary in tide.get("dry_times", []):
-		var start := Time.get_unix_time_from_datetime_string(str(dry.start).substr(0, 16)) - GameCalendar.TIME_ZONE_S
-		var end := Time.get_unix_time_from_datetime_string(str(dry.end).substr(0, 16)) - GameCalendar.TIME_ZONE_S
+		var start := Time.get_unix_time_from_datetime_string(str(dry.start).substr(0, 16) + ":00") - GameCalendar.TIME_ZONE_S
+		var end := Time.get_unix_time_from_datetime_string(str(dry.end).substr(0, 16) + ":00") - GameCalendar.TIME_ZONE_S
 		if low and start <= now and now <= end:
 			return dry
 		if not low and absf(now - end - HOURS_AFTER * 3600.0) <= 60.0 * 60.0:

@@ -14,7 +14,7 @@ def load(build, name):
 
 def test_all_files_exist(small_build):
     for name in ["world.json", "roads.json", "blocks.json", "buildings.json", "landmarks.json", "homestay.json",
-                 "coastline.json", "land.json", "beaches.json", "report.md", "surface.png", "homestay_area.png",
+                 "coastline.json", "land.json", "beaches.json", "report.md", "surface.png", "rock.png", "homestay_area.png",
                  "height/overview.png", "roadworks.json", "sea_objects.json", "trees.json"]:
         assert (small_build / name).exists(), name
 

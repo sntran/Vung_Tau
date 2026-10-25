@@ -57,6 +57,15 @@ var _ground_material: ShaderMaterial
 var _sea_material: ShaderMaterial
 var _road_materials: Dictionary = {}
 var _tree_mesh: Mesh
+var _tree_material: ShaderMaterial
+## The band of rocks around the Hòn Bà path (R8h): polygons in game X, Z.
+var band_polygons: Array[PackedVector2Array] = []
+var street_trees: StreetTrees
+var sea_objects: SeaObjects
+var roadworks: Roadworks
+## The season values of the game day (R12a), from Season.of_day().
+var season: Dictionary = {}
+var _season_day := -1
 var _surface_image: Image
 var _chunks: Dictionary = {}  # Vector2i -> {"detail", "wanted", "far", "tile", "fine", "busy", "asked"}
 var _far_tiles: Dictionary = {}  # Vector2i -> MeshInstance3D
@@ -78,11 +87,30 @@ func setup(folder := GeoData.ROOT) -> bool:
 		ridge_points.append(Vector2(p[0], p[1]))
 	ridge_top = float(ridge.get("top_m", -INF))
 	ridge_width = float(ridge.get("width_m", 4.0))
+	for polygon: Dictionary in ridge.get("band", {}).get("polygons", []):
+		var points := PackedVector2Array()
+		for p: Array in polygon.get("outline", []):
+			points.append(Vector2(p[0], p[1]))
+		band_polygons.append(points)
 	_make_environment()
 	_make_materials()
 	_make_sea()
 	_make_far_ground()
 	_make_markers()
+	street_trees = StreetTrees.new()
+	street_trees.name = "StreetTrees"
+	add_child(street_trees)
+	street_trees.setup(data.root.path_join("trees.json"))
+	sea_objects = SeaObjects.new()
+	sea_objects.name = "SeaObjects"
+	add_child(sea_objects)
+	sea_objects.setup(data.root.path_join("sea_objects.json"))
+	roadworks = Roadworks.new()
+	roadworks.name = "Roadworks"
+	add_child(roadworks)
+	if not roadworks.setup(data.root.path_join("roadworks.json")):
+		roadworks.queue_free()
+		roadworks = null
 	return true
 
 
@@ -123,11 +151,14 @@ func can_stand(point: Vector3) -> bool:
 	return ground >= sea_level - MAX_WATER_DEPTH
 
 
-## True when the point is on the line of the Hòn Bà ridge.
+## True when the point is on the Hòn Bà rock path: on its line or in its band of rocks.
 func is_on_ridge(point: Vector3) -> bool:
 	if ridge_points.size() < 2:
 		return false
 	var at := Vector2(point.x, point.z)
+	for polygon: PackedVector2Array in band_polygons:
+		if Geometry2D.is_point_in_polygon(at, polygon):
+			return true
 	for i in ridge_points.size() - 1:
 		var closest := Geometry2D.get_closest_point_to_segment(at, ridge_points[i], ridge_points[i + 1])
 		if closest.distance_to(at) <= ridge_width / 2.0 + RIDGE_MARGIN:
@@ -199,6 +230,10 @@ func update_time(minutes: int, day: int) -> void:
 		sea_level = tide.level(GameCalendar.unix_time(day, minutes))
 	sea.position.y = sea_level
 	_ground_material.set_shader_parameter("sea_level", sea_level)
+	if day != _season_day:
+		_apply_season(day)
+	if roadworks:
+		roadworks.update_time(minutes)
 	var origin: Dictionary = data.world.get("origin", {})
 	var sun_now := SunPosition.at(float(origin.get("lat", 10.35)), float(origin.get("lon", 107.08)),
 			GameCalendar.day_of_year(day), minutes)
@@ -230,6 +265,17 @@ func update_time(minutes: int, day: int) -> void:
 	sky_material.ground_bottom_color = colors[0].darkened(0.6)
 
 
+## The plants follow the season of the game date (R12a): the hill grass, the
+## hill trees, and the street trees.
+func _apply_season(day: int) -> void:
+	_season_day = day
+	season = Season.of_day(day)
+	_ground_material.set_shader_parameter("dryness", season.dryness)
+	TreeKit.apply_season("hill", _tree_material, season)
+	if street_trees:
+		street_trees.apply_season(season)
+
+
 ## The colors of the sky (the top and the horizon) for the sun elevation in degrees.
 static func sky_colors(elevation: float) -> Array[Color]:
 	var keys := [
@@ -255,13 +301,15 @@ static func _point_light(light: DirectionalLight3D, toward_light: Vector3) -> vo
 
 # --- Streaming ---------------------------------------------------------------
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if data == null:
 		return
 	var camera := get_viewport().get_camera_3d()
 	if camera:
 		_focus = camera.global_position
 	sea.global_position = Vector3(snappedf(_focus.x, 64.0), sea_level, snappedf(_focus.z, 64.0))
+	if sea_objects:
+		sea_objects.update_sea(sea_level, delta)
 	_update_wanted()
 	_start_tasks()
 	_apply_done()
@@ -473,6 +521,7 @@ func _add_trees(node: Node3D, transforms: Array[Transform3D]) -> void:
 	var instance := MultiMeshInstance3D.new()
 	instance.name = "Trees"
 	instance.multimesh = multimesh
+	instance.material_override = _tree_material
 	instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	node.add_child(instance)
 
@@ -532,6 +581,11 @@ func _make_materials() -> void:
 		var texture_kind: String = {"town": "concrete", "wood": "grass"}.get(kind, kind)
 		_ground_material.set_shader_parameter(kind + "_texture", _texture_or_color(texture_kind, kind))
 	_ground_material.set_shader_parameter("surface_mask", mask_texture)
+	var rock_path := data.root.path_join(str(data.surface.get("rock", "rock.png")))
+	if FileAccess.file_exists(rock_path):
+		var rock_image := Image.new()
+		rock_image.load_png_from_buffer(FileAccess.get_file_as_bytes(rock_path))
+		_ground_material.set_shader_parameter("rock_mask", ImageTexture.create_from_image(rock_image))
 	_ground_material.set_shader_parameter("mask_origin", mask_origin)
 	_ground_material.set_shader_parameter("mask_size", size)
 	_sea_material = ShaderMaterial.new()
@@ -562,7 +616,10 @@ func _make_materials() -> void:
 				material.albedo_color = Color("#E8E6DC")
 				material.roughness = 0.7
 		_road_materials[kind] = material
-	_tree_mesh = _make_tree_mesh()
+	_tree_mesh = TreeKit.mesh("hill")
+	_tree_material = TreeKit.material("hill")
+	var rock_ridge: Dictionary = data.world.get("hon_ba_ridge", {})
+	_ground_material.set_shader_parameter("pool_level", float(rock_ridge.get("top_m", -100.0)) - 0.12)
 
 
 func _texture_or_color(texture_kind: String, color_kind: String) -> Texture2D:
@@ -690,29 +747,3 @@ func _make_markers() -> void:
 				label.position.y = other.y + MARKER_STACK
 		placed.append(label.position)
 		add_child(label)
-
-
-static func _make_tree_mesh() -> Mesh:
-	# A trunk and a round crown: two surfaces with their own colors.
-	var mesh := ArrayMesh.new()
-	var trunk := CylinderMesh.new()
-	trunk.top_radius = 0.12
-	trunk.bottom_radius = 0.18
-	trunk.height = 2.4
-	trunk.radial_segments = 6
-	trunk.rings = 1
-	var crown := SphereMesh.new()
-	crown.radius = 1.8
-	crown.height = 3.0
-	crown.radial_segments = 8
-	crown.rings = 4
-	var parts := [[trunk, Vector3(0, 1.2, 0), Color("#6B4E33")], [crown, Vector3(0, 3.4, 0), Color("#466B32")]]
-	for part: Array in parts:
-		var tool := SurfaceTool.new()
-		tool.append_from(part[0], 0, Transform3D(Basis(), part[1]))
-		var material := StandardMaterial3D.new()
-		material.albedo_color = part[2]
-		material.roughness = 1.0
-		tool.set_material(material)
-		tool.commit(mesh)
-	return mesh

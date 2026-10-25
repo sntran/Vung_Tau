@@ -64,10 +64,12 @@ def make(spec: dict, roads: list, hem=None) -> tuple[dict | None, list[str]]:
     if line is None:
         return None, [f"the roadworks road {spec['road']} is not in the data"]
     part = cut(line, float(spec["length_m"]))
-    width = max(r.width for r in named) + float(spec.get("widen_m", 0.0))
+    road_width = max(r.width for r in named)
+    widen = float(spec.get("widen_m", 0.0))
     record = {"road": spec["road"], "from": spec["from"], "length_m": round(float(LineString(part[:, :2]).length), 1),
-              "width_m": round(width, 2), "planned_end": spec["planned_end"], "contractor": spec["contractor"],
-              "sign": spec["sign"], "work_hours": spec["work_hours"],
+              "width_m": round(road_width + widen, 2), "road_width_m": round(road_width, 2), "widen_m": widen,
+              "planned_end": spec["planned_end"], "contractor": spec["contractor"], "sign": spec["sign"],
+              "work_hours": spec["work_hours"],
               "points": [[round(float(x), 2), round(float(h), 2), round(-float(y), 2)] for x, y, h in part]}
     if hem is not None:
         line_2d = LineString(part[:, :2])
