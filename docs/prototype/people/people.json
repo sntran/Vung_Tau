@@ -1,0 +1,397 @@
+[
+ {
+  "id": "batu",
+  "macro": {
+   "gender": 0.0,
+   "age": 70,
+   "asian": 1.0,
+   "african": 0.0,
+   "caucasian": 0.0,
+   "weight": 0.35,
+   "muscle": 0.35,
+   "height": 0.3
+  },
+  "targets": {
+   "nose-scale-horiz-incr": 0.5,
+   "nose-flaring-incr": 0.5,
+   "nose-point-width-incr": 0.4,
+   "nose-hump-decr": 0.5,
+   "nose-scale-vert-decr": 0.3,
+   "nose-curve-concave": 0.2,
+   "mouth-angles-up": 0.4,
+   "mouth-scale-horiz-incr": 0.2,
+   "eye-scale-incr": 0.4,
+   "eye-height1-incr": 0.4,
+   "eye-epicanthus-in": 0.3,
+   "head-scale-vert-decr": 0.3,
+   "cheek-bones-incr": 0.6,
+   "chin-height-decr": 0.2,
+   "head-age-incr": 0.6,
+   "neck-scale-horiz-decr": 0.3,
+   "cheek-volume-decr": 0.6,
+   "mouth-laugh-lines-in": 0.6
+  },
+  "skin": "old_asian_female",
+  "skin_tint": "#BE9C84",
+  "hair": "rehmanpolanski_hair_bun_brown",
+  "hair_val": 1.4,
+  "clothes": [
+   {
+    "mhclo": "joepal_crude_t-shirt_female",
+    "print": "dobo_batu.png"
+   },
+   {
+    "mhclo": "toigo_harem_pants",
+    "print": "dobo_batu.png"
+   }
+  ],
+  "dep": "#5B4A3C",
+  "face": {
+   "mouthSmileLeft": 0.2,
+   "mouthSmileRight": 0.2
+  }
+ },
+ {
+  "id": "nga",
+  "macro": {
+   "gender": 0.0,
+   "age": 48,
+   "asian": 1.0,
+   "african": 0.0,
+   "caucasian": 0.0,
+   "weight": 0.55,
+   "muscle": 0.45,
+   "height": 0.35
+  },
+  "targets": {
+   "nose-scale-horiz-incr": 0.5,
+   "nose-flaring-incr": 0.5,
+   "nose-point-width-incr": 0.4,
+   "nose-hump-decr": 0.5,
+   "nose-scale-vert-decr": 0.3,
+   "nose-curve-concave": 0.2,
+   "mouth-angles-up": 0.4,
+   "mouth-scale-horiz-incr": 0.2,
+   "eye-scale-incr": 0.4,
+   "eye-height1-incr": 0.4,
+   "eye-epicanthus-in": 0.3,
+   "head-scale-vert-decr": 0.3,
+   "cheek-bones-incr": 0.6,
+   "chin-height-decr": 0.2,
+   "head-round": 0.4
+  },
+  "skin": "middleage_asian_female",
+  "skin_tint": "#C8A68C",
+  "hair": "ponytail01",
+  "hair_val": 0.12,
+  "clothes": [
+   {
+    "mhclo": "toigo_basic_tucked_t-shirt",
+    "color": "#B7C4B0"
+   },
+   {
+    "mhclo": "toigo_harem_pants",
+    "color": "#3A3A44"
+   }
+  ],
+  "dep": "#2E2B2A",
+  "face": {
+   "mouthSmileLeft": 0.2,
+   "mouthSmileRight": 0.2
+  }
+ },
+ {
+  "id": "cosau",
+  "macro": {
+   "gender": 0.0,
+   "age": 55,
+   "asian": 1.0,
+   "african": 0.0,
+   "caucasian": 0.0,
+   "weight": 0.65,
+   "muscle": 0.6,
+   "height": 0.3
+  },
+  "targets": {
+   "nose-scale-horiz-incr": 0.5,
+   "nose-flaring-incr": 0.5,
+   "nose-point-width-incr": 0.4,
+   "nose-hump-decr": 0.5,
+   "nose-scale-vert-decr": 0.3,
+   "nose-curve-concave": 0.2,
+   "mouth-angles-up": 0.4,
+   "mouth-scale-horiz-incr": 0.2,
+   "eye-scale-incr": 0.4,
+   "eye-height1-incr": 0.4,
+   "eye-epicanthus-in": 0.3,
+   "head-scale-vert-decr": 0.3,
+   "cheek-bones-incr": 0.6,
+   "chin-height-decr": 0.2,
+   "head-rectangular": 0.4,
+   "chin-width-incr": 0.3
+  },
+  "skin": "middleage_asian_female",
+  "skin_tint": "#B9967C",
+  "hair": "rehmanpolanski_hair_bun_brown",
+  "hair_val": 0.18,
+  "clothes": [
+   {
+    "mhclo": "joepal_crude_t-shirt_female",
+    "print": "dobo_cosau.png"
+   },
+   {
+    "mhclo": "toigo_harem_pants",
+    "print": "dobo_cosau.png"
+   }
+  ],
+  "dep": "#7A3B30",
+  "face": {
+   "mouthSmileLeft": 0.45,
+   "mouthSmileRight": 0.45,
+   "cheekSquintLeft": 0.25,
+   "cheekSquintRight": 0.25,
+   "eyeSquintLeft": 0.15,
+   "eyeSquintRight": 0.15
+  }
+ },
+ {
+  "id": "bacha",
+  "macro": {
+   "gender": 1.0,
+   "age": 68,
+   "asian": 1.0,
+   "african": 0.0,
+   "caucasian": 0.0,
+   "weight": 0.3,
+   "muscle": 0.4,
+   "height": 0.4
+  },
+  "targets": {
+   "nose-scale-horiz-incr": 0.5,
+   "nose-flaring-incr": 0.7,
+   "nose-point-width-incr": 0.6,
+   "nose-hump-decr": 0.6,
+   "nose-scale-vert-decr": 0.4,
+   "nose-curve-concave": 0.3,
+   "nose-trans-backward": 0.2,
+   "mouth-scale-horiz-incr": 0.4,
+   "mouth-angles-up": 0.6,
+   "eye-scale-incr": 0.5,
+   "eye-height1-incr": 0.6,
+   "eye-trans-out": 0.2,
+   "eye-epicanthus-in": 0.4,
+   "head-scale-vert-decr": 0.4,
+   "head-diamond": 0.5,
+   "cheek-bones-incr": 0.8,
+   "chin-width-incr": 0.4,
+   "chin-height-decr": 0.2,
+   "cheek-volume-decr": 0.6,
+   "mouth-laugh-lines-in": 0.6,
+   "head-oval": 0.5
+  },
+  "skin": "old_asian_male",
+  "skin_tint": "#B7967C",
+  "hair": "short02",
+  "hair_val": 0.45,
+  "hair_mix": [
+   "#8A8680",
+   0.3
+  ],
+  "clothes": [
+   {
+    "mhclo": "elvs_male_shirt_untucked_bd1",
+    "color": "#DDE6DC",
+    "cut": "short_sleeves"
+   },
+   {
+    "mhclo": "mindfront_male_trousers_1",
+    "color": "#8E9488"
+   }
+  ],
+  "dep": "#3A2E26",
+  "glasses": {
+   "color": "#3A332C"
+  },
+  "face": {
+   "mouthSmileLeft": 0.2,
+   "mouthSmileRight": 0.2
+  }
+ },
+ {
+  "id": "cout",
+  "macro": {
+   "gender": 0.0,
+   "age": 40,
+   "asian": 1.0,
+   "african": 0.0,
+   "caucasian": 0.0,
+   "weight": 0.4,
+   "muscle": 0.5,
+   "height": 0.2
+  },
+  "targets": {
+   "nose-scale-horiz-incr": 0.5,
+   "nose-flaring-incr": 0.5,
+   "nose-point-width-incr": 0.4,
+   "nose-hump-decr": 0.5,
+   "nose-scale-vert-decr": 0.3,
+   "nose-curve-concave": 0.2,
+   "mouth-angles-up": 0.4,
+   "mouth-scale-horiz-incr": 0.2,
+   "eye-scale-incr": 0.4,
+   "eye-height1-incr": 0.4,
+   "eye-epicanthus-in": 0.3,
+   "head-scale-vert-decr": 0.3,
+   "cheek-bones-incr": 0.5,
+   "chin-height-decr": 0.2,
+   "head-invertedtriangular": 0.3
+  },
+  "skin": "middleage_asian_female",
+  "skin_tint": "#C09C82",
+  "hair": "ponytail01",
+  "hair_val": 0.1,
+  "clothes": [
+   {
+    "mhclo": "toigo_basic_tucked_t-shirt",
+    "color": "#D9B25E"
+   },
+   {
+    "mhclo": "mindfront_female_trousers_1",
+    "color": "#4A3A34"
+   }
+  ],
+  "dep": "#3B5A7A",
+  "face": {
+   "mouthSmileLeft": 0.2,
+   "mouthSmileRight": 0.2
+  }
+ },
+ {
+  "id": "chubay",
+  "macro": {
+   "gender": 1.0,
+   "age": 62,
+   "asian": 1.0,
+   "african": 0.0,
+   "caucasian": 0.0,
+   "weight": 0.3,
+   "muscle": 0.5,
+   "height": 0.3
+  },
+  "targets": {
+   "nose-scale-horiz-incr": 0.8,
+   "nose-flaring-incr": 0.7,
+   "nose-point-width-incr": 0.6,
+   "nose-hump-decr": 0.6,
+   "nose-scale-vert-decr": 0.4,
+   "nose-curve-concave": 0.3,
+   "nose-trans-backward": 0.2,
+   "mouth-scale-horiz-incr": 0.4,
+   "mouth-angles-up": 0.6,
+   "eye-scale-incr": 0.5,
+   "eye-height1-incr": 0.6,
+   "eye-trans-out": 0.2,
+   "eye-epicanthus-in": 0.4,
+   "head-scale-vert-decr": 0.4,
+   "head-diamond": 0.5,
+   "cheek-bones-incr": 0.8,
+   "chin-width-incr": 0.4,
+   "chin-height-decr": 0.2,
+   "cheek-volume-decr": 0.6,
+   "mouth-laugh-lines-in": 0.6
+  },
+  "skin": "middleage_asian_male",
+  "skin_tint": "#B08E74",
+  "hair": "short02",
+  "hair_val": 0.25,
+  "hair_mix": [
+   "#1E1C1B",
+   0.2
+  ],
+  "clothes": [
+   {
+    "mhclo": "elvs_crude_t-shirt_male",
+    "color": "#EFEDE8",
+    "solid": true
+   },
+   {
+    "mhclo": "mindfront_male_trousers_1",
+    "color": "#2E2E33"
+   }
+  ],
+  "dep": "#2A2A2A",
+  "glasses": {
+   "color": "#1F1C1A"
+  },
+  "face": {
+   "mouthSmileLeft": 0.2,
+   "mouthSmileRight": 0.2
+  }
+ },
+ {
+  "id": "chuchin",
+  "macro": {
+   "gender": 1.0,
+   "age": 60,
+   "asian": 1.0,
+   "african": 0.0,
+   "caucasian": 0.0,
+   "weight": 1.0,
+   "muscle": 0.4,
+   "height": 0.35
+  },
+  "targets": {
+   "nose-scale-horiz-incr": 0.8,
+   "nose-flaring-incr": 0.7,
+   "nose-point-width-incr": 0.6,
+   "nose-hump-decr": 0.6,
+   "nose-scale-vert-decr": 0.4,
+   "nose-curve-concave": 0.3,
+   "nose-trans-backward": 0.2,
+   "mouth-scale-horiz-incr": 0.4,
+   "mouth-angles-up": 0.6,
+   "eye-scale-incr": 0.5,
+   "eye-height1-incr": 0.6,
+   "eye-trans-out": 0.2,
+   "eye-epicanthus-in": 0.4,
+   "head-scale-vert-decr": 0.4,
+   "head-diamond": 0.0,
+   "cheek-bones-incr": 0.6,
+   "chin-width-incr": 0.4,
+   "chin-height-decr": 0.2,
+   "cheek-volume-decr": 0.0,
+   "mouth-laugh-lines-in": 0.5,
+   "head-round": 0.6,
+   "head-fat-incr": 0.5,
+   "neck-double-incr": 0.4,
+   "stomach-pregnant-incr": 0.4,
+   "torso-scale-horiz-incr": 0.3
+  },
+  "skin": "middleage_asian_male",
+  "skin_tint": "#BC987E",
+  "hair": "short02",
+  "hair_val": 0.2,
+  "hair_mix": [
+   "#1E1C1B",
+   0.15
+  ],
+  "clothes": [
+   {
+    "mhclo": "mindfront_male_trousers_1",
+    "print": "plaid_navy.png",
+    "scale": 2.5,
+    "cut": "knee"
+   }
+  ],
+  "dep": "#6A4A2E",
+  "singlet": "#ECE9E1",
+  "face": {
+   "mouthSmileLeft": 0.45,
+   "mouthSmileRight": 0.45,
+   "cheekSquintLeft": 0.25,
+   "cheekSquintRight": 0.25,
+   "eyeSquintLeft": 0.15,
+   "eyeSquintRight": 0.15
+  }
+ }
+]

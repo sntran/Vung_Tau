@@ -37,26 +37,29 @@ The blocks of plans 0001 to 0003 go away.
 | D10 | Each spoken line can have a face: `smile`, `laugh`, `proud`, `surprised`, `worried`, `frown`, or `neutral`. `data/faces.json` gives the face-shape weights of each face. | Content is data. I can change the feeling of a line without code. |
 | D11 | Work in two phases. Phase A makes Bà Tư only. I judge her look, movement, face, and lip sync. Phase B makes the other people only after I approve Phase A. | The look is a matter of taste. One person is cheap to change. Seven people are not. |
 | D12 | Face shapes are only on a separate head mesh. Keep only the face shapes that the game uses (R10). | A face shape stores data for each vertex of its mesh. The full body has about 13 000 faces. With 67 shapes on the full body, one person uses tens of MB of memory. On the head mesh only, it is a small part of that. |
+| D13 | The prototype in `docs/prototype/people/` is the target look. I approved it. It also shows how to make the clothes that MakeHuman does not have. | It is faster to start from values and methods that work. Its README lists what we learned and the known faults. |
 
 ## 4. Requirements
 
 ### People data
 
 - **R1.** `data/people.json` has an entry for each person: `id` (the speaker ID of the dialogue), sex, age, weight, muscle, height, the proportions of the face, the skin, the hair, the eyebrows, the clothes, the shoes, the things they carry or wear (for example a nón lá or a cloth bag), and a `seed`. The values are the MPFB slider values, so I can change them.
-- **R2.** All people of this plan are Vietnamese adults from the South. Their faces and bodies have variety: not one face with different hair. Use the `asian` value of MPFB near 1.0, and use the face sliders (nose, cheeks, eyes, jaw, mouth) for variety. Skin is the color of people who live in the sun. Older people have the marks of age.
-- **R3.** The first values of the people (I check them, see Q1):
+- **R2.** All people of this plan are Vietnamese adults from the South. Their faces and bodies have variety: not one face with different hair. The `asian` value of MPFB alone gives a general East Asian face. Use the face targets of the prototype (`docs/prototype/people/people.json`): a wider nose with a lower bridge, a shorter face, high cheekbones, lean cheeks for older people, eyes that are open enough, and mouth corners that are not low. Skin is the color of people who live in the sun: the "asian" skins of MakeHuman are light-skin textures, so lower their saturation and tint them, as the prototype does. Older people have the marks of age. Older men often have dark hair.
+- **R3.** The people (I approved this table and the prototype look, see Q1):
 
   | Person | Age | Look | Clothes |
   |---|---|---|---|
   | Bà Tư | about 70 | Small and thin. Grey hair in a bun. | Đồ bộ with a small flower print. Dép (sandals). |
-  | Cô Nga | about 48 | Medium build. Black hair to the shoulders, tied back. | A plain blouse and long trousers. Dép. |
-  | Cô Sáu | about 55 | Strong arms. Hair tied back under a cloth. | An apron over đồ bộ. Rubber sandals. |
-  | Bác Hà | about 68 | Thin, straight back. Short grey hair. | A light shirt with buttons, dark trousers. From the North. |
-  | Cô Út | about 40 | Small, quick. Black hair in a clip. | A T-shirt, an apron, a cloth hat. |
-  | Chú Bảy | about 62 | Thin, sunburned. Short hair. | An old polo shirt, shorts, dép. |
-  | Chú Chín | about 60 | Heavy, round face. Short grey hair. | A singlet (áo ba lỗ), long trousers, dép. |
+  | Cô Nga | about 48 | Medium build. Black hair in a ponytail. | A plain T-shirt and loose long trousers. Dép. |
+  | Cô Sáu | about 55 | Strong arms. Black hair in a bun. A wide smile. | Đồ bộ with a red flower print. Dép. An apron at the shop (later plan). |
+  | Bác Hà | about 68 | Thin, straight back. Short steel-grey hair. Glasses. From the North. | A pale short-sleeve shirt with buttons, light trousers. Dép. |
+  | Cô Út | about 40 | Small, quick. Black hair in a ponytail. | A T-shirt and trousers. Dép. An apron and a cloth hat at the shop (later plan). |
+  | Chú Bảy | about 62 | Thin, lean face, sunburned. Short dark hair. Glasses. | A white T-shirt and dark trousers. Dép. |
+  | Chú Chín | about 60 | Heavy, round face, a belly, a ready smile. Short black hair. | An áo ba lỗ (singlet) and checked quần đùi (shorts). Dép. |
 
-- **R4.** Clothes: start from the CC0 shirt, trousers, and shoe meshes of MakeHuman, which fit the body. Make the cloth patterns by code: small flower prints, checks, plain colors that are worn and faded. The colors come from the same kind of measured palette as the walls of plan 0004 (low saturation, with rare strong colors). Do not use a logo or a real brand. Make the nón lá and the cloth bag by code.
+- **R4.** Clothes: start from the CC0 shirt and trousers meshes of MakeHuman, which fit the body. Keep their materials (normal maps), and replace only the base color. Make the cloth patterns by code: small flower prints for đồ bộ, checks for quần đùi, plain colors that are worn and faded. The colors come from the same kind of measured palette as the walls of plan 0004 (low saturation, with rare strong colors). Do not use a logo or a real brand. Do not use the shoes of MakeHuman: people wear dép.
+- **R4a.** Make by code, with the methods of the prototype: short sleeves and knee shorts (cut a MakeHuman item, then show the skin again where the cloth is gone), the áo ba lỗ (from the torso surface of the body, cut along smooth curves), dép, and glasses. Also make the nón lá and the cloth bag by code. Each item made by code must follow the skeleton.
+- **R4b.** The face of each person at rest can have a light expression from the ARKit face units (for example a small smile). It is in `data/people.json`. A line `face` (R25) adds to it.
 - **R5.** Hair: use the CC0 hair meshes and hair materials. A bun, short hair, and hair tied back must exist. If no CC0 mesh has a bun, make the bun by code (a shape at the back of the head with the hair material).
 
 ### People build
@@ -66,7 +69,7 @@ The blocks of plans 0001 to 0003 go away.
 - **R8.** The build makes two levels of detail for each person: LOD0 (full mesh) and LOD1 (about a quarter of the faces, no face shapes, the head joined to the body). The builder can use the MPFB proxy meshes for LOD1.
 - **R9.** `build.py` writes `assets/people/manifest.json`: for each person, the files, the triangle count of each level, the texture sizes, the face shapes, and a hash of the person entry, the MPFB version, the `bpy` version, and the pack hashes. It makes a person again only when the hash changes. `Content` checks the hashes at start, as for the voices (plan 0003, R4).
 - **R10.** Face shapes to keep on the head: the 15 Meta (Oculus) visemes of `visemes02` (`viseme_sil`, `viseme_PP`, `viseme_FF`, `viseme_TH`, `viseme_DD`, `viseme_kk`, `viseme_CH`, `viseme_SS`, `viseme_nn`, `viseme_RR`, `viseme_aa`, `viseme_E`, `viseme_I`, `viseme_O`, `viseme_U`), and these ARKit face units of `faceunits01`: `eyeBlinkLeft`, `eyeBlinkRight`, `eyeLookUpLeft`, `eyeLookUpRight`, `eyeLookDownLeft`, `eyeLookDownRight`, `eyeLookInLeft`, `eyeLookInRight`, `eyeLookOutLeft`, `eyeLookOutRight`, `eyeSquintLeft`, `eyeSquintRight`, `eyeWideLeft`, `eyeWideRight`, `browInnerUp`, `browDownLeft`, `browDownRight`, `browOuterUpLeft`, `browOuterUpRight`, `cheekSquintLeft`, `cheekSquintRight`, `mouthSmileLeft`, `mouthSmileRight`, `mouthFrownLeft`, `mouthFrownRight`, `mouthPressLeft`, `mouthPressRight`, `jawOpen`, `noseSneerLeft`, `noseSneerRight`. A face in `data/faces.json` can use only these.
-- **R11.** `.github/workflows/people-packs.yml` runs by hand only. It downloads the asset packs in `tools/people/packs.json` from the MakeHuman servers, checks the license of each pack on its page, and uploads them to the release `people-packs-1` of our repository. `tools/people/packs.py` downloads each asset pack that `data/people.json` uses from the release `people-packs-1` of our repository, and checks its SHA-256. `tools/people/packs.json` lists each pack: name, license, source URL, SHA-256. A pack that is not CC0 or CC-BY stops the build.
+- **R11.** Done: `.github/workflows/people-packs.yml` (by hand only) copied the asset packs in `tools/people/packs.json` from the MakeHuman servers to the release `people-packs-1` of our repository. The files `packs.lock.*.json` in the release give the source, the license, and the SHA-256 of each pack. Add a `tools/people/packs.py` that downloads each pack that `data/people.json` uses from that release only, and checks its SHA-256. A pack that is not CC0 or CC-BY stops the build. Unzip the packs into the MPFB user data folder (see the prototype README).
 - **R12.** `.github/workflows/people.yml` runs by hand, and on a push to `main` that changes `data/people.json`, `data/faces.json`, or `tools/people/`. It runs `build.py` and commits the changed files to `main` with the identity in `CONTRIBUTING.md` and the message "Update the people". It also renders a picture of each person (front, three-quarter, and face) with Blender into `docs/people/`, and the export workflow publishes the pictures at `/people/` on GitHub Pages, as for the voice audition.
 - **R13.** Add MPFB, each asset pack, each animation library, and Rhubarb Lip Sync to `assets/CREDITS.md`, with the license and the source.
 
@@ -134,7 +137,7 @@ PT-01, PT-03 to PT-24 must still pass. A play test that taps a person must tap t
 
 ## 8. Open questions
 
-- **Q1.** Are the ages, looks, and clothes in R3 correct? I decide before Phase A starts.
+- **Q1.** Answered: the R3 table and the prototype look (`docs/prototype/people/people_v3.jpg`) are close enough for now. The women's faces had no reference photos. I can send photos later.
 - **Q2.** Does Rhubarb make a good mouth for Vietnamese? I decide in Phase A (R26).
 - **Q3.** Is the look of Phase A good, or must it be more realistic or more simple? I decide in Phase A.
 

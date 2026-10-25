@@ -157,6 +157,7 @@ The audio driver prints ALSA errors in the workspace. These errors are not defec
 | `docs/playtests/` | Play-test reports from the architect. |
 | `docs/content/culture-notes.md` | What we know about the food and customs, with sources and check status. |
 | `docs/prototype/hem-2d.html` | The first 2D prototype. Use it as a reference for content and flow only. Do not copy its look. |
+| `docs/prototype/people/` | The people prototype of plan 0006 (Blender and MPFB 2): the approved target look, the values of each person, and how to make clothes by code. |
 | `project.godot`, `export_presets.cfg` | The Godot project and the export presets (Web, Android, iOS). |
 | `autoload/` | `Content` (reads and checks `data/`), `GameState` (clock, notebook, save), `Playtest` (active only with `--playtest=NAME`). |
 | `data/` | All content: cards, spots and opening hours, people, dialogue, messages, voices, sound captions, the hẻm layout, UI text. |
@@ -167,7 +168,7 @@ The audio driver prints ALSA errors in the workspace. These errors are not defec
 | `tools/` | `setup.sh`, `test.sh`, `playtest.sh`, and `voices/` (the voice build and its tests). |
 | `assets/` | Fonts, icons, voices, and `CREDITS.md`. |
 | `docs/voices/` | The voice audition page (made by the voices workflow). |
-| `.github/workflows/` | `test.yml` (tests on each push), `export.yml` (web, Android, iOS builds, and GitHub Pages), and `voices.yml` (the voice files). |
+| `.github/workflows/` | `test.yml` (tests on each push), `export.yml` (web, Android, iOS builds, and GitHub Pages), and `voices.yml` (the voice files), and `people-packs.yml` (copies the MakeHuman asset packs to the release `people-packs-1`, by hand only). |
 
 Plan 0001 adds the Godot project structure. See that plan.
 
