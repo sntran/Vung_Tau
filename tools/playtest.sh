@@ -40,7 +40,11 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 GODOT="${GODOT:-$ROOT/.tools/godot/godot}"
 DEFAULT_SIZES="1280x720 2400x1080"
-TIME_LIMIT=200
+# The real time of one run, to stop a run that does not end. The game stops a
+# run after 180 s of game time. The CI computers are about two times slower
+# than the workspace, and the house kit of plan 0004 makes a frame at
+# 2400x1080 slower, so a run there can take more than 200 s of real time.
+TIME_LIMIT=300
 
 if [[ ! -x "$GODOT" ]]; then
   echo "playtest.sh: Godot is missing. Run tools/setup.sh first." >&2
