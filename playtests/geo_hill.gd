@@ -3,7 +3,7 @@ extends RefCounted
 # through the ground. The player cannot walk up a slope that is steeper than
 # 45° where there is no road.
 # The road from Hạ Long to the lighthouse is about 2.8 km long. The game runs
-# 6 times faster, and the walk is in 8 runs, so that each run is shorter than
+# 6 times faster, and the walk is in 12 runs, so that each run is shorter than
 # 180 s under lavapipe. Each run starts where the last run stops (a setup step).
 # The last run finds a slope that is steeper than 45° for 6 m on Núi Nhỏ or Núi
 # Lớn, with no road near it, and checks it.
@@ -17,8 +17,12 @@ extends RefCounted
 # phase: --world=vung_tau --start-time=08:00
 # phase: --world=vung_tau --start-time=08:00
 # phase: --world=vung_tau --start-time=08:00
+# phase: --world=vung_tau --start-time=08:00
+# phase: --world=vung_tau --start-time=08:00
+# phase: --world=vung_tau --start-time=08:00
+# phase: --world=vung_tau --start-time=08:00
 
-const WALK_RUNS := 8
+const WALK_RUNS := 12
 
 
 func run(d: PlaytestDriver) -> void:

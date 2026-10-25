@@ -1441,7 +1441,11 @@ func stick_along(route: PackedVector3Array, to: float, check := Callable(), ahea
 		stuck = stuck + 1 if moved < 0.5 else 0
 		if stuck >= 4:
 			if not may_stop:
-				fail("the player does not move on the route at %.0f m" % here)
+				var at: Vector3 = state().player
+				var player: Player = main().player
+				fail("the player does not move on the route at %.0f m: it stops at (%.1f, %.1f, %.1f), on the floor %s, floor normal %s, wall %s" % [
+						here, at.x, at.y, at.z, player.is_on_floor(), player.get_floor_normal(), player.is_on_wall()])
+				await screenshot("stops_on_route")
 			break
 	_tree.process_frame.disconnect(hook)
 	return reached
