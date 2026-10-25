@@ -5,7 +5,8 @@ extends RefCounted
 # Report 0003: the "far" screenshot looks along the hẻm, not at a wall
 # (D-0003-06). In run 2, the player stays 3 minutes near the neighbors with
 # Listen on, and no chat line comes again (D-0003-03). The game runs 3 times
-# faster in run 2, so that the run is shorter than 180 s.
+# faster in run 2 and in the wait at 15 m, so that each run is shorter than
+# 180 s.
 # sizes: 1280x720 2400x1080
 # phase: --start-time=06:00
 # phase: --start-time=06:00 --fresh-save
@@ -19,7 +20,8 @@ func run(d: PlaytestDriver) -> void:
 	var hem: Node = d.main().hem
 	var chu_bay: Npc = hem.npcs["chubay"]
 	var near := Vector3(chu_bay.global_position.x + 3.0, 0.0, 0.6)
-	await d.stick_to(near)
+	# The way along the middle of the hẻm is free at 06:00: one straight walk.
+	await d.stick_straight(near)
 	var s := d.state()
 	var distance := Vector2(chu_bay.global_position.x - s.player.x, chu_bay.global_position.z - s.player.z).length()
 	d.expect(distance <= 5.0, "the player is about 4 m from the neighbors: %.1f m" % distance)
@@ -50,7 +52,10 @@ func run(d: PlaytestDriver) -> void:
 	d.expect(distance >= 14.0, "the player is 15 m from the neighbors: %.1f m" % distance)
 	var count := d.transcript().size()
 	var saw_subtitle := false
-	# The next chat comes "every_s" seconds after the last one.
+	# The next chat comes "every_s" seconds after the last one. The game runs
+	# 3 times faster for this wait, so that the run is shorter than 180 s at
+	# 2400×1080 on a slow computer.
+	Engine.time_scale = 3.0
 	var end := Time.get_ticks_msec() + 120000
 	var spoke := false
 	while Time.get_ticks_msec() < end:
@@ -62,6 +67,7 @@ func run(d: PlaytestDriver) -> void:
 		if spoke and now.speaking.is_empty():
 			break
 		await d.wait_frames(2)
+	Engine.time_scale = 1.0
 	d.expect(spoke, "the neighbors talk again")
 	d.expect(d.transcript().size() == count, "at 15 m no new line goes into the transcript")
 	d.expect(not saw_subtitle, "at 15 m no subtitle shows")
