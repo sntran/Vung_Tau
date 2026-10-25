@@ -95,19 +95,29 @@ func _run() -> void:
 		_finish()
 		return
 	var scenario: Object = load(path).new()
-	# The limit does not change with Engine.time_scale: a scenario that plays the
-	# game faster does more in the same time.
-	var timer := get_tree().create_timer(TIME_LIMIT_S, true, false, true)
-	timer.timeout.connect(_on_time_limit)
+	_limit_on = true
 	driver.step("start %s, phase %d, %s, %s" % [scenario_name, driver.phase,
 			GameClock.format_time(GameState.minutes), get_window().size])
 	await scenario.run(driver)
 	_finish()
 
 
-func _on_time_limit() -> void:
-	driver.fail("the scenario takes more than %d seconds" % TIME_LIMIT_S)
-	_finish()
+## The time limit counts the game time at the normal speed: the frame time
+## divided by Engine.time_scale. A scenario that plays the game faster does
+## more in the same time. A SceneTreeTimer with ignore_time_scale counts the
+## real time, which is longer than the game time at a low frame rate.
+func _process(delta: float) -> void:
+	if not _limit_on or _finished:
+		return
+	_limit_time += delta / maxf(Engine.time_scale, 0.001)
+	if _limit_time > TIME_LIMIT_S:
+		_limit_on = false
+		driver.fail("the scenario takes more than %d seconds" % TIME_LIMIT_S)
+		_finish()
+
+
+var _limit_on := false
+var _limit_time := 0.0
 
 
 var _finished := false

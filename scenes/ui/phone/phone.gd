@@ -18,6 +18,9 @@ const MAX_WIDTH := 560.0
 const MARGIN := 12.0
 const BUTTON_SIZE := Vector2(150, 88)
 const BANNER_SECONDS := 3.0
+## The height of the slot of the status bar and the banner, and the text size of the banner.
+const BANNER_SLOT_HEIGHT := 72.0
+const BANNER_FONT_SIZE := 16
 ## A swipe down of this many base pixels lowers the phone.
 const SWIPE := 110.0
 
@@ -80,9 +83,18 @@ func _build_device() -> void:
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 8)
 	device.add_child(column)
+	# The status bar is in a slot of fixed height. A notification banner covers
+	# the status bar in the same slot, so nothing on the phone moves while it
+	# shows (report 0003, D-0003-07).
+	var slot := Control.new()
+	slot.name = "StatusSlot"
+	slot.custom_minimum_size.y = BANNER_SLOT_HEIGHT
+	slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(slot)
 	var status := HBoxContainer.new()
 	status.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	column.add_child(status)
+	status.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	slot.add_child(status)
 	_time = PhoneUi.label("", "BarLabel", 20)
 	_time.name = "StatusTime"
 	_time.set_meta("test_id", "phone.time")
@@ -90,18 +102,19 @@ func _build_device() -> void:
 	var signal_label := PhoneUi.label("▂▄▆ 82%", "BarSmall")
 	signal_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	status.add_child(signal_label)
-	# The banner of a notification is under the status bar. While it shows, it
-	# pushes the header and the app down, so it covers nothing (D-0003-07).
 	_banner = PanelContainer.new()
 	_banner.name = "Banner"
 	_banner.set_meta("test_id", "phone.banner")
 	_banner.theme_type_variation = "Toast"
 	_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_banner.visible = false
-	_banner_label = PhoneUi.label("")
+	_banner.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_banner_label = PhoneUi.label("", "", BANNER_FONT_SIZE)
 	_banner_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_banner_label.max_lines_visible = 2
+	_banner_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_banner.add_child(_banner_label)
-	column.add_child(_banner)
+	slot.add_child(_banner)
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 8)
 	column.add_child(header)
