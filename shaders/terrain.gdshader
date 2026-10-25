@@ -76,7 +76,8 @@ void fragment() {
 	color = mix(color, dry_color, dry);
 	float bare_rock = texture(rock_mask, (world_position.xz - mask_origin) / mask_size).r;
 	vec3 wood = wood_color * luminance(texture(wood_texture, uv * 0.7).rgb) * 2.2;
-	wood = mix(wood, wood * vec3(1.25, 1.05, 0.7), dryness * 0.4);
+	// Under the trees, the dry season shows less: half of the dry patches.
+	wood = mix(wood, dry_color * 0.75, dry * 0.5);
 	color = mix(color, wood, mask.b * 0.85);
 	// On a hill with wood, the wood is stronger than the town (the roads up the hill).
 	color = mix(color, texture(town_texture, uv).rgb, mask.g * (1.0 - mask.b * 0.75));

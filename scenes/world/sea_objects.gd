@@ -34,6 +34,7 @@ func setup(path: String) -> bool:
 	add_child(_boats_node)
 	var material := StandardMaterial3D.new()
 	material.vertex_color_use_as_albedo = true
+	material.vertex_color_is_srgb = true
 	material.roughness = 0.75
 	var ship_batch := MeshBatch.new()
 	for ship: Dictionary in ships:

@@ -4,11 +4,16 @@ extends RefCounted
 # and Bãi Sau from the beach road. Take each one at 06:00, 12:00, and 18:00.
 # I compare them with the real places.
 # The fourth run takes the same views at 21:00, for the night light (R14).
+# The fifth run is on 3 June 2027, in the rainy season (R12a): the hills are
+# green, and the flame trees show red flowers. The other runs are on day 1, in
+# the dry season: the hills are partly dry. Each run also looks up the Hải Đăng
+# road, where the flame trees stand.
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=06:00
 # phase: --world=vung_tau --start-time=12:00
 # phase: --world=vung_tau --start-time=18:00
 # phase: --world=vung_tau --start-time=21:00
+# phase: --world=vung_tau --start-time=12:00 --start-date=2027-06-03
 
 
 func run(d: PlaytestDriver) -> void:
@@ -16,7 +21,12 @@ func run(d: PlaytestDriver) -> void:
 	if not d.expect(w != null, "the Vũng Tàu world starts with --world=vung_tau"):
 		return
 	await d.wait_ground()
-	var time: String = ["0600", "1200", "1800", "2100"][d.phase - 1]
+	var time: String = ["0600", "1200", "1800", "2100", "june"][d.phase - 1]
+	if d.phase == 5:
+		d.expect(w.season.name == "rainy" and w.season.dryness < 0.15, "on 3 June the hills are green: %s" % [w.season])
+		d.expect(w.season.flame_flowers > 0.9, "on 3 June the flame trees flower: %.2f" % w.season.flame_flowers)
+	else:
+		d.expect(w.season.name == "dry" and w.season.dryness > 0.4, "on day 1 the hills are partly dry: %s" % [w.season])
 	for view: Dictionary in views(w):
 		if view.is_empty():
 			continue
@@ -48,6 +58,11 @@ static func views(w: VungTau) -> Array[Dictionary]:
 		var point := Vector3(cape.position[0], 0.0, cape.position[1])
 		point.y = maxf(w.ground_height(point.x, point.z), 0.0) + 6.0
 		result.append({"name": "nghinh_phong_south", "eye": point, "target": point + Vector3(0, -10.0, 400.0)})
+	if w.roadworks != null:
+		var works_line: Array = w.roadworks.record.points
+		var bottom := Vector3(works_line[0][0], works_line[0][1] + Player.EYE_HEIGHT, works_line[0][2])
+		var up: Array = works_line[mini(10, works_line.size() - 1)]
+		result.append({"name": "hai_dang_road", "eye": bottom, "target": Vector3(up[0], up[1] + 2.0, up[2])})
 	var back := w.data.landmark("bai_sau")
 	if d_ok(back):
 		var beach := Vector3(back.position[0], 0.0, back.position[1])

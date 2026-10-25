@@ -34,7 +34,8 @@ void vertex() {
 }
 
 void fragment() {
-	vec3 color = COLOR.rgb;
+	// The vertex colors are sRGB colors.
+	vec3 color = pow(COLOR.rgb, vec3(2.2));
 	if (leaf > 0.5) {
 		if (tree_random < bare_share) {
 			discard;

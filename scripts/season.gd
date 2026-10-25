@@ -6,7 +6,7 @@ extends RefCounted
 ## trees (phượng vĩ) show red flowers around May and June.
 
 ## The dryness of the hill grass on the 15th of each month (January first).
-const DRYNESS := [0.8, 0.95, 1.0, 0.85, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.35, 0.6]
+const DRYNESS := [0.8, 0.95, 1.0, 0.85, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.35, 0.6]
 ## The flowers of the flame trees on the 15th of each month.
 const FLAME_FLOWERS := [0.0, 0.0, 0.0, 0.15, 0.85, 1.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0]
 ## The leaves of the flame trees: they lose most leaves late in the dry season.

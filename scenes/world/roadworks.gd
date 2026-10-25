@@ -16,6 +16,8 @@ var workers: Node3D
 var machine: AudioStreamPlayer3D
 var excavator_position := Vector3.ZERO
 var sign_position := Vector3.ZERO
+## The direction from the sign to the people who read it (the road side).
+var sign_facing := Vector3.FORWARD
 ## The points of the road line: x, height, z.
 var _line: PackedVector3Array = PackedVector3Array()
 var _hours: Array[int] = []
@@ -128,9 +130,11 @@ func _build() -> void:
 	# The site sign at the bottom of the roadworks.
 	var at_sign: Array = _at(3.0)
 	sign_position = at_sign[0] + _side(at_sign[1]) * (road_half + widen + 1.5)
+	sign_facing = -_side(at_sign[1])
 	_add_sign(batch, sign_position, Basis.looking_at(-_side(at_sign[1]), Vector3.UP))
 	var material := StandardMaterial3D.new()
 	material.vertex_color_use_as_albedo = true
+	material.vertex_color_is_srgb = true
 	material.roughness = 0.85
 	batch.commit(self, {"works": material}, "Roadworks")
 	# The workers.
@@ -179,8 +183,8 @@ func _add_excavator(batch: MeshBatch, body: StaticBody3D, place: Vector3, basis:
 ## fictional name), and the planned end.
 func _add_sign(batch: MeshBatch, place: Vector3, basis: Basis) -> void:
 	for side in [-1.0, 1.0]:
-		batch.box("works", Vector3(0.1, 2.6, 0.1), place + basis * Vector3(side * 1.2, 1.3, 0), Color("#5A5A58"), basis)
-	batch.box("works", Vector3(2.8, 1.6, 0.06), place + basis * Vector3(0, 2.0, 0), Color("#1F5FA8"), basis)
+		batch.box("works", Vector3(0.1, 2.6, 0.1), place + basis * Vector3(side * 1.75, 1.3, 0.05), Color("#5A5A58"), basis)
+	batch.box("works", Vector3(3.8, 1.7, 0.06), place + basis * Vector3(0, 2.0, 0), Color("#1F5FA8"), basis)
 	var label := Label3D.new()
 	label.name = "SiteSign"
 	label.text = "%s\n%s\nDự kiến hoàn thành: %s" % [record.sign, record.contractor, record.planned_end]
@@ -189,7 +193,7 @@ func _add_sign(batch: MeshBatch, place: Vector3, basis: Basis) -> void:
 	label.pixel_size = 0.004
 	label.outline_size = 0
 	label.modulate = Color("#FFFFFF")
-	label.width = 640.0
+	label.width = 820.0
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.transform = Transform3D(basis * Basis(Vector3.UP, PI), place + basis * Vector3(0, 2.0, -0.04))
