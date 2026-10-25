@@ -41,8 +41,13 @@ func run(d: PlaytestDriver) -> void:
 	d.set_time_scale(5.0)
 	var heights := {"min": INF, "max": -INF, "bad": 0}
 	var space: PhysicsDirectSpaceState3D = d.main().get_world_3d().direct_space_state
+	# The debug screen shows the road during the walk. At the end of a part,
+	# the player can stop just off the edge of the road.
+	var debug_road := [false]
 	var check := func() -> void:
 		var s := d.state()
+		if str(s.debug_text).contains("Road: " + coast):
+			debug_road[0] = true
 		if not s.on_floor:
 			return
 		# The surface under the eye: a sidewalk, or the road mesh, which is
@@ -64,11 +69,12 @@ func run(d: PlaytestDriver) -> void:
 	var names := {}
 	for part in 3:
 		var goal := from + (to - from) * (part + 1) / 3.0
+		debug_road[0] = false
 		if not await d.stick_along(route, goal, check, 25.0):
 			break
 		var s := d.state()
 		names[s.road_name] = true
-		d.expect(str(s.debug_text).contains("Road: " + coast), "the debug screen shows the road %s: %s" % [coast, s.debug_text])
+		d.expect(debug_road[0], "the debug screen shows the road %s during part %d of the walk" % [coast, part + 1])
 		await d.screenshot("walk_%d" % (part + 1))
 	d.set_time_scale(1.0)
 	var walked: float = PlaytestDriver.route_distance(route, d.state().player) - from
