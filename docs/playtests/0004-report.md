@@ -71,10 +71,26 @@
 - **Expected:** R8: patches mostly low on the wall and at the edges, fewer and larger. Most walls of new houses have none.
 - **Correction:** Fewer, larger patches. Use the "low" and "edge" weights more strongly. New houses (paint age low) have no patch above the ground floor.
 
-### D-0004-07: Low on a computer starts the game two times at each start (low, question for me)
+### D-0004-07: Low on a computer starts the game two times at each start (low)
 
 - **Actual:** Builder note N1: the desktop build uses Forward+, and Low uses the Mobile renderer, so the game starts again at each start.
-- **Proposal:** On a computer, Low uses Forward+ with all effects off. Then no restart is needed. The Mobile renderer stays for phones. This changes R4 of plan 0004, so I decide.
+- **My decision (changes R4):** On a computer, Low uses Forward+ with all effects off (no SSAO, SSIL, SDFGI, or fog), the 25 m shadow, and the 0.75 render scale. No preset needs a restart on a computer. Android and iOS keep the Mobile renderer, and the web build keeps Compatibility. Remove the restart code if no preset needs it.
+
+### D-0004-08: The houses are all in line (medium)
+
+- **Expected (first-hand, 2026-10-24):** In a dense hẻm, houses are not in line with each other. They face in different directions, with different depths, back extensions, and roofs at many heights. See the top-down photo of R10c.
+- **Actual:** In the test street, all houses have the same depth, a flat back, and parallel walls (D-0004-03, picture above).
+- **Correction in this plan:** The kit makes houses with different depths, back extensions of one or two floors, a small room on some roof terraces, and metal roofs over a part of a terrace. The fronts on the test street stay on the street line.
+- **For plan 0009:** The house generator turns houses to follow the real lot shapes, so the houses face in different directions.
+
+### D-0004-09: The buildings must be colorful, like the photos (medium)
+
+- **My decision (answers Q5, changes R10a):** I prefer colorful buildings, like the photos.
+- **Measured by the architect** on three of my photos (the top-down dense hẻm and two views from Núi Nhỏ, without plants, sky, and dark shade): 28% to 36% of the building surfaces have a saturation above 0.25. Rust, orange, and terracotta are 17% to 25%. Mint and teal are 2% to 8%. Yellow is 2% to 5%. Blue is 1% to 6%. In the game from above (picture of D-0004-03), almost all surfaces are grey or white.
+- **Correction:**
+  - Metal roofs as in D-0004-03.
+  - Bold walls: about 30% of the walls instead of 15%, up to 1 house in 3 in a hẻm of homes. Colors: mint, teal, pastel yellow, salmon, sky blue, and two-color fronts. Keep the rule that two neighbors do not have the same color.
+  - Add a check to PT-25: from the fixed view above the test street, 25% to 40% of the pixels of the buildings have a saturation above 0.25.
 
 ## 4. Audit of the requirements
 
@@ -82,12 +98,12 @@
 |---|---|---|
 | R1 | Pass | Renderers set. PT-30 checks 16:9, 21:9, and 16:10. |
 | R2, R3 | Pass | PT-26 and PT-27. Esc opens the phone home screen (Q6 is still open). |
-| R4 | Pass | See D-0004-07. |
+| R4 | Change | My decision in D-0004-07: Low on a computer uses Forward+ with the effects off. |
 | R5 | Pass | Shadows on all presets. The web build keeps them off, with the reason in `AGENTS.md`. |
 | R6 | Defect | D-0004-02. `docs/release-notes.md` exists. |
 | R7 | Partly | All parts exist. See D-0004-03 for the roofs. |
 | R8, R9 | Partly | See D-0004-06. |
-| R10, R10a, R10b | Pass | `content_checker.gd` checks the palette rules. Q5 (the builder's bold and accent colors) is still open. |
+| R10, R10a, R10b | Change | `content_checker.gd` checks the palette rules. My answer to Q5 changes the rules: D-0004-09. |
 | R10c | Defect | D-0004-03. |
 | R11 | Pass | Concrete floor with cracks, patches, and the drain. |
 | R11a | Defect | The hẻm is 2.8 m wide. Walking, tap to walk, and the phone pass at 1280×720. See D-0004-01 and D-0004-05. |
@@ -100,12 +116,16 @@
 |---|---|
 | 1 | Fail: D-0004-01. |
 | 2 | Open: I look at the PT-25 screenshots. The architect's findings are D-0004-03, D-0004-04, and D-0004-06. |
-| 3 | Blocked: D-0004-02. Also Q1 (which computer I use) is open. |
+| 3 | Blocked: D-0004-02. I test on macOS and Windows (Q1). |
 | 4 | Pass. |
 
 ## 5. Order of the corrections
 
 1. D-0004-01 and D-0004-02 (CI must be green, and the desktop builds must exist).
 2. D-0004-05 (plan 0006 needs it).
-3. D-0004-03 and D-0004-04 (the look).
-4. D-0004-06, then D-0004-07 after my decision.
+3. D-0004-03, D-0004-08, D-0004-09, and D-0004-04 (the look).
+4. D-0004-06 and D-0004-07.
+
+## 6. Note: the test street is not the homestay hẻm
+
+The real homestay hẻm is only homes, with the slope of Núi Nhỏ on one side and one row of houses on the other side. Nobody sells anything in it (first-hand, 2026-10-24). The street of plans 0001 to 0004, with its shops and carts, is a test street. Plan 0009 builds the real hẻm and moves the shops and their people to the streets near chợ Xóm Lưới. Do not add more shops to the test street.

@@ -163,12 +163,12 @@ The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0009 puts h
 
 ## 7. Open questions
 
-- **Q1.** Which computer do I use to test the desktop builds (Windows, macOS, or Linux)?
+- **Q1.** Answered: I test the desktop builds on macOS and Windows.
 - **Q2.** Which parts in R7 are not correct for Vũng Tàu, and which parts are missing? (For example: solar water heaters on roofs, an altar for Ông Địa in shops, numbers painted on the walls.) Answered in part: the photos show solar water heaters on many flat roofs (now in R7).
 - **Q3.** Answered: in a dense hẻm, corrugated metal roofs and flat concrete terraces are the most common. Tile roofs are common in villa areas (R7, R10c).
 - **Q4.** Answered: the street photos show granite or tiled ground floor fronts and some fully tiled fronts with patterns. They are in R7.
-- **Q5.** The bold wall colors "sky blue" (`#7DB3DC`) and "bright yellow" (`#E6C440`), the stripes, the brick color, and the accent colors (R10b) are first values of the builder, with the source "builder, check" in `palette.json`. Are they correct?
-- **Q6.** Esc shows the home screen of the phone, because the phone is the menu of the game (N3). Is that the menu that I want, or do I want a separate pause menu?
+- **Q5.** Answered: I prefer colorful buildings, like the photos. See D-0004-09 in `docs/playtests/0004-report.md`. The question was: the bold wall colors "sky blue" (`#7DB3DC`) and "bright yellow" (`#E6C440`), the stripes, the brick color, and the accent colors (R10b) are first values of the builder, with the source "builder, check" in `palette.json`. Are they correct?
+- **Q6.** Answered: Esc shows the home screen of the phone. The phone is the menu. No separate pause menu.
 
 ## 8. Builder notes
 

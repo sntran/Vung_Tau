@@ -12,7 +12,7 @@ Vũng Tàu is a 3D game about Vietnamese food and daily life. The player is a tr
 
 - **Audience:** adults who are not Vietnamese. They know phở from restaurants abroad. They do not know how people eat it in Vietnam.
 - **Goal:** the player learns how people in Vietnam really eat, order, and live around food. The player does not learn recipes.
-- **Setting:** Vũng Tàu today, with its real geography. The player stays at a family homestay in a small hẻm (alley) at the foot of Núi Nhỏ, near Bãi Trước (Front Beach).
+- **Setting:** Vũng Tàu today, with its real geography. The player stays at a family homestay in a small hẻm (alley) at the foot of Núi Nhỏ, near Bãi Trước (Front Beach). The homestay hẻm is only homes: the slope of the mountain is on one side, and one row of houses is on the other side. Nobody sells anything in it. To eat, the player walks down to chợ Xóm Lưới and the streets near it. The hẻm of plans 0001 to 0004, with its shops, is a test street until plan 0009 builds the real hẻm.
 - **Platforms:** desktop (Windows, macOS, Linux) is the main platform. Android and iPhone apps stay, with lower settings. A web build is for quick review (plan 0004, D1).
 - **Engine:** Godot 4.7.2-stable. See section 5.
 

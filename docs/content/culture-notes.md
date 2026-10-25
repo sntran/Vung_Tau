@@ -80,6 +80,11 @@ Status values:
 | The pagoda with the monkeys is Chùa Tam Bảo (chùa Khỉ), 72 Vi Ba. | Confirmed | First-hand; [Foody](https://www.foody.vn/vung-tau/chua-tam-bao); [VinWonders](https://vinwonders.com/vi/wonderpedia/news/nui-lon-vung-tau/) |
 | Wild monkeys on Núi Lớn sometimes go into houses and bite people. | Source | [Tuổi Trẻ](https://tuoitre.vn/nui-lon.html) |
 | Town anchors that have been in the same place for a long time: the main bus station, the old markets, the big roundabout, and Ngã Năm. | Confirmed | First-hand. I will name the markets and the roundabout. |
+| The homestay hẻm is only homes. The slope of Núi Nhỏ is on one side, and there is just enough space for one row of houses on the other side. Nobody sells anything in it. | Confirmed | First-hand, 2026-10-24 |
+| The nearest place to eat from the homestay hẻm is chợ Xóm Lưới, a short walk down. | Confirmed | First-hand, 2026-10-24 |
+| Chợ Xóm Lưới is on Phan Bội Châu (at Nguyễn Công Trứ), Phường 2. It sells fresh seafood, and stalls cook it on site. Fishing boats come in at about 15:00. | Source | [Mytour](https://mytour.vn/vi/blog/bai-viet/5-dia-chi-ban-hai-san-tuoi-ngon-khong-lo-chat-chem-o-vung-tau.html), [Mia.vn](https://mia.vn/cam-nang-du-lich/bo-tui-ngay-9-dia-chi-vang-mua-hai-san-tuoi-song-vung-tau-danh-cho-dan-sanh-an-1611) |
+| Houses in a dense hẻm are not in line with each other. They face in different directions, with different depths, back extensions, and roofs at many heights. | Confirmed | First-hand, and the top-down photo of a dense hẻm, 2026-10-24 |
+| Buildings are colorful, as in the photos: about a third of the building surfaces seen from above have a strong color (rust, orange, terracotta, mint, teal). | Confirmed | My choice ("colorful like the photos"), and the architect's measurement of the photos, 2026-10-24 |
 
 ## Houses
 

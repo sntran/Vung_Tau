@@ -88,7 +88,7 @@ Required notices. Show them on a "Credits" screen in the game and in `assets/CRE
   2. Find the road that goes from the coast road at Bãi Trước up to the lighthouse. Use the shortest path in the road network.
   3. Go up this road from the bottom. Find the first curve: a change of direction of more than 45° in 60 m or less.
   4. At the end of this curve, find the hẻm that leaves the road and goes straight on, in the direction that the road had before the curve (±30°).
-  5. Record this hẻm as `homestay_hem`, with the residential blocks along it, in `data/geo/build/homestay.json`.
+  5. Record this hẻm as `homestay_hem`, with the residential blocks along it, in `data/geo/build/homestay.json`. The hẻm has the slope of Núi Nhỏ on one side and one row of houses on the other side, and no shops (first-hand, 2026-10-24). The report says which side is the slope.
 - **R8b.** `build.py` draws `data/geo/build/homestay_area.png`: a top-down map of 300 m around the hẻm, with the roads, their names, the lighthouse road, and the hẻm in a strong color. I confirm the hẻm on this map.
 - **R8c.** If step 4 finds no hẻm, or more than one, the report lists each candidate with its OSM ID, and the map shows each candidate with a number.
 
