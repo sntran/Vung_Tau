@@ -1,0 +1,464 @@
+{
+	"anchors": [
+		{
+			"kind": "bus_station",
+			"osm": "node/5596865382",
+			"name": "Xe Toàn Thắng",
+			"number": 1,
+			"game": [
+				2270.1,
+				-2361.0
+			]
+		},
+		{
+			"kind": "bus_station",
+			"osm": "way/220891652",
+			"name": "Bến xe Vũng Tàu",
+			"number": 2,
+			"game": [
+				1418.6,
+				-757.8
+			]
+		},
+		{
+			"kind": "bus_station",
+			"osm": "node/11813095037",
+			"name": "Bến xe Vũng Tàu",
+			"number": 3,
+			"game": [
+				1430.8,
+				-747.6
+			]
+		},
+		{
+			"kind": "marketplace",
+			"osm": "way/235991337",
+			"name": "Chợ Rạch Dừa",
+			"number": 4,
+			"game": [
+				4556.8,
+				-6041.7
+			]
+		},
+		{
+			"kind": "marketplace",
+			"osm": "way/790787255",
+			"name": "Chợ Thắng Nhất",
+			"number": 5,
+			"game": [
+				2972.9,
+				-5335.0
+			]
+		},
+		{
+			"kind": "marketplace",
+			"osm": "way/259759825",
+			"name": "Chợ Bến Đá",
+			"number": 6,
+			"game": [
+				-802.6,
+				-4009.6
+			]
+		},
+		{
+			"kind": "marketplace",
+			"osm": "way/790384308",
+			"name": "Chợ Phường 9",
+			"number": 7,
+			"game": [
+				1319.6,
+				-3245.2
+			]
+		},
+		{
+			"kind": "marketplace",
+			"osm": "node/5552599299",
+			"name": "Chợ Bến Đình",
+			"number": 8,
+			"game": [
+				262.9,
+				-3147.1
+			]
+		},
+		{
+			"kind": "marketplace",
+			"osm": "node/12995457671",
+			"name": "Chợ Phường 7",
+			"number": 9,
+			"game": [
+				954.7,
+				-2669.9
+			]
+		},
+		{
+			"kind": "marketplace",
+			"osm": "node/7100657303",
+			"name": "Chợ Phường 8",
+			"number": 10,
+			"game": [
+				1906.6,
+				-2204.0
+			]
+		},
+		{
+			"kind": "marketplace",
+			"osm": "node/2641109127",
+			"name": "Chợ Cô Giang",
+			"number": 11,
+			"game": [
+				505.3,
+				-1255.2
+			]
+		},
+		{
+			"kind": "marketplace",
+			"osm": "way/259528309",
+			"name": "Chợ Phường 1",
+			"number": 12,
+			"game": [
+				159.1,
+				-708.5
+			]
+		},
+		{
+			"kind": "marketplace",
+			"osm": "node/11424996126",
+			"name": "Fruits (cheap & specials)",
+			"number": 13,
+			"game": [
+				1323.1,
+				-700.5
+			]
+		},
+		{
+			"kind": "marketplace",
+			"osm": "way/215166910",
+			"name": "Chợ Vũng Tàu",
+			"number": 14,
+			"game": [
+				1299.7,
+				-509.8
+			]
+		},
+		{
+			"kind": "marketplace",
+			"osm": "node/2339056843",
+			"name": "Chợ Du lịch Vũng Tàu",
+			"number": 15,
+			"game": [
+				2217.2,
+				-182.6
+			]
+		},
+		{
+			"kind": "marketplace",
+			"osm": "node/5599563192",
+			"name": "Nguyễn Công Trứ",
+			"number": 16,
+			"game": [
+				308.7,
+				177.4
+			]
+		},
+		{
+			"kind": "marketplace",
+			"osm": "node/2649575440",
+			"name": "Chợ Xóm Lưới",
+			"number": 17,
+			"game": [
+				224.6,
+				242.6
+			]
+		},
+		{
+			"kind": "marketplace",
+			"osm": "node/13788662719",
+			"name": "Chợ Đêm Vũng Tàu",
+			"number": 18,
+			"game": [
+				1851.0,
+				384.9
+			]
+		},
+		{
+			"kind": "roundabout",
+			"osm": "way/744059421",
+			"name": "Đường số 1",
+			"number": 19,
+			"game": [
+				4222.2,
+				-7277.0
+			]
+		},
+		{
+			"kind": "roundabout",
+			"osm": "way/243919219",
+			"name": "Đường số 1",
+			"number": 20,
+			"game": [
+				4398.5,
+				-6789.8
+			]
+		},
+		{
+			"kind": "roundabout",
+			"osm": "way/243919220",
+			"name": "",
+			"number": 21,
+			"game": [
+				4552.2,
+				-6365.9
+			]
+		},
+		{
+			"kind": "roundabout",
+			"osm": "way/565372328,1279678267,1279678271",
+			"name": "",
+			"number": 22,
+			"game": [
+				3971.1,
+				-4145.0
+			]
+		},
+		{
+			"kind": "roundabout",
+			"osm": "way/1458906879",
+			"name": "",
+			"number": 23,
+			"game": [
+				5874.6,
+				-3909.3
+			]
+		},
+		{
+			"kind": "roundabout",
+			"osm": "way/790529498",
+			"name": "",
+			"number": 24,
+			"game": [
+				160.6,
+				-2537.9
+			]
+		},
+		{
+			"kind": "roundabout",
+			"osm": "way/790529505",
+			"name": "",
+			"number": 25,
+			"game": [
+				165.6,
+				-2490.1
+			]
+		},
+		{
+			"kind": "roundabout",
+			"osm": "way/199528378,1446433949,1446433950",
+			"name": "Vòng Xoay Nguyễn Tri Phương",
+			"number": 26,
+			"game": [
+				939.7,
+				-2297.5
+			]
+		},
+		{
+			"kind": "roundabout",
+			"osm": "way/118927579",
+			"name": "Vòng xoay Paradise",
+			"number": 27,
+			"game": [
+				2624.5,
+				-1778.6
+			]
+		},
+		{
+			"kind": "roundabout",
+			"osm": "way/269819561",
+			"name": "",
+			"number": 28,
+			"game": [
+				-650.2,
+				-1712.3
+			]
+		},
+		{
+			"kind": "roundabout",
+			"osm": "way/694747968",
+			"name": "",
+			"number": 29,
+			"game": [
+				-570.6,
+				-1341.2
+			]
+		},
+		{
+			"kind": "roundabout",
+			"osm": "way/1150854196,1446433945,1446433946",
+			"name": "",
+			"number": 30,
+			"game": [
+				1177.1,
+				-1244.1
+			]
+		},
+		{
+			"kind": "roundabout",
+			"osm": "way/1150848437,1502887824",
+			"name": "Bùng binh Lam Sơn",
+			"number": 31,
+			"game": [
+				19.7,
+				-891.4
+			]
+		},
+		{
+			"kind": "roundabout",
+			"osm": "way/112177664,975192902,975192903",
+			"name": "Vòng Xoay Đài Tưởng Niệm Liệt Sĩ",
+			"number": 32,
+			"game": [
+				2046.1,
+				-601.6
+			]
+		},
+		{
+			"kind": "roundabout",
+			"osm": "way/953253569",
+			"name": "Vòng Xoay Xóm Vườn",
+			"number": 33,
+			"game": [
+				638.7,
+				-149.8
+			]
+		},
+		{
+			"kind": "junction",
+			"osm": "node/2440052520",
+			"name": "Hà Bổng / Đinh Núp",
+			"number": 34,
+			"game": [
+				4651.2,
+				-4874.8
+			]
+		},
+		{
+			"kind": "junction",
+			"osm": "node/7108827695",
+			"name": "Đường 2 Tháng 9",
+			"number": 35,
+			"game": [
+				5030.3,
+				-4835.6
+			]
+		},
+		{
+			"kind": "junction",
+			"osm": "node/2454871079",
+			"name": "Hẻm 268 Trần Phú / Hẻm 326 Trần Phú",
+			"number": 36,
+			"game": [
+				-1660.2,
+				-4701.1
+			]
+		},
+		{
+			"kind": "junction",
+			"osm": "node/3702692182",
+			"name": "Hà Huy Tập / Nguyễn Hữu Cảnh / Đường 3 Tháng 2",
+			"number": 37,
+			"game": [
+				5426.8,
+				-3983.9
+			]
+		},
+		{
+			"kind": "junction",
+			"osm": "node/5000821862",
+			"name": "Nguyễn An Ninh / Phạm Hồng Thái / Đường 30 Tháng 4",
+			"number": 38,
+			"game": [
+				1006.8,
+				-2771.0
+			]
+		},
+		{
+			"kind": "junction",
+			"osm": "node/2317186304",
+			"name": "Hẻm 370 Nguyễn An Ninh / Nguyễn An Ninh / Đội Cấn",
+			"number": 39,
+			"game": [
+				1937.1,
+				-2290.3
+			]
+		},
+		{
+			"kind": "junction",
+			"osm": "node/10705743296",
+			"name": "Nguyễn An Ninh / Đường 2 Tháng 9 / Đội Cấn",
+			"number": 40,
+			"game": [
+				2107.1,
+				-2180.0
+			]
+		},
+		{
+			"kind": "junction",
+			"osm": "node/1337220599",
+			"name": "Bình Giã / Chu Mạnh Trinh / Hẻm 285 Bình Giã / Nguyễn Trọng Quản",
+			"number": 41,
+			"game": [
+				2064.4,
+				-1820.7
+			]
+		},
+		{
+			"kind": "junction",
+			"osm": "node/419939179",
+			"name": "Bà Triệu / Lê Lai / Lê Quý Đôn / Nguyễn Văn Trỗi",
+			"number": 42,
+			"game": [
+				347.3,
+				-976.6
+			]
+		},
+		{
+			"kind": "junction",
+			"osm": "node/419939060",
+			"name": "Lê Lợi / Lê Quý Đôn / Thủ Khoa Huân",
+			"number": 43,
+			"game": [
+				11.3,
+				-656.8
+			]
+		},
+		{
+			"kind": "junction",
+			"osm": "node/2347538670",
+			"name": "Huỳnh Thúc Kháng / Hẻm 100 Xô Viết Nghệ Tĩnh / Xô Viết Nghệ Tĩnh",
+			"number": 44,
+			"game": [
+				1343.3,
+				-402.1
+			]
+		},
+		{
+			"kind": "junction",
+			"osm": "node/419939084",
+			"name": "Thống Nhất / Trần Hưng Đạo",
+			"number": 45,
+			"game": [
+				264.6,
+				-235.5
+			]
+		},
+		{
+			"kind": "junction",
+			"osm": "node/419939001",
+			"name": "Hoàng Hoa Thám / Nguyễn Trãi / Trương Công Định",
+			"number": 46,
+			"game": [
+				293.5,
+				134.3
+			]
+		}
+	]
+}

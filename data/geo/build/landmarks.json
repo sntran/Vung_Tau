@@ -1920,6 +1920,365 @@
 			],
 			"area_m2": 520.8,
 			"distance_to_hint_m": 259.6
+		},
+		{
+			"id": "duc_me_bai_dau",
+			"name_vi": "Tượng Đức Mẹ Bãi Dâu",
+			"found": true,
+			"osm": "way/790529433",
+			"osm_name": "Đức Mẹ Bãi Dâu",
+			"lonlat": [
+				107.0624465,
+				10.3714531
+			],
+			"position": [
+				-1290.64,
+				-3064.05
+			],
+			"candidates": 2,
+			"height": 57.0,
+			"outline": [
+				[
+					-1294.51,
+					-3062.86
+				],
+				[
+					-1289.41,
+					-3060.21
+				],
+				[
+					-1286.77,
+					-3065.25
+				],
+				[
+					-1291.87,
+					-3067.9
+				],
+				[
+					-1294.51,
+					-3062.86
+				]
+			],
+			"area_m2": 32.7,
+			"distance_to_hint_m": 7.3
+		},
+		{
+			"id": "mieu_hon_ba",
+			"name_vi": "Miếu Hòn Bà",
+			"found": true,
+			"osm": "way/221906193",
+			"osm_name": "Miếu Hòn Bà",
+			"lonlat": [
+				107.0892317,
+				10.3239342
+			],
+			"position": [
+				1677.76,
+				2174.06
+			],
+			"candidates": 8,
+			"height": 10.05,
+			"outline": [
+				[
+					1666.73,
+					2174.41
+				],
+				[
+					1673.6,
+					2182.49
+				],
+				[
+					1679.59,
+					2177.46
+				],
+				[
+					1680.5,
+					2178.51
+				],
+				[
+					1684.02,
+					2175.55
+				],
+				[
+					1685.49,
+					2176.97
+				],
+				[
+					1690.12,
+					2173.43
+				],
+				[
+					1685.6,
+					2168.18
+				],
+				[
+					1682.16,
+					2170.88
+				],
+				[
+					1678.41,
+					2166.67
+				],
+				[
+					1674.57,
+					2169.9
+				],
+				[
+					1673.54,
+					2168.69
+				],
+				[
+					1666.73,
+					2174.41
+				]
+			],
+			"area_m2": 182.4,
+			"distance_to_hint_m": 8.4
+		},
+		{
+			"id": "chua_tam_bao",
+			"name_vi": "Chùa Tam Bảo",
+			"found": true,
+			"osm": "way/792193852",
+			"osm_name": "Chùa Tam Bảo",
+			"lonlat": [
+				107.0672836,
+				10.3552566
+			],
+			"position": [
+				-749.18,
+				-1275.61
+			],
+			"candidates": 1,
+			"height": 104.03,
+			"outline": [
+				[
+					-766.48,
+					-1278.79
+				],
+				[
+					-745.54,
+					-1258.51
+				],
+				[
+					-731.88,
+					-1272.45
+				],
+				[
+					-752.81,
+					-1292.72
+				],
+				[
+					-766.48,
+					-1278.79
+				]
+			],
+			"area_m2": 568.8,
+			"distance_to_hint_m": 5.1
+		},
+		{
+			"id": "duong_vi_ba",
+			"name_vi": "Vi Ba",
+			"found": true,
+			"osm": "way/35923559",
+			"osm_name": "Vi Ba",
+			"lonlat": [
+				107.0675174,
+				10.353729
+			],
+			"position": [
+				-722.46,
+				-1106.78
+			],
+			"candidates": 5,
+			"height": 75.47,
+			"distance_to_hint_m": 299.0
+		},
+		{
+			"id": "duong_hai_dang",
+			"name_vi": "Hải Đăng",
+			"found": true,
+			"osm": "way/35923584",
+			"osm_name": "Hải Đăng",
+			"lonlat": [
+				107.0770242,
+				10.3344936
+			],
+			"position": [
+				332.79,
+				1014.55
+			],
+			"candidates": 3,
+			"height": 169.1,
+			"distance_to_hint_m": 125.2
+		},
+		{
+			"id": "ben_xe",
+			"name_vi": "Bến xe Vũng Tàu",
+			"found": true,
+			"osm": "way/220891652",
+			"osm_name": "Bến xe Vũng Tàu",
+			"lonlat": [
+				107.087041,
+				10.3504485
+			],
+			"position": [
+				1418.58,
+				-757.78
+			],
+			"candidates": 2,
+			"height": 6.21,
+			"outline": [
+				[
+					1347.92,
+					-747.26
+				],
+				[
+					1449.52,
+					-689.83
+				],
+				[
+					1460.42,
+					-710.54
+				],
+				[
+					1491.45,
+					-769.51
+				],
+				[
+					1400.19,
+					-819.12
+				],
+				[
+					1393.08,
+					-805.8
+				],
+				[
+					1381.43,
+					-812.29
+				],
+				[
+					1372.49,
+					-808.88
+				],
+				[
+					1352.68,
+					-770.12
+				],
+				[
+					1358.54,
+					-766.99
+				],
+				[
+					1347.92,
+					-747.26
+				]
+			],
+			"area_m2": 10515.3,
+			"distance_to_hint_m": 7.3
+		},
+		{
+			"id": "cho_vung_tau",
+			"name_vi": "Chợ Vũng Tàu",
+			"found": true,
+			"osm": "way/215166910",
+			"osm_name": "Chợ Vũng Tàu",
+			"lonlat": [
+				107.0859414,
+				10.3482146
+			],
+			"position": [
+				1299.74,
+				-509.85
+			],
+			"candidates": 1,
+			"height": 9.48,
+			"outline": [
+				[
+					1209.06,
+					-479.81
+				],
+				[
+					1340.88,
+					-416.95
+				],
+				[
+					1361.37,
+					-485.16
+				],
+				[
+					1374.71,
+					-513.58
+				],
+				[
+					1386.43,
+					-542.04
+				],
+				[
+					1269.02,
+					-602.49
+				],
+				[
+					1209.06,
+					-479.81
+				]
+			],
+			"area_m2": 18442.0,
+			"distance_to_hint_m": 785.3
+		},
+		{
+			"id": "cho_xom_luoi",
+			"name_vi": "Chợ Xóm Lưới",
+			"found": true,
+			"osm": "node/2649575440",
+			"osm_name": "Chợ Xóm Lưới",
+			"lonlat": [
+				107.0760829,
+				10.3414775
+			],
+			"position": [
+				224.65,
+				242.56
+			],
+			"candidates": 1,
+			"height": 7.88,
+			"distance_to_hint_m": 3.1
+		},
+		{
+			"id": "vong_xoay_lon",
+			"name_vi": "Vòng xoay Đài tưởng niệm Liệt sĩ",
+			"found": true,
+			"osm": "way/975192902",
+			"osm_name": "Vòng Xoay Đài Tưởng Niệm Liệt Sĩ",
+			"lonlat": [
+				107.0919133,
+				10.3486518
+			],
+			"position": [
+				1953.62,
+				-562.5
+			],
+			"candidates": 8,
+			"height": 9.61,
+			"distance_to_hint_m": 811.8
+		},
+		{
+			"id": "nga_nam",
+			"name_vi": "Ngã Năm",
+			"found": true,
+			"osm": "node/3144051066",
+			"osm_name": "Ngã Năm",
+			"lonlat": [
+				107.084881,
+				10.3549487
+			],
+			"position": [
+				1178.71,
+				-1254.11
+			],
+			"candidates": 1,
+			"height": 6.48,
+			"distance_to_hint_m": 5.8
 		}
 	]
 }

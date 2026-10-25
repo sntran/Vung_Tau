@@ -1,6 +1,6 @@
 # Geodata report
 
-Made by `tools/geo/build.py` on 2026-10-24.
+Made by `tools/geo/build.py` on 2026-10-25.
 
 ## Extents
 
@@ -55,6 +55,16 @@ Total road length: 692.3 km. Roads with a width tag: 7 of 4123. Hẻm: 2365.
 | Tượng Chúa Kitô Vua | yes | way/235008112 | 1159.87, 1893.39 | 138.33 | 1 candidates, 83.3 m from the hint |
 | Hải đăng Vũng Tàu | yes | way/229301316 | 402.21, 1056.5 | 173.11 | 1 candidates, 21.8 m from the hint |
 | Bạch Dinh | yes | way/220753354 | -596.69, -776.93 | 28.11 | 1 candidates, 259.6 m from the hint |
+| Tượng Đức Mẹ Bãi Dâu | yes | way/790529433 | -1290.64, -3064.05 | 57.0 | 2 candidates, 7.3 m from the hint |
+| Miếu Hòn Bà | yes | way/221906193 | 1677.76, 2174.06 | 10.05 | 8 candidates, 8.4 m from the hint |
+| Chùa Tam Bảo | yes | way/792193852 | -749.18, -1275.61 | 104.03 | 1 candidates, 5.1 m from the hint |
+| Vi Ba | yes | way/35923559 | -722.46, -1106.78 | 75.47 | 5 candidates, 299.0 m from the hint |
+| Hải Đăng | yes | way/35923584 | 332.79, 1014.55 | 169.1 | 3 candidates, 125.2 m from the hint |
+| Bến xe Vũng Tàu | yes | way/220891652 | 1418.58, -757.78 | 6.21 | 2 candidates, 7.3 m from the hint |
+| Chợ Vũng Tàu | yes | way/215166910 | 1299.74, -509.85 | 9.48 | 1 candidates, 785.3 m from the hint |
+| Chợ Xóm Lưới | yes | node/2649575440 | 224.65, 242.56 | 7.88 | 1 candidates, 3.1 m from the hint |
+| Vòng xoay Đài tưởng niệm Liệt sĩ | yes | way/975192902 | 1953.62, -562.5 | 9.61 | 8 candidates, 811.8 m from the hint |
+| Ngã Năm | yes | node/3144051066 | 1178.71, -1254.11 | 6.48 | 1 candidates, 5.8 m from the hint |
 
 ## Homestay hẻm
 
@@ -67,11 +77,89 @@ The first curve of the lighthouse road turns -172° between 116 m and 138 m from
 - The sea floor slopes from +1.2 m at the coastline to -4.0 m over 80 m, then stays at -4.0 m.
 - Rocks in the sea: 58 grid cells at +0.5 m.
 - The ridge Đường ra Hòn Bà (way/221906223): 206 m long, 4 m wide, top at -1.70 m.
+- The band of rocks Bãi đá ra Hòn Bà: about 34 m wide, 1495 grid cells in the sea, from -2.96 m (tide pools) to +1.07 m (outcrops).
+- The sand flat in front of the path: 110 m around the beach end, at -1.85 m (1538 grid cells).
 - The tide: see `tide_report.md`.
+
+## Roadworks (R11a)
+
+- Hải Đăng: the first 220 m from the bottom, 9.0 m wide, planned to end in 2027. The homestay hẻm (Hẻm 2 Hải Đăng) is at 133 m.
+
+## Objects on the sea (R13a)
+
+- 20 cargo ships at anchor and 18 fishing boats.
+- The ferry pier Cầu Đá: way/200554633, way/200554614.
+- Groynes and breakwaters from OSM: way/286293879, way/895756048, way/895756049, way/895756057, way/895756058.
+
+## Trees (R12a)
+
+- casuarina: 3331
+- coconut: 755
+- fan_palm: 104
+- flame: 5994
+- frangipani: 3903
+- shade: 14850
+- tall_shade: 158
+- From: bai_truoc_road 192, coast_roads 3956, osm 385, parks 2154, street 22408.
+
+## Town anchors (R6a)
+
+`anchors.png` shows each candidate as a number. I write the correct Vietnamese names into `landmarks.json`.
+
+| Number | Kind | OSM | Name in OSM | Position (game X, Z) |
+|---|---|---|---|---|
+| 1 | bus station | node/5596865382 | Xe Toàn Thắng | 2270.1, -2361.0 |
+| 2 | bus station | way/220891652 | Bến xe Vũng Tàu | 1418.6, -757.8 |
+| 3 | bus station | node/11813095037 | Bến xe Vũng Tàu | 1430.8, -747.6 |
+| 4 | marketplace | way/235991337 | Chợ Rạch Dừa | 4556.8, -6041.7 |
+| 5 | marketplace | way/790787255 | Chợ Thắng Nhất | 2972.9, -5335.0 |
+| 6 | marketplace | way/259759825 | Chợ Bến Đá | -802.6, -4009.6 |
+| 7 | marketplace | way/790384308 | Chợ Phường 9 | 1319.6, -3245.2 |
+| 8 | marketplace | node/5552599299 | Chợ Bến Đình | 262.9, -3147.1 |
+| 9 | marketplace | node/12995457671 | Chợ Phường 7 | 954.7, -2669.9 |
+| 10 | marketplace | node/7100657303 | Chợ Phường 8 | 1906.6, -2204.0 |
+| 11 | marketplace | node/2641109127 | Chợ Cô Giang | 505.3, -1255.2 |
+| 12 | marketplace | way/259528309 | Chợ Phường 1 | 159.1, -708.5 |
+| 13 | marketplace | node/11424996126 | Fruits (cheap & specials) | 1323.1, -700.5 |
+| 14 | marketplace | way/215166910 | Chợ Vũng Tàu | 1299.7, -509.8 |
+| 15 | marketplace | node/2339056843 | Chợ Du lịch Vũng Tàu | 2217.2, -182.6 |
+| 16 | marketplace | node/5599563192 | Nguyễn Công Trứ | 308.7, 177.4 |
+| 17 | marketplace | node/2649575440 | Chợ Xóm Lưới | 224.6, 242.6 |
+| 18 | marketplace | node/13788662719 | Chợ Đêm Vũng Tàu | 1851.0, 384.9 |
+| 19 | roundabout | way/744059421 | Đường số 1 | 4222.2, -7277.0 |
+| 20 | roundabout | way/243919219 | Đường số 1 | 4398.5, -6789.8 |
+| 21 | roundabout | way/243919220 | (no name) | 4552.2, -6365.9 |
+| 22 | roundabout | way/565372328,1279678267,1279678271 | (no name) | 3971.1, -4145.0 |
+| 23 | roundabout | way/1458906879 | (no name) | 5874.6, -3909.3 |
+| 24 | roundabout | way/790529498 | (no name) | 160.6, -2537.9 |
+| 25 | roundabout | way/790529505 | (no name) | 165.6, -2490.1 |
+| 26 | roundabout | way/199528378,1446433949,1446433950 | Vòng Xoay Nguyễn Tri Phương | 939.7, -2297.5 |
+| 27 | roundabout | way/118927579 | Vòng xoay Paradise | 2624.5, -1778.6 |
+| 28 | roundabout | way/269819561 | (no name) | -650.2, -1712.3 |
+| 29 | roundabout | way/694747968 | (no name) | -570.6, -1341.2 |
+| 30 | roundabout | way/1150854196,1446433945,1446433946 | (no name) | 1177.1, -1244.1 |
+| 31 | roundabout | way/1150848437,1502887824 | Bùng binh Lam Sơn | 19.7, -891.4 |
+| 32 | roundabout | way/112177664,975192902,975192903 | Vòng Xoay Đài Tưởng Niệm Liệt Sĩ | 2046.1, -601.6 |
+| 33 | roundabout | way/953253569 | Vòng Xoay Xóm Vườn | 638.7, -149.8 |
+| 34 | junction | node/2440052520 | Hà Bổng / Đinh Núp | 4651.2, -4874.8 |
+| 35 | junction | node/7108827695 | Đường 2 Tháng 9 | 5030.3, -4835.6 |
+| 36 | junction | node/2454871079 | Hẻm 268 Trần Phú / Hẻm 326 Trần Phú | -1660.2, -4701.1 |
+| 37 | junction | node/3702692182 | Hà Huy Tập / Nguyễn Hữu Cảnh / Đường 3 Tháng 2 | 5426.8, -3983.9 |
+| 38 | junction | node/5000821862 | Nguyễn An Ninh / Phạm Hồng Thái / Đường 30 Tháng 4 | 1006.8, -2771.0 |
+| 39 | junction | node/2317186304 | Hẻm 370 Nguyễn An Ninh / Nguyễn An Ninh / Đội Cấn | 1937.1, -2290.3 |
+| 40 | junction | node/10705743296 | Nguyễn An Ninh / Đường 2 Tháng 9 / Đội Cấn | 2107.1, -2180.0 |
+| 41 | junction | node/1337220599 | Bình Giã / Chu Mạnh Trinh / Hẻm 285 Bình Giã / Nguyễn Trọng Quản | 2064.4, -1820.7 |
+| 42 | junction | node/419939179 | Bà Triệu / Lê Lai / Lê Quý Đôn / Nguyễn Văn Trỗi | 347.3, -976.6 |
+| 43 | junction | node/419939060 | Lê Lợi / Lê Quý Đôn / Thủ Khoa Huân | 11.3, -656.8 |
+| 44 | junction | node/2347538670 | Huỳnh Thúc Kháng / Hẻm 100 Xô Viết Nghệ Tĩnh / Xô Viết Nghệ Tĩnh | 1343.3, -402.1 |
+| 45 | junction | node/419939084 | Thống Nhất / Trần Hưng Đạo | 264.6, -235.5 |
+| 46 | junction | node/419939001 | Hoàng Hoa Thám / Nguyễn Trãi / Trương Công Định | 293.5, 134.3 |
 
 ## Corrections from overrides.json
 
 - add node -1 ({'natural': 'peak', 'name': 'Núi Nhỏ', 'alt_name': 'Núi Tao Phùng'}): OSM has no object for Núi Nhỏ. The position is the highest point of the Copernicus DEM on the hill (177.9 m), next to the lighthouse.
+- add way -2 ({'name': 'Bãi đá ra Hòn Bà', 'natural': 'shoal', 'surface': 'rock', 'tidal': 'yes'}): R8h: OSM has only the line of the path (way 221906223, a track), with no outline of the rocks. This band is 30 m wide: the path line with 15 m on each side, and 12 m more at each end, so that it touches the beach below Mũi Nghinh Phong and the islet. The heights of the rocks are in hon_ba.json.
+- roadworks on Hải Đăng (220 m from the bottom): R11a: the first 220 m of the Hải Đăng road from the bottom are being widened, and the work is planned to end in 2027 (Zing: https://lifestyle.zingnews.vn/mo-rong-duong-len-ngon-hai-dang-song-ao-164-nam-tuoi-o-vung-tau-post1668055.html). The contractor name is fictional. The width added to the road (widen_m) and the lunch break are builder values: check.
 
 ## Problems with the data
 
