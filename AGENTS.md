@@ -168,7 +168,7 @@ The audio driver prints ALSA errors in the workspace. These errors are not defec
 | `tools/` | `setup.sh`, `test.sh`, `playtest.sh`, and `voices/` (the voice build and its tests). |
 | `assets/` | Fonts, icons, voices, and `CREDITS.md`. |
 | `docs/voices/` | The voice audition page (made by the voices workflow). |
-| `.github/workflows/` | `test.yml` (tests on each push), `export.yml` (web, Android, iOS builds, and GitHub Pages), and `voices.yml` (the voice files), and `people-packs.yml` (copies the MakeHuman asset packs to the release `people-packs-1`, by hand only). |
+| `.github/workflows/` | `test.yml` (tests on each push), `export.yml` (web, Android, iOS builds, and GitHub Pages), `voices.yml` (the voice files), and `people-packs.yml` (copies the MakeHuman asset packs to the release `people-packs-1`, by hand only). |
 
 Plan 0001 adds the Godot project structure. See that plan.
 
