@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | In progress |
+| Status | Built |
 | Branch | `feat/0005-real-geography` |
 | Depends on | 0004 (status "Built") |
 
