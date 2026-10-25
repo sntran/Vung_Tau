@@ -5,7 +5,7 @@ extends RefCounted
 # or fewer. The values go to the log and to budget_PRESET.json. AGENTS.md has
 # the measured values.
 # sizes: 1280x720
-# phase: --quality=low --start-time=12:00 --fresh-save
+# phase: --renderer=forward_plus --quality=low --start-time=12:00 --fresh-save
 # phase: --renderer=forward_plus --quality=medium --start-time=12:00 --fresh-save
 # phase: --renderer=forward_plus --quality=high --start-time=12:00 --fresh-save
 # phase: --renderer=forward_plus --quality=ultra --start-time=12:00 --fresh-save

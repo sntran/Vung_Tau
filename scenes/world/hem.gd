@@ -10,6 +10,15 @@ extends Node3D
 ## The helper of the hủ tiếu gõ cart clacks the bamboo sticks.
 signal clacked(position: Vector3)
 
+## The distance from a person to the stand point for a talk.
+const TALK_STAND_M := 1.1
+## The lights at night: the warm light of each open place and the street
+## lamps. Each light makes a pool, with dark parts between the pools (D-0004-04).
+const SHOP_LIGHT_ENERGY := 1.1
+const SHOP_LIGHT_RANGE := 3.2
+const STREET_LIGHT_ENERGY := 1.6
+const STREET_LIGHT_RANGE := 5.5
+const LIGHT_FALLOFF := 1.6
 const TubeHouseScene := preload("res://scenes/world/tube_house.tscn")
 const NpcScene := preload("res://scenes/actors/npc.tscn")
 const BeachScene := preload("res://scenes/world/beach.tscn")
@@ -85,7 +94,9 @@ func build() -> void:
 	lot_stand_z = -half + 0.65
 	cart_stand_z = cart_z + 1.1
 	npc_z = -half + 0.45
-	npc_stand_z = npc_z + 0.75
+	# A talk at a normal distance: 1.1 m from the person (report 0004, D-0004-05).
+	# The stand point is also in the free lane of the hẻm, clear of the carts.
+	npc_stand_z = npc_z + TALK_STAND_M
 	# The boy of the hủ tiếu gõ walks near the other side, so that a player can pass him.
 	helper_z = half - 0.55
 	parts = HouseParts.new()
@@ -137,6 +148,8 @@ func _make_house(lot: Dictionary, floor_height: float) -> TubeHouse:
 	house.kind = lot.get("kind", "tube")
 	house.style = lot.get("style", "old")
 	house.paint = Color(lot.paint)
+	if lot.has("stripe"):
+		house.stripe = Color(lot.stripe)
 	house.paint_age = float(lot.get("paint_age", 0.4))
 	house.seed = int(lot.get("seed", 0))
 	house.roof = lot.get("roof", "")
@@ -179,8 +192,11 @@ func _build_lot(lot: Dictionary, center: float, floor_height: float) -> TubeHous
 	var light := OmniLight3D.new()
 	light.name = "Light_%s" % spot_id
 	light.light_color = Color("#FFD9A0")
-	light.light_energy = 1.4
-	light.omni_range = 5.0
+	# A pool of light in front of the shop. A long range made the lights of
+	# all places light the whole hẻm at night (D-0004-04).
+	light.light_energy = SHOP_LIGHT_ENERGY
+	light.omni_range = SHOP_LIGHT_RANGE
+	light.omni_attenuation = LIGHT_FALLOFF
 	light.position = Vector3(center, 2.4, -hem_width / 2.0 + 1.0)
 	light.visible = false
 	add_child(light)
@@ -481,8 +497,9 @@ func _build_street_lamps() -> void:
 		var light := OmniLight3D.new()
 		light.name = "StreetLight"
 		light.light_color = Color("#FFE2B0")
-		light.light_energy = 1.2
-		light.omni_range = 7.0
+		light.light_energy = STREET_LIGHT_ENERGY
+		light.omni_range = STREET_LIGHT_RANGE
+		light.omni_attenuation = LIGHT_FALLOFF
 		light.position = Vector3(x, 4.0, pole_z - 1.1)
 		light.visible = false
 		add_child(light)

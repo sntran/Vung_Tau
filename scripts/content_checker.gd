@@ -570,7 +570,8 @@ func _check_layout(layout: Dictionary, spot_ids: Dictionary, spots: Dictionary) 
 
 
 ## Two neighbor houses do not have the same color. A bold wall is at most 1
-## house in 6 in the hẻm of homes, and 1 in 3 on the beach road (R10a).
+## house in 3 in the hẻm of homes, and 1 in 2 on the beach road (R10a,
+## D-0004-09). The values are in palette.json.
 func _check_paints(layout: Dictionary, file: String) -> void:
 	var palette := HousePalette.data()
 	var homes := 0
@@ -616,6 +617,9 @@ func _check_lot_shape(lot: Dictionary, file: String, where: String) -> void:
 		_error(file, where, "style \"%s\" must be one of %s" % [lot.style, HOUSE_STYLES])
 	if _require(lot, "paint", TYPE_STRING, file, where) and not HousePalette.is_wall_color(Color(lot.paint)):
 		_error(file, where, "paint \"%s\" is not a wall color of palette.json" % lot.paint)
+	if lot.has("stripe") and (typeof(lot.stripe) != TYPE_STRING or typeof(lot.get("paint")) != TYPE_STRING
+			or not HousePalette.is_two_color(Color(lot.paint), Color(lot.stripe))):
+		_error(file, where, "paint and stripe \"%s\" are not a two-color front of palette.json" % str(lot.stripe))
 	if _require(lot, "paint_age", TYPE_FLOAT, file, where) and (lot.paint_age < 0.0 or lot.paint_age > 1.0):
 		_error(file, where, "\"paint_age\" must be from 0 to 1")
 	_require(lot, "seed", TYPE_INT, file, where)
@@ -649,7 +653,7 @@ func _check_ui(ui: Dictionary) -> void:
 			"phrase_saved", "lens_empty", "lens_person", "messages_empty", "notify_card", "notify_message",
 			"clock_day", "clock_rest", "clock_sleep_away", "notebook_phrases", "notebook_no_phrases",
 			"settings_sound", "settings_subtitles", "settings_subtitle_size", "settings_subtitle_box",
-			"settings_quality", "settings_restart_note", "settings_restart", "settings_fullscreen", "settings_mouse"]:
+			"settings_quality", "settings_fullscreen", "settings_mouse"]:
 		_require(ui, field, TYPE_STRING, file, "file")
 	if _require(ui, "apps", TYPE_DICTIONARY, file, "file"):
 		for app: String in ["listen", "lens", "messages", "notebook", "clock", "settings"]:

@@ -28,10 +28,15 @@ const STEP_HEIGHT := 0.08
 const STEP_DEPTH := 0.3
 ## The time of the shutter animation in seconds.
 const SHUTTER_SECONDS := 1.2
+## The smallest depth of the main house: the shop room and the house behind it.
+const MIN_BODY_DEPTH := 8.0
+## The height of a small room on a roof terrace.
+const ROOF_ROOM_HEIGHT := 2.5
 
 @export var width := 4.5
 @export var floors := 3
 @export var floor_height := 3.2
+## The depth of the lot: the house and its back extension (D-0004-08).
 @export var depth := 12.0
 @export_enum("gate", "shop", "wall") var ground := "gate"
 @export var sign_text := ""
@@ -85,6 +90,17 @@ var _windows: Array = []
 var _window_top := 2.4
 var _sill := 0.9
 var _recess := 0.2
+## The depth of the main house. A back extension fills the rest of the lot.
+var _body_depth := 12.0
+## The back extension: its depth (0 for none) and its floors.
+var _extension_depth := 0.0
+var _extension_floors := 0
+## The part at the back of a flat roof terrace: "", "room" (a small room),
+## or "canopy" (a metal roof on posts over a part of the terrace).
+var _terrace_back := ""
+var _shape_rng := RandomNumberGenerator.new()
+## The color of the concrete of a flat roof (D-0004-03).
+var _terrace_color := Color("#B9B6AC")
 
 
 func _ready() -> void:
@@ -119,8 +135,10 @@ func build() -> void:
 		trim_color = paint.darkened(0.12) if style == "old" else paint.lightened(0.1)
 	_recess = _rng.randf_range(0.15, 0.25)
 	solid = Greybox.solid_body(self)
+	_plan_shape()
 	_plan_windows()
 	_build_body()
+	_build_extension()
 	_build_front()
 	match ground:
 		"shop":
@@ -147,6 +165,36 @@ func build() -> void:
 
 
 # --- The plan of the front ----------------------------------------------------
+
+## Houses in a dense hẻm have different depths, back extensions of one or two
+## floors, small rooms on the roof terraces, and metal roofs over a part of a
+## terrace (D-0004-08). A second random generator makes this plan, so the
+## other parts of a house stay the same for the same seed.
+func _plan_shape() -> void:
+	var shape := _shape_rng
+	shape.seed = seed * 7 + 3
+	_terrace_color = HousePalette.terrace(shape)
+	_metal_roof_color = HousePalette.metal_roof(shape).color
+	_body_depth = depth
+	_extension_depth = 0.0
+	_extension_floors = 0
+	_terrace_back = ""
+	if kind == "tube":
+		var room_for := depth - MIN_BODY_DEPTH
+		if floors > 1 and room_for >= 2.0 and shape.randf() < 0.65:
+			_extension_depth = shape.randf_range(2.0, minf(4.5, room_for))
+			_extension_floors = 1 if floors == 2 or shape.randf() < 0.5 else 2
+			_body_depth = depth - _extension_depth
+		elif room_for > 0.0:
+			# A shorter house with a small yard behind it.
+			_body_depth = depth - shape.randf_range(0.0, minf(2.5, room_for))
+	if _roof_kind() == "flat":
+		var pick := shape.randf()
+		if pick < 0.45:
+			_terrace_back = "room"
+		elif pick < 0.75:
+			_terrace_back = "canopy"
+
 
 func _plan_windows() -> void:
 	_windows.clear()
@@ -194,17 +242,17 @@ func _box(key: String, size: Vector3, center: Vector3, color := Color.WHITE, par
 ## The house behind the front wall. A shop has an open room on the ground floor.
 func _build_body() -> void:
 	var height := wall_height()
-	var back := depth - FRONT
+	var back := _body_depth - FRONT
 	if ground == "shop":
 		var upper := height - OPENING_HEIGHT
 		_box(HouseMaterials.PLASTER, Vector3(width, upper, back), Vector3(0, OPENING_HEIGHT + upper / 2.0, -FRONT - back / 2.0),
 				Color.WHITE, "body")
-		var behind := depth - ROOM_DEPTH
+		var behind := _body_depth - ROOM_DEPTH
 		_box(HouseMaterials.PLASTER, Vector3(width, OPENING_HEIGHT, behind), Vector3(0, OPENING_HEIGHT / 2.0, -ROOM_DEPTH - behind / 2.0))
 		for side: float in [-1.0, 1.0]:
 			_box(HouseMaterials.PLASTER, Vector3(WALL, OPENING_HEIGHT, ROOM_DEPTH - FRONT),
 					Vector3(side * (width - WALL) / 2.0, OPENING_HEIGHT / 2.0, -FRONT - (ROOM_DEPTH - FRONT) / 2.0))
-		Greybox.solid_shape(solid, Vector3(width, upper, depth), Vector3(0, OPENING_HEIGHT + upper / 2.0, -depth / 2.0))
+		Greybox.solid_shape(solid, Vector3(width, upper, _body_depth), Vector3(0, OPENING_HEIGHT + upper / 2.0, -_body_depth / 2.0))
 		Greybox.solid_shape(solid, Vector3(width, OPENING_HEIGHT, behind), Vector3(0, OPENING_HEIGHT / 2.0, -ROOM_DEPTH - behind / 2.0))
 		for side: float in [-1.0, 1.0]:
 			Greybox.solid_shape(solid, Vector3(WALL, OPENING_HEIGHT, ROOM_DEPTH),
@@ -212,7 +260,7 @@ func _build_body() -> void:
 	else:
 		_box(HouseMaterials.PLASTER, Vector3(width, height, back), Vector3(0, height / 2.0, -FRONT - back / 2.0),
 				Color.WHITE, "body")
-		Greybox.solid_shape(solid, Vector3(width, height, depth), Vector3(0, height / 2.0, -depth / 2.0))
+		Greybox.solid_shape(solid, Vector3(width, height, _body_depth), Vector3(0, height / 2.0, -_body_depth / 2.0))
 
 
 ## The front wall of the upper floors, with openings for the windows, the
@@ -529,29 +577,45 @@ func _build_roof() -> void:
 			_tile_roof(height)
 
 
-## A flat roof terrace with a parapet, and the things on it.
+## A flat roof terrace with a parapet, and the things on it. From the front
+## to the back: plants along the parapet, the laundry line, the water tank,
+## the solar water heater, and at the back a small room or a metal roof on
+## posts (D-0004-03, D-0004-08).
 func _flat_roof(height: float) -> void:
-	var concrete := Color("#B9B6AC")
-	_box(HouseMaterials.DETAIL, Vector3(width, 0.12, depth - FRONT), Vector3(0, height + 0.06, -FRONT - (depth - FRONT) / 2.0), concrete)
+	var length := _body_depth - FRONT
+	_box(HouseMaterials.DETAIL, Vector3(width, 0.12, length), Vector3(0, height + 0.06, -FRONT - length / 2.0), _terrace_color)
 	for side: float in [-1.0, 1.0]:
-		_box(HouseMaterials.PLASTER, Vector3(0.15, 0.8, depth - FRONT), Vector3(side * (width / 2.0 - 0.075), height + 0.4, -FRONT - (depth - FRONT) / 2.0))
-	_box(HouseMaterials.PLASTER, Vector3(width, 0.8, 0.15), Vector3(0, height + 0.4, -depth + 0.075))
-	var back := -depth * 0.55
+		_box(HouseMaterials.PLASTER, Vector3(0.15, 0.8, length), Vector3(side * (width / 2.0 - 0.075), height + 0.4, -FRONT - length / 2.0))
+	_box(HouseMaterials.PLASTER, Vector3(width, 0.8, 0.15), Vector3(0, height + 0.4, -_body_depth + 0.075))
+	var floor_y := height + 0.12
+	# The free part of the terrace for the tank and the heater: from behind
+	# the laundry line to the part at the back.
+	var free_front := -FRONT - 1.7
+	var free_back := -_body_depth + 0.3
+	match _terrace_back:
+		"room":
+			free_back = _terrace_room(floor_y) + 0.3
+		"canopy":
+			free_back = _terrace_canopy(floor_y) + 0.3
 	# A stainless steel water tank: vertical or horizontal.
-	if _rng.randf() < 0.85:
+	if _rng.randf() < 0.85 and free_front - free_back >= 1.0:
 		var tank_x := _rng.randf_range(-width / 2.0 + 0.7, width / 2.0 - 0.7)
 		if _rng.randf() < 0.5:
-			_batch.cylinder(HouseMaterials.METAL, 0.5, 1.3, Vector3(tank_x, height + 0.12 + 0.95, back), Color("#D8DCDD"), 14)
-			_box(HouseMaterials.METAL, Vector3(0.9, 0.3, 0.9), Vector3(tank_x, height + 0.27, back), Color("#6E6F6A"))
-			part_boxes["tank"] = AABB(Vector3(tank_x - 0.5, height + 0.12, back - 0.5), Vector3(1.0, 1.48, 1.0))
+			var tank_z := free_front - 0.5
+			_batch.cylinder(HouseMaterials.METAL, 0.5, 1.3, Vector3(tank_x, floor_y + 0.95, tank_z), Color("#D8DCDD"), 14)
+			_box(HouseMaterials.METAL, Vector3(0.9, 0.3, 0.9), Vector3(tank_x, floor_y + 0.15, tank_z), Color("#6E6F6A"))
+			part_boxes["tank"] = AABB(Vector3(tank_x - 0.5, floor_y, tank_z - 0.5), Vector3(1.0, 1.48, 1.0))
+			free_front = tank_z - 0.5 - 0.4
 		else:
-			_batch.cylinder(HouseMaterials.METAL, 0.45, 1.5, Vector3(tank_x, height + 0.12 + 0.8, back), Color("#D8DCDD"), 14,
+			var tank_z := free_front - 0.45
+			_batch.cylinder(HouseMaterials.METAL, 0.45, 1.5, Vector3(tank_x, floor_y + 0.8, tank_z), Color("#D8DCDD"), 14,
 					Basis(Vector3.FORWARD, PI / 2.0))
-			_box(HouseMaterials.METAL, Vector3(1.2, 0.35, 0.7), Vector3(tank_x, height + 0.3, back), Color("#6E6F6A"))
-			part_boxes["tank"] = AABB(Vector3(tank_x - 0.75, height + 0.12, back - 0.45), Vector3(1.5, 1.13, 0.9))
+			_box(HouseMaterials.METAL, Vector3(1.2, 0.35, 0.7), Vector3(tank_x, floor_y + 0.18, tank_z), Color("#6E6F6A"))
+			part_boxes["tank"] = AABB(Vector3(tank_x - 0.75, floor_y, tank_z - 0.45), Vector3(1.5, 1.13, 0.9))
+			free_front = tank_z - 0.45 - 0.4
 	# A solar water heater: a dark panel or glass tubes on a stand.
-	if _rng.randf() < 0.55:
-		var heater_z := back - 2.2
+	if _rng.randf() < 0.55 and free_front - free_back >= 1.2:
+		var heater_z := free_front - 0.55
 		var tilt := Basis(Vector3.RIGHT, deg_to_rad(-25.0))
 		if _rng.randf() < 0.5:
 			_batch.box(HouseMaterials.GLASS, Vector3(1.8, 0.06, 1.0), Vector3(0, height + 0.75, heater_z), Color("#1E2A3A"), tilt)
@@ -561,9 +625,9 @@ func _flat_roof(height: float) -> void:
 						tilt * Basis(Vector3.RIGHT, PI / 2.0), false)
 		_batch.cylinder(HouseMaterials.METAL, 0.15, 1.8, Vector3(0, height + 1.2, heater_z - 0.45), Color("#D8DCDD"), 10,
 				Basis(Vector3.FORWARD, PI / 2.0))
-		part_boxes["heater"] = AABB(Vector3(-0.9, height + 0.12, heater_z - 0.65), Vector3(1.8, 1.25, 1.2))
+		part_boxes["heater"] = AABB(Vector3(-0.9, floor_y, heater_z - 0.65), Vector3(1.8, 1.25, 1.2))
 	# A laundry line with clothes.
-	if _rng.randf() < 0.6:
+	if _rng.randf() < 0.75:
 		var line_z := -FRONT - 1.2
 		var line_y := height + 1.7
 		for side: float in [-1.0, 1.0]:
@@ -577,22 +641,79 @@ func _flat_roof(height: float) -> void:
 			var color := Color.from_hsv(_rng.randf(), _rng.randf_range(0.2, 0.7), _rng.randf_range(0.6, 0.95))
 			_batch.quad(HouseMaterials.CLOTH, [Vector3(cloth_x, line_y - cloth_h, line_z), Vector3(cloth_x + cloth_w, line_y - cloth_h, line_z),
 					Vector3(cloth_x + cloth_w, line_y, line_z), Vector3(cloth_x, line_y, line_z)] as Array[Vector3], color)
-	# Foam boxes with plants along the parapet.
-	if _rng.randf() < 0.7:
-		for i in _rng.randi_range(2, 4):
+	# Foam boxes and pots with plants along the front parapet.
+	if _rng.randf() < 0.85:
+		for i in _rng.randi_range(2, 5):
 			var box_x := -width / 2.0 + 0.45 + i * 0.6
 			if box_x > width / 2.0 - 0.4:
 				break
 			_box(HouseMaterials.DETAIL, Vector3(0.5, 0.3, 0.35), Vector3(box_x, height + 0.27, -FRONT - 0.35), Color("#F2F2EE"))
-			_box(HouseMaterials.DETAIL, Vector3(0.45, 0.25, 0.3), Vector3(box_x, height + 0.5, -FRONT - 0.35), Color("#5E8C3A"))
+			_box(HouseMaterials.DETAIL, Vector3(0.45, 0.25, 0.3), Vector3(box_x, height + 0.5, -FRONT - 0.35),
+					Color("#5E8C3A").lerp(Color("#3F6B2A"), _rng.randf()))
 	# Rebar that sticks up at the corners for a future floor.
-	if _rng.randf() < 0.45:
+	if _terrace_back == "" and _rng.randf() < 0.45:
 		for corner: Vector2 in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)]:
-			var base := Vector3(corner.x * (width / 2.0 - 0.15), height + 0.8, -FRONT - 0.15 if corner.y < 0 else -depth + 0.15)
+			var base := Vector3(corner.x * (width / 2.0 - 0.15), height + 0.8, -FRONT - 0.15 if corner.y < 0 else -_body_depth + 0.15)
 			for k in 4:
 				_box(HouseMaterials.DETAIL, Vector3(0.016, 0.7, 0.016), base + Vector3((k % 2) * 0.1 - 0.05, 0.35, (k / 2) * 0.1 - 0.05),
 						Color("#5A3E30"))
-	_build_rooftop_antennas(height + 0.12)
+	_build_rooftop_antennas(floor_y)
+
+
+## A small room at the back of the terrace, of bare plaster or brick, with a
+## door and a metal roof. Returns the z of its front.
+func _terrace_room(floor_y: float) -> float:
+	var room_w := minf(width - 0.8, _shape_rng.randf_range(2.2, 3.2))
+	var room_d := minf(_shape_rng.randf_range(2.4, 3.4), _body_depth - FRONT - 3.5)
+	var x := _shape_rng.randf_range(-1.0, 1.0) * (width / 2.0 - 0.4 - room_w / 2.0)
+	var back := -_body_depth + 0.15
+	var front := back + room_d
+	_box(HouseMaterials.BARE, Vector3(room_w, ROOF_ROOM_HEIGHT, room_d), Vector3(x, floor_y + ROOF_ROOM_HEIGHT / 2.0, back + room_d / 2.0),
+			Color.WHITE, "terrace_room")
+	_box(HouseMaterials.DETAIL, Vector3(0.8, 2.0, 0.04), Vector3(x - room_w / 2.0 + 0.6, floor_y + 1.0, front + 0.02), Color("#6B4A33"))
+	var top := floor_y + ROOF_ROOM_HEIGHT
+	var h := room_w / 2.0 + 0.1
+	_batch.quad(HouseMaterials.METAL_ROOF, [Vector3(x - h, top + 0.02, back - 0.1), Vector3(x + h, top + 0.02, back - 0.1),
+			Vector3(x + h, top + 0.2, front + 0.2), Vector3(x - h, top + 0.2, front + 0.2)] as Array[Vector3], Color.WHITE)
+	part_boxes["terrace_room_roof"] = AABB(Vector3(x - h, top + 0.02, back - 0.1), Vector3(h * 2.0, 0.18, room_d + 0.3))
+	return front + 0.2
+
+
+## A metal roof on four posts over the back of the terrace, for the laundry
+## and the things that the family keeps there. Returns the z of its front.
+func _terrace_canopy(floor_y: float) -> float:
+	var canopy_d := minf(_shape_rng.randf_range(2.5, 3.5), _body_depth - FRONT - 3.5)
+	var back := -_body_depth + 0.25
+	var front := back + canopy_d
+	var h := width / 2.0 - 0.2
+	for corner: Vector2 in [Vector2(-1, back), Vector2(1, back), Vector2(-1, front), Vector2(1, front)]:
+		var post_h := 2.15 if corner.y == back else 2.4
+		_box(HouseMaterials.METAL, Vector3(0.05, post_h, 0.05), Vector3(corner.x * (h - 0.1), floor_y + post_h / 2.0, corner.y), Color("#6E6F6A"))
+	_batch.quad(HouseMaterials.METAL_ROOF, [Vector3(-h, floor_y + 2.15, back - 0.1), Vector3(h, floor_y + 2.15, back - 0.1),
+			Vector3(h, floor_y + 2.4, front + 0.1), Vector3(-h, floor_y + 2.4, front + 0.1)] as Array[Vector3], Color.WHITE)
+	part_boxes["canopy"] = AABB(Vector3(-h, floor_y + 2.15, back - 0.1), Vector3(h * 2.0, 0.25, canopy_d + 0.2))
+	return front + 0.1
+
+
+## The back extension of one or two floors, with a metal roof or a small
+## concrete roof (D-0004-08).
+func _build_extension() -> void:
+	if _extension_depth <= 0.0:
+		return
+	var h := _extension_floors * floor_height
+	var z0 := -_body_depth
+	var z1 := -depth
+	_box(HouseMaterials.PLASTER, Vector3(width, h, _extension_depth), Vector3(0, h / 2.0, (z0 + z1) / 2.0), Color.WHITE, "extension")
+	Greybox.solid_shape(solid, Vector3(width, h, _extension_depth), Vector3(0, h / 2.0, (z0 + z1) / 2.0))
+	_box(HouseMaterials.GLASS, Vector3(0.8, 0.9, 0.02), Vector3(0, h - 1.4, z1 - 0.01), Color("#41525A"))
+	var hw := width / 2.0
+	if _shape_rng.randf() < 0.6:
+		_batch.quad(HouseMaterials.METAL_ROOF, [Vector3(-hw, h + 0.05, z1 - 0.15), Vector3(hw, h + 0.05, z1 - 0.15),
+				Vector3(hw, h + 0.35, z0), Vector3(-hw, h + 0.35, z0)] as Array[Vector3], Color.WHITE)
+		part_boxes["extension_roof"] = AABB(Vector3(-hw, h + 0.05, z1 - 0.15), Vector3(width, 0.3, z0 - z1 + 0.15))
+	else:
+		_box(HouseMaterials.DETAIL, Vector3(width, 0.12, _extension_depth), Vector3(0, h + 0.06, (z0 + z1) / 2.0), _terrace_color,
+				"extension_roof")
 
 
 ## A metal roof that slopes from the front parapet to the back, with a round
@@ -602,7 +723,7 @@ func _metal_roof(height: float) -> void:
 	var front_y := height + _parapet_height() - 0.05
 	var back_y := height + 0.15
 	var z0 := -FRONT
-	var z1 := -depth - 0.2
+	var z1 := -_body_depth - 0.2
 	# The roof does not go past the side walls, into the house next door.
 	var h := width / 2.0
 	_batch.quad(HouseMaterials.METAL_ROOF, [Vector3(-h, back_y, z1), Vector3(h, back_y, z1), Vector3(h, front_y, z0), Vector3(-h, front_y, z0)] as Array[Vector3], Color.WHITE)
@@ -624,7 +745,7 @@ func _tile_roof(height: float) -> void:
 	# The eaves go out at the front and the back, not into the houses next door.
 	var h := width / 2.0
 	var z0 := 0.3
-	var z1 := -depth - 0.3
+	var z1 := -_body_depth - 0.3
 	var eave := height + 0.2
 	_batch.quad(HouseMaterials.TILE_ROOF, [Vector3(-h, eave, z0), Vector3(-h, eave, z1), Vector3(0, top, z1), Vector3(0, top, z0)] as Array[Vector3], Color.WHITE)
 	_batch.quad(HouseMaterials.TILE_ROOF, [Vector3(h, eave, z1), Vector3(h, eave, z0), Vector3(0, top, z0), Vector3(0, top, z1)] as Array[Vector3], Color.WHITE)
@@ -636,7 +757,7 @@ func _tile_roof(height: float) -> void:
 
 ## Satellite dishes, TV antennas, and sometimes a cell tower.
 func _build_rooftop_antennas(base_y: float) -> void:
-	var z := -depth * 0.3
+	var z := -_body_depth * 0.3
 	if _rng.randf() < 0.35:
 		var x := _rng.randf_range(-width / 2.0 + 0.5, width / 2.0 - 0.5)
 		_box(HouseMaterials.METAL, Vector3(0.05, 0.6, 0.05), Vector3(x, base_y + 0.3, z), Color("#7A7A74"))
@@ -649,7 +770,7 @@ func _build_rooftop_antennas(base_y: float) -> void:
 			_box(HouseMaterials.METAL, Vector3(0.9 - i * 0.15, 0.02, 0.02), Vector3(x, base_y + 1.5 + i * 0.18, z - 1.0), Color("#8A8A84"))
 	if kind == "hotel" and seed % 7 == 0:
 		# A cell tower: a lattice mast with panels.
-		var mast_z := -depth * 0.6
+		var mast_z := -_body_depth * 0.6
 		for corner: Vector2 in [Vector2(-0.3, -0.3), Vector2(0.3, -0.3), Vector2(-0.3, 0.3), Vector2(0.3, 0.3)]:
 			_box(HouseMaterials.METAL, Vector3(0.05, 6.0, 0.05), Vector3(corner.x, base_y + 3.0, mast_z + corner.y), Color("#9A9A94"))
 		for i in 6:
@@ -673,14 +794,14 @@ func _build_side_walls() -> void:
 		var y0 := maxf(neighbor, 0.0)
 		var points: Array[Vector3] = []
 		if side < 0.0:
-			points = [Vector3(x, y0, -depth), Vector3(x, y0, 0), Vector3(x, top, 0), Vector3(x, top, -depth)]
+			points = [Vector3(x, y0, -_body_depth), Vector3(x, y0, 0), Vector3(x, top, 0), Vector3(x, top, -_body_depth)]
 		else:
-			points = [Vector3(x, y0, 0), Vector3(x, y0, -depth), Vector3(x, top, -depth), Vector3(x, top, 0)]
+			points = [Vector3(x, y0, 0), Vector3(x, y0, -_body_depth), Vector3(x, top, -_body_depth), Vector3(x, top, 0)]
 		_batch.quad(key, points, Color.WHITE)
-		part_boxes["side_%s" % ("left" if side < 0.0 else "right")] = AABB(Vector3(x, y0, -depth), Vector3(0.0, top - y0, depth))
+		part_boxes["side_%s" % ("left" if side < 0.0 else "right")] = AABB(Vector3(x, y0, -_body_depth), Vector3(0.0, top - y0, _body_depth))
 		# Breeze blocks: a grid of small openings high on the bare wall.
 		if top - y0 > 2.0 and _rng.randf() < 0.5:
-			var center := Vector3(x + side * 0.01, top - 1.4, -depth * _rng.randf_range(0.3, 0.7))
+			var center := Vector3(x + side * 0.01, top - 1.4, -_body_depth * _rng.randf_range(0.3, 0.7))
 			for row in 3:
 				for column in 4:
 					_box(HouseMaterials.DETAIL, Vector3(0.02, 0.14, 0.14),
@@ -702,6 +823,9 @@ func _build_clutter() -> void:
 			var to_right := _rng.randf() < 0.5 and kind != "hotel"
 			var x: float = _windows[0][0] + (w / 2.0 + 0.5) * (1.0 if to_right else -1.0)
 			x = clampf(x, -width / 2.0 + 0.45, width / 2.0 - 0.45)
+			# A narrow house has no room for the unit next to the sill.
+			if absf(x - float(_windows[0][0])) < w / 2.0 + 0.06 + 0.41:
+				continue
 			parts.add("ac_unit", Transform3D(global_basis_for_parts(), to_global_part(Vector3(x, i * floor_height + 0.35, 0.16))), Color("#E6E6E0"))
 	# Potted plants on the step of a home.
 	if ground != "shop" and _rng.randf() < 0.6:
@@ -757,9 +881,9 @@ func _build_occluder() -> void:
 	occluder.name = "Occluder"
 	var box := BoxOccluder3D.new()
 	var height := wall_height()
-	box.size = Vector3(width - 0.3, height - 0.4, depth - FRONT - 0.6)
+	box.size = Vector3(width - 0.3, height - 0.4, _body_depth - FRONT - 0.6)
 	occluder.occluder = box
-	occluder.position = Vector3(0, height / 2.0 + 0.1, -FRONT - (depth - FRONT) / 2.0)
+	occluder.position = Vector3(0, height / 2.0 + 0.1, -FRONT - (_body_depth - FRONT) / 2.0)
 	add_child(occluder)
 
 

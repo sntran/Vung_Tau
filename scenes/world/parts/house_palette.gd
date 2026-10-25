@@ -71,6 +71,15 @@ static func is_wall_color(color: Color) -> bool:
 	return false
 
 
+## True when the palette has a two-color front with these two colors.
+static func is_two_color(color: Color, stripe: Color) -> bool:
+	for entry: Dictionary in data().bold_walls:
+		if entry.has("stripe") and Color(entry.color).is_equal_approx(color) \
+				and Color(entry.stripe).is_equal_approx(stripe):
+			return true
+	return false
+
+
 static func is_bold(color: Color) -> bool:
 	for entry: Dictionary in data().bold_walls:
 		if Color(entry.color).is_equal_approx(color):
@@ -84,10 +93,15 @@ static func accent(kind: String, rng: RandomNumberGenerator) -> Color:
 	return Color(list[rng.randi() % list.size()])
 
 
-## A color of corrugated metal or a concrete roof terrace: {color, kind}.
+## A color of corrugated metal: {color, kind}.
 static func metal_roof(rng: RandomNumberGenerator) -> Dictionary:
 	var entry := _by_weight(data().metal_roofs.colors, rng)
 	return {"color": Color(entry.color), "kind": entry.kind}
+
+
+## A color of a flat concrete roof terrace (D-0004-03).
+static func terrace(rng: RandomNumberGenerator) -> Color:
+	return Color(_by_weight(data().terraces.colors, rng).color)
 
 
 static func roof_tile(rng: RandomNumberGenerator) -> Color:

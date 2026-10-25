@@ -25,8 +25,6 @@ var _sound: CheckButton
 var _subtitles: TextButton
 var _center: TextButton
 var _quality: TextButton
-var _restart_note: Label
-var _restart: TextButton
 var _fullscreen: CheckButton
 var _mouse: HSlider
 var _mouse_label: Label
@@ -43,12 +41,6 @@ func _init() -> void:
 	_quality = PhoneUi.button("settings.quality", "")
 	_quality.pressed.connect(_next_preset)
 	_column.add_child(_quality)
-	_restart_note = PhoneUi.label("")
-	_restart_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_column.add_child(_restart_note)
-	_restart = PhoneUi.button("settings.restart", "")
-	_restart.pressed.connect(func() -> void: phone.request.emit("restart", {}))
-	_column.add_child(_restart)
 	_fullscreen = _toggle("settings.fullscreen")
 	_sound = _toggle("settings.sound")
 	_subtitles = PhoneUi.button("settings.subtitles", "")
@@ -115,7 +107,6 @@ func refresh(state: Dictionary) -> void:
 	_tap_walk.text = Content.ui_text("settings_tap_walk")
 	_center.set_texts(Content.ui_text("center_view"))
 	_fullscreen.text = Content.ui_text("settings_fullscreen")
-	_restart.set_texts(Content.ui_text("settings_restart"))
 	# A phone has no window and no mouse.
 	var desktop := not OS.has_feature("mobile") and not OS.has_feature("web")
 	_fullscreen.visible = desktop
@@ -172,11 +163,6 @@ func _update_labels() -> void:
 	_box_label.text = Content.format(Content.ui_text("settings_subtitle_box"), {"value": "%d%%" % int(_box.value * 100)})
 	_quality.set_texts(Content.format(Content.ui_text("settings_quality"),
 			{"value": Content.ui_dict("quality_presets").get(_preset, _preset)}))
-	# A change of renderer needs a restart (R4).
-	var restart := Quality.needs_restart(_preset)
-	_restart_note.text = Content.ui_text("settings_restart_note") if restart else ""
-	_restart_note.visible = restart
-	_restart.visible = restart
 	_mouse_label.text = Content.format(Content.ui_text("settings_mouse"), {"value": "%.2f" % _mouse.value})
 	_subtitles.set_texts(Content.format(Content.ui_text("settings_subtitles"),
 			{"value": Content.ui_dict("subtitle_languages").get(_language, _language)}))

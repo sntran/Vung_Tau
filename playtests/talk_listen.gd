@@ -29,6 +29,11 @@ func run(d: PlaytestDriver) -> void:
 	var line := await d.talk_to("batu")
 	d.main().get_tree().process_frame.disconnect(record)
 	d.expect(names.get("batu.intro", "") == "Bà Tư", "she says who she is, and her name shows from that line on: %s" % [names])
+	# A talk at a normal distance: 1.0 m to 1.2 m (D-0004-05).
+	var npc_at: Vector3 = (d.find("npc.batu") as Node3D).global_position
+	var player_at: Vector3 = d.main().player.global_position
+	var talk_m := Vector2(player_at.x - npc_at.x, player_at.z - npc_at.z).length()
+	d.expect(talk_m >= 1.0 and talk_m <= 1.2, "the player talks at %.2f m from Bà Tư, from 1.0 m to 1.2 m" % talk_m)
 	d.expect(line == "batu.greet", "Bà Tư greets the player, not \"%s\"" % line)
 	d.expect(d.audio_playing("batu"), "her audio plays")
 	await d.wait_frames(2)

@@ -38,12 +38,20 @@ void fragment() {
 	float down = ridges_along_z > 0.5 ? local_pos.z : local_pos.x;
 	float wave = cos(across * 6.2831 / 0.076);
 	vec3 color = roof_color.rgb * (0.86 + 0.14 * wave);
-	// Each sheet is about 1 m wide, with a small change of tone.
-	color *= 0.92 + 0.16 * hash(vec2(floor(across / 1.0), seed));
+	// Each sheet is about 1 m wide, with a small change of tone. Some sheets
+	// are newer or were painted again, so their color is stronger: the photo
+	// colors of R10c are the means of many sheets (D-0004-09).
+	float sheet = hash(vec2(floor(across / 1.0), seed));
+	color *= 0.92 + 0.16 * sheet;
+	float lum = dot(color, vec3(0.299, 0.587, 0.114));
+	color = max(mix(vec3(lum), color, 1.4 + 0.9 * hash(vec2(floor(across / 1.0) + 7.0, seed))), vec3(0.0));
 	float streak = noise(vec2(across * 26.0 + seed * 9.0, down * 1.5));
 	float rust_mask = smoothstep(0.75 - rust * 0.45, 0.95 - rust * 0.3, streak) * step(0.2, wave);
 	color = mix(color, rust_color * (0.8 + 0.4 * noise(local_pos.xz * 4.0)), rust_mask * (0.4 + 0.6 * rust));
 	ALBEDO = color;
-	METALLIC = 0.35 * (1.0 - rust_mask);
-	ROUGHNESS = mix(0.45, 0.9, rust_mask);
+	// Painted sheets are almost matte. A shiny metal reflected the pale sky
+	// and made the colors grey from above (D-0004-03).
+	METALLIC = 0.1 * (1.0 - rust_mask);
+	ROUGHNESS = mix(0.65, 0.9, rust_mask);
+	SPECULAR = 0.3;
 }

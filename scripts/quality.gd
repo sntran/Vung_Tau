@@ -2,18 +2,15 @@ class_name Quality
 extends RefCounted
 ## The quality presets (plan 0004, D3, R4): Low, Medium, High, and Ultra.
 ##
-## A preset sets the renderer (on desktop only), the distance of the sun
-## shadow, the screen-space effects, the volumetric fog, and the render scale.
+## A preset sets the distance of the sun shadow, the screen-space effects,
+## the volumetric fog, and the render scale. All presets use Forward+ on a
+## computer, so a change of preset does not start the game again (D-0004-07).
 ## Android and iOS always use the Mobile renderer, and the web build always
-## uses the Compatibility renderer. There the preset sets only the other values.
-##
-## Godot selects the renderer when it starts, and a file in user:// cannot
-## change it (verified with Godot 4.7.2). So a preset with another renderer
-## starts the game again with the command-line argument --rendering-method.
+## uses the Compatibility renderer.
 
 const NAMES: Array[String] = ["low", "medium", "high", "ultra"]
 const PRESETS := {
-	"low": {"renderer": "mobile", "shadow_distance": 25.0, "ssao": false, "ssil": false, "sdfgi": false,
+	"low": {"renderer": "forward_plus", "shadow_distance": 25.0, "ssao": false, "ssil": false, "sdfgi": false,
 			"fog": false, "scale": 0.75},
 	"medium": {"renderer": "forward_plus", "shadow_distance": 50.0, "ssao": true, "ssil": false, "sdfgi": false,
 			"fog": false, "scale": 1.0},
@@ -22,8 +19,6 @@ const PRESETS := {
 	"ultra": {"renderer": "forward_plus", "shadow_distance": 120.0, "ssao": true, "ssil": true, "sdfgi": true,
 			"fog": true, "scale": 1.0},
 }
-const RENDERER_ARG := "--rendering-method"
-
 
 ## The preset for the first start: Low on phones, in the web build, and on a
 ## computer without a graphics card (a software renderer). Medium with a
@@ -58,34 +53,6 @@ static func current_renderer() -> String:
 	return RenderingServer.get_current_rendering_method()
 
 
-## True when the preset needs another renderer than the renderer now. Then the
-## game must start again.
-static func needs_restart(preset: String) -> bool:
-	return renderer_for(preset) != current_renderer()
-
-
-## True when the command line selects the renderer (the play tests do). Then
-## the game does not start again for the preset.
-static func renderer_fixed_by_command_line() -> bool:
-	return OS.get_cmdline_args().has(RENDERER_ARG)
-
-
-## The command-line arguments to start the game again with the renderer of the preset.
-static func restart_args(preset: String) -> PackedStringArray:
-	var args := PackedStringArray()
-	var old := OS.get_cmdline_args()
-	var i := 0
-	while i < old.size():
-		if old[i] == RENDERER_ARG:
-			i += 2
-			continue
-		args.append(old[i])
-		i += 1
-	args.append(RENDERER_ARG)
-	args.append(renderer_for(preset))
-	return args
-
-
 ## Sets the values of the preset. The screen-space effects and the fog are
 ## only in the Forward+ renderer, so they stay off with the other renderers.
 static func apply(preset: String, environment: Environment, sun: DirectionalLight3D, viewport: Viewport) -> void:
@@ -96,8 +63,8 @@ static func apply(preset: String, environment: Environment, sun: DirectionalLigh
 	environment.sdfgi_enabled = forward and bool(values.sdfgi)
 	environment.volumetric_fog_enabled = forward and bool(values.fog)
 	# A narrow hẻm gets little sky light. Without these values, SDFGI and SSAO
-	# made the street almost black at noon in the look review (PT-25).
-	environment.sdfgi_energy = 4.0
+	# made the street almost black at noon in the look review (PT-25). The
+	# SDFGI energy changes with the time (DayLight.gi_energy()).
 	environment.sdfgi_bounce_feedback = 0.6
 	environment.ssao_intensity = 1.2
 	environment.ssil_intensity = 1.4

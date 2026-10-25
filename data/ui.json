@@ -142,8 +142,6 @@
 		"high": "High",
 		"ultra": "Ultra"
 	},
-	"settings_restart_note": "This quality uses another renderer. The change starts after a restart.",
-	"settings_restart": "Restart now",
 	"settings_fullscreen": "Fullscreen",
 	"settings_mouse": "Mouse speed: {value}"
 }

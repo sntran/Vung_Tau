@@ -98,8 +98,11 @@ func _check(d: PlaytestDriver, house: TubeHouse) -> int:
 
 ## Pairs of parts that are fixed to each other or to the body.
 func _may_touch(a: String, b: String) -> bool:
-	var fixed := ["body", "parapet", "side_left", "side_right", "step"]
+	var fixed := ["body", "extension", "parapet", "side_left", "side_right", "step"]
 	if a in fixed or b in fixed:
+		return true
+	# A roof stands on its room (D-0004-08).
+	if a.begins_with(b + "_") or b.begins_with(a + "_"):
 		return true
 	var kind_a := a.get_slice("_", 0)
 	var kind_b := b.get_slice("_", 0)

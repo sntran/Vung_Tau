@@ -1,5 +1,5 @@
 {
-	"note": "The hẻm (plan 0004, R10, R11a). Each house has a width (3.5 m to 5 m), floors (2 to 5), a kind (tube, villa, hotel), a style (old or new), a paint color from data/world/palette.json, a paint age (0 new to 1 old), and a seed. The hẻm is 2.8 m wide until the map data of plan 0005 gives its real width.",
+	"note": "The hẻm (plan 0004, R10, R11a). Each house has a width (3.5 m to 5 m), floors (2 to 5), a kind (tube, villa, hotel), a style (old or new), a paint color from data/world/palette.json (and an optional second color \"stripe\" for a two-color front), a paint age (0 new to 1 old), and a seed. The hẻm is 2.8 m wide until the map data of plan 0005 gives its real width.",
 	"hem_width": 2.8,
 	"floor_height": 3.2,
 	"lots": [
@@ -84,7 +84,7 @@
 			"floors": 4,
 			"kind": "tube",
 			"style": "new",
-			"paint": "#FEFFFB",
+			"paint": "#F0D98A",
 			"paint_age": 0.3,
 			"seed": 505,
 			"roof": "flat",
@@ -264,7 +264,7 @@
 			"paint": "#E7E9E9",
 			"paint_age": 0.2,
 			"seed": 111,
-			"roof": "flat",
+			"roof": "metal",
 			"front_tiles": "ground",
 			"balcony": true,
 			"ground": "gate"
@@ -289,7 +289,8 @@
 			"floors": 4,
 			"kind": "tube",
 			"style": "new",
-			"paint": "#FEFFFB",
+			"paint": "#9ED8C3",
+			"stripe": "#F2EFE6",
 			"paint_age": 0.35,
 			"seed": 333,
 			"roof": "flat",
@@ -334,7 +335,7 @@
 			"paint": "#D4D5D6",
 			"paint_age": 0.3,
 			"seed": 666,
-			"roof": "flat",
+			"roof": "metal",
 			"front_tiles": "ground",
 			"balcony": true,
 			"ground": "gate"
@@ -361,7 +362,7 @@
 			"floors": 5,
 			"kind": "hotel",
 			"style": "new",
-			"paint": "#FEFFFB",
+			"paint": "#F0D98A",
 			"paint_age": 0.3,
 			"seed": 121,
 			"roof": "flat",
@@ -416,7 +417,7 @@
 			"paint": "#C3C0C2",
 			"paint_age": 0.6,
 			"seed": 454,
-			"roof": "flat",
+			"roof": "metal",
 			"front_tiles": "full",
 			"balcony": false,
 			"ground": "gate"

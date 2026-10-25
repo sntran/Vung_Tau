@@ -650,6 +650,12 @@ func stick_to(point: Vector3) -> bool:
 	return await _stick_straight(point)
 
 
+## Walks straight to the point with the joystick, without the free lane of
+## stick_to(). Returns true when the player arrives (±0.6 m).
+func stick_straight(point: Vector3) -> bool:
+	return await _stick_straight(point)
+
+
 func _stick_straight(point: Vector3) -> bool:
 	for attempt in 3:
 		var pos: Vector3 = state().player
@@ -1086,6 +1092,7 @@ func hem_views() -> Array[Dictionary]:
 		{"name": "back", "eye": Vector3(hem.end_x - 1.0, 1.6, -0.2), "target": Vector3(hem.start_x, 4.0, 0.2)},
 		{"name": "fronts", "eye": Vector3(mid, 1.6, half - 0.4), "target": Vector3(mid + 3.0, 6.0, -half)},
 		{"name": "roofs", "eye": Vector3(mid - 14.0, 26.0, 18.0), "target": Vector3(mid, 4.0, 0.0)},
+		{"name": "top", "eye": Vector3(mid, 40.0, 7.5), "target": Vector3(mid, 0.0, 0.0)},
 	]
 
 

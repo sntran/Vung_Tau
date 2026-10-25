@@ -6,10 +6,10 @@ func test_presets_have_the_values_of_the_plan() -> void:
 	assert_eq(Quality.NAMES, ["low", "medium", "high", "ultra"] as Array[String])
 	var shadows := Quality.NAMES.map(func(n: String) -> float: return Quality.PRESETS[n].shadow_distance)
 	assert_eq(shadows, [25.0, 50.0, 80.0, 120.0])
-	assert_eq(Quality.PRESETS.low.renderer, "mobile")
 	for preset: String in ["medium", "high", "ultra"]:
-		assert_eq(Quality.PRESETS[preset].renderer, "forward_plus")
 		assert_true(Quality.PRESETS[preset].ssao)
+	for key: String in ["ssao", "ssil", "sdfgi", "fog"]:
+		assert_false(Quality.PRESETS.low[key], "Low has no %s" % key)
 	assert_false(Quality.PRESETS.medium.ssil)
 	assert_true(Quality.PRESETS.high.sdfgi)
 	assert_false(Quality.PRESETS.high.fog)
@@ -23,11 +23,12 @@ func test_unknown_preset_takes_the_default() -> void:
 	assert_true(Quality.NAMES.has(Quality.default_preset()))
 
 
-func test_restart_arguments_replace_the_renderer() -> void:
-	var args := Quality.restart_args("low")
-	assert_eq(args.count(Quality.RENDERER_ARG), 1)
-	var at := args.find(Quality.RENDERER_ARG)
-	assert_eq(args[at + 1], "mobile")
+## All presets use Forward+ on a computer, so no preset starts the game
+## again (D-0004-07).
+func test_all_presets_use_forward_plus_on_a_computer() -> void:
+	for preset: String in Quality.NAMES:
+		assert_eq(Quality.PRESETS[preset].renderer, "forward_plus")
+		assert_eq(Quality.renderer_for(preset), "forward_plus")
 
 
 func test_apply_sets_the_shadow_and_the_scale() -> void:

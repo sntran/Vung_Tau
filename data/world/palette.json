@@ -1,5 +1,5 @@
 {
-	"note": "The colors of the houses (plan 0004, R10a to R10c). \"walls\" are the muted wall colors measured from aerial photos of Vũng Tàu: about 85 % of the walls. \"bold_walls\" are the strong colors of a few walls, more on mini-hotels and shops near the beach. A bold wall is at most 1 house in 6 in a hẻm of homes, and at most 1 in 3 on a street near the beach. Two neighbor houses do not have the same color. The colors with the source \"builder\" are first values that the owner checks.",
+	"note": "The colors of the houses (plan 0004, R10a to R10c, and the report 0004, D-0004-09). \"walls\" are the muted wall colors measured from aerial photos of Vũng Tàu: about 70 % of the walls. \"bold_walls\" are the strong colors of the other walls: mint, teal, pastel yellow, salmon, sky blue, and two-color fronts. A bold wall is at most 1 house in 3 in a hẻm of homes, and at most 1 in 2 on a street near the beach. Two neighbor houses do not have the same color. The colors with the source \"builder\" are first values that the owner checks.",
 	"walls": [
 		{
 			"color": "#D4D5D6",
@@ -66,9 +66,9 @@
 			"source": "aerial photos, 2026-10-24"
 		}
 	],
-	"bold_share": 0.15,
-	"bold_max_homes": 0.1667,
-	"bold_max_beach": 0.3333,
+	"bold_share": 0.3,
+	"bold_max_homes": 0.3333,
+	"bold_max_beach": 0.5,
 	"bold_walls": [
 		{
 			"color": "#CE9E74",
@@ -81,19 +81,35 @@
 			"source": "street photos, 2026-10-24"
 		},
 		{
+			"color": "#9ED8C3",
+			"name": "mint",
+			"source": "builder, check"
+		},
+		{
+			"color": "#3E9C95",
+			"name": "teal",
+			"source": "builder, check"
+		},
+		{
 			"color": "#7DB3DC",
 			"name": "sky blue",
 			"source": "builder, check"
 		},
 		{
-			"color": "#E6C440",
-			"name": "bright yellow",
+			"color": "#F0D98A",
+			"name": "pastel yellow",
 			"source": "builder, check"
 		},
 		{
 			"color": "#CE9E74",
 			"stripe": "#F2EFE6",
 			"name": "salmon and white stripes",
+			"source": "builder, check"
+		},
+		{
+			"color": "#9ED8C3",
+			"stripe": "#F2EFE6",
+			"name": "mint and white stripes",
 			"source": "builder, check"
 		}
 	],
@@ -170,33 +186,13 @@
 		"source": "aerial photos, 2026-10-24"
 	},
 	"metal_roofs": {
-		"note": "Corrugated metal and roof terrace colors in a dense hẻm (R10c). Kind: grey (concrete roof, wall, faded metal), orange (terracotta or orange metal), rust, or teal (mint or teal metal).",
+		"note": "The colors of corrugated metal sheets in a dense hẻm (R10c): mint or teal, rust, orange or tan, and some red. The grey and white clusters of the photo are concrete roof terraces and walls, not metal (D-0004-03): they are in \"terraces\".",
 		"source": "top-down photo of a dense hẻm, 2026-10-24",
 		"colors": [
-			{
-				"color": "#CBCAC0",
-				"weight": 0.132,
-				"kind": "grey"
-			},
 			{
 				"color": "#BCAF9A",
 				"weight": 0.114,
 				"kind": "orange"
-			},
-			{
-				"color": "#DDE5E4",
-				"weight": 0.112,
-				"kind": "grey"
-			},
-			{
-				"color": "#91968E",
-				"weight": 0.104,
-				"kind": "grey"
-			},
-			{
-				"color": "#7A7A71",
-				"weight": 0.086,
-				"kind": "grey"
 			},
 			{
 				"color": "#5C3E36",
@@ -232,6 +228,34 @@
 				"color": "#4FA9A9",
 				"weight": 0.027,
 				"kind": "teal"
+			},
+			{
+				"color": "#A9473A",
+				"weight": 0.06,
+				"kind": "red",
+				"source": "builder, check"
+			}
+		]
+	},
+	"terraces": {
+		"note": "The colors of flat concrete roof terraces: the grey and white clusters of the top-down photo of a dense hẻm (R10c, D-0004-03).",
+		"source": "top-down photo of a dense hẻm, 2026-10-24",
+		"colors": [
+			{
+				"color": "#CBCAC0",
+				"weight": 0.132
+			},
+			{
+				"color": "#DDE5E4",
+				"weight": 0.112
+			},
+			{
+				"color": "#91968E",
+				"weight": 0.104
+			},
+			{
+				"color": "#7A7A71",
+				"weight": 0.086
 			}
 		]
 	}

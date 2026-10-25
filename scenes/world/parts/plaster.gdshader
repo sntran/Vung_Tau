@@ -111,14 +111,18 @@ void fragment() {
 	float base = 1.0 - smoothstep(0.15, 0.7 + smooth_noise(s * 1.7) * 0.5, w.y);
 	paint = mix(paint, paint * vec3(0.55, 0.56, 0.5), base * (0.35 + 0.5 * paint_age));
 
-	// Patches where the plaster fell off, mostly low on the wall and at edges.
-	float low = 1.0 - smoothstep(0.4, 2.4, w.y);
-	float edge = 1.0 - smoothstep(0.0, 0.7, edge_distance);
-	float threshold = 0.86 - paint_age * 0.12 - low * 0.1 - edge * 0.12;
+	// Patches where the plaster fell off: few and large, mostly low on the
+	// wall and at the edges (D-0004-06). A new house (low paint age) has no
+	// patch above the ground floor.
+	float low = 1.0 - smoothstep(0.3, 1.8, w.y);
+	float edge = 1.0 - smoothstep(0.0, 0.6, edge_distance);
+	float threshold = 0.95 - paint_age * 0.1 - low * 0.2 - edge * 0.14;
 	if (bare > 0.5) {
 		threshold -= 0.03;
 	}
-	float mask = smooth_noise(s * 0.95 + 11.0) * 0.75 + detail_noise(s * 0.4) * 0.25;
+	float new_house = 1.0 - smoothstep(0.3, 0.45, paint_age);
+	threshold += new_house * step(floor_height, w.y);
+	float mask = smooth_noise(s * 0.45 + 11.0) * 0.8 + detail_noise(s * 0.3) * 0.2;
 	float patch = smoothstep(threshold, threshold + 0.015, mask);
 	float rim = smoothstep(threshold - 0.02, threshold, mask) * (1.0 - patch);
 	float bricks_here = bare > 1.5 ? 1.0 : patch;

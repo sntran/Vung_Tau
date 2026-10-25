@@ -886,13 +886,6 @@ func _on_phone_request(action: String, args: Dictionary) -> void:
 			_apply_settings()
 		"center":
 			center_view()
-		"restart":
-			# The play tests cannot start the game again: the next run of a
-			# play test is the restart.
-			GameState.save_game()
-			if not Playtest.active:
-				OS.set_restart_on_exit(true, Quality.restart_args(GameState.settings.quality))
-				get_tree().quit()
 
 
 ## A choice of the Clock app: wait, or sleep until morning (R27).
@@ -1054,10 +1047,15 @@ func _apply_time(minutes: int) -> void:
 	var sky_material := environment.sky.sky_material as ProceduralSkyMaterial
 	sky_material.sky_top_color = sky[0]
 	sky_material.sky_horizon_color = sky[1]
-	sky_material.ground_horizon_color = sky[1]
-	sky_material.ground_bottom_color = sky[1].darkened(0.5)
-	environment.ambient_light_color = sky[1].lerp(Color.WHITE, 0.4)
+	# The lower half of the sky is not visible, but SDFGI (High and Ultra)
+	# takes its light. By day it has the warm color of the sunlit ground, so
+	# the shade is not blue and cold (D-0004-04).
+	var day := 1.0 - DayLight.darkness(minutes) / 0.55
+	sky_material.ground_horizon_color = sky[1].lerp(DayLight.WARM_GROUND, 0.6 * day)
+	sky_material.ground_bottom_color = sky[1].darkened(0.5).lerp(DayLight.WARM_GROUND, 0.8 * day)
+	environment.ambient_light_color = DayLight.ambient_color(minutes)
 	environment.ambient_light_energy = DayLight.ambient_energy(minutes)
+	environment.sdfgi_energy = DayLight.gi_energy(minutes)
 	environment.fog_light_color = sky[1]
 	sun.rotation_degrees = DayLight.sun_rotation(minutes)
 	sun.light_color = DayLight.sun_color(minutes)
