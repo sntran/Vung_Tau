@@ -1425,6 +1425,10 @@ func stick_along(route: PackedVector3Array, to: float, check := Callable(), ahea
 		var now := route_point(route, here)
 		var off := Vector2(pos.x - now.x, pos.z - now.z).length()
 		var step := ahead if stuck == 0 and off < 1.0 else 4.0
+		# After a stop, aim at a nearer point: in a sharp hairpin, a straight
+		# line to a point 4 m on can cross the steep ground inside the bend.
+		if stuck > 0:
+			step = 2.0 if stuck == 1 else 1.0
 		var soon := route_point(route, minf(here + 3.0, to))
 		while step > 4.0:
 			var far := route_point(route, minf(here + step, to))
