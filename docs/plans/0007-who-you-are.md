@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Branch | `feat/0007-who-you-are` |
 | Depends on | 0003 (status "Done": the corrections of `docs/playtests/0003-report.md`, mainly D-0003-04, the introductions) |
 

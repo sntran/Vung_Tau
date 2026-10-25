@@ -37,7 +37,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 | 0004 | [Desktop and the house detail kit](0004-desktop-and-house-detail.md) | Built |
 | 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Approved |
 | 0006 | [People](0006-people.md) | Approved |
-| 0007 | [Who you are: the passport and the forms of address](0007-who-you-are.md) | Draft |
+| 0007 | [Who you are: the passport and the forms of address](0007-who-you-are.md) | Approved |
 
 ## Proposed order of the next plans
 
@@ -49,7 +49,7 @@ The order can change.
 | 0004 | [Desktop and the house detail kit](0004-desktop-and-house-detail.md) | Built. Desktop becomes the main platform, with the Forward+ renderer and quality presets. Tube houses get depth, brick under plaster and paint, wear, and the clutter of a real street. |
 | 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Approved. The real ground, hills, coast, beaches, sea, and roads, from OpenStreetMap and the Copernicus elevation data. |
 | 0006 | [People](0006-people.md) | Approved. People with real bodies, faces, hair, and clothes, made by code with MPFB 2. Library animations, head and eye movement, blinks, faces for each line, and lip sync from the voice audio. |
-| 0007 | [Who you are](0007-who-you-are.md) | Draft. Cô Nga asks for a photo of the passport for the police registration. The player sets the age and the gender. People address the traveler with the correct kinship words (con, em, anh, chị, chú, cô…), and the traveler answers with the correct words. |
+| 0007 | [Who you are](0007-who-you-are.md) | Approved. Cô Nga asks for a photo of the passport for the police registration. The player sets the age and the gender. People address the traveler with the correct kinship words (con, em, anh, chị, chú, cô…), and the traveler answers with the correct words. |
 | 0008 | Known structures | Tượng Chúa Kitô Vua, Hải đăng, Bạch Dinh, Tượng Đức Mẹ Bãi Dâu, Miếu Hòn Bà (with its gate and the old bunkers), Chùa Tam Bảo, the ferry pier near Bãi Trước, the park of Bãi Trước, the main bus station, the old markets, the big roundabout, Ngã Năm, and others that I name. Made by code from their real outlines and sizes. |
 | 0009 | Houses on the lots | A house generator that uses the kit of plan 0004 and puts houses on the lots between the roads. The homestay hẻm moves to its real place. |
 | 0010 | Arrival | The game starts at the bus station (Bến xe Vũng Tàu). The player can walk anywhere, or take a taxi or a ride from a ride app (a fictional app, not a real brand) to the homestay. At the door, the traveler shows the passport, and cô Nga registers the stay. |
