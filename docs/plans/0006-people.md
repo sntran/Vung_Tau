@@ -14,9 +14,9 @@ The blocks of plans 0001 to 0003 go away.
 
 ## 2. Out of scope
 
-- Crowds on the beach and on the coast road (plan 0013).
-- Work movements for one place: cooking bánh khọt, the phin of the cà phê cóc, the morning exercise at Bãi Trước. The plan of each place adds its movements (plans 0010 to 0013).
-- People on scooters (plan 0016).
+- Crowds on the beach and on the coast road (plan 0015).
+- Work movements for one place: cooking bánh khọt, the phin of the cà phê cóc, the morning exercise at Bãi Trước. The plan of each place adds its movements (plans 0012 to 0015).
+- People on scooters (plan 0018).
 - The body and the hands of the player.
 - Motion capture of real people.
 - New dialogue lines.

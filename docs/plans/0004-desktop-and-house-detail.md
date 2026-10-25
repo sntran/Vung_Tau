@@ -10,7 +10,7 @@
 
 The game runs on desktop computers as the main platform, with better light. The houses of the hẻm look like real tube houses in Vũng Tàu: brick under plaster and paint, with depth, wear, and the clutter of a real street.
 
-The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0007 puts houses of the same kit on the real lots of the map.
+The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0009 puts houses of the same kit on the real lots of the map.
 
 ## 2. Out of scope
 

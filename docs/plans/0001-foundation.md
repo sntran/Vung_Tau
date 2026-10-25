@@ -94,7 +94,7 @@ tools/
 
 ### Content and data
 
-- **R5.** Move the content of the prototype (`docs/prototype/hem-2d.html`) into `data/`: the spots, the opening hours, the cards, and the hẻm dialogue. Do not move the phở table content. It is for plan 0009.
+- **R5.** Move the content of the prototype (`docs/prototype/hem-2d.html`) into `data/`: the spots, the opening hours, the cards, and the hẻm dialogue. Do not move the phở table content. It is for plan 0011.
 - **R6.** Each fact in the data has a `status` field with the value `confirmed`, `source`, or `check`, the same as in `docs/content/culture-notes.md`.
 - **R7.** `Content` checks the data when the game starts. In a debug build, it stops the game with a clear message when:
   - a dialogue choice points to a line ID that does not exist,
