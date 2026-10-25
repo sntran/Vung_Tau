@@ -319,3 +319,17 @@ def test_small_island_keeps_its_height():
     keep[40:61, 40:61] = True
     terrain.remove_buildings(grid, no_town, keep)
     assert grid.heights[50, 50] == pytest.approx(12.0), "the island keeps its height"
+
+
+def test_outside_of_a_sharp_bend_is_flat():
+    # A road with a bend of 90 degrees on a slope. The cells at the outside of
+    # the bend are beside neither segment, and the road must be flat there too.
+    cols, rows = 51, 51
+    gx = np.arange(cols) * 2.0
+    heights = np.tile((0.3 * gx).astype(np.float32), (rows, 1))
+    grid = terrain.Grid(x0=0.0, z0=-100.0, step=2.0, heights=heights)
+    road = _road(1, "residential", [(20.0, 20.0), (50.0, 50.0), (20.0, 80.0)], width=6.0)
+    terrain.flatten_roads(grid, [road], 2.0)
+    apex = grid.sample([50.0], [-50.0])[0]
+    outside = grid.sample([52.5], [-50.0])[0]
+    assert outside == pytest.approx(apex, abs=0.15)

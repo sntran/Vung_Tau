@@ -63,7 +63,7 @@ Total road length: 692.3 km. Roads with a width tag: 7 of 4123. Hẻm: 2365.
 | Bến xe Vũng Tàu | yes | way/220891652 | 1418.58, -757.78 | 6.21 | 2 candidates, 7.3 m from the hint |
 | Chợ Vũng Tàu | yes | way/215166910 | 1299.74, -509.85 | 9.48 | 1 candidates, 785.3 m from the hint |
 | Chợ Xóm Lưới | yes | node/2649575440 | 224.65, 242.56 | 7.88 | 1 candidates, 3.1 m from the hint |
-| Vòng xoay Đài tưởng niệm Liệt sĩ | yes | way/975192902 | 1953.62, -562.5 | 9.61 | 8 candidates, 811.8 m from the hint |
+| Vòng xoay Đài tưởng niệm Liệt sĩ | yes | way/975192902 | 1953.62, -562.5 | 9.62 | 8 candidates, 811.8 m from the hint |
 | Ngã Năm | yes | node/3144051066 | 1178.71, -1254.11 | 6.48 | 1 candidates, 5.8 m from the hint |
 
 ## Homestay hẻm

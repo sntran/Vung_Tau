@@ -46,6 +46,13 @@ ROAD_SMOOTH_M = 16.0
 MAX_ROAD_GRADE = 0.25
 # The most that a road goes into the ground or above it.
 MAX_ROAD_CUT_M = 4.0
+# The weight of the round join at a bend of a road, against the segments.
+JOIN_WEIGHT = 0.001
+# The steepest ground in the band beside a flat road (31 degrees): the player
+# can walk on it. Steeper steps beside a road stopped the player in a hairpin.
+ROAD_SIDE_GRADE = 0.6
+# The width of that band beside the road surface.
+ROAD_SIDE_M = 6.0
 # Road types that follow the natural ground: the pipeline does not make them flat.
 # A footway and steps are for walking, so they are flat like the other roads.
 NATURAL_ROADS = {"path", "track"}
@@ -338,6 +345,66 @@ def flatten_roads(grid: Grid, roads, step: float) -> None:
     mix = (np.zeros(grid.shape, dtype=np.float32), np.zeros(grid.shape, dtype=np.float32))
     for road, profile, x, z in reversed(profiles):
         _flatten(grid, road, profile, x, z, "mix", mix=mix)
+    limit_road_sides(grid, flat)
+
+
+def limit_road_sides(grid: Grid, roads, grade: float = ROAD_SIDE_GRADE, iterations: int = 30) -> int:
+    """Limits the slope of the ground in a band beside the flat roads. The
+    shoulders blend into the ground before the surfaces get their last
+    heights, so the ground beside a road (most between the two legs of a
+    hairpin) can have steps. The road surfaces do not change. Returns the
+    number of changed cells."""
+    h = grid.heights
+    rows, cols = h.shape
+    surface = np.zeros(h.shape, dtype=bool)
+    band = np.zeros(h.shape, dtype=bool)
+    for road in roads:
+        half = road.width / 2.0
+        reach = half + ROAD_SIDE_M
+        x = road.points[:, 0]
+        z = -road.points[:, 1]
+        for i in range(len(x) - 1):
+            ax, az, bx, bz = x[i], z[i], x[i + 1], z[i + 1]
+            c0 = max(0, int((min(ax, bx) - reach - grid.x0) / grid.step))
+            c1 = min(cols - 1, int((max(ax, bx) + reach - grid.x0) / grid.step) + 1)
+            r0 = max(0, int((min(az, bz) - reach - grid.z0) / grid.step))
+            r1 = min(rows - 1, int((max(az, bz) + reach - grid.z0) / grid.step) + 1)
+            if c1 < c0 or r1 < r0:
+                continue
+            dx, dz = bx - ax, bz - az
+            length2 = dx * dx + dz * dz
+            if length2 <= 0.0:
+                continue
+            gx, gz = np.meshgrid(grid.x0 + np.arange(c0, c1 + 1) * grid.step, grid.z0 + np.arange(r0, r1 + 1) * grid.step)
+            t = np.clip(((gx - ax) * dx + (gz - az) * dz) / length2, 0.0, 1.0)
+            d = np.hypot(gx - (ax + t * dx), gz - (az + t * dz))
+            surface[r0:r1 + 1, c0:c1 + 1] |= d <= half + grid.step / 2.0
+            band[r0:r1 + 1, c0:c1 + 1] |= d <= reach
+    return _limit_slope(h, band & ~surface, grade * grid.step, iterations)
+
+
+def _limit_slope(h: np.ndarray, free_mask: np.ndarray, most: float, iterations: int) -> int:
+    """Changes the cells of "free_mask" so that no step to a neighbor cell is
+    more than "most". Returns the number of changed cells."""
+    rows, cols = h.shape
+    rs, cs = np.nonzero(free_mask)
+    if len(rs) == 0:
+        return 0
+    r0, r1, c0, c1 = max(rs.min() - 1, 0), min(rs.max() + 2, rows), max(cs.min() - 1, 0), min(cs.max() + 2, cols)
+    window = h[r0:r1, c0:c1]
+    free = free_mask[r0:r1, c0:c1]
+    before = window.copy()
+    for _ in range(iterations):
+        padded = np.pad(window, 1, mode="edge")
+        neighbors = np.stack([padded[:-2, 1:-1], padded[2:, 1:-1], padded[1:-1, :-2], padded[1:-1, 2:]])
+        low = neighbors.max(axis=0) - most
+        high = neighbors.min(axis=0) + most
+        limited = np.where(low <= high, np.clip(window, low, high), (low + high) / 2.0)
+        changed = free & (np.abs(limited - window) > 1e-4)
+        if not changed.any():
+            break
+        window[changed] = limited[changed]
+    return int((free & (np.abs(window - before) > 1e-3)).sum())
 
 
 def _flatten(grid: Grid, road, profile, x, z, mode: str, locked: np.ndarray | None = None, mix=None) -> None:
@@ -381,6 +448,13 @@ def _flatten(grid: Grid, road, profile, x, z, mode: str, locked: np.ndarray | No
             weight = 1.0 / (d + 0.5) ** 2
             mix[0][r0:r1 + 1, c0:c1 + 1][core] += (target * weight)[core]
             mix[1][r0:r1 + 1, c0:c1 + 1][core] += weight[core]
+            if i > 0:
+                # The outside of a bend is beside neither segment. A disc at the
+                # start point has the height of that point, with a very small
+                # weight, so it counts only where no segment is beside a cell.
+                join = (raw_t < 0.0) & (d <= half + grid.step / 2.0)
+                mix[0][r0:r1 + 1, c0:c1 + 1][join] += (target * weight * JOIN_WEIGHT)[join]
+                mix[1][r0:r1 + 1, c0:c1 + 1][join] += (weight * JOIN_WEIGHT)[join]
             touched.append((r0, r1, c0, c1))
         elif mode == "surface":
             # The road surface and a band of half a grid step, so that the edge sample is flat too.

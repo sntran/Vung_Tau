@@ -1425,10 +1425,6 @@ func stick_along(route: PackedVector3Array, to: float, check := Callable(), ahea
 		var now := route_point(route, here)
 		var off := Vector2(pos.x - now.x, pos.z - now.z).length()
 		var step := ahead if stuck == 0 and off < 1.0 else 4.0
-		# After a stop, aim at a nearer point: in a sharp hairpin, a straight
-		# line to a point 4 m on can cross the steep ground inside the bend.
-		if stuck > 0:
-			step = 2.0 if stuck == 1 else 1.0
 		var soon := route_point(route, minf(here + 3.0, to))
 		while step > 4.0:
 			var far := route_point(route, minf(here + step, to))
@@ -1438,10 +1434,6 @@ func stick_along(route: PackedVector3Array, to: float, check := Callable(), ahea
 				break
 			step *= 0.5
 		var target := route_point(route, minf(here + step, to))
-		# After a stop away from the middle of the route (at the steep edge of
-		# a road in a hairpin), go back to the middle first, as a player does.
-		if stuck > 0 and off > 0.4:
-			target = now
 		await look_at_point(Vector3(target.x, pos.y + Player.EYE_HEIGHT, target.z), 4.0 if stuck == 0 else 2.0, 15.0)
 		var length := Vector2(target.x - pos.x, target.z - pos.z).length()
 		await hold_stick(Vector2(0, -1), clampf(length / Player.WALK_SPEED, 0.5, 8.0))
