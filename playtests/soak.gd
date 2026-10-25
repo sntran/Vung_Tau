@@ -3,11 +3,16 @@ extends RefCounted
 # people, and the visible buttons of the phone (plan 0003). Between the taps, do random joystick touches and look
 # drags. Check that there is no script error, and that the player is always
 # on the floor and never in a wall.
-# The 200 taps are in 8 runs of 25, so that each run is shorter than 180 s at
+# The 200 taps are in 10 runs of 20, so that each run is shorter than 180 s at
 # 2400×1080 under lavapipe. The random number state goes from one run to the
 # next, so the taps are one sequence with seed 1. The game starts again
 # between the runs, from the same save file.
+# After each action, the test waits until the player stops walking (not for a
+# number of frames), so a slow computer makes the same walk (report 0003,
+# D-0003-05).
 # phase: --start-time=06:00 --seed=1
+# phase: --seed=1
+# phase: --seed=1
 # phase: --seed=1
 # phase: --seed=1
 # phase: --seed=1
@@ -17,7 +22,9 @@ extends RefCounted
 # phase: --seed=1
 
 const TAPS := 200
-const RUNS := 8
+const RUNS := 10
+## The longest wait for the end of a walk, in game time.
+const WALK_WAIT_S := 10.0
 
 
 func run(d: PlaytestDriver) -> void:
@@ -87,7 +94,7 @@ func run(d: PlaytestDriver) -> void:
 			var start := d.to_screen(await d._free_point("look"))
 			await d.drag(start, start + Vector2(rng.randf_range(-150, 150), rng.randf_range(-60, 60)), 0.2)
 			counts.look += 1
-		await d.wait_frames(rng.randi_range(0, 1))
+		await _wait_walk_end(d)
 		if not _check_body(d, i):
 			break
 		if (i + 1) % 25 == 0:
@@ -100,6 +107,13 @@ func run(d: PlaytestDriver) -> void:
 	# The timing of a slower computer (CI) changes the random walk, so some runs
 	# end in a corner where more taps are not possible.
 	d.expect(counts.skipped <= per_run * 2 / 5, "more than 40 %% of the random taps were not possible: %s" % [counts])
+
+
+## Waits until the player stops walking, but not more than WALK_WAIT_S of game time.
+func _wait_walk_end(d: PlaytestDriver) -> void:
+	var timer := d.main().get_tree().create_timer(WALK_WAIT_S)
+	while d.state().walking and timer.time_left > 0.0:
+		await d.wait_frames(1)
 
 
 ## The spots and the people that the player can see: the first thing on the

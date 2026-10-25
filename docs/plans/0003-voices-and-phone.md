@@ -150,6 +150,7 @@ Change PT-01, PT-03, PT-04, PT-06, PT-08, PT-14, PT-16, and PT-17 to use the pho
 - **Q3.** Answered for now: the forms of address below are correct. The traveler is an adult. "cô" for Cô Sáu, "bà" for Bà Tư, "chú" for Chú Bảy, "bác" for Bác Hà, and "con" or "cháu" for the player in their answers.
 - **Q4.** The builder added a second neighbor for PT-19: Chú Chín, who argues about football with Chú Bảy at the cà phê cóc (`coc.talk.1` to `coc.talk.4`). Is the name correct for a neighbor of Chú Bảy, and is the talk natural?
 - **Q5.** The neutral phone voice (the Play button) is "Mai Anh" (Northern, news style), because a phone voice is usually standard and neutral. A Southern voice is the other choice. Which one do I want?
+- **Q6.** Report D-0003-09: people of about 50 and more can call the traveler "con". Cô Sáu and cô Nga call him "con" in most of their lines. The data does not give their ages. Are they about 50 or more, or must they say "anh" too?
 
 ## 9. Builder notes
 
@@ -164,4 +165,15 @@ Change PT-01, PT-03, PT-04, PT-06, PT-08, PT-14, PT-16, and PT-17 to use the pho
 - **N9. Save file.** The save stays version 2. It has new fields with defaults: the people that the player met, the saved phrases, the messages, the unread count, and the subtitle settings. A save of plan 0002 loads.
 - **N10. Play tests.** PT-22 shows each line in the subtitle box at 4 times the speed of the audio, because the rules are about the layout. The old scenarios PT-01, PT-03 to PT-06, PT-08 to PT-10, and PT-13 to PT-17 use the phone now. Plan 0004 has its scenarios as PT-25 to PT-32, and the geography plan (now 0005) has PT-33 to PT-39, so the numbers do not conflict.
 - **N11. The stools of the cà phê cóc.** The soak test (PT-09) found that the player could stand on a stool of the cà phê cóc: the stool is 0.32 m high, and the round bottom of the player capsule climbed it. Now the collision of each stool is 0.6 m high, and PT-12 pushes the player into two stools at 06:00.
-
+- **N12. The corrections of the report (`docs/playtests/0003-report.md`).**
+  - D-0003-01: with Listen on and an empty transcript, the hint is "Listening… The lines that you hear show here." PT-18 checks both hints.
+  - D-0003-02: "Dạ, … nói lại được không ạ?" is the first phrase of the phrasebook, so it stays in the same place when the replies come in at the end of a line. While the person speaks, "say again" stops the line, and the person says it again after the phone voice. PT-18 taps "say again" in the last 0.2 s of a line.
+  - D-0003-03: the neighbors have three chats (the football, the sea, and a grandson at the university). Each chat plays one time each day, in order, 60 s after the last one. Then they sit quietly. The new lines have the status "check". The transcript keeps the newest 50 lines. Run 2 of PT-19 stays 3 minutes near them (the game runs 3 times faster) and checks that no line comes again. The time limit of a run (180 s) does not change with the speed of the game.
+  - D-0003-04: a person says who they are in the first talk (`intro` in `data/spots.json`, a line with `"introduces"`). The name shows in the subtitle and in the Listen app from that line on. Before it, both show "Someone", and the subtitle name is gray. The introductions of Bà Tư, Cô Sáu, Bác Hà, and Cô Út have the status "check". Cô Nga is known from the start. Chú Bảy and Chú Chín stay "Someone".
+  - D-0003-05: the play tests that failed on `main` at random were PT-09 (soak) at 2400×1080, part 1 of CI. The random walk did not wait for the end of a walk, so a slower computer made another walk. Now the test waits until the player stops (not more than 10 s of game time) after each action, in 10 runs of 20 taps. Plan 0004 also gave a run 300 s of real time.
+  - D-0003-06: the "far" screenshot of PT-19 looks back along the hẻm to the neighbors.
+  - D-0003-07: the banner is under the status bar of the phone. While it shows, it pushes the header and the app down. PT-18 saves a line and checks that the banner covers neither Home nor the Listen button.
+  - D-0003-08: `docs/.gdignore` stops the import of the files in `docs/`.
+  - D-0003-09: Cô Út says "Bánh khọt nè! Ăn thử đi anh!" (status "confirmed", your decision). Q6 asks about Cô Sáu and cô Nga.
+  - R3: the note in `data/voices.json` is in the first person.
+  - The voice files of the new and the changed lines are made in the workspace (N3).

@@ -38,7 +38,9 @@ func refresh(state: Dictionary) -> void:
 		_phrasebook(talk)
 	var transcript: Array = state.get("transcript", [])
 	if transcript.is_empty():
-		_column.add_child(PhoneUi.label(Content.ui_text("listen_empty"), "Hint"))
+		var hint := PhoneUi.label(Content.ui_text("listen_empty_on" if listen_on else "listen_empty"), "Hint")
+		hint.set_meta("test_id", "listen.hint")
+		_column.add_child(hint)
 		return
 	_column.add_child(PhoneUi.label(Content.ui_text("listen_save_hint"), "Hint"))
 	# The newest line is at the top.
@@ -51,11 +53,13 @@ func refresh(state: Dictionary) -> void:
 
 func _phrasebook(talk: Dictionary) -> void:
 	_column.add_child(PhoneUi.label(Content.ui_text("phrasebook_title"), "GroupTitle"))
+	# "Say again" is always first, so it stays in the same place when the
+	# replies come in at the end of a line (D-0003-02).
+	if talk.has("say_again"):
+		_phrase({"id": "say_again", "vi": talk.say_again.vi, "en": talk.say_again.en})
 	var replies: Array = talk.get("replies", [])
 	for reply: Dictionary in replies:
 		_phrase(reply)
-	if talk.has("say_again"):
-		_phrase({"id": "say_again", "vi": talk.say_again.vi, "en": talk.say_again.en})
 
 
 func _phrase(reply: Dictionary) -> void:

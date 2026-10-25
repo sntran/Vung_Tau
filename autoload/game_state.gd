@@ -90,7 +90,8 @@ func new_game() -> void:
 	pitch = 0.0
 	settings = SaveFormat.DEFAULT_SETTINGS.duplicate()
 	walk_m = 0.0
-	met = []
+	# Cô Nga introduces herself in her first message, so the player knows her from the start.
+	met = ["nga"]
 	phrases = []
 	messages = []
 	unread = 0

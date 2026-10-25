@@ -6,6 +6,8 @@ extends Node3D
 ## Listen app, in English, or with an action in the world. The phone is the
 ## only flat thing on the screen.
 
+## The subtitle color of a person that the player does not know yet (D-0003-04).
+const UNKNOWN_SPEAKER_COLOR := Color("#5E5E5E")
 ## A tap is shorter than this and moves less than TAP_SLOP (plan 0002, R8).
 const TAP_SECONDS := 0.25
 const TAP_SLOP := 12.0
@@ -25,6 +27,8 @@ const TALK_DISTANCE := 6.0
 const TALK_IDLE_SECONDS := 45.0
 ## The time between the lines of a talk.
 const LINE_GAP_SECONDS := 0.5
+## The Listen app keeps this many lines.
+const TRANSCRIPT_MAX := 50
 ## The player can sleep at the homestay: at this distance from the door or less.
 const HOME_DISTANCE := 5.0
 ## The bottom left part of the screen, where the left thumb holds the joystick.
@@ -76,6 +80,9 @@ var _stick_id: Variant = null
 var _pending: Dictionary = {}
 ## The time to the next chat line of each person with "chat" or "calls".
 var _chat_left: Dictionary = {}
+## The next chat of each person who chats, and the day of these values.
+var _chat_index: Dictionary = {}
+var _chat_day := -1
 ## The steps that wait: [{seconds, action, args, talk}]. A step of the talk
 ## ("talk" is true) stops when the talk ends.
 var _steps: Array[Dictionary] = []
@@ -460,14 +467,33 @@ func can_hear(npc: Npc) -> bool:
 
 
 func _on_heard(npc_id: String, line_id: String, line: Dictionary, seconds: float) -> void:
+	if line.has("introduces"):
+		GameState.meet(line.introduces)
+	# The subtitle names only a person that the player knows (D-0003-04).
 	var speaker := Content.speaker(line.speaker)
-	subtitles.show_line(line_id, speaker.name, Color(speaker.color), line.vi, line.en,
-			GameState.settings.subtitles, seconds)
+	var known := GameState.has_met(line.speaker)
+	var shown_name: String = speaker.name if known else Content.string("someone")
+	var color := Color(speaker.color) if known else UNKNOWN_SPEAKER_COLOR
+	subtitles.show_line(line_id, shown_name, color, line.vi, line.en, GameState.settings.subtitles, seconds)
 	if listen_on:
 		transcript.append({"speaker": line.speaker, "line": line_id, "vi": line.vi, "en": line.en})
+		# The transcript keeps the newest lines only, so that the phone stays fast (D-0003-03).
+		if transcript.size() > TRANSCRIPT_MAX:
+			transcript = transcript.slice(transcript.size() - TRANSCRIPT_MAX)
 	for card_id: String in line.get("learn", []):
 		GameState.learn(card_id)
 	check_messages("heard:" + line_id)
+
+
+## The person stops the line at once. The line does not finish, so the talk does not go on.
+func _stop_line(npc_id: String) -> void:
+	if not speech.has(npc_id):
+		return
+	var item: Dictionary = speech[npc_id]
+	hem.npcs[npc_id].voice.stop()
+	if subtitles.current.get("line_id", "") == item.line:
+		subtitles.clear()
+	speech.erase(npc_id)
 
 
 func _update_speech(delta: float) -> void:
@@ -500,7 +526,11 @@ func _on_line_finished(npc_id: String, line_id: String) -> void:
 		return
 	talk.last = line_id
 	talk.idle = 0.0
-	if line.has("then"):
+	if talk.get("after_intro", "") != "":
+		talk.line = talk.after_intro
+		talk.after_intro = ""
+		_wait_then(LINE_GAP_SECONDS, "speak", {"npc": npc_id, "line": talk.line})
+	elif line.has("then"):
 		talk.line = line.then
 	elif not line.get("replies", []).is_empty() or not line.get("actions", []).is_empty():
 		talk.state = "answer"
@@ -526,12 +556,18 @@ func start_talk(npc_id: String) -> void:
 		return
 	for card_id: String in rule.get("learn", []):
 		GameState.learn(card_id)
-	GameState.meet(npc_id)
 	hem.npcs[npc_id].face(player.global_position)
 	_turn_to(hem.npcs[npc_id].head_position())
-	talk = {"npc": npc_id, "state": "speaking", "line": rule.line, "answer": "", "last": rule.line,
-			"idle": 0.0, "saying": {}}
-	speak(npc_id, rule.line)
+	# In the first talk, the person says who they are, then the line for the
+	# time. The player knows the name from that line on (D-0003-04).
+	var first: String = rule.line
+	var after_intro := ""
+	if not GameState.has_met(npc_id) and npc_data.has("intro"):
+		first = npc_data.intro
+		after_intro = rule.line
+	talk = {"npc": npc_id, "state": "speaking", "line": first, "answer": "", "last": first,
+			"idle": 0.0, "saying": {}, "after_intro": after_intro}
+	speak(npc_id, first)
 
 
 ## Turns the view of the player to the point (the face of the person in a talk).
@@ -608,7 +644,9 @@ func _reply(reply_id: String) -> Dictionary:
 		return {}
 	if reply_id == "say_again":
 		var phrase := Content.say_again(talk.npc)
-		return {"id": "say_again", "vi": phrase.vi, "en": phrase.en, "next": talk.last}
+		# While the person speaks, "say again" asks for the line that the person says now.
+		var again: String = talk.line if talk.state == "speaking" else talk.last
+		return {"id": "say_again", "vi": phrase.vi, "en": phrase.en, "next": again}
 	if talk.state != "answer":
 		return {}
 	for reply: Dictionary in Content.line(talk.answer).get("replies", []):
@@ -623,6 +661,10 @@ func reply(reply_id: String, mode: String) -> bool:
 	var entry := _reply(reply_id)
 	if entry.is_empty():
 		return false
+	# "Say again" while the person speaks: the person stops, so that the phone
+	# voice does not play over the voice of the person (D-0003-02).
+	if reply_id == "say_again" and talk.state == "speaking":
+		_stop_line(talk.npc)
 	for card_id: String in entry.get("learn", []):
 		GameState.learn(card_id)
 	talk.idle = 0.0
@@ -688,9 +730,14 @@ func try_action(target: String) -> bool:
 	return true
 
 
-## The people who chat with other people (the neighbors at the cà phê cóc)
-## and the people who call out (Cô Út) speak each "every_s" seconds.
+## The people who call out (Cô Út) speak each "every_s" seconds. The people
+## who chat with other people (the neighbors at the cà phê cóc) have a list
+## of chats: each chat plays one time each day, in order, "every_s" seconds
+## after the last one. Then they sit quietly (D-0003-03).
 func _update_chats(delta: float) -> void:
+	if _chat_day != GameState.day:
+		_chat_day = GameState.day
+		_chat_index.clear()
 	for npc_id: String in _chat_left:
 		var npc: Npc = hem.npcs.get(npc_id)
 		if npc == null or not npc.visible:
@@ -699,12 +746,20 @@ func _update_chats(delta: float) -> void:
 			continue
 		var data := Content.npc(npc_id)
 		var chat: Dictionary = data.get("chat", data.get("calls", {}))
-		if _chat_busy(chat.line):
+		var lines: Array = chat.get("lines", [chat.get("line", "")])
+		if lines.any(func(line_id: String) -> bool: return _chat_busy(line_id)):
+			continue
+		var index: int = _chat_index.get(npc_id, 0)
+		if chat.has("lines") and index >= lines.size():
 			continue
 		_chat_left[npc_id] -= delta
 		if _chat_left[npc_id] <= 0.0:
 			_chat_left[npc_id] = float(chat.every_s)
-			speak(npc_id, chat.line)
+			if chat.has("lines"):
+				_chat_index[npc_id] = index + 1
+				speak(npc_id, lines[index])
+			else:
+				speak(npc_id, chat.line)
 
 
 ## True while a line of the chat that starts with the line plays or waits.

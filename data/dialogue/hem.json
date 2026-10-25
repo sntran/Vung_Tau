@@ -52,6 +52,13 @@
 		"someone": "Someone"
 	},
 	"lines": {
+		"batu.intro": {
+			"speaker": "batu",
+			"vi": "Bà là bà Tư đó con.",
+			"en": "I'm Bà Tư, dear.",
+			"introduces": "batu",
+			"status": "check"
+		},
 		"batu.greet": {
 			"speaker": "batu",
 			"vi": "Ủa, con dậy rồi hả? Ăn sáng chưa con?",
@@ -102,6 +109,13 @@
 			"speaker": "batu",
 			"vi": "Đi đâu đó con? Nhớ ăn sáng nghen!",
 			"en": "Where are you off to, dear? Remember to eat breakfast!",
+			"status": "check"
+		},
+		"cosau.intro": {
+			"speaker": "cosau",
+			"vi": "Cô là Cô Sáu, bán phở ở đây nè.",
+			"en": "I'm Cô Sáu. I sell phở here.",
+			"introduces": "cosau",
 			"status": "check"
 		},
 		"cosau.closed_before": {
@@ -190,6 +204,13 @@
 			"en": "Oh, where are you going, dear?",
 			"status": "check"
 		},
+		"bacha.intro": {
+			"speaker": "bacha",
+			"vi": "Bác là bác Hà, bác nấu phở Bắc.",
+			"en": "I'm Bác Hà. I cook Northern phở.",
+			"introduces": "bacha",
+			"status": "check"
+		},
 		"bacha.open": {
 			"speaker": "bacha",
 			"vi": "Mời cháu vào ăn phở!",
@@ -228,11 +249,18 @@
 			"en": "Where are you going?",
 			"status": "check"
 		},
+		"cout.intro": {
+			"speaker": "cout",
+			"vi": "Bánh khọt Cô Út đây anh!",
+			"en": "This is Cô Út's bánh khọt!",
+			"introduces": "cout",
+			"status": "check"
+		},
 		"cout.call": {
 			"speaker": "cout",
-			"vi": "Bánh khọt nè! Ăn thử đi con!",
-			"en": "Bánh khọt here! Come and try some, dear!",
-			"status": "source"
+			"vi": "Bánh khọt nè! Ăn thử đi anh!",
+			"en": "Bánh khọt here! Try some!",
+			"status": "confirmed"
 		},
 		"nga.hello": {
 			"speaker": "nga",
@@ -305,6 +333,46 @@
 			"speaker": "chuchin",
 			"vi": "Thôi, một ly đủ rồi. Ngồi chơi chút nữa.",
 			"en": "No, one glass is enough. Let's sit a little longer.",
+			"status": "check"
+		},
+		"coc.sea.1": {
+			"speaker": "chuchin",
+			"vi": "Sáng nay biển êm ghê, ghe về sớm.",
+			"en": "The sea is calm this morning. The boats came back early.",
+			"status": "check",
+			"then": "coc.sea.2"
+		},
+		"coc.sea.2": {
+			"speaker": "chubay",
+			"vi": "Ừ, nghe nói cá thu nhiều lắm.",
+			"en": "Yeah, I hear there's a lot of mackerel.",
+			"status": "check",
+			"then": "coc.sea.3"
+		},
+		"coc.sea.3": {
+			"speaker": "chuchin",
+			"vi": "Chiều ra chợ mua một con về kho.",
+			"en": "This afternoon I'll buy one at the market and braise it.",
+			"status": "check"
+		},
+		"coc.kid.1": {
+			"speaker": "chubay",
+			"vi": "Thằng cháu tui mới đậu đại học rồi đó.",
+			"en": "My grandson just got into university.",
+			"status": "check",
+			"then": "coc.kid.2"
+		},
+		"coc.kid.2": {
+			"speaker": "chuchin",
+			"vi": "Vậy hả? Giỏi quá! Phải đãi cà phê đi chớ.",
+			"en": "Really? Great! Then you have to buy me a coffee.",
+			"status": "check",
+			"then": "coc.kid.3"
+		},
+		"coc.kid.3": {
+			"speaker": "chubay",
+			"vi": "Được, bữa nay tui bao.",
+			"en": "Fine, today it's on me.",
 			"status": "check"
 		},
 		"spot.home.look": {

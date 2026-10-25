@@ -97,6 +97,7 @@
 	"listen_on": "Listen: on",
 	"listen_off": "Listen: off",
 	"listen_empty": "Turn on Listen. The app writes down what people near you say, in Vietnamese and English.",
+	"listen_empty_on": "Listening… The lines that you hear show here.",
 	"listen_save_hint": "Tap a line to save it to your sổ tay.",
 	"phrasebook_title": "Phrasebook",
 	"phrasebook_empty": "Talk to someone. Your answers show here.",

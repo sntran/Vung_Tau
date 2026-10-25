@@ -19,6 +19,13 @@
 			"voice": "Ngọc Huyền",
 			"text": "Welcome, welcome! Mời cháu ngồi."
 		},
+		"bacha.intro": {
+			"file": "bacha.intro.ogg",
+			"duration_s": 1.79,
+			"hash": "77dbb3e7ea04c785b62ea77343cfbcb7cdccf4db5f1cbb4492a585661beeaca1",
+			"voice": "Ngọc Huyền",
+			"text": "Bác là bác Hà, bác nấu phở Bắc."
+		},
 		"bacha.open": {
 			"file": "bacha.open.ogg",
 			"duration_s": 1.14,
@@ -47,6 +54,13 @@
 			"voice": "Thục Đoan",
 			"text": "Ủa, con dậy rồi hả? Ăn sáng chưa con?"
 		},
+		"batu.intro": {
+			"file": "batu.intro.ogg",
+			"duration_s": 1.23,
+			"hash": "b774fb6db355b7915d134fec8a74f91cab3c7380948c5e2775e65fd6cf486ea7",
+			"voice": "Thục Đoan",
+			"text": "Bà là bà Tư đó con."
+		},
 		"batu.reply_chua": {
 			"file": "batu.reply_chua.ogg",
 			"duration_s": 3.18,
@@ -67,6 +81,48 @@
 			"hash": "927986e8b5f8dd1fe72e0195d574c7277c5f65401a48c3222ef9ab8de5553c1e",
 			"voice": "Thục Đoan",
 			"text": "Good morning! Phở, phở! Cô Sáu."
+		},
+		"coc.kid.1": {
+			"file": "coc.kid.1.ogg",
+			"duration_s": 2.04,
+			"hash": "d1dadcd86b5453d8931ef3e59f923880e3b1bd8ab3855612f7274e461bdd2199",
+			"voice": "Thái Sơn",
+			"text": "Thằng cháu tui mới đậu đại học rồi đó."
+		},
+		"coc.kid.2": {
+			"file": "coc.kid.2.ogg",
+			"duration_s": 3.8,
+			"hash": "33784cc25c2a575d807ca55739444fe97ca6d83b42358a4fccca0bbd90bd8239",
+			"voice": "Đức Trí",
+			"text": "Vậy hả? Giỏi quá! Phải đãi cà phê đi chớ."
+		},
+		"coc.kid.3": {
+			"file": "coc.kid.3.ogg",
+			"duration_s": 1.17,
+			"hash": "86434541f4409bca44b52a2fcd10941ce75e65860ed7524ee71d2fdad985c8cf",
+			"voice": "Thái Sơn",
+			"text": "Được, bữa nay tui bao."
+		},
+		"coc.sea.1": {
+			"file": "coc.sea.1.ogg",
+			"duration_s": 2.5,
+			"hash": "96ebdbaff835511ff74dea7e4cc144b560d43da587def1ac68f9924d377ffb8a",
+			"voice": "Đức Trí",
+			"text": "Sáng nay biển êm ghê, ghe về sớm."
+		},
+		"coc.sea.2": {
+			"file": "coc.sea.2.ogg",
+			"duration_s": 2.04,
+			"hash": "ec04fe7c3cb5a923e1ed6b13320b5c08f6ac2e30de6fd3245bbf03ce409322e4",
+			"voice": "Thái Sơn",
+			"text": "Ừ, nghe nói cá thu nhiều lắm."
+		},
+		"coc.sea.3": {
+			"file": "coc.sea.3.ogg",
+			"duration_s": 2.3,
+			"hash": "69f979b90542d274b4cf1c76b39dacf3730594753d57040e8af01ef0beee817c",
+			"voice": "Đức Trí",
+			"text": "Chiều ra chợ mua một con về kho."
 		},
 		"coc.talk.1": {
 			"file": "coc.talk.1.ogg",
@@ -117,6 +173,13 @@
 			"voice": "Kim Thanh",
 			"text": "Ô kê, ô kê! Ngồi, ngồi!"
 		},
+		"cosau.intro": {
+			"file": "cosau.intro.ogg",
+			"duration_s": 2.95,
+			"hash": "001ca14ac7abb3b7f328299d86a89a6d5e302b66148d438afafb5c87c1cd1f8e",
+			"voice": "Kim Thanh",
+			"text": "Cô là Cô Sáu, bán phở ở đây nè."
+		},
 		"cosau.open": {
 			"file": "cosau.open.ogg",
 			"duration_s": 1.88,
@@ -161,10 +224,17 @@
 		},
 		"cout.call": {
 			"file": "cout.call.ogg",
-			"duration_s": 1.74,
-			"hash": "b6c272dcca24cb26d542295b8d85b775e6899555c69ca6a0459ea3c8aa3d2050",
+			"duration_s": 1.54,
+			"hash": "f27c9fc8ea8b803c34f62b896eca863d36279641f99e5a760121f01341643f69",
 			"voice": "Thùy Dung",
-			"text": "Bánh khọt nè! Ăn thử đi con!"
+			"text": "Bánh khọt nè! Ăn thử đi anh!"
+		},
+		"cout.intro": {
+			"file": "cout.intro.ogg",
+			"duration_s": 1.11,
+			"hash": "df38e3cbdbe36c3bc5b9a13eff0c574fa6ff18974f4c332856da5d5e5efdb4b4",
+			"voice": "Thùy Dung",
+			"text": "Bánh khọt Cô Út đây anh!"
 		},
 		"nga.call_after": {
 			"file": "nga.call_after.ogg",

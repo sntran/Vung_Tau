@@ -6,6 +6,10 @@ extends RefCounted
 # Turn on Listen, and ask again. The transcript shows the line in Vietnamese
 # and English. Answer with Play, then on a second visit with I'll say it.
 # Check the two different answers.
+# Report 0003: with Listen on and an empty transcript, the hint says that the
+# app listens (D-0003-01). A tap on "say again" in the last 0.2 s of a line
+# makes the person say the same line again (D-0003-02). The banner of a saved
+# line covers no part of the phone (D-0003-07).
 # sizes: 1280x720 2400x1080
 # phase: --start-time=06:00
 
@@ -14,7 +18,17 @@ func run(d: PlaytestDriver) -> void:
 	await d.wait_idle()
 	var s := d.state()
 	d.expect(s.messages.has("welcome") and s.phone_dot, "the first message from cô Nga arrives: %s" % [s.messages])
+	# The player does not know her name before she says it (D-0003-04).
+	d.expect(not GameState.has_met("batu"), "the player does not know Bà Tư before the first talk")
+	var names := {}
+	var record := func() -> void:
+		var shown := d.subtitle()
+		if not shown.is_empty() and not shown.get("caption", false):
+			names[shown.get("line_id", "")] = shown.get("speaker", "")
+	d.main().get_tree().process_frame.connect(record)
 	var line := await d.talk_to("batu")
+	d.main().get_tree().process_frame.disconnect(record)
+	d.expect(names.get("batu.intro", "") == "Bà Tư", "she says who she is, and her name shows from that line on: %s" % [names])
 	d.expect(line == "batu.greet", "Bà Tư greets the player, not \"%s\"" % line)
 	d.expect(d.audio_playing("batu"), "her audio plays")
 	await d.wait_frames(2)
@@ -35,15 +49,37 @@ func run(d: PlaytestDriver) -> void:
 	d.expect(line == "batu.greet", "she says the line again, not \"%s\"" % line)
 	d.expect(d.transcript().is_empty(), "the line is not in the transcript: Listen is off")
 	await d.wait_answer()
+	d.expect(_hint(d) == Content.ui_text("listen_empty"), "with Listen off, the hint tells the player to turn it on")
 	await d.tap_phone_id("listen.toggle")
 	d.expect(d.state().listen_on, "Listen is on")
+	await d.wait_frames(2)
+	d.expect(_hint(d) == Content.ui_text("listen_empty_on"), "with Listen on, the hint says that the app listens: \"%s\"" % _hint(d))
 	await d.answer("say_again", "play")
 	line = await d.wait_line("batu")
+	# "Say again" at the end of her line: she says the same line again (D-0003-02).
+	var m: Node = d.main()
+	await d.wait_until(func() -> bool: return m.speech.has("batu") and float(m.speech.batu.left) < 0.2, 15.0,
+			"the last 0.2 s of her line")
+	await d.tap_phone_id("reply.say_again.play")
+	line = await d.wait_line("batu")
+	d.expect(line == "batu.greet", "after \"say again\" at the end of her line, she says it again, not \"%s\"" % line)
+	d.expect(m.talk.get("state", "") == "speaking", "the talk goes on: %s" % m.talk.get("state", ""))
 	await d.wait_answer()
 	var transcript := d.transcript()
-	d.expect(transcript.size() == 1 and transcript[0].vi == vi and transcript[0].en == Content.line("batu.greet").en
+	d.expect(transcript.size() == 2 and transcript[0].vi == vi and transcript[0].en == Content.line("batu.greet").en
 			and transcript[0].speaker == "Bà Tư", "the transcript shows the line in Vietnamese and English: %s" % [transcript])
 	await d.screenshot("transcript")
+	# Save a line: the banner shows, and it covers no part of the phone (D-0003-07).
+	await d.tap_phone_id("listen.entry.0")
+	await d.wait_frames(2)
+	var banner := d.find("phone.banner") as Control
+	d.expect(banner != null and d.state().banner_visible, "the banner \"saved\" shows")
+	if banner != null:
+		for part: String in ["phone.home", "listen.toggle"]:
+			var control := d.find(part) as Control
+			d.expect(control != null and not banner.get_global_rect().intersects(control.get_global_rect()),
+					"the banner does not cover %s" % part)
+	await d.screenshot("banner")
 	await d.answer("chua", "play")
 	var first := await d.wait_line("batu")
 	d.expect(first == "batu.reply_chua", "the answer to Play is \"batu.reply_chua\", not \"%s\"" % first)
@@ -65,3 +101,8 @@ func run(d: PlaytestDriver) -> void:
 	d.expect(first != second, "the two answers are different")
 	await d.wait_frames(3)
 	await d.screenshot("warmer_answer")
+
+
+static func _hint(d: PlaytestDriver) -> String:
+	var hint: Label = d.find("listen.hint") as Label
+	return hint.text if hint != null else ""

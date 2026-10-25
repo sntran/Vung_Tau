@@ -230,6 +230,8 @@ func _check_dialogue(dialogue: Dictionary, card_ids: Dictionary) -> Dictionary:
 			_error(file, where, "\"voice_style\" must be a tag like \"[cười]\"")
 		if line.has("then"):
 			_check_speech_ref(line.then, kinds, file, where, "then")
+		if line.has("introduces") and line.introduces != line.speaker:
+			_error(file, where, "\"introduces\" must be the speaker of the line, \"%s\"" % line.speaker)
 		if line.has("learn"):
 			_check_card_refs(line.learn, card_ids, file, where)
 		_check_replies(line, kinds, card_ids, file, where)
@@ -368,6 +370,11 @@ func _check_spots(spots: Dictionary, dialogue: Dictionary, card_ids: Dictionary,
 			if npc.get("talk", true):
 				_require(npc, "verb", TYPE_STRING, file, where)
 				_check_line_rules(npc, "lines", "speech", card_ids, lines, dialogue, file, where, npc_id)
+				if npc.has("intro"):
+					_check_speech_ref(npc.intro, lines, file, where, "intro")
+					var intro: Variant = dialogue.lines.get(npc.intro)
+					if typeof(intro) == TYPE_DICTIONARY and intro.get("introduces", "") != npc_id:
+						_error(file, where, "the line \"%s\" of \"intro\" must have \"introduces\": \"%s\"" % [npc.intro, npc_id])
 			elif npc.has("lines"):
 				_error(file, where, "a person with \"talk\": false has no \"lines\"")
 			for field: String in ["chat", "calls"]:
@@ -376,7 +383,11 @@ func _check_spots(spots: Dictionary, dialogue: Dictionary, card_ids: Dictionary,
 				var fwhere := "%s %s" % [where, field]
 				if not _is_dict(npc[field], file, fwhere):
 					continue
-				if _require(npc[field], "line", TYPE_STRING, file, fwhere):
+				if field == "chat" and npc[field].has("lines"):
+					if _require(npc[field], "lines", TYPE_ARRAY, file, fwhere):
+						for line_id: Variant in npc[field].lines:
+							_check_speech_ref(line_id, lines, file, fwhere, "lines")
+				elif _require(npc[field], "line", TYPE_STRING, file, fwhere):
 					_check_speech_ref(npc[field].line, lines, file, fwhere, "line")
 				if _require(npc[field], "every_s", TYPE_FLOAT, file, fwhere) and npc[field].every_s <= 0:
 					_error(file, fwhere, "\"every_s\" must be more than 0")
@@ -633,7 +644,7 @@ func _check_ui(ui: Dictionary) -> void:
 	for field: String in ["notebook_title", "notebook_count", "notebook_locked", "notebook_hint",
 			"clock_title", "clock_hint", "settings_title", "settings_sensitivity", "settings_invert",
 			"settings_gyro", "settings_fov", "settings_tap_walk", "center_view", "too_far", "phone_button",
-			"home", "listen_on", "listen_off", "listen_empty", "listen_save_hint", "phrasebook_title",
+			"home", "listen_on", "listen_off", "listen_empty", "listen_empty_on", "listen_save_hint", "phrasebook_title",
 			"phrasebook_empty", "reply_play", "reply_say", "reply_english", "said_title", "said_done",
 			"phrase_saved", "lens_empty", "lens_person", "messages_empty", "notify_card", "notify_message",
 			"clock_day", "clock_rest", "clock_sleep_away", "notebook_phrases", "notebook_no_phrases",

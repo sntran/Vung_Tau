@@ -209,3 +209,16 @@ func test_all_facts_have_status() -> void:
 		assert_has(ContentChecker.STATUS_VALUES, spot.status, spot.id)
 	for line_id: String in Content.dialogue.lines:
 		assert_has(ContentChecker.STATUS_VALUES, Content.line(line_id).status, line_id)
+
+
+func test_intro_must_introduce_the_person() -> void:
+	# Report 0003, D-0003-04: the first talk starts with a line that introduces the person.
+	for npc: Dictionary in spots.npcs:
+		if npc.id == "batu":
+			npc.intro = "batu.greet"
+	_assert_error(_check(), "must have \"introduces\": \"batu\"")
+
+
+func test_introduces_must_be_the_speaker() -> void:
+	dialogue.lines["cosau.intro"].introduces = "batu"
+	_assert_error(_check(), "\"introduces\" must be the speaker of the line")

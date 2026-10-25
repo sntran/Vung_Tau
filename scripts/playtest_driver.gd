@@ -801,11 +801,19 @@ func audio_playing(npc_id: String) -> bool:
 
 
 ## Waits until the person speaks a line. Returns the line ID, or "" at the timeout.
-func wait_line(npc_id: String, timeout_s := 15.0) -> String:
+## The introduction of a first talk (report 0003, D-0003-04) is not the
+## line that the test waits for: with "skip_intro", it waits for the next line.
+func wait_line(npc_id: String, timeout_s := 15.0, skip_intro := true) -> String:
 	var m: Node = main()
-	if await wait_until(func() -> bool: return m.is_speaking(npc_id), timeout_s, "%s speaks" % npc_id):
-		return m.speech[npc_id].line
-	return ""
+	if not await wait_until(func() -> bool: return m.is_speaking(npc_id), timeout_s, "%s speaks" % npc_id):
+		return ""
+	var line: String = m.speech[npc_id].line
+	if skip_intro and Content.line(line).has("introduces"):
+		if not await wait_until(func() -> bool: return m.is_speaking(npc_id) and m.speech[npc_id].line != line,
+				timeout_s, "%s speaks after the introduction" % npc_id):
+			return ""
+		line = m.speech[npc_id].line
+	return line
 
 
 ## Waits until the talk waits for an answer (the phrasebook shows the replies).

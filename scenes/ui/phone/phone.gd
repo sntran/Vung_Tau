@@ -90,6 +90,18 @@ func _build_device() -> void:
 	var signal_label := PhoneUi.label("▂▄▆ 82%", "BarSmall")
 	signal_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	status.add_child(signal_label)
+	# The banner of a notification is under the status bar. While it shows, it
+	# pushes the header and the app down, so it covers nothing (D-0003-07).
+	_banner = PanelContainer.new()
+	_banner.name = "Banner"
+	_banner.set_meta("test_id", "phone.banner")
+	_banner.theme_type_variation = "Toast"
+	_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_banner.visible = false
+	_banner_label = PhoneUi.label("")
+	_banner_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_banner.add_child(_banner_label)
+	column.add_child(_banner)
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 8)
 	column.add_child(header)
@@ -139,14 +151,6 @@ func _build_device() -> void:
 		page.set("phone", self)
 		page.visible = false
 		_screen.add_child(page)
-	_banner = PanelContainer.new()
-	_banner.name = "Banner"
-	_banner.theme_type_variation = "Toast"
-	_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_banner.visible = false
-	_banner_label = PhoneUi.label("")
-	_banner.add_child(_banner_label)
-	add_child(_banner)
 
 
 ## Places the phone and the button for the size of the view.
@@ -162,9 +166,6 @@ func layout(view: Vector2) -> void:
 		button.position = Vector2(device.position.x - BUTTON_SIZE.x - MARGIN, view.y - BUTTON_SIZE.y - MARGIN)
 	else:
 		button.position = Vector2(view.x - BUTTON_SIZE.x - MARGIN, view.y - BUTTON_SIZE.y - MARGIN)
-	# The banner floats at the top of the screen of the phone.
-	_banner.size = Vector2(width - 40, 0)
-	_banner.position = device.position + Vector2(20, 96)
 
 
 ## The part of the view that the phone covers (an empty rectangle when it is down).

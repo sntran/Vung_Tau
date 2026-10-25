@@ -260,7 +260,8 @@
 				{
 					"line": "batu.greet"
 				}
-			]
+			],
+			"intro": "batu.intro"
 		},
 		{
 			"id": "cosau",
@@ -289,7 +290,8 @@
 						"shutter"
 					]
 				}
-			]
+			],
+			"intro": "cosau.intro"
 		},
 		{
 			"id": "bacha",
@@ -307,7 +309,8 @@
 						"bac"
 					]
 				}
-			]
+			],
+			"intro": "bacha.intro"
 		},
 		{
 			"id": "cout",
@@ -323,6 +326,7 @@
 					"line": "cout.call"
 				}
 			],
+			"intro": "cout.intro",
 			"calls": {
 				"line": "cout.call",
 				"every_s": 45
@@ -353,8 +357,12 @@
 			"status": "check",
 			"talk": false,
 			"chat": {
-				"line": "coc.talk.1",
-				"every_s": 20
+				"lines": [
+					"coc.talk.1",
+					"coc.sea.1",
+					"coc.kid.1"
+				],
+				"every_s": 60
 			}
 		},
 		{
