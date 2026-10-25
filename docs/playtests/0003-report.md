@@ -98,7 +98,7 @@ The other scenarios (PT-01, PT-03 to PT-17) ran in CI. The workspace has 2 CPUs,
 
 - **Steps:** Run `godot --headless --path . --import` after a clone.
 - **Actual:** Godot imports the 75 MP3 files of the audition page and the pictures in `docs/`. It writes a `.import` file next to each, and `git status` lists them. The exports exclude `docs/*`, so the builds are correct, but the import is slower and the work tree is not clean.
-- **Correction:** Add an empty `docs/.gdignore`.
+- **Correction:** Add an empty `docs/.gdignore`. The builder added `docs/voices/.gdignore` (commit `691c23b`), but Godot still imports the pictures in `docs/playtests/` and `docs/prototype/`.
 
 ## 4. Audit of the requirements
 
