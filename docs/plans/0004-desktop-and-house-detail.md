@@ -14,7 +14,7 @@ The houses in this plan are in the hẻm of plans 0001 to 0003. Plan 0009 puts h
 
 ## 2. Out of scope
 
-- Houses on the real map. (Plan 0007.)
+- Houses on the real map. (Plan 0009.)
 - Rooms inside the houses, except the open shop floor of plan 0002 R15.
 - People models.
 - Signed builds and store pages. (The release plan.)
