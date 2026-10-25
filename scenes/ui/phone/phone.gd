@@ -21,6 +21,8 @@ const BANNER_SECONDS := 3.0
 ## The height of the slot of the status bar and the banner, and the text size of the banner.
 const BANNER_SLOT_HEIGHT := 72.0
 const BANNER_FONT_SIZE := 16
+## The lines of text in the banner.
+const BANNER_LINES := 2
 ## A swipe down of this many base pixels lowers the phone.
 const SWIPE := 110.0
 
@@ -111,7 +113,7 @@ func _build_device() -> void:
 	_banner.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_banner_label = PhoneUi.label("", "", BANNER_FONT_SIZE)
 	_banner_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_banner_label.max_lines_visible = 2
+	_banner_label.max_lines_visible = BANNER_LINES
 	_banner_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_banner.add_child(_banner_label)
 	slot.add_child(_banner)
@@ -251,11 +253,32 @@ func has_dot() -> bool:
 	return _dot.visible
 
 
+## Cuts a long text at a word and ends it with "…", so that it fits in the
+## lines of the banner, as on a real phone.
+func _fit_banner(text: String) -> String:
+	var font := _banner_label.get_theme_font("font")
+	var panel := _banner.get_theme_stylebox("panel")
+	var width := (_banner.get_parent() as Control).size.x - panel.get_minimum_size().x - 4.0
+	var line := font.get_height(BANNER_FONT_SIZE)
+	var fits := func(candidate: String) -> bool:
+		var height := font.get_multiline_string_size(candidate, HORIZONTAL_ALIGNMENT_LEFT, width, BANNER_FONT_SIZE).y
+		return roundi(height / line) <= BANNER_LINES
+	if width <= 0.0 or fits.call(text):
+		return text
+	var words := text.split(" ")
+	while words.size() > 1:
+		words.resize(words.size() - 1)
+		var candidate := " ".join(words) + "…"
+		if fits.call(candidate):
+			return candidate
+	return text
+
+
 ## A notification: a banner on the phone when it is up, else a short vibration.
 func notify(text: String) -> void:
 	last_notification = text
 	if up:
-		_banner_label.text = text
+		_banner_label.text = _fit_banner(text)
 		_banner.visible = true
 		_banner_left = BANNER_SECONDS
 	else:
