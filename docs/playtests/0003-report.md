@@ -82,6 +82,12 @@ The other scenarios (PT-01, PT-03 to PT-17) ran in CI. The workspace has 2 CPUs,
 - **Actual:** The banner covers the **Home** button, the app title, and the first line of the app for 3 s. The taps go through it, so the player can still use the phone, but the player cannot see what they tap.
 - **Correction:** Put the banner at the top of the phone above the status bar, or push the app down while it shows, or let the player swipe it away.
 
+### D-0003-08: Godot imports the files in `docs/` (low)
+
+- **Steps:** Run `godot --headless --path . --import` after a clone.
+- **Actual:** Godot imports the 75 MP3 files of the audition page and the pictures in `docs/`. It writes a `.import` file next to each, and `git status` lists them. The exports exclude `docs/*`, so the builds are correct, but the import is slower and the work tree is not clean.
+- **Correction:** Add an empty `docs/.gdignore`.
+
 ## 4. Audit of the requirements
 
 | Req. | Result | Notes |
