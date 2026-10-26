@@ -8,12 +8,12 @@ Then read `CONTRIBUTING.md` and the active plan in `docs/plans/`.
 The name of the project is "Vũng Tàu". Always write the name with the diacritics.
 The repository name is `Vung_Tau` because GitHub names cannot have diacritics. Use "Vũng Tàu" in all other places: documents, the Godot project name, the app name, and the game text.
 
-Vũng Tàu is a 3D game about Vietnamese food and daily life. The player is a traveler from the United States who visits Vũng Tàu today.
+Vũng Tàu is a 3D game about Vietnamese food and daily life. The player is a traveler from the United States who visits Vũng Tàu in January and February 2019.
 
 - **Audience:** adults who are not Vietnamese. They know phở from restaurants abroad. They do not know how people eat it in Vietnam.
 - **Goal:** the player learns how people in Vietnam really eat, order, and live around food. The player does not learn recipes.
-- **Setting:** Vũng Tàu today, with its real geography. The player stays at a family homestay in a small hẻm (alley) at the foot of Núi Nhỏ, near Bãi Trước (Front Beach). The homestay hẻm is Hẻm 2 Hải Đăng. It is only homes: the slope of the mountain is on one side, with some houses on it, and one row of houses is on the other side. Nobody sells anything in it. The homestay is on the slope side, with a garden on the slope behind it. To eat, the player walks down to chợ Xóm Lưới and the streets near it. The hẻm of plans 0001 to 0004, with its shops, is a test street until plan 0009 builds the real hẻm.
-- **Time:** day 1 of the game is Saturday 23 January 2027, two weeks before Tết (Mùng 1 is Saturday 6 February 2027). The town gets ready for Tết.
+- **Setting:** Vũng Tàu in 2019, when it was still Vũng Tàu City (Bà Rịa - Vũng Tàu province), with its real geography. The player stays at a family homestay in a small hẻm (alley) at the foot of Núi Nhỏ, near Bãi Trước (Front Beach). The homestay hẻm is Hẻm 2 Hải Đăng. It is only homes: the slope of the mountain is on one side, with some houses on it, and one row of houses is on the other side. Nobody sells anything in it. The homestay is on the slope side, with a garden on the slope behind it. To eat, the player walks down to chợ Xóm Lưới and the streets near it. The hẻm of plans 0001 to 0004, with its shops, is a test street until plan 0009 builds the real hẻm.
+- **Time:** day 1 of the game is Tuesday 22 January 2019, two weeks before Tết Kỷ Hợi (Mùng 1 is Tuesday 5 February 2019). The town gets ready for Tết. Prices, phones, and shops are those of 2019.
 - **Platforms:** desktop (Windows, macOS, Linux) is the main platform. Android and iPhone apps stay, with lower settings. A web build is for quick review (plan 0004, D1).
 - **Engine:** Godot 4.7.2-stable. See section 5.
 

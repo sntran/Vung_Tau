@@ -59,12 +59,15 @@ Status values:
 | Bánh khọt: small crisp cakes of rice flour with curry powder, topped with shrimp or squid. People wrap them in lettuce and herbs and dip them in a fish sauce mix. | Source | [Vietnam Travel](https://vietnam.travel/jp/node/745) |
 | Bánh khọt is cooked in a large round metal pan with many small cups. The cook pours the batter with a spoon, adds a shrimp to each, and tops them with scallion. On the plate, they have shrimp floss on top. They come with mustard greens and herbs, pickled green papaya and carrot, and nước mắm with chili. Plates and bowls often have a printed flower pattern. | Source | Photos that I chose, 2026-10-24 |
 | In the late afternoon and evening, many local families swim at Bãi Trước. Fishing boats stay at anchor in the bay. | Source | Photos that I chose, 2026-10-24 |
-| The sand of Bãi Trước is narrow. The wide main part of Bãi Trước is where the locals swim. The boats are only at the corner end. | Confirmed | First-hand, 2026-10-26 |
+| The sand of Bãi Trước is narrow. The wide main part of Bãi Trước is where the locals swim. The boats are only at the corner end: the south end, near Xóm Lưới and Núi Nhỏ. | Confirmed | First-hand, 2026-10-26 |
 | Bãi Trước and its park have coconut palms. Sources also name old coconut palms along the curve of the shore and old bàng trees (Terminalia catappa) in the park along Quang Trung. | Confirmed (coconut), Source (bàng) | First-hand, 2026-10-26; [VinWonders](https://vinwonders.com/vi/wonderpedia/news/bai-truoc-vung-tau/) |
 | Before Tết, Bãi Trước has a spring flower festival in the triangle area, with a decorated flower boat. Coconut trunks are wrapped in blue and red cloth, and flags hang over the streets. The flower market sells roses, marigolds (vạn thọ), chrysanthemums, bonsai, cactus, mai, and peach from the North. | Source (one year) | [VnExpress](https://vnexpress.net/pho-bien-nghenh-xuan-2119835.html) |
 | Ngã Năm is a big roundabout, like the other big roundabout. | Confirmed | First-hand, 2026-10-26 |
-| There is an old market near Bãi Trước. Which one is it on `anchors.png`? | Check | First-hand, 2026-10-26 |
-| Since 1 July 2025, Vũng Tàu is part of Ho Chi Minh City. Old Phường 1, 2, 3, 4, 5, Thắng Nhì, and Thắng Tam are now one ward: phường Vũng Tàu. So the homestay address in 2027 is "Hẻm 2 Hải Đăng, phường Vũng Tàu, TP. Hồ Chí Minh". People still say "Vũng Tàu". | Source | [PLO](https://plo.vn/ly-do-chon-va-y-nghia-ten-4-phuong-moi-cua-tp-vung-tau-sau-sap-xep-post845532.html); [Wikipedia](https://en.wikipedia.org/wiki/V%C5%A9ng_T%C3%A0u) |
+| There is an old market near Bãi Trước: "Chợ Phường 1" (number 12 on `anchors.png`), at Trần Hưng Đạo and Lê Quý Đôn. | Confirmed | First-hand, 2026-10-26 |
+| The game is in January and February 2019. Then Vũng Tàu was a city of Bà Rịa - Vũng Tàu province. (On 1 July 2025 it became part of Ho Chi Minh City, and old Phường 1, 2, 3, 4, 5, Thắng Nhì, and Thắng Tam became one ward, phường Vũng Tàu.) So the homestay address in the game is "Hẻm 2 Hải Đăng, Phường 2, TP. Vũng Tàu, tỉnh Bà Rịa - Vũng Tàu" (the ward is "check"). | Confirmed (2019), Source (2025), Check (ward) | My decision, 2026-10-26; [PLO](https://plo.vn/ly-do-chon-va-y-nghia-ten-4-phuong-moi-cua-tp-vung-tau-sau-sap-xep-post845532.html); [Wikipedia](https://en.wikipedia.org/wiki/V%C5%A9ng_T%C3%A0u) |
+| Why 2019: Bãi Trước still had many coconut palms, Vũng Tàu was still Vũng Tàu City, and in my memory Tết meant more than now. It is also before COVID-19, and smartphones, 4G (from 2017), and ride apps (from 2014) were common, so the phone apps of the game fit. | Confirmed (my wish), Source (dates) | My decision, 2026-10-26; [Tuổi Trẻ News: Viettel 4G, 2017](https://tuoitrenews.vn/news/audio/20170529/military-run-viettel-becomes-vietnam%E2%80%99s-first-4g-provider/39825.html); [Advertising Vietnam: Grab, 7 years in Vietnam](https://advertisingvietnam.com/article/grab-7-nam-tho-nhip-viet-nam-hanh-trinh-xay-dung-sieu-ung-dung-tu-nhung-dieu-binh-di-l17690) |
+| Prices, phones, shops, and buildings in the game are those of 2019, not of today. The geodata (OSM) is of today: a few newer buildings and roads can stay. | Confirmed | My decision, 2026-10-26 |
+| In the 1960s, Bãi Trước was called "Vịnh Hàng Dừa" (the bay of coconut rows). Coconut palms, casuarinas (dương liễu), and bàng trees shaded almost all of the sand. | Source | [ArtCorner: Bãi Trước 1969](https://artcorner.vn/product/bai-truoc-1969-vinh-hang-dua-bieu-tuong-vung-tau-xua/) (a shop page) |
 | The small fishing boats are wooden, painted blue with red trim, with worn paint. They carry coils of rope, nets, and plastic baskets. | Source | Photos that I chose, 2026-10-24 |
 | Fast ferries stop at a pier near Bãi Trước. | Check | Photos that I chose, 2026-10-24 |
 | In the evening, people drive scooters along the coast road. | Confirmed | First-hand |
@@ -97,8 +100,8 @@ Status values:
 
 | Fact | Status | Source |
 |---|---|---|
-| Tết Nguyên Đán 2027 (Mùng 1, year Đinh Mùi) is Saturday 6 February 2027. Tháng Chạp of Bính Ngọ has 29 days, so giao thừa is the night of Friday 5 February. | Source | [Thư viện Pháp luật](https://thuvienphapluat.vn/hoi-dap-phap-luat/tet-am-lich-2027-la-ngay-may-duong-lich-138050948.html); the lunar calendar of the game (`tools/geo/geodata/lunar.py`) |
-| Day 1 of the game is two weeks before Tết. | Confirmed | My decision, 2026-10-26 |
+| Tết Nguyên Đán 2019 (Mùng 1, year Kỷ Hợi) is Tuesday 5 February 2019. Tháng Chạp of Mậu Tuất has 30 days, so giao thừa is the night of Monday 4 February (30 Tết). | Source | [Tuổi Trẻ, 5 February 2019](https://tuoitre.vn/loi-chuc-tet-xuan-ky-hoi-2019-cua-tong-bi-thu-chu-tich-nuoc-nguyen-phu-trong-20190205001942703.htm); [Báo Hà Tĩnh, lịch âm 5/2/2019](https://baohatinh.vn/cong-cu/lich-am/05-02-2019); the lunar calendar of the game (`tools/geo/geodata/lunar.py`) |
+| Day 1 of the game is two weeks before Tết 2019: Tuesday 22 January 2019 (17 tháng Chạp). | Confirmed | My decision, 2026-10-26 |
 | Before Tết, markets have special items, houses start to decorate, and people buy Tết plants, for example hoa mai and hoa đào. | Confirmed | First-hand, 2026-10-26 |
 | Some people cook the Tết cake at home in the old way, and some in a new way. | Confirmed | First-hand, 2026-10-26 |
 | In the South, the Tết cake is bánh tét (a cylinder in banana leaves). Bánh chưng (square, in lá dong) is the cake of the North. Many Northern families in Vũng Tàu make bánh chưng. | Source | [Báo Pháp luật](https://baophapluat.vn/net-dac-trung-thu-vi-trong-ngay-tet-o-nam-bo-post269976.html) |
@@ -107,17 +110,17 @@ Status values:
 | The Southern five-fruit tray (mâm ngũ quả) has mãng cầu, dừa, đu đủ, and xoài: "cầu vừa đủ xài" (pray for just enough to spend). | Source | [Báo Pháp luật](https://baophapluat.vn/net-dac-trung-thu-vi-trong-ngay-tet-o-nam-bo-post269976.html) |
 | Tết dishes in the South: thịt kho (pork braised with eggs) with dưa giá or củ kiệu (pickled shallots). | Source | [Báo Pháp luật](https://baophapluat.vn/net-dac-trung-thu-vi-trong-ngay-tet-o-nam-bo-post269976.html) |
 | Lì xì: children get money in red envelopes. Families do not sweep out the house and do not break things on the first days. | Source | [Báo Pháp luật](https://baophapluat.vn/net-dac-trung-thu-vi-trong-ngay-tet-o-nam-bo-post269976.html) |
-| Ông Táo (the Kitchen Gods) go to heaven on the 23rd of tháng Chạp. In 2027 that is Saturday 30 January (day 8 of the game). Families make an offering, and some release a carp. | Check | Common custom. Needs your check for Vũng Tàu. |
-| Bàng trees turn red and drop their leaves in the dry season, near Tết. | Check | Not verified for Vũng Tàu |
+| Ông Táo (the Kitchen Gods) go to heaven on the 23rd of tháng Chạp. In 2019 that is Monday 28 January (day 7 of the game). Families make an offering, and some release a carp. | Check | Common custom. Needs your check for Vũng Tàu. |
+| Bàng leaves turn pinkish red or yellow-brown and fall in the dry season, so some bàng trees are red near Tết. | Source | [Wikipedia: Terminalia catappa](https://en.wikipedia.org/wiki/Terminalia_catappa) (not specific to Vũng Tàu) |
+| Rằm tháng Giêng (the 15th of the 1st lunar month) is a day of the gathering at Miếu Hòn Bà. In 2019 that is Tuesday 19 February (day 29 of the game). | Source | See the Hòn Bà facts in section Vũng Tàu |
 
 ## Farming at home
 
 | Fact | Status | Source |
 |---|---|---|
 | The traditional home farm is VAC (vườn, ao, chuồng): a garden, a fish pond, and an animal pen. | Source | Common knowledge. Needs a source. |
-| The old province resolution 14/2021/NQ-HĐND of Bà Rịa - Vũng Tàu (10 December 2021) bans livestock and poultry in all wards of Vũng Tàu city. Only pets and laboratory animals are allowed. Farms had to stop or move before 31 December 2024. | Source | [Nghị quyết 14/2021/NQ-HĐND](https://hethongphapluat.com/nghi-quyet-14-2021-nq-hdnd-5d7cccee0efcebe93080a15302a474a6.html) |
-| After the merger, Ho Chi Minh City drafts a new rule. The draft bans livestock in all 113 wards. The city council gets it in the last quarter of 2026. | Source | [Avinews, 13 March 2026](https://avinews.com/vi/tp-hcm-sap-ban-hanh-quy-dinh-moi-ve-khu-vuc-cam-chan-nuoi/) |
-| Do families on Núi Nhỏ keep a few chickens anyway? | Check | Your knowledge |
+| The homestay is fictional. Its garden on the slope has small terraced rice fields, like the ruộng bậc thang of the mountains but smaller, vegetables, five fruit trees (mãng cầu, đu đủ, chuối, xoài, dừa), a small fish pond, and a few types of animals (chickens and pigs). | Confirmed | My decision for the game, 2026-10-26 |
+| The national ban on livestock in inner-city areas came with the Law on Animal Husbandry 2018, in force from 1 January 2020. The Bà Rịa - Vũng Tàu resolution 14/2021/NQ-HĐND (10 December 2021) then banned livestock and poultry in all wards of Vũng Tàu city. So in 2019 a family can still keep a few chickens and pigs. | Source | [Luật Chăn nuôi 2018](https://hethongphapluat.com/luat-chan-nuoi-2018/dieu-80); [Nghị quyết 14/2021/NQ-HĐND](https://hethongphapluat.com/nghi-quyet-14-2021-nq-hdnd-5d7cccee0efcebe93080a15302a474a6.html) |
 
 ## Houses
 
