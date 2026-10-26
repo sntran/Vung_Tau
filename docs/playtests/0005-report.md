@@ -94,3 +94,101 @@ Plan 0005 still named the old plan numbers for the structures and the houses. Th
 2. D-0005-01 and D-0005-02 (I need them to judge the shapes).
 3. D-0005-03 and D-0005-05.
 4. The approved changes of 2026-10-26 (plan 0005, open questions): day 1 in 2019 (Q8, Q13), no roadworks (Q13), the boats and the thúng (Q6), the old market (Q12), and the sea floor from public data (R8g, Q14).
+
+## 6. Re-check (2026-10-26)
+
+Commit `9a3a2ba`. The architect ran PT-33 (12:00) and PT-35 (both runs) again, took the low-tide screenshot of PT-38, read the code of the sea floor, and measured the data in `data/geo/raw/` and the height chunks.
+
+![The PT-33 views at 12:00](0005/r-views.jpg)
+
+| Item | Result | Evidence |
+|---|---|---|
+| D-0005-01 | Fixed | From the top of Núi Nhỏ, Núi Lớn shows a canopy with the far trees, and pale grass without them (PT-33 checks it: 77 % of the points). Near trees are still sparse boxes on brown ground: plan 0020 replaces them. |
+| D-0005-02 | Fixed | The view from the bay shows Bãi Trước between Núi Lớn and Núi Nhỏ. The two new views show Bãi Trước from Núi Lớn and Bãi Sau from Núi Nhỏ. The markers overlap (temporary, plan 0008). |
+| D-0005-03 | Not fixed in the view | The view of Mũi Nghinh Phong still stands on smooth sand. The tip has rock now, but the camera stands on a made-up sand flat south of the tip (D-0005-06). |
+| D-0005-04 | Fixed | The credits page and `assets/CREDITS.md` have EOT20, pyTMD, the Sentinel-2 notice, GEBCO, and the method. |
+| D-0005-05 | Fixed | Light grey-brown rock, boulders, and trees on the top of Hòn Bà. |
+| Day 1 (Q8) | Done | `calendar.json` is 2019-01-22, approved. The dry times match mine. |
+| No roadworks (Q13) | Done | `roadworks.json` is empty. |
+| Boats, thúng, stakes, flat rocks (Q6) | Done | 40 boats, 16 thúng, 6 rows of stakes off Hạ Long, and dark flat rocks along the sea wall. The places are builder values: I check them. |
+| Chợ Phường 1 (Q12) | Done | In `landmarks.json`. |
+| The sea floor (R8g) | Defects | D-0005-06, D-0005-07, D-0005-08. |
+
+### D-0005-06: Most of the sea floor near the coast is made up, and it is too shallow (high)
+
+![Bãi Trước: the satellite data and the floor of the game](0005/r-floor-profile.png)
+
+![Dry at the lowest tide: from the data (sand) and made up (red)](0005/r-dry-made-up.png)
+
+- **Actual:**
+  - At the lowest tide of the game days (−2.25 m), 8.4 km² of sea floor is dry. Only 3.5 km² of it has a value from the satellite data. The other 4.9 km² (red in the picture) is made up: a band of 40 m to 230 m (median 96 m) along almost every coast, also along the rocky coast of Hạ Long and around Hòn Bà.
+  - At Bãi Trước, the data ends about 70 m from the water line, at about −1.65 m. After that, the floor stays almost flat at −1.7 m to −2.0 m out to 150 m, then goes down to −4 m. `intertidal_report.md` shows this flat part as if it were data ("the floor is −1.6 m to −2.0 m out to about 150 m"). So "the sand is dry to about 180 m" is not a measurement.
+  - Around Hòn Bà, the data has only a few scattered pixels, but the floor is −0.4 m to −1.5 m for 120 m on all sides. At the low tide of day 1, the islet stands on a dry plain, and the player can walk around it. The rock path is then not the only way, and that is the point of the place (plan 0016).
+
+    ![PT-38 at 06:45 on day 1: Hòn Bà stands on a dry sand plain](0005/r-hon-ba-low.jpg)
+
+  - South of Mũi Nghinh Phong, the data has no value, but the floor is −0.3 m to −1.0 m for 100 m. At 12:00 on day 1 it is a sand flat at the tip (the PT-33 view).
+- **Causes:**
+  1. The filter `MIN_SHARE = 0.08` needs 8 % dry images. Only 19 of the 220 images have the sea below −1.5 m (the lowest is −1.95 m), so a pixel lower than about −1.55 m cannot get a value. The data stops there because of the filter, not because the floor stops.
+  2. From the edge of the data, `sea_floor_from_data()` blends with a smoothstep that starts flat (`down = smoothstep(0, 300 m, distance)`), so the floor stays near the edge height for about 100 m. A few scattered pixels (for example near the tip of the cape) make a whole shelf.
+  3. 59 images are in the list two times (the same time, two processing versions, for example `S2A_48PYS_20190518_0_L2A` and `_1_L2A`). There are 161 different images, not 220, and the doubles count two times.
+- **Expected:** the floor is from the data where the data has a value. Where it has no value, the floor does not make new shallow ground: it goes down from the edge of the data, and the report shows which parts are data and which are not.
+- **Correction:**
+  1. Keep one image for each time (the newest processing version).
+  2. More low-tide images: use the Sentinel-2 images of 2016 to 2024 (the beaches change little), and add Landsat 8 and 9 (30 m) if needed. Write in the report how many images have the sea below −1.5 m and below −2.0 m.
+  3. Replace the share filter with counts: a pixel needs at least 5 wet and 5 dry clear images.
+  4. Beyond the edge of the data, the floor goes down at once, at the slope of the data at its edge (from the outer 30 m), and never flatter than 1 m in 60 m, to the GEBCO depth or −4 m. No smoothstep that starts flat. A group of data pixels smaller than about 20 pixels does not make a shelf.
+  5. `intertidal_report.md`: in the table, mark each row "data" or "made", and show the made parts in another color on the dry map, with the area of each.
+  6. PT-35: check the depth only where the data has a value, and check that beyond the edge the floor goes down by at least 0.5 m in the next 50 m. PT-38: at the low tide, the water is at least 0.3 m deep at 30 m on each side of the rock path.
+- **What the data says now:** at Bãi Trước the floor goes from about −0.6 m at the water line to about −1.65 m at 70 m (a slope of about 1 m in 65 m). If that slope goes on, the sand is dry to about 100 m at the lowest tide of the game days. More low-tide images can show it.
+
+### D-0005-07: Foam covers wide shallow water as a white sheet (medium)
+
+![Mũi Nghinh Phong at 12:00](0005/r-cape-foam.jpg)
+
+- **Actual:** the foam is where the water along the view is thinner than 1.2 m (`water.gdshader`, `foam_depth`). Over a wide shallow area, the whole area is white, with a hard straight edge (the view of Mũi Nghinh Phong). Bãi Trước is a calm bay: my photos show no white surf at the swimming beach.
+- **Expected:** foam is a narrow band at the water line (a few meters), stronger on the open coast (Bãi Sau) and on the rocks, and weak in the calm bay of Bãi Trước. No hard edges.
+- **Correction:** make the foam from the distance to the water line (the depth falls to 0 there), not from the depth alone. Add a check to PT-35: in the screenshot at low tide from the sand of Bãi Trước, at most 5 % of the water pixels are near white.
+
+### D-0005-08: The report of the sea floor does not show what is made up (low)
+
+Part of D-0005-06, correction 5. Listed alone, because the report is how I check the data: I must see which parts are measured.
+
+### D-0005-09: The land looks grey and dead (high)
+
+![The Hải Đăng road at 12:00 on day 1](0005/r-hai-dang-road.jpg)
+
+My words (2026-10-26): "the screenshots make the land so dead. It's so grayish. I know the trees on the mountains are not that green, but I think we can make the view more alive."
+
+- **Measured** (the land part of each image, below the sky): the PT-33 views at 12:00 on day 1 against my photos of Vũng Tàu, two of them from the dry season (April).
+
+  | | Green pixels (green is the largest channel) | Mean value |
+  |---|---|---|
+  | Game: from Núi Lớn, from Núi Nhỏ to the north and to the north-east, the Hải Đăng road | 7 % to 24 % | 0.59 to 0.70 |
+  | My photos: Bãi Trước from above, the slope of Núi Nhỏ over Hạ Long (April), Núi Lớn from Hạ Long | 23 % to 57 % (four of six above 30 %) | 0.21 to 0.57 (most 0.3 to 0.5) |
+
+  The saturation is similar (0.22 to 0.35 in the game, 0.12 to 0.38 in the photos). So the land is not grey because of the tone mapping: it is too bright, and it has too little green.
+- **What the photos show:**
+  - In the dry season (April, the driest month), the slopes of Núi Nhỏ above Hạ Long are a dense mosaic of olive and dark green bushes and small trees, with patches of yellow-brown grass. Bare ground shows only on the steep granite.
+  - The town has red and orange roofs, colored walls, and green trees along the streets and in the park.
+  - Wet sand and wet rock at low tide are dark.
+- **In the game:**
+  - Sparse box trees stand on flat, smooth ochre and beige ground. Most of each slope is bare ground. The pale patches on the Hải Đăng road look like snow.
+  - The town is a flat grey plain (it has no houses until plan 0009).
+  - At low tide, the sand of the intertidal zone at Bãi Trước is as dry and light as the beach above it (`r-low-tide-sand.jpg`).
+  - On 22 January, `season.gd` gives the hills a dryness of 0.8. That is almost the April value (0.85), but in my April photo the slopes are still mostly green.
+- **Correction:**
+  1. Cover the hill slopes: a dense layer of bushes and small trees (the type `scrub` of plan 0020, and a bush detail in the ground shader for the far views). Bare ground only on rock and steep granite. Do it with plan 0020: the near forms come from there, but the cover and the colors are this defect.
+  2. Take the colors of the dry season from my April photos. The driest value of `season.gd` is that look: olive and dark green with some yellow-brown, not ochre ground. Day 1 (January) is between the rainy green and that look.
+  3. The land is darker: a mean value of 0.40 to 0.55 in the PT-33 views at 12:00.
+  4. Until plan 0009 builds the houses, the town ground seen from far away shows a pattern of roofs (red, orange, grey, and the colors of the palette) and green trees, not one grey.
+  5. The intertidal zone below the last high water looks wet: darker, with a shine, and small pools, and it dries slowly after the sea goes down.
+  6. Add checks to PT-33 at 12:00 on day 1: in the views from Núi Lớn and from Núi Nhỏ and on the Hải Đăng road, 30 % or more of the land pixels are green, and the mean value of the land is 0.40 to 0.55. In the view from Núi Lớn, 40 % or more of the town pixels have a saturation above 0.2.
+
+### Order of the new corrections
+
+1. D-0005-06 and D-0005-08 (the sea floor: Hòn Bà and the beaches depend on it).
+2. D-0005-09 (the land), together with plan 0020 (Real trees).
+3. D-0005-07 (the foam).
+
+**Status:** plan 0005 stays "Built". D-0005-03 is re-checked after D-0005-06, because the sand at the cape comes from the made-up floor.

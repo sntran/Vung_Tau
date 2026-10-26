@@ -155,3 +155,20 @@ Commit `0c33960`. CI on `main` is green, and the export uploads the Windows, mac
 - **Correction:** Use the AgX tone mapping (Godot 4.4 and later) or set the white point and the exposure, so that sunlit surfaces keep their color. Then check the noon shade again: in the "along" view at 12:00, the shade has a mean value of 0.21 now, darker than a real hẻm at noon, where the sunlit walls light the shade. Add to PT-25: in the view from above at 12:00 on High and on Low, at most 10 % of the building pixels are near white, and the mean value is 0.55 to 0.75.
 
 **Status:** plan 0004 stays "Built" until D-0004-10 is corrected. Then two of my checks remain: I look at the PT-25 screenshots (criterion 2), and I start the macOS and Windows builds on my computers (criterion 3).
+## 8. Re-check of D-0004-10 (2026-10-26)
+
+Commit `9a3a2ba`. The architect ran PT-25 again on High and on Low at 12:00 and measured the screenshots.
+
+![From above on High, from above on Low, and along the hẻm on High, at 12:00](0004/r2-noon.jpg)
+
+| View at 12:00 | Near white | Mean value | Limit |
+|---|---|---|---|
+| From above, High | 3.4 % | 0.68 | at most 10 %, 0.55 to 0.75 |
+| From above, Low | 0.1 % | 0.59 | at most 10 %, 0.55 to 0.75 |
+| Roofs, High | 1.7 % | 0.65 | |
+| Roofs, Low | 0.1 % | 0.55 | |
+
+- **D-0004-10: Fixed.** The roofs and the terraces keep their colors. The shade along the hẻm at noon on High has a mean of 0.272 (it was 0.21), and 0.45 on Low.
+- **Observation (not a defect):** on High, white and grey surfaces still have a light blue tint from the sky light, and the shade along the hẻm is still a little cool. Low looks a little dull. These are matters of taste: I judge them in the PT-25 screenshots (criterion 2).
+
+**Status:** all defects of this report are fixed. Plan 0004 becomes "Done" after my two checks: the PT-25 screenshots (criterion 2), and the macOS and Windows builds on my computers (criterion 3).
