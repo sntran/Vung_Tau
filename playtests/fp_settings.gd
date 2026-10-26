@@ -123,6 +123,8 @@ func _check(d: PlaytestDriver) -> void:
 		text += (node as Label).text + "\n"
 	d.expect(text.contains("© OpenStreetMap contributors"), "the credits show the OpenStreetMap notice")
 	d.expect(text.contains("Copernicus WorldDEM-30 © DLR e.V."), "the credits show the Copernicus notice")
+	# The tide model is CC BY 4.0, so it needs its credit (report 0005, D-0005-04).
+	d.expect(text.contains("EOT20") and text.contains("10.17882/79489"), "the credits show the EOT20 notice")
 	await PlaytestLayout.check(d, "credits")
 	await d.tap_phone_id("phone.home")
 	d.expect(d.state().app == "", "Home closes the credits page")

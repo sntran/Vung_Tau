@@ -18,6 +18,8 @@ The 3D shapes in plan 0001 are made in code (`scripts/greybox.gd`). They use no 
 |---|---|---|---|
 | Map data: roads, coastline, beaches, buildings, names | `data/geo/raw/osm.pbf`, `data/geo/build/` | © OpenStreetMap contributors ([openstreetmap.org](https://www.openstreetmap.org)) | ODbL 1.0. The changed data in `data/geo/` is a Derivative Database under ODbL 1.0 (`data/geo/LICENSE`). |
 | Ground height | `data/geo/raw/dem.tif`, `data/geo/build/height/` | Copernicus DEM GLO-30. Produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved. | Copernicus DEM license. The organisations in charge of the Copernicus programme by law or by delegation do not incur any liability for any use of the Copernicus WorldDEM-30. |
+| Tide model | `data/geo/build/tide.json` | EOT20: Hart-Davis, M. G., Piccioni, G., Dettmering, D., Schwatke, C., Passaro, M., Seitz, F. (2021). EOT20 - A global Empirical Ocean Tide model from multi-mission satellite altimetry. SEANOE. [doi:10.17882/79489](https://doi.org/10.17882/79489). The game uses the tide constituents at Hòn Bà and Bãi Trước. | CC BY 4.0 |
+| Tide software | (used in CI by `tools/geo/tide.py`, not in the game) | [pyTMD](https://github.com/tsutterley/pyTMD), by Tyler Sutterley | MIT License |
 | Ground texture: sand | `assets/textures/ground/sand/` | [Poly Haven: Coast Sand 01](https://polyhaven.com/a/coast_sand_01) | CC0 |
 | Ground texture: grass | `assets/textures/ground/grass/` | [Poly Haven: Leafy Grass](https://polyhaven.com/a/leafy_grass) | CC0 |
 | Ground texture: rock | `assets/textures/ground/rock/` | [Poly Haven: Rocky Terrain 02](https://polyhaven.com/a/rocky_terrain_02) | CC0 |
