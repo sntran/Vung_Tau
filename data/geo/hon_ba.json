@@ -1,15 +1,24 @@
 {
-	"note": "The rock path from the beach below Mũi Nghinh Phong to the islet Hòn Bà (plan 0005, R8h). The line is the OSM way \"Đường ra Hòn Bà\", and the band of rocks around it (band_name) is in overrides.json. The path is dry only when the sea level is below ridge_top_m (meters above mean sea level). tools/geo/tide.py shows the dry times for this height. On the path (ridge_width_m), the rocks are within path_rough_m of the top. In the rest of the band, rock outcrops rise up to outcrop_m above the top, and tide pools go down to pool_m below it. In front of the path, a sand flat (sand_flat_radius_m around the beach end) is at sand_flat_m, a little below the path, so that the lowest tides show it. The islet point is the center of the OSM islet. The tide constants of the game are for this point.",
+	"note": "The rock path from the beach below Mũi Nghinh Phong to the islet Hòn Bà (plan 0005, R8h). The line is the OSM way \"Đường ra Hòn Bà\", and the band of rocks around it (band_name) is in overrides.json. The path is dry only when the sea level is below ridge_top_m (meters above mean sea level). tools/geo/tide.py shows the dry times for this height. On the path (ridge_width_m), the rocks are within path_rough_m of the top. In the rest of the band, rock outcrops rise up to outcrop_m above the top, and tide pools go down to pool_m below it. In front of the path, a sand flat (sand_flat_radius_m around the beach end) is at sand_flat_m, a little below the path, so that the lowest tides show it. The islet point is the center of the OSM islet. The tide constants of the game are for this point. Beside the middle of the path (up to beside_m from its line, and farther than beside_from_land_m from the land), the sea floor is at least beside_below_top_m below the top, so that the water is there at each tide of the game days and the path is the only dry way (report 0005, D-0005-06). The satellite pixels there see the rock of the path and the water together, so their heights are not used.",
 	"ridge_way": 221906223,
 	"ridge_name": "Đường ra Hòn Bà",
 	"band_name": "Bãi đá ra Hòn Bà",
 	"ridge_top_m": -1.7,
 	"ridge_width_m": 4.0,
-	"islet": {"lat": 10.32388, "lon": 107.08928},
-	"bai_truoc": {"lat": 10.3466, "lon": 107.0728},
+	"islet": {
+		"lat": 10.32388,
+		"lon": 107.08928
+	},
+	"bai_truoc": {
+		"lat": 10.3466,
+		"lon": 107.0728
+	},
 	"path_rough_m": 0.08,
 	"outcrop_m": 0.35,
 	"pool_m": -0.45,
 	"sand_flat_m": -1.85,
-	"sand_flat_radius_m": 110.0
+	"sand_flat_radius_m": 110.0,
+	"beside_m": 45.0,
+	"beside_from_land_m": 25.0,
+	"beside_below_top_m": 0.9
 }

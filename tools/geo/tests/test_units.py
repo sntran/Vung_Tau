@@ -461,8 +461,28 @@ def test_intertidal_height_is_the_sea_level_where_the_pixel_becomes_wet():
     assert np.allclose(heights[:4], truth[:4], atol=0.12), heights
     assert np.isnan(heights[4]) and np.isnan(heights[5]), "no value above the highest or below the lowest tide"
     few = observations.copy()
-    few[:-10, 0] = intertidal.UNCLEAR
-    assert np.isnan(intertidal.elevations(tides, few)[0][0]), "too few clear images"
+    dry_at_first = np.flatnonzero(few[:, 0] == intertidal.DRY)
+    few[dry_at_first[4:], 0] = intertidal.UNCLEAR
+    assert np.isnan(intertidal.elevations(tides, few)[0][0]), "4 dry images are too few"
+    # A low pixel that is dry in only 5 images (the lowest tides) gets a value:
+    # the old share filter (8 %) stopped the data at about -1.55 m (D-0005-06).
+    low_tides = np.concatenate([np.full(5, -2.0), rng.uniform(-1.4, 1.4, 115)])
+    low = np.where(low_tides[:, None] > -1.8, intertidal.WET, intertidal.DRY).astype(np.int8)
+    height = intertidal.elevations(low_tides, low)[0][0]
+    assert height == pytest.approx(-1.7, abs=0.15), height
+
+
+def test_one_image_for_each_time():
+    """D-0005-06: an image in two processing versions counts one time, the newest."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("intertidal_script", ROOT / "tools" / "geo" / "intertidal.py")
+    script = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(script)
+    items = [{"id": "S2A_48PYS_20190518_0_L2A", "properties": {"datetime": "2019-05-18T03:17:01.123Z"}},
+             {"id": "S2A_48PYS_20190518_1_L2A", "properties": {"datetime": "2019-05-18T03:17:01.456Z"}},
+             {"id": "S2B_48PYS_20190513_0_L2A", "properties": {"datetime": "2019-05-13T03:17:00Z"}}]
+    kept = script.one_for_each_time(items)
+    assert [item["id"] for item in kept] == ["S2B_48PYS_20190513_0_L2A", "S2A_48PYS_20190518_1_L2A"]
 
 
 def test_intertidal_observation_and_clouds():
@@ -474,24 +494,61 @@ def test_intertidal_observation_and_clouds():
 
 
 def test_sea_floor_from_data():
-    """R8g: the intertidal heights near the coast, then a smooth slope down to the GEBCO depth."""
+    """R8g, D-0005-06: the intertidal heights near the coast. Beyond the edge of
+    the data the floor goes down at once, at the slope of the data at its edge,
+    and never flatter than MIN_EDGE_SLOPE, to the GEBCO depth."""
     n = 400
     grid = terrain.Grid(0.0, 0.0, 2.0, np.zeros((n, n), dtype=np.float32))
     land = np.zeros((n, n), dtype=bool)
     land[:, :20] = True
     terrain.shape_coast(grid, land, np.zeros((n, n), dtype=bool))
     intertidal = np.full((n, n), np.nan, dtype=np.float32)
-    intertidal[:, 20:120] = -1.6  # a flat to 200 m from the coast
+    # Data from -0.6 m at the water line down to -1.65 m at 70 m (35 cells).
+    cols = np.arange(20, 55)
+    intertidal[:, 20:55] = (-0.6 - (cols - 20) * 2.0 / 65.0)[None, :]
     gebco = np.full((n, n), -8.0, dtype=np.float32)
-    stats = terrain.sea_floor_from_data(grid, land, intertidal, gebco)
-    assert stats["intertidal_cells"] == n * 100
+    stats, data = terrain.sea_floor_from_data(grid, land, intertidal, gebco)
+    assert stats["intertidal_cells"] == n * 35 and data[200, 30] and not data[200, 60]
     row = grid.heights[200]
-    assert row[60] == pytest.approx(-1.6, abs=0.05), "the flat of the intertidal zone"
-    assert row[300] < -6.0, "far out, the GEBCO depth"
-    assert np.all(np.diff(row[120:400]) <= 1e-4), "the floor goes down from the low-tide edge"
+    assert row[40] == pytest.approx(-0.6 - 20 * 2.0 / 65.0, abs=0.05), "the data"
+    edge = row[54]
+    assert row[54 + 25] <= edge - 0.5, "50 m beyond the edge, the floor is 0.5 m lower or more"
+    assert row[54 + 25] == pytest.approx(edge - 50.0 / 65.0, abs=0.12), "the slope of the data goes on"
+    assert row[350] < -6.0, "far out, the GEBCO depth"
+    assert np.all(np.diff(row[54:400]) <= 1e-4), "the floor goes down from the edge of the data"
     assert np.all(grid.heights[:, :20] >= terrain.LAND_MIN_HEIGHT), "the land does not change"
     step = np.abs(np.diff(grid.heights[200, 15:40]))
     assert step.max() <= terrain.COAST_RAMP * grid.step + 0.05, "no step at the coastline"
+
+
+def test_sea_floor_flat_data_goes_down_at_the_least_slope():
+    """D-0005-06: flat data does not make a flat shelf: never flatter than 1 m in 60 m."""
+    n = 300
+    grid = terrain.Grid(0.0, 0.0, 2.0, np.zeros((n, n), dtype=np.float32))
+    land = np.zeros((n, n), dtype=bool)
+    land[:, :20] = True
+    terrain.shape_coast(grid, land, np.zeros((n, n), dtype=bool))
+    intertidal = np.full((n, n), np.nan, dtype=np.float32)
+    intertidal[:, 20:60] = -1.6
+    stats, _ = terrain.sea_floor_from_data(grid, land, intertidal, None)
+    row = grid.heights[150]
+    assert row[60 + 30] <= -1.6 - 60.0 * terrain.MIN_EDGE_SLOPE + 0.05
+    assert row[280] == pytest.approx(-terrain.SEA_FLOOR_DEPTH, abs=0.01)
+
+
+def test_sea_floor_small_groups_make_no_shelf():
+    """D-0005-06: a few scattered pixels near a coast (around Hòn Bà) make no shelf."""
+    n = 200
+    grid = terrain.Grid(0.0, 0.0, 2.0, np.zeros((n, n), dtype=np.float32))
+    land = np.zeros((n, n), dtype=bool)
+    land[90:110, 90:110] = True
+    terrain.shape_coast(grid, land, np.zeros((n, n), dtype=bool))
+    before = grid.heights.copy()
+    intertidal = np.full((n, n), np.nan, dtype=np.float32)
+    intertidal[80:85, 100:105] = -0.5  # 25 cells of 2 m: 100 m2
+    stats, data = terrain.sea_floor_from_data(grid, land, intertidal, None)
+    assert stats["intertidal_cells"] == 0 and not data.any()
+    assert grid.heights[60, 100] <= before[60, 100] + 1e-4, "no new shallow ground"
 
 
 def test_sea_floor_ignores_far_spots_and_shallow_gebco():
@@ -505,7 +562,7 @@ def test_sea_floor_ignores_far_spots_and_shallow_gebco():
     intertidal = np.full((n, n), np.nan, dtype=np.float32)
     intertidal[200:204, 250:254] = -1.0  # a boat 460 m out
     gebco = np.full((n, n), -1.0, dtype=np.float32)
-    stats = terrain.sea_floor_from_data(grid, land, intertidal, gebco)
+    stats, _ = terrain.sea_floor_from_data(grid, land, intertidal, gebco)
     assert stats["intertidal_cells"] == 0
     assert grid.heights[202, 252] <= -terrain.SEA_FLOOR_DEPTH + 0.01, "no shoal at the boat"
 
@@ -524,3 +581,34 @@ def test_sea_floor_keeps_the_rock_band():
     terrain.sea_floor_from_data(grid, land, intertidal, None, keep)
     assert np.allclose(grid.heights[keep], -1.7), "the band keeps its heights"
     assert grid.heights[20, 50] == pytest.approx(-0.5, abs=0.05), "the data elsewhere"
+
+
+def test_water_beside_the_rock_path():
+    """D-0005-06: beside the middle of the Hòn Bà path the floor is low, so the path is the only dry way."""
+    n = 200
+    grid = terrain.Grid(0.0, 0.0, 2.0, np.full((n, n), -1.7, dtype=np.float32))
+    land = np.zeros((n, n), dtype=bool)
+    land[:, :10] = True
+    land[:, 190:] = True
+    # The path goes from x = 20 to x = 380 at map y = -200 (the middle row), the band is 30 m wide.
+    line = LineString([(20.0, -200.0), (380.0, -200.0)])
+    band = line.buffer(15.0)
+    changed = terrain.water_beside_path(grid, land, line, band, -2.6, 45.0, 25.0)
+    assert changed.any()
+    row_path, col_mid = 100, 100
+    assert grid.heights[row_path, col_mid] == pytest.approx(-1.7), "the band does not change"
+    assert grid.heights[row_path + 15, col_mid] <= -2.6 + 1e-4, "30 m beside the path: deep water"
+    assert grid.heights[row_path + 15, 12] == pytest.approx(-1.7), "near the land: no change"
+    assert grid.heights[row_path + 40, col_mid] == pytest.approx(-1.7), "far from the path: no change"
+
+
+def test_rocky_coast_has_boulders():
+    """D-0005-03: the rocky cape has boulders on the land and in the sea."""
+    n = 120
+    grid = terrain.Grid(0.0, 0.0, 2.0, np.full((n, n), -0.5, dtype=np.float32))
+    rocks = np.zeros((n, n), dtype=bool)
+    rocks[20:100, 20:100] = True
+    assert terrain.roughen_rocks(grid, rocks) == 80 * 80
+    inside = grid.heights[30:90, 30:90] + 0.5
+    assert inside.max() > 1.0, "boulders rise more than 1 m"
+    assert np.all(grid.heights[:20, :] == -0.5), "the ground outside does not change"

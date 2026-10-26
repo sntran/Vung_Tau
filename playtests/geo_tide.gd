@@ -13,6 +13,8 @@ extends RefCounted
 
 const STEP := 12.0
 const HOURS_AFTER := 3.0
+## The check of the water beside the path leaves out this length at each end.
+const END_M := 60.0
 
 
 func run(d: PlaytestDriver) -> void:
@@ -26,6 +28,7 @@ func run(d: PlaytestDriver) -> void:
 	if d.phase == 1:
 		d.expect(not dry.is_empty(), "tide.json has a dry time at %s" % _now_text())
 		d.expect(w.is_ridge_dry(), "the ridge is dry at low tide: the sea is at %+.2f m" % w.sea_level)
+		_check_water_beside(d, w)
 	else:
 		d.expect(not dry.is_empty(), "tide.json has a dry time that ends %d hours before %s" % [HOURS_AFTER, _now_text()])
 		d.expect(not w.is_ridge_dry(), "the ridge is under water at high tide: the sea is at %+.2f m" % w.sea_level)
@@ -147,3 +150,27 @@ static func _dry_time(low: bool) -> Dictionary:
 		if not low and absf(now - end - HOURS_AFTER * 3600.0) <= 60.0 * 60.0:
 			return dry
 	return {}
+
+
+## At low tide, the rock path is the only dry way to Hòn Bà: the water is 0.3 m
+## deep or more at 30 m on each side of the path (report 0005, D-0005-06). The
+## check is along the part of the path that is more than END_M from both ends:
+## near the ends, the slopes of the beach and of the islet are there.
+static func _check_water_beside(d: PlaytestDriver, w: VungTau) -> void:
+	var line := PackedVector3Array()
+	for p: Vector2 in w.ridge_points:
+		line.append(Vector3(p.x, 0.0, p.y))
+	var length := PlaytestDriver._length(line)
+	var shallowest := INF
+	for i in 11:
+		var distance := lerpf(END_M, length - END_M, i / 10.0)
+		var at := PlaytestDriver.route_point(line, distance)
+		var ahead := PlaytestDriver.route_point(line, minf(length, distance + 2.0))
+		var along := Vector2(ahead.x - at.x, ahead.z - at.z).normalized()
+		var side := Vector2(-along.y, along.x)
+		for sign_value: float in [-1.0, 1.0]:
+			var point := Vector2(at.x, at.z) + side * 30.0 * sign_value
+			var depth := w.sea_level - w.ground_height(point.x, point.y)
+			shallowest = minf(shallowest, depth)
+	d.step("at low tide the water beside the rock path is %.2f m deep or more" % shallowest)
+	d.expect(shallowest >= 0.3, "at low tide the water is 0.3 m deep or more at 30 m beside the rock path: %.2f m" % shallowest)

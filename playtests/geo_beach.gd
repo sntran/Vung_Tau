@@ -3,10 +3,12 @@ extends RefCounted
 # stops at the 0.5 m depth and the message shows. The depth is from the sea
 # level of the tide at that time (R13).
 # The sea floor comes from public data (R8g, Q14). Each run checks the water
-# depth at 100 m and 250 m from the sand of the main beach, on the line of
-# data/geo/build/world.json (sea_floor.bai_truoc_profile): the ground of the
-# game has the height of the data there, and the depth is the sea level of
-# the tide minus that height. Run 1 is at the high tide of day 1 (15:30), and
+# depth on the line of data/geo/build/world.json (sea_floor.bai_truoc_profile)
+# only where the satellite data has a value (report 0005, D-0005-06): in the
+# middle of the data part and at its edge. There the ground of the game has the
+# height of the data, and the depth is the sea level of the tide minus that
+# height. Beyond the edge of the data, the floor goes down by 0.5 m or more in
+# the next 50 m. Run 1 is at the high tide of day 1 (15:30), and
 # run 2 at the low tide (08:30), with a screenshot from the sand at each tide.
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=15:30
@@ -82,7 +84,12 @@ func _check_depths(d: PlaytestDriver, w: VungTau) -> void:
 	var start := Vector2(line.start[0], line.start[1])
 	var direction := Vector2(line.direction[0], line.direction[1]).normalized()
 	var tide := "high tide" if d.phase == 1 else "low tide"
-	for distance: float in floor_data.get("check_distances_m", [100.0, 250.0]):
+	var measured: Array = line.points.filter(func(p: Array) -> bool: return p.size() > 2 and int(p[2]) == 1)
+	if not d.expect(measured.size() >= 2, "the line has points with data: %d" % measured.size()):
+		return
+	var edge := float(measured[measured.size() - 1][0])
+	var middle := float(measured[measured.size() / 2][0])
+	for distance: float in [middle, edge]:
 		var expected := _height_on_line(line.points, distance)
 		var at := start + direction * distance
 		var ground := w.ground_height(at.x, at.y)
@@ -92,6 +99,12 @@ func _check_depths(d: PlaytestDriver, w: VungTau) -> void:
 		d.step("%s (sea %+.2f m): the water is %.2f m deep at %.0f m from the sand (the data: %.2f m)" % [
 				tide, w.sea_level, depth, distance, maxf(w.sea_level - expected, 0.0)])
 		d.expect(absf(depth - maxf(w.sea_level - expected, 0.0)) < 0.2, "the depth at %.0f m follows the tide and the data" % distance)
+	# Beyond the edge of the data, the floor goes down: no made shelf (D-0005-06).
+	var at_edge := start + direction * edge
+	var beyond := start + direction * (edge + 50.0)
+	var drop := w.ground_height(at_edge.x, at_edge.y) - w.ground_height(beyond.x, beyond.y)
+	d.step("the data ends %.0f m from the sand; 50 m farther the floor is %.2f m lower" % [edge, drop])
+	d.expect(drop >= 0.5, "beyond the edge of the data the floor goes down 0.5 m or more in 50 m: %.2f m" % drop)
 	var eye := Vector3(start.x, 0.0, start.y) - Vector3(direction.x, 0.0, direction.y) * 10.0
 	eye.y = w.ground_height(eye.x, eye.z) + Player.EYE_HEIGHT
 	var target := Vector3(start.x, 0.0, start.y) + Vector3(direction.x, 0.0, direction.y) * 250.0

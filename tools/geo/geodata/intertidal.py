@@ -6,11 +6,12 @@ level where it changes from dry to wet."""
 
 import numpy as np
 
-# A pixel needs this many clear images, or it gets no value.
-MIN_CLEAR = 15
-# A pixel is intertidal when this part of its clear images, or more, is wet,
-# and this part, or more, is dry.
-MIN_SHARE = 0.08
+# A pixel is intertidal when this many of its clear images, or more, are wet
+# above its height, and this many, or more, are dry below it (report 0005, D-0005-06: a share of the
+# images stopped the data at about -1.55 m, because few images have the sea
+# lower).
+MIN_WET = 5
+MIN_DRY = 5
 # A pixel gets no value when more than this part of its clear images
 # disagrees with its height (wet above it or dry below it).
 MAX_ERROR = 0.2
@@ -18,8 +19,8 @@ MAX_ERROR = 0.2
 UNCLEAR, DRY, WET = -1, 0, 1
 
 
-def elevations(tides: np.ndarray, observations: np.ndarray, min_clear: int = MIN_CLEAR,
-               min_share: float = MIN_SHARE, max_error: float = MAX_ERROR) -> tuple[np.ndarray, np.ndarray]:
+def elevations(tides: np.ndarray, observations: np.ndarray, min_wet: int = MIN_WET, min_dry: int = MIN_DRY,
+               max_error: float = MAX_ERROR) -> tuple[np.ndarray, np.ndarray]:
     """The height of each pixel.
 
     tides is the sea level (m) at the time of each image, shape (N,).
@@ -54,9 +55,14 @@ def elevations(tides: np.ndarray, observations: np.ndarray, min_clear: int = MIN
     # The middle between the sea levels around the best place.
     padded = np.concatenate([[levels[0]], levels, [levels[-1]]])
     height = (padded[best] + padded[best + 1]) / 2.0
-    wet_share = wet.sum(axis=0) / np.maximum(clear, 1)
-    error_share = errors[best, np.arange(errors.shape[1])] / np.maximum(clear, 1)
-    valid = (clear >= min_clear) & (wet_share >= min_share) & (wet_share <= 1.0 - min_share) & (error_share <= max_error)
+    columns = np.arange(errors.shape[1])
+    error_share = errors[best, columns] / np.maximum(clear, 1)
+    # Only the images that agree with the height count: the dry images below it
+    # and the wet images above it. A few wrong images (a boat, a wave) do not
+    # give a value to a pixel that is always wet or always dry.
+    dry_below_height = dry_below[best, columns]
+    wet_above_height = wet_below[-1] - wet_below[best, columns]
+    valid = (wet_above_height >= min_wet) & (dry_below_height >= min_dry) & (error_share <= max_error)
     height = np.where(valid, height, np.nan).astype(np.float32)
     return height.reshape(shape), clear.reshape(shape)
 

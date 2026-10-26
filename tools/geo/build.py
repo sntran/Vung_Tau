@@ -48,6 +48,8 @@ TOWN_ROAD_SIGMA_M = 40.0
 ISLAND_MAX_M2 = 1_000_000.0
 # The DEM shows an island a little larger than the OSM coastline.
 ISLAND_MARGIN_M = 20.0
+# The value of the low rocks with pebbles and shells in rock.png (the other bare rock is 255).
+ROCK_PEBBLES = 140
 KEEP_IMPORT = '[remap]\n\nimporter="keep"\n'
 
 
@@ -136,6 +138,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
                 land_rocks.append(line.buffer(CLIFF_ROCK_M))
                 cliffs += 1
     rock_coasts = []
+    rock_coast_shapes = []
     for spec in data.rock_coasts:
         x, y = projection.to_map(np.array([float(spec["lon"])]), np.array([float(spec["lat"])]))
         shape = coast.rock_coast_area(land, (float(x[0]), float(y[0])), float(spec["radius_m"]), float(spec["sea_m"]))
@@ -143,6 +146,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
             problems.append(f"the rock coast {spec.get('name', '')} finds no land within {spec['radius_m']} m")
             continue
         land_rocks.append(shape)
+        rock_coast_shapes.append(shape)
         rock_coasts.append({"name": spec.get("name", ""), "area_m2": round(shape.area)})
     shelves = []
     for spec in data.rock_shelves:
@@ -214,15 +218,26 @@ def build(raw: Path, out: Path, geo: Path) -> int:
         if (raw / "gebco.tif").exists() else None
     # The rock band of Hòn Bà keeps its own heights (Q14).
     keep = terrain.rasterize(grid, polygons_of(rock_band)) if rock_band is not None else None
-    floor_stats = terrain.sea_floor_from_data(grid, land_mask, intertidal, gebco, keep)
+    floor_stats, floor_data = terrain.sea_floor_from_data(grid, land_mask, intertidal, gebco, keep)
+    if rock_band is not None:
+        h = config.hon_ba
+        beside = terrain.water_beside_path(grid, land_mask, line, band, top - float(h["beside_below_top_m"]),
+                                           float(h["beside_m"]), float(h["beside_from_land_m"]))
+        floor_data &= ~beside
+        log(f"water beside the Hòn Bà path: {int(beside.sum())} cells at {top - float(h['beside_below_top_m']):+.2f} m or lower")
     del intertidal, gebco
     log(f"sea floor: {floor_stats['intertidal_cells']} intertidal cells, GEBCO {floor_stats['gebco']}")
+    # The boulders of the rocky coasts (D-0005-03): the cape is not smooth sand.
+    for shape in rock_coast_shapes:
+        terrain.roughen_rocks(grid, terrain.rasterize(grid, polygons_of(shape)))
     rock_cells = terrain.raise_sea_rocks(grid, land_mask, terrain.rasterize(grid, [p for r in rocks for p in polygons_of(r)]))
     rock_shelves = []
+    pebble_shapes = []
     for spec, band in shelves:
         cells = terrain.make_rock_shelf(grid, land_mask, terrain.rasterize(grid, polygons_of(band)), float(spec["height_m"]),
                                         float(spec["rough_m"]))
         land_rocks.append(band)
+        pebble_shapes.append(band)
         point = band.representative_point()
         rock_shelves.append({"name": spec.get("name", ""), "height_m": float(spec["height_m"]),
                              "area_m2": round(band.area), "cells": cells, "point": map_to_game([(point.x, point.y)])[0]})
@@ -299,8 +314,10 @@ def build(raw: Path, out: Path, geo: Path) -> int:
         write_keep_import(png)
     rock_mask = terrain.rasterize(grid, [p for r in rocks + land_rocks + [rock_band] + islands if r is not None
                                          for p in polygons_of(r)])
+    pebble_mask = terrain.rasterize(grid, [p for r in pebble_shapes + [rock_band] if r is not None
+                                           for p in polygons_of(r)])
     surface = write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods, landuse, roads, area,
-                            out / "surface.png", rock_mask, out / "rock.png")
+                            out / "surface.png", rock_mask, out / "rock.png", pebble_mask)
     write_keep_import(out / "surface.png")
     write_keep_import(out / "rock.png")
 
@@ -339,14 +356,19 @@ def build(raw: Path, out: Path, geo: Path) -> int:
         lowest, highest = seafloor.tide_range(tide, day_one)
         # From the center of Bãi Trước (the game origin) to the nearest point of the coastline.
         water = shapely.ops.nearest_points(land.boundary, shapely.Point(0.0, 0.0))[0]
-        line = seafloor.profile(grid, land_mask, (0.0, 0.0), (water.x, water.y))
-        dry_cells = seafloor.draw_dry_map(out / "intertidal_dry.png", grid, land_mask, lowest)
+        line = seafloor.profile(grid, land_mask, floor_data, (0.0, 0.0), (water.x, water.y))
+        dry = seafloor.draw_dry_map(out / "intertidal_dry.png", grid, land_mask, floor_data, lowest)
+        images = {}
+        if (raw / "intertidal.json").exists():
+            info = load_json(raw / "intertidal.json")["sentinel"]
+            images = dict(info.get("low_tide_images", {}), count=len(info.get("images", [])))
         write_keep_import(out / "intertidal_dry.png")
         (out / "intertidal_report.md").write_text(
-            seafloor.report(floor_stats, lowest, highest, line, dry_cells, grid.step, "intertidal_dry.png"), encoding="utf-8")
+            seafloor.report(floor_stats, lowest, highest, line, dry, images, "intertidal_dry.png"), encoding="utf-8")
         world["sea_floor"] |= {"source": "intertidal and GEBCO" if floor_stats["intertidal_cells"] else "slope",
                                "game_tide_m": [round(lowest, 2), round(highest, 2)], "bai_truoc_profile": line,
-                               "check_distances_m": list(seafloor.CHECK_DISTANCES_M)}
+                               "check_distances_m": list(seafloor.CHECK_DISTANCES_M),
+                               "dry_at_lowest_m2": {k: round(v) for k, v in dry.items()}}
     write_json(out / "world.json", world)
     write_json(out / "coastline.json", {"lines": [map_to_game(l.coords) for l in coast.coastline_lines(data.ways, projection)]}, None)
     write_json(out / "land.json", {"polygons": [blocks_module.polygon_to_game(p.simplify(1.0)) for p in polygons_of(land)]}, None)
@@ -425,11 +447,13 @@ def road_record(road) -> dict:
 
 
 def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods, landuse, roads, area, path,
-                  rock_mask, rock_path) -> dict:
+                  rock_mask, rock_path, pebble_mask=None) -> dict:
     """An RGBA image for the ground materials: R is sand, G is town, B is wood,
     A is the distance to the coastline (positive on land). A second gray
     image (rock_path) is bare rock: the Hòn Bà rock path, the rocks in the
-    sea, and the small islands (R8h).
+    sea, the rocky coasts, and the small islands (R8h). Its value is 255 for
+    boulders, and ROCK_PEBBLES for the low rocks with pebbles and shells (the
+    Hòn Bà band and the flat rocks along the sea wall, D-0005-03).
 
     OSM has few building outlines in Vũng Tàu, so a place with many roads is
     also town: there, the roads cover more than TOWN_ROAD_COVER of the ground."""
@@ -456,7 +480,9 @@ def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods,
     # The sea floor is sand: the low tide shows it.
     image = np.dstack([channel((beach_mask | ~land_mask) & ~rock_mask), channel(town), channel(wood & ~rock_mask), alpha])
     Image.fromarray(image, "RGBA").save(path)
-    Image.fromarray(channel(rock_mask), "L").save(rock_path)
+    pebbles = np.zeros(grid.shape, dtype=bool) if pebble_mask is None else pebble_mask
+    rock = np.maximum(channel(rock_mask & ~pebbles), (channel(pebbles).astype(np.float32) * ROCK_PEBBLES / 255).astype(np.uint8))
+    Image.fromarray(rock, "L").save(rock_path)
     return {"x0": grid.x0, "z0": grid.z0, "step": grid.step * every, "columns": image.shape[1], "rows": image.shape[0],
             "coast_range_m": limit, "rock": rock_path.name}
 

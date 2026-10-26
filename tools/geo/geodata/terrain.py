@@ -170,18 +170,27 @@ def shape_coast(grid: Grid, land: np.ndarray, beach: np.ndarray) -> None:
     h[sea] = LAND_MIN_HEIGHT - (LAND_MIN_HEIGHT + SEA_FLOOR_DEPTH) * part
 
 
-# The sea floor from data (plan 0005, R8g, changed on 2026-10-26, Q14): the
-# floor slopes from the low-tide edge of the intertidal zone (or from the old
-# slope) to the GEBCO depth over SEA_BLEND_M.
-SEA_BLEND_M = 300.0
+# The sea floor from data (plan 0005, R8g, changed on 2026-10-26, Q14, and
+# report 0005, D-0005-06): beyond the edge of the intertidal data, the floor
+# goes down at once, at the slope of the data at its edge, and never flatter
+# than MIN_EDGE_SLOPE, to the GEBCO depth or to -SEA_FLOOR_DEPTH.
+MIN_EDGE_SLOPE = 1.0 / 60.0
+# The slope of the data at its edge comes from the outer EDGE_BAND_M of the data.
+EDGE_BAND_M = 30.0
+# Farther than this from the data, the floor has no data near: the old slope
+# near the coast, then down at MIN_EDGE_SLOPE to the GEBCO depth.
+DATA_REACH_M = 300.0
 # The intertidal heights are smoothed over this size (the 10 m pixels are noisy).
 INTERTIDAL_SMOOTH_M = 15.0
 # From the coastline (LAND_MIN_HEIGHT), the floor is not lower than a ramp of
 # this slope, so that there is no step at the coastline (the 10 m pixels of the
 # intertidal zone near the coast are lower than the land).
 COAST_RAMP = 0.1
-# An intertidal group of cells counts when it comes this near to the coast.
+# An intertidal group of cells counts when it comes this near to the coast,
+# and when it has this many cells or more (20 pixels of 10 m): a few scattered
+# pixels must not make a shelf (D-0005-06).
 INTERTIDAL_COAST_M = 40.0
+INTERTIDAL_MIN_GROUP_M2 = 2000.0
 # The cells that keep their heights blend into the floor over this distance.
 KEEP_BLEND_M = 12.0
 
@@ -214,57 +223,119 @@ def _smoothstep(edge0: float, edge1: float, x: np.ndarray) -> np.ndarray:
     return t * t * (3.0 - 2.0 * t)
 
 
-def sea_floor_from_data(grid: Grid, land: np.ndarray, intertidal: np.ndarray | None, gebco: np.ndarray | None,
-                        keep: np.ndarray | None = None) -> dict:
-    """The sea floor from public data (R8g). The sea cells have the slope of
-    shape_coast() before this step.
+def edge_slopes(values: np.ndarray, valid: np.ndarray, step: float) -> np.ndarray:
+    """The slope (rise for each meter) of the data in its outer EDGE_BAND_M,
+    smoothed. NaN at the other cells."""
+    to_edge = ndimage.distance_transform_edt(valid).astype(np.float32) * step
+    band = valid & (to_edge <= EDGE_BAND_M)
+    filled = np.where(valid, values, 0.0).astype(np.float32)
+    rise_rows, rise_cols = np.gradient(filled, step)
+    slope = np.hypot(rise_rows, rise_cols)
+    # The gradient is wrong where a neighbor has no data: those cells do not count.
+    inner = ndimage.binary_erosion(valid, structure=np.ones((3, 3), dtype=bool))
+    slope = np.where(band & inner, slope, np.nan).astype(np.float32)
+    return smooth_valid(np.where(np.isfinite(slope), slope, np.nan), EDGE_BAND_M / step / 2.0) if np.isfinite(
+        slope).any() else slope
 
-    - Where the intertidal zone has a height, the floor has that height.
-    - From the low-tide edge of the intertidal zone, the floor slopes smoothly
-      to the GEBCO depth over SEA_BLEND_M.
-    - Where no intertidal height is near, the old slope stays near the coast,
-      and the floor goes to the GEBCO depth farther out.
+
+def sea_floor_from_data(grid: Grid, land: np.ndarray, intertidal: np.ndarray | None, gebco: np.ndarray | None,
+                        keep: np.ndarray | None = None) -> tuple[dict, np.ndarray]:
+    """The sea floor from public data (R8g, D-0005-06). The sea cells have the
+    slope of shape_coast() before this step.
+
+    - Where the intertidal zone has a height (a group of cells that touches the
+      coast and is not too small), the floor has that height.
+    - Beyond the edge of the data, the floor goes down at once, at the slope of
+      the data at its edge (never flatter than MIN_EDGE_SLOPE), to the GEBCO
+      depth or to -SEA_FLOOR_DEPTH. It never makes new shallow ground.
+    - Where no data is near, the old slope stays near the coast, and then the
+      floor goes down at MIN_EDGE_SLOPE to the GEBCO depth.
     - Near the coastline, the floor is not lower than a ramp of COAST_RAMP.
     - The cells of keep (the rock band of Hòn Bà) keep their heights, with a
       blend over KEEP_BLEND_M around them.
-    Returns the numbers for the report."""
+    Returns the numbers for the report, and the mask of the cells with data."""
     h = grid.heights
     sea = ~land
     old = h.copy()
-    # GEBCO counts where it is deeper than the old floor: its cells near the
-    # coast have the land in them, so there it is too shallow.
-    deep = old if gebco is None else np.where(np.isfinite(gebco), np.minimum(gebco, old), old).astype(np.float32)
+    # The depth farther out: GEBCO where it is deeper than -SEA_FLOOR_DEPTH (its
+    # cells near the coast have the land in them, so there it is too shallow).
+    target = np.full(grid.shape, -SEA_FLOOR_DEPTH, dtype=np.float32)
+    if gebco is not None:
+        target = np.where(np.isfinite(gebco), np.minimum(gebco, target), target).astype(np.float32)
     to_land = ndimage.distance_transform_edt(sea).astype(np.float32) * grid.step
-    far = _smoothstep(SEA_FLOOR_SLOPE_M, SEA_FLOOR_SLOPE_M + SEA_BLEND_M, to_land)
-    floor = old * (1.0 - far) + deep * far
+    beyond_slope = -SEA_FLOOR_DEPTH - np.maximum(to_land - SEA_FLOOR_SLOPE_M, 0.0) * MIN_EDGE_SLOPE
+    floor = np.where(to_land <= SEA_FLOOR_SLOPE_M, old, np.maximum(beyond_slope, target)).astype(np.float32)
     stats = {"intertidal_cells": 0, "gebco": gebco is not None}
+    valid = np.zeros(grid.shape, dtype=bool)
     if intertidal is not None:
         values = smooth_valid(intertidal, INTERTIDAL_SMOOTH_M / grid.step / 2.0)
         valid = np.isfinite(values) & sea
-        # Only the groups of cells that touch the coast: a boat at anchor looks
-        # dry in some images, and it must not make a shoal far out.
+        # Only the groups of cells that touch the coast and are not too small: a
+        # boat at anchor looks dry in some images, and a few scattered pixels
+        # must not make a shoal or a shelf.
         groups, count = ndimage.label(valid, structure=np.ones((3, 3), dtype=bool))
         if count:
-            touching = np.unique(groups[valid & (to_land <= INTERTIDAL_COAST_M)])
-            valid &= np.isin(groups, touching[touching > 0])
+            sizes = np.bincount(groups.ravel())
+            touching = np.zeros(count + 1, dtype=bool)
+            touching[np.unique(groups[valid & (to_land <= INTERTIDAL_COAST_M)])] = True
+            keep_group = touching & (sizes * grid.step * grid.step >= INTERTIDAL_MIN_GROUP_M2)
+            keep_group[0] = False
+            valid &= keep_group[groups]
         if valid.any():
+            slopes = edge_slopes(values, valid, grid.step)
             distance, (rows, cols) = ndimage.distance_transform_edt(~valid, return_indices=True)
             distance = distance.astype(np.float32) * grid.step
-            edge = np.where(valid, values, values[rows, cols])
-            down = _smoothstep(0.0, SEA_BLEND_M, distance)
-            measured = edge * (1.0 - down) + np.minimum(floor, edge) * down
-            weight = 1.0 - _smoothstep(SEA_BLEND_M * 0.5, SEA_BLEND_M, distance)
-            floor = floor * (1.0 - weight) + measured * weight
+            edge = values[rows, cols]
+            slope = np.nan_to_num(slopes[rows, cols], nan=MIN_EDGE_SLOPE)
+            slope = np.clip(slope, MIN_EDGE_SLOPE, 1.0)
+            down = np.maximum(edge - slope * distance, target)
+            near = (distance <= DATA_REACH_M) & ~valid
+            floor = np.where(valid, values, np.where(near, down, floor)).astype(np.float32)
             stats["intertidal_cells"] = int(valid.sum())
             stats["intertidal_min_m"] = round(float(values[valid].min()), 2)
             stats["intertidal_max_m"] = round(float(values[valid].max()), 2)
-    floor = np.maximum(floor, LAND_MIN_HEIGHT - to_land * COAST_RAMP)
+            stats["edge_slope_median"] = round(float(np.nanmedian(slopes)), 4) if np.isfinite(slopes).any() else None
+    ramp = LAND_MIN_HEIGHT - to_land * COAST_RAMP
+    # A data cell that the ramp lifts is not data any more (D-0005-08).
+    valid &= floor >= ramp - 0.1
+    floor = np.maximum(floor, ramp)
     if keep is not None and keep.any():
         near_keep = ndimage.distance_transform_edt(~keep).astype(np.float32) * grid.step
         weight = 1.0 - _smoothstep(0.0, KEEP_BLEND_M, near_keep)
         floor = floor * (1.0 - weight) + old * weight
     h[sea] = np.minimum(floor[sea], LAND_MIN_HEIGHT)
-    return stats
+    return stats, valid
+
+
+def water_beside_path(grid: Grid, land: np.ndarray, line, band, depth: float, reach: float, from_land: float,
+                      blend: float = KEEP_BLEND_M) -> np.ndarray:
+    """The water beside the rock path to Hòn Bà (D-0005-06): within reach of the
+    line, farther than from_land from the land, and outside the band, the floor
+    is not higher than depth. It blends over blend at the edges. Returns the
+    cells that changed."""
+    near = rasterize(grid, [line.buffer(reach + blend)])
+    in_band = rasterize(grid, polygons_of_shape(band))
+    to_land = ndimage.distance_transform_edt(~land).astype(np.float32) * grid.step
+    zone = near & ~land & ~in_band & (to_land >= from_land)
+    if not zone.any():
+        return zone
+    rows, cols = np.nonzero(zone)
+    window = (slice(rows.min(), rows.max() + 1), slice(cols.min(), cols.max() + 1))
+    inner = rasterize(grid, [line.buffer(reach)])[window] & ~in_band[window] & (to_land[window] >= from_land + blend)
+    to_inner = ndimage.distance_transform_edt(~inner).astype(np.float32) * grid.step
+    weight = np.where(zone[window], 1.0 - _smoothstep(0.0, blend, to_inner), 0.0)
+    h = grid.heights[window]
+    lowered = np.minimum(h, depth)
+    changed = weight > 0.0
+    h[changed] = (h * (1.0 - weight) + lowered * weight)[changed]
+    grid.heights[window] = h
+    result = np.zeros(grid.shape, dtype=bool)
+    result[window] = changed & (lowered < grid.heights[window] + 1e-6)
+    return result
+
+
+def polygons_of_shape(shape) -> list:
+    return [g for g in getattr(shape, "geoms", [shape]) if not g.is_empty]
 
 
 def raise_sea_rocks(grid: Grid, land: np.ndarray, rocks: np.ndarray) -> int:
@@ -373,6 +444,26 @@ def make_rock_shelf(grid: Grid, land: np.ndarray, band: np.ndarray, height: floa
     h[inside] = (height + noise * rough)[inside]
     grid.heights[window] = h
     return int(inside.sum())
+
+
+def roughen_rocks(grid: Grid, rocks: np.ndarray, amplitude: float = ISLAND_BOULDER_M, seed: int = 12) -> int:
+    """Boulders on a rocky coast (D-0005-03), on the land and in the sea: up to
+    amplitude above the ground, about 6 m wide. Returns the number of cells."""
+    rows, cols = np.nonzero(rocks)
+    if rows.size == 0:
+        return 0
+    window = (slice(rows.min(), rows.max() + 1), slice(cols.min(), cols.max() + 1))
+    h = grid.heights[window]
+    rng = np.random.default_rng(seed)
+    big = _smooth_noise(h.shape, rng, ISLAND_BOULDER_SIGMA)
+    small = _smooth_noise(h.shape, rng, 1.0)
+    # The boulders fade out at the edge of the area.
+    inside = ndimage.distance_transform_edt(rocks[window]).astype(np.float32) * grid.step
+    fade = np.clip(inside / 8.0, 0.0, 1.0)
+    bumps = (np.maximum(big, 0.0) * amplitude + small * ISLAND_ROCK_M * 0.5) * fade
+    h[rocks[window]] = (h + bumps)[rocks[window]]
+    grid.heights[window] = h
+    return int(rocks.sum())
 
 
 def make_sand_flat(grid: Grid, land: np.ndarray, center: tuple[float, float], radius: float, height: float) -> int:

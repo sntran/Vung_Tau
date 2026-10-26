@@ -47,9 +47,9 @@ Total road length: 692.3 km. Roads with a width tag: 7 of 4123. Hẻm: 2365.
 | Landmark | Found | OSM | Position (game X, Z) | Height (m) | Note |
 |---|---|---|---|---|---|
 | Bãi Trước | yes | way/220821647 | -2.55, -1.31 | 1.2 | 3 candidates, 347.9 m from the hint |
-| Bãi Sau | yes | way/234800751 | 2463.57, 115.52 | -0.97 | 5 candidates, 391.9 m from the hint |
+| Bãi Sau | yes | way/234800751 | 2463.57, 115.52 | -0.96 | 5 candidates, 391.9 m from the hint |
 | Bãi Dâu | yes | way/895756059 | -1377.16, -2753.98 | 1.08 | 3 candidates, 435.3 m from the hint |
-| Mũi Nghinh Phong | yes | node/2435353682 | 1076.55, 2561.69 | 1.2 | 1 candidates, 85.4 m from the hint |
+| Mũi Nghinh Phong | yes | node/2435353682 | 1076.55, 2561.69 | 1.33 | 1 candidates, 85.4 m from the hint |
 | Núi Lớn | yes | node/2452682527 | -649.2, -1712.32 | 238.42 | 1 candidates, 188.9 m from the hint |
 | Núi Nhỏ | yes | node/-1 | 374.1, 1035.7 | 175.6 | 1 candidates, 0.0 m from the hint |
 | Tượng Chúa Kitô Vua | yes | way/235008112 | 1159.87, 1893.39 | 138.33 | 1 candidates, 83.3 m from the hint |

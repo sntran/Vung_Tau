@@ -126,7 +126,7 @@ func _check(d: PlaytestDriver) -> void:
 	# The tide model is CC BY 4.0, so it needs its credit (report 0005, D-0005-04).
 	d.expect(text.contains("EOT20") and text.contains("10.17882/79489"), "the credits show the EOT20 notice")
 	# The sea floor (plan 0005, R8g): Sentinel-2 and GEBCO.
-	d.expect(text.contains("Contains modified Copernicus Sentinel data 2017–2020") and text.contains("GEBCO"),
+	d.expect(text.contains("Contains modified Copernicus Sentinel data 2017–2024") and text.contains("GEBCO"),
 			"the credits show the Sentinel-2 and GEBCO notices")
 	await PlaytestLayout.check(d, "credits")
 	await d.tap_phone_id("phone.home")

@@ -257,7 +257,7 @@
 			"kind": "ghe",
 			"seed": 1036809247,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới",
-			"floor_m": -3.81
+			"floor_m": -4.0
 		},
 		{
 			"position": [
@@ -269,7 +269,7 @@
 			"kind": "ghe",
 			"seed": 1014921663,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới",
-			"floor_m": -3.99
+			"floor_m": -4.0
 		},
 		{
 			"position": [
@@ -293,7 +293,7 @@
 			"kind": "ghe",
 			"seed": 798310413,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới",
-			"floor_m": -2.3
+			"floor_m": -3.37
 		},
 		{
 			"position": [
@@ -329,7 +329,7 @@
 			"kind": "ghe",
 			"seed": 933017914,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới",
-			"floor_m": -2.62
+			"floor_m": -3.85
 		},
 		{
 			"position": [
@@ -341,7 +341,7 @@
 			"kind": "ghe",
 			"seed": 94940493,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới",
-			"floor_m": -1.76
+			"floor_m": -2.59
 		},
 		{
 			"position": [
@@ -353,7 +353,7 @@
 			"kind": "ghe",
 			"seed": 742538888,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới",
-			"floor_m": -1.61
+			"floor_m": -2.06
 		},
 		{
 			"position": [
@@ -365,7 +365,7 @@
 			"kind": "ghe",
 			"seed": 193800310,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới",
-			"floor_m": -3.96
+			"floor_m": -4.0
 		},
 		{
 			"position": [
@@ -377,7 +377,7 @@
 			"kind": "ghe",
 			"seed": 335775705,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới",
-			"floor_m": -1.57
+			"floor_m": -1.63
 		},
 		{
 			"position": [
@@ -389,7 +389,7 @@
 			"kind": "ghe",
 			"seed": 558570051,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới",
-			"floor_m": -3.89
+			"floor_m": -4.0
 		},
 		{
 			"position": [
@@ -401,7 +401,7 @@
 			"kind": "ghe",
 			"seed": 194749709,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới",
-			"floor_m": -2.65
+			"floor_m": -3.97
 		},
 		{
 			"position": [
@@ -413,7 +413,7 @@
 			"kind": "ghe",
 			"seed": 931290271,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới",
-			"floor_m": -2.89
+			"floor_m": -4.0
 		},
 		{
 			"position": [
@@ -425,7 +425,7 @@
 			"kind": "ghe",
 			"seed": 997347857,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới",
-			"floor_m": -3.72
+			"floor_m": -4.0
 		},
 		{
 			"position": [
@@ -437,7 +437,7 @@
 			"kind": "ghe",
 			"seed": 747538511,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới",
-			"floor_m": -3.89
+			"floor_m": -4.0
 		},
 		{
 			"position": [
@@ -449,7 +449,7 @@
 			"kind": "ghe",
 			"seed": 1002713389,
 			"area": "All over the bay of Bãi Trước, 100 m or more from the sand of the main beach",
-			"floor_m": -2.84
+			"floor_m": -4.0
 		},
 		{
 			"position": [
@@ -473,7 +473,7 @@
 			"kind": "ghe",
 			"seed": 819294675,
 			"area": "All over the bay of Bãi Trước, 100 m or more from the sand of the main beach",
-			"floor_m": -1.79
+			"floor_m": -2.43
 		},
 		{
 			"position": [
@@ -497,7 +497,7 @@
 			"kind": "ghe",
 			"seed": 726936826,
 			"area": "All over the bay of Bãi Trước, 100 m or more from the sand of the main beach",
-			"floor_m": -3.65
+			"floor_m": -4.0
 		},
 		{
 			"position": [
@@ -509,7 +509,7 @@
 			"kind": "ghe",
 			"seed": 227158375,
 			"area": "All over the bay of Bãi Trước, 100 m or more from the sand of the main beach",
-			"floor_m": -2.51
+			"floor_m": -3.39
 		},
 		{
 			"position": [
@@ -521,7 +521,7 @@
 			"kind": "ghe",
 			"seed": 176545168,
 			"area": "All over the bay of Bãi Trước, 100 m or more from the sand of the main beach",
-			"floor_m": -3.95
+			"floor_m": -4.0
 		},
 		{
 			"position": [
@@ -533,7 +533,7 @@
 			"kind": "ghe",
 			"seed": 513774052,
 			"area": "All over the bay of Bãi Trước, 100 m or more from the sand of the main beach",
-			"floor_m": -3.67
+			"floor_m": -4.0
 		},
 		{
 			"position": [
@@ -557,7 +557,7 @@
 			"kind": "ghe",
 			"seed": 747861756,
 			"area": "All over the bay of Bãi Trước, 100 m or more from the sand of the main beach",
-			"floor_m": -2.34
+			"floor_m": -4.0
 		},
 		{
 			"position": [
@@ -581,7 +581,7 @@
 			"kind": "ghe",
 			"seed": 4828965,
 			"area": "All over the bay of Bãi Trước, 100 m or more from the sand of the main beach",
-			"floor_m": -3.75
+			"floor_m": -4.0
 		},
 		{
 			"position": [
@@ -641,7 +641,7 @@
 			"kind": "ghe",
 			"seed": 36518711,
 			"area": "Near the sand at the north end of the main beach",
-			"floor_m": -1.76
+			"floor_m": -2.65
 		},
 		{
 			"position": [
@@ -653,7 +653,7 @@
 			"kind": "ghe",
 			"seed": 682007542,
 			"area": "Near the sand at the north end of the main beach",
-			"floor_m": -1.07
+			"floor_m": -1.42
 		},
 		{
 			"position": [
@@ -665,7 +665,7 @@
 			"kind": "ghe",
 			"seed": 1052807358,
 			"area": "Near the sand at the north end of the main beach",
-			"floor_m": -1.81
+			"floor_m": -2.78
 		},
 		{
 			"position": [
@@ -677,7 +677,7 @@
 			"kind": "ghe",
 			"seed": 275003517,
 			"area": "Near the sand at the south end of the main beach",
-			"floor_m": -2.09
+			"floor_m": -2.79
 		},
 		{
 			"position": [
@@ -689,7 +689,7 @@
 			"kind": "ghe",
 			"seed": 395951802,
 			"area": "Near the sand at the south end of the main beach",
-			"floor_m": -1.56
+			"floor_m": -1.84
 		},
 		{
 			"position": [
@@ -701,7 +701,7 @@
 			"kind": "ghe",
 			"seed": 322105115,
 			"area": "Near the sand at the south end of the main beach",
-			"floor_m": -1.85
+			"floor_m": -2.56
 		}
 	],
 	"basket_boats": [
@@ -712,7 +712,7 @@
 			],
 			"heading_deg": 80.1,
 			"diameter_m": 1.91,
-			"floor_m": -1.51,
+			"floor_m": -2.21,
 			"tied_to": -1,
 			"area": "Near the sand at the north end of the main beach"
 		},
@@ -734,7 +734,7 @@
 			],
 			"heading_deg": 223.0,
 			"diameter_m": 2.29,
-			"floor_m": -1.76,
+			"floor_m": -2.68,
 			"tied_to": -1,
 			"area": "Near the sand at the north end of the main beach"
 		},
@@ -745,7 +745,7 @@
 			],
 			"heading_deg": 20.1,
 			"diameter_m": 1.94,
-			"floor_m": -1.2,
+			"floor_m": -1.21,
 			"tied_to": -1,
 			"area": "Near the sand at the south end of the main beach"
 		},
@@ -767,7 +767,7 @@
 			],
 			"heading_deg": 348.0,
 			"diameter_m": 2.01,
-			"floor_m": -1.87,
+			"floor_m": -2.33,
 			"tied_to": -1,
 			"area": "Near the sand at the south end of the main beach"
 		},
@@ -778,7 +778,7 @@
 			],
 			"heading_deg": 120.6,
 			"diameter_m": 1.87,
-			"floor_m": -2.3,
+			"floor_m": -3.37,
 			"tied_to": 5,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới"
 		},
@@ -789,7 +789,7 @@
 			],
 			"heading_deg": 173.3,
 			"diameter_m": 2.25,
-			"floor_m": -1.76,
+			"floor_m": -2.59,
 			"tied_to": 9,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới"
 		},
@@ -800,7 +800,7 @@
 			],
 			"heading_deg": 245.1,
 			"diameter_m": 2.09,
-			"floor_m": -3.89,
+			"floor_m": -4.0,
 			"tied_to": 13,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới"
 		},
@@ -811,7 +811,7 @@
 			],
 			"heading_deg": 231.3,
 			"diameter_m": 2.23,
-			"floor_m": -2.65,
+			"floor_m": -3.97,
 			"tied_to": 14,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới"
 		},
@@ -822,7 +822,7 @@
 			],
 			"heading_deg": 132.3,
 			"diameter_m": 1.96,
-			"floor_m": -3.72,
+			"floor_m": -4.0,
 			"tied_to": 16,
 			"area": "The south part of the bay, in front of the sea wall from the park to Xóm Lưới"
 		},
@@ -833,7 +833,7 @@
 			],
 			"heading_deg": 351.0,
 			"diameter_m": 2.24,
-			"floor_m": -2.84,
+			"floor_m": -4.0,
 			"tied_to": 18,
 			"area": "All over the bay of Bãi Trước, 100 m or more from the sand of the main beach"
 		},
@@ -844,7 +844,7 @@
 			],
 			"heading_deg": 286.2,
 			"diameter_m": 1.93,
-			"floor_m": -3.65,
+			"floor_m": -4.0,
 			"tied_to": 22,
 			"area": "All over the bay of Bãi Trước, 100 m or more from the sand of the main beach"
 		},
@@ -855,7 +855,7 @@
 			],
 			"heading_deg": 154.3,
 			"diameter_m": 1.99,
-			"floor_m": -3.95,
+			"floor_m": -4.0,
 			"tied_to": 24,
 			"area": "All over the bay of Bãi Trước, 100 m or more from the sand of the main beach"
 		},
@@ -866,7 +866,7 @@
 			],
 			"heading_deg": 25.5,
 			"diameter_m": 2.11,
-			"floor_m": -3.67,
+			"floor_m": -4.0,
 			"tied_to": 25,
 			"area": "All over the bay of Bãi Trước, 100 m or more from the sand of the main beach"
 		},
@@ -891,22 +891,22 @@
 					[
 						-559.68,
 						961.56,
-						-3.99
+						-4.0
 					],
 					[
 						-561.68,
 						961.38,
-						-3.99
+						-4.0
 					],
 					[
 						-563.67,
 						961.19,
-						-3.99
+						-4.0
 					],
 					[
 						-565.66,
 						961.0,
-						-3.99
+						-4.0
 					],
 					[
 						-567.65,
@@ -1501,117 +1501,117 @@
 					[
 						-360.39,
 						883.3,
-						-1.48
+						-2.41
 					],
 					[
 						-362.21,
 						884.15,
-						-1.51
+						-2.44
 					],
 					[
 						-364.02,
 						884.99,
-						-1.53
+						-2.47
 					],
 					[
 						-365.83,
 						885.83,
-						-1.56
+						-2.5
 					],
 					[
 						-367.65,
 						886.68,
-						-1.58
+						-2.53
 					],
 					[
 						-369.46,
 						887.52,
-						-1.6
+						-2.55
 					],
 					[
 						-371.28,
 						888.36,
-						-1.61
+						-2.58
 					],
 					[
 						-373.09,
 						889.2,
-						-1.63
+						-2.61
 					],
 					[
 						-374.9,
 						890.05,
-						-1.65
+						-2.64
 					],
 					[
 						-376.72,
 						890.89,
-						-1.67
+						-2.67
 					],
 					[
 						-378.53,
 						891.73,
-						-1.69
+						-2.7
 					],
 					[
 						-380.34,
 						892.58,
-						-1.71
+						-2.73
 					],
 					[
 						-382.16,
 						893.42,
-						-1.73
+						-2.77
 					],
 					[
 						-383.97,
 						894.26,
-						-1.75
+						-2.8
 					],
 					[
 						-385.78,
 						895.11,
-						-1.77
+						-2.83
 					],
 					[
 						-387.6,
 						895.95,
-						-1.79
+						-2.86
 					],
 					[
 						-389.41,
 						896.79,
-						-1.81
+						-2.89
 					],
 					[
 						-391.22,
 						897.64,
-						-1.84
+						-2.92
 					],
 					[
 						-393.04,
 						898.48,
-						-1.86
+						-2.95
 					],
 					[
 						-394.85,
 						899.32,
-						-1.88
+						-2.99
 					],
 					[
 						-396.67,
 						900.17,
-						-1.9
+						-3.02
 					],
 					[
 						-398.48,
 						901.01,
-						-1.93
+						-3.05
 					],
 					[
 						-400.29,
 						901.85,
-						-1.95
+						-3.08
 					]
 				]
 			}

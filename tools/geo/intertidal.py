@@ -4,10 +4,14 @@
 Usage:
   python tools/geo/intertidal.py              Read the images and GEBCO, and write the files.
   python tools/geo/intertidal.py --limit 20   Use only the first 20 images (a quick test).
+  python tools/geo/intertidal.py --cache DIR  Keep the observations of each image in DIR, so that
+                                              a second run reads only the new images.
 
 The intertidal zone: the heights of each 10 m pixel between the lowest and
 the highest tide, with the pixel method of DEA Intertidal (geodata/intertidal.py),
-from the Sentinel-2 L2A images of 2017 to 2020 (Earth Search on AWS) and the
+from the Sentinel-2 L2A images of 2016 to 2024 (Earth Search on AWS; the tile has
+images from 2017), one image
+for each time (the newest processing version, report 0005, D-0005-06), and the
 EOT20 sea level at the time of each image (data/geo/build/tide.json, so run
 tide.py first). The deeper water: a window of the GEBCO 2025 grid.
 
@@ -38,13 +42,14 @@ from geodata.config import BUILD, GEO, RAW, Config, write_json  # noqa: E402
 
 STAC = "https://earth-search.aws.element84.com/v1/search"
 COLLECTION = "sentinel-2-l2a"
-YEARS = ("2017-01-01T00:00:00Z", "2020-12-31T23:59:59Z")
+# The beaches change little, and more years give more images at low tide (D-0005-06).
+YEARS = ("2016-01-01T00:00:00Z", "2024-12-31T23:59:59Z")
 MAX_CLOUD = 60
 GEBCO_URL = ("https://dap.ceda.ac.uk/bodc/gebco/global/gebco_2025/ice_surface_elevation/geotiff/"
              "gebco_2025_n90.0_s0.0_w90.0_e180.0.tif")
 GEBCO_CITATION = ("GEBCO Compilation Group (2025) GEBCO 2025 Grid (doi:10.5285/37c52e96-24ea-67ce-e063-7086abc05f29). "
                   "Public domain, with the GEBCO terms of use.")
-SENTINEL_NOTICE = "Contains modified Copernicus Sentinel data 2017–2020"
+SENTINEL_NOTICE = "Contains modified Copernicus Sentinel data 2017–2024"
 METHOD = ("The pixel method of DEA Intertidal (Geoscience Australia, "
           "https://knowledge.dea.ga.gov.au/data/product/dea-intertidal)")
 # The tide point of tide.json for the images.
@@ -89,11 +94,35 @@ def search(bbox: dict) -> list[dict]:
         tile = f"{p.get('mgrs:utm_zone')}{p.get('mgrs:latitude_band')}{p.get('mgrs:grid_square')}"
         tiles.setdefault(tile, []).append(item)
     tile, chosen = max(tiles.items(), key=lambda kv: len(kv[1]))
-    log(f"{len(items)} images, {len(chosen)} on the tile {tile}")
-    return sorted(chosen, key=lambda item: item["properties"]["datetime"])
+    unique = one_for_each_time(chosen)
+    log(f"{len(items)} images, {len(chosen)} on the tile {tile}, {len(unique)} different times")
+    return unique
+
+
+def one_for_each_time(items: list[dict]) -> list[dict]:
+    """One image for each time: Earth Search has some images two times, from two
+    processing versions (for example S2A_48PYS_20190518_0_L2A and _1_L2A). The
+    newest version (the higher number) stays. Sorted by time."""
+    best: dict[str, dict] = {}
+    for item in items:
+        when = item["properties"]["datetime"][:16]
+        version = int(item["id"].split("_")[-2]) if item["id"].split("_")[-2].isdigit() else 0
+        old = best.get(when)
+        if old is None or version > int(old["id"].split("_")[-2] if old["id"].split("_")[-2].isdigit() else 0):
+            best[when] = item
+    return sorted(best.values(), key=lambda item: item["properties"]["datetime"])
+
+
+def https(href: str) -> str:
+    """Some items give s3://BUCKET/KEY. The Sentinel-2 bucket is public over HTTPS too."""
+    if href.startswith("s3://"):
+        bucket, _, key = href[5:].partition("/")
+        return f"https://{bucket}.s3.us-west-2.amazonaws.com/{key}"
+    return href
 
 
 def _read(href: str, bounds_lonlat: tuple, shape=None):
+    href = https(href)
     for attempt in range(RETRIES):
         try:
             with rasterio.open("/vsicurl/" + href) as src:
@@ -109,29 +138,50 @@ def _read(href: str, bounds_lonlat: tuple, shape=None):
     return None
 
 
-def read_images(items: list[dict], bounds_lonlat: tuple, tide: dict) -> tuple:
+def read_images(items: list[dict], bounds_lonlat: tuple, tide: dict, cache: Path | None = None) -> tuple:
     """The observations (WET, DRY, UNCLEAR) and the sea level of each image."""
     observations, levels, used = [], [], []
     transform = crs = None
+    shape = None
+    skipped: list[str] = []
     for index, item in enumerate(items):
-        assets = item["assets"]
-        green, transform, crs = _read(assets["green"]["href"], bounds_lonlat)
-        nir, _, _ = _read(assets["nir"]["href"], bounds_lonlat)
-        scl, _, _ = _read(assets["scl"]["href"], bounds_lonlat)
-        # The scene classes have 20 m pixels.
-        scl = np.repeat(np.repeat(scl, 2, axis=0), 2, axis=1)[:green.shape[0], :green.shape[1]]
-        if scl.shape != green.shape or nir.shape != green.shape:
-            log(f"{item['id']}: the bands have different sizes, not used")
+        cached = cache / f"{item['id']}.npz" if cache is not None else None
+        if cached is not None and cached.exists():
+            stored = np.load(cached)
+            seen, transform, crs = stored["seen"], rasterio.Affine(*stored["transform"]), str(stored["crs"])
+        else:
+            assets = item["assets"]
+            try:
+                green, transform, crs = _read(assets["green"]["href"], bounds_lonlat)
+                nir, _, _ = _read(assets["nir"]["href"], bounds_lonlat)
+                scl, _, _ = _read(assets["scl"]["href"], bounds_lonlat)
+            except rasterio.errors.RasterioIOError as error:
+                log(f"{item['id']}: cannot read it ({error}), not used")
+                skipped.append(item["id"])
+                continue
+            # The scene classes have 20 m pixels.
+            scl = np.repeat(np.repeat(scl, 2, axis=0), 2, axis=1)[:green.shape[0], :green.shape[1]]
+            if scl.shape != green.shape or nir.shape != green.shape:
+                log(f"{item['id']}: the bands have different sizes, not used")
+                continue
+            seen = intertidal.observe(green, nir, scl)
+            if cached is not None:
+                np.savez_compressed(cached, seen=seen, transform=np.array(list(transform)[:6]), crs=str(crs))
+        if shape is None:
+            shape = seen.shape
+        if seen.shape != shape:
+            log(f"{item['id']}: another size {seen.shape}, not used")
             continue
         when = datetime.datetime.fromisoformat(item["properties"]["datetime"].replace("Z", "+00:00"))
         level = float(tidecalc.level(tide, TIDE_POINT, np.array([when.timestamp()]))[0])
-        seen = intertidal.observe(green, nir, scl)
         clear = float((seen != intertidal.UNCLEAR).mean())
         observations.append(seen)
         levels.append(level)
         used.append({"id": item["id"], "time": item["properties"]["datetime"], "sea_level_m": round(level, 3),
                      "cloud_cover": item["properties"].get("eo:cloud_cover"), "clear": round(clear, 3)})
         log(f"{index + 1}/{len(items)} {item['id']}: sea {level:+.2f} m, {clear:.0%} clear")
+    if skipped:
+        log(f"{len(skipped)} images not used: {', '.join(skipped)}")
     return np.stack(observations), np.array(levels), used, transform, crs
 
 
@@ -144,6 +194,12 @@ def read_gebco(bounds_lonlat: tuple, path: Path) -> None:
     log(f"GEBCO {data.shape[1]} x {data.shape[0]} cells, from {data.min()} to {data.max()} m")
 
 
+def notice(used: list[dict]) -> str:
+    """The Copernicus notice with the years of the images that the run used."""
+    years = sorted({image["time"][:4] for image in used})
+    return f"Contains modified Copernicus Sentinel data {years[0]}–{years[-1]}" if years else SENTINEL_NOTICE
+
+
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -154,26 +210,23 @@ def main() -> int:
     parser.add_argument("--tide", type=Path, default=BUILD / "tide.json")
     parser.add_argument("--limit", type=int, default=0)
     parser.add_argument("--cache", type=Path, default=None,
-                        help="A .npz file for the observations: read it when it is there, or write it.")
+                        help="A folder for the observations of each image: read them when they are there, or write them.")
     args = parser.parse_args()
     bbox = Config(GEO).area["bbox"]
     bounds = (bbox["west"], bbox["south"], bbox["east"], bbox["north"])
     tide = json.loads(args.tide.read_text(encoding="utf-8"))
     args.raw.mkdir(parents=True, exist_ok=True)
     read_gebco(bounds, args.raw / "gebco.tif")
-    if args.cache is not None and args.cache.exists():
-        cached = np.load(args.cache, allow_pickle=True)
-        observations, levels = cached["observations"], cached["levels"]
-        used, transform, crs = list(cached["used"]), rasterio.Affine(*cached["transform"]), str(cached["crs"])
-        log(f"{len(levels)} images from the cache {args.cache}")
-    else:
-        items = search(bbox)
-        if args.limit:
-            items = items[:args.limit]
-        observations, levels, used, transform, crs = read_images(items, bounds, tide)
-        if args.cache is not None:
-            np.savez_compressed(args.cache, observations=observations, levels=levels, used=np.array(used, dtype=object),
-                                transform=np.array(list(transform)[:6]), crs=str(crs))
+    items = search(bbox)
+    if args.limit:
+        items = items[:args.limit]
+    if args.cache is not None:
+        args.cache.mkdir(parents=True, exist_ok=True)
+    observations, levels, used, transform, crs = read_images(items, bounds, tide, args.cache)
+    low = {"below_-1.5_m": int((levels < -1.5).sum()), "below_-2.0_m": int((levels < -2.0).sum()),
+           "lowest_m": round(float(levels.min()), 2), "highest_m": round(float(levels.max()), 2)}
+    log(f"{len(levels)} images: {low['below_-1.5_m']} with the sea below -1.5 m, {low['below_-2.0_m']} below -2.0 m, "
+        f"from {low['lowest_m']:+.2f} to {low['highest_m']:+.2f} m")
     # In blocks of rows, so that the sums of all images fit in the memory.
     heights = np.full(observations.shape[1:], np.nan, dtype=np.float32)
     for row in range(0, heights.shape[0], 64):
@@ -190,11 +243,11 @@ def main() -> int:
         "note": "Made by tools/geo/intertidal.py (plan 0005, R8g). Do not change by hand.",
         "date": datetime.date.today().isoformat(),
         "method": METHOD,
-        "parameters": {"min_clear": intertidal.MIN_CLEAR, "min_share": intertidal.MIN_SHARE,
+        "parameters": {"min_wet": intertidal.MIN_WET, "min_dry": intertidal.MIN_DRY,
                        "max_error": intertidal.MAX_ERROR, "water_index": "NDWI (green, near infrared) > 0",
                        "not_clear": list(intertidal.NOT_CLEAR), "max_cloud_cover": MAX_CLOUD, "tide_point": TIDE_POINT},
-        "sentinel": {"notice": SENTINEL_NOTICE, "stac": STAC, "collection": COLLECTION, "years": list(YEARS),
-                     "images": used},
+        "sentinel": {"notice": notice(used), "stac": STAC, "collection": COLLECTION, "years": list(YEARS),
+                     "low_tide_images": low, "images": used},
         "gebco": {"citation": GEBCO_CITATION, "url": GEBCO_URL},
         "files": [{"file": name, "sha256": sha256(args.raw / name)} for name in ("intertidal.tif", "gebco.tif")],
         "pixels": {"with_height": int(valid.sum()), "total": int(valid.size),

@@ -57,7 +57,7 @@ uniform vec3 grass_color : source_color = vec3(0.36, 0.47, 0.2);
 uniform vec3 wood_color : source_color = vec3(0.2, 0.32, 0.13);
 // The rocks of Vũng Tàu are light grey-brown granite (report 0005, D-0005-05:
 // Hòn Bà was almost black).
-uniform vec3 rock_color : source_color = vec3(0.76, 0.69, 0.6);
+uniform vec3 rock_color : source_color = vec3(0.66, 0.62, 0.56);
 
 float luminance(vec3 c) {
 	return dot(c, vec3(0.299, 0.587, 0.114));
@@ -86,7 +86,11 @@ void fragment() {
 	float dry = dryness * smoothstep(0.3, 0.6, patches + dryness * 0.25);
 	vec3 dry_color = mix(dry_grass_color, dry_orange_color, value_noise(world_position.xz * 0.05)) * grass_detail;
 	color = mix(color, dry_color, dry);
-	float bare_rock = texture(rock_mask, (world_position.xz - mask_origin) / mask_size).r;
+	// The rock mask: 1 for boulders, about 0.55 for the low rocks with pebbles
+	// and shells (the Hòn Bà band and the flat rocks along the sea wall).
+	float rock_value = texture(rock_mask, (world_position.xz - mask_origin) / mask_size).r;
+	float bare_rock = smoothstep(0.25, 0.45, rock_value);
+	float pebbles = bare_rock * (1.0 - smoothstep(0.7, 0.85, rock_value));
 	vec3 wood = wood_color * luminance(texture(wood_texture, uv * 0.7).rgb) * 2.2;
 	// Under the trees, the dry season shows less: half of the dry patches.
 	wood = mix(wood, dry_color * 0.75, dry * 0.5);
@@ -97,7 +101,7 @@ void fragment() {
 	float rock = smoothstep(rock_normal_y + 0.04, rock_normal_y - 0.04, normalize(world_normal).y);
 	// The rock texture is dark (a mean linear brightness of 0.07), so the
 	// detail takes about 80 % of the rock color.
-	vec3 rock_detail = rock_color * luminance(texture(rock_texture, uv * 0.5).rgb) * 11.0;
+	vec3 rock_detail = rock_color * clamp(luminance(texture(rock_texture, uv * 0.5).rgb) * 11.0, 0.45, 1.25);
 	// The canopy: crowns of about 8 m with dark gaps between them. In the dry
 	// season, some crowns are brown and red.
 	float hill = smoothstep(forest_height - 1.0, forest_height + 1.0, world_position.y) * (1.0 - smoothstep(0.2, 0.3, mask.g));
@@ -114,9 +118,14 @@ void fragment() {
 	// time: it is darker, with algae and shells (the flat rocks along the sea
 	// wall, Q6, and the low rocks of the Hòn Bà path).
 	vec3 low_rock = mix(rock_detail, rock_detail * vec3(0.3, 0.3, 0.24), smoothstep(0.0, -0.8, world_position.y));
+	// Boulders: lit tops and dark gaps of about 3 m, so that a rocky coast does
+	// not look like sand (D-0005-03).
+	float blocks = value_noise(world_position.xz * 0.35) * 0.7 + value_noise(world_position.xz * 1.1) * 0.3;
+	vec3 boulders = low_rock * mix(0.32, 1.1, smoothstep(0.38, 0.62, blocks));
+	low_rock = mix(low_rock, boulders, bare_rock - pebbles);
 	color = mix(color, low_rock, max(rock, bare_rock));
 	float roughness = 0.92;
-	if (bare_rock > 0.5 && world_position.y < 0.5) {
+	if (pebbles > 0.5 && world_position.y < 0.5) {
 		// The Hòn Bà rock path: pebbles and oyster shells on the rocks (R8h).
 		float speck = hash2(floor(world_position.xz * 20.0));
 		color = speck < 0.015 ? shell_color : (speck < 0.05 ? rock_detail * 0.7 : color);
