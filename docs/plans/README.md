@@ -38,7 +38,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 | 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Built |
 | 0006 | [People](0006-people.md) | Approved |
 | 0007 | [Who you are: the passport and the forms of address](0007-who-you-are.md) | Approved |
-| 0020 | [Real trees](0020-real-trees.md) | Draft |
+| 0020 | [Real trees](0020-real-trees.md) | Approved |
 
 ## Proposed order of the next plans
 
@@ -51,7 +51,7 @@ The order can change. A number is only a name: plans 0020 to 0022 were added aft
 | 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Built. The real ground, hills, coast, beaches, sea, and roads, from OpenStreetMap and the Copernicus elevation data. |
 | 0006 | [People](0006-people.md) | Approved. People with real bodies, faces, hair, and clothes, made by code with MPFB 2. Library animations, head and eye movement, blinks, faces for each line, and lip sync from the voice audio. |
 | 0007 | [Who you are](0007-who-you-are.md) | Approved. Cô Nga asks for a photo of the passport for the police registration. The player sets the age and the gender. People address the traveler with the correct kinship words (con, em, anh, chị, chú, cô…), and the traveler answers with the correct words. |
-| 0020 | [Real trees](0020-real-trees.md) | Draft. Trees made by code in Blender, with real leaves near the player and simpler forms far away: coconut palms at Bãi Trước, bàng, casuarina, phượng vĩ, hoa sứ, palms, the street shade trees, and the hill forest. They move in the wind and follow the season. |
+| 0020 | [Real trees](0020-real-trees.md) | Approved. Trees made by code in Blender, with real leaves near the player and simpler forms far away: coconut palms at Bãi Trước, bàng, casuarina, phượng vĩ, hoa sứ, palms, the street shade trees, and the hill forest. They move in the wind and follow the season. |
 | 0008 | Known structures | Tượng Chúa Kitô Vua, Hải đăng, Bạch Dinh, Tượng Đức Mẹ Bãi Dâu, Miếu Hòn Bà (with its gate and the old bunkers), Chùa Tam Bảo, the ferry pier near Bãi Trước, the park of Bãi Trước, the main bus station, the old markets (with chợ Xóm Lưới), the big roundabout, Ngã Năm, and others that I name. Made by code from their real outlines and sizes. |
 | 0009 | Houses on the lots | A house generator that uses the kit of plan 0004 and puts houses on the lots between the roads. Houses are not in line: they face in different directions, with different depths, back extensions, and roofs at many heights. The real homestay hẻm (Hẻm 2 Hải Đăng) replaces the test street: only homes, the slope of Núi Nhỏ on one side with some houses on it, one row of houses on the other. The homestay is on an empty lot on the slope side, with terraces behind it for the garden of plan 0022. The shops and the people of the test street (Cô Sáu, Bác Hà, Cô Út, the cà phê cóc, the bánh mì and hủ tiếu gõ carts) move to the streets near chợ Xóm Lưới. Bà Tư and cô Nga stay at the homestay. |
 | 0010 | Arrival | The game starts on Tuesday 22 January 2019 at the bus station (Bến xe Vũng Tàu). The player can walk anywhere, or take a taxi or a ride from a ride app (a fictional app, not a real brand) to the homestay. At the door, the traveler shows the passport, and cô Nga registers the stay. |
