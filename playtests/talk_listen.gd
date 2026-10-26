@@ -62,10 +62,16 @@ func run(d: PlaytestDriver) -> void:
 	await d.answer("say_again", "play")
 	line = await d.wait_line("batu")
 	# "Say again" at the end of her line: she says the same line again (D-0003-02).
+	# The game plays 10 times slower here: on a slow computer, one frame can be
+	# longer than the last 0.2 s of the line, and the wait or the tap missed it.
 	var m: Node = d.main()
-	await d.wait_until(func() -> bool: return m.speech.has("batu") and float(m.speech.batu.left) < 0.2, 15.0,
+	await d.wait_until(func() -> bool: return m.speech.has("batu") and float(m.speech.batu.left) < 1.0, 15.0,
+			"the last second of her line")
+	d.set_time_scale(0.1)
+	await d.wait_until(func() -> bool: return m.speech.has("batu") and float(m.speech.batu.left) < 0.2, 30.0,
 			"the last 0.2 s of her line")
 	await d.tap_phone_id("reply.say_again.play")
+	d.set_time_scale(1.0)
 	line = await d.wait_line("batu")
 	d.expect(line == "batu.greet", "after \"say again\" at the end of her line, she says it again, not \"%s\"" % line)
 	d.expect(m.talk.get("state", "") == "speaking", "the talk goes on: %s" % m.talk.get("state", ""))
