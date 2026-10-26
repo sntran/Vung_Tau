@@ -6,7 +6,10 @@ extends RefCounted
 # to 40 % of the pixels of the buildings have a saturation above 0.25
 # (D-0004-09). The light follows the time (D-0004-04): the mean brightness of
 # the lower half of the view along the hẻm is lower at 20:00 than at 17:30,
-# and lower at 17:30 than at 12:00.
+# and lower at 17:30 than at 12:00. The re-check of report 0004 (D-0004-10):
+# in the view from above at 12:00, at most 10 % of the building pixels are
+# near white (a value above 0.92 and a saturation below 0.1), and the mean
+# value of the building pixels is 0.55 to 0.75.
 # Forward+ with SDFGI takes about 2 s for one frame under lavapipe (D7), so
 # each run takes only the screenshots.
 # sizes: 1280x720
@@ -23,6 +26,12 @@ const TIMES := ["0700", "1200", "1730", "2000"]
 ## The share of the building pixels with a saturation above SATURATED (D-0004-09).
 const SATURATED := 0.25
 const COLORFUL_SHARE := Vector2(0.25, 0.40)
+## A near white pixel (D-0004-10): a value above NEAR_WHITE.x and a saturation
+## below NEAR_WHITE.y.
+const NEAR_WHITE := Vector2(0.92, 0.1)
+const NEAR_WHITE_MOST := 0.10
+## The limits of the mean value of the building pixels from above (D-0004-10).
+const MEAN_VALUE := Vector2(0.55, 0.75)
 ## The distance between two measured pixels.
 const SAMPLE_PX := 6
 
@@ -45,8 +54,16 @@ func run(d: PlaytestDriver) -> void:
 		if view.name == "along":
 			_check_brightness(d, time, tag)
 		if view.name == "top" and time == "1200":
-			var share := _colorful_share(d)
+			var values := _building_values(d)
+			var share: float = values.colorful
 			d.step("%s, %s: %.0f %% of the building pixels have a saturation above %.2f" % [tag, time, share * 100.0, SATURATED])
+			d.step("%s, %s: %.0f %% of the building pixels are near white, the mean value is %.2f" % [
+					tag, time, values.white * 100.0, values.mean])
+			d.expect(values.white <= NEAR_WHITE_MOST, "%s: %.0f %% of the building pixels from above are near white, it must be %d %% or less" % [
+					tag, values.white * 100.0, int(NEAR_WHITE_MOST * 100)])
+			d.expect(values.mean >= MEAN_VALUE.x and values.mean <= MEAN_VALUE.y,
+					"%s: the mean value of the building pixels from above is %.2f, it must be %.2f to %.2f" % [
+					tag, values.mean, MEAN_VALUE.x, MEAN_VALUE.y])
 			d.expect(share >= COLORFUL_SHARE.x and share <= COLORFUL_SHARE.y,
 					"%s: %.0f %% of the building pixels from above are colorful, it must be %d %% to %d %%" % [
 					tag, share * 100.0, int(COLORFUL_SHARE.x * 100), int(COLORFUL_SHARE.y * 100)])
@@ -80,10 +97,11 @@ func _check_brightness(d: PlaytestDriver, time: String, tag: String) -> void:
 	d.expect(values["1730"] < values["1200"], "%s: 17:30 (%.3f) is darker than 12:00 (%.3f)" % [tag, values["1730"], values["1200"]])
 
 
-## Returns the share of the pixels of the buildings with a saturation above
-## SATURATED. A ray from the camera through each measured pixel finds what
-## the pixel shows. It reads only the physics and the screen.
-func _colorful_share(d: PlaytestDriver) -> float:
+## Returns the values of the pixels of the buildings: "colorful", the share
+## with a saturation above SATURATED, "white", the share of near white pixels,
+## and "mean", the mean value. A ray from the camera through each measured
+## pixel finds what the pixel shows. It reads only the physics and the screen.
+func _building_values(d: PlaytestDriver) -> Dictionary:
 	var image := d.viewport().get_texture().get_image()
 	var camera: Camera3D = d.main().player.camera
 	var space := camera.get_world_3d().direct_space_state
@@ -91,6 +109,8 @@ func _colorful_share(d: PlaytestDriver) -> float:
 	var covered: Array[Rect2] = [d.main().action_button.get_global_rect(), d.main().phone.get_global_rect()]
 	var buildings := 0
 	var colorful := 0
+	var white := 0
+	var value := 0.0
 	for y in range(0, image.get_height(), SAMPLE_PX):
 		for x in range(0, image.get_width(), SAMPLE_PX):
 			var at := Vector2(x, y) * scale
@@ -102,10 +122,15 @@ func _colorful_share(d: PlaytestDriver) -> float:
 			if hit.is_empty() or _house_of(hit.collider) == null:
 				continue
 			buildings += 1
-			if image.get_pixel(x, y).s > SATURATED:
+			var pixel := image.get_pixel(x, y)
+			if pixel.s > SATURATED:
 				colorful += 1
+			if pixel.v > NEAR_WHITE.x and pixel.s < NEAR_WHITE.y:
+				white += 1
+			value += pixel.v
 	d.expect(buildings > 1000, "the view from above shows the buildings: %d pixels" % buildings)
-	return float(colorful) / maxf(buildings, 1)
+	var count := maxf(buildings, 1)
+	return {"colorful": colorful / count, "white": white / count, "mean": value / count}
 
 
 func _house_of(node: Object) -> TubeHouse:

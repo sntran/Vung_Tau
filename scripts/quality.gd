@@ -66,6 +66,12 @@ static func apply(preset: String, environment: Environment, sun: DirectionalLigh
 	# made the street almost black at noon in the look review (PT-25). The
 	# SDFGI energy changes with the time (DayLight.gi_energy()).
 	environment.sdfgi_bounce_feedback = 0.6
+	# The AgX tone mapping makes bright colors a little paler. SDFGI also adds
+	# the blue light of the sky to all surfaces, and to the sunlit roofs too.
+	# A small saturation adjustment gives the colors back, as a phone camera
+	# does (report 0004, D-0004-10).
+	environment.adjustment_enabled = true
+	environment.adjustment_saturation = 1.35 if environment.sdfgi_enabled else 1.15
 	environment.ssao_intensity = 1.2
 	environment.ssil_intensity = 1.4
 	environment.volumetric_fog_density = 0.004
