@@ -110,7 +110,11 @@ void fragment() {
 	canopy = mix(canopy, canopy_dry * (0.6 + 0.5 * crowns), crown_dry);
 	canopy *= mix(0.55, 1.0, smoothstep(0.15, 0.35, crowns));
 	color = mix(color, canopy, forest * far);
-	color = mix(color, rock_detail, max(rock, bare_rock));
+	// Bare rock below the mean sea level is under the water for half of the
+	// time: it is darker, with algae and shells (the flat rocks along the sea
+	// wall, Q6, and the low rocks of the Hòn Bà path).
+	vec3 low_rock = mix(rock_detail, rock_detail * vec3(0.3, 0.3, 0.24), smoothstep(0.0, -0.8, world_position.y));
+	color = mix(color, low_rock, max(rock, bare_rock));
 	float roughness = 0.92;
 	if (bare_rock > 0.5 && world_position.y < 0.5) {
 		// The Hòn Bà rock path: pebbles and oyster shells on the rocks (R8h).
