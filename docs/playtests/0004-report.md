@@ -172,3 +172,5 @@ Commit `9a3a2ba`. The architect ran PT-25 again on High and on Low at 12:00 and 
 - **Observation (not a defect):** on High, white and grey surfaces still have a light blue tint from the sky light, and the shade along the hẻm is still a little cool. Low looks a little dull. These are matters of taste: I judge them in the PT-25 screenshots (criterion 2).
 
 **Status:** all defects of this report are fixed. Plan 0004 becomes "Done" after my two checks: the PT-25 screenshots (criterion 2), and the macOS and Windows builds on my computers (criterion 3).
+
+Decision (2026-10-26): I try the macOS and Windows builds when I can walk around and see the known landmarks (after plan 0008), so that I can check the places too. Until then, plan 0004 stays "Built", and the work goes on with the next plans.

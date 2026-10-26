@@ -47,7 +47,7 @@ The order can change. A number is only a name: plans 0020 to 0022 were added aft
 | Number | Name | Content |
 |---|---|---|
 | 0003 | [Voices and the phone](0003-voices-and-phone.md) | Done. People speak aloud in Vietnamese with subtitles. The traveler's phone has Listen (transcribe and translate), Lens, Messages, Sổ tay, Clock, and Settings. It replaces the talk panel and the 2D sheets. |
-| 0004 | [Desktop and the house detail kit](0004-desktop-and-house-detail.md) | Built. Desktop becomes the main platform, with the Forward+ renderer and quality presets. Tube houses get depth, brick under plaster and paint, wear, and the clutter of a real street. |
+| 0004 | [Desktop and the house detail kit](0004-desktop-and-house-detail.md) | Built (all defects fixed; I try the macOS and Windows builds after plan 0008). Desktop becomes the main platform, with the Forward+ renderer and quality presets. Tube houses get depth, brick under plaster and paint, wear, and the clutter of a real street. |
 | 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Built. The real ground, hills, coast, beaches, sea, and roads, from OpenStreetMap and the Copernicus elevation data. |
 | 0006 | [People](0006-people.md) | Approved. People with real bodies, faces, hair, and clothes, made by code with MPFB 2. Library animations, head and eye movement, blinks, faces for each line, and lip sync from the voice audio. |
 | 0007 | [Who you are](0007-who-you-are.md) | Approved. Cô Nga asks for a photo of the passport for the police registration. The player sets the age and the gender. People address the traveler with the correct kinship words (con, em, anh, chị, chú, cô…), and the traveler answers with the correct words. |
