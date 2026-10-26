@@ -33,6 +33,10 @@ RIDGE_SIDE_SLOPE = 1.0
 BAND_BLEND_M = 4.0
 # The boulders on the small islands (roughen_islands).
 ISLAND_ROCK_M = 0.6
+# The large boulders of the small islands (report 0005, D-0005-05): up to this
+# height above the smooth hump of the DEM, about 6 m wide.
+ISLAND_BOULDER_M = 1.8
+ISLAND_BOULDER_SIGMA = 3.0
 # The width of the band at the land side of a beach, where the beach slope meets the ground.
 BEACH_BLEND_M = 10.0
 # The lowest ground height on land. The OSM coastline is the line of the
@@ -238,17 +242,22 @@ def make_rock_band(grid: Grid, land: np.ndarray, line, band, top: float, width: 
 
 def roughen_islands(grid: Grid, islands: np.ndarray, amplitude: float = ISLAND_ROCK_M, seed: int = 9) -> int:
     """Boulders on the small islands: the DEM has a cell of 30 m, so a small
-    island is a smooth hump. Smooth noise of +/- amplitude on the land cells
-    above LAND_MIN_HEIGHT keeps the mean height. Returns the number of cells."""
+    island is a smooth hump. Large boulders (up to ISLAND_BOULDER_M, about 6 m
+    wide) stand on it, with smooth noise of +/- amplitude between them, on the
+    land cells above LAND_MIN_HEIGHT. Returns the number of cells."""
     rows, cols = np.nonzero(islands)
     if rows.size == 0:
         return 0
     window = (slice(rows.min(), rows.max() + 1), slice(cols.min(), cols.max() + 1))
     h = grid.heights[window]
-    noise = _smooth_noise(h.shape, np.random.default_rng(seed), 1.5)
+    rng = np.random.default_rng(seed)
+    noise = _smooth_noise(h.shape, rng, 1.5)
+    big = _smooth_noise(h.shape, rng, ISLAND_BOULDER_SIGMA)
+    # Round tops and narrow gaps: the low parts of the noise go down less.
+    boulders = np.where(big > 0.0, big, big * 0.3) * ISLAND_BOULDER_M
     above = islands[window] & (h > LAND_MIN_HEIGHT + 0.3)
     fade = np.clip((h - LAND_MIN_HEIGHT - 0.3) / 2.0, 0.0, 1.0)
-    h[above] = (h + noise * amplitude * fade)[above]
+    h[above] = (h + (noise * amplitude + boulders) * fade)[above]
     grid.heights[window] = h
     return int(above.sum())
 

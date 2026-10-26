@@ -32,6 +32,10 @@ from geodata.projection import Projection, map_to_game  # noqa: E402
 ROAD_POINT_STEP_M = 4.0
 WOOD_TAGS = {("natural", "wood"), ("landuse", "forest"), ("natural", "scrub")}
 SEA_ROCK_TAGS = {"rock", "reef", "bare_rock"}
+# Bare rock on the land that does not rise in the sea (report 0005, D-0005-03):
+# scree areas, and cliff lines with CLIFF_ROCK_M on each side.
+LAND_ROCK_TAGS = {"scree"}
+CLIFF_ROCK_M = 6.0
 # tide.py writes these files before build.py runs. build.py keeps them.
 TIDE_FILES = ("tide.json", "tide_report.md")
 BUILT_LANDUSE = {"residential", "commercial", "retail", "industrial", "construction", "military", "religious"}
@@ -97,6 +101,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     box = coast.box_polygon(config.bbox, projection)
     land = coast.land_polygon(coast.coastline_lines(data.ways, projection), box, problems)
     beaches, beach_records, buildings, landuse, woods, water, rocks, parks = [], [], [], [], [], [], [], []
+    land_rocks = []
     for a in data.areas:
         shape = to_map_geometry(a.geometry, projection).intersection(box)
         if shape.is_empty:
@@ -114,13 +119,32 @@ def build(raw: Path, out: Path, geo: Path) -> int:
             water.append(shape)
         if a.tags.get("natural") in SEA_ROCK_TAGS:
             rocks.append(shape)
+        if a.tags.get("natural") in LAND_ROCK_TAGS:
+            land_rocks.append(shape)
         if a.tags.get("leisure") == "park":
             parks.extend(polygons_of(shape))
     for n in data.nodes:
         if n.tags.get("natural") in SEA_ROCK_TAGS:
             x, y = projection.to_map(np.array([n.lon]), np.array([n.lat]))
             rocks.append(shapely.Point(float(x[0]), float(y[0])).buffer(terrain.SEA_ROCK_NODE_RADIUS_M))
+    cliffs = 0
+    for w in data.ways:
+        if w.tags.get("natural") == "cliff" and not w.closed:
+            line = to_map_geometry(shapely.LineString(w.coords), projection).intersection(box)
+            if not line.is_empty:
+                land_rocks.append(line.buffer(CLIFF_ROCK_M))
+                cliffs += 1
+    rock_coasts = []
+    for spec in data.rock_coasts:
+        x, y = projection.to_map(np.array([float(spec["lon"])]), np.array([float(spec["lat"])]))
+        shape = coast.rock_coast_area(land, (float(x[0]), float(y[0])), float(spec["radius_m"]), float(spec["sea_m"]))
+        if shape.is_empty:
+            problems.append(f"the rock coast {spec.get('name', '')} finds no land within {spec['radius_m']} m")
+            continue
+        land_rocks.append(shape)
+        rock_coasts.append({"name": spec.get("name", ""), "area_m2": round(shape.area)})
     log(f"land {land.area / 1e6:.2f} km2, {len(beaches)} beaches, {len(buildings)} buildings")
+    log(f"{cliffs} cliffs, {len(land_rocks) - cliffs - len(rock_coasts)} scree areas, {len(rock_coasts)} rock coasts")
 
     ridge_way = find_ridge(config, data, problems)
     roads = roads_module.make_roads([w for w in data.ways if w is not ridge_way], projection, config.road_widths)
@@ -242,7 +266,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
                                       area["height_step_m"], out / "height" / "overview.png")
     for png in (out / "height").glob("*.png"):
         write_keep_import(png)
-    rock_mask = terrain.rasterize(grid, [p for r in rocks + [rock_band] + islands if r is not None
+    rock_mask = terrain.rasterize(grid, [p for r in rocks + land_rocks + [rock_band] + islands if r is not None
                                          for p in polygons_of(r)])
     surface = write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods, landuse, roads, area,
                             out / "surface.png", rock_mask, out / "rock.png")
@@ -272,6 +296,9 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     }
     if ridge is not None:
         world["hon_ba_ridge"] = ridge
+    # The small islands, for the trees on their tops (report 0005, D-0005-05).
+    world["islands"] = [dict(area_m2=round(p.area), **blocks_module.polygon_to_game(p.simplify(1.0))) for p in islands]
+    world["rock_coasts"] = rock_coasts
     write_json(out / "world.json", world)
     write_json(out / "coastline.json", {"lines": [map_to_game(l.coords) for l in coast.coastline_lines(data.ways, projection)]}, None)
     write_json(out / "land.json", {"polygons": [blocks_module.polygon_to_game(p.simplify(1.0)) for p in polygons_of(land)]}, None)
@@ -459,6 +486,12 @@ def write_report(path, world, data, roads, block_list, buildings, found, home, p
               f"- The sea floor slopes from {floor['coast_m']:+.1f} m at the coastline to {floor['depth_m']:+.1f} m "
               f"over {floor['slope_m']:.0f} m, then stays at {floor['depth_m']:+.1f} m.",
               f"- Rocks in the sea: {rock_cells} grid cells at {floor['rock_m']:+.1f} m."]
+    for rock_coast in world.get("rock_coasts", []):
+        lines.append(f"- The rocky coast {rock_coast['name']} (overrides.json): {rock_coast['area_m2']} m² of bare rock, "
+                     "on the land and in the sea in front of it.")
+    if world.get("islands"):
+        lines.append(f"- {len(world['islands'])} small islands with large boulders (up to "
+                     f"{terrain.ISLAND_BOULDER_M:.1f} m) and trees on their tops.")
     ridge = world.get("hon_ba_ridge")
     if ridge:
         lines.append(f"- The ridge {ridge['name']} ({ridge['osm']}): {ridge['length_m']:.0f} m long, "

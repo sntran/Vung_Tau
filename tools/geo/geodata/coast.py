@@ -46,6 +46,17 @@ def _side(line: LineString, point: Point) -> float:
     return (b.x - a.x) * (point.y - a.y) - (b.y - a.y) * (point.x - a.x)
 
 
+def rock_coast_area(land: BaseGeometry, center: tuple[float, float], radius: float, sea: float) -> BaseGeometry:
+    """A rocky coast (report 0005, D-0005-03): the land within radius of the
+    map point center, and the sea up to sea meters from that land. The sea
+    floor near a rocky cape is rock too, so it is not sand at low tide."""
+    circle = Point(center).buffer(radius)
+    near = land.intersection(circle)
+    if near.is_empty:
+        return near
+    return near.buffer(sea).intersection(Point(center).buffer(radius + sea))
+
+
 def land_polygon(lines: list[LineString], box: Polygon, problems: list[str]) -> BaseGeometry:
     """Returns the land inside the box."""
     if not lines:

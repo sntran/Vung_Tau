@@ -1,5 +1,5 @@
 {
-	"note": "Corrections to the OSM data (plan 0005, R7). tools/geo/build.py applies them after it reads the OSM data. Each correction must have a reason. Actions: add_node (tags, lon, lat), add_way (tags and coords as [lon, lat]; closed: true for an area), set_tags (way and tags; a null value removes the tag), remove_way (way). The action roadworks (R11a) adds no shape: it puts roadworks on a part of a road. A later plan removes it when the work ends.",
+	"note": "Corrections to the OSM data (plan 0005, R7). tools/geo/build.py applies them after it reads the OSM data. Each correction must have a reason. Actions: add_node (tags, lon, lat), add_way (tags and coords as [lon, lat]; closed: true for an area), set_tags (way and tags; a null value removes the tag), remove_way (way). The action rock_coast (name, lon, lat, radius_m, sea_m) marks the coast within radius_m of the point as bare rock, on the land and sea_m meters into the sea (report 0005, D-0005-03). The action roadworks (R11a) adds no shape: it puts roadworks on a part of a road. A later plan removes it when the work ends.",
 	"corrections": [
 		{
 			"action": "add_node",
@@ -85,6 +85,15 @@
 				"end": "17:00"
 			},
 			"reason": "R11a: the first 220 m of the Hải Đăng road from the bottom are being widened, and the work is planned to end in 2027 (Zing: https://lifestyle.zingnews.vn/mo-rong-duong-len-ngon-hai-dang-song-ao-164-nam-tuoi-o-vung-tau-post1668055.html). The contractor name is fictional. The width added to the road (widen_m) and the lunch break are builder values: check."
+		},
+		{
+			"action": "rock_coast",
+			"name": "Mũi Nghinh Phong",
+			"lon": 107.083721,
+			"lat": 10.3204661,
+			"radius_m": 150,
+			"sea_m": 30,
+			"reason": "Mũi Nghinh Phong is a rocky cape (report 0005, D-0005-03). The point is the OSM node natural=cape (node 2435353682). OSM has bare rock, scree, and cliffs on its sides, but not at the tip, and the sea floor in front of the tip showed as sand at low tide."
 		}
 	]
 }

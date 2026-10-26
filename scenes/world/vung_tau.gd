@@ -27,6 +27,17 @@ const RIDGE_ABOVE := 0.3
 const MAX_TASKS := 2
 const MAX_APPLY_PER_FRAME := 1
 const TREE_SPACING := 9.0
+## Trees grow on wood and on the hills above FOREST_HEIGHT (R12, D-0005-01),
+## not lower than FOREST_LOWEST.
+const FOREST_HEIGHT := 12.0
+const FOREST_LOWEST := 2.0
+## The part of the tree places that get a tree: on wood, and on the other hill ground.
+const WOOD_DENSITY := 0.8
+const HILL_DENSITY := 0.75
+## On the small islands (Hòn Bà), trees grow on the top, higher than
+## ISLAND_TREE_HEIGHT, also between the boulders (D-0005-05).
+const ISLAND_TREE_HEIGHT := 7.0
+const ISLAND_TREE_SLOPE := 1.2
 const NIGHT_AMBIENT := Color("#2B3754")
 const TWILIGHT_AMBIENT := Color("#C8A48E")
 const DAY_AMBIENT := Color("#BCD0E2")
@@ -61,6 +72,11 @@ var _tree_material: ShaderMaterial
 ## The band of rocks around the Hòn Bà path (R8h): polygons in game X, Z.
 var band_polygons: Array[PackedVector2Array] = []
 var street_trees: StreetTrees
+## The far form of the hill trees (D-0005-01).
+var canopy: HillCanopy
+## The outlines of the small islands in game X, Z, and their bounds.
+var _islands: Array[PackedVector2Array] = []
+var _island_bounds: Array[Rect2] = []
 var sea_objects: SeaObjects
 var roadworks: Roadworks
 ## The season values of the game day (R12a), from Season.of_day().
@@ -92,11 +108,27 @@ func setup(folder := GeoData.ROOT) -> bool:
 		for p: Array in polygon.get("outline", []):
 			points.append(Vector2(p[0], p[1]))
 		band_polygons.append(points)
+	for island: Dictionary in data.world.get("islands", []):
+		var outline := PackedVector2Array()
+		for p: Array in island.get("outline", []):
+			outline.append(Vector2(p[0], p[1]))
+		if outline.size() < 3:
+			continue
+		var bounds := Rect2(outline[0], Vector2.ZERO)
+		for p: Vector2 in outline:
+			bounds = bounds.expand(p)
+		_islands.append(outline)
+		_island_bounds.append(bounds)
 	_make_environment()
 	_make_materials()
 	_make_sea()
 	_make_far_ground()
 	_make_markers()
+	canopy = HillCanopy.new()
+	canopy.name = "HillCanopy"
+	add_child(canopy)
+	canopy.setup(self)
+	set_canopy(true)
 	street_trees = StreetTrees.new()
 	street_trees.name = "StreetTrees"
 	add_child(street_trees)
@@ -199,6 +231,14 @@ func spawn() -> Dictionary:
 	return {"position": best, "yaw": yaw}
 
 
+## Shows or hides the far form of the hill trees: the clumps and the canopy
+## of the ground (D-0005-01). PT-33 compares the hills with and without it.
+func set_canopy(on: bool) -> void:
+	canopy.visible = on
+	_ground_material.set_shader_parameter("canopy_near", (HillCanopy.NEAR_HIDE - 80.0) if on else 1.0e9)
+	_ground_material.set_shader_parameter("canopy_far", (HillCanopy.NEAR_HIDE + 120.0) if on else 2.0e9)
+
+
 ## The detail of the chunk at a game point, for the tests.
 func detail_at(point: Vector3) -> int:
 	var state: Dictionary = _chunks.get(data.chunk_of(point.x, point.z), {})
@@ -272,6 +312,8 @@ func _apply_season(day: int) -> void:
 	season = Season.of_day(day)
 	_ground_material.set_shader_parameter("dryness", season.dryness)
 	TreeKit.apply_season("hill", _tree_material, season)
+	if canopy:
+		canopy.apply_season(season)
 	if street_trees:
 		street_trees.apply_season(season)
 
@@ -463,6 +505,32 @@ func _add_roads(node: Node3D, body: StaticBody3D, roads: Dictionary) -> void:
 
 # --- Trees -------------------------------------------------------------------
 
+## True when trees grow at the point (h is the ground height, slope is the
+## rise for each meter): in woods and on the hills, not in towns, on sand, or
+## on steep rock. The town area of the data covers most of the hill slopes
+## too, so on wood the town does not stop the trees, as in the ground shader
+## (D-0005-01). The near trees and the far canopy use this rule. Safe in a
+## worker thread.
+func is_forest(x: float, z: float, h: float, slope: float) -> bool:
+	if _surface_image == null or h < FOREST_LOWEST:
+		return false
+	if is_on_island(x, z):
+		return h > ISLAND_TREE_HEIGHT and slope < ISLAND_TREE_SLOPE
+	if slope > 0.6:
+		return false
+	var mask := _mask_at(Vector2(x, z))
+	return mask.r <= 0.3 and (mask.b > 0.4 or (mask.g <= 0.3 and h > FOREST_HEIGHT))
+
+
+## True when the point is on a small island (for example Hòn Bà).
+func is_on_island(x: float, z: float) -> bool:
+	var at := Vector2(x, z)
+	for i in _islands.size():
+		if _island_bounds[i].has_point(at) and Geometry2D.is_point_in_polygon(at, _islands[i]):
+			return true
+	return false
+
+
 ## Runs in a worker thread. Trees grow in woods and on the hills, not in towns,
 ## on sand, on steep rock, or on roads.
 func _tree_transforms(key: Vector2i, heights: PackedFloat32Array) -> Array[Transform3D]:
@@ -479,18 +547,12 @@ func _tree_transforms(key: Vector2i, heights: PackedFloat32Array) -> Array[Trans
 			var col := clampi(int(local.x / data.grid), 1, n - 2)
 			var row := clampi(int(local.y / data.grid), 1, n - 2)
 			var h := heights[row * n + col]
-			if h < 2.0:
-				continue
 			var slope := maxf(absf(heights[row * n + col + 1] - heights[row * n + col - 1]),
 					absf(heights[(row + 1) * n + col] - heights[(row - 1) * n + col])) / (2.0 * data.grid)
-			if slope > 0.6:
-				continue
 			var world := Vector2(key.x * data.chunk_size, key.y * data.chunk_size) + local
-			var mask := _mask_at(world)
-			var wood := mask.b > 0.4
-			if mask.r > 0.3 or mask.g > 0.3 or not (wood or h > 12.0):
+			if not is_forest(world.x, world.y, h, slope):
 				continue
-			if rng.randf() > (0.8 if wood else 0.45):
+			if rng.randf() > (WOOD_DENSITY if _mask_at(world).b > 0.4 else HILL_DENSITY):
 				continue
 			if not data.road_at(world.x, world.y).is_empty():
 				continue
@@ -588,6 +650,7 @@ func _make_materials() -> void:
 		_ground_material.set_shader_parameter("rock_mask", ImageTexture.create_from_image(rock_image))
 	_ground_material.set_shader_parameter("mask_origin", mask_origin)
 	_ground_material.set_shader_parameter("mask_size", size)
+	_ground_material.set_shader_parameter("forest_height", FOREST_HEIGHT)
 	_sea_material = ShaderMaterial.new()
 	_sea_material.shader = load("res://shaders/water.gdshader")
 	_sea_material.set_shader_parameter("surface_mask", mask_texture)

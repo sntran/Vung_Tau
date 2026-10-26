@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from shapely.geometry import LineString, Polygon
 
-from geodata import blocks, coast, homestay, landmarks, pngio, roads, terrain
+from geodata import blocks, coast, homestay, landmarks, osm, pngio, roads, terrain
 from geodata.config import Config, ROOT
 from geodata.projection import Projection
 
@@ -333,3 +333,41 @@ def test_outside_of_a_sharp_bend_is_flat():
     apex = grid.sample([50.0], [-50.0])[0]
     outside = grid.sample([52.5], [-50.0])[0]
     assert outside == pytest.approx(apex, abs=0.15)
+
+
+def test_rock_coast_covers_the_tip_and_the_sea_in_front():
+    """A rocky cape (report 0005, D-0005-03): the land near the point and the
+    sea in front of it are rock, and the land far from the point is not."""
+    box = Polygon([(-200, -200), (200, -200), (200, 200), (-200, 200)])
+    # A cape: land at the east of x = 0, with a point that goes west to x = -50.
+    cape = Polygon([(0, -200), (200, -200), (200, 200), (0, 200), (0, 20), (-50, 0), (0, -20)])
+    land = cape.intersection(box)
+    rock = coast.rock_coast_area(land, (-50.0, 0.0), 40.0, 15.0)
+    assert rock.contains(Polygon([(-45, -1), (-40, -1), (-40, 1), (-45, 1)])), "the tip is rock"
+    assert rock.contains(Polygon([(-60, -1), (-58, -1), (-58, 1), (-60, 1)])), "the sea in front of the tip is rock"
+    assert not rock.intersects(Polygon([(100, -5), (110, -5), (110, 5), (100, 5)])), "the land far away is not rock"
+    assert coast.rock_coast_area(land, (-150.0, 150.0), 20.0, 10.0).is_empty, "no land near the point"
+
+
+def test_rock_coast_correction():
+    data = osm.OsmData()
+    osm.apply_corrections(data, [{"action": "rock_coast", "name": "Mũi", "lon": 107.08, "lat": 10.32,
+                                  "radius_m": 150, "sea_m": 30, "reason": "a rocky cape"},
+                                 {"action": "rock_coast", "lon": 107.0, "lat": 10.0, "radius_m": 1, "sea_m": 1}])
+    assert len(data.rock_coasts) == 1 and data.rock_coasts[0]["radius_m"] == 150
+    assert len(data.problems) == 1, "a correction without a reason is not used"
+
+
+def test_island_boulders_are_large():
+    """The small islands have large boulders, not only small bumps (report 0005, D-0005-05)."""
+    n = 121
+    heights = np.full((n, n), 8.0, dtype=np.float32)
+    grid = terrain.Grid(0.0, 0.0, 2.0, heights.copy())
+    island = np.zeros((n, n), dtype=bool)
+    island[10:111, 10:111] = True
+    cells = terrain.roughen_islands(grid, island)
+    assert cells > 0
+    inside = grid.heights[10:111, 10:111] - 8.0
+    assert inside.max() > terrain.ISLAND_BOULDER_M * 0.8, "boulders rise more than a meter"
+    assert inside.min() > -terrain.ISLAND_BOULDER_M, "the gaps are not deep holes"
+    assert np.all(grid.heights[0:5, :] == 8.0), "the ground outside the island does not change"

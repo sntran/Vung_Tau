@@ -1,6 +1,6 @@
 # Geodata report
 
-Made by `tools/geo/build.py` on 2026-10-25.
+Made by `tools/geo/build.py` on 2026-10-26.
 
 ## Extents
 
@@ -56,7 +56,7 @@ Total road length: 692.3 km. Roads with a width tag: 7 of 4123. Hẻm: 2365.
 | Hải đăng Vũng Tàu | yes | way/229301316 | 402.21, 1056.5 | 173.11 | 1 candidates, 21.8 m from the hint |
 | Bạch Dinh | yes | way/220753354 | -596.69, -776.93 | 28.11 | 1 candidates, 259.6 m from the hint |
 | Tượng Đức Mẹ Bãi Dâu | yes | way/790529433 | -1290.64, -3064.05 | 57.0 | 2 candidates, 7.3 m from the hint |
-| Miếu Hòn Bà | yes | way/221906193 | 1677.76, 2174.06 | 10.05 | 8 candidates, 8.4 m from the hint |
+| Miếu Hòn Bà | yes | way/221906193 | 1677.76, 2174.06 | 11.34 | 8 candidates, 8.4 m from the hint |
 | Chùa Tam Bảo | yes | way/792193852 | -749.18, -1275.61 | 104.03 | 1 candidates, 5.1 m from the hint |
 | Vi Ba | yes | way/35923559 | -722.46, -1106.78 | 75.47 | 5 candidates, 299.0 m from the hint |
 | Hải Đăng | yes | way/35923584 | 332.79, 1014.55 | 169.1 | 3 candidates, 125.2 m from the hint |
@@ -76,6 +76,8 @@ The first curve of the lighthouse road turns -172° between 116 m and 138 m from
 
 - The sea floor slopes from +1.2 m at the coastline to -4.0 m over 80 m, then stays at -4.0 m.
 - Rocks in the sea: 58 grid cells at +0.5 m.
+- The rocky coast Mũi Nghinh Phong (overrides.json): 31059 m² of bare rock, on the land and in the sea in front of it.
+- 5 small islands with large boulders (up to 1.8 m) and trees on their tops.
 - The ridge Đường ra Hòn Bà (way/221906223): 206 m long, 4 m wide, top at -1.70 m.
 - The band of rocks Bãi đá ra Hòn Bà: about 34 m wide, 1495 grid cells in the sea, from -2.96 m (tide pools) to +1.07 m (outcrops).
 - The sand flat in front of the path: 110 m around the beach end, at -1.85 m (1538 grid cells).
@@ -160,6 +162,7 @@ The first curve of the lighthouse road turns -172° between 116 m and 138 m from
 - add node -1 ({'natural': 'peak', 'name': 'Núi Nhỏ', 'alt_name': 'Núi Tao Phùng'}): OSM has no object for Núi Nhỏ. The position is the highest point of the Copernicus DEM on the hill (177.9 m), next to the lighthouse.
 - add way -2 ({'name': 'Bãi đá ra Hòn Bà', 'natural': 'shoal', 'surface': 'rock', 'tidal': 'yes'}): R8h: OSM has only the line of the path (way 221906223, a track), with no outline of the rocks. This band is 30 m wide: the path line with 15 m on each side, and 12 m more at each end, so that it touches the beach below Mũi Nghinh Phong and the islet. The heights of the rocks are in hon_ba.json.
 - roadworks on Hải Đăng (220 m from the bottom): R11a: the first 220 m of the Hải Đăng road from the bottom are being widened, and the work is planned to end in 2027 (Zing: https://lifestyle.zingnews.vn/mo-rong-duong-len-ngon-hai-dang-song-ao-164-nam-tuoi-o-vung-tau-post1668055.html). The contractor name is fictional. The width added to the road (widen_m) and the lunch break are builder values: check.
+- rock coast Mũi Nghinh Phong (150 m around 107.083721, 10.3204661): Mũi Nghinh Phong is a rocky cape (report 0005, D-0005-03). The point is the OSM node natural=cape (node 2435353682). OSM has bare rock, scree, and cliffs on its sides, but not at the tip, and the sea floor in front of the tip showed as sand at low tide.
 
 ## Problems with the data
 
