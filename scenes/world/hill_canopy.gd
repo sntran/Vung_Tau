@@ -4,7 +4,7 @@ extends Node3D
 ## have the hill trees only within about 300 m, so the hills were bare grass
 ## in the views. Here each cell of the overview grid (16 m) with wood or hill
 ## ground (VungTau.is_forest(), the same rule as the near trees) gets one or
-## two round crown clumps. The clumps of each tile of TILE meters are one
+## two round crown clumps (9 m to 14 m wide). The clumps of each tile of TILE meters are one
 ## MultiMesh. Near the player, the near chunks have the real trees, so the
 ## shader hides the clumps nearer than NEAR_HIDE meters.
 
@@ -52,7 +52,7 @@ func setup(world: VungTau) -> void:
 				var key := Vector2i(floori(p.x / TILE), floori(p.y / TILE))
 				if not tiles.has(key):
 					tiles[key] = []
-				var size := rng.randf_range(0.8, 1.3)
+				var size := rng.randf_range(1.0, 1.5)
 				var basis := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(size, size * rng.randf_range(0.8, 1.1), size))
 				# The clumps stand a little into the ground: the overview grid is
 				# smoother than the near ground.

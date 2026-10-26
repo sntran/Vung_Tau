@@ -12,7 +12,7 @@ extends RefCounted
 # Núi Nhỏ checks that the slopes of Núi Lớn show the color of tree crowns,
 # not the color of grass (D-0005-01).
 # The fourth run takes the same views at 21:00, for the night light (R14).
-# The fifth run is on 3 June 2027, in the rainy season (R12a): the hills are
+# The fifth run is on 3 June 2019, in the rainy season (R12a): the hills are
 # green, and the flame trees show red flowers. The other runs are on day 1, in
 # the dry season: the hills are partly dry. Each run also looks up the Hải Đăng
 # road, where the flame trees stand.
@@ -21,7 +21,7 @@ extends RefCounted
 # phase: --world=vung_tau --start-time=12:00
 # phase: --world=vung_tau --start-time=18:00
 # phase: --world=vung_tau --start-time=21:00
-# phase: --world=vung_tau --start-time=12:00 --start-date=2027-06-03
+# phase: --world=vung_tau --start-time=12:00 --start-date=2019-06-03
 
 ## The view of Bãi Trước from the bay: the distance out from the line between the two hills, and the height.
 const BAY_OUT_M := 2500.0
@@ -33,8 +33,9 @@ const CANOPY_LOWEST_M := 40.0
 const CANOPY_RADIUS_M := 1100.0
 ## The part of the sampled points that must show a tree crown color.
 const CANOPY_SHARE := 0.6
-## A crown is darker than the grass by this value, or greener by this value (G minus R).
-const CROWN_DARKER := 0.06
+## A crown is darker than the grass by this part of its value (the haze at
+## 3 km makes all differences smaller), or greener by this value (G minus R).
+const CROWN_DARKER := 0.07
 const CROWN_GREENER := 0.04
 
 
@@ -153,7 +154,7 @@ static func pixel_colors(d: PlaytestDriver, points: Array[Vector2]) -> Array[Col
 
 ## A tree crown color: darker than the grass at the same point, or greener.
 static func is_crown_color(tree: Color, grass: Color) -> bool:
-	return grass.v - tree.v > CROWN_DARKER or (tree.g - tree.r) - (grass.g - grass.r) > CROWN_GREENER
+	return grass.v - tree.v > CROWN_DARKER * grass.v or (tree.g - tree.r) - (grass.g - grass.r) > CROWN_GREENER
 
 
 ## True when no ground is between the eye and the point (the overview grid).
@@ -205,11 +206,11 @@ static func views(w: VungTau) -> Array[Dictionary]:
 		var point := Vector3(cape.position[0], 0.0, cape.position[1])
 		point.y = maxf(w.ground_height(point.x, point.z), 0.0) + 6.0
 		result.append({"name": "nghinh_phong_south", "eye": point, "target": point + Vector3(0, -10.0, 400.0)})
-	if w.roadworks != null:
-		var works_line: Array = w.roadworks.record.points
-		var bottom := Vector3(works_line[0][0], works_line[0][1] + Player.EYE_HEIGHT, works_line[0][2])
-		var up: Array = works_line[mini(10, works_line.size() - 1)]
-		result.append({"name": "hai_dang_road", "eye": bottom, "target": Vector3(up[0], up[1] + 2.0, up[2])})
+	var hai_dang := _road_points(w, "Hải Đăng")
+	if hai_dang.size() > 10:
+		# From the bottom of the Hải Đăng road, up the road.
+		var bottom := hai_dang[0] + Vector3(0, Player.EYE_HEIGHT, 0)
+		result.append({"name": "hai_dang_road", "eye": bottom, "target": hai_dang[10] + Vector3(0, 2.0, 0)})
 	if d_ok(back):
 		var beach := Vector3(back.position[0], 0.0, back.position[1])
 		var road := _nearest_road_point(w, beach)
@@ -220,6 +221,20 @@ static func views(w: VungTau) -> Array[Dictionary]:
 
 static func d_ok(record: Dictionary) -> bool:
 	return not record.is_empty()
+
+
+## The points of the longest road with the name, from its lowest end.
+static func _road_points(w: VungTau, road_name: String) -> Array[Vector3]:
+	var best: Array = []
+	for road: Dictionary in w.data.roads:
+		if road.name == road_name and road.points.size() > best.size():
+			best = road.points
+	var result: Array[Vector3] = []
+	for p: Array in best:
+		result.append(Vector3(p[0], p[1], p[2]))
+	if result.size() > 1 and result[0].y > result[result.size() - 1].y:
+		result.reverse()
+	return result
 
 
 ## The eye point 12 m above the ground at the top of a hill.

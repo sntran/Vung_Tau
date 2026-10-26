@@ -54,6 +54,8 @@ class OsmData:
     roadworks: list[dict] = field(default_factory=list)
     # The rocky coasts of overrides.json (report 0005, D-0005-03): lon, lat, radius_m, sea_m.
     rock_coasts: list[dict] = field(default_factory=list)
+    # The flat rocks along a coast of overrides.json (plan 0005, Q6): from, to, width_m, height_m, rough_m.
+    rock_shelves: list[dict] = field(default_factory=list)
 
 
 class _Handler(osmium.SimpleHandler):
@@ -138,6 +140,9 @@ def apply_corrections(data: OsmData, corrections: list[dict]) -> None:
             data.rock_coasts.append(c)
             data.corrections.append(f"rock coast {c.get('name', '')} ({c['radius_m']} m around {c['lon']}, {c['lat']}): "
                                     f"{reason}")
+        elif action == "rock_shelf":
+            data.rock_shelves.append(c)
+            data.corrections.append(f"rock shelf {c.get('name', '')} ({c['width_m']} m wide at {c['height_m']:+} m): {reason}")
         elif action in ("set_tags", "remove_way"):
             way = by_id.get(int(c["way"]))
             if way is None:

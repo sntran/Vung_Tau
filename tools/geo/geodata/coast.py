@@ -57,6 +57,22 @@ def rock_coast_area(land: BaseGeometry, center: tuple[float, float], radius: flo
     return near.buffer(sea).intersection(Point(center).buffer(radius + sea))
 
 
+def coast_band(land: BaseGeometry, start: tuple[float, float], end: tuple[float, float], width: float) -> BaseGeometry:
+    """The sea along the coast between the map points start and end, up to
+    width meters from the coast (plan 0005, Q6: the flat rocks along the sea
+    wall). The coast is the shorter way along the land boundary between the
+    nearest points to start and end."""
+    rings = [ring for p in getattr(land, "geoms", [land]) for ring in [p.exterior, *p.interiors]]
+    ring = min(rings, key=lambda r: r.distance(Point(start)) + r.distance(Point(end)))
+    line = LineString(ring.coords)
+    a, b = sorted((line.project(Point(start)), line.project(Point(end))))
+    if b - a <= line.length / 2.0:
+        part = ops.substring(line, a, b)
+    else:
+        part = ops.linemerge(MultiLineString([ops.substring(line, b, line.length), ops.substring(line, 0.0, a)]))
+    return part.buffer(width).difference(land)
+
+
 def land_polygon(lines: list[LineString], box: Polygon, problems: list[str]) -> BaseGeometry:
     """Returns the land inside the box."""
     if not lines:

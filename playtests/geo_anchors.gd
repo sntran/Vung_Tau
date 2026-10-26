@@ -6,19 +6,23 @@ extends RefCounted
 # roundabout, and the junction of five roads). The camera looks at each marker
 # from 70 m away, from a direction where no hill is in the way. Each run takes
 # a part of the places, so that each run is shorter than 180 s under lavapipe.
-# Runs 4 and 5 (plan 0005, R11a, R13a): the roadworks on the Hải Đăng road at
-# 09:00 (workers, the machine sound and its caption) and at 12:00 (the lunch
-# break: no workers and no sound), and the objects on the sea.
+# Run 4 (plan 0005, R11a, R13a, Q6, Q13): the game is in 2019, before the
+# widening of the Hải Đăng road, so the road has no roadworks. The objects on
+# the sea: the ships, the fishing boats (100 m or more from the sand in front
+# of the swimmers of the main beach), the thúng, the rows of fishing stakes,
+# the pier, and the groynes. At 09:00 on day 1 the tide is low, so the flat
+# rocks along the sea wall south of the main beach are dry.
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=10:00
 # phase: --world=vung_tau --start-time=10:00
 # phase: --world=vung_tau --start-time=10:00
 # phase: --world=vung_tau --start-time=09:00
-# phase: --world=vung_tau --start-time=12:00
 
 const RUNS := 3
 const DISTANCE := 70.0
 const EYE_ABOVE := 25.0
+## The boats in front of the main beach are this far from its sand, or more (Q6).
+const BOATS_FROM_SAND := 100.0
 
 
 func run(d: PlaytestDriver) -> void:
@@ -27,9 +31,10 @@ func run(d: PlaytestDriver) -> void:
 		return
 	await d.wait_ground()
 	if d.phase > RUNS:
-		await _roadworks(d, w, d.phase == RUNS + 1)
-		if d.phase == RUNS + 1:
-			await _sea_objects(d, w)
+		d.expect(w.roadworks == null and w.get_node_or_null("Roadworks") == null,
+				"the Hải Đăng road has no roadworks in 2019 (Q13)")
+		await _sea_objects(d, w)
+		await _flat_rocks(d, w)
 		return
 	var records: Array = w.data.landmarks.duplicate()
 	records.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return str(a.id) < str(b.id))
@@ -58,51 +63,27 @@ func run(d: PlaytestDriver) -> void:
 	d.fly_end()
 
 
-## The roadworks: at 09:00 the workers work and the machine plays, and the
-## player who walks near sees the caption. At 12:00 it is the lunch break.
-func _roadworks(d: PlaytestDriver, w: VungTau, working: bool) -> void:
-	if not d.expect(w.roadworks != null, "the Hải Đăng road has roadworks"):
-		return
-	var works := w.roadworks
-	d.expect(works.workers.visible == working, "the workers are %s at %s" % ["there" if working else "not there", _clock()])
-	d.expect(works.machine.playing == working, "the machine sound %s at %s" % ["plays" if working else "is off", _clock()])
-	var sign: Label3D = works.get_node("SiteSign")
-	d.expect(sign.text.contains(str(works.record.contractor)) and sign.text.contains("2027"),
-			"the site sign has the contractor and the planned end: %s" % sign.text.replace("\n", " / "))
-	if works.record.has("corner"):
-		var corner: Array = works.record.corner.point
-		d.expect(Vector2(corner[0], corner[1]).distance_to(Vector2(works.excavator_position.x, works.excavator_position.z)) < 15.0,
-				"the excavator is at the corner of the homestay hẻm")
-	var eye := works.excavator_position + Vector3(14.0, 7.0, 10.0)
-	w.prepare_at(eye)
-	await d.fly_to(eye, works.excavator_position + Vector3(0, 1.0, 0))
-	await d.wait_ground(60.0)
-	await d.wait_frames(5)
-	await d.screenshot("roadworks_%s" % ("work" if working else "lunch"))
-	await d.fly_to(works.sign_position + works.sign_facing * 7.0 + Vector3(0, 1.0, 0), works.sign_position + Vector3(0, 2.0, 0))
-	await d.wait_frames(5)
-	await d.screenshot("roadworks_sign")
-	d.fly_end()
-	if working:
-		# The player stands on the road, 15 m from the machine.
-		var road: Array = works.record.points[0]
-		var bottom := Vector3(road[0], road[1], road[2])
-		var near := works.excavator_position.lerp(bottom, 15.0 / works.excavator_position.distance_to(bottom))
-		await d.start_at(near, 0.0)
-		var caption := str(Content.sound("machine").caption)
-		var heard := await d.wait_until(func() -> bool:
-			var shown := d.subtitle()
-			return shown.get("caption", false) and Array(shown.lines).has(caption), 12.0, "the caption of the machine")
-		d.expect(heard, "the caption of the machine shows near the roadworks")
-
-
-## The objects on the sea: the ships at anchor, the fishing boats, the pier, and the groynes.
+## The objects on the sea: the ships at anchor, the fishing boats, the thúng,
+## the fishing stakes, the pier, and the groynes.
 func _sea_objects(d: PlaytestDriver, w: VungTau) -> void:
 	var sea := w.sea_objects
 	d.expect(sea.ships.size() >= 10 and sea.ships.size() <= 30, "10 to 30 cargo ships: %d" % sea.ships.size())
-	d.expect(sea.boats.size() > 0, "fishing boats in the bay of Bãi Trước: %d" % sea.boats.size())
-	d.expect(sea.pier_parts > 0, "the ferry pier: %d parts" % sea.pier_parts)
+	d.expect(sea.boats.size() >= 30, "fishing boats all over the bay of Bãi Trước: %d" % sea.boats.size())
+	d.expect(sea.baskets.size() >= 6, "thúng near the sand and beside the boats: %d" % sea.baskets.size())
+	d.expect(sea.baskets.any(func(b: Dictionary) -> bool: return int(b.tied_to) >= 0), "some thúng are beside the boats")
+	d.expect(sea.stake_count > 50, "rows of fishing stakes off Hạ Long: %d stakes" % sea.stake_count)
+	d.expect(sea.pier_parts > 0, "the pier Cảng Cầu Đá: %d parts" % sea.pier_parts)
 	d.expect(sea.groyne_count > 0, "the groynes: %d" % sea.groyne_count)
+	var sand := _main_beach(w)
+	var near := 0
+	for boat: Dictionary in sea.boats:
+		if str(boat.area).begins_with("Near the sand"):
+			continue
+		var at := Vector2(boat.position[0], boat.position[1])
+		for polygon: PackedVector2Array in sand:
+			if _distance_to_polygon(at, polygon) < BOATS_FROM_SAND - 1.0:
+				near += 1
+	d.expect(near == 0, "no boat of the bay is nearer than %d m to the sand of the main beach: %d" % [BOATS_FROM_SAND, near])
 	var boat: Array = sea.boats[0].position
 	var target := Vector3(boat[0], 1.0, boat[1])
 	var front := w.data.landmark("bai_truoc")
@@ -114,6 +95,50 @@ func _sea_objects(d: PlaytestDriver, w: VungTau) -> void:
 	await d.wait_frames(5)
 	await d.screenshot("boats_and_ships")
 	d.fly_end()
+
+
+## The flat rocks along the sea wall south of the main beach are dry at low tide (Q6).
+func _flat_rocks(d: PlaytestDriver, w: VungTau) -> void:
+	var shelves: Array = w.data.world.get("rock_shelves", [])
+	if not d.expect(not shelves.is_empty(), "the data has the flat rocks along the sea wall"):
+		return
+	var point: Array = shelves[0].point
+	var rocks := Vector3(point[0], 0.0, point[1])
+	w.prepare_at(rocks)
+	rocks.y = w.ground_height(rocks.x, rocks.z)
+	d.expect(rocks.y > w.sea_level, "at %s the flat rocks (%+.2f m) are above the sea (%+.2f m)" % [
+			_clock(), rocks.y, w.sea_level])
+	var eye := rocks + Vector3(-45.0, 12.0, 25.0)
+	await d.fly_to(eye, rocks)
+	await d.wait_ground(60.0)
+	await d.wait_frames(5)
+	await d.screenshot("flat_rocks_low_tide")
+	d.fly_end()
+
+
+## The outlines of the main beach of Bãi Trước (data/geo/build/beaches.json).
+static func _main_beach(w: VungTau) -> Array[PackedVector2Array]:
+	var result: Array[PackedVector2Array] = []
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(w.data.root.path_join("beaches.json")))
+	for beach: Dictionary in (parsed as Dictionary).get("beaches", []):
+		if beach.name != "Bãi Trước":
+			continue
+		for polygon: Dictionary in beach.polygons:
+			var outline := PackedVector2Array()
+			for p: Array in polygon.outline:
+				outline.append(Vector2(p[0], p[1]))
+			result.append(outline)
+	return result
+
+
+static func _distance_to_polygon(at: Vector2, polygon: PackedVector2Array) -> float:
+	if Geometry2D.is_point_in_polygon(at, polygon):
+		return 0.0
+	var best := INF
+	for i in polygon.size():
+		var closest := Geometry2D.get_closest_point_to_segment(at, polygon[i], polygon[(i + 1) % polygon.size()])
+		best = minf(best, closest.distance_to(at))
+	return best
 
 
 static func _clock() -> String:

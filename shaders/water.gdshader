@@ -1,6 +1,9 @@
 // The sea of the Vũng Tàu world (plan 0005, D8): waves, the reflection of the
-// sky, and foam near the coast. The foam and the shallow color use the
-// distance to the coastline in the alpha channel of the surface mask.
+// sky, and foam near the coast. The shallow color uses the distance to the
+// coastline in the alpha channel of the surface mask. The foam is where the
+// water is thin: the depth texture gives the ground behind the water, so the
+// foam follows the water line at each tide (the coastline of the data is near
+// the high tide, and at high tide the water covers the low beach).
 shader_type spatial;
 render_mode cull_back, specular_schlick_ggx;
 
@@ -16,7 +19,9 @@ uniform sampler2D foam_noise : filter_linear_mipmap, repeat_enable;
 uniform vec3 deep_color : source_color = vec3(0.04, 0.22, 0.32);
 uniform vec3 shallow_color : source_color = vec3(0.16, 0.48, 0.5);
 uniform vec3 foam_color : source_color = vec3(0.92, 0.95, 0.95);
-uniform float foam_width = 7.0;
+// The foam is where the water is thinner than this, along the view (m).
+uniform float foam_depth = 1.2;
+uniform sampler2D depth_texture : hint_depth_texture, filter_nearest;
 
 varying vec3 world_position;
 
@@ -45,9 +50,19 @@ void fragment() {
 	float distance_to_coast = inside ? max(0.0, -signed_distance) : coast_range;
 	float shallow = 1.0 - smoothstep(0.0, coast_range * 0.6, distance_to_coast);
 	vec3 color = mix(deep_color, shallow_color, shallow);
+	// The thickness of the water along the view, from the depth of the ground behind it.
+	float raw_depth = texture(depth_texture, SCREEN_UV).r;
+#if CURRENT_RENDERER == RENDERER_COMPATIBILITY
+	vec3 ndc = vec3(SCREEN_UV, raw_depth) * 2.0 - 1.0;
+#else
+	vec3 ndc = vec3(SCREEN_UV * 2.0 - 1.0, raw_depth);
+#endif
+	vec4 behind = INV_PROJECTION_MATRIX * vec4(ndc, 1.0);
+	float thickness = max(0.0, -behind.z / behind.w + VERTEX.z);
 	float noise = texture(foam_noise, p * 0.08 + vec2(TIME * 0.02, 0.0)).r;
-	float wave = 0.5 + 0.5 * sin(distance_to_coast * 0.9 - TIME * 1.4);
-	float edge = 1.0 - smoothstep(0.0, foam_width, distance_to_coast + (noise - 0.5) * 4.0);
+	float wave = 0.5 + 0.5 * sin(thickness * 6.0 - TIME * 1.4);
+	float edge = 1.0 - smoothstep(0.0, foam_depth, thickness + (noise - 0.5) * 0.5);
+	color = mix(color, shallow_color * 1.15, 1.0 - smoothstep(0.0, 3.0, thickness));
 	float foam = edge * smoothstep(0.35, 0.75, noise * 0.7 + wave * 0.5);
 	color = mix(color, foam_color, foam * 0.85);
 	ALBEDO = color;

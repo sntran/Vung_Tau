@@ -170,6 +170,103 @@ def shape_coast(grid: Grid, land: np.ndarray, beach: np.ndarray) -> None:
     h[sea] = LAND_MIN_HEIGHT - (LAND_MIN_HEIGHT + SEA_FLOOR_DEPTH) * part
 
 
+# The sea floor from data (plan 0005, R8g, changed on 2026-10-26, Q14): the
+# floor slopes from the low-tide edge of the intertidal zone (or from the old
+# slope) to the GEBCO depth over SEA_BLEND_M.
+SEA_BLEND_M = 300.0
+# The intertidal heights are smoothed over this size (the 10 m pixels are noisy).
+INTERTIDAL_SMOOTH_M = 15.0
+# From the coastline (LAND_MIN_HEIGHT), the floor is not lower than a ramp of
+# this slope, so that there is no step at the coastline (the 10 m pixels of the
+# intertidal zone near the coast are lower than the land).
+COAST_RAMP = 0.1
+# An intertidal group of cells counts when it comes this near to the coast.
+INTERTIDAL_COAST_M = 40.0
+# The cells that keep their heights blend into the floor over this distance.
+KEEP_BLEND_M = 12.0
+
+
+def load_raster(grid: Grid, path, projection, resampling=Resampling.bilinear) -> np.ndarray:
+    """A raster resampled to the grid. NaN where it has no value."""
+    result = np.full(grid.shape, np.nan, dtype=np.float32)
+    with rasterio.open(path) as src:
+        source = src.read(1).astype(np.float32)
+        if src.nodata is not None and not np.isnan(src.nodata):
+            source[source == src.nodata] = np.nan
+        transform = Affine(grid.step, 0, projection.origin_e + grid.x0 - grid.step / 2,
+                           0, -grid.step, projection.origin_n - grid.z0 + grid.step / 2)
+        reproject(source=source, destination=result, src_transform=src.transform, src_crs=src.crs, src_nodata=np.nan,
+                  dst_transform=transform, dst_crs=f"EPSG:{projection.epsg}", resampling=resampling, dst_nodata=np.nan)
+    return result
+
+
+def smooth_valid(values: np.ndarray, sigma_cells: float) -> np.ndarray:
+    """A Gaussian smoothing of the values that are not NaN. NaN stays NaN."""
+    valid = np.isfinite(values)
+    filled = np.where(valid, values, 0.0).astype(np.float32)
+    total = ndimage.gaussian_filter(filled, sigma_cells)
+    weight = ndimage.gaussian_filter(valid.astype(np.float32), sigma_cells)
+    return np.where(valid, total / np.maximum(weight, 1e-6), np.nan).astype(np.float32)
+
+
+def _smoothstep(edge0: float, edge1: float, x: np.ndarray) -> np.ndarray:
+    t = np.clip((x - edge0) / (edge1 - edge0), 0.0, 1.0)
+    return t * t * (3.0 - 2.0 * t)
+
+
+def sea_floor_from_data(grid: Grid, land: np.ndarray, intertidal: np.ndarray | None, gebco: np.ndarray | None,
+                        keep: np.ndarray | None = None) -> dict:
+    """The sea floor from public data (R8g). The sea cells have the slope of
+    shape_coast() before this step.
+
+    - Where the intertidal zone has a height, the floor has that height.
+    - From the low-tide edge of the intertidal zone, the floor slopes smoothly
+      to the GEBCO depth over SEA_BLEND_M.
+    - Where no intertidal height is near, the old slope stays near the coast,
+      and the floor goes to the GEBCO depth farther out.
+    - Near the coastline, the floor is not lower than a ramp of COAST_RAMP.
+    - The cells of keep (the rock band of Hòn Bà) keep their heights, with a
+      blend over KEEP_BLEND_M around them.
+    Returns the numbers for the report."""
+    h = grid.heights
+    sea = ~land
+    old = h.copy()
+    # GEBCO counts where it is deeper than the old floor: its cells near the
+    # coast have the land in them, so there it is too shallow.
+    deep = old if gebco is None else np.where(np.isfinite(gebco), np.minimum(gebco, old), old).astype(np.float32)
+    to_land = ndimage.distance_transform_edt(sea).astype(np.float32) * grid.step
+    far = _smoothstep(SEA_FLOOR_SLOPE_M, SEA_FLOOR_SLOPE_M + SEA_BLEND_M, to_land)
+    floor = old * (1.0 - far) + deep * far
+    stats = {"intertidal_cells": 0, "gebco": gebco is not None}
+    if intertidal is not None:
+        values = smooth_valid(intertidal, INTERTIDAL_SMOOTH_M / grid.step / 2.0)
+        valid = np.isfinite(values) & sea
+        # Only the groups of cells that touch the coast: a boat at anchor looks
+        # dry in some images, and it must not make a shoal far out.
+        groups, count = ndimage.label(valid, structure=np.ones((3, 3), dtype=bool))
+        if count:
+            touching = np.unique(groups[valid & (to_land <= INTERTIDAL_COAST_M)])
+            valid &= np.isin(groups, touching[touching > 0])
+        if valid.any():
+            distance, (rows, cols) = ndimage.distance_transform_edt(~valid, return_indices=True)
+            distance = distance.astype(np.float32) * grid.step
+            edge = np.where(valid, values, values[rows, cols])
+            down = _smoothstep(0.0, SEA_BLEND_M, distance)
+            measured = edge * (1.0 - down) + np.minimum(floor, edge) * down
+            weight = 1.0 - _smoothstep(SEA_BLEND_M * 0.5, SEA_BLEND_M, distance)
+            floor = floor * (1.0 - weight) + measured * weight
+            stats["intertidal_cells"] = int(valid.sum())
+            stats["intertidal_min_m"] = round(float(values[valid].min()), 2)
+            stats["intertidal_max_m"] = round(float(values[valid].max()), 2)
+    floor = np.maximum(floor, LAND_MIN_HEIGHT - to_land * COAST_RAMP)
+    if keep is not None and keep.any():
+        near_keep = ndimage.distance_transform_edt(~keep).astype(np.float32) * grid.step
+        weight = 1.0 - _smoothstep(0.0, KEEP_BLEND_M, near_keep)
+        floor = floor * (1.0 - weight) + old * weight
+    h[sea] = np.minimum(floor[sea], LAND_MIN_HEIGHT)
+    return stats
+
+
 def raise_sea_rocks(grid: Grid, land: np.ndarray, rocks: np.ndarray) -> int:
     """Rocks in the sea rise to SEA_ROCK_HEIGHT (R8g). Returns the number of grid cells."""
     cells = rocks & ~land
@@ -260,6 +357,22 @@ def roughen_islands(grid: Grid, islands: np.ndarray, amplitude: float = ISLAND_R
     h[above] = (h + (noise * amplitude + boulders) * fade)[above]
     grid.heights[window] = h
     return int(above.sum())
+
+
+def make_rock_shelf(grid: Grid, land: np.ndarray, band: np.ndarray, height: float, rough: float, seed: int = 11) -> int:
+    """Flat rocks in the sea (plan 0005, Q6): the sea cells of band are at
+    height, with small bumps of +/- rough. Returns the number of cells."""
+    cells = band & ~land
+    rows, cols = np.nonzero(cells)
+    if rows.size == 0:
+        return 0
+    window = (slice(rows.min(), rows.max() + 1), slice(cols.min(), cols.max() + 1))
+    h = grid.heights[window]
+    noise = _smooth_noise(h.shape, np.random.default_rng(seed), 1.0)
+    inside = cells[window]
+    h[inside] = (height + noise * rough)[inside]
+    grid.heights[window] = h
+    return int(inside.sum())
 
 
 def make_sand_flat(grid: Grid, land: np.ndarray, center: tuple[float, float], radius: float, height: float) -> int:

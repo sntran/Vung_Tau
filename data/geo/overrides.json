@@ -1,5 +1,5 @@
 {
-	"note": "Corrections to the OSM data (plan 0005, R7). tools/geo/build.py applies them after it reads the OSM data. Each correction must have a reason. Actions: add_node (tags, lon, lat), add_way (tags and coords as [lon, lat]; closed: true for an area), set_tags (way and tags; a null value removes the tag), remove_way (way). The action rock_coast (name, lon, lat, radius_m, sea_m) marks the coast within radius_m of the point as bare rock, on the land and sea_m meters into the sea (report 0005, D-0005-03). The action roadworks (R11a) adds no shape: it puts roadworks on a part of a road. A later plan removes it when the work ends.",
+	"note": "Corrections to the OSM data (plan 0005, R7). tools/geo/build.py applies them after it reads the OSM data. Each correction must have a reason. Actions: add_node (tags, lon, lat), add_way (tags and coords as [lon, lat]; closed: true for an area), set_tags (way and tags; a null value removes the tag), remove_way (way). The action rock_coast (name, lon, lat, radius_m, sea_m) marks the coast within radius_m of the point as bare rock, on the land and sea_m meters into the sea (report 0005, D-0005-03). The action rock_shelf (name, from and to as [lon, lat], width_m, height_m, rough_m) makes flat rocks in the sea along the coast between the two points, up to width_m from the coast, at height_m (plan 0005, Q6). The action roadworks (R11a) adds no shape: it puts roadworks on a part of a road. The game is in 2019, before the widening of the Hải Đăng road, so the file has no roadworks now (plan 0005, Q13). The code stays.",
 	"corrections": [
 		{
 			"action": "add_node",
@@ -70,23 +70,6 @@
 			"reason": "R8h: OSM has only the line of the path (way 221906223, a track), with no outline of the rocks. This band is 30 m wide: the path line with 15 m on each side, and 12 m more at each end, so that it touches the beach below Mũi Nghinh Phong and the islet. The heights of the rocks are in hon_ba.json."
 		},
 		{
-			"action": "roadworks",
-			"road": "Hải Đăng",
-			"from": "bottom",
-			"length_m": 220,
-			"widen_m": 3.0,
-			"planned_end": "2027",
-			"contractor": "Công ty TNHH Xây dựng Gió Biển",
-			"sign": "CÔNG TRÌNH MỞ RỘNG ĐƯỜNG HẢI ĐĂNG",
-			"work_hours": {
-				"start": "07:00",
-				"lunch": "11:00",
-				"after_lunch": "13:00",
-				"end": "17:00"
-			},
-			"reason": "R11a: the first 220 m of the Hải Đăng road from the bottom are being widened, and the work is planned to end in 2027 (Zing: https://lifestyle.zingnews.vn/mo-rong-duong-len-ngon-hai-dang-song-ao-164-nam-tuoi-o-vung-tau-post1668055.html). The contractor name is fictional. The width added to the road (widen_m) and the lunch break are builder values: check."
-		},
-		{
 			"action": "rock_coast",
 			"name": "Mũi Nghinh Phong",
 			"lon": 107.083721,
@@ -94,6 +77,22 @@
 			"radius_m": 150,
 			"sea_m": 30,
 			"reason": "Mũi Nghinh Phong is a rocky cape (report 0005, D-0005-03). The point is the OSM node natural=cape (node 2435353682). OSM has bare rock, scree, and cliffs on its sides, but not at the tip, and the sea floor in front of the tip showed as sand at low tide."
+		},
+		{
+			"action": "rock_shelf",
+			"name": "Đá ven kè Bãi Trước",
+			"from": [
+				107.0737,
+				10.3423
+			],
+			"to": [
+				107.0708,
+				10.34
+			],
+			"width_m": 25,
+			"height_m": -1.0,
+			"rough_m": 0.15,
+			"reason": "Plan 0005, Q6: at low tide, flat dark rocks show along the sea wall south of the main beach of Bãi Trước, toward Núi Nhỏ, and people walk and fish on them. The ends, the width, and the height are builder values from the map: the rocks are dry when the tide is below -1.0 m, at most low tides of the game days. Check."
 		}
 	]
 }

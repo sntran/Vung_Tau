@@ -453,6 +453,23 @@
 			}
 		},
 		{
+			"id": "cho_phuong_1",
+			"name_vi": "Chợ Phường 1",
+			"other_names": [],
+			"search": [
+				{
+					"tags": {
+						"amenity": "marketplace"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3501,
+				"lon": 107.0755
+			},
+			"note": "An old market near Bãi Trước, at Trần Hưng Đạo and Lê Quý Đôn (plan 0005, Q9, Q12: number 12 on anchors.png, OSM way 259528309)."
+		},
+		{
 			"id": "vong_xoay_lon",
 			"name_vi": "Vòng xoay Đài tưởng niệm Liệt sĩ",
 			"other_names": [

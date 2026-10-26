@@ -14,6 +14,10 @@
 			"text": "EOT20 tide model: Hart-Davis, M. G., Piccioni, G., Dettmering, D., Schwatke, C., Passaro, M., Seitz, F. (2021). EOT20 - A global Empirical Ocean Tide model from multi-mission satellite altimetry. SEANOE. https://doi.org/10.17882/79489. CC BY 4.0. The game uses the tide constituents of EOT20 at Vũng Tàu, computed with pyTMD."
 		},
 		{
+			"title": "Sea floor",
+			"text": "Contains modified Copernicus Sentinel data 2017–2020. GEBCO Compilation Group (2025) GEBCO 2025 Grid (doi:10.5285/37c52e96-24ea-67ce-e063-7086abc05f29). The heights of the intertidal zone use the method of DEA Intertidal (Geoscience Australia)."
+		},
+		{
 			"title": "Ground textures",
 			"text": "Poly Haven (polyhaven.com), CC0."
 		},

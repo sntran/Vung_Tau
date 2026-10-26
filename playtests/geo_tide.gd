@@ -3,13 +3,13 @@ extends RefCounted
 # Phong. Walk the ridge to Hòn Bà with tap to walk. Then start 3 hours after the
 # end of the dry time. The ridge is under water, and the player cannot walk on
 # it. Take screenshots of the same view at low tide and high tide.
-# Day 17 of the game is 2026-12-24 (day 1 is 2026-12-08, data/calendar.json),
-# the 16th day of the lunar month. tools/geo/tide.py gives a dry time from
-# 05:35 to 09:15 on that day. The test reads the dry time from
+# Day 1 of the game is 2019-01-22 (data/calendar.json, plan 0005, Q8), the
+# 17th day of the lunar month. tools/geo/tide.py gives a dry time from 06:35
+# to 10:00 on that day. The test reads the dry time from
 # data/geo/build/tide.json, so a new tide build that moves it fails the test.
 # sizes: 1280x720
-# phase: --world=vung_tau --day=17 --start-time=06:30
-# phase: --world=vung_tau --day=17 --start-time=12:15
+# phase: --world=vung_tau --day=1 --start-time=06:45
+# phase: --world=vung_tau --day=1 --start-time=13:00
 
 const STEP := 12.0
 const HOURS_AFTER := 3.0
@@ -128,7 +128,7 @@ func _on_islet(d: PlaytestDriver) -> bool:
 	return Vector2(player.x, player.z).distance_to(islet) < 90.0 and w.ground_height(player.x, player.z) > 1.0
 
 
-## The time of the game as text: "2026-12-24 06:30".
+## The time of the game as text: "2019-01-22 06:45".
 static func _now_text() -> String:
 	var date := GameCalendar.date_of(GameState.day)
 	return "%04d-%02d-%02d %s" % [date.year, date.month, date.day, GameClock.format_time(GameState.minutes)]

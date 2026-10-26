@@ -18,6 +18,7 @@ from pathlib import Path
 
 import numpy as np
 import shapely
+import shapely.ops
 from shapely.geometry import Polygon
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -25,8 +26,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from geodata import blocks as blocks_module  # noqa: E402
 from geodata import anchors as anchors_module  # noqa: E402
 from geodata import coast, homestay, landmarks, mapdraw, osm, roads as roads_module, terrain  # noqa: E402
-from geodata import roadworks as roadworks_module, sea as sea_module, trees as trees_module  # noqa: E402
-from geodata.config import BUILD, GEO, RAW, Config, load_json, write_json  # noqa: E402
+from geodata import roadworks as roadworks_module, sea as sea_module, seafloor, trees as trees_module  # noqa: E402
+from geodata.config import BUILD, GEO, RAW, ROOT, Config, load_json, write_json  # noqa: E402
 from geodata.projection import Projection, map_to_game  # noqa: E402
 
 ROAD_POINT_STEP_M = 4.0
@@ -143,6 +144,15 @@ def build(raw: Path, out: Path, geo: Path) -> int:
             continue
         land_rocks.append(shape)
         rock_coasts.append({"name": spec.get("name", ""), "area_m2": round(shape.area)})
+    shelves = []
+    for spec in data.rock_shelves:
+        ends = [projection.to_map(np.array([float(p[0])]), np.array([float(p[1])])) for p in (spec["from"], spec["to"])]
+        band = coast.coast_band(land, (float(ends[0][0][0]), float(ends[0][1][0])),
+                                (float(ends[1][0][0]), float(ends[1][1][0])), float(spec["width_m"]))
+        if band.is_empty:
+            problems.append(f"the rock shelf {spec.get('name', '')} has no sea")
+            continue
+        shelves.append((spec, band))
     log(f"land {land.area / 1e6:.2f} km2, {len(beaches)} beaches, {len(buildings)} buildings")
     log(f"{cliffs} cliffs, {len(land_rocks) - cliffs - len(rock_coasts)} scree areas, {len(rock_coasts)} rock coasts")
 
@@ -168,7 +178,6 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     beach_mask = terrain.rasterize(grid, [p for b in beaches for p in polygons_of(b)]) & land_mask
     terrain.shape_coast(grid, land_mask, beach_mask)
     terrain.roughen_islands(grid, island_mask & land_mask)
-    rock_cells = terrain.raise_sea_rocks(grid, land_mask, terrain.rasterize(grid, [p for r in rocks for p in polygons_of(r)]))
     ridge = None
     rock_band = None
     if ridge_way is not None:
@@ -199,6 +208,25 @@ def build(raw: Path, out: Path, geo: Path) -> int:
             rock_band = sea_band
             log(f"Hòn Bà rock band {sea_band.area:.0f} m2 from {stats['min_m']:+.2f} to {stats['max_m']:+.2f} m")
         log(f"Hòn Bà ridge {line.length:.0f} m at {top:+.2f} m")
+    # The sea floor from public data (R8g): the intertidal zone and GEBCO (tools/geo/intertidal.py).
+    intertidal = terrain.load_raster(grid, raw / "intertidal.tif", projection) if (raw / "intertidal.tif").exists() else None
+    gebco = terrain.load_raster(grid, raw / "gebco.tif", projection, terrain.Resampling.cubic) \
+        if (raw / "gebco.tif").exists() else None
+    # The rock band of Hòn Bà keeps its own heights (Q14).
+    keep = terrain.rasterize(grid, polygons_of(rock_band)) if rock_band is not None else None
+    floor_stats = terrain.sea_floor_from_data(grid, land_mask, intertidal, gebco, keep)
+    del intertidal, gebco
+    log(f"sea floor: {floor_stats['intertidal_cells']} intertidal cells, GEBCO {floor_stats['gebco']}")
+    rock_cells = terrain.raise_sea_rocks(grid, land_mask, terrain.rasterize(grid, [p for r in rocks for p in polygons_of(r)]))
+    rock_shelves = []
+    for spec, band in shelves:
+        cells = terrain.make_rock_shelf(grid, land_mask, terrain.rasterize(grid, polygons_of(band)), float(spec["height_m"]),
+                                        float(spec["rough_m"]))
+        land_rocks.append(band)
+        point = band.representative_point()
+        rock_shelves.append({"name": spec.get("name", ""), "height_m": float(spec["height_m"]),
+                             "area_m2": round(band.area), "cells": cells, "point": map_to_game([(point.x, point.y)])[0]})
+        log(f"rock shelf {spec.get('name', '')}: {band.area:.0f} m2 at {float(spec['height_m']):+.2f} m")
     log(f"{len(rocks)} rocks, {rock_cells} sea rock cells")
     terrain.flatten_roads(grid, roads, ROAD_POINT_STEP_M)
     for road in roads:
@@ -229,10 +257,13 @@ def build(raw: Path, out: Path, geo: Path) -> int:
             log(f"roadworks on {record['road']}: {record['length_m']} m")
     sea_objects = None
     if config.sea_objects is not None:
-        sea_objects, found_problems = sea_module.make(config.sea_objects, data.ways, projection, land, floor_at)
+        named_beaches = [(b["name"], shape) for b, shape in zip(beach_records, beaches)]
+        sea_objects, found_problems = sea_module.make(config.sea_objects, data.ways, projection, land, floor_at,
+                                                      named_beaches)
         problems += found_problems
         log(f"{len(sea_objects['cargo_ships'])} cargo ships, {len(sea_objects['fishing_boats'])} fishing boats, "
-            f"{len(sea_objects['groynes']['lines'])} groynes")
+            f"{len(sea_objects['basket_boats'])} basket boats, {len(sea_objects['fishing_stakes']['rows'])} rows of "
+            f"stakes, {len(sea_objects['groynes']['lines'])} groynes")
     tree_record, tree_counts = None, {}
     if config.trees is not None:
         osm_trees, osm_rows = [], []
@@ -299,6 +330,23 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     # The small islands, for the trees on their tops (report 0005, D-0005-05).
     world["islands"] = [dict(area_m2=round(p.area), **blocks_module.polygon_to_game(p.simplify(1.0))) for p in islands]
     world["rock_coasts"] = rock_coasts
+    world["rock_shelves"] = rock_shelves
+    # The sea floor report (R8g): the dry land at the lowest tide, and the line out from the main beach.
+    tide_path = out / "tide.json"
+    if tide_path.exists():
+        tide = load_json(tide_path)
+        day_one = datetime.date.fromisoformat(load_json(ROOT / "data" / "calendar.json")["day_one"])
+        lowest, highest = seafloor.tide_range(tide, day_one)
+        # From the center of Bãi Trước (the game origin) to the nearest point of the coastline.
+        water = shapely.ops.nearest_points(land.boundary, shapely.Point(0.0, 0.0))[0]
+        line = seafloor.profile(grid, land_mask, (0.0, 0.0), (water.x, water.y))
+        dry_cells = seafloor.draw_dry_map(out / "intertidal_dry.png", grid, land_mask, lowest)
+        write_keep_import(out / "intertidal_dry.png")
+        (out / "intertidal_report.md").write_text(
+            seafloor.report(floor_stats, lowest, highest, line, dry_cells, grid.step, "intertidal_dry.png"), encoding="utf-8")
+        world["sea_floor"] |= {"source": "intertidal and GEBCO" if floor_stats["intertidal_cells"] else "slope",
+                               "game_tide_m": [round(lowest, 2), round(highest, 2)], "bai_truoc_profile": line,
+                               "check_distances_m": list(seafloor.CHECK_DISTANCES_M)}
     write_json(out / "world.json", world)
     write_json(out / "coastline.json", {"lines": [map_to_game(l.coords) for l in coast.coastline_lines(data.ways, projection)]}, None)
     write_json(out / "land.json", {"polygons": [blocks_module.polygon_to_game(p.simplify(1.0)) for p in polygons_of(land)]}, None)
@@ -483,12 +531,19 @@ def write_report(path, world, data, roads, block_list, buildings, found, home, p
         lines.append(f"- Problem: {p}")
     floor = world["sea_floor"]
     lines += ["", "## The sea floor, the rocks, and the Hòn Bà ridge (R8g, R8h)", "",
-              f"- The sea floor slopes from {floor['coast_m']:+.1f} m at the coastline to {floor['depth_m']:+.1f} m "
-              f"over {floor['slope_m']:.0f} m, then stays at {floor['depth_m']:+.1f} m.",
+              (f"- The sea floor comes from the intertidal zone of the Sentinel-2 images and from GEBCO 2025: see "
+               f"`intertidal_report.md`. Where both have no value near the coast, it slopes from {floor['coast_m']:+.1f} m "
+               f"at the coastline to {floor['depth_m']:+.1f} m over {floor['slope_m']:.0f} m."
+               if floor.get("source") == "intertidal and GEBCO" else
+               f"- The sea floor slopes from {floor['coast_m']:+.1f} m at the coastline to {floor['depth_m']:+.1f} m "
+               f"over {floor['slope_m']:.0f} m, then stays at {floor['depth_m']:+.1f} m."),
               f"- Rocks in the sea: {rock_cells} grid cells at {floor['rock_m']:+.1f} m."]
     for rock_coast in world.get("rock_coasts", []):
         lines.append(f"- The rocky coast {rock_coast['name']} (overrides.json): {rock_coast['area_m2']} m² of bare rock, "
                      "on the land and in the sea in front of it.")
+    for shelf in world.get("rock_shelves", []):
+        lines.append(f"- The flat rocks {shelf['name']} (overrides.json): {shelf['area_m2']} m² at "
+                     f"{shelf['height_m']:+.2f} m, dry when the tide is lower.")
     if world.get("islands"):
         lines.append(f"- {len(world['islands'])} small islands with large boulders (up to "
                      f"{terrain.ISLAND_BOULDER_M:.1f} m) and trees on their tops.")

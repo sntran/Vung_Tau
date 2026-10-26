@@ -87,6 +87,7 @@ Verified in the development workspace (Linux, 2 CPUs, no GPU, no Vulkan):
 - GitHub, npm, and PyPI are reachable. Google downloads (Android SDK, Maven) and blender.org are not reachable.
 - The Copernicus DEM bucket (`copernicus-dem-30m.s3.amazonaws.com`) and the Poly Haven API are reachable. The Overpass API, Geofabrik, and `dl.polyhaven.org` are not. So `tools/geo/fetch.py` runs in CI only (plan 0005, D1).
 - Godot changes a 16-bit PNG file to 8 bits when it loads it. The game reads the 16-bit height files with `Png16` (`scripts/geo/png16.gd`). An import file with `importer="keep"` makes the export keep a file as it is, and Godot does not change that import file.
+- Earth Search (`earth-search.aws.element84.com`, the Sentinel-2 L2A images on `sentinel-cogs.s3.us-west-2.amazonaws.com`) and the GEBCO 2025 files on `dap.ceda.ac.uk` are reachable. rasterio reads a window of these files over HTTP (`/vsicurl/`), so `tools/geo/intertidal.py` downloads only the play area.
 - `PackedByteArray.decompress_dynamic(-1, FileAccess.COMPRESSION_DEFLATE)` reads a zlib stream (the data of a PNG file).
 - A `Vector2` has 32-bit floats. UTM values and degrees need 64 bits, so `GeoProjection` gives them in a `PackedFloat64Array`.
 - GitHub archive downloads (`github.com/OWNER/REPO/archive/...`) return 403 in the workspace. `git clone` works. So `tools/setup.sh` gets GUT with `git clone`. GitHub release downloads (Godot, the export templates) work.
@@ -139,6 +140,8 @@ python -m pip install -r tools/geo/requirements.txt
 python tools/geo/build.py          # data/geo/raw/ to data/geo/build/ (about 2 minutes, no download)
 python -m pytest -q tools/geo/tests
 python tools/geo/fetch.py          # CI only: the "Geodata" workflow runs it by hand on main
+python tools/geo/tide.py --times-only   # the dry times of the game year again, from tide.json
+python tools/geo/intertidal.py     # the sea floor sources (Sentinel-2 and GEBCO), about 25 minutes
 tools/playtest.sh geo_views        # PT-33: the screenshots of the real places
 
 # The Vũng Tàu world (plan 0005): add -- --world=vung_tau to the Godot command. F3 shows the debug screen.
@@ -178,7 +181,7 @@ People speak aloud in Vietnamese with subtitles. The player is a traveler with a
 
 ## 5c. The geodata and the Vũng Tàu world (plan 0005)
 
-- **Pipeline.** `tools/geo/fetch.py` (CI only, the "Geodata" workflow) downloads the OSM extract, the Copernicus DEM, and the ground textures to `data/geo/raw/`. `tools/geo/tide.py` (CI only) computes the tide constants of EOT20 and the dry times of the Hòn Bà rock path. `tools/geo/build.py` (CI and workspace, about 2 minutes) reads `data/geo/raw/` and the configuration files of `data/geo/` and writes `data/geo/build/`: the height chunks (16-bit PNG), the surface mask and the rock mask, the roads, the blocks, the landmarks and the town anchors, the homestay hẻm, the roadworks, the sea objects, the trees, and `report.md`.
+- **Pipeline.** `tools/geo/fetch.py` (CI only, the "Geodata" workflow) downloads the OSM extract, the Copernicus DEM, and the ground textures to `data/geo/raw/`. `tools/geo/tide.py` (CI only) computes the tide constants of EOT20 and the dry times of the Hòn Bà rock path in the game year (`--times-only` computes the dry times again from `tide.json`, with no download). `tools/geo/intertidal.py` (CI, and it also runs in the workspace in about 25 minutes) computes the heights of the intertidal zone from the Sentinel-2 images of 2017 to 2020 and the tide, and reads a window of the GEBCO 2025 grid, to `data/geo/raw/` (R8g). `tools/geo/build.py` (CI and workspace, about 2 minutes) reads `data/geo/raw/` and the configuration files of `data/geo/` and writes `data/geo/build/`: the height chunks (16-bit PNG), the surface mask and the rock mask, the roads, the blocks, the landmarks and the town anchors, the homestay hẻm, the roadworks, the sea objects, the trees, `report.md`, and `intertidal_report.md` (the sea floor).
 - **Configuration** (`data/geo/`, data that I can edit): `area.json` (the box), `landmarks.json` (R1), `road_widths.json`, `overrides.json` (corrections to OSM, the band of rocks of the Hòn Bà path, the rocky coasts, and the roadworks), `hon_ba.json` (the heights of the path), `sea_objects.json` (ships and boats), and `trees.json` (the street and park trees).
 - **The world** (`scenes/world/vung_tau.gd`): chunks of 256 m that load around the player, the sea with the tide, the sun and the sky by the real date and time, the markers, the street trees (`street_trees.gd`, `tree_kit.gd`), the far form of the hill trees (`hill_canopy.gd`), the sea objects (`sea_objects.gd`), and the roadworks (`roadworks.gd`). The plants follow the season of the game date (`scripts/season.gd`).
 

@@ -16,7 +16,7 @@ static func day_one_jd() -> int:
 		var text := GameState.arg_value("start-date")
 		if text == "":
 			var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(PATH))
-			text = str(data.get("day_one", "2026-12-08")) if data is Dictionary else "2026-12-08"
+			text = str(data.get("day_one", "2019-01-22")) if data is Dictionary else "2019-01-22"
 		var parts := text.split("-")
 		_day_one_jd = Lunar.jd_from_date(int(parts[2]), int(parts[1]), int(parts[0]))
 	return _day_one_jd
@@ -46,7 +46,7 @@ static func unix_time(game_day: int, minutes: float) -> float:
 	return days * 86400.0 + minutes * 60.0 - TIME_ZONE_S
 
 
-## The date as text: "8/12/2026 · 30/10 âm lịch".
+## The date as text: "22/1/2019 · 17/12 âm lịch".
 static func text(game_day: int) -> String:
 	var date := date_of(game_day)
 	var lunar := lunar_of(game_day)

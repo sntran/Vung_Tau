@@ -35,7 +35,7 @@ var move_input := Vector2.ZERO
 var walking := false
 ## False in a world without a navigation mesh: a tap walk then goes straight to the point.
 var use_navigation := true
-## When it is set, the player cannot go to a point where walk_limit.call(point) is false.
+## When it is set, the player cannot go to a point where walk_limit.call(point, from) is false.
 var walk_limit: Callable
 ## The view direction that the input asks for, in degrees.
 var target_yaw := -90.0
@@ -171,7 +171,7 @@ func _physics_process(delta: float) -> void:
 		velocity.y -= GRAVITY * delta
 	var wanted := horizontal * delta
 	move_and_slide()
-	if walk_limit.is_valid() and not walk_limit.call(global_position):
+	if walk_limit.is_valid() and not walk_limit.call(global_position, start):
 		global_position = Vector3(start.x, global_position.y, start.z)
 		velocity = Vector3.ZERO
 		if walking:

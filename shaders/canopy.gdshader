@@ -12,8 +12,8 @@ uniform float fade_m = 60.0;
 uniform float dryness = 0.0;
 // The part of the trees that have no leaves.
 uniform float bare_share = 0.0;
-uniform vec3 leaf_dark : source_color = vec3(0.18, 0.3, 0.12);
-uniform vec3 leaf_light : source_color = vec3(0.32, 0.45, 0.19);
+uniform vec3 leaf_dark : source_color = vec3(0.14, 0.25, 0.1);
+uniform vec3 leaf_light : source_color = vec3(0.25, 0.37, 0.15);
 uniform vec3 dry_brown : source_color = vec3(0.5, 0.38, 0.2);
 uniform vec3 dry_red : source_color = vec3(0.55, 0.27, 0.16);
 uniform vec3 dry_yellow : source_color = vec3(0.62, 0.53, 0.25);

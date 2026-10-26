@@ -2,19 +2,27 @@ class_name SeaObjects
 extends Node3D
 ## The objects on the sea of data/geo/build/sea_objects.json (plan 0005,
 ## R13a): cargo ships at anchor far offshore, small fishing boats in the bay of
-## Bãi Trước, the ferry pier, and the rock groynes. The ships and the boats
-## float: they move up and down with the tide. The pier and the groynes have
-## collision, so the player can walk on them.
+## Bãi Trước, the round basket boats (thúng) of the fishermen, rows of fishing
+## stakes off Hạ Long (Q6), the pier, and the rock groynes. The ships and the
+## boats float: they move up and down with the tide. A boat or a thúng sits on
+## the sea floor when the water is lower than its draft. The pier and the
+## groynes have collision, so the player can walk on them.
 
 const PILE_SPACING := 6.0
 const SEA_FLOOR := -4.0
+## The depth of a small boat in the water.
+const DRAFT := 0.35
 
 var ships: Array = []
 var boats: Array = []
+var baskets: Array = []
+var stake_count := 0
 var pier_parts := 0
 var groyne_count := 0
 var _floating: Node3D
 var _boats_node: Node3D
+## Each boat and thúng: [node, the sea floor under it].
+var _afloat: Array = []
 var _time := 0.0
 
 
@@ -40,10 +48,15 @@ func setup(path: String) -> bool:
 	for ship: Dictionary in ships:
 		_add_ship(ship_batch, ship)
 	ship_batch.commit(_floating, {"hull": material}, "Ship")
-	var boat_batch := MeshBatch.new()
-	for boat: Dictionary in boats:
-		_add_boat(boat_batch, boat)
-	boat_batch.commit(_boats_node, {"hull": material}, "Boat")
+	for i in boats.size():
+		var boat_batch := MeshBatch.new()
+		_add_boat(boat_batch, boats[i])
+		_add_afloat(boat_batch, material, "Boat_%d" % i, float(boats[i].get("floor_m", SEA_FLOOR)))
+	baskets = parsed.get("basket_boats", [])
+	for i in baskets.size():
+		var basket_batch := MeshBatch.new()
+		_add_basket(basket_batch, baskets[i])
+		_add_afloat(basket_batch, material, "Thung_%d" % i, float(baskets[i].get("floor_m", SEA_FLOOR)))
 	var fixed := MeshBatch.new()
 	var body := StaticBody3D.new()
 	body.name = "Collision"
@@ -59,15 +72,33 @@ func setup(path: String) -> bool:
 		_add_groyne(fixed, body, line.points, float(groynes.get("width_m", 4.0)), float(groynes.get("height_m", 1.6)),
 				hash(line.osm))
 		groyne_count += 1
+	var stakes: Dictionary = parsed.get("fishing_stakes", {})
+	for row: Dictionary in stakes.get("rows", []):
+		for stake: Array in row.stakes:
+			_add_stake(fixed, stake, float(stakes.get("height_m", 1.8)))
+			stake_count += 1
 	fixed.commit(self, {"hull": material}, "Fixed")
 	return true
 
 
-## Ships and boats float on the sea. The boats rock a little.
+func _add_afloat(batch: MeshBatch, material: Material, name_text: String, bottom: float) -> void:
+	var holder := Node3D.new()
+	holder.name = name_text
+	_boats_node.add_child(holder)
+	batch.commit(holder, {"hull": material}, name_text)
+	_afloat.append([holder, bottom])
+
+
+## Ships and boats float on the sea. The boats rock a little. A boat or a
+## thúng sits on the sea floor when the water is lower than DRAFT.
 func update_sea(sea_level: float, delta: float) -> void:
 	_time += delta
 	_floating.position.y = sea_level
-	_boats_node.position.y = sea_level + 0.05 * sin(_time * 1.3)
+	var bob := 0.05 * sin(_time * 1.3)
+	for item: Array in _afloat:
+		var bottom: float = item[1]
+		var holder: Node3D = item[0]
+		holder.position.y = sea_level + bob if sea_level - bottom > DRAFT else bottom + DRAFT
 
 
 static func _place(item: Dictionary) -> Transform3D:
@@ -131,6 +162,24 @@ func _add_boat(batch: MeshBatch, boat: Dictionary) -> void:
 	box.call(Vector3(beam * 0.7, 1.4, length * 0.25), Vector3(0, 1.4, 0.18 * length), Color("#D9D2BE"))
 	box.call(Vector3(beam * 0.8, 0.12, length * 0.3), Vector3(0, 2.15, 0.18 * length), Color("#3C6A9E"))
 	box.call(Vector3(0.12, 3.5, 0.12), Vector3(0, 2.2, -0.15 * length), Color("#6B4E33"))
+
+
+## A round basket boat (thúng chai): woven bamboo, dark with tar, with a rim.
+func _add_basket(batch: MeshBatch, basket: Dictionary) -> void:
+	var p: Array = basket.position
+	var radius := float(basket.diameter_m) / 2.0
+	var center := Vector3(p[0], 0.05, p[1])
+	batch.cylinder("hull", radius, 0.6, center, Color("#3A2F25"), 12)
+	batch.cylinder("hull", radius + 0.05, 0.1, center + Vector3(0, 0.32, 0), Color("#6B5638"), 12)
+	batch.box("hull", Vector3(radius * 1.6, 0.06, 0.25), center + Vector3(0, 0.2, 0), Color("#7A6446"),
+			Basis(Vector3.UP, deg_to_rad(float(basket.heading_deg))))
+
+
+## A fishing stake: a thin wood pole from the sea floor to height above the mean sea level.
+func _add_stake(batch: MeshBatch, stake: Array, height: float) -> void:
+	var bottom := float(stake[2])
+	batch.box("hull", Vector3(0.12, height - bottom, 0.12), Vector3(stake[0], (height + bottom) / 2.0, stake[1]),
+			Color("#6E5B43"))
 
 
 ## The ferry pier: a concrete deck on piles, with a low rail.

@@ -175,12 +175,17 @@ func ground_height(x: float, z: float) -> float:
 
 
 ## True when the player can stand at the point: the water is not deeper than
-## 0.5 m (R13). On the Hòn Bà ridge, the ridge must be dry.
-func can_stand(point: Vector3) -> bool:
+## 0.5 m (R13). On the Hòn Bà ridge, the ridge must be dry. A step from the
+## point "from" that does not go into deeper water is also allowed, so that
+## the player can always walk back out of the water (the floor of the data is
+## almost flat in places, and the tide can rise under the player).
+func can_stand(point: Vector3, from := Vector3.INF) -> bool:
 	var ground := ground_height(point.x, point.z)
 	if is_on_ridge(point) and ground <= ridge_top + RIDGE_ABOVE:
 		return sea_level < ground
-	return ground >= sea_level - MAX_WATER_DEPTH
+	if ground >= sea_level - MAX_WATER_DEPTH:
+		return true
+	return from != Vector3.INF and ground >= ground_height(from.x, from.z)
 
 
 ## True when the point is on the Hòn Bà rock path: on its line or in its band of rocks.

@@ -4,10 +4,14 @@
 Usage:
   python tools/geo/tide.py                      Download EOT20 (if necessary) and write the tide files.
   python tools/geo/tide.py --eot DIR            The folder of EOT20 (DIR/EOT20/ocean_tides/).
-  python tools/geo/tide.py --from 2026-11-01    The first day of the 12 months of dry times.
+  python tools/geo/tide.py --from 2018-12-01    The first day of the dry times.
+  python tools/geo/tide.py --times-only         Only the dry times and the report again, from the
+                                                constituents in tide.json (no download, no pyTMD).
 
 CI runs this script after fetch.py and before build.py. It writes
-data/geo/build/tide.json and data/geo/build/tide_report.md.
+data/geo/build/tide.json and data/geo/build/tide_report.md. The dry times
+are for the game year: from the first day of the month before day 1 of the
+game (data/calendar.json) to the end of the year of day 1.
 """
 
 import argparse
@@ -23,6 +27,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from geodata import eot20, lunar, tidecalc  # noqa: E402
 from geodata.config import BUILD, GEO, ROOT, load_json, write_json  # noqa: E402
+
+CALENDAR = ROOT / "data" / "calendar.json"
 
 CONSTITUENTS = ["2n2", "j1", "k1", "k2", "m2", "m4", "mf", "mm", "n2", "o1", "p1", "q1", "s1", "s2", "sa", "ssa", "t2"]
 # The published amplitudes for the Vũng Tàu station (R8e), in meters.
@@ -137,6 +143,15 @@ def propose_days(windows: list[dict]) -> list[dict]:
     return out
 
 
+def game_year(calendar: dict) -> tuple[datetime.date, int]:
+    """The first day and the number of days of the dry times: from the first
+    day of the month before day 1 of the game to the end of the year of day 1."""
+    day_one = datetime.date.fromisoformat(calendar["day_one"])
+    first = (day_one.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
+    last = datetime.date(day_one.year, 12, 31)
+    return first, (last - first).days + 1
+
+
 def report(tide: dict, top: float, windows: list[dict], days: list[dict], check: float) -> str:
     lines = ["# The tide report (plan 0005, R8d to R8j)", "",
              f"Made by `tools/geo/tide.py` on {datetime.date.today().isoformat()}. Source: {tide['source']}", "",
@@ -163,7 +178,7 @@ def report(tide: dict, top: float, windows: list[dict], days: list[dict], check:
               "The game uses only the 17 constituents of EOT20."]
     lines += ["", "## The Hòn Bà ridge (R8h, R8i)", "",
               f"The ridge top is {top:+.2f} m (from `data/geo/hon_ba.json`). The ridge is dry when the sea level is "
-              f"below this height. These are the times in the next 12 months when the ridge is dry for at least "
+              f"below this height. These are the times in the game year when the ridge is dry for at least "
               f"{MIN_DRY_H:.0f} hours between {DAY_START_H:02d}:00 and {DAY_END_H:02d}:00 (UTC+7).", "",
               "| Start | End | Hours | Lowest sea level (m) | Lunar date |", "|---|---|---|---|---|"]
     for w in windows:
@@ -188,8 +203,14 @@ def main() -> int:
     parser.add_argument("--out", type=Path, default=BUILD)
     parser.add_argument("--geo", type=Path, default=GEO)
     parser.add_argument("--from", dest="start", default=None, help="The first day (YYYY-MM-DD) of the dry times.")
+    parser.add_argument("--times-only", action="store_true", help="Only the dry times, from tide.json.")
     args = parser.parse_args()
     hon_ba = load_json(args.geo / "hon_ba.json")
+    if args.times_only:
+        tide = load_json(args.out / "tide.json")
+        tests = np.array(tide["tests"], dtype=float)
+        check = float(np.max(np.abs(tidecalc.level(tide, "hon_ba", tests[:, 0]) - tests[:, 1])))
+        return write_times(args, tide, hon_ba, check)
     folder = args.eot / "EOT20" / "ocean_tides"
     if len(list(folder.glob("*_ocean_eot20.nc"))) != 17:
         log(f"download EOT20 to {args.eot}")
@@ -223,16 +244,23 @@ def main() -> int:
     if check > 0.001:
         raise SystemExit(f"tidecalc.py differs from pyTMD by {check:.4f} m")
     tide["tests"] = [[int(t), round(float(v), 4)] for t, v in zip(tests_t, expected)]
+    return write_times(args, tide, hon_ba, check)
+
+
+def write_times(args, tide: dict, hon_ba: dict, check: float) -> int:
+    """Adds the dry times and the day 1 proposals to tide, and writes tide.json and the report."""
     top = float(hon_ba["ridge_top_m"])
-    start = datetime.date.fromisoformat(args.start) if args.start else datetime.datetime.now(LOCAL).date()
-    windows = dry_windows(tide, top, start, 365)
+    start, days_count = game_year(load_json(CALENDAR))
+    if args.start:
+        start, days_count = datetime.date.fromisoformat(args.start), 365
+    windows = dry_windows(tide, top, start, days_count)
     days = propose_days(windows)
     tide["ridge_top_m"] = top
     tide["dry_times"] = windows
     tide["day_one_proposals"] = [d["day_one"] for d in days]
     write_json(args.out / "tide.json", tide)
     (args.out / "tide_report.md").write_text(report(tide, top, windows, days, check), encoding="utf-8")
-    log(f"wrote tide.json: M2 {constants['hon_ba']['m2']['amplitude']:.3f} m, {len(windows)} dry times, "
+    log(f"wrote tide.json: M2 {tide['points']['hon_ba']['constituents']['m2']['amplitude']:.3f} m, {len(windows)} dry times, "
         f"day 1 proposals {tide['day_one_proposals']}")
     return 0
 

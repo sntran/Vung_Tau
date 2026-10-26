@@ -4,9 +4,10 @@ import math
 
 import numpy as np
 import pytest
+import shapely
 from shapely.geometry import LineString, Polygon
 
-from geodata import blocks, coast, homestay, landmarks, osm, pngio, roads, terrain
+from geodata import blocks, coast, homestay, landmarks, osm, pngio, roads, sea, terrain
 from geodata.config import Config, ROOT
 from geodata.projection import Projection
 
@@ -371,3 +372,155 @@ def test_island_boulders_are_large():
     assert inside.max() > terrain.ISLAND_BOULDER_M * 0.8, "boulders rise more than a meter"
     assert inside.min() > -terrain.ISLAND_BOULDER_M, "the gaps are not deep holes"
     assert np.all(grid.heights[0:5, :] == 8.0), "the ground outside the island does not change"
+
+
+def test_coast_band_is_the_sea_along_the_coast_between_two_points():
+    """The flat rocks along the sea wall (plan 0005, Q6)."""
+    land = Polygon([(0, -200), (200, -200), (200, 200), (0, 200)])
+    band = coast.coast_band(land, (-5.0, -50.0), (-5.0, 50.0), 20.0)
+    assert not band.intersects(Polygon([(1, -1), (5, -1), (5, 1), (1, 1)])), "no land in the band"
+    assert band.contains(Polygon([(-15, -1), (-10, -1), (-10, 1), (-15, 1)])), "the sea in front of the coast"
+    assert not band.intersects(Polygon([(-15, 100), (-10, 100), (-10, 105), (-15, 105)])), "not past the end point"
+    assert band.bounds[0] == pytest.approx(-20.0, abs=0.5)
+
+
+def test_rock_shelf_is_flat_at_its_height():
+    n = 51
+    heights = np.full((n, n), -3.0, dtype=np.float32)
+    grid = terrain.Grid(0.0, 0.0, 2.0, heights)
+    land = np.zeros((n, n), dtype=bool)
+    land[:, 40:] = True
+    band = np.zeros((n, n), dtype=bool)
+    band[10:30, 30:45] = True
+    cells = terrain.make_rock_shelf(grid, land, band, -1.0, 0.15)
+    assert cells == 20 * 10
+    assert np.all(np.abs(grid.heights[10:30, 30:40] + 1.0) <= 0.15 + 1e-6)
+    assert np.all(grid.heights[10:30, 40:45] == -3.0), "the land does not change"
+    assert np.all(grid.heights[0:10, :] == -3.0)
+
+
+def test_boats_keep_away_from_the_beach_and_thung_and_stakes():
+    """Plan 0005, Q6: boats at least 100 m from the main beach, thúng near the
+    sand and beside the boats, and rows of stakes that go away from the coast."""
+    projection = Projection.at(107.0, 10.0, 10)
+    land = Polygon([(0, -2000), (2000, -2000), (2000, 2000), (0, 2000)])
+    beach = Polygon([(0, -200), (40, -200), (40, 200), (0, 200)])
+
+    def ll(x, y):
+        lon, lat = projection.map_to_lonlat(x, y)
+        return [float(lon), float(lat)]
+
+    square = lambda x0, y0, x1, y1: [ll(x0, y0), ll(x1, y0), ll(x1, y1), ll(x0, y1), ll(x0, y0)]
+    spec = {"seed": 3,
+            "cargo_ships": {"count": 0, "length_m": [100, 200], "kinds": ["bulk"], "min_spacing_m": 100,
+                            "min_floor_m": -3.0, "areas": [{"name": "far", "polygon": square(-3000, -500, -2000, 500)}]},
+            "fishing_boats": {"count": 20, "length_m": [8, 12], "min_spacing_m": 10, "min_floor_m": -1.0,
+                              "areas": [{"name": "bay", "share": 1.0, "away_from_beach": {"name": "Main", "m": 100},
+                                         "polygon": square(-300, -150, -1, 150)}]},
+            "basket_boats": {"diameter_m": [1.8, 2.2], "min_spacing_m": 4, "tied_areas": ["bay"], "tied_share": 0.5,
+                             "near_sand": [{"name": "sand", "count": 3, "min_floor_m": 0.0,
+                                            "polygon": square(-30, -20, -1, 20)}]},
+            "fishing_stakes": {"height_m": 1.8, "spacing_m": 2.0, "row_length_m": [30, 40], "min_row_spacing_m": 50,
+                               "min_from_coast_m": 20, "max_floor_m": -1.0,
+                               "areas": [{"name": "off", "rows": 3, "polygon": square(-200, 500, -30, 900)}]},
+            "ferry_pier": {"name": "P", "osm_ways": [], "width_m": 6, "deck_m": 2.8},
+            "groynes": {"tags": [["man_made", "groyne"]], "width_m": 4, "height_m": 1.6}}
+    floor_at = lambda x, y: max(-4.0, x * 0.05)
+    record, problems = sea.make(spec, [], projection, land, floor_at, [("Main", beach)])
+    boats = record["fishing_boats"]
+    assert len(boats) == 20 and not problems
+    for boat in boats:
+        x, z = boat["position"]
+        assert beach.distance(shapely.Point(x, -z)) >= 100.0 - 0.5, "100 m or more from the beach"
+        assert boat["floor_m"] <= -1.0
+    baskets = record["basket_boats"]
+    assert sum(1 for b in baskets if b["tied_to"] < 0) == 3
+    assert any(b["tied_to"] >= 0 for b in baskets), "some thúng are tied beside the boats"
+    rows = record["fishing_stakes"]["rows"]
+    assert len(rows) == 3
+    for row in rows:
+        first, last = row["stakes"][0], row["stakes"][-1]
+        assert last[0] < first[0], "the row goes away from the coast (west)"
+        assert all(p[2] <= 0.0 for p in row["stakes"])
+
+
+def test_intertidal_height_is_the_sea_level_where_the_pixel_becomes_wet():
+    """R8g, R18: made-up images and tide levels. A pixel at the height e is wet
+    when the sea is above e. Clouds hide some images. The method finds e."""
+    from geodata import intertidal
+    rng = np.random.default_rng(4)
+    tides = rng.uniform(-2.2, 1.4, 120)
+    truth = np.array([-1.5, -0.4, 0.3, 0.9, 5.0, -9.0])  # the last two are always dry and always wet
+    observations = np.where(tides[:, None] > truth[None, :], intertidal.WET, intertidal.DRY).astype(np.int8)
+    observations[rng.uniform(size=observations.shape) < 0.3] = intertidal.UNCLEAR  # clouds
+    # Some wrong observations (a wave, a wet sand).
+    wrong = rng.uniform(size=observations.shape) < 0.04
+    observations[wrong & (observations != intertidal.UNCLEAR)] ^= 1
+    heights, clear = intertidal.elevations(tides, observations)
+    assert np.all(clear > 60)
+    assert np.allclose(heights[:4], truth[:4], atol=0.12), heights
+    assert np.isnan(heights[4]) and np.isnan(heights[5]), "no value above the highest or below the lowest tide"
+    few = observations.copy()
+    few[:-10, 0] = intertidal.UNCLEAR
+    assert np.isnan(intertidal.elevations(tides, few)[0][0]), "too few clear images"
+
+
+def test_intertidal_observation_and_clouds():
+    from geodata import intertidal
+    green = np.array([[1000, 1000, 1000]], dtype=np.uint16)
+    nir = np.array([[200, 3000, 200]], dtype=np.uint16)
+    scl = np.array([[6, 4, 9]], dtype=np.uint8)  # water, vegetation, cloud
+    assert intertidal.observe(green, nir, scl).tolist() == [[intertidal.WET, intertidal.DRY, intertidal.UNCLEAR]]
+
+
+def test_sea_floor_from_data():
+    """R8g: the intertidal heights near the coast, then a smooth slope down to the GEBCO depth."""
+    n = 400
+    grid = terrain.Grid(0.0, 0.0, 2.0, np.zeros((n, n), dtype=np.float32))
+    land = np.zeros((n, n), dtype=bool)
+    land[:, :20] = True
+    terrain.shape_coast(grid, land, np.zeros((n, n), dtype=bool))
+    intertidal = np.full((n, n), np.nan, dtype=np.float32)
+    intertidal[:, 20:120] = -1.6  # a flat to 200 m from the coast
+    gebco = np.full((n, n), -8.0, dtype=np.float32)
+    stats = terrain.sea_floor_from_data(grid, land, intertidal, gebco)
+    assert stats["intertidal_cells"] == n * 100
+    row = grid.heights[200]
+    assert row[60] == pytest.approx(-1.6, abs=0.05), "the flat of the intertidal zone"
+    assert row[300] < -6.0, "far out, the GEBCO depth"
+    assert np.all(np.diff(row[120:400]) <= 1e-4), "the floor goes down from the low-tide edge"
+    assert np.all(grid.heights[:, :20] >= terrain.LAND_MIN_HEIGHT), "the land does not change"
+    step = np.abs(np.diff(grid.heights[200, 15:40]))
+    assert step.max() <= terrain.COAST_RAMP * grid.step + 0.05, "no step at the coastline"
+
+
+def test_sea_floor_ignores_far_spots_and_shallow_gebco():
+    """A boat at anchor looks dry in some images: a spot far out makes no shoal.
+    GEBCO near the coast has the land in its cells: it does not make the floor shallow."""
+    n = 400
+    grid = terrain.Grid(0.0, 0.0, 2.0, np.zeros((n, n), dtype=np.float32))
+    land = np.zeros((n, n), dtype=bool)
+    land[:, :20] = True
+    terrain.shape_coast(grid, land, np.zeros((n, n), dtype=bool))
+    intertidal = np.full((n, n), np.nan, dtype=np.float32)
+    intertidal[200:204, 250:254] = -1.0  # a boat 460 m out
+    gebco = np.full((n, n), -1.0, dtype=np.float32)
+    stats = terrain.sea_floor_from_data(grid, land, intertidal, gebco)
+    assert stats["intertidal_cells"] == 0
+    assert grid.heights[202, 252] <= -terrain.SEA_FLOOR_DEPTH + 0.01, "no shoal at the boat"
+
+
+def test_sea_floor_keeps_the_rock_band():
+    """Q14: the rock band of Hòn Bà keeps its own heights in the floor from data."""
+    n = 200
+    grid = terrain.Grid(0.0, 0.0, 2.0, np.zeros((n, n), dtype=np.float32))
+    land = np.zeros((n, n), dtype=bool)
+    land[:, :10] = True
+    terrain.shape_coast(grid, land, np.zeros((n, n), dtype=bool))
+    keep = np.zeros((n, n), dtype=bool)
+    keep[90:110, 40:60] = True
+    grid.heights[keep] = -1.7
+    intertidal = np.full((n, n), -0.5, dtype=np.float32)
+    terrain.sea_floor_from_data(grid, land, intertidal, None, keep)
+    assert np.allclose(grid.heights[keep], -1.7), "the band keeps its heights"
+    assert grid.heights[20, 50] == pytest.approx(-0.5, abs=0.05), "the data elsewhere"

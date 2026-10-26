@@ -40,7 +40,7 @@ uniform float forest_height = 12.0;
 uniform float canopy_near = 200.0;
 uniform float canopy_far = 400.0;
 uniform vec3 canopy_dark : source_color = vec3(0.13, 0.22, 0.09);
-uniform vec3 canopy_light : source_color = vec3(0.3, 0.42, 0.17);
+uniform vec3 canopy_light : source_color = vec3(0.24, 0.35, 0.14);
 uniform vec3 canopy_dry : source_color = vec3(0.5, 0.33, 0.18);
 
 varying vec3 world_position;
