@@ -153,3 +153,23 @@ All new lines have the status "check". These need my ear or my decision:
 3. D-0003-04 and D-0003-09 (my decisions).
 4. D-0003-01, D-0003-03.
 5. D-0003-06, D-0003-07, D-0003-08.
+
+## 6. Re-check (2026-10-25)
+
+Commit `0c33960`. CI on `main` is green ("Test" and "Export"). Unit tests: 95, all pass. The architect ran a new exploratory scenario at 1280×720.
+
+| Defect | Result | Evidence |
+|---|---|---|
+| D-0003-01 | Fixed | With Listen on and no line, the app says "Listening… The lines that you hear show here." |
+| D-0003-02 | Fixed | "Say again" is the first phrase while the person speaks and at the answer, so nothing moves under the finger. PT-18 taps it in the last 0.2 s of a line. |
+| D-0003-03 | Fixed | Three chats, each one time each day. PT-19 run 2 waits 3 minutes and finds no repeat (CI). The transcript keeps 50 lines. |
+| D-0003-04 | Fixed | The first talk with Cô Sáu starts with her introduction. Her name shows only after it. The new introductions have the status "check". |
+| D-0003-05 | Fixed | The soak test waits for each walk. CI passed for `4971f11` and `0c33960`, the two pushes since the correction. |
+| D-0003-06 | Fixed | PT-19 "far" looks back along the hẻm. |
+| D-0003-07 | Fixed | The banner covers only the status bar. |
+| D-0003-08 | Fixed | `docs/.gdignore`. |
+| D-0003-09 | Fixed | "Bánh khọt nè! Ăn thử đi anh!" |
+
+The builder's question Q6 in plan 0003 (Cô Sáu and cô Nga say "con"): I answered it there.
+
+**Status:** all defects are corrected, so plan 0003 is "Done". Two acceptance criteria are my own checks and do not block the builder: I choose the voices on the audition page (criterion 2), and I try the Android build on a phone in daylight (criterion 5).

@@ -33,7 +33,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 |---|---|---|
 | 0001 | [Foundation and the walkable hẻm](0001-foundation.md) | Built |
 | 0002 | [First-person walking](0002-first-person.md) | Built |
-| 0003 | [Voices and the phone](0003-voices-and-phone.md) | Built |
+| 0003 | [Voices and the phone](0003-voices-and-phone.md) | Done |
 | 0004 | [Desktop and the house detail kit](0004-desktop-and-house-detail.md) | Built |
 | 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Built |
 | 0006 | [People](0006-people.md) | Approved |
@@ -45,7 +45,7 @@ The order can change.
 
 | Number | Name | Content |
 |---|---|---|
-| 0003 | [Voices and the phone](0003-voices-and-phone.md) | Built. People speak aloud in Vietnamese with subtitles. The traveler's phone has Listen (transcribe and translate), Lens, Messages, Sổ tay, Clock, and Settings. It replaces the talk panel and the 2D sheets. |
+| 0003 | [Voices and the phone](0003-voices-and-phone.md) | Done. People speak aloud in Vietnamese with subtitles. The traveler's phone has Listen (transcribe and translate), Lens, Messages, Sổ tay, Clock, and Settings. It replaces the talk panel and the 2D sheets. |
 | 0004 | [Desktop and the house detail kit](0004-desktop-and-house-detail.md) | Built. Desktop becomes the main platform, with the Forward+ renderer and quality presets. Tube houses get depth, brick under plaster and paint, wear, and the clutter of a real street. |
 | 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Built. The real ground, hills, coast, beaches, sea, and roads, from OpenStreetMap and the Copernicus elevation data. |
 | 0006 | [People](0006-people.md) | Approved. People with real bodies, faces, hair, and clothes, made by code with MPFB 2. Library animations, head and eye movement, blinks, faces for each line, and lip sync from the voice audio. |

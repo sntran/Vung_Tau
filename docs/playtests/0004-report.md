@@ -129,3 +129,29 @@
 ## 6. Note: the test street is not the homestay hẻm
 
 The real homestay hẻm is only homes, with the slope of Núi Nhỏ on one side and one row of houses on the other side. Nobody sells anything in it (first-hand, 2026-10-24). The street of plans 0001 to 0004, with its shops and carts, is a test street. Plan 0009 builds the real hẻm and moves the shops and their people to the streets near chợ Xóm Lưới. Do not add more shops to the test street.
+
+## 7. Re-check (2026-10-25)
+
+Commit `0c33960`. CI on `main` is green, and the export uploads the Windows, macOS, and Linux builds. The architect ran PT-25 again and measured the screenshots.
+
+| Defect | Result | Evidence |
+|---|---|---|
+| D-0004-01 | Fixed | CI green. The new scenario `hem_walk` walks the full hẻm at five times on both sizes. |
+| D-0004-02 | Fixed | The artifacts `windows-build`, `macos-build`, and `linux-build` exist for `0c33960`. |
+| D-0004-03 | Fixed, but see D-0004-10 | The metal roofs have mint, teal, rust, and orange colors. The terraces have rooms, plants, and laundry. |
+| D-0004-04 | Fixed | 20:00 is darker than 17:30, and 17:30 is darker than 12:00 (PT-25 checks it). |
+| D-0004-05 | Fixed | The eyes of the player are 1.10 m from the head of Cô Sáu in a talk. |
+| D-0004-06 | Fixed | Fewer and larger patches, mostly low. |
+| D-0004-07 | Fixed | Low uses Forward+ on a computer. No restart. |
+| D-0004-08 | Fixed | Back extensions, small yards, rooms on terraces. |
+| D-0004-09 | Fixed | About 30 % bold walls. PT-25 checks the saturation from above. |
+
+### D-0004-10: On High, the roofs and walls seen from above are too pale (medium)
+
+![The game from above at 12:00 on High](0004/d10-pale.jpg)
+
+- **Measured** in the view from above at 12:00 on High: 39 % of the pixels are near white (value above 0.92, saturation below 0.1), and the mean value is 0.87. In my top-down photo of a dense hẻm: 3 % near white, and a mean value of 0.62. At 07:00 and 17:30 the game has 34 % to 35 % near white.
+- **Cause (probable):** the exposure and the tone mapping. The terraces are grey in `palette.json` (`#CBCAC0`, `#91968E`), but they show white. The Filmic tone mapping (`tonemap_mode = 2`) with the default white point clips the bright surfaces, and SDFGI (energy 5 by day) adds light to all of them.
+- **Correction:** Use the AgX tone mapping (Godot 4.4 and later) or set the white point and the exposure, so that sunlit surfaces keep their color. Then check the noon shade again: in the "along" view at 12:00, the shade has a mean value of 0.21 now, darker than a real hẻm at noon, where the sunlit walls light the shade. Add to PT-25: in the view from above at 12:00 on High and on Low, at most 10 % of the building pixels are near white, and the mean value is 0.55 to 0.75.
+
+**Status:** plan 0004 stays "Built" until D-0004-10 is corrected. Then two of my checks remain: I look at the PT-25 screenshots (criterion 2), and I start the macOS and Windows builds on my computers (criterion 3).

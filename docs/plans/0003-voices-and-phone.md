@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Built |
+| Status | Done |
 | Branch | `feat/0003-voices-and-phone` |
 | Depends on | 0002 (status "Built") |
 
@@ -150,7 +150,7 @@ Change PT-01, PT-03, PT-04, PT-06, PT-08, PT-14, PT-16, and PT-17 to use the pho
 - **Q3.** Answered for now: the forms of address below are correct. The traveler is an adult. "cô" for Cô Sáu, "bà" for Bà Tư, "chú" for Chú Bảy, "bác" for Bác Hà, and "con" or "cháu" for the player in their answers.
 - **Q4.** The builder added a second neighbor for PT-19: Chú Chín, who argues about football with Chú Bảy at the cà phê cóc (`coc.talk.1` to `coc.talk.4`). Is the name correct for a neighbor of Chú Bảy, and is the talk natural?
 - **Q5.** The neutral phone voice (the Play button) is "Mai Anh" (Northern, news style), because a phone voice is usually standard and neutral. A Southern voice is the other choice. Which one do I want?
-- **Q6.** Report D-0003-09: people of about 50 and more can call the traveler "con". Cô Sáu and cô Nga call him "con" in most of their lines. The data does not give their ages. Are they about 50 or more, or must they say "anh" too?
+- **Q6.** Answered: Cô Sáu is about 55 and can say "con" to a traveler of about 30. Cô Nga is the host and knows the traveler's age from the passport, so "con" is correct for her too. Plan 0007 replaces these words with the rules of `data/address.json` for the age of the traveler.
 
 ## 9. Builder notes
 
