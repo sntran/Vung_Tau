@@ -93,3 +93,4 @@ Plan 0005 still named the old plan numbers for the structures and the houses. Th
 1. D-0005-04 (a license duty).
 2. D-0005-01 and D-0005-02 (I need them to judge the shapes).
 3. D-0005-03 and D-0005-05.
+4. The approved changes of 2026-10-26 (plan 0005, open questions): day 1 in 2019 (Q8, Q13), no roadworks (Q13), the boats and the thúng (Q6), the old market (Q12), and the sea floor from public data (R8g, Q14).

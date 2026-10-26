@@ -59,7 +59,7 @@ I must not find a defect that a play test can find.
 - **The notebook (sổ tay).** Each custom that the player learns is a card in the notebook. The cards are the progress of the game.
 - **Content is data.** All culture text, names, prices, and opening hours are in data files in `data/`. They are not in code. I must be able to edit them.
 - **Respect.** Smelly or "strange" food is a brave moment for the player. It is not a joke about the food. Local people are proud of their food.
-- **No real businesses.** Do not use the names, logos, or signs of real shops or brands.
+- **No real businesses.** Do not use the names, logos, or signs of real shops or brands. Exception: a business that was in the town for a long time and that everyone knows, like a landmark (for example Khách sạn Hải Âu). I approve each exception, and `docs/content/culture-notes.md` lists it.
 
 ## 5. Technical decisions
 
