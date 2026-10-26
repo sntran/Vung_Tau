@@ -25,7 +25,7 @@ The box shapes of plan 0005 (`TreeKit`) go away.
 | ID | Decision | Reason |
 |---|---|---|
 | D1 | The trees are made by code in Blender (`bpy` from PyPI, the version of plan 0006), from the values in `data/trees/types.json`. The script exports a `.glb` for each type and variant. | We have no artist. Free libraries have few tropical trees, and the workspace cannot download from `dl.polyhaven.org`. Code lets me change a tree with numbers. Plan 0006 already runs Blender in the workspace and in CI. The prototype `docs/prototype/trees/trees.py` makes a coconut palm and a bàng tree in about 40 s each. |
-| D2 | The prototype pictures `docs/prototype/trees/trees_v2.jpg` show the target look. | I judge a look from a picture, not from text. |
+| D2 | The prototype pictures `docs/prototype/trees/trees_v3.jpg` show the target look. | I judge a look from a picture, not from text. |
 | D3 | Each type has three forms: near (real leaves and leaflets), middle (leaf cards: flat pictures of leaf groups with alpha), and far (an impostor: a picture of the tree from many directions, on a camera-facing card). Godot changes the form by distance with `visibility_range_begin`, `visibility_range_end`, and a fade. | A tree with real leaves has tens of thousands of triangles. The town has about 29 000 street trees and many more hill trees. Only the near trees can have real leaves. |
 | D4 | The leaves use alpha scissor, not alpha blend. | Blended leaves sort wrong and cannot cast shadows. Scissored leaves can. |
 | D5 | Each type has at least 3 variants with different seeds. The world adds a random turn and size to each tree. | Copies of one tree in a row look false. |
@@ -40,13 +40,14 @@ The box shapes of plan 0005 (`TreeKit`) go away.
 
 | Type | Where | Look |
 |---|---|---|
-| `coconut` | Bãi Trước (shore and park), coast roads | Curved grey trunk with rings, 8 to 15 m. A round crown of 18 to 26 fronds of about 4 to 5 m that arch out, with tips that curve down. The fronds do not hang to the ground. Leaflets hang down in a V. Dead brown fronds hang under the crown. Green and brown coconuts. |
-| `bang` | The park of Bãi Trước, streets | Old trees: a short, thick dark trunk and a few big limbs under a wide dome of leaves (my memory). Young trees: branches in flat layers, like a pagoda. Large leaves in groups at the ends of the twigs. In the dry season, some leaves are red and orange, and some fall (Q4). |
-| `casuarina` | Bãi Sau, coast roads, a few at Bãi Trước | Tall and thin, with a sparse, uneven crown of thin grey-green needles. |
-| `flame` | Streets, Núi Lớn | Phượng vĩ: wide, flat crown like an umbrella, small fern-like leaves. Red flowers from late April to early July. Few leaves late in the dry season. |
+| `coconut` | Bãi Trước (shore and park), coast roads | Tall, thin trunk with rings, 10 to 15 m, often leaning and curved. A round crown of 22 to 26 fronds of 5 to 6 m that arch out, with tips that curve down. The leaflets hang down from each frond like a curtain. Dead brown fronds hang under the crown. Green and brown coconuts. |
+| `bang` | Quang Trung (the Bãi Trước road), the park, streets | Old trees as in my photos: a thick trunk, often leaning, that forks at 2 to 3 m into 2 or 3 leaders. Layers of near-flat branches end in groups of large leaves. A tall, rounded, open crown: the sky shows through. Light green, with yellow-green new leaves. In the dry season, some leaves are red and orange, and some fall (Q4). |
+| `casuarina` | Ba Cu, Bãi Sau, coast roads, a few at Bãi Trước | Tall and thin (11 to 15 m), with a ragged, see-through crown of drooping grey-green needles that starts high on the trunk. |
+| `flame` | Ba Cu, other streets, Núi Lớn | Phượng vĩ: a light grey trunk that forks low into wide limbs, and a wide, flat umbrella of fine, fern-like leaves. Red flowers from late April to early July. Few leaves late in the dry season. |
 | `frangipani` | Streets, temples, parks | Hoa sứ: short, thick, grey branches that fork. Long leaves in groups at the ends. White and yellow flowers. |
 | `fan_palm` | Parks | Round fan leaves on long stems. |
-| `shade` | Main roads | A large shade tree (Q1). |
+| `araucaria` | One or a few on the coast road near the south end of Bãi Trước | Norfolk pine: a straight trunk with flat layers of branches in a tall cone. |
+| `shade` | Main roads | A large shade tree, for roads that have no answer yet (Q1). |
 | `tall_shade` | Between the Bãi Trước road and the sea | Old coconut palms and old bàng trees (Q2). This type goes away: the mixes use `coconut` and `bang` there. |
 | `hill_a`, `hill_b`, `hill_c`, `teak` | Núi Lớn, Núi Nhỏ | The hill forest (Q3): a round broadleaf crown (the Ficus group: đa, sung, sanh), a tall tree with a high crown, a low, wide bush-tree, and teak (gỗ tếch) in an area of Núi Lớn. Teak and some hill trees lose their leaves in the dry season. Bông gòn (kapok) along the Hải Đăng road. |
 
@@ -73,7 +74,7 @@ The box shapes of plan 0005 (`TreeKit`) go away.
 ### In the world
 
 - **R10.** `StreetTrees` and the hill trees of `scenes/world/vung_tau.gd` use the new types. The mixes in `data/geo/trees.json` use the new type names. Bãi Trước has coconut palms along the shore and in the park (culture notes).
-- **R11.** The boats are only at the corner end of Bãi Trước (plan 0005, Q6). The trees of the main beach do not stand on the sand where the locals swim.
+- **R11.** No tree stands on the sand of Bãi Trước or in the water. The boats are in the bay, as plan 0005 (Q6) says.
 - **R12.** Budget (plan 0004, R14): at the views of PT-54, Low stays at 600 draw calls and 300 000 triangles or less, and High at 2 000 draw calls and 2 000 000 triangles or less.
 - **R13.** On a phone (Mobile renderer), the near form ends at 15 m, and the middle form at 80 m.
 
@@ -93,8 +94,8 @@ The box shapes of plan 0005 (`TreeKit`) go away.
 
 ## 7. Open questions
 
-- **Q1.** Which trees are the large shade trees of the main roads of Vũng Tàu (for example Ba Cu, Trần Hưng Đạo, Lê Lợi)? Research (2026-10-26) found no source that names them. A source shows a flame tree on Thùy Vân ([VnExpress, 2022](https://vnexpress.net/cay-phuong-nua-la-nua-hoa-4460108.html)). Until I answer, `shade` stays a generic large broadleaf tree. Photos of the streets in 2019 can answer it.
+- **Q1.** Partly answered (2026-10-26, a photo that I chose): Ba Cu has casuarinas and flame trees. Quang Trung has large old bàng trees and coconut palms. A source shows a flame tree on Thùy Vân ([VnExpress, 2022](https://vnexpress.net/cay-phuong-nua-la-nua-hoa-4460108.html)). The other main roads (for example Trần Hưng Đạo, Lê Lợi): still open. Until I answer, they use a mix of bàng, flame trees, and `shade`.
 - **Q2.** Answered by research (2026-10-26): old coconut palms and old bàng trees stand in the park along Quang Trung ([VinWonders](https://vinwonders.com/vi/wonderpedia/news/bai-truoc-vung-tau/)). In the 1960s, coconut palms, casuarinas (dương liễu), and bàng shaded almost all of the sand, and the bay was called "Vịnh Hàng Dừa" ([ArtCorner](https://artcorner.vn/product/bai-truoc-1969-vinh-hang-dua-bieu-tuong-vung-tau-xua/)). The game is in 2019, with many coconut palms (culture notes). The mix there: mostly coconut, some bàng, a few casuarinas.
 - **Q3.** Partly answered by research (2026-10-26). No survey of the species was found. A news title says that Núi Lớn has a forest area of teak (gỗ tếch) and old trees ([Dân Việt, 2024](https://danviet.vn/nui-lon-o-vung-tau-cao-254m-so-voi-mat-nuoc-bien-co-khu-rung-la-toan-cay-go-tech-cay-co-thu-2024100318182828-d845974.html)). A 2026 report says that the forest of both hills is in poor condition, and the plan to green them uses the Ficus group (đa, bồ đề, sung, sanh, sộp), cẩm lai, đỗ mai, sứ đại, phượng vĩ, bằng lăng, mủ trôm, and bông giấy, with bông gòn on the Hải Đăng road ([Nhân Dân, 14 June 2026](https://nhandan.vn/phu-xanh-nui-lon-nui-nho-vung-tau-post969115.html)). These are planned trees, not a list of the trees of 2019. I check the forms of R1 against my photos.
 - **Q4.** Answered by research (2026-10-26): yes in general. Bàng leaves turn pinkish red or yellow-brown and fall in the dry season ([Wikipedia](https://en.wikipedia.org/wiki/Terminalia_catappa)). So on day 1 (22 January 2019), some bàng trees are part red, and some are part bare. The source is not specific to Vũng Tàu.
-- **Q5.** Is the target look of `trees_v2.jpg` correct? What must change?
+- **Q5.** Version 3 (2026-10-26) follows my photos: the coconut palm, the old bàng, the casuarina, and the flame tree. Is it correct? What must change?

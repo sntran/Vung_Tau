@@ -60,7 +60,7 @@ The order can change. A number is only a name: plans 0020 to 0022 were added aft
 | 0013 | Homestay meal | Eat with the host family. Home dishes and strong-smelling sauces. I name the dishes. |
 | 0014 | Street snacks | Bánh mì at dawn, bánh khọt, hột vịt lộn, hủ tiếu gõ at night. |
 | 0021 | Tết | The two weeks before Tết and the first days of the year (day 1 to about day 22). The markets sell Tết items. Houses decorate. The flower market at Bãi Trước sells hoa mai, hoa đào, and other plants, and people carry them home. The family makes bánh tét (and a Northern neighbor bánh chưng): the old way over a wood fire through the night, or a new way, or they buy them. Ông Táo on day 7, the five-fruit tray, giao thừa on the night of day 14 (30 Tết), lì xì, and the quiet streets of Mùng 1. Facts in the culture notes, section Tết. |
-| 0015 | Beach mornings and evenings | Morning exercise, the boats, the fish, the evening on the coast road. |
+| 0015 | Beach mornings and evenings | Morning exercise, the boats moored all over the bay, the fishermen near the rocks at the south end, the flat rocks at low tide, the fish, and the evening swim of the families at the main beach, with rented swim rings. The evening on the coast road. |
 | 0016 | Hòn Bà at low tide | Check the tide, walk the rock path to Miếu Hòn Bà, and come back before the sea covers it. Locals warn the player about the time. |
 | 0017 | Afternoon on the Vi Ba road | Jog or ride up Núi Lớn in the afternoon. Stop at Chùa Tam Bảo to watch the monkeys (and keep your bag closed). At the top, eat sữa chua and trứng lòng đào. |
 | 0018 | Scooter | Wear a helmet and ride along the coast in the evening, and up the Vi Ba road. |
