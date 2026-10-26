@@ -12,7 +12,8 @@ Vũng Tàu is a 3D game about Vietnamese food and daily life. The player is a tr
 
 - **Audience:** adults who are not Vietnamese. They know phở from restaurants abroad. They do not know how people eat it in Vietnam.
 - **Goal:** the player learns how people in Vietnam really eat, order, and live around food. The player does not learn recipes.
-- **Setting:** Vũng Tàu today, with its real geography. The player stays at a family homestay in a small hẻm (alley) at the foot of Núi Nhỏ, near Bãi Trước (Front Beach). The homestay hẻm is only homes: the slope of the mountain is on one side, and one row of houses is on the other side. Nobody sells anything in it. To eat, the player walks down to chợ Xóm Lưới and the streets near it. The hẻm of plans 0001 to 0004, with its shops, is a test street until plan 0009 builds the real hẻm.
+- **Setting:** Vũng Tàu today, with its real geography. The player stays at a family homestay in a small hẻm (alley) at the foot of Núi Nhỏ, near Bãi Trước (Front Beach). The homestay hẻm is Hẻm 2 Hải Đăng. It is only homes: the slope of the mountain is on one side, with some houses on it, and one row of houses is on the other side. Nobody sells anything in it. The homestay is on the slope side, with a garden on the slope behind it. To eat, the player walks down to chợ Xóm Lưới and the streets near it. The hẻm of plans 0001 to 0004, with its shops, is a test street until plan 0009 builds the real hẻm.
+- **Time:** day 1 of the game is Saturday 23 January 2027, two weeks before Tết (Mùng 1 is Saturday 6 February 2027). The town gets ready for Tết.
 - **Platforms:** desktop (Windows, macOS, Linux) is the main platform. Android and iPhone apps stay, with lower settings. A web build is for quick review (plan 0004, D1).
 - **Engine:** Godot 4.7.2-stable. See section 5.
 
@@ -197,6 +198,7 @@ The audio driver prints ALSA errors in the workspace. These errors are not defec
 | `docs/content/reference/houses.md` | Links to public photos for each part of the house kit (plan 0004, R12). |
 | `docs/release-notes.md` | Notes for the desktop builds. |
 | `docs/prototype/hem-2d.html` | The first 2D prototype. Use it as a reference for content and flow only. Do not copy its look. |
+| `docs/prototype/trees/` | The tree prototype of plan 0020: the target look of the coconut palm and the bàng tree, made by code. |
 | `docs/prototype/people/` | The people prototype of plan 0006 (Blender and MPFB 2): the approved target look, the values of each person, and how to make clothes by code. |
 | `project.godot`, `export_presets.cfg` | The Godot project and the export presets (Web, Android, iOS, Linux, Windows, macOS). |
 | `autoload/` | `Content` (reads and checks `data/`), `GameState` (clock, notebook, save), `Playtest` (active only with `--playtest=NAME`). |

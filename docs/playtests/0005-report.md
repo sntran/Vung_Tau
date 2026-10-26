@@ -25,7 +25,7 @@ The other geography scenarios (PT-34 to PT-37, PT-39) passed in CI. They take 12
 
 - **Actual:** From the top of Núi Nhỏ, Núi Lớn and the near slopes are smooth, bare grass. The hill trees grow only in the near chunks (300 m), and the views show none.
 - **Expected:** R12: trees on the hills. In my photos, Núi Lớn and Núi Nhỏ are covered by dense trees in both seasons (green in the rainy season, with brown and red leaves in the dry season). The hills are the first thing that a player sees of Vũng Tàu.
-- **Correction:** Dense trees on all slopes with the surface "wood" or above 12 m, at every distance: near trees as now, and a simple far form (for example clumps or a tree canopy texture on the ground) for the mid and far chunks. Add a check to PT-33: in the view from the top of Núi Nhỏ, the slopes of Núi Lớn show a canopy color, not the grass color.
+- **Correction:** Dense trees on all slopes with the surface "wood" or above 12 m, at every distance: near trees as now, and a simple far form (for example clumps or a tree canopy texture on the ground) for the mid and far chunks. Plan 0020 replaces the near tree shapes later, so do not spend time on the look of the near trees here: this defect is about trees at every distance. Add a check to PT-33: in the view from the top of Núi Nhỏ, the slopes of Núi Lớn show a canopy color, not the grass color.
 
 ### D-0005-02: PT-33 does not frame the places that I must compare (medium)
 

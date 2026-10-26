@@ -59,6 +59,12 @@ Status values:
 | Bánh khọt: small crisp cakes of rice flour with curry powder, topped with shrimp or squid. People wrap them in lettuce and herbs and dip them in a fish sauce mix. | Source | [Vietnam Travel](https://vietnam.travel/jp/node/745) |
 | Bánh khọt is cooked in a large round metal pan with many small cups. The cook pours the batter with a spoon, adds a shrimp to each, and tops them with scallion. On the plate, they have shrimp floss on top. They come with mustard greens and herbs, pickled green papaya and carrot, and nước mắm with chili. Plates and bowls often have a printed flower pattern. | Source | Photos that I chose, 2026-10-24 |
 | In the late afternoon and evening, many local families swim at Bãi Trước. Fishing boats stay at anchor in the bay. | Source | Photos that I chose, 2026-10-24 |
+| The sand of Bãi Trước is narrow. The wide main part of Bãi Trước is where the locals swim. The boats are only at the corner end. | Confirmed | First-hand, 2026-10-26 |
+| Bãi Trước and its park have coconut palms. Sources also name old coconut palms along the curve of the shore and old bàng trees (Terminalia catappa) in the park along Quang Trung. | Confirmed (coconut), Source (bàng) | First-hand, 2026-10-26; [VinWonders](https://vinwonders.com/vi/wonderpedia/news/bai-truoc-vung-tau/) |
+| Before Tết, Bãi Trước has a spring flower festival in the triangle area, with a decorated flower boat. Coconut trunks are wrapped in blue and red cloth, and flags hang over the streets. The flower market sells roses, marigolds (vạn thọ), chrysanthemums, bonsai, cactus, mai, and peach from the North. | Source (one year) | [VnExpress](https://vnexpress.net/pho-bien-nghenh-xuan-2119835.html) |
+| Ngã Năm is a big roundabout, like the other big roundabout. | Confirmed | First-hand, 2026-10-26 |
+| There is an old market near Bãi Trước. Which one is it on `anchors.png`? | Check | First-hand, 2026-10-26 |
+| Since 1 July 2025, Vũng Tàu is part of Ho Chi Minh City. Old Phường 1, 2, 3, 4, 5, Thắng Nhì, and Thắng Tam are now one ward: phường Vũng Tàu. So the homestay address in 2027 is "Hẻm 2 Hải Đăng, phường Vũng Tàu, TP. Hồ Chí Minh". People still say "Vũng Tàu". | Source | [PLO](https://plo.vn/ly-do-chon-va-y-nghia-ten-4-phuong-moi-cua-tp-vung-tau-sau-sap-xep-post845532.html); [Wikipedia](https://en.wikipedia.org/wiki/V%C5%A9ng_T%C3%A0u) |
 | The small fishing boats are wooden, painted blue with red trim, with worn paint. They carry coils of rope, nets, and plastic baskets. | Source | Photos that I chose, 2026-10-24 |
 | Fast ferries stop at a pier near Bãi Trước. | Check | Photos that I chose, 2026-10-24 |
 | In the evening, people drive scooters along the coast road. | Confirmed | First-hand |
@@ -80,11 +86,38 @@ Status values:
 | The pagoda with the monkeys is Chùa Tam Bảo (chùa Khỉ), 72 Vi Ba. | Confirmed | First-hand; [Foody](https://www.foody.vn/vung-tau/chua-tam-bao); [VinWonders](https://vinwonders.com/vi/wonderpedia/news/nui-lon-vung-tau/) |
 | Wild monkeys on Núi Lớn sometimes go into houses and bite people. | Source | [Tuổi Trẻ](https://tuoitre.vn/nui-lon.html) |
 | Town anchors that have been in the same place for a long time: the main bus station, the old markets, the big roundabout, and Ngã Năm. | Confirmed | First-hand. I will name the markets and the roundabout. |
-| The homestay hẻm is only homes. The slope of Núi Nhỏ is on one side, and there is just enough space for one row of houses on the other side. Nobody sells anything in it. | Confirmed | First-hand, 2026-10-24 |
+| The homestay hẻm is only homes. The slope of Núi Nhỏ is on one side, and there is just enough space for one row of houses on the other side. There are also houses on the slope side. Nobody sells anything in it. | Confirmed | First-hand, 2026-10-24 and 2026-10-26 |
+| The homestay hẻm is Hẻm 2 Hải Đăng (OSM way 1408726731). The homestay is on an empty lot on the slope side, at the point where `homestay_area.png` shows the name of the hẻm. The family uses the slope behind the house. | Confirmed | First-hand, 2026-10-26 |
 | The nearest place to eat from the homestay hẻm is chợ Xóm Lưới, a short walk down. | Confirmed | First-hand, 2026-10-24 |
 | Chợ Xóm Lưới is on Phan Bội Châu (at Nguyễn Công Trứ), Phường 2. It sells fresh seafood, and stalls cook it on site. Fishing boats come in at about 15:00. | Source | [Mytour](https://mytour.vn/vi/blog/bai-viet/5-dia-chi-ban-hai-san-tuoi-ngon-khong-lo-chat-chem-o-vung-tau.html), [Mia.vn](https://mia.vn/cam-nang-du-lich/bo-tui-ngay-9-dia-chi-vang-mua-hai-san-tuoi-song-vung-tau-danh-cho-dan-sanh-an-1611) |
 | Houses in a dense hẻm are not in line with each other. They face in different directions, with different depths, back extensions, and roofs at many heights. | Confirmed | First-hand, and the top-down photo of a dense hẻm, 2026-10-24 |
 | Buildings are colorful, as in the photos: about a third of the building surfaces seen from above have a strong color (rust, orange, terracotta, mint, teal). | Confirmed | My choice ("colorful like the photos"), and the architect's measurement of the photos, 2026-10-24 |
+
+## Tết
+
+| Fact | Status | Source |
+|---|---|---|
+| Tết Nguyên Đán 2027 (Mùng 1, year Đinh Mùi) is Saturday 6 February 2027. Tháng Chạp of Bính Ngọ has 29 days, so giao thừa is the night of Friday 5 February. | Source | [Thư viện Pháp luật](https://thuvienphapluat.vn/hoi-dap-phap-luat/tet-am-lich-2027-la-ngay-may-duong-lich-138050948.html); the lunar calendar of the game (`tools/geo/geodata/lunar.py`) |
+| Day 1 of the game is two weeks before Tết. | Confirmed | My decision, 2026-10-26 |
+| Before Tết, markets have special items, houses start to decorate, and people buy Tết plants, for example hoa mai and hoa đào. | Confirmed | First-hand, 2026-10-26 |
+| Some people cook the Tết cake at home in the old way, and some in a new way. | Confirmed | First-hand, 2026-10-26 |
+| In the South, the Tết cake is bánh tét (a cylinder in banana leaves). Bánh chưng (square, in lá dong) is the cake of the North. Many Northern families in Vũng Tàu make bánh chưng. | Source | [Báo Pháp luật](https://baophapluat.vn/net-dac-trung-thu-vi-trong-ngay-tet-o-nam-bo-post269976.html) |
+| The old way: boil the cakes for many hours in a big pot over a wood fire, and the family stays up to watch the fire. A new way: a pressure cooker, in about 1 to 2 hours. Many families buy the cakes. | Check | [Điện máy XANH](https://www.dienmayxanh.com/vao-bep/cach-luoc-banh-chung-bang-noi-ap-suat-don-gian-sieu-nhanh-16423). The details need your check. |
+| In the South, homes have hoa mai (yellow apricot flowers). The North has hoa đào. A family picks a mai tree with many buds, so that it opens on Tết. | Source | [Báo Pháp luật](https://baophapluat.vn/net-dac-trung-thu-vi-trong-ngay-tet-o-nam-bo-post269976.html) |
+| The Southern five-fruit tray (mâm ngũ quả) has mãng cầu, dừa, đu đủ, and xoài: "cầu vừa đủ xài" (pray for just enough to spend). | Source | [Báo Pháp luật](https://baophapluat.vn/net-dac-trung-thu-vi-trong-ngay-tet-o-nam-bo-post269976.html) |
+| Tết dishes in the South: thịt kho (pork braised with eggs) with dưa giá or củ kiệu (pickled shallots). | Source | [Báo Pháp luật](https://baophapluat.vn/net-dac-trung-thu-vi-trong-ngay-tet-o-nam-bo-post269976.html) |
+| Lì xì: children get money in red envelopes. Families do not sweep out the house and do not break things on the first days. | Source | [Báo Pháp luật](https://baophapluat.vn/net-dac-trung-thu-vi-trong-ngay-tet-o-nam-bo-post269976.html) |
+| Ông Táo (the Kitchen Gods) go to heaven on the 23rd of tháng Chạp. In 2027 that is Saturday 30 January (day 8 of the game). Families make an offering, and some release a carp. | Check | Common custom. Needs your check for Vũng Tàu. |
+| Bàng trees turn red and drop their leaves in the dry season, near Tết. | Check | Not verified for Vũng Tàu |
+
+## Farming at home
+
+| Fact | Status | Source |
+|---|---|---|
+| The traditional home farm is VAC (vườn, ao, chuồng): a garden, a fish pond, and an animal pen. | Source | Common knowledge. Needs a source. |
+| The old province resolution 14/2021/NQ-HĐND of Bà Rịa - Vũng Tàu (10 December 2021) bans livestock and poultry in all wards of Vũng Tàu city. Only pets and laboratory animals are allowed. Farms had to stop or move before 31 December 2024. | Source | [Nghị quyết 14/2021/NQ-HĐND](https://hethongphapluat.com/nghi-quyet-14-2021-nq-hdnd-5d7cccee0efcebe93080a15302a474a6.html) |
+| After the merger, Ho Chi Minh City drafts a new rule. The draft bans livestock in all 113 wards. The city council gets it in the last quarter of 2026. | Source | [Avinews, 13 March 2026](https://avinews.com/vi/tp-hcm-sap-ban-hanh-quy-dinh-moi-ve-khu-vuc-cam-chan-nuoi/) |
+| Do families on Núi Nhỏ keep a few chickens anyway? | Check | Your knowledge |
 
 ## Houses
 
