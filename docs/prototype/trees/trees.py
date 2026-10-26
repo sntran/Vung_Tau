@@ -129,14 +129,14 @@ def coconut(origin=Vector((0, 0, 0)), height=11.0, lean=1.6, seed=1):
         az = i * 2.39996 + r.uniform(-0.1, 0.1)
         age = i / fronds                       # 0 young (up), 1 old (down)
         dead = i >= fronds - 2
-        up = math.radians(35 + 95 * age + r.uniform(-8, 8))
-        L = 4.6 + r.uniform(-0.4, 0.3)
+        up = math.radians(30 + 70 * age + r.uniform(-6, 6))
+        L = 4.4 + r.uniform(-0.4, 0.3) - (1.2 if dead else 0.0)
         d0 = Vector((math.sin(up) * math.cos(az), math.sin(up) * math.sin(az), math.cos(up)))
         out = Vector((math.cos(az), math.sin(az), 0))
         seg = 20; rach = []
         for k in range(seg + 1):
             s = k / seg
-            droop = (0.7 + 0.9 * age) * s * s * L * 0.6
+            droop = (0.75 + 0.55 * age) * s * s * L * 0.5
             rach.append(top + d0 * (s * L) - Vector((0, 0, droop)))
         tube(bm, rach, [0.045 * (1 - k / seg) + 0.01 for k in range(seg + 1)], 5, 2 if dead else 1)
         side = out.cross(Vector((0, 0, 1))).normalized()
@@ -151,7 +151,7 @@ def coconut(origin=Vector((0, 0, 0)), height=11.0, lean=1.6, seed=1):
             for sgn in (-1, 1):
                 sd = (side * sgn).normalized()
                 # Leaflets point out, forward, and down in a V.
-                dirv = (sd * 0.7 + tang * 0.3 + Vector((0, 0, -0.75 if not dead else -1.2))).normalized()
+                dirv = (sd * 0.7 + tang * 0.3 + Vector((0, 0, -0.45 if not dead else -1.2))).normalized()
                 wv = tang * 0.028
                 q0 = p; segs = 4; prev = None
                 for m in range(segs + 1):
@@ -197,48 +197,71 @@ def leaf(bm, base, direction, normal, size, mi):
 
 
 def bang(origin=Vector((0, 0, 0)), seed=3, tet=False):
+    """An old bàng: a short thick trunk, a few big limbs, and a wide dome of leaves."""
     r = random.Random(seed)
     bm = bmesh.new()
-    H = 9.0
-    tpts = [origin + Vector((0.15 * math.sin(i * 0.7), 0.1 * math.cos(i), H * i / 12)) for i in range(13)]
-    tube(bm, tpts, [0.32 - 0.2 * i / 12 + (0.12 if i == 0 else 0) for i in range(13)], 12, 0)
-    tiers = [(2.8, 4.6, 5), (4.3, 3.9, 5), (5.7, 3.0, 5), (7.0, 2.2, 4), (8.1, 1.4, 4), (8.9, 0.8, 3)]
+    trunk_h = 3.0
+    tpts = [origin + Vector((0.1 * math.sin(i), 0.08 * math.cos(i * 1.3), trunk_h * i / 6)) for i in range(7)]
+    tube(bm, tpts, [0.42 - 0.08 * i / 6 + (0.15 if i == 0 else 0) for i in range(7)], 14, 0)
+    top = tpts[-1]
+    centre = origin + Vector((0, 0, 5.2)); A, B = 6.2, 3.4     # the dome: half width, half height
+    network = []                                               # points on the branches
+
+    def inside(p, k=0.92):
+        # Keep a branch end inside the dome, so no bare branch sticks out.
+        v = p - centre; e = math.sqrt((v.x / A) ** 2 + (v.y / A) ** 2 + (v.z / B) ** 2)
+        return centre + v * (k / e) if e > k else p
+    limbs = 6
+    for li in range(limbs):
+        az = li * 2 * math.pi / limbs + r.uniform(-0.25, 0.25)
+        out = Vector((math.cos(az), math.sin(az), 0))
+        tilt = r.uniform(0.45, 0.75)                           # 0 = up, 1 = flat
+        end = inside(centre + out * A * 0.72 + Vector((0, 0, B * (0.55 - tilt * 0.5))), 0.8)
+        pts = [top.lerp(end, k / 8) + Vector((0, 0, 0.6 * math.sin(math.pi * k / 8)))  for k in range(9)]
+        tube(bm, pts, [0.24 * (1 - 0.75 * k / 8) for k in range(9)], 8, 0)
+        network += pts[2:]
+        side = out.cross(Vector((0, 0, 1)))
+        for k in (3, 5, 7):
+            for sg in (-1, 1):
+                d = (out * 0.5 + side * sg * r.uniform(0.6, 1.0) + Vector((0, 0, r.uniform(0.2, 0.6)))).normalized()
+                q = inside(pts[k] + d * r.uniform(1.6, 2.6), 0.85)
+                sub = [pts[k].lerp(q, u / 4) + Vector((0, 0, 0.25 * math.sin(math.pi * u / 4))) for u in range(5)]
+                tube(bm, sub, [0.09 * (1 - 0.7 * u / 4) for u in range(5)], 6, 0)
+                network += sub[1:]
+                # Small branches from the end, out to the shell of the dome.
+                for _ in range(4):
+                    d2 = (d + Vector((r.uniform(-0.9, 0.9), r.uniform(-0.9, 0.9), r.uniform(-0.2, 0.5)))).normalized()
+                    q2 = inside(sub[-1] + d2 * r.uniform(1.0, 1.8))
+                    tw = [sub[-1].lerp(q2, u / 3) for u in range(4)]
+                    tube(bm, tw, [0.035, 0.028, 0.02, 0.014], 4, 0)
+                    network += tw[1:]
+    # Groups of leaves on the shell of the dome, each on a twig from the nearest branch.
     rosettes = []
-    for ti, (h, L, nb) in enumerate(tiers):
-        base = tpts[0] + Vector((0, 0, h))
-        for b in range(nb):
-            az = b * 2 * math.pi / nb + ti * 0.62 + r.uniform(-0.2, 0.2)
-            out = Vector((math.cos(az), math.sin(az), 0))
-            pts = []
-            for k in range(9):
-                s = k / 8
-                pts.append(base + out * (L * s) + Vector((0, 0, 0.35 * s * s * L * 0.3 + 0.1 * s)))
-            tube(bm, pts, [0.11 * (1 - ti / 7) * (1 - 0.8 * s) + 0.015 for s in [k / 8 for k in range(9)]], 6, 0)
-            # Twigs along the outer two thirds, each with a rosette of leaves at the end.
-            side = out.cross(Vector((0, 0, 1)))
-            for k in range(2, 9):
-                for t in range(4):
-                    p = pts[k]
-                    sg = 1 if t % 2 else -1
-                    tw = (out * 0.6 + side * sg * r.uniform(0.5, 1.2) + Vector((0, 0, r.uniform(0.0, 0.35)))).normalized()
-                    ln = r.uniform(0.4, 1.1) * (0.6 + 0.4 * L / 4.6)
-                    q = p + tw * ln
-                    tube(bm, [p, q], [0.03, 0.012], 4, 0)
-                    rosettes.append((q, tw))
-                    rosettes.append((p.lerp(q, 0.5) + Vector((0, 0, 0.05)), tw))
-            rosettes.append((pts[-1], out))
-    green = mat('bang_leaf', (0.12, 0.30, 0.06), 0.45, 0.3, (0.35, 0.55, 0.1))
-    red = mat('bang_red', (0.55, 0.12, 0.04), 0.5, 0.3, (0.8, 0.25, 0.05))
-    orange = mat('bang_orange', (0.65, 0.35, 0.06), 0.5, 0.3, (0.85, 0.5, 0.1))
-    for q, tw in rosettes:
-        n = r.randint(9, 13)
-        for k in range(n):
-            a = 2 * math.pi * k / n + r.uniform(-0.2, 0.2)
-            d = Vector((math.cos(a), math.sin(a), r.uniform(-0.15, 0.25))).normalized()
+    for i in range(1600):
+        th = math.acos(1 - r.random() * 1.15)                  # from the top to a little below the middle
+        ph = r.uniform(0, 2 * math.pi)
+        k = r.uniform(0.7, 1.0) ** 0.5
+        n = Vector((math.sin(th) * math.cos(ph), math.sin(th) * math.sin(ph), math.cos(th)))
+        q = centre + Vector((n.x * A * k, n.y * A * k, n.z * B * k))
+        near = min(network, key=lambda p: (p - q).length_squared)
+        if (near - q).length > 1.4:
+            continue
+        tube(bm, [near, q], [0.022, 0.008], 3, 0)
+        rosettes.append((q, n))
+    green = mat('bang_leaf', (0.07, 0.20, 0.035), 0.45, 0.22, (0.3, 0.5, 0.08))
+    red = mat('bang_red', (0.45, 0.08, 0.03), 0.5, 0.22, (0.8, 0.25, 0.05))
+    orange = mat('bang_orange', (0.55, 0.28, 0.05), 0.5, 0.22, (0.85, 0.5, 0.1))
+    for q, n in rosettes:
+        up = (n + Vector((0, 0, 1.2))).normalized()
+        m = r.randint(9, 13)
+        for k in range(m):
+            a = 2 * math.pi * k / m + r.uniform(-0.2, 0.2)
+            t = up.orthogonal().normalized(); b = up.cross(t)
+            d = (t * math.cos(a) + b * math.sin(a) + up * r.uniform(-0.1, 0.25)).normalized()
             mi = 1
             if tet:
                 x = r.random(); mi = 2 if x < 0.35 else (3 if x < 0.5 else 1)
-            leaf(bm, q, d, Vector((0, 0, 1)), r.uniform(0.9, 1.3), mi)
+            leaf(bm, q, d, up, r.uniform(0.85, 1.2), mi)
     wood = mat('bang_wood', (0.12, 0.10, 0.08), 0.9)
     o = obj('bang', bm, [wood, green, red, orange])
     for poly in o.data.polygons:
@@ -264,17 +287,17 @@ def render(name):
 what = sys.argv[-2]
 if what == 'coconut':
     sc = reset(); ground((0.62, 0.52, 0.36))
-    coconut(Vector((-2.2, 0, 0)), 11.5, 1.8, 1); coconut(Vector((2.4, 3.5, 0)), 9.0, -1.2, 4)
+    coconut(Vector((-2.2, 0, 0)), 11.5, 1.8, 1); coconut(Vector((2.4, 3.5, 0)), 10.0, -1.2, 4)
     person(Vector((1.0, -1.5, 0)))
     camera((0.4, 0, 6.0), 16, 1.7, 30)
     render('coconut')
 elif what == 'bang':
     sc = reset(); ground((0.45, 0.42, 0.33))
     bang(Vector((0, 0, 0)), 3, tet=False); person(Vector((2.5, -2.5, 0)))
-    camera((0, 0, 4.2), 17, 1.7, 30)
+    camera((0, 0, 4.0), 18, 1.7, 30)
     render('bang_green')
 elif what == 'bang_tet':
     sc = reset(); ground((0.45, 0.42, 0.33))
     bang(Vector((0, 0, 0)), 3, tet=True); person(Vector((2.5, -2.5, 0)))
-    camera((0, 0, 4.2), 17, 1.7, 30)
+    camera((0, 0, 4.0), 18, 1.7, 30)
     render('bang_tet')
