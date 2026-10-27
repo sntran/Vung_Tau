@@ -23,7 +23,7 @@ const SECOND := 0.5
 ## clumps are larger, so that they cover about as much of the hills as all
 ## the clumps.
 const DETAIL := {
-	"low": {"crown": true, "scale": [2.0, 4.0], "scale_m": [400.0, 1600.0], "dense_m": 0.0},
+	"low": {"crown": true, "scale": [2.0, 4.5], "scale_m": [400.0, 1600.0], "dense_m": 0.0},
 	"medium": {"crown": false, "scale": [1.0, 2.4], "scale_m": [900.0, 1500.0], "dense_m": 1000.0},
 	"high": {"crown": false, "scale": [1.0, 2.4], "scale_m": [1300.0, 2000.0], "dense_m": 1500.0},
 	"ultra": {"crown": false, "scale": [1.0, 2.4], "scale_m": [1800.0, 2600.0], "dense_m": 2000.0},
@@ -145,13 +145,13 @@ static func clump_mesh() -> Mesh:
 	return tool.commit()
 
 
-## The mesh of one clump on Low: one round crown (24 triangles), 5 m wide and
-## 4.5 m high, so that LOW_SCALE makes it about as large as a clump.
+## The mesh of one sparse clump on Low: one round crown (24 triangles), 5 m
+## wide and 4 m high.
 static func crown_mesh() -> Mesh:
 	var tool := SurfaceTool.new()
 	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
 	# Darker than a crown of a clump: one crown has no shade of the other crowns on it.
-	_crown(tool, Vector3(0.0, 2.6, 0.0), Vector3(2.6, 2.4, 2.6), 0.4, 0.75)
+	_crown(tool, Vector3(0.0, 2.2, 0.0), Vector3(2.6, 2.0, 2.6), 0.4, 0.75)
 	tool.index()
 	return tool.commit()
 

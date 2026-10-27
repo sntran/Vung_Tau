@@ -53,4 +53,7 @@ void vertex() {
 void fragment() {
 	ALBEDO = clump_color;
 	ROUGHNESS = 0.9;
+	// Leaves have almost no shine: with the default specular, a low sun made
+	// the clumps pale tan on the Mobile renderer.
+	SPECULAR = 0.1;
 }
