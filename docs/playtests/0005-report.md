@@ -210,3 +210,23 @@ The builder copies these answers into the open questions of plan 0020 when it re
 - **Q8 (High at 07:00 and 17:30 in PT-52):** no. CI takes High at 12:00 only. The architect takes the other times on High in the audit.
 - **The public data (D-0005-09, correction 0, and plan 0020, D8 and R10a, commit `e38d4f0`):** the branch `feat/0020-real-trees` was made before that commit, so its trees and cover do not use ESA WorldCover and the canopy height maps yet. Rebase on main and do it before plan 0020 is "Built".
 - **Order:** finish the CI of `feat/0020-real-trees`, rebase on main, then the public data (D8, R10a), then D-0005-10.
+
+## 8. Second re-check (2026-10-27)
+
+Commit `8fa9a0e`. The architect ran PT-33 (12:00), PT-35 (low tide), PT-38 (low tide), and PT-54 on Low again, and read the reports of the sea floor and of the land cover.
+
+![The PT-33 views at 12:00 on day 1](0005/r3-views.jpg)
+
+![Hòn Bà at low tide, at the islet, and Bãi Trước at low tide](0005/r3-sea.jpg)
+
+| Defect | Result | Evidence |
+|---|---|---|
+| D-0005-06 | Fixed | 310 different images (28 with the sea below −1.5 m, 4 below −2.0 m). At Bãi Trước the data goes to 90 m (−1.72 m), and 50 m farther the floor is 0.79 m lower. Made: 2.76 km² (was 4.9 km²), a thin edge. At the low tide of day 1 the water beside the Hòn Bà path is 0.37 m deep or more, and the screenshot shows the path with water on both sides. |
+| D-0005-07 | Fixed | 2.2 % of the water near white at low tide from the sand of Bãi Trước. The wet sand has pools. |
+| D-0005-08 | Fixed | `intertidal_report.md` marks each row "data" or "made", and the dry map shows the made parts in red. |
+| D-0005-09 | Fixed | 68 % green from Núi Lớn, 59 % from Núi Nhỏ, 86 % on the Hải Đăng road, with mean values of 0.51, 0.50, and 0.43. 67 % of the town pixels have color. The hills come from the land cover (tree cover 73 % on Núi Lớn and 78 % on Núi Nhỏ) and the canopy map of 2019. The land looks alive now. |
+| D-0005-10 | Fixed | Low: 212 000 to 265 000 triangles at the PT-54 views (limit 300 000). |
+| D-0005-03 | Not fixed in the view | The view of Mũi Nghinh Phong at 12:00 still shows a smooth, light beige ground with tree shadows, like sand. No boulders show. My photos show dark grey and brown granite rocks at the cape. |
+| D-0005-05 | Partly fixed | From the beach, Hòn Bà is a low hump with trees. At the end of the path (PT-38), the islet is a smooth brown mound with small stones. My photo shows a pile of large grey and brown boulders. |
+
+**Status:** plan 0005 stays "Built" until D-0005-03 and D-0005-05 are corrected. Add to PT-33 and PT-38: in the view of the cape and in the view at the end of the path, the ground near the camera shows rock (a dark grey or brown color with a value below 0.5 for most pixels), not sand.
