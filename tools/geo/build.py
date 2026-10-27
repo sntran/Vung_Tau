@@ -25,7 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from geodata import blocks as blocks_module  # noqa: E402
 from geodata import anchors as anchors_module  # noqa: E402
-from geodata import coast, homestay, landmarks, mapdraw, osm, roads as roads_module, terrain  # noqa: E402
+from geodata import coast, homestay, landcover, landmarks, mapdraw, osm, roads as roads_module, terrain  # noqa: E402
 from geodata import roadworks as roadworks_module, sea as sea_module, seafloor, trees as trees_module  # noqa: E402
 from geodata.config import BUILD, GEO, RAW, ROOT, Config, load_json, write_json  # noqa: E402
 from geodata.projection import Projection, map_to_game  # noqa: E402
@@ -320,6 +320,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
                             out / "surface.png", rock_mask, out / "rock.png", pebble_mask)
     write_keep_import(out / "surface.png")
     write_keep_import(out / "rock.png")
+    cover_record = write_cover(grid, raw, out, projection, land_mask, area, found_by_id)
 
     lon_min, lat_min = projection.map_to_lonlat(box.bounds[0], box.bounds[1])
     lon_max, lat_max = projection.map_to_lonlat(box.bounds[2], box.bounds[3])
@@ -339,6 +340,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
         "chunks": chunks,
         "overview": overview,
         "surface": surface,
+        "cover": (cover_record or {}).get("world", {}),
         "sea_floor": {"coast_m": terrain.LAND_MIN_HEIGHT, "depth_m": -terrain.SEA_FLOOR_DEPTH,
                       "slope_m": terrain.SEA_FLOOR_SLOPE_M, "rock_m": terrain.SEA_ROCK_HEIGHT},
     }
@@ -389,6 +391,11 @@ def build(raw: Path, out: Path, geo: Path) -> int:
         write_json(out / "sea_objects.json", sea_objects)
     if tree_record is not None:
         write_json(out / "trees.json", tree_record, None)
+        if cover_record is not None:
+            # Plan 0020, R10a: the street trees that the canopy map does not show are in the report.
+            points = [p for kind in tree_record["types"].values() for p in kind]
+            missing = landcover.street_trees_without_canopy(points, grid, cover_record.pop("canopy_values"))
+            cover_record["street"] = {"count": len(points), "missing": missing}
     center = mapdraw.center_of(home)
     if center is not None:
         mapdraw.draw(out / "homestay_area.png", center, roads, land, beaches, block_list, buildings, home)
@@ -396,8 +403,11 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     anchors_module.draw(out / "anchors.png", anchor_list, roads, land)
     write_keep_import(out / "anchors.png")
     write_json(out / "anchors.json", {"anchors": [{k: v for k, v in a.items() if k != "map"} for a in anchor_list]})
+    if cover_record is not None:
+        cover_record.pop("canopy_values", None)
     write_report(out / "report.md", world, data, roads, block_list, buildings, found, home, problems,
-                 town_change, dem_max, raw, rock_cells, out, anchor_list, works, sea_objects, tree_record, tree_counts)
+                 town_change, dem_max, raw, rock_cells, out, anchor_list, works, sea_objects, tree_record, tree_counts,
+                 cover_record)
     log(f"done in {time.time() - started:.0f} s")
     return 0
 
@@ -487,6 +497,90 @@ def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods,
             "coast_range_m": limit, "rock": rock_path.name}
 
 
+# The hills of the cover report: the landmark, the radius (m), and the lowest height (m).
+COVER_HILLS = {"nui_lon": (1100.0, 20.0), "nui_nho": (700.0, 20.0)}
+
+
+def write_cover(grid, raw, out, projection, land_mask, area, found_by_id) -> dict | None:
+    """The land cover and the canopy heights (report 0005, D-0005-09; plan 0020,
+    D8): cover.png (on the grid of surface.png: R tree cover, G bushes, B grass,
+    A bare ground), canopy.png (the canopy height for the trees and the bushes
+    of the game), and two maps for the report. None when landcover.py did not run."""
+    if not ((raw / "worldcover.tif").exists() and (raw / "canopy.tif").exists()):
+        return None
+    classes = terrain.load_raster(grid, raw / "worldcover.tif", projection, terrain.Resampling.nearest)
+    classes = np.nan_to_num(classes, nan=0.0).astype(np.uint8)
+    canopy = terrain.load_raster(grid, raw / "canopy.tif", projection, terrain.Resampling.max)
+    masks = landcover.cover_masks(classes, canopy, land_mask)
+    every = int(area["land_mask_grid_m"] / grid.step)
+    landcover.write_cover(masks, every, out / "cover.png")
+    write_keep_import(out / "cover.png")
+    canopy_place = landcover.write_canopy(grid, canopy, land_mask, out / "canopy.png")
+    write_keep_import(out / "canopy.png")
+    landcover.draw_cover_map(out / "cover_map.png", classes, every * 2)
+    landcover.draw_canopy_map(out / "canopy_map.png", canopy, land_mask, every * 2)
+    write_keep_import(out / "cover_map.png")
+    write_keep_import(out / "canopy_map.png")
+    rows, cols = landcover.tree_tops(canopy, grid.step, masks["tree"])
+    hills = {}
+    for hill_id, (radius, lowest) in COVER_HILLS.items():
+        record = found_by_id.get(hill_id)
+        if not record or not record.get("found"):
+            continue
+        cx = (record["position"][0] - grid.x0) / grid.step
+        cz = (record["position"][1] - grid.z0) / grid.step
+        r = radius / grid.step
+        r0, r1 = max(int(cz - r), 0), min(int(cz + r) + 1, grid.shape[0])
+        c0, c1 = max(int(cx - r), 0), min(int(cx + r) + 1, grid.shape[1])
+        yy, xx = np.mgrid[r0:r1, c0:c1]
+        area_mask = np.zeros(grid.shape, dtype=bool)
+        area_mask[r0:r1, c0:c1] = ((yy - cz) ** 2 + (xx - cx) ** 2 <= r * r) & (grid.heights[r0:r1, c0:c1] > lowest)
+        area_mask &= land_mask
+        inside = area_mask[rows, cols] if rows.size else np.zeros(0, dtype=bool)
+        hills[hill_id] = landcover.shares(masks, classes, area_mask) | {
+            "name": record.get("name_vi", hill_id), "area_m2": round(float(area_mask.sum()) * grid.step ** 2),
+            "tree_tops": int(inside.sum())}
+    info = load_json(raw / "landcover.json") if (raw / "landcover.json").exists() else {}
+    log(f"cover: {int(rows.size)} tree tops on the open land; " +
+        ", ".join(f"{k} {v['tree'] * 100:.0f} % trees, {v['bush'] * 100:.0f} % bushes" for k, v in hills.items()))
+    return {"world": {"file": "cover.png", "canopy": canopy_place},
+            "hills": hills, "tree_tops": int(rows.size), "info": info, "canopy_values": canopy}
+
+
+def cover_report_lines(cover: dict) -> list[str]:
+    info = cover.get("info", {})
+    years = info.get("canopy", {}).get("image_years", {})
+    lines = ["## Land cover and trees (report 0005, D-0005-09; plan 0020, D8)", "",
+             f"- Sources: {info.get('worldcover', {}).get('name', 'ESA WorldCover 2021')} (10 m classes) and "
+             f"{info.get('canopy', {}).get('name', 'the Meta and WRI canopy height maps')} (about 1 m, kept on a grid of "
+             f"{info.get('canopy', {}).get('step_m', 2)} m with the highest value). Both CC BY 4.0.",
+             f"- The canopy images over the play area are from {years.get('first', '?')} to {years.get('last', '?')} "
+             f"(decimal years, mean {years.get('mean', '?')}).",
+             f"- A canopy of {landcover.TREE_MIN_M:.0f} m or more is a tree, and a canopy of {landcover.BUSH_MIN_M} m to "
+             f"{landcover.TREE_MIN_M:.0f} m is a bush (WorldCover has almost no shrubland here). The built-up and the "
+             f"cropland classes keep the rules of the town and of `trees.json`.",
+             f"- {cover['tree_tops']} tree tops on the open land (the highest canopy within {landcover.TOP_RADIUS_M:.0f} m).",
+             "", "| Hill | Area (km²) | Trees | Bushes | Grass | Bare | Tree tops | WorldCover classes |", "|---|---|---|---|---|---|---|---|"]
+    for hill in cover.get("hills", {}).values():
+        classes = ", ".join(f"{k} {v * 100:.0f} %" for k, v in sorted(hill["classes"].items(), key=lambda kv: -kv[1]))
+        lines.append(f"| {hill['name']} | {hill['area_m2'] / 1e6:.2f} | {hill['tree'] * 100:.0f} % | {hill['bush'] * 100:.0f} % | "
+                     f"{hill['grass'] * 100:.0f} % | {hill['bare'] * 100:.0f} % | {hill['tree_tops']} | {classes} |")
+    lines += ["", "The hills: the land within 1.1 km of the top of Núi Lớn and 0.7 km of the top of Núi Nhỏ, higher than 20 m.",
+              "", "![The WorldCover classes](cover_map.png)", "",
+              "Dark green: tree cover. Yellow: grassland. Red: built-up. Gray: bare. Blue: water. Light green: mangroves.",
+              "", "![The canopy height](canopy_map.png)", "",
+              "Light green (1 m) to dark green (25 m or more): the canopy height. Gray: land with no canopy. Blue: the sea."]
+    street = cover.get("street")
+    if street:
+        missing = street["missing"]
+        lines += ["", f"- The canopy map shows no tree within {landcover.STREET_RADIUS_M:.0f} m of {len(missing)} of the "
+                  f"{street['count']} street and park trees (plan 0020, R10a). They stay, and I check them on photos:"]
+        lines += [f"  - ({p[0]:.0f}, {p[2]:.0f})" for p in missing[:30]]
+        if len(missing) > 30:
+            lines.append(f"  - and {len(missing) - 30} more.")
+    return lines
+
+
 def homestay_record(home: dict) -> dict:
     record = {"found": home["found"], "problems": home["problems"], "coast_road": home.get("coast_road", "")}
     if "lighthouse_road" in home:
@@ -510,7 +604,7 @@ def homestay_record(home: dict) -> dict:
 
 def write_report(path, world, data, roads, block_list, buildings, found, home, problems, town_change, dem_max, raw,
                  rock_cells=0, out=None, anchor_list=None, works=None, sea_objects=None, tree_record=None,
-                 tree_counts=None):
+                 tree_counts=None, cover_record=None):
     manifest = load_json(raw / "manifest.json") if (raw / "manifest.json").exists() else {"files": []}
     lines = ["# Geodata report", "", f"Made by `tools/geo/build.py` on {datetime.date.today().isoformat()}.", ""]
     lines += ["## Extents", "", "| Item | Value |", "|---|---|",
@@ -615,6 +709,8 @@ def write_report(path, world, data, roads, block_list, buildings, found, home, p
         lines += ["", "## Trees (R12a)", ""]
         lines += [f"- {kind}: {len(points)}" for kind, points in tree_record["types"].items()]
         lines.append("- From: " + ", ".join(f"{k} {v}" for k, v in sorted((tree_counts or {}).items())) + ".")
+    if cover_record is not None:
+        lines += [""] + cover_report_lines(cover_record)
     lines += [""] + anchors_module.report_lines(anchor_list or [])
     lines += ["## Corrections from overrides.json", ""]
     lines += [f"- {c}" for c in data.corrections] or ["None."]

@@ -6777,6 +6777,20 @@
 		"coast_range_m": 64.0,
 		"rock": "rock.png"
 	},
+	"cover": {
+		"file": "cover.png",
+		"canopy": {
+			"file": "canopy.png",
+			"x0": -2815.0,
+			"z0": -8703.0,
+			"step": 4,
+			"columns": 2304,
+			"rows": 3392,
+			"scale_m": 0.2,
+			"tree_min_m": 3.0,
+			"bush_min_m": 0.6
+		}
+	},
 	"sea_floor": {
 		"coast_m": 1.2,
 		"depth_m": -4.0,

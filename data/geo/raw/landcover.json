@@ -1,0 +1,37 @@
+{
+	"note": "Made by tools/geo/landcover.py (report 0005, D-0005-09; plan 0020, D8). Do not change by hand.",
+	"worldcover": {
+		"name": "ESA WorldCover 2021 v200",
+		"license": "CC BY 4.0",
+		"notice": "© ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium. CC BY 4.0.",
+		"file": "worldcover.tif",
+		"url": "https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/ESA_WorldCover_10m_2021_v200_N09E105_Map.tif",
+		"shares": {
+			"tree cover": 0.0699,
+			"shrubland": 0.0,
+			"grassland": 0.0341,
+			"cropland": 0.0027,
+			"built-up": 0.1845,
+			"bare or sparse": 0.0096,
+			"water": 0.6958,
+			"herbaceous wetland": 0.0004,
+			"mangroves": 0.0029
+		}
+	},
+	"canopy": {
+		"name": "Meta and WRI High Resolution Canopy Height Maps (v1)",
+		"license": "CC BY 4.0",
+		"notice": "High Resolution Canopy Height Maps by WRI and Meta (Tolan et al. 2024), from Maxar images. CC BY 4.0.",
+		"file": "canopy.tif",
+		"tiles": [
+			"132231002"
+		],
+		"step_m": 2.0,
+		"share_3m": 0.0669,
+		"image_years": {
+			"first": 2019.42,
+			"last": 2019.83,
+			"mean": 2019.73
+		}
+	}
+}

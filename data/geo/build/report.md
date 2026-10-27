@@ -1,6 +1,6 @@
 # Geodata report
 
-Made by `tools/geo/build.py` on 2026-10-26.
+Made by `tools/geo/build.py` on 2026-10-27.
 
 ## Extents
 
@@ -105,6 +105,61 @@ None.
 - shade: 11057
 - tall_shade: 184
 - From: bai_truoc_road 192, coast_roads 3956, named_roads 502, osm 385, parks 2151, street 21874.
+
+## Land cover and trees (report 0005, D-0005-09; plan 0020, D8)
+
+- Sources: ESA WorldCover 2021 v200 (10 m classes) and Meta and WRI High Resolution Canopy Height Maps (v1) (about 1 m, kept on a grid of 2.0 m with the highest value). Both CC BY 4.0.
+- The canopy images over the play area are from 2019.42 to 2019.83 (decimal years, mean 2019.73).
+- A canopy of 3 m or more is a tree, and a canopy of 0.6 m to 3 m is a bush (WorldCover has almost no shrubland here). The built-up and the cropland classes keep the rules of the town and of `trees.json`.
+- 31450 tree tops on the open land (the highest canopy within 4 m).
+
+| Hill | Area (km²) | Trees | Bushes | Grass | Bare | Tree tops | WorldCover classes |
+|---|---|---|---|---|---|---|---|
+| Núi Lớn | 2.32 | 73 % | 7 % | 8 % | 0 % | 6964 | tree cover 88 %, built-up 11 %, grassland 1 %, bare or sparse 0 %, water 0 % |
+| Núi Nhỏ | 0.92 | 78 % | 8 % | 7 % | 0 % | 2865 | tree cover 92 %, built-up 7 %, grassland 1 %, bare or sparse 0 % |
+
+The hills: the land within 1.1 km of the top of Núi Lớn and 0.7 km of the top of Núi Nhỏ, higher than 20 m.
+
+![The WorldCover classes](cover_map.png)
+
+Dark green: tree cover. Yellow: grassland. Red: built-up. Gray: bare. Blue: water. Light green: mangroves.
+
+![The canopy height](canopy_map.png)
+
+Light green (1 m) to dark green (25 m or more): the canopy height. Gray: land with no canopy. Blue: the sea.
+
+- The canopy map shows no tree within 5 m of 14600 of the 29060 street and park trees (plan 0020, R10a). They stay, and I check them on photos:
+  - (91, 197)
+  - (101, 159)
+  - (106, 136)
+  - (108, 121)
+  - (112, 96)
+  - (113, 91)
+  - (112, 75)
+  - (112, 66)
+  - (110, 52)
+  - (108, 43)
+  - (106, 37)
+  - (105, 30)
+  - (102, 20)
+  - (101, 14)
+  - (93, -18)
+  - (84, -47)
+  - (72, -79)
+  - (56, -122)
+  - (50, -139)
+  - (41, -160)
+  - (37, -168)
+  - (35, -173)
+  - (32, -182)
+  - (15, -209)
+  - (11, -215)
+  - (6, -223)
+  - (2, -229)
+  - (-2, -234)
+  - (-8, -242)
+  - (-11, -246)
+  - and 14570 more.
 
 ## Town anchors (R6a)
 
