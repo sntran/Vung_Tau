@@ -8,14 +8,28 @@ extends RefCounted
 # Ultra have no limit and are recorded). With the detail levels of the ground
 # (report 0005, D-0005-10), the test checks the whole view against R12 again,
 # and the part of the trees: not more than half of each limit. It records the
-# values in the log and in tree_budget_PRESET.json.
+# values in the log and in tree_budget_PRESET_VIEW.json.
+# Each run measures one view on one preset (report 0020, D-0020-05: the three
+# views of High in one run took more than 300 s in the workspace): runs 1 to 3
+# are Low, 4 to 6 Medium, 7 to 9 High, and 10 to 12 Ultra, each with the views
+# in the order of views().
 # sizes: 1280x720
 # phase: --world=vung_tau --renderer=forward_plus --quality=low --start-time=12:00
+# phase: --world=vung_tau --renderer=forward_plus --quality=low --start-time=12:00
+# phase: --world=vung_tau --renderer=forward_plus --quality=low --start-time=12:00
+# phase: --world=vung_tau --renderer=forward_plus --quality=medium --start-time=12:00
+# phase: --world=vung_tau --renderer=forward_plus --quality=medium --start-time=12:00
 # phase: --world=vung_tau --renderer=forward_plus --quality=medium --start-time=12:00
 # phase: --world=vung_tau --renderer=forward_plus --quality=high --start-time=12:00
+# phase: --world=vung_tau --renderer=forward_plus --quality=high --start-time=12:00
+# phase: --world=vung_tau --renderer=forward_plus --quality=high --start-time=12:00
+# phase: --world=vung_tau --renderer=forward_plus --quality=ultra --start-time=12:00
+# phase: --world=vung_tau --renderer=forward_plus --quality=ultra --start-time=12:00
 # phase: --world=vung_tau --renderer=forward_plus --quality=ultra --start-time=12:00
 
 const PRESETS := ["low", "medium", "high", "ultra"]
+## The number of views (views()): one run for each view and preset.
+const VIEWS := 3
 const LIMITS := {"low": [600, 300000], "high": [2000, 2000000]}
 ## The part of each limit that the trees can use.
 const TREE_PART := 0.5
@@ -25,10 +39,13 @@ func run(d: PlaytestDriver) -> void:
 	var w := d.world()
 	if not d.expect(w != null, "the Vũng Tàu world starts with --world=vung_tau"):
 		return
-	var preset: String = PRESETS[d.phase - 1]
+	var preset: String = PRESETS[(d.phase - 1) / VIEWS]
 	d.expect(GameState.settings.quality == preset, "the preset is %s" % GameState.settings.quality)
+	var all_views := views(w)
+	if not d.expect(all_views.size() == VIEWS, "the data has the %d views: %d" % [VIEWS, all_views.size()]):
+		return
 	var results := []
-	for view: Dictionary in views(w):
+	for view: Dictionary in [all_views[(d.phase - 1) % VIEWS]]:
 		await d.fly_to(view.eye, view.target)
 		await d.wait_ground(90.0)
 		await d.wait_frames(6)
@@ -65,7 +82,7 @@ func run(d: PlaytestDriver) -> void:
 			d.expect(tree_triangles <= limit[1] * TREE_PART, "%s, view %s: the trees add %d triangles, not more than %d" % [
 					preset, view.name, tree_triangles, int(limit[1] * TREE_PART)])
 	d.fly_end()
-	var file := FileAccess.open(d.out_dir.path_join("tree_budget_%s.json" % preset), FileAccess.WRITE)
+	var file := FileAccess.open(d.out_dir.path_join("tree_budget_%s_%s.json" % [preset, results[0].view]), FileAccess.WRITE)
 	file.store_string(JSON.stringify({"preset": preset, "renderer": RenderingServer.get_current_rendering_method(),
 			"views": results}, "\t"))
 	file.close()
