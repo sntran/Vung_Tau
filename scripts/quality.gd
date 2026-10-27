@@ -85,6 +85,8 @@ static func apply(preset: String, environment: Environment, sun: DirectionalLigh
 	viewport.scaling_3d_scale = float(values.scale)
 	# The distances of the tree forms (plan 0020, R5, R13).
 	TreeLibrary.set_ranges(valid(preset))
+	# The detail levels of the ground of the Vũng Tàu world (report 0005, D-0005-10).
+	VungTau.set_ground_detail(valid(preset))
 
 
 ## True when the sun casts shadows. Plan 0001 (note N18) turned them off,

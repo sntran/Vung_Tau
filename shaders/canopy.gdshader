@@ -7,6 +7,11 @@ shader_type spatial;
 render_mode cull_disabled;
 
 uniform float near_hide = 280.0;
+// Low shows fewer clumps, each one larger, and larger again far away, so that
+// they cover the hills as the clumps of the other presets do (report 0005, D-0005-10).
+uniform float clump_scale = 1.0;
+uniform float clump_scale_far = 1.0;
+uniform vec2 scale_range = vec2(400.0, 1600.0);
 uniform float fade_m = 60.0;
 // 0 is green, 1 is the driest.
 uniform float dryness = 0.0;
@@ -29,8 +34,9 @@ float hash(vec2 p) {
 void vertex() {
 	// MODEL_MATRIX has the transform of the clump in the MultiMesh.
 	vec3 origin = (MODEL_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
-	float near = smoothstep(near_hide, near_hide + fade_m, distance(origin.xz, CAMERA_POSITION_WORLD.xz));
-	VERTEX *= near;
+	float distance_xz = distance(origin.xz, CAMERA_POSITION_WORLD.xz);
+	float near = smoothstep(near_hide, near_hide + fade_m, distance_xz);
+	VERTEX *= near * mix(clump_scale, clump_scale_far, smoothstep(scale_range.x, scale_range.y, distance_xz));
 	float a = hash(origin.xz);
 	float b = hash(origin.xz + vec2(17.0, 5.0));
 	vec3 color = mix(leaf_dark, leaf_light, a);

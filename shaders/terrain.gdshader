@@ -68,8 +68,9 @@ uniform vec3 bare_color : source_color = vec3(0.42, 0.33, 0.24);
 // The canopy starts at canopy_near meters from the camera, and it is full at canopy_far.
 uniform float canopy_near = 200.0;
 uniform float canopy_far = 400.0;
-uniform vec3 canopy_dark : source_color = vec3(0.11, 0.19, 0.08);
-uniform vec3 canopy_light : source_color = vec3(0.2, 0.3, 0.12);
+// As dark as the far clumps of HillCanopy: on Low, the ground shows the far forest with fewer clumps (D-0005-10).
+uniform vec3 canopy_dark : source_color = vec3(0.08, 0.15, 0.06);
+uniform vec3 canopy_light : source_color = vec3(0.15, 0.24, 0.09);
 uniform vec3 canopy_dry : source_color = vec3(0.4, 0.33, 0.17);
 
 varying vec3 world_position;

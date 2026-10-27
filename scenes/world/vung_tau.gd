@@ -7,17 +7,41 @@ extends Node3D
 ## the overview grid all the time, so there is never a hole. Near the player,
 ## a worker thread makes a finer mesh, and the far mesh hides when the fine
 ## mesh is ready. Near chunks also have collision, roads, and trees.
+##
+## The ground has detail levels by distance (report 0005, D-0005-10): a near
+## chunk is 4 x 4 patches of 64 m, each with a grid of 2 m, 4 m, or 8 m by its
+## distance; a mid chunk has a grid of 8 m; and a far tile has a grid of 16 m,
+## 32 m, or 64 m. The skirts of the meshes hide the gaps between the levels.
+## The sun shadow uses a mesh of 8 m for each near chunk.
 
 ## The detail of a chunk: the far mesh only, the mid mesh (8 m), or the near mesh (2 m).
 enum Detail { FAR, MID, NEAR }
 
+## The near chunks (collision, roads, and trees) are nearer than this.
 const NEAR_DISTANCE := 300.0
-const MID_DISTANCE := 1000.0
 ## The distance at which a chunk goes back to less detail, so that it does not change at each step.
 const HYSTERESIS := 60.0
 const MID_STRIDE := 4
+## A near chunk has PATCHES x PATCHES patches.
+const PATCHES := 4
+## A patch changes its grid back to a coarser one only this much farther than the limit.
+const PATCH_HYSTERESIS := 20.0
 ## A far tile has FAR_TILE x FAR_TILE chunks.
 const FAR_TILE := 4
+## The ground detail of each quality preset (D-0005-10): the distances (m) to
+## which a near patch has a grid of 2 m and of 4 m (then 8 m), the distance of
+## the mid chunks (a grid of 8 m), and the distances to which a far tile has a
+## grid of 16 m and of 32 m (then 64 m). Low uses the coarser grids sooner.
+const GROUND_DETAIL := {
+	"low": {"near": [60.0, 160.0], "mid": 500.0, "far": [900.0, 2000.0]},
+	"medium": {"near": [100.0, 250.0], "mid": 800.0, "far": [2000.0, 4000.0]},
+	"high": {"near": [150.0, 400.0], "mid": 1000.0, "far": [2500.0, 5000.0]},
+	"ultra": {"near": [150.0, 400.0], "mid": 1000.0, "far": [3000.0, 6000.0]},
+}
+
+## The ground detail now (Quality.apply() sets it with set_ground_detail()).
+static var ground_detail: Dictionary = GROUND_DETAIL.high
+static var ground_preset := "high"
 ## The player cannot walk into water deeper than this (R13).
 const MAX_WATER_DEPTH := 0.5
 ## A point at this distance or less from the line of the Hòn Bà ridge is on
@@ -92,12 +116,21 @@ var roadworks: Roadworks
 var season: Dictionary = {}
 var _season_day := -1
 var _surface_image: Image
-var _chunks: Dictionary = {}  # Vector2i -> {"detail", "wanted", "far", "tile", "fine", "busy", "asked"}
+var _chunks: Dictionary = {}  # Vector2i -> {"detail", "wanted", "far", "tile", "fine", "busy", "asked", "patches", "heights"}
 var _far_tiles: Dictionary = {}  # Vector2i -> MeshInstance3D
+var _far_strides: Dictionary = {}  # Vector2i -> the grid step of the tile now, in overview samples
+## The preset of the far clumps of the hill trees now.
+var _canopy_preset := ""
 var _done: Array = []
 var _mutex := Mutex.new()
 var _tasks := 0
 var _focus := Vector3.ZERO
+
+
+## Sets the ground detail for a quality preset (D-0005-10).
+static func set_ground_detail(preset: String) -> void:
+	ground_preset = preset if GROUND_DETAIL.has(preset) else "low"
+	ground_detail = GROUND_DETAIL[ground_preset]
 
 
 ## Builds the world. Returns false when the geodata is not there.
@@ -269,9 +302,14 @@ func detail_at(point: Vector3) -> int:
 func is_settled() -> bool:
 	if _tasks > 0:
 		return false
-	for state: Dictionary in _chunks.values():
+	for key: Vector2i in _chunks:
+		var state: Dictionary = _chunks[key]
 		if state.wanted != state.detail:
 			return false
+		var patches: Dictionary = state.get("patches", {})
+		for at: Vector2i in patches:
+			if patches[at].stride != _patch_stride(key, at, patches[at].stride):
+				return false
 	return true
 
 
@@ -380,8 +418,13 @@ func _process(delta: float) -> void:
 	sea.global_position = Vector3(snappedf(_focus.x, 64.0), sea_level, snappedf(_focus.z, 64.0))
 	if sea_objects:
 		sea_objects.update_sea(sea_level, delta)
+	if canopy and _canopy_preset != ground_preset:
+		_canopy_preset = ground_preset
+		canopy.set_preset(ground_preset)
 	_update_wanted()
 	_start_tasks()
+	_update_patches()
+	_update_far_strides()
 	_apply_done()
 
 
@@ -400,7 +443,7 @@ func _update_wanted() -> void:
 		var wanted := Detail.FAR
 		if distance < NEAR_DISTANCE + (margin if state.detail == Detail.NEAR else 0.0):
 			wanted = Detail.NEAR
-		elif distance < MID_DISTANCE + margin:
+		elif distance < float(ground_detail.mid) + margin:
 			wanted = Detail.MID
 		state.wanted = wanted
 		state.distance = distance
@@ -427,19 +470,30 @@ func _start_tasks() -> void:
 	state.busy = true
 	state.asked = Time.get_ticks_msec()
 	_tasks += 1
-	WorkerThreadPool.add_task(_build_chunk.bind(best, int(state.wanted)), false, "ground chunk")
+	var strides := {}
+	if state.wanted == Detail.NEAR:
+		for j in PATCHES:
+			for i in PATCHES:
+				strides[Vector2i(i, j)] = _patch_stride(best, Vector2i(i, j), 0)
+	WorkerThreadPool.add_task(_build_chunk.bind(best, int(state.wanted), strides), false, "ground chunk")
 
 
-## Runs in a worker thread: decodes the heights and makes the mesh arrays.
-func _build_chunk(key: Vector2i, detail: int) -> void:
+## Runs in a worker thread: decodes the heights and makes the mesh arrays. A
+## near chunk gets its patches with the grids of "strides" (patch -> samples),
+## and a shadow mesh of 8 m.
+func _build_chunk(key: Vector2i, detail: int, strides := {}) -> void:
 	var result := {"key": key, "detail": detail}
 	var heights := data.chunk_heights(key)
 	if not heights.is_empty():
 		var n := data.samples
-		var stride := 1 if detail == Detail.NEAR else MID_STRIDE
-		var count := (n - 1) / stride + 1
-		result.ground = TerrainBuilder.arrays(heights, n, n, 0, 0, count, stride, data.grid)
+		var count := (n - 1) / MID_STRIDE + 1
+		result.ground = TerrainBuilder.arrays(heights, n, n, 0, 0, count, MID_STRIDE, data.grid)
 		if detail == Detail.NEAR:
+			result.heights = heights
+			result.strides = strides
+			result.patches = {}
+			for at: Vector2i in strides:
+				result.patches[at] = _patch_arrays(heights, at, strides[at])
 			result.shape = TerrainBuilder.height_shape(heights, n, data.grid)
 			var origin := Vector3(key.x * data.chunk_size, 0.0, key.y * data.chunk_size)
 			result.roads = RoadBuilder.build(data, key, origin)
@@ -456,6 +510,9 @@ func _apply_done() -> void:
 	_mutex.unlock()
 	for result: Dictionary in ready:
 		_tasks -= 1
+		if result.has("patch"):
+			_show_patch(result)
+			continue
 		var key: Vector2i = result.key
 		var state: Dictionary = _chunks[key]
 		state.busy = false
@@ -475,9 +532,26 @@ func _show_fine(key: Vector2i, result: Dictionary) -> void:
 	node.position = Vector3(key.x * data.chunk_size, 0.0, key.y * data.chunk_size)
 	add_child(node)
 	var ground := MeshInstance3D.new()
-	ground.name = "Ground"
 	ground.mesh = TerrainBuilder.mesh(result.ground, _ground_material)
 	node.add_child(ground)
+	state.patches = {}
+	state.erase("heights")
+	if result.has("patches"):
+		# The mesh of 8 m only casts the sun shadow, and the patches show the ground.
+		ground.name = "Shadow"
+		ground.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+		state.heights = result.heights
+		for at: Vector2i in result.patches:
+			var patch := MeshInstance3D.new()
+			patch.name = "Ground_%d_%d" % [at.x, at.y]
+			patch.position = Vector3(at.x, 0.0, at.y) * (data.chunk_size / PATCHES)
+			patch.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			patch.mesh = TerrainBuilder.mesh(result.patches[at], _ground_material)
+			node.add_child(patch)
+			state.patches[at] = {"node": patch, "stride": int(result.strides[at]), "busy": false}
+	else:
+		ground.name = "Ground"
+		ground.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	if result.has("shape"):
 		var body := StaticBody3D.new()
 		body.name = "Collision"
@@ -501,11 +575,95 @@ func _show_fine(key: Vector2i, result: Dictionary) -> void:
 		_rebuild_far_tile(state.tile)
 
 
+## The grid of a patch (in samples of 2 m: 1, 2, or 4) for its distance from
+## the view. "current" is the grid now: a patch goes back to a coarser grid only
+## PATCH_HYSTERESIS farther than the limit.
+func _patch_stride(key: Vector2i, at: Vector2i, current: int) -> int:
+	var size := data.chunk_size / PATCHES
+	var x0 := key.x * data.chunk_size + at.x * size
+	var z0 := key.y * data.chunk_size + at.y * size
+	var dx := maxf(maxf(x0 - _focus.x, _focus.x - (x0 + size)), 0.0)
+	var dz := maxf(maxf(z0 - _focus.z, _focus.z - (z0 + size)), 0.0)
+	var distance := Vector2(dx, dz).length()
+	var limits: Array = ground_detail.near
+	var stride := 4
+	for level in limits.size():
+		var limit := float(limits[level])
+		# Keep a finer grid a little farther than its limit.
+		if current != 0 and current <= (1 << level):
+			limit += PATCH_HYSTERESIS
+		if distance < limit:
+			stride = 1 << level
+			break
+	return stride
+
+
+## Runs in a worker thread: the mesh arrays of a patch with a grid of "stride" samples.
+func _patch_arrays(heights: PackedFloat32Array, at: Vector2i, stride: int) -> Array:
+	var cells := (data.samples - 1) / PATCHES
+	return TerrainBuilder.arrays(heights, data.samples, data.samples, at.x * cells, at.y * cells, cells / stride + 1,
+			stride, data.grid)
+
+
+## Starts a worker for each patch that needs another grid, the nearest first.
+func _update_patches() -> void:
+	if _tasks >= MAX_TASKS:
+		return
+	var best_key := Vector2i.ZERO
+	var best_at := Vector2i.ZERO
+	var best_stride := 0
+	var best_distance := INF
+	for key: Vector2i in _chunks:
+		var state: Dictionary = _chunks[key]
+		var patches: Dictionary = state.get("patches", {})
+		if patches.is_empty() or state.busy:
+			continue
+		for at: Vector2i in patches:
+			var patch: Dictionary = patches[at]
+			var stride := _patch_stride(key, at, patch.stride)
+			if patch.busy or stride == patch.stride:
+				continue
+			# The patches that need a finer grid go first.
+			var order: float = float(stride) * 1000.0 + float(state.distance)
+			if order < best_distance:
+				best_distance = order
+				best_key = key
+				best_at = at
+				best_stride = stride
+	if best_distance == INF:
+		return
+	var state: Dictionary = _chunks[best_key]
+	state.patches[best_at].busy = true
+	_tasks += 1
+	WorkerThreadPool.add_task(_build_patch.bind(best_key, best_at, best_stride, state.heights), false, "ground patch")
+
+
+## Runs in a worker thread.
+func _build_patch(key: Vector2i, at: Vector2i, stride: int, heights: PackedFloat32Array) -> void:
+	var result := {"key": key, "patch": at, "stride": stride, "ground": _patch_arrays(heights, at, stride)}
+	_mutex.lock()
+	_done.append(result)
+	_mutex.unlock()
+
+
+func _show_patch(result: Dictionary) -> void:
+	var state: Dictionary = _chunks.get(result.key, {})
+	var patches: Dictionary = state.get("patches", {})
+	if not patches.has(result.patch):
+		return
+	var patch: Dictionary = patches[result.patch]
+	patch.busy = false
+	patch.stride = result.stride
+	(patch.node as MeshInstance3D).mesh = TerrainBuilder.mesh(result.ground, _ground_material)
+
+
 func _show_far(key: Vector2i) -> void:
 	var state: Dictionary = _chunks[key]
 	if state.fine:
 		state.fine.queue_free()
 		state.fine = null
+	state.patches = {}
+	state.erase("heights")
 	trees.remove_source(key)
 	state.detail = Detail.FAR
 	_rebuild_far_tile(state.tile)
@@ -952,8 +1110,11 @@ func _make_far_ground() -> void:
 	for key: Vector2i in data.chunks:
 		var col0 := int(roundf((key.x * data.chunk_size - float(overview.x0)) / step))
 		var row0 := int(roundf((key.y * data.chunk_size - float(overview.z0)) / step))
-		var arrays := TerrainBuilder.arrays(overview.heights, overview.width, overview.height, col0, row0, per + 1, 1,
-				step)
+		# The far mesh with a grid of 1, 2, and 4 overview samples (16 m, 32 m, 64 m).
+		var arrays := {}
+		for stride: int in [1, 2, 4]:
+			arrays[stride] = TerrainBuilder.arrays(overview.heights, overview.width, overview.height, col0, row0,
+					per / stride + 1, stride, step)
 		var tile := Vector2i(floori(float(key.x) / FAR_TILE), floori(float(key.y) / FAR_TILE))
 		_chunks[key] = {"detail": Detail.FAR, "wanted": Detail.FAR, "far": arrays, "tile": tile, "fine": null,
 				"busy": false, "asked": 0, "distance": INF}
@@ -965,7 +1126,31 @@ func _make_far_ground() -> void:
 			add_child(instance)
 			_far_tiles[tile] = instance
 	for tile: Vector2i in _far_tiles:
+		_far_strides[tile] = _far_stride(tile)
 		_rebuild_far_tile(tile)
+
+
+## The grid of a far tile (in overview samples: 1, 2, or 4) for its distance from the view.
+func _far_stride(tile: Vector2i) -> int:
+	var size := FAR_TILE * data.chunk_size
+	var dx := maxf(maxf(tile.x * size - _focus.x, _focus.x - (tile.x + 1) * size), 0.0)
+	var dz := maxf(maxf(tile.y * size - _focus.z, _focus.z - (tile.y + 1) * size), 0.0)
+	var distance := Vector2(dx, dz).length()
+	var limits: Array = ground_detail.far
+	for level in limits.size():
+		if distance < float(limits[level]):
+			return 1 << level
+	return 4
+
+
+## Makes the far tiles again whose grid must change (one each frame).
+func _update_far_strides() -> void:
+	for tile: Vector2i in _far_tiles:
+		var stride := _far_stride(tile)
+		if stride != _far_strides[tile]:
+			_far_strides[tile] = stride
+			_rebuild_far_tile(tile)
+			return
 
 
 ## Makes the mesh of a far tile from the far arrays of its chunks that show no finer mesh.
@@ -980,7 +1165,7 @@ func _rebuild_far_tile(tile: Vector2i) -> void:
 			var state: Dictionary = _chunks.get(key, {})
 			if state.is_empty() or state.detail != Detail.FAR:
 				continue
-			var arrays: Array = state.far
+			var arrays: Array = state.far[_far_strides.get(tile, 1)]
 			var offset := Vector3(key.x * data.chunk_size, 0.0, key.y * data.chunk_size) - origin
 			var first := vertices.size()
 			for v: Vector3 in arrays[Mesh.ARRAY_VERTEX]:
