@@ -1,16 +1,18 @@
 // The ground of the Vũng Tàu world (plan 0005, R12): sand on beaches, grass
 // on hills, rock on slopes above 35 degrees, and concrete in towns. The
-// surface mask comes from tools/geo/build.py: R is sand, G is town, B is wood,
-// A is the distance to the coastline. The rock mask is bare rock: the Hòn Bà
+// surface mask comes from tools/geo/build.py: R is sand, A is the distance to
+// the coastline (G, the town of OpenStreetMap, and B, its wood, are not used
+// here: the cover mask has the land cover). The rock mask is bare rock: the Hòn Bà
 // rock path, the rocks in the sea, and the small islands (R8h). In the dry
-// season, the grass is partly dry (R12a). Far from the camera, the ground
-// with trees (wood, or the hills above forest_height, the rule of
+// season, the grass is partly dry (R12a).
+// The cover mask is the land cover of ESA WorldCover and the canopy height
+// maps (report 0005, D-0005-09, correction 0): R tree cover, G bushes, B
+// grass, A bare ground. Far from the camera, the tree cover (the rule of
 // VungTau.is_forest()) shows a canopy of tree crowns, so that the hills are not
-// bare grass (report 0005, D-0005-01). Near the camera, the near chunks have
-// the real trees.
-// Report 0005, D-0005-09: the hill slopes have a dense cover of bushes (the
-// scrub of plan 0020 near the camera, and a pattern of bushes here), with
-// bare ground only on rock and steep granite. The dry season is olive and
+// bare grass (D-0005-01). Near the camera, the near chunks have the real
+// trees. The bushes and the ground under the trees have a pattern of bushes
+// (the scrub of plan 0020 stands there near the camera). The grass shows the
+// grass texture, and the bare ground shows soil. The dry season is olive and
 // yellow-brown, not ochre. The town ground seen from far is a pattern of roofs
 // and trees, until plan 0009 builds the houses. The sand below the last high
 // water is wet: darker, shiny, with small pools.
@@ -18,6 +20,16 @@ shader_type spatial;
 render_mode cull_back;
 
 uniform sampler2D surface_mask : filter_linear, repeat_disable;
+uniform sampler2D cover_mask : filter_linear, repeat_disable;
+// The canopy heights (canopy.png): the trees of the town seen from far.
+uniform sampler2D canopy_heights : filter_linear, repeat_disable;
+uniform vec2 canopy_origin = vec2(0.0);
+uniform vec2 canopy_size = vec2(1.0);
+// The height (m) of a texture value of 1.
+uniform float canopy_unit = 51.0;
+uniform float tree_min = 3.0;
+// 0 shows grass in place of the tree cover (the reference of the canopy check of PT-33).
+uniform float tree_cover = 1.0;
 uniform sampler2D rock_mask : filter_linear, repeat_disable;
 uniform vec2 mask_origin = vec2(0.0);
 uniform vec2 mask_size = vec2(1.0);
@@ -51,7 +63,8 @@ uniform float roof_far = 220.0;
 uniform float last_high = -100.0;
 uniform vec3 shell_color : source_color = vec3(0.85, 0.82, 0.76);
 uniform vec3 pool_color : source_color = vec3(0.1, 0.22, 0.24);
-uniform float forest_height = 12.0;
+// The bare ground of the cover map: the red-brown soil and the granite grit of the hills.
+uniform vec3 bare_color : source_color = vec3(0.42, 0.33, 0.24);
 // The canopy starts at canopy_near meters from the camera, and it is full at canopy_far.
 uniform float canopy_near = 200.0;
 uniform float canopy_far = 400.0;
@@ -107,29 +120,50 @@ void fragment() {
 	float rock_value = texture(rock_mask, (world_position.xz - mask_origin) / mask_size).r;
 	float bare_rock = smoothstep(0.25, 0.45, rock_value);
 	float pebbles = bare_rock * (1.0 - smoothstep(0.7, 0.85, rock_value));
+	vec4 cover = texture(cover_mask, (world_position.xz - mask_origin) / mask_size);
+	cover.r *= tree_cover;
 	vec3 wood = wood_color * luminance(texture(wood_texture, uv * 0.7).rgb) * 2.2;
 	// Under the trees, the dry season shows less: half of the dry patches.
 	wood = mix(wood, dry_color * 0.75, dry * 0.5);
-	color = mix(color, wood, mask.b * 0.85);
-	// On a hill with wood, the wood is stronger than the town (the roads up the hill).
-	color = mix(color, texture(town_texture, uv).rgb, mask.g * (1.0 - mask.b * 0.75));
-	// The hill ground: the same rule as VungTau.is_scrub().
-	float hill_ground = max(max(smoothstep(0.35, 0.45, mask.b),
-			step(forest_height * 0.5, world_position.y) * (1.0 - smoothstep(0.25, 0.35, mask.g))),
-			step(forest_height, world_position.y));
+	color = mix(color, wood, cover.r * 0.85);
+	// The bare ground: soil with the detail of the grass texture.
+	color = mix(color, bare_color * clamp(grass_detail, 0.6, 1.3), cover.a);
+	// From far, the grass and the soil lose the light of the blade tips and show
+	// the shade between them: darker (D-0005-09, the land was grey from the hills).
 	float camera_distance = distance(world_position, CAMERA_POSITION_WORLD);
+	color *= mix(1.0, 0.8, smoothstep(150.0, 600.0, camera_distance));
+	// The town is the land with no cover channel (the built-up class of
+	// WorldCover), not the town areas of OpenStreetMap: they also have the
+	// forest of the hills and the grass field on the top of Núi Lớn, and they
+	// do not have the radar station there.
+	float wild = clamp(cover.r + cover.g, 0.0, 1.0);
+	float town_ground = 1.0 - smoothstep(0.3, 0.7, cover.r + cover.g + cover.b + cover.a);
+	color = mix(color, texture(town_texture, uv).rgb, town_ground);
+	// The ground with bushes: the bushes of the cover map, and the ground under the trees.
+	float hill_ground = smoothstep(0.25, 0.45, wild);
 	// The town seen from far: blocks of roofs, with streets and trees between them.
 	vec2 lot = world_position.xz / vec2(9.0, 11.0);
 	vec2 cell = floor(lot);
 	vec2 in_lot = fract(lot);
-	float pick = hash2(cell + vec2(3.1, 7.7));
 	vec3 roof = roof_colors[int(floor(hash2(cell) * 7.99))];
 	// The shade between the houses makes the roofs darker from far.
-	roof *= in_lot.x < 0.5 ? 0.52 : 0.66;
+	roof *= in_lot.x < 0.5 ? 0.46 : 0.6;
 	float street = step(0.86, max(in_lot.x, in_lot.y));
-	vec3 lot_color = pick < 0.16 ? canopy_light * (0.7 + 0.5 * value_noise(world_position.xz * 0.4)) : roof;
-	lot_color = mix(lot_color, texture(town_texture, uv).rgb, street);
-	float town = mask.g * (1.0 - mask.b * 0.75) * (1.0 - hill_ground);
+	// The streets are asphalt and the shade of the houses: darker than the concrete.
+	vec3 lot_color = mix(roof, texture(town_texture, uv).rgb * 0.55, street);
+	// The trees of the town where the canopy map has them (report 0005, D-0005-09).
+	// From far, a pixel covers many cells of the canopy map: five samples over
+	// the pixel give the part of it with trees.
+	vec2 canopy_uv = (world_position.xz - canopy_origin) / canopy_size;
+	vec2 spread = fwidth(world_position.xz) * 0.35 / canopy_size;
+	float town_tree = 0.0;
+	for (int k = 0; k < 5; k++) {
+		vec2 offset = k == 0 ? vec2(0.0) : vec2(k < 3 ? (k == 1 ? 1.0 : -1.0) : 0.0, k >= 3 ? (k == 3 ? 1.0 : -1.0) : 0.0);
+		town_tree += step(tree_min, texture(canopy_heights, canopy_uv + offset * spread).r * canopy_unit) * 0.2;
+	}
+	vec3 town_crowns = mix(canopy_dark, canopy_light, value_noise(world_position.xz * 0.4));
+	lot_color = mix(lot_color, town_crowns, town_tree);
+	float town = town_ground * (1.0 - hill_ground);
 	color = mix(color, lot_color, town * smoothstep(roof_near, roof_far, camera_distance));
 	// The bushes of the hill slopes: blobs of about 2 to 3 m over most of the
 	// ground. Near the camera, the scrub of plan 0020 stands there, so the
@@ -143,13 +177,15 @@ void fragment() {
 	color = mix(color, bush_color, bush * hill_ground * bush_strength * (1.0 - mask.r));
 	color = mix(color, texture(sand_texture, uv).rgb * 1.15, mask.r);
 	float rock = smoothstep(rock_normal_y + 0.04, rock_normal_y - 0.04, normalize(world_normal).y);
+	// Where the cover map has trees or bushes, they grow on the steep ground too:
+	// the granite shows only where the map has no cover.
+	rock *= 1.0 - smoothstep(0.3, 0.6, wild);
 	// The rock texture is dark (a mean linear brightness of 0.07), so the
 	// detail takes about 80 % of the rock color.
 	vec3 rock_detail = rock_color * clamp(luminance(texture(rock_texture, uv * 0.5).rgb) * 11.0, 0.45, 1.25);
 	// The canopy: crowns of about 8 m with dark gaps between them. In the dry
 	// season, some crowns are brown and red.
-	float hill = smoothstep(forest_height - 1.0, forest_height + 1.0, world_position.y) * (1.0 - smoothstep(0.2, 0.3, mask.g));
-	float forest = max(smoothstep(0.35, 0.45, mask.b), hill) * (1.0 - smoothstep(0.2, 0.3, mask.r));
+	float forest = smoothstep(0.4, 0.6, cover.r) * (1.0 - smoothstep(0.2, 0.3, mask.r));
 	float far = smoothstep(canopy_near, canopy_far, distance(world_position, CAMERA_POSITION_WORLD));
 	vec2 crown_uv = world_position.xz / 8.0;
 	float crowns = value_noise(crown_uv) * 0.6 + value_noise(crown_uv * 2.7) * 0.4;

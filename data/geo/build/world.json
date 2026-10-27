@@ -6789,7 +6789,8 @@
 			"scale_m": 0.2,
 			"tree_min_m": 3.0,
 			"bush_min_m": 0.6
-		}
+		},
+		"trees": "canopy_trees.json"
 	},
 	"sea_floor": {
 		"coast_m": 1.2,

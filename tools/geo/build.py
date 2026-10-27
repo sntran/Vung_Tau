@@ -393,9 +393,12 @@ def build(raw: Path, out: Path, geo: Path) -> int:
         write_json(out / "trees.json", tree_record, None)
         if cover_record is not None:
             # Plan 0020, R10a: the street trees that the canopy map does not show are in the report.
-            points = [p for kind in tree_record["types"].values() for p in kind]
-            missing = landcover.street_trees_without_canopy(points, grid, cover_record.pop("canopy_values"))
-            cover_record["street"] = {"count": len(points), "missing": missing}
+            canopy = cover_record.pop("canopy_values")
+            by_type = {kind: (len(points), landcover.street_trees_without_canopy(points, grid, canopy))
+                       for kind, points in tree_record["types"].items()}
+            cover_record["street"] = {"count": sum(n for n, _ in by_type.values()),
+                                      "missing": [p for _, m in by_type.values() for p in m],
+                                      "by_type": {kind: (n, len(m)) for kind, (n, m) in by_type.items()}}
     center = mapdraw.center_of(home)
     if center is not None:
         mapdraw.draw(out / "homestay_area.png", center, roads, land, beaches, block_list, buildings, home)
@@ -521,7 +524,8 @@ def write_cover(grid, raw, out, projection, land_mask, area, found_by_id) -> dic
     landcover.draw_canopy_map(out / "canopy_map.png", canopy, land_mask, every * 2)
     write_keep_import(out / "cover_map.png")
     write_keep_import(out / "canopy_map.png")
-    rows, cols = landcover.tree_tops(canopy, grid.step, masks["tree"])
+    rows, cols = landcover.tree_places(canopy, grid.step, masks["tree"])
+    tops = landcover.write_trees(out / "canopy_trees.json", grid, canopy, rows, cols)
     hills = {}
     for hill_id, (radius, lowest) in COVER_HILLS.items():
         record = found_by_id.get(hill_id)
@@ -539,12 +543,12 @@ def write_cover(grid, raw, out, projection, land_mask, area, found_by_id) -> dic
         inside = area_mask[rows, cols] if rows.size else np.zeros(0, dtype=bool)
         hills[hill_id] = landcover.shares(masks, classes, area_mask) | {
             "name": record.get("name_vi", hill_id), "area_m2": round(float(area_mask.sum()) * grid.step ** 2),
-            "tree_tops": int(inside.sum())}
+            "trees": int(inside.sum())}
     info = load_json(raw / "landcover.json") if (raw / "landcover.json").exists() else {}
-    log(f"cover: {int(rows.size)} tree tops on the open land; " +
+    log(f"cover: {int(rows.size)} trees on the open land; " +
         ", ".join(f"{k} {v['tree'] * 100:.0f} % trees, {v['bush'] * 100:.0f} % bushes" for k, v in hills.items()))
-    return {"world": {"file": "cover.png", "canopy": canopy_place},
-            "hills": hills, "tree_tops": int(rows.size), "info": info, "canopy_values": canopy}
+    return {"world": {"file": "cover.png", "canopy": canopy_place, "trees": "canopy_trees.json"},
+            "hills": hills, "trees": tops, "info": info, "canopy_values": canopy}
 
 
 def cover_report_lines(cover: dict) -> list[str]:
@@ -559,12 +563,16 @@ def cover_report_lines(cover: dict) -> list[str]:
              f"- A canopy of {landcover.TREE_MIN_M:.0f} m or more is a tree, and a canopy of {landcover.BUSH_MIN_M} m to "
              f"{landcover.TREE_MIN_M:.0f} m is a bush (WorldCover has almost no shrubland here). The built-up and the "
              f"cropland classes keep the rules of the town and of `trees.json`.",
-             f"- {cover['tree_tops']} tree tops on the open land (the highest canopy within {landcover.TOP_RADIUS_M:.0f} m).",
-             "", "| Hill | Area (km²) | Trees | Bushes | Grass | Bare | Tree tops | WorldCover classes |", "|---|---|---|---|---|---|---|---|"]
+             f"- {cover['trees']['count']} trees on the open land, with a mean height of {cover['trees']['mean_height_m']} m "
+             f"and a mean crown radius of {cover['trees']['mean_radius_m']} m (`canopy_trees.json`, R10a). A tree stands on "
+             f"the highest canopy first, then on the lower canopy, at a spacing of {landcover.SPACING_PER_M} of its height "
+             f"({landcover.SPACING_MIN_M:.0f} m to {landcover.SPACING_MAX_M:.0f} m): the map has one height top for each "
+             f"group of crowns. The crown of a tree is the canopy that is nearer to it than to another tree.",
+             "", "| Hill | Area (km²) | Tree cover | Bushes | Grass | Bare | Trees | WorldCover classes |", "|---|---|---|---|---|---|---|---|"]
     for hill in cover.get("hills", {}).values():
         classes = ", ".join(f"{k} {v * 100:.0f} %" for k, v in sorted(hill["classes"].items(), key=lambda kv: -kv[1]))
         lines.append(f"| {hill['name']} | {hill['area_m2'] / 1e6:.2f} | {hill['tree'] * 100:.0f} % | {hill['bush'] * 100:.0f} % | "
-                     f"{hill['grass'] * 100:.0f} % | {hill['bare'] * 100:.0f} % | {hill['tree_tops']} | {classes} |")
+                     f"{hill['grass'] * 100:.0f} % | {hill['bare'] * 100:.0f} % | {hill['trees']} | {classes} |")
     lines += ["", "The hills: the land within 1.1 km of the top of Núi Lớn and 0.7 km of the top of Núi Nhỏ, higher than 20 m.",
               "", "![The WorldCover classes](cover_map.png)", "",
               "Dark green: tree cover. Yellow: grassland. Red: built-up. Gray: bare. Blue: water. Light green: mangroves.",
@@ -574,7 +582,9 @@ def cover_report_lines(cover: dict) -> list[str]:
     if street:
         missing = street["missing"]
         lines += ["", f"- The canopy map shows no tree within {landcover.STREET_RADIUS_M:.0f} m of {len(missing)} of the "
-                  f"{street['count']} street and park trees (plan 0020, R10a). They stay, and I check them on photos:"]
+                  f"{street['count']} street and park trees (plan 0020, R10a): "
+                  + ", ".join(f"{kind} {m} of {n}" for kind, (n, m) in street["by_type"].items())
+                  + ". They stay, and I check them on photos. The first ones:"]
         lines += [f"  - ({p[0]:.0f}, {p[2]:.0f})" for p in missing[:30]]
         if len(missing) > 30:
             lines.append(f"  - and {len(missing) - 30} more.")

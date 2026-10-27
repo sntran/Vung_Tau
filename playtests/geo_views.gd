@@ -90,10 +90,16 @@ static func in_frame(d: PlaytestDriver, point: Vector3) -> bool:
 
 
 ## The slopes of Núi Lớn show the color of tree crowns, not the color of grass
-## (D-0005-01). The check reads the color at points on the slopes, then hides
-## the far form of the trees and reads the same points again. A point shows a
-## crown when it is darker or greener than the grass at the same point.
+## (D-0005-01). With the near trees hidden, the check reads the color at
+## points on the slopes, then hides the far form of the trees and the tree
+## cover of the ground (the ground is grass there then) and reads the same
+## points again. A point shows a crown when it is darker or greener than the
+## grass at the same point.
 static func _check_canopy(d: PlaytestDriver, w: VungTau, time: String) -> void:
+	# The near trees of the top of Núi Nhỏ can stand in front of some points:
+	# the check is about the far form, so they are hidden for both readings.
+	w.trees.visible = false
+	await d.wait_frames(3)
 	var points := canopy_points(d, w)
 	var with_trees := pixel_colors(d, points)
 	var with_ms := await _frame_ms(d)
@@ -105,6 +111,7 @@ static func _check_canopy(d: PlaytestDriver, w: VungTau, time: String) -> void:
 	await d.screenshot("nui_nho_north_%s_no_far_trees" % time)
 	var grass := pixel_colors(d, points)
 	w.set_canopy(true)
+	w.trees.visible = true
 	await d.wait_frames(3)
 	var crowns := 0
 	var tree_sum := Color(0, 0, 0)
@@ -149,7 +156,9 @@ static func _check_land(d: PlaytestDriver, w: VungTau, view_name: String) -> voi
 			land.append(screen)
 			land_near.append(eye.distance_to(point) < 300.0)
 			var mask := w.surface_at(x, z)
-			if mask.g > 0.5 and mask.b < 0.3 and h < VungTau.FOREST_HEIGHT * 0.5:
+			# The town: the built-up class of the cover map (no cover channel), not sand.
+			var cover := w.cover_at(x, z)
+			if mask.r < 0.3 and cover.r + cover.g + cover.b + cover.a < 0.3:
 				town.append(screen)
 	var colors := pixel_colors(d, land)
 	var green := 0
@@ -272,7 +281,8 @@ static func views(w: VungTau) -> Array[Dictionary]:
 				"frame": ["nui_nho", "bai_truoc"]})
 	if d_ok(hill):
 		var top := _top(w, hill)
-		result.append({"name": "nui_nho_north", "eye": top, "target": top + Vector3(0, -40.0, -400.0),
+		var north := _over_trees(w, top)
+		result.append({"name": "nui_nho_north", "eye": north, "target": north + Vector3(0, -40.0, -400.0),
 				"frame": ["nui_lon"]})
 		if d_ok(back):
 			result.append({"name": "nui_nho_north_east", "eye": top,
@@ -318,6 +328,18 @@ static func _top(w: VungTau, record: Dictionary) -> Vector3:
 	var top := Vector3(record.position[0], 0.0, record.position[1])
 	top.y = w.ground_height(top.x, top.z) + 12.0
 	return top
+
+
+## The eye a little higher than the trees of the canopy map within 8 m (the
+## hill trees have the heights of the map), so that a crown at the eye does
+## not fill the view.
+static func _over_trees(w: VungTau, eye: Vector3) -> Vector3:
+	var trees := 0.0
+	for j in range(-2, 3):
+		for i in range(-2, 3):
+			trees = maxf(trees, w.canopy_height_at(eye.x + i * 4.0, eye.z + j * 4.0))
+	eye.y = maxf(eye.y, w.ground_height(eye.x, eye.z) + trees + 1.0)
+	return eye
 
 
 ## The nearest point of a main road to the point.

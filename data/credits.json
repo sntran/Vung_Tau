@@ -18,6 +18,10 @@
 			"text": "Contains modified Copernicus Sentinel data 2017–2024. GEBCO Compilation Group (2025) GEBCO 2025 Grid (doi:10.5285/37c52e96-24ea-67ce-e063-7086abc05f29). The heights of the intertidal zone use the method of DEA Intertidal (Geoscience Australia)."
 		},
 		{
+			"title": "Land cover and trees",
+			"text": "© ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium. CC BY 4.0. Meta and World Resources Institute (WRI) - 2024. High Resolution Canopy Height Maps (CHM). Source imagery for CHM © 2016 Maxar. Accessed 27 October 2026. CC BY 4.0. The game uses changed copies of both: the cover classes, the canopy heights, and the tree tops of the play area."
+		},
+		{
 			"title": "Ground textures",
 			"text": "Poly Haven (polyhaven.com), CC0."
 		},

@@ -128,6 +128,9 @@ func _check(d: PlaytestDriver) -> void:
 	# The sea floor (plan 0005, R8g): Sentinel-2 and GEBCO.
 	d.expect(text.contains("Contains modified Copernicus Sentinel data 2017–2024") and text.contains("GEBCO"),
 			"the credits show the Sentinel-2 and GEBCO notices")
+	# The land cover and the trees (report 0005, D-0005-09, correction 0): both CC BY 4.0.
+	d.expect(text.contains("© ESA WorldCover project 2021") and text.contains("High Resolution Canopy Height Maps"),
+			"the credits show the WorldCover and canopy height notices")
 	await PlaytestLayout.check(d, "credits")
 	await d.tap_phone_id("phone.home")
 	d.expect(d.state().app == "", "Home closes the credits page")

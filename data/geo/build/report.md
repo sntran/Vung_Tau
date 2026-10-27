@@ -111,12 +111,12 @@ None.
 - Sources: ESA WorldCover 2021 v200 (10 m classes) and Meta and WRI High Resolution Canopy Height Maps (v1) (about 1 m, kept on a grid of 2.0 m with the highest value). Both CC BY 4.0.
 - The canopy images over the play area are from 2019.42 to 2019.83 (decimal years, mean 2019.73).
 - A canopy of 3 m or more is a tree, and a canopy of 0.6 m to 3 m is a bush (WorldCover has almost no shrubland here). The built-up and the cropland classes keep the rules of the town and of `trees.json`.
-- 31450 tree tops on the open land (the highest canopy within 4 m).
+- 92454 trees on the open land, with a mean height of 6.8 m and a mean crown radius of 4.4 m (`canopy_trees.json`, R10a). A tree stands on the highest canopy first, then on the lower canopy, at a spacing of 0.9 of its height (5 m to 12 m): the map has one height top for each group of crowns. The crown of a tree is the canopy that is nearer to it than to another tree.
 
-| Hill | Area (km²) | Trees | Bushes | Grass | Bare | Tree tops | WorldCover classes |
+| Hill | Area (km²) | Tree cover | Bushes | Grass | Bare | Trees | WorldCover classes |
 |---|---|---|---|---|---|---|---|
-| Núi Lớn | 2.32 | 73 % | 7 % | 8 % | 0 % | 6964 | tree cover 88 %, built-up 11 %, grassland 1 %, bare or sparse 0 %, water 0 % |
-| Núi Nhỏ | 0.92 | 78 % | 8 % | 7 % | 0 % | 2865 | tree cover 92 %, built-up 7 %, grassland 1 %, bare or sparse 0 % |
+| Núi Lớn | 2.32 | 73 % | 7 % | 8 % | 0 % | 16334 | tree cover 88 %, built-up 11 %, grassland 1 %, bare or sparse 0 %, water 0 % |
+| Núi Nhỏ | 0.92 | 78 % | 8 % | 7 % | 0 % | 7251 | tree cover 92 %, built-up 7 %, grassland 1 %, bare or sparse 0 % |
 
 The hills: the land within 1.1 km of the top of Núi Lớn and 0.7 km of the top of Núi Nhỏ, higher than 20 m.
 
@@ -128,7 +128,7 @@ Dark green: tree cover. Yellow: grassland. Red: built-up. Gray: bare. Blue: wate
 
 Light green (1 m) to dark green (25 m or more): the canopy height. Gray: land with no canopy. Blue: the sea.
 
-- The canopy map shows no tree within 5 m of 14600 of the 29060 street and park trees (plan 0020, R10a). They stay, and I check them on photos:
+- The canopy map shows no tree within 5 m of 14600 of the 29060 street and park trees (plan 0020, R10a): bang 2937 of 6102, casuarina 2499 of 3509, coconut 536 of 902, flame 2296 of 4835, frangipani 1125 of 2471, shade 5192 of 11057, tall_shade 15 of 184. They stay, and I check them on photos. The first ones:
   - (91, 197)
   - (101, 159)
   - (106, 136)

@@ -26,18 +26,10 @@ const RIDGE_MARGIN := 1.0
 const RIDGE_ABOVE := 0.3
 const MAX_TASKS := 2
 const MAX_APPLY_PER_FRAME := 1
-const TREE_SPACING := 9.0
-## Trees grow on wood and on the hills above FOREST_HEIGHT (R12, D-0005-01),
-## not lower than FOREST_LOWEST.
-const FOREST_HEIGHT := 12.0
+## Trees and scrub do not grow lower than this.
 const FOREST_LOWEST := 2.0
-## The part of the tree places that get a tree: on wood, and on the other hill ground.
-const WOOD_DENSITY := 0.8
-const HILL_DENSITY := 0.75
-## On the small islands (Hòn Bà), trees grow on the top, higher than
-## ISLAND_TREE_HEIGHT, also between the boulders (D-0005-05).
-const ISLAND_TREE_HEIGHT := 7.0
-const ISLAND_TREE_SLOPE := 1.2
+## A point is tree ground when the tree cover (cover.png, R) is more than this.
+const FOREST_COVER := 0.5
 ## The calm water around Bãi Trước: little foam (report 0005, D-0005-07).
 const CALM_BAY_RADIUS := 1200.0
 const NIGHT_AMBIENT := Color("#2B3754")
@@ -81,9 +73,19 @@ var canopy: HillCanopy
 ## The outlines of the small islands in game X, Z, and their bounds.
 var _islands: Array[PackedVector2Array] = []
 var _island_bounds: Array[Rect2] = []
-## The hill tree mix (data/trees/types.json, "hills") and its areas.
+## The hill tree values (data/trees/types.json, "hills"), their areas, and
+## the sizes of the variants of each hill type: type -> [[height, radius], ...].
 var _hill_settings: Dictionary = {}
 var _hill_areas: Array = []
+var _hill_sizes: Dictionary = {}
+## The land cover (cover.png: R tree cover, G bushes, B grass, A bare ground),
+## the canopy heights (canopy.png) and their place, and the tree tops of the
+## canopy map in each near chunk: Vector2i -> PackedFloat32Array of x, z,
+## height, crown radius (report 0005, D-0005-09; plan 0020, R10a).
+var _cover_image: Image
+var _canopy_image: Image
+var _canopy_place: Dictionary = {}
+var _canopy_trees: Dictionary = {}
 var sea_objects: SeaObjects
 var roadworks: Roadworks
 ## The season values of the game day (R12a), from Season.of_day().
@@ -127,6 +129,7 @@ func setup(folder := GeoData.ROOT) -> bool:
 		_islands.append(outline)
 		_island_bounds.append(bounds)
 	_make_environment()
+	_read_cover()
 	_make_materials()
 	_make_sea()
 	_make_far_ground()
@@ -140,7 +143,7 @@ func setup(folder := GeoData.ROOT) -> bool:
 	trees.name = "Trees"
 	add_child(trees)
 	trees.setup(TreeLibrary.shared())
-	_read_hill_mix()
+	_read_hill_settings()
 	street_trees = StreetTrees.new()
 	street_trees.setup(data.root.path_join("trees.json"), trees)
 	sea_objects = SeaObjects.new()
@@ -246,10 +249,12 @@ func spawn() -> Dictionary:
 	return {"position": best, "yaw": yaw}
 
 
-## Shows or hides the far form of the hill trees: the clumps and the canopy
-## of the ground (D-0005-01). PT-33 compares the hills with and without it.
+## Shows or hides the far form of the hill trees: the clumps, and the canopy
+## and the tree cover of the ground (D-0005-01). PT-33 compares the hills
+## with it and without it (then the ground under the trees is grass).
 func set_canopy(on: bool) -> void:
 	canopy.visible = on
+	_ground_material.set_shader_parameter("tree_cover", 1.0 if on else 0.0)
 	_ground_material.set_shader_parameter("canopy_near", (HillCanopy.NEAR_HIDE - 80.0) if on else 1.0e9)
 	_ground_material.set_shader_parameter("canopy_far", (HillCanopy.NEAR_HIDE + 120.0) if on else 2.0e9)
 
@@ -531,21 +536,39 @@ func _add_roads(node: Node3D, body: StaticBody3D, roads: Dictionary) -> void:
 
 # --- Trees -------------------------------------------------------------------
 
-## True when trees grow at the point (h is the ground height, slope is the
-## rise for each meter): in woods and on the hills, not in towns, on sand, or
-## on steep rock. The town area of the data covers most of the hill slopes
-## too, so on wood the town does not stop the trees, as in the ground shader
-## (D-0005-01). The near trees and the far canopy use this rule. Safe in a
-## worker thread.
-func is_forest(x: float, z: float, h: float, slope: float) -> bool:
-	if _surface_image == null or h < FOREST_LOWEST:
+## True when trees grow at the point (h is the ground height): where the land
+## cover has trees (ESA WorldCover and the canopy height maps, report 0005,
+## D-0005-09), not on sand or in the water. The far forms (HillCanopy) and
+## the ground shader use this rule. Safe in a worker thread.
+func is_forest(x: float, z: float, h: float, _slope := 0.0) -> bool:
+	if _cover_image == null or h < FOREST_LOWEST:
 		return false
-	if is_on_island(x, z):
-		return h > ISLAND_TREE_HEIGHT and slope < ISLAND_TREE_SLOPE
-	if slope > 0.6:
-		return false
-	var mask := _mask_at(Vector2(x, z))
-	return mask.r <= 0.3 and (mask.b > 0.4 or (mask.g <= 0.3 and h > FOREST_HEIGHT))
+	return cover_at(x, z).r > FOREST_COVER and _mask_at(Vector2(x, z)).r <= 0.3
+
+
+## The land cover at a point: R the part of tree cover, G of bushes, B of
+## grass, A of bare ground. Safe in a worker thread.
+func cover_at(x: float, z: float) -> Color:
+	if _cover_image == null:
+		return Color(0, 0, 0, 0)
+	return _pixel(_cover_image, data.surface, x, z)
+
+
+## The canopy height (m) at a point: the highest value of its cell of 4 m. Safe in a worker thread.
+func canopy_height_at(x: float, z: float) -> float:
+	if _canopy_image == null:
+		return 0.0
+	return _pixel(_canopy_image, _canopy_place, x, z).r * 255.0 * float(_canopy_place.get("scale_m", 0.2))
+
+
+## The pixel of an image on a grid (x0 and z0 are the center of the first pixel).
+static func _pixel(image: Image, place: Dictionary, x: float, z: float) -> Color:
+	var step := float(place.get("step", 8.0))
+	var col := roundi((x - float(place.get("x0", 0.0))) / step)
+	var row := roundi((z - float(place.get("z0", 0.0))) / step)
+	if col < 0 or row < 0 or col >= image.get_width() or row >= image.get_height():
+		return Color(0, 0, 0, 0)
+	return image.get_pixel(col, row)
 
 
 ## True when the point is on a small island (for example Hòn Bà).
@@ -557,49 +580,90 @@ func is_on_island(x: float, z: float) -> bool:
 	return false
 
 
-## Runs in a worker thread. Trees grow in woods and on the hills, not in towns,
-## on sand, on steep rock, or on roads. Returns type -> transforms in world
-## space: the hill trees (a mix of the hill types, R1) and a dense cover of
-## scrub on the hill slopes (report 0005, D-0005-09).
+## Runs in a worker thread. Returns type -> transforms in world space: a hill
+## tree on each tree top of the canopy map in the chunk, with the height of
+## the map and the type with the shape of the crown (plan 0020, R10a), and the
+## scrub where the canopy is a bush and, less dense, under the trees (report
+## 0005, D-0005-09). Not on sand, in the water, or on roads.
 func _tree_transforms(key: Vector2i, heights: PackedFloat32Array) -> Dictionary:
 	var result := {}
-	if _surface_image == null:
+	if _cover_image == null or _surface_image == null:
 		return result
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(key)
 	var origin := Vector2(key.x * data.chunk_size, key.y * data.chunk_size)
-	var count := int(data.chunk_size / TREE_SPACING)
-	for j in count:
-		for i in count:
-			var local := Vector2((i + rng.randf()) * TREE_SPACING, (j + rng.randf()) * TREE_SPACING)
-			var ground := _ground_at(heights, local)
-			var world := origin + local
-			if not is_forest(world.x, world.y, ground.x, ground.y):
-				continue
-			if rng.randf() > (WOOD_DENSITY if _mask_at(world).b > 0.4 else HILL_DENSITY):
-				continue
-			if not data.road_at(world.x, world.y).is_empty():
-				continue
-			var type := _pick(_hill_mix_at(world), rng.randf())
-			_add_place(result, type, world, ground.x, rng.randf_range(0.7, 1.3), rng.randf() * TAU)
+	var scale_range: Array = _hill_settings.get("scale", [0.5, 2.0])
+	var tops: PackedFloat32Array = _canopy_trees.get(key, PackedFloat32Array())
+	for i in range(0, tops.size(), 4):
+		var world := Vector2(tops[i], tops[i + 1])
+		var ground := _ground_at(heights, world - origin)
+		var height := tops[i + 2] + rng.randf_range(-0.5, 0.5)
+		var value := rng.randf()
+		var turn := rng.randf() * TAU
+		if ground.x < FOREST_LOWEST or _mask_at(world).r > 0.3 or not data.road_at(world.x, world.y).is_empty():
+			continue
+		var type := hill_type(world, height, tops[i + 3], value)
+		var size: Array = _hill_sizes[type][TreeField.variant_at(Vector3(world.x, 0.0, world.y), _hill_sizes[type].size())]
+		_add_place(result, type, world, ground.x, clampf(height / size[0], scale_range[0], scale_range[1]), turn)
 	var scrub: Dictionary = _hill_settings.get("scrub", {})
-	var spacing := float(scrub.get("spacing_m", 4.0))
-	var density := float(scrub.get("density", 0.55))
+	var spacing := float(scrub.get("spacing_m", 3.5))
+	var density := float(scrub.get("density", 0.6))
+	var under_trees := float(scrub.get("under_trees", 0.25))
 	var max_slope := float(scrub.get("max_slope", 0.85))
-	count = int(data.chunk_size / spacing)
+	var bush_min := float(_canopy_place.get("bush_min_m", 0.6))
+	var tree_min := float(_canopy_place.get("tree_min_m", 3.0))
+	var scrub_height: float = _hill_sizes.get("scrub", [[2.2, 1.6]])[0][0]
+	var count := int(data.chunk_size / spacing)
 	for j in count:
 		for i in count:
 			var local := Vector2((i + rng.randf()) * spacing, (j + rng.randf()) * spacing)
-			var ground := _ground_at(heights, local)
+			var value := rng.randf()
+			var size := rng.randf_range(0.7, 1.3)
+			var turn := rng.randf() * TAU
 			var world := origin + local
-			if ground.y > max_slope or rng.randf() > density:
+			var canopy_m := canopy_height_at(world.x, world.y)
+			var chance := density if canopy_m >= bush_min and canopy_m < tree_min else (under_trees if canopy_m >= tree_min else 0.0)
+			if value > chance:
 				continue
-			if not is_scrub(world.x, world.y, ground.x, ground.y):
+			var ground := _ground_at(heights, local)
+			if ground.x < FOREST_LOWEST or ground.y > max_slope or _mask_at(world).r > 0.3:
 				continue
 			if not data.road_at(world.x, world.y).is_empty():
 				continue
-			_add_place(result, "scrub", world, ground.x, rng.randf_range(0.7, 1.4), rng.randf() * TAU)
+			if canopy_m < tree_min:
+				# A bush has the height of the map.
+				size = clampf(canopy_m / scrub_height, 0.5, 1.4)
+			_add_place(result, "scrub", world, ground.x, size, turn)
 	return result
+
+
+## The hill type of a tree top: in an area with extra types (teak on Núi Lớn),
+## a part of the tall trees is of the extra type; else the type whose crown
+## has the shape of the canopy patch (crown radius / height), and a height
+## near the type height. value is a random value from 0 to 1. Safe in a worker thread.
+func hill_type(world: Vector2, height: float, radius: float, value: float) -> String:
+	for area: Dictionary in _hill_areas:
+		if world.distance_to(area.center) > area.radius or height < area.min_height:
+			continue
+		for type: String in area.extra:
+			if value < float(area.extra[type]):
+				return type
+			value -= float(area.extra[type])
+	var p := Vector3(world.x, 0.0, world.y)
+	var ratio := maxf(radius, 0.5) / maxf(height, 1.0)
+	var weight := float(_hill_settings.get("height_weight", 0.5))
+	var best := ""
+	var best_score := INF
+	for type: String in _hill_settings.get("types", ["hill_a"]):
+		var sizes: Array = _hill_sizes.get(type, [])
+		if sizes.is_empty():
+			continue
+		var size: Array = sizes[TreeField.variant_at(p, sizes.size())]
+		var score := absf(log(ratio * size[0] / size[1])) + weight * absf(log(height / size[0]))
+		if score < best_score:
+			best_score = score
+			best = type
+	return best
 
 
 ## The height and the slope (rise for each meter) of the ground at a local point of a chunk.
@@ -620,48 +684,64 @@ static func _add_place(result: Dictionary, type: String, world: Vector2, h: floa
 	(result[type] as Array[Transform3D]).append(Transform3D(basis, Vector3(world.x, h - 0.1, world.y)))
 
 
-## True when scrub grows at the point: on the hill ground (also below the
-## forest height, but not in the town), not on rock, sand, or water.
-func is_scrub(x: float, z: float, h: float, slope: float) -> bool:
-	if _surface_image == null or h < FOREST_LOWEST or is_on_island(x, z):
-		return false
-	var mask := _mask_at(Vector2(x, z))
-	if mask.r > 0.3:
-		return false
-	return mask.b > 0.4 or (mask.g <= 0.3 and h > FOREST_HEIGHT * 0.5) or (mask.g > 0.3 and h > FOREST_HEIGHT)
-
-
-func _read_hill_mix() -> void:
-	_hill_settings = TreeLibrary.shared().settings.get("hills", {})
+func _read_hill_settings() -> void:
+	var library := TreeLibrary.shared()
+	_hill_settings = library.settings.get("hills", {})
 	_hill_areas.clear()
 	for area: Dictionary in _hill_settings.get("areas", []):
 		var landmark := data.landmark(str(area.get("landmark", "")))
 		if landmark.is_empty():
 			continue
 		var p: Array = landmark.position
-		_hill_areas.append({"center": Vector2(p[0], p[1]), "radius": float(area.radius_m), "mix": area.mix})
+		_hill_areas.append({"center": Vector2(p[0], p[1]), "radius": float(area.radius_m), "extra": area.get("extra", {}),
+				"min_height": float(area.get("extra_min_height_m", 0.0))})
+	_hill_sizes.clear()
+	for type: String in _hill_settings.get("types", []) + ["scrub"] + _extra_types():
+		if not library.has_type(type):
+			continue
+		var sizes := []
+		for v in library.variants(type):
+			var info := library.variant_info(type, v)
+			sizes.append([maxf(float(info.height), 0.5), maxf(float(info.radius), 0.5)])
+		_hill_sizes[type] = sizes
 
 
-func _hill_mix_at(world: Vector2) -> Dictionary:
+func _extra_types() -> Array:
+	var result := []
 	for area: Dictionary in _hill_areas:
-		if world.distance_to(area.center) <= area.radius:
-			return area.mix
-	return _hill_settings.get("mix", {"hill_a": 1.0})
+		result.append_array(area.extra.keys())
+	return result
 
 
-## A type from a mix (type -> share) for a random value from 0 to 1.
-static func _pick(mix: Dictionary, value: float) -> String:
-	var total := 0.0
-	for type: String in mix:
-		total += float(mix[type])
-	var at := value * total
-	var last := ""
-	for type: String in mix:
-		last = type
-		at -= float(mix[type])
-		if at <= 0.0:
-			return type
-	return last
+## The land cover, the canopy heights, and the tree tops of the canopy map.
+func _read_cover() -> void:
+	var cover: Dictionary = data.world.get("cover", {})
+	var cover_path := data.root.path_join(str(cover.get("file", "cover.png")))
+	if not FileAccess.file_exists(cover_path):
+		push_warning("VungTau: no %s. Run tools/geo/landcover.py and tools/geo/build.py." % cover_path)
+		return
+	_cover_image = Image.new()
+	_cover_image.load_png_from_buffer(FileAccess.get_file_as_bytes(cover_path))
+	_canopy_place = cover.get("canopy", {})
+	var canopy_path := data.root.path_join(str(_canopy_place.get("file", "canopy.png")))
+	if FileAccess.file_exists(canopy_path):
+		_canopy_image = Image.new()
+		_canopy_image.load_png_from_buffer(FileAccess.get_file_as_bytes(canopy_path))
+	var trees_path := data.root.path_join(str(cover.get("trees", "canopy_trees.json")))
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(trees_path)) if FileAccess.file_exists(trees_path) else null
+	if not parsed is Dictionary:
+		push_warning("VungTau: no tree tops in %s." % trees_path)
+		return
+	# A packed array in a container is a copy when it changes, so the lists grow in an Array first.
+	var lists := {}
+	var flat: Array = parsed.get("trees", [])
+	for i in range(0, flat.size() - 3, 4):
+		var key := Vector2i(floori(float(flat[i]) / data.chunk_size), floori(float(flat[i + 1]) / data.chunk_size))
+		if not lists.has(key):
+			lists[key] = []
+		lists[key].append_array([flat[i], flat[i + 1], flat[i + 2], flat[i + 3]])
+	for key: Vector2i in lists:
+		_canopy_trees[key] = PackedFloat32Array(lists[key])
 
 
 ## The surface mask at a point: R sand, G town, B wood, A the distance to the coast.
@@ -749,7 +829,15 @@ func _make_materials() -> void:
 		_ground_material.set_shader_parameter("rock_mask", rock_texture)
 	_ground_material.set_shader_parameter("mask_origin", mask_origin)
 	_ground_material.set_shader_parameter("mask_size", size)
-	_ground_material.set_shader_parameter("forest_height", FOREST_HEIGHT)
+	if _cover_image:
+		_ground_material.set_shader_parameter("cover_mask", ImageTexture.create_from_image(_cover_image))
+	if _canopy_image:
+		var canopy_step := float(_canopy_place.get("step", 4.0))
+		_ground_material.set_shader_parameter("canopy_heights", ImageTexture.create_from_image(_canopy_image))
+		_ground_material.set_shader_parameter("canopy_origin", Vector2(float(_canopy_place.x0), float(_canopy_place.z0)) - Vector2.ONE * canopy_step / 2.0)
+		_ground_material.set_shader_parameter("canopy_size", Vector2(_canopy_image.get_width(), _canopy_image.get_height()) * canopy_step)
+		_ground_material.set_shader_parameter("canopy_unit", 255.0 * float(_canopy_place.get("scale_m", 0.2)))
+		_ground_material.set_shader_parameter("tree_min", float(_canopy_place.get("tree_min_m", 3.0)))
 	_ground_material.set_shader_parameter("roof_colors", roof_colors())
 	_sea_material = ShaderMaterial.new()
 	_sea_material.shader = load("res://shaders/water.gdshader")

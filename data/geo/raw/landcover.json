@@ -1,5 +1,6 @@
 {
 	"note": "Made by tools/geo/landcover.py (report 0005, D-0005-09; plan 0020, D8). Do not change by hand.",
+	"accessed": "2026-10-27",
 	"worldcover": {
 		"name": "ESA WorldCover 2021 v200",
 		"license": "CC BY 4.0",
@@ -21,7 +22,7 @@
 	"canopy": {
 		"name": "Meta and WRI High Resolution Canopy Height Maps (v1)",
 		"license": "CC BY 4.0",
-		"notice": "High Resolution Canopy Height Maps by WRI and Meta (Tolan et al. 2024), from Maxar images. CC BY 4.0.",
+		"notice": "Meta and World Resources Institute (WRI) - 2024. High Resolution Canopy Height Maps (CHM). Source imagery for CHM © 2016 Maxar. CC BY 4.0.",
 		"file": "canopy.tif",
 		"tiles": [
 			"132231002"

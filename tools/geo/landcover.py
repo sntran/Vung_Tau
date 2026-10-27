@@ -18,6 +18,7 @@ Usage:
 build.py reads them.
 """
 
+import datetime
 import json
 import sys
 import time
@@ -39,8 +40,9 @@ WORLDCOVER_URL = ("https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/202
 CANOPY_ROOT = "https://dataforgood-fb-data.s3.amazonaws.com/forests/v1/alsgedi_global_v6_float/"
 WORLDCOVER_NOTICE = ("© ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by "
                      "ESA WorldCover consortium. CC BY 4.0.")
-CANOPY_NOTICE = ("High Resolution Canopy Height Maps by WRI and Meta (Tolan et al. 2024), from Maxar images. "
-                 "CC BY 4.0.")
+# The citation of the Registry of Open Data on AWS (dataforgood-fb-forests).
+CANOPY_NOTICE = ("Meta and World Resources Institute (WRI) - 2024. High Resolution Canopy Height Maps (CHM). "
+                 "Source imagery for CHM © 2016 Maxar. CC BY 4.0.")
 CLASSES = {10: "tree cover", 20: "shrubland", 30: "grassland", 40: "cropland", 50: "built-up", 60: "bare or sparse",
            70: "snow and ice", 80: "water", 90: "herbaceous wetland", 95: "mangroves", 100: "moss and lichen"}
 # The canopy heights go to this grid (m), in the UTM zone of the game.
@@ -151,6 +153,7 @@ def main() -> int:
     canopy = read_canopy(box, int(area["epsg"]), RAW / "canopy.tif")
     write_json(RAW / "landcover.json", {
         "note": "Made by tools/geo/landcover.py (report 0005, D-0005-09; plan 0020, D8). Do not change by hand.",
+        "accessed": datetime.date.today().isoformat(),
         "worldcover": {"name": "ESA WorldCover 2021 v200", "license": "CC BY 4.0", "notice": WORLDCOVER_NOTICE,
                        "file": "worldcover.tif"} | cover,
         "canopy": {"name": "Meta and WRI High Resolution Canopy Height Maps (v1)", "license": "CC BY 4.0",

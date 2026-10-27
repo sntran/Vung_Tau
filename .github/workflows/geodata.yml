@@ -3,8 +3,10 @@ name: Geodata
 # Downloads the OpenStreetMap data, the Copernicus DEM, the ground textures,
 # and the EOT20 tide model, computes the tide (tide.py), computes the
 # intertidal zone from the Sentinel-2 images and reads the GEBCO grid
-# (intertidal.py), builds data/geo/build/, and commits the changed files
-# (plan 0005, D1, D12, R8, and R8g).
+# (intertidal.py), reads the land cover of ESA WorldCover and the canopy
+# height maps of Meta and WRI (landcover.py), builds data/geo/build/, and
+# commits the changed files (plan 0005, D1, D12, R8, and R8g; report 0005,
+# D-0005-09; plan 0020, D8).
 # Run this workflow by hand on main. The commit goes to the branch that the
 # workflow runs on.
 on:
@@ -54,6 +56,9 @@ jobs:
       - name: Compute the intertidal zone and read GEBCO
         run: python tools/geo/intertidal.py
 
+      - name: Read the land cover and the canopy heights
+        run: python tools/geo/landcover.py
+
       - name: Build the game data
         run: python tools/geo/build.py
 
@@ -71,6 +76,9 @@ jobs:
             data/geo/build/intertidal_report.md
             data/geo/build/intertidal_dry.png
             data/geo/raw/intertidal.json
+            data/geo/raw/landcover.json
+            data/geo/build/cover_map.png
+            data/geo/build/canopy_map.png
             data/geo/build/homestay_area.png
             data/geo/build/anchors.png
             data/geo/raw/manifest.json

@@ -213,3 +213,9 @@ def test_report(small_build):
                  "## Problems with the data", "Bãi Sau | **no**", "has no reason", "finds no way", "## Roadworks (R11a)",
                  "## Objects on the sea (R13a)", "## Trees (R12a)", "the pier way 999998"]:
         assert text in report, text
+
+
+def test_no_cover_without_the_land_cover_files(small_build):
+    # The small extract has no worldcover.tif or canopy.tif: the build goes on without the cover (D-0005-09).
+    assert load(small_build, "world.json")["cover"] == {}
+    assert not (small_build / "cover.png").exists() and not (small_build / "canopy_trees.json").exists()

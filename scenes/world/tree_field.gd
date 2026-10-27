@@ -44,6 +44,11 @@ static func mesh_id(type_index: int, variant: int) -> int:
 	return type_index * 8 + variant
 
 
+## The variant of a tree at a position: the same place always has the same tree.
+static func variant_at(p: Vector3, variant_count: int) -> int:
+	return posmod(hash(Vector2i(roundi(p.x * 4.0), roundi(p.z * 4.0))), variant_count)
+
+
 ## Adds trees of one type to a source. Each transform has the base of the tree
 ## as its origin, in world space. The variant comes from the position, so the
 ## same place always has the same tree, or from variants (the gallery of PT-52).
@@ -61,7 +66,7 @@ func add_trees(source: Vector2i, type: String, transforms: Array[Transform3D], f
 	for n in transforms.size():
 		var t := transforms[n]
 		var p := t.origin
-		var variant := posmod(hash(Vector2i(roundi(p.x * 4.0), roundi(p.z * 4.0))), variant_count)
+		var variant := variant_at(p, variant_count)
 		if n < variants.size():
 			variant = variants[n] % variant_count
 		var key := Vector2i(floori(p.x / CELL), floori(p.z / CELL))
