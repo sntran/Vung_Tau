@@ -50,6 +50,8 @@ ISLAND_MAX_M2 = 1_000_000.0
 ISLAND_MARGIN_M = 20.0
 # The value of the low rocks with pebbles and shells in rock.png (the other bare rock is 255).
 ROCK_PEBBLES = 140
+# The low rocks this near a small island are boulders in rock.png (VungTau.ISLAND_REACH in the game).
+ISLAND_BOULDER_REACH_M = 10.0
 KEEP_IMPORT = '[remap]\n\nimporter="keep"\n'
 
 
@@ -328,6 +330,9 @@ def build(raw: Path, out: Path, geo: Path) -> int:
                                          for p in polygons_of(r)])
     pebble_mask = terrain.rasterize(grid, [p for r in pebble_shapes + [rock_band] if r is not None
                                            for p in polygons_of(r)])
+    # Near a small island the low rocks are boulders (report 0005, section 8: at
+    # the end of the path, Hòn Bà is a pile of large boulders).
+    pebble_mask &= ~terrain.rasterize(grid, [p.buffer(ISLAND_BOULDER_REACH_M) for p in islands])
     surface = write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods, landuse, roads, area,
                             out / "surface.png", rock_mask, out / "rock.png", pebble_mask)
     write_keep_import(out / "surface.png")

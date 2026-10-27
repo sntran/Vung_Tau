@@ -42,6 +42,19 @@ const GROUND_DETAIL := {
 ## The ground detail now (Quality.apply() sets it with set_ground_detail()).
 static var ground_detail: Dictionary = GROUND_DETAIL.high
 static var ground_preset := "high"
+## The boulders stay this far from the line of the Hòn Bà path (more than
+## their size) and from the shrine of Hòn Bà (m), so that the player walks there
+## and sees the islet at the end of the path.
+const PATH_CLEAR := 4.0
+## On the islet and near it, the walk along the path is narrower (m more than the size of the boulders).
+const ISLAND_PATH_CLEAR := 0.5
+## The boulders of a small island also lie on the low rocks (rock mask
+## LOW_ROCK_MIN or more) up to this distance from it (m).
+const ISLAND_REACH := 10.0
+const LOW_ROCK_MIN := 0.3
+const SHRINE_CLEAR := 12.0
+## The boulders stay this far from the trunk of a hill tree, more than their radius (m).
+const TRUNK_CLEAR := 1.0
 ## The player cannot walk into water deeper than this (R13).
 const MAX_WATER_DEPTH := 0.5
 ## A point at this distance or less from the line of the Hòn Bà ridge is on
@@ -116,6 +129,10 @@ var roadworks: Roadworks
 var season: Dictionary = {}
 var _season_day := -1
 var _surface_image: Image
+## The rock mask (1 for the bare rock of the rocky coasts and the islands).
+var _rock_image: Image
+## The preset of the far boulders now.
+var _boulder_preset := ""
 var _chunks: Dictionary = {}  # Vector2i -> {"detail", "wanted", "far", "tile", "fine", "busy", "asked", "patches", "heights"}
 var _far_tiles: Dictionary = {}  # Vector2i -> MeshInstance3D
 var _far_strides: Dictionary = {}  # Vector2i -> the grid step of the tile now, in overview samples
@@ -421,6 +438,11 @@ func _process(delta: float) -> void:
 	if canopy and _canopy_preset != ground_preset:
 		_canopy_preset = ground_preset
 		canopy.set_preset(ground_preset)
+	if _boulder_preset != ground_preset:
+		_boulder_preset = ground_preset
+		for key: Vector2i in _chunks:
+			if _chunks[key].fine:
+				BoulderBuilder.set_preset(_chunks[key].fine, ground_preset)
 	_update_wanted()
 	_start_tasks()
 	_update_patches()
@@ -494,6 +516,7 @@ func _build_chunk(key: Vector2i, detail: int, strides: Dictionary) -> void:
 			var origin := Vector3(key.x * data.chunk_size, 0.0, key.y * data.chunk_size)
 			result.roads = RoadBuilder.build(data, key, origin)
 			result.trees = _tree_transforms(key, heights)
+			result.boulders = _boulder_transforms(key, heights, result.trees)
 	_mutex.lock()
 	_done.append(result)
 	_mutex.unlock()
@@ -562,6 +585,8 @@ func _show_fine(key: Vector2i, result: Dictionary) -> void:
 		node.add_child(body)
 		_add_roads(node, body, result.roads)
 		_add_trees(key, result.trees)
+		for boulders: MultiMeshInstance3D in BoulderBuilder.nodes(result.boulders, node.position, ground_preset):
+			node.add_child(boulders)
 	else:
 		trees.remove_source(key)
 	var was_far: bool = state.detail == Detail.FAR
@@ -819,6 +844,144 @@ func _tree_transforms(key: Vector2i, heights: PackedFloat32Array) -> Dictionary:
 	return result
 
 
+## Runs in a worker thread. Returns cell -> transforms in world space: the
+## granite boulders on the bare rock of the rocky coasts and the small
+## islands (_boulder_ground(); report 0005, D-0005-03 and D-0005-05),
+## BoulderBuilder.PER_CELL in each cell of the mask. A cell is
+## a square of BoulderBuilder.CELL meters of the chunk. A boulder lies on the
+## slope of the ground. Not at the trunk of a hill tree of "trees_placed" (from
+## _tree_transforms()), on roads, on the Hòn Bà path, or near the shrine of Hòn Bà.
+func _boulder_transforms(key: Vector2i, heights: PackedFloat32Array, trees_placed: Dictionary) -> Dictionary:
+	var result := {}
+	if _rock_image == null:
+		return result
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(key) + 7
+	var origin := Vector2(key.x * data.chunk_size, key.y * data.chunk_size)
+	var step := float(data.surface.get("step", 8.0))
+	var trunks := PackedVector2Array()
+	for type: String in trees_placed:
+		if type != "scrub":
+			for t: Transform3D in trees_placed[type]:
+				trunks.append(Vector2(t.origin.x, t.origin.z))
+	var shrine := data.landmark("mieu_hon_ba")
+	var shrine_at := Vector2(shrine.position[0], shrine.position[1]) if not shrine.is_empty() else Vector2.INF
+	var count := int(data.chunk_size / step)
+	for j in count:
+		for i in count:
+			var center := origin + Vector2(i + 0.5, j + 0.5) * step
+			if not _boulder_ground(center) and not _boulder_ground(center + Vector2(step, step) * 0.45) \
+					and not _boulder_ground(center - Vector2(step, step) * 0.45):
+				continue
+			for k in BoulderBuilder.PER_CELL:
+				var local := Vector2(i + rng.randf(), j + rng.randf()) * step
+				# More small boulders than large ones.
+				var radius := lerpf(BoulderBuilder.RADIUS.x, BoulderBuilder.RADIUS.y, pow(rng.randf(), 1.3))
+				var turn := rng.randf() * TAU
+				var tilt := rng.randf_range(-0.2, 0.2)
+				var stretch := Vector3(rng.randf_range(0.8, 1.3), rng.randf_range(0.7, 1.25), rng.randf_range(0.8, 1.3))
+				var world := origin + local
+				if not _boulder_ground(world) or _near_trunk(trunks, world, radius + TRUNK_CLEAR):
+					continue
+				var extent := radius * maxf(stretch.x, stretch.z)
+				# A boulder can reach a little over the edge of a road (the steps to the shrine of Hòn Bà are narrow).
+				if world.distance_to(shrine_at) < SHRINE_CLEAR or _near_road(world, extent * 0.5):
+					continue
+				var clear := ISLAND_PATH_CLEAR if _island_distance(world) <= ISLAND_REACH else PATH_CLEAR
+				if _near_ridge_line(world, extent + clear, shrine_at):
+					continue
+				# The boulder lies on the slope: its base is parallel to the ground,
+				# and a part of it is in the ground.
+				var h := _height_at(heights, local)
+				var normal := Vector3(_height_at(heights, local - Vector2.RIGHT) - _height_at(heights, local + Vector2.RIGHT), 2.0,
+						_height_at(heights, local - Vector2.DOWN) - _height_at(heights, local + Vector2.DOWN)).normalized()
+				var lift := normal * radius * (BoulderBuilder.BASE * stretch.y - BoulderBuilder.SINK)
+				var basis := Basis(Quaternion(Vector3.UP, normal)) * Basis(Vector3.UP, turn) * Basis(Vector3.RIGHT, tilt) \
+						* Basis.from_scale(stretch * radius)
+				var cell := Vector2i(int(local.x / BoulderBuilder.CELL), int(local.y / BoulderBuilder.CELL))
+				if not result.has(cell):
+					result[cell] = [] as Array[Transform3D]
+				(result[cell] as Array[Transform3D]).append(Transform3D(basis, Vector3(world.x, h, world.y) + lift))
+	return result
+
+
+## True when a boulder can lie at the point: the bare rock of the rocky coasts
+## and the islands (rock mask BoulderBuilder.MASK_MIN or more), all of a small
+## island (the mask of 8 m is lower at its edge), and the low rocks near a
+## small island, where the Hòn Bà path ends in the boulders of the islet. Safe
+## in a worker thread.
+func _boulder_ground(at: Vector2) -> bool:
+	var value := rock_at(at.x, at.y)
+	return value >= BoulderBuilder.MASK_MIN or (value >= LOW_ROCK_MIN and _island_distance(at) <= ISLAND_REACH)
+
+
+## The distance (m) from the point to the nearest small island, 0 on an island,
+## or INF when no island is nearer than ISLAND_REACH. Safe in a worker thread.
+func _island_distance(at: Vector2) -> float:
+	var best := INF
+	for i in _islands.size():
+		if not _island_bounds[i].grow(ISLAND_REACH).has_point(at):
+			continue
+		var outline := _islands[i]
+		if Geometry2D.is_point_in_polygon(at, outline):
+			return 0.0
+		for k in outline.size():
+			var closest := Geometry2D.get_closest_point_to_segment(at, outline[k], outline[(k + 1) % outline.size()])
+			best = minf(best, closest.distance_to(at))
+	return best
+
+
+## The rock mask at a point: 1 for the bare rock of the rocky coasts and the
+## islands, about 0.55 for the low rocks of the Hòn Bà path. Safe in a worker thread.
+func rock_at(x: float, z: float) -> float:
+	if _rock_image == null:
+		return 0.0
+	return _pixel(_rock_image, data.surface, x, z).r
+
+
+## The ground height at a local point of a chunk, between the samples. Safe in a worker thread.
+func _height_at(heights: PackedFloat32Array, local: Vector2) -> float:
+	return GeoData._bilinear(heights, data.samples, data.samples, local.x / data.grid, local.y / data.grid)
+
+
+## True when the point is nearer than "margin" to a point of "trunks".
+static func _near_trunk(trunks: PackedVector2Array, at: Vector2, margin: float) -> bool:
+	for trunk in trunks:
+		if trunk.distance_squared_to(at) < margin * margin:
+			return true
+	return false
+
+
+## True when the point is nearer than "margin" to the line of the Hòn Bà path,
+## but not beyond its end on the islet: there the boulders start (the islet
+## end of the line is the end nearer to the shrine).
+func _near_ridge_line(at: Vector2, margin: float, shrine_at := Vector2.INF) -> bool:
+	var count := ridge_points.size()
+	if count < 2:
+		return false
+	var last := count - 1
+	var step := -1
+	if shrine_at != Vector2.INF and ridge_points[0].distance_to(shrine_at) < ridge_points[last].distance_to(shrine_at):
+		last = 0
+		step = 1
+	var end := ridge_points[last]
+	var before := ridge_points[last + step]
+	if (at - end).dot(end - before) > 0.0:
+		return false
+	for i in count - 1:
+		if Geometry2D.get_closest_point_to_segment(at, ridge_points[i], ridge_points[i + 1]).distance_to(at) < margin:
+			return true
+	return false
+
+
+## True when a road is at the point or at "extent" from it in one of the four directions. Safe in a worker thread.
+func _near_road(at: Vector2, extent: float) -> bool:
+	for offset: Vector2 in [Vector2.ZERO, Vector2(extent, 0.0), Vector2(-extent, 0.0), Vector2(0.0, extent), Vector2(0.0, -extent)]:
+		if not data.road_at(at.x + offset.x, at.y + offset.y).is_empty():
+			return true
+	return false
+
+
 ## The hill type of a tree top: in an area with extra types (teak on Núi Lớn),
 ## a part of the tall trees is of the extra type; else the type whose crown
 ## has the shape of the canopy patch (crown radius / height), and a height
@@ -1005,9 +1168,9 @@ func _make_materials() -> void:
 	var rock_path := data.root.path_join(str(data.surface.get("rock", "rock.png")))
 	var rock_texture: Texture2D = null
 	if FileAccess.file_exists(rock_path):
-		var rock_image := Image.new()
-		rock_image.load_png_from_buffer(FileAccess.get_file_as_bytes(rock_path))
-		rock_texture = ImageTexture.create_from_image(rock_image)
+		_rock_image = Image.new()
+		_rock_image.load_png_from_buffer(FileAccess.get_file_as_bytes(rock_path))
+		rock_texture = ImageTexture.create_from_image(_rock_image)
 		_ground_material.set_shader_parameter("rock_mask", rock_texture)
 	_ground_material.set_shader_parameter("mask_origin", mask_origin)
 	_ground_material.set_shader_parameter("mask_size", size)

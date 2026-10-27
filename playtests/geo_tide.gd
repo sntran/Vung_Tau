@@ -2,7 +2,8 @@ extends RefCounted
 # PT-38 geo_tide. Start at a dry time from R8i, on the beach below Mũi Nghinh
 # Phong. Walk the ridge to Hòn Bà with tap to walk. Then start 3 hours after the
 # end of the dry time. The ridge is under water, and the player cannot walk on
-# it. Take screenshots of the same view at low tide and high tide.
+# it. Take screenshots of the same view at low tide and high tide. At the end of
+# the walk, the land near the camera shows rock (report 0005, section 8).
 # Day 1 of the game is 2019-01-22 (data/calendar.json, plan 0005, Q8), the
 # 17th day of the lunar month. tools/geo/tide.py gives a dry time from 06:35
 # to 10:00 on that day. The test reads the dry time from
@@ -11,6 +12,7 @@ extends RefCounted
 # phase: --world=vung_tau --day=1 --start-time=06:45
 # phase: --world=vung_tau --day=1 --start-time=13:00
 
+const Views := preload("res://playtests/geo_views.gd")
 const STEP := 12.0
 const HOURS_AFTER := 3.0
 ## The check of the water beside the path leaves out this length at each end.
@@ -58,6 +60,9 @@ func run(d: PlaytestDriver) -> void:
 		d.expect(_on_islet(d), "the player walks the ridge to Hòn Bà: %.0f m of %.0f m, and stands on the islet" % [walked, length])
 		d.expect(w.is_ridge_dry(), "the ridge is still dry at the end of the walk: the sea is at %+.2f m" % w.sea_level)
 		await d.screenshot("at_hon_ba")
+		# Report 0005, section 8: at the end of the path, the islet is a pile of boulders.
+		await d.wait_frames(3)
+		Views.check_rock(d, w, "at_hon_ba")
 	else:
 		var target := PlaytestDriver.route_point(route, minf(40.0, length))
 		await d.look_at_point(target + Vector3(0, 0.05, 0), 6.0, 15.0)

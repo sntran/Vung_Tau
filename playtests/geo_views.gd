@@ -21,6 +21,9 @@ extends RefCounted
 # (green is the largest channel), and the mean value of the land is 0.40 to
 # 0.55. In the view from Núi Lớn, 40 % or more of the town pixels have a
 # saturation above 0.2.
+# At 12:00 (report 0005, section 8), the land near the camera in the view of
+# the cape shows rock: 60 % or more of it is dark grey or brown, with a value
+# below 0.5.
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=06:00
 # phase: --world=vung_tau --start-time=12:00
@@ -53,6 +56,13 @@ const LAND_RADIUS_M := 1500.0
 ## example a tree crown at the eye) cover NEAR_SHARE of a view or less.
 const NEAR_M := 3.0
 const NEAR_SHARE := 0.05
+## Report 0005, section 8 (D-0005-03 and D-0005-05): the ground near the
+## camera in the view of the cape shows rock. ROCK_SHARE or more of the points
+## of the land from ROCK_M.x to ROCK_M.y from the camera have a dark grey or
+## brown color (rock_color()).
+const ROCK_M := Vector2(3.0, 40.0)
+const ROCK_VALUE := 0.5
+const ROCK_SHARE := 0.6
 ## The scrub check near the Bãi Sau view (plan 0020, R10a).
 const SCRUB_RADIUS_M := 250.0
 
@@ -91,6 +101,8 @@ func run(d: PlaytestDriver) -> void:
 			_check_land(d, w, view.name)
 		if time == "1200" and view.name == "bai_sau_from_road":
 			_check_scrub(d, w, view.eye)
+		if time == "1200" and view.name == "nghinh_phong_south":
+			check_rock(d, w, view.name)
 	d.fly_end()
 
 
@@ -297,6 +309,52 @@ static func canopy_points(d: PlaytestDriver, w: VungTau) -> Array[Vector2]:
 			if in_frame(d, point) and _clear_view(w, eye, point):
 				result.append(camera.unproject_position(point))
 	return result
+
+
+## Report 0005, section 8: the land near the camera shows rock, not sand.
+## Reads the screen at the points of a grid of 1 m on the land from ROCK_M.x
+## to ROCK_M.y from the camera (above the sea, in the frame, and not under the
+## phone button), and expects ROCK_SHARE or more of them with a rock color.
+static func check_rock(d: PlaytestDriver, w: VungTau, view_name: String) -> void:
+	var camera := d.viewport().get_camera_3d()
+	var eye := camera.global_position
+	var size := d.viewport().get_visible_rect().size
+	# The phone button is in the lower right corner of the screen.
+	var button := Rect2(size - Vector2(140.0, 80.0), Vector2(140.0, 80.0))
+	var points: Array[Vector2] = []
+	var steps := int(ROCK_M.y)
+	for j in range(-steps, steps + 1):
+		for i in range(-steps, steps + 1):
+			var x := eye.x + i
+			var z := eye.z + j
+			var distance := Vector2(i, j).length()
+			if distance < ROCK_M.x or distance > ROCK_M.y:
+				continue
+			var point := Vector3(x, w.ground_height(x, z), z)
+			if point.y < w.sea_level + 0.2 or not in_frame(d, point):
+				continue
+			var screen := camera.unproject_position(point)
+			if not button.has_point(screen):
+				points.append(screen)
+	var colors := pixel_colors(d, points)
+	var rock := 0
+	var value := 0.0
+	for c: Color in colors:
+		value += c.v
+		if rock_color(c):
+			rock += 1
+	var n := maxf(colors.size(), 1)
+	d.step("%s: %d land points from %.0f m to %.0f m, %.0f %% with a rock color, mean value %.2f" % [
+			view_name, colors.size(), ROCK_M.x, ROCK_M.y, 100.0 * rock / n, value / n])
+	d.expect(colors.size() >= 50, "%s: the view shows the land near the camera: %d points" % [view_name, colors.size()])
+	d.expect(rock >= ROCK_SHARE * n, "%s: %.0f %% of the land near the camera is dark grey or brown rock (value below %.1f), it must be %.0f %% or more (report 0005, section 8)" % [
+			view_name, 100.0 * rock / n, ROCK_VALUE, ROCK_SHARE * 100.0])
+
+
+## A rock color: dark (a value below ROCK_VALUE) and grey (a low saturation)
+## or brown (red, then green, then blue), not green or blue.
+static func rock_color(c: Color) -> bool:
+	return c.v < ROCK_VALUE and (c.s < 0.15 or (c.r >= c.g and c.g >= c.b))
 
 
 ## The colors of the screen at the points.

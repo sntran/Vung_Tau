@@ -85,9 +85,10 @@ void vertex() {
 // the textures, so the grass, the wood, and the rock take their color here.
 uniform vec3 grass_color : source_color = vec3(0.22, 0.3, 0.11);
 uniform vec3 wood_color : source_color = vec3(0.2, 0.32, 0.13);
-// The rocks of Vũng Tàu are light grey-brown granite (report 0005, D-0005-05:
-// Hòn Bà was almost black).
-uniform vec3 rock_color : source_color = vec3(0.66, 0.62, 0.56);
+// The rocks of Vũng Tàu are dark grey and brown granite (report 0005, section
+// 8: the light color of before looked like sand at the cape). Not black: Hòn
+// Bà was almost black before (D-0005-05).
+uniform vec3 rock_color : source_color = vec3(0.34, 0.31, 0.28);
 
 float luminance(vec3 c) {
 	return dot(c, vec3(0.299, 0.587, 0.114));

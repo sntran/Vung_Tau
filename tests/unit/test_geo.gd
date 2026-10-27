@@ -91,3 +91,23 @@ func test_terrain_arrays() -> void:
 	assert_eq(vertices[8], Vector3(8.0, 4.0, 8.0), "the last vertex is 8 m from the first")
 	var indices: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
 	assert_eq(indices.size(), (2 * 2 * 2 + 4 * 2 * 2) * 3)
+
+
+func test_boulder_meshes() -> void:
+	# Report 0005, D-0005-03 and D-0005-05: the near form has 80 triangles, the far form 20.
+	for form in 2:
+		var mesh := BoulderBuilder.mesh(form)
+		var arrays := mesh.surface_get_arrays(0)
+		var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+		var normals: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
+		assert_eq(vertices.size(), [80, 20][form] * 3)
+		var lowest := INF
+		for i in range(0, vertices.size(), 3):
+			var a := vertices[i]
+			var b := vertices[i + 1]
+			var c := vertices[i + 2]
+			# The faces point out, and Godot draws the clockwise order as the front.
+			assert_gt(normals[i].dot(a + b + c), 0.0, "face %d points out" % (i / 3))
+			assert_lt((b - a).cross(c - a).dot(normals[i]), 0.0, "face %d is clockwise from the front" % (i / 3))
+			lowest = minf(lowest, minf(a.y, minf(b.y, c.y)))
+		assert_almost_eq(lowest, -BoulderBuilder.BASE, 0.001, "the base of the boulder is flat")
