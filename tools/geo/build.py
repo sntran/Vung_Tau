@@ -561,8 +561,9 @@ def cover_report_lines(cover: dict) -> list[str]:
              f"- The canopy images over the play area are from {years.get('first', '?')} to {years.get('last', '?')} "
              f"(decimal years, mean {years.get('mean', '?')}).",
              f"- A canopy of {landcover.TREE_MIN_M:.0f} m or more is a tree, and a canopy of {landcover.BUSH_MIN_M} m to "
-             f"{landcover.TREE_MIN_M:.0f} m is a bush (WorldCover has almost no shrubland here). The built-up and the "
-             f"cropland classes keep the rules of the town and of `trees.json`.",
+             f"{landcover.TREE_MIN_M:.0f} m in tree cover is a bush (WorldCover has almost no shrubland here). Grassland "
+             f"and bare ground show the ground (R10a). The built-up and the cropland classes keep the rules of the town "
+             f"and of `trees.json`.",
              f"- {cover['trees']['count']} trees on the open land, with a mean height of {cover['trees']['mean_height_m']} m "
              f"and a mean crown radius of {cover['trees']['mean_radius_m']} m (`canopy_trees.json`, R10a). A tree stands on "
              f"the highest canopy first, then on the lower canopy, at a spacing of {landcover.SPACING_PER_M} of its height "

@@ -583,8 +583,9 @@ func is_on_island(x: float, z: float) -> bool:
 ## Runs in a worker thread. Returns type -> transforms in world space: a hill
 ## tree on each tree top of the canopy map in the chunk, with the height of
 ## the map and the type with the shape of the crown (plan 0020, R10a), and the
-## scrub where the canopy is a bush and, less dense, under the trees (report
-## 0005, D-0005-09). Not on sand, in the water, or on roads.
+## scrub where the canopy and the cover map have a bush and, less dense, under
+## the trees (report 0005, D-0005-09). Not on sand, grass, bare ground, in the
+## water, or on roads.
 func _tree_transforms(key: Vector2i, heights: PackedFloat32Array) -> Dictionary:
 	var result := {}
 	if _cover_image == null or _surface_image == null:
@@ -622,7 +623,14 @@ func _tree_transforms(key: Vector2i, heights: PackedFloat32Array) -> Dictionary:
 			var turn := rng.randf() * TAU
 			var world := origin + local
 			var canopy_m := canopy_height_at(world.x, world.y)
-			var chance := density if canopy_m >= bush_min and canopy_m < tree_min else (under_trees if canopy_m >= tree_min else 0.0)
+			# Only on the bushes and the trees of the cover map: grass and bare
+			# ground show the ground (R10a), also with a low canopy on them.
+			var cover := cover_at(world.x, world.y)
+			var chance := 0.0
+			if canopy_m >= bush_min and canopy_m < tree_min and cover.g > 0.3:
+				chance = density
+			elif canopy_m >= tree_min and cover.r > FOREST_COVER:
+				chance = under_trees
 			if value > chance:
 				continue
 			var ground := _ground_at(heights, local)

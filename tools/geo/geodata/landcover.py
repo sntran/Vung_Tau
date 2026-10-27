@@ -3,9 +3,10 @@ correction 0; plan 0020, D8 and R10a): ESA WorldCover 2021 (the class of each
 10 m pixel) and the Meta and WRI canopy height maps (the height of the trees).
 
 WorldCover has almost no shrubland in Vũng Tàu: the bushes of the hills are in
-"tree cover" and "grassland". So the bushes come from the canopy height too:
-a canopy from BUSH_MIN_M to TREE_MIN_M is a bush, and a canopy of TREE_MIN_M or
-more is a tree."""
+"tree cover". So the bushes come from the canopy height too: in "tree cover"
+and "shrubland", a canopy from BUSH_MIN_M to TREE_MIN_M is a bush. A canopy of
+TREE_MIN_M or more is a tree in all open classes. In "grassland" and "bare or
+sparse", the ground shows (plan 0020, R10a)."""
 
 import json
 
@@ -52,7 +53,7 @@ def cover_masks(classes: np.ndarray, canopy: np.ndarray, land: np.ndarray) -> di
     open_land = land & ~np.isin(classes, (BUILT, CROP, WATER))
     # The canopy height decides: the classes of 10 m mix trees, bushes, and grass.
     tree = open_land & ((canopy >= TREE_MIN_M) | (classes == MANGROVE))
-    bush = open_land & ~tree & ((classes == SHRUB) | (canopy >= BUSH_MIN_M))
+    bush = open_land & ~tree & ((classes == SHRUB) | ((classes == TREE) & (canopy >= BUSH_MIN_M)))
     grass = open_land & ~tree & ~bush & np.isin(classes, (GRASS, TREE, WETLAND))
     bare = open_land & ~tree & ~bush & (classes == BARE)
     return {"tree": tree, "bush": bush, "grass": grass, "bare": bare}

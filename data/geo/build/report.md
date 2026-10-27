@@ -110,7 +110,7 @@ None.
 
 - Sources: ESA WorldCover 2021 v200 (10 m classes) and Meta and WRI High Resolution Canopy Height Maps (v1) (about 1 m, kept on a grid of 2.0 m with the highest value). Both CC BY 4.0.
 - The canopy images over the play area are from 2019.42 to 2019.83 (decimal years, mean 2019.73).
-- A canopy of 3 m or more is a tree, and a canopy of 0.6 m to 3 m is a bush (WorldCover has almost no shrubland here). The built-up and the cropland classes keep the rules of the town and of `trees.json`.
+- A canopy of 3 m or more is a tree, and a canopy of 0.6 m to 3 m in tree cover is a bush (WorldCover has almost no shrubland here). Grassland and bare ground show the ground (R10a). The built-up and the cropland classes keep the rules of the town and of `trees.json`.
 - 92454 trees on the open land, with a mean height of 6.8 m and a mean crown radius of 4.4 m (`canopy_trees.json`, R10a). A tree stands on the highest canopy first, then on the lower canopy, at a spacing of 0.9 of its height (5 m to 12 m): the map has one height top for each group of crowns. The crown of a tree is the canopy that is nearer to it than to another tree.
 
 | Hill | Area (km²) | Tree cover | Bushes | Grass | Bare | Trees | WorldCover classes |

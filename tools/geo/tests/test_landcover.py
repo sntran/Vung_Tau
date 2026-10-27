@@ -35,6 +35,16 @@ def test_canopy_decides_tree_bush_and_grass():
     assert masks["bare"].tolist() == [[False, False, False, False, True]]
 
 
+def test_low_canopy_on_grass_or_bare_ground_is_not_a_bush():
+    # Plan 0020, R10a: grassland and bare ground show the ground.
+    classes = np.array([[landcover.GRASS, landcover.BARE, landcover.SHRUB]])
+    canopy = np.array([[1.5, 1.5, 0.0]], dtype=np.float32)
+    masks = landcover.cover_masks(classes, canopy, np.ones(classes.shape, dtype=bool))
+    assert masks["bush"].tolist() == [[False, False, True]]
+    assert masks["grass"].tolist() == [[True, False, False]]
+    assert masks["bare"].tolist() == [[False, True, False]]
+
+
 def test_sea_has_no_cover():
     classes = np.full((2, 2), landcover.TREE, dtype=np.uint8)
     canopy = np.full((2, 2), 10.0, dtype=np.float32)

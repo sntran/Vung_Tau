@@ -49,6 +49,8 @@ const VALUE_RANGE := Vector2(0.4, 0.55)
 const MIN_TOWN_SATURATED := 0.4
 const LAND_STEP_M := 20.0
 const LAND_RADIUS_M := 1500.0
+## The scrub check near the Bãi Sau view (plan 0020, R10a).
+const SCRUB_RADIUS_M := 250.0
 
 
 func run(d: PlaytestDriver) -> void:
@@ -78,6 +80,8 @@ func run(d: PlaytestDriver) -> void:
 			await _check_canopy(d, w, time)
 		if time == "1200" and view.name in LAND_VIEWS:
 			_check_land(d, w, view.name)
+		if time == "1200" and view.name == "bai_sau_from_road":
+			_check_scrub(d, w, view.eye)
 	d.fly_end()
 
 
@@ -127,6 +131,22 @@ static func _check_canopy(d: PlaytestDriver, w: VungTau, time: String) -> void:
 	d.expect(points.size() >= 50, "the view from Núi Nhỏ shows the slopes of Núi Lớn: %d points" % points.size())
 	d.expect(crowns >= CANOPY_SHARE * total, "%d %% of the slopes of Núi Lớn show a crown color, it must be %d %% or more" % [
 			roundi(100.0 * crowns / total), roundi(CANOPY_SHARE * 100)])
+
+
+## Plan 0020, R10a: the scrub near the view stands on the bushes and the
+## trees of the cover map, not on the sand, the grass, or the bare ground
+## behind Bãi Sau (the canopy map has low heights there too).
+static func _check_scrub(d: PlaytestDriver, w: VungTau, eye: Vector3) -> void:
+	var wrong := []
+	var near: Array = w.trees.trees_near("scrub", eye, SCRUB_RADIUS_M)
+	for entry: Array in near:
+		var p: Vector3 = entry[0]
+		var cover := w.cover_at(p.x, p.z)
+		if cover.g <= 0.3 and cover.r <= VungTau.FOREST_COVER:
+			wrong.append("(%.0f, %.0f) cover %s" % [p.x, p.z, cover])
+	d.step("bai_sau_from_road: %d scrub bushes within %.0f m" % [near.size(), SCRUB_RADIUS_M])
+	d.expect(wrong.is_empty(), "bai_sau_from_road: no scrub on sand, grass, or bare ground: %d, %s" % [
+			wrong.size(), wrong.slice(0, 6)])
 
 
 ## D-0005-09: the colors of the land in the view, from points on a grid of
