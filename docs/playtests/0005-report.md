@@ -193,3 +193,20 @@ My words (2026-10-26): "the screenshots make the land so dead. It's so grayish. 
 3. D-0005-07 (the foam).
 
 **Status:** plan 0005 stays "Built". D-0005-03 is re-checked after D-0005-06, because the sand at the cape comes from the made-up floor.
+
+### D-0005-10: The ground has too many triangles for Low (high)
+
+- **Actual:** the builder measured the ground of plan 0005 alone, with no trees, on Low at the PT-54 views (plan 0020, Q7): 1 430 000 triangles at "Núi Nhỏ top", 1 210 000 at "Bãi Trước road", and 600 000 at "Bãi Sau road". The near chunks have a grid of 2 m out to 300 m, and the shadow pass draws them again.
+- **Expected:** plan 0004 (R14): Low has 300 000 triangles or less in a view. Low is for phones and weak computers (plan 0005, R16).
+- **Correction:** detail levels for the ground chunks by distance, with skirts so that no cracks show between the levels. For example: a grid of 2 m to 150 m, 4 m to 400 m, 8 m to 1 km, and 16 m or 32 m farther (Low uses the coarser grids sooner). The sun shadow uses the coarse grids. Then PT-54 checks the whole view against R12 again, on all presets. Measure the frame time before and after.
+- **Decision (2026-10-27):** I keep the Low limit. The ground becomes lighter; the limit does not change.
+
+## 7. Decisions of 2026-10-27, for plan 0020
+
+The builder copies these answers into the open questions of plan 0020 when it rebases on main.
+
+- **Q6 (the Norfolk pines on Quang Trung):** not known for 2019. They stay out of the game (bàng and coconut palms only) until a photo of 2019 shows them.
+- **Q7 (the Low budget):** see D-0005-10. The ground becomes lighter. Until D-0005-10 is corrected, PT-54 may check only the part that the trees add (half of each limit or less), as the builder made it.
+- **Q8 (High at 07:00 and 17:30 in PT-52):** no. CI takes High at 12:00 only. The architect takes the other times on High in the audit.
+- **The public data (D-0005-09, correction 0, and plan 0020, D8 and R10a, commit `e38d4f0`):** the branch `feat/0020-real-trees` was made before that commit, so its trees and cover do not use ESA WorldCover and the canopy height maps yet. Rebase on main and do it before plan 0020 is "Built".
+- **Order:** finish the CI of `feat/0020-real-trees`, rebase on main, then the public data (D8, R10a), then D-0005-10.
