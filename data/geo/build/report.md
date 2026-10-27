@@ -97,14 +97,14 @@ None.
 
 ## Trees (R12a)
 
-- casuarina: 3331
-- coconut: 755
-- fan_palm: 104
-- flame: 5994
-- frangipani: 3903
-- shade: 14850
-- tall_shade: 158
-- From: bai_truoc_road 192, coast_roads 3956, osm 385, parks 2154, street 22408.
+- bang: 6102
+- casuarina: 3509
+- coconut: 902
+- flame: 4835
+- frangipani: 2471
+- shade: 11057
+- tall_shade: 184
+- From: bai_truoc_road 192, coast_roads 3956, named_roads 502, osm 385, parks 2151, street 21874.
 
 ## Town anchors (R6a)
 

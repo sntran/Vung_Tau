@@ -61,3 +61,22 @@ global_illumination/sdfgi/frames_to_converge=0
 occlusion_culling/use_occlusion_culling=true
 lights_and_shadows/directional_shadow/size=2048
 lights_and_shadows/directional_shadow/size.mobile=2048
+
+[shader_globals]
+
+wind_direction={
+"type": "vec2",
+"value": Vector2(0.8, 0.6)
+}
+wind_strength={
+"type": "float",
+"value": 0.3
+}
+tree_view_position={
+"type": "vec3",
+"value": Vector3(0, 0, 0)
+}
+tree_ranges={
+"type": "vec3",
+"value": Vector3(20, 120, 900)
+}

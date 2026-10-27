@@ -6,7 +6,9 @@ extends RefCounted
 ## trees (phượng vĩ) show red flowers around May and June.
 
 ## The dryness of the hill grass on the 15th of each month (January first).
-const DRYNESS := [0.8, 0.95, 1.0, 0.85, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.35, 0.6]
+## April is the driest (my April photos). Day 1 (22 January) is between the
+## rainy and the driest look (report 0005, D-0005-09).
+const DRYNESS := [0.45, 0.7, 0.95, 1.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.15, 0.3]
 ## The flowers of the flame trees on the 15th of each month.
 const FLAME_FLOWERS := [0.0, 0.0, 0.0, 0.15, 0.85, 1.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0]
 ## The leaves of the flame trees: they lose most leaves late in the dry season.
@@ -27,6 +29,11 @@ static func _between(table: Array, month: int, day: int) -> float:
 	var a: float = table[posmod(first, 12)]
 	var b: float = table[posmod(first + 1, 12)]
 	return lerpf(a, b, part)
+
+
+## The value of a table of 12 month values (January first) for a date.
+static func by_month(table: Array, month: int, day: int) -> float:
+	return _between(table, month, day)
 
 
 ## 0 (green) to 1 (the driest) for the hill grass.

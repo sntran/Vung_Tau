@@ -1,0 +1,622 @@
+{
+	"note": "The tree types of plan 0020 (Real trees). tools/trees/build.py makes the forms of each type and variant from these values with Blender. Sizes in meters, angles in degrees, colors in sRGB. Each value has the status \"check\" until I confirm it. The game shows each type in the season of the game date: \"rainy\" is the look from June to October, \"dry\" the look of the driest time (March and April), and the game mixes them by the dryness of scripts/season.gd.",
+	"version": 1,
+	"variants": 3,
+	"impostor": {
+		"views": 8,
+		"cell_px": 128
+	},
+	"cards": {
+		"cell_px": 256
+	},
+	"wind": {
+		"comment": "The wind of the game (D6): from the northeast in the dry season, stronger in the afternoon. Builder values: check.",
+		"from_degrees": 45.0,
+		"day": 0.45,
+		"night": 0.2
+	},
+	"hills": {
+		"comment": "The hill trees of Núi Lớn and Núi Nhỏ (R1, Q3): a mix of the hill types, with teak in the area of Núi Lớn. The scrub is a dense cover of bushes on the hill slopes, except on rock and steep granite (report 0005, D-0005-09). Builder values: check.",
+		"mix": {
+			"hill_a": 0.42,
+			"hill_b": 0.28,
+			"hill_c": 0.3
+		},
+		"areas": [
+			{
+				"landmark": "nui_lon",
+				"radius_m": 900.0,
+				"mix": {
+					"hill_a": 0.36,
+					"hill_b": 0.24,
+					"hill_c": 0.25,
+					"teak": 0.15
+				}
+			}
+		],
+		"scrub": {
+			"spacing_m": 3.5,
+			"density": 0.6,
+			"max_slope": 0.85
+		}
+	},
+	"types": {
+		"coconut": {
+			"generator": "palm",
+			"status": "check",
+			"source": "Prototype version 3 (my photos of Bãi Trước); FAO: Cocos nucifera reaches 20 to 30 m, the fronds are 4 to 6 m long.",
+			"seeds": [
+				1,
+				4,
+				7
+			],
+			"height": [
+				10.0,
+				14.0
+			],
+			"lean": [
+				0.6,
+				2.4
+			],
+			"trunk_radius": 0.17,
+			"fronds": 22,
+			"frond_length": 5.6,
+			"dead_fronds": 3,
+			"nuts": 10,
+			"wood": "#6B5D4C",
+			"leaf": "#6B8A2E",
+			"leaf_young": "#8FA642",
+			"dead": "#8F7448",
+			"flower": "#C9A23E",
+			"season": {
+				"rainy": {
+					"leaf": "#6B8A2E"
+				},
+				"dry": {
+					"leaf": "#7A8A36",
+					"red_share": 0.0,
+					"bare_share": 0.0
+				}
+			},
+			"leaflet_pairs_per_part": 12,
+			"frond_parts": 4,
+			"rings": 1.0,
+			"sway": 0.6
+		},
+		"fan_palm": {
+			"generator": "fan_palm",
+			"status": "check",
+			"source": "Livistona chinensis, a common park palm: a straight trunk to 10 m and round fan leaves of about 1.5 m.",
+			"seeds": [
+				2,
+				5,
+				8
+			],
+			"height": [
+				4.0,
+				7.0
+			],
+			"trunk_radius": 0.2,
+			"leaves": 22,
+			"leaf_radius": 0.8,
+			"stem_length": 1.3,
+			"wood": "#7A6B58",
+			"leaf": "#3F6A2C",
+			"leaf_young": "#5E8A37",
+			"season": {
+				"rainy": {
+					"leaf": "#3F6A2C"
+				},
+				"dry": {
+					"leaf": "#56693A",
+					"red_share": 0.0,
+					"bare_share": 0.0
+				}
+			},
+			"rings": 0.5,
+			"sway": 0.45
+		},
+		"bang": {
+			"generator": "bang",
+			"status": "check",
+			"source": "Prototype version 3 (my photos of Quang Trung); Wikipedia: Terminalia catappa grows to 35 m, the leaves are 15 to 25 cm long, they turn red or yellow and fall in the dry season.",
+			"seeds": [
+				3,
+				11,
+				19
+			],
+			"height": [
+				8.6,
+				9.6
+			],
+			"fork": 2.6,
+			"trunk_radius": 0.36,
+			"crown_width": 12.0,
+			"crown_height": 7.4,
+			"leaders": 3,
+			"leaf_size": 1.4,
+			"wood": "#3F362D",
+			"leaf": "#3C6B1E",
+			"leaf_young": "#7E9E33",
+			"season": {
+				"rainy": {
+					"leaf": "#3C6B1E"
+				},
+				"dry": {
+					"leaf": "#4D6A24",
+					"red": "#A33A1C",
+					"orange": "#B8742A",
+					"red_share": 0.4,
+					"bare_share": 0.25
+				}
+			},
+			"sprays_per_branch": 4,
+			"leaves_per_rosette": 6,
+			"layers": 5
+		},
+		"casuarina": {
+			"generator": "casuarina",
+			"status": "check",
+			"source": "Prototype version 3 (my photos of Ba Cu); Casuarina equisetifolia: 15 to 25 m, drooping grey-green branchlets.",
+			"seeds": [
+				5,
+				8,
+				13
+			],
+			"height": [
+				11.0,
+				15.0
+			],
+			"trunk_radius": 0.22,
+			"branches": 40,
+			"wood": "#4A3F36",
+			"leaf": "#53654A",
+			"leaf_young": "#66784F",
+			"season": {
+				"rainy": {
+					"leaf": "#53654A"
+				},
+				"dry": {
+					"leaf": "#626A4C",
+					"red_share": 0.0,
+					"bare_share": 0.0
+				}
+			},
+			"tufts_per_branch": 6,
+			"needles_per_tuft": 20,
+			"tuft_size": 1.5,
+			"sway": 0.5,
+			"impostor_cover": 2.4,
+			"card_scale": 0.78
+		},
+		"flame": {
+			"generator": "flame",
+			"status": "check",
+			"source": "Prototype version 3 (my photos of Ba Cu); Delonix regia: an umbrella crown, red flowers in the hot season, deciduous in the dry season.",
+			"seeds": [
+				9,
+				14,
+				21
+			],
+			"height": [
+				6.0,
+				8.0
+			],
+			"fork": 2.3,
+			"trunk_radius": 0.3,
+			"crown_width": 14.0,
+			"crown_height": 4.0,
+			"wood": "#6E6A62",
+			"leaf": "#3D6B1A",
+			"leaf_young": "#5E8A2A",
+			"flower": "#D7261E",
+			"season": {
+				"rainy": {
+					"leaf": "#3D6B1A"
+				},
+				"dry": {
+					"leaf": "#6B7230",
+					"red_share": 0.0,
+					"bare_share": 0.55
+				}
+			},
+			"group_size": 2.3,
+			"twigs_per_limb": 16,
+			"leaves_per_group": 6,
+			"leaflet_pairs": 9,
+			"flowers": [
+				0.0,
+				0.0,
+				0.0,
+				0.08,
+				0.45,
+				0.55,
+				0.15,
+				0.0,
+				0.0,
+				0.0,
+				0.0,
+				0.0
+			]
+		},
+		"frangipani": {
+			"generator": "frangipani",
+			"status": "check",
+			"source": "Plumeria: a small tree of 3 to 6 m with thick, forking branches and groups of long leaves at the ends; white and yellow flowers.",
+			"seeds": [
+				6,
+				12,
+				18
+			],
+			"height": [
+				3.5,
+				5.5
+			],
+			"trunk_radius": 0.16,
+			"forks": 4,
+			"wood": "#8A8378",
+			"leaf": "#46702A",
+			"leaf_young": "#6A9038",
+			"flower": "#F4EFD9",
+			"season": {
+				"rainy": {
+					"leaf": "#46702A"
+				},
+				"dry": {
+					"leaf": "#5B6E2E",
+					"red_share": 0.0,
+					"bare_share": 0.45
+				}
+			},
+			"leaf_size": 2.0,
+			"leaves_per_rosette": 12,
+			"flowers": [
+				0.15,
+				0.15,
+				0.2,
+				0.25,
+				0.25,
+				0.2,
+				0.15,
+				0.1,
+				0.1,
+				0.1,
+				0.1,
+				0.15
+			]
+		},
+		"araucaria": {
+			"generator": "araucaria",
+			"status": "check",
+			"source": "Araucaria heterophylla (Norfolk pine), as in the photos of Quang Trung: a straight trunk with flat layers of branches in a narrow cone.",
+			"seeds": [
+				10,
+				15,
+				20
+			],
+			"height": [
+				14.0,
+				20.0
+			],
+			"trunk_radius": 0.25,
+			"tiers": 14,
+			"wood": "#5E5045",
+			"leaf": "#3A6634",
+			"leaf_young": "#4E7F42",
+			"season": {
+				"rainy": {
+					"leaf": "#3A6634"
+				},
+				"dry": {
+					"leaf": "#44663A",
+					"red_share": 0.0,
+					"bare_share": 0.0
+				}
+			},
+			"needles_per_plume": 16,
+			"plume_width": 1.7,
+			"sway": 0.25,
+			"impostor_cover": 2.6,
+			"card_cross": false,
+			"max_cards": 200,
+			"card_scale": 1.15
+		},
+		"shade": {
+			"generator": "broadleaf",
+			"status": "check",
+			"source": "A large shade tree of the main roads (Q1 is open): a round crown on a straight trunk.",
+			"seeds": [
+				22,
+				23,
+				24
+			],
+			"height": [
+				9.0,
+				12.0
+			],
+			"fork": 3.2,
+			"trunk_radius": 0.3,
+			"crown_width": 8.5,
+			"crown_height": 6.5,
+			"leaders": 4,
+			"leaf_size": 1.0,
+			"wood": "#4E4339",
+			"leaf": "#3A6626",
+			"leaf_young": "#5E8A34",
+			"season": {
+				"rainy": {
+					"leaf": "#3A6626"
+				},
+				"dry": {
+					"leaf": "#4E6A2C",
+					"red": "#9C7A2A",
+					"orange": "#A88C34",
+					"red_share": 0.12,
+					"bare_share": 0.0
+				}
+			},
+			"layers": 5,
+			"branches_per_layer": 3,
+			"sprays_per_branch": 3,
+			"leaves_per_rosette": 5
+		},
+		"tall_shade": {
+			"generator": "broadleaf",
+			"status": "check",
+			"source": "The very tall old shade trees of Trần Hưng Đạo (photos that I chose): straight, pale trunks and crowns high over the road (Q1 is open).",
+			"seeds": [
+				25,
+				26,
+				27
+			],
+			"height": [
+				18.0,
+				23.0
+			],
+			"fork": 9.0,
+			"trunk_radius": 0.45,
+			"crown_width": 11.0,
+			"crown_height": 8.0,
+			"leaders": 4,
+			"leaf_size": 1.1,
+			"wood": "#9A9284",
+			"leaf": "#3C6A28",
+			"leaf_young": "#628C36",
+			"season": {
+				"rainy": {
+					"leaf": "#3C6A28"
+				},
+				"dry": {
+					"leaf": "#566B2C",
+					"red": "#B09A3A",
+					"orange": "#A88A30",
+					"red_share": 0.2,
+					"bare_share": 0.0
+				}
+			},
+			"layers": 5,
+			"branches_per_layer": 3,
+			"sprays_per_branch": 3,
+			"leaves_per_rosette": 5
+		},
+		"hill_a": {
+			"generator": "broadleaf",
+			"status": "check",
+			"source": "The hill forest (Q3): a round broadleaf crown of the Ficus group (đa, sung, sanh).",
+			"seeds": [
+				31,
+				32,
+				33
+			],
+			"height": [
+				7.0,
+				10.0
+			],
+			"fork": 2.2,
+			"trunk_radius": 0.3,
+			"crown_width": 8.0,
+			"crown_height": 6.0,
+			"leaders": 4,
+			"leaf_size": 0.9,
+			"wood": "#5A5048",
+			"leaf": "#2F5A22",
+			"leaf_young": "#4E7A2C",
+			"season": {
+				"rainy": {
+					"leaf": "#2F5A22"
+				},
+				"dry": {
+					"leaf": "#43602A",
+					"red": "#8C6A2A",
+					"orange": "#9A7A30",
+					"red_share": 0.15,
+					"bare_share": 0.05
+				}
+			},
+			"layers": 4,
+			"branches_per_layer": 3,
+			"sprays_per_branch": 2,
+			"leaves_per_rosette": 4,
+			"max_cards": 64,
+			"rosettes_per_spray": 2,
+			"spray_length": 1.6,
+			"range_scale": 0.7,
+			"card_scale": 1.25
+		},
+		"hill_b": {
+			"generator": "broadleaf",
+			"status": "check",
+			"source": "The hill forest (Q3): a tall tree with a high, narrow crown.",
+			"seeds": [
+				34,
+				35,
+				36
+			],
+			"height": [
+				10.0,
+				14.0
+			],
+			"fork": 5.0,
+			"trunk_radius": 0.25,
+			"crown_width": 5.5,
+			"crown_height": 6.5,
+			"leaders": 3,
+			"leaf_size": 0.8,
+			"wood": "#6A6058",
+			"leaf": "#3A6228",
+			"leaf_young": "#56803A",
+			"season": {
+				"rainy": {
+					"leaf": "#3A6228"
+				},
+				"dry": {
+					"leaf": "#566630",
+					"red": "#9A6A2C",
+					"orange": "#A88434",
+					"red_share": 0.2,
+					"bare_share": 0.15
+				}
+			},
+			"layers": 4,
+			"branches_per_layer": 3,
+			"sprays_per_branch": 2,
+			"leaves_per_rosette": 4,
+			"max_cards": 64,
+			"rosettes_per_spray": 2,
+			"spray_length": 1.6,
+			"range_scale": 0.7,
+			"card_scale": 1.15
+		},
+		"hill_c": {
+			"generator": "broadleaf",
+			"status": "check",
+			"source": "The hill forest (Q3): a low, wide bush-tree.",
+			"seeds": [
+				37,
+				38,
+				39
+			],
+			"height": [
+				3.5,
+				5.0
+			],
+			"fork": 0.8,
+			"trunk_radius": 0.14,
+			"crown_width": 5.0,
+			"crown_height": 3.6,
+			"leaders": 4,
+			"leaf_size": 0.7,
+			"wood": "#5A4E42",
+			"leaf": "#3E6326",
+			"leaf_young": "#5A7E30",
+			"season": {
+				"rainy": {
+					"leaf": "#3E6326"
+				},
+				"dry": {
+					"leaf": "#56652C",
+					"red": "#8A6A2C",
+					"orange": "#9C8032",
+					"red_share": 0.15,
+					"bare_share": 0.05
+				}
+			},
+			"layers": 4,
+			"branches_per_layer": 3,
+			"sprays_per_branch": 2,
+			"leaves_per_rosette": 4,
+			"range_scale": 0.7,
+			"impostor_cover": 1.3,
+			"max_cards": 64,
+			"rosettes_per_spray": 2,
+			"spray_length": 1.6,
+			"card_scale": 1.15
+		},
+		"teak": {
+			"generator": "broadleaf",
+			"status": "check",
+			"source": "Teak (gỗ tếch) in an area of Núi Lớn (Dân Việt, 2024): large leaves, bare in the dry season.",
+			"seeds": [
+				40,
+				41,
+				42
+			],
+			"height": [
+				12.0,
+				16.0
+			],
+			"fork": 6.0,
+			"trunk_radius": 0.28,
+			"crown_width": 6.5,
+			"crown_height": 6.0,
+			"leaders": 3,
+			"leaf_size": 1.6,
+			"wood": "#6E6457",
+			"leaf": "#47692A",
+			"leaf_young": "#6A8A34",
+			"season": {
+				"rainy": {
+					"leaf": "#47692A"
+				},
+				"dry": {
+					"leaf": "#7A6A34",
+					"red": "#8E5A2A",
+					"orange": "#A0702E",
+					"red_share": 0.35,
+					"bare_share": 0.6
+				}
+			},
+			"layers": 4,
+			"branches_per_layer": 3,
+			"sprays_per_branch": 2,
+			"leaves_per_rosette": 4,
+			"max_cards": 64,
+			"rosettes_per_spray": 2,
+			"spray_length": 1.6,
+			"range_scale": 0.7,
+			"card_scale": 1.15
+		},
+		"scrub": {
+			"generator": "scrub",
+			"status": "check",
+			"source": "My April photo of the slope of Núi Nhỏ above Hạ Long: a dense mosaic of olive and dark green bushes and small trees (report 0005, D-0005-09).",
+			"seeds": [
+				43,
+				44,
+				45
+			],
+			"height": [
+				1.4,
+				3.0
+			],
+			"crown_width": 3.2,
+			"stems": 5,
+			"leaf_size": 0.55,
+			"wood": "#5A4E40",
+			"leaf": "#3B5E25",
+			"leaf_young": "#566F2A",
+			"season": {
+				"rainy": {
+					"leaf": "#3B5E25"
+				},
+				"dry": {
+					"leaf": "#4F6228",
+					"red": "#7E6A34",
+					"orange": "#8C7838",
+					"red_share": 0.2,
+					"bare_share": 0.0
+				}
+			},
+			"sprays": 40,
+			"spray_length": 1.9,
+			"range_scale": 0.45,
+			"far": false,
+			"sway": 0.15,
+			"card_cross": true,
+			"max_cards": 20,
+			"rosettes_per_spray": 2,
+			"leaves_per_rosette": 5,
+			"card_scale": 0.85
+		}
+	}
+}

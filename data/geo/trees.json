@@ -1,36 +1,91 @@
 {
-	"note": "The street trees and the park trees (plan 0005, R12a). tools/geo/build.py puts them along the roads and in the parks and writes data/geo/build/trees.json. The trees on the hills come from the surface mask in the game. A mix gives the share of each tree type. The game shows each type in the season of the game date. Tree types: shade (large shade trees), tall_shade (tall trees between the Bãi Trước road and the sea), flame (phượng vĩ), frangipani (hoa sứ), casuarina (phi lao), coconut, fan_palm. The mixes and the spacings are builder values from photos: check.",
+	"note": "The street trees and the park trees (plans 0005 and 0020). tools/geo/build.py puts them along the roads and in the parks and writes data/geo/build/trees.json. The trees on the hills come from the surface mask in the game, with the mix of data/trees/types.json. A mix gives the share of each tree type. The game shows each type in the season of the game date. Tree types (data/trees/types.json): bang, shade, tall_shade, flame, frangipani, casuarina, coconut, fan_palm, araucaria. The mixes and the spacings are builder values from photos and the culture notes: check.",
 	"seed": 21,
 	"street": {
-		"road_types": ["trunk", "primary", "secondary", "tertiary"],
+		"road_types": [
+			"trunk",
+			"primary",
+			"secondary",
+			"tertiary"
+		],
 		"spacing_m": 9.0,
 		"jitter_m": 1.5,
 		"in_from_edge_m": 0.8,
 		"out_from_edge_m": 1.5,
 		"skip_near_road_m": 2.5,
-		"mix": {"shade": 0.6, "flame": 0.25, "frangipani": 0.15}
+		"mix": {
+			"shade": 0.45,
+			"bang": 0.25,
+			"flame": 0.2,
+			"frangipani": 0.1
+		},
+		"comment": "Plan 0020, Q1: until the species of the main roads are known, a mix of bàng, flame trees, and shade."
 	},
 	"coast_roads": {
-		"names": ["Thùy Vân", "Hạ Long", "Trần Phú"],
+		"names": [
+			"Thùy Vân",
+			"Hạ Long",
+			"Trần Phú"
+		],
 		"spacing_m": 7.0,
-		"mix": {"casuarina": 0.85, "coconut": 0.15}
+		"mix": {
+			"casuarina": 0.85,
+			"coconut": 0.15
+		}
 	},
 	"bai_truoc_road": {
-		"comment": "The road along Bãi Trước is the coast road that the homestay search finds (homestay.json). Its trees stand between the road and the sea.",
+		"comment": "Quang Trung, the road along Bãi Trước (the coast road that the homestay search finds). Large old bàng trees stand between the road and the park, with coconut palms behind them (culture notes, Confirmed). The trees stand between the road and the sea.",
 		"spacing_m": 8.0,
-		"mix": {"tall_shade": 0.8, "coconut": 0.2}
+		"mix": {
+			"bang": 0.55,
+			"coconut": 0.45
+		}
+	},
+	"named_roads": {
+		"comment": "Roads with their own trees (plan 0020, Q1, photos that I chose).",
+		"Trần Hưng Đạo": {
+			"spacing_m": 11.0,
+			"mix": {
+				"tall_shade": 1.0
+			}
+		},
+		"Ba Cu": {
+			"spacing_m": 9.0,
+			"mix": {
+				"casuarina": 0.5,
+				"flame": 0.5
+			}
+		}
 	},
 	"parks": {
 		"near_landmark": "bai_truoc",
 		"near_m": 500.0,
 		"spacing_m": 11.0,
-		"mix_near": {"coconut": 0.35, "fan_palm": 0.35, "frangipani": 0.3},
-		"mix": {"shade": 0.6, "frangipani": 0.2, "flame": 0.2}
+		"mix_near": {
+			"coconut": 0.65,
+			"bang": 0.3,
+			"casuarina": 0.05
+		},
+		"mix": {
+			"shade": 0.5,
+			"bang": 0.2,
+			"frangipani": 0.15,
+			"flame": 0.15
+		},
+		"comment": "Near Bãi Trước: mostly coconut palms, some bàng, a few casuarinas (plan 0020, Q2)."
 	},
 	"osm_trees": {
 		"comment": "OSM natural=tree nodes and natural=tree_row ways. A tag genus or species can select the type.",
 		"row_spacing_m": 8.0,
-		"genus": {"Delonix": "flame", "Plumeria": "frangipani", "Casuarina": "casuarina", "Cocos": "coconut", "Livistona": "fan_palm"},
+		"genus": {
+			"Delonix": "flame",
+			"Plumeria": "frangipani",
+			"Casuarina": "casuarina",
+			"Cocos": "coconut",
+			"Livistona": "fan_palm",
+			"Terminalia": "bang",
+			"Araucaria": "araucaria"
+		},
 		"default": "shade"
 	}
 }

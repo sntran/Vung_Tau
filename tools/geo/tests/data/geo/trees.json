@@ -37,6 +37,15 @@
 			"coconut": 0.2
 		}
 	},
+	"named_roads": {
+		"comment": "A road with its own trees (plan 0020).",
+		"Lê Lợi": {
+			"spacing_m": 11.0,
+			"mix": {
+				"tall_shade": 1.0
+			}
+		}
+	},
 	"parks": {
 		"near_landmark": "bai_truoc",
 		"near_m": 500.0,

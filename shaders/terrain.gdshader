@@ -8,6 +8,12 @@
 // VungTau.is_forest()) shows a canopy of tree crowns, so that the hills are not
 // bare grass (report 0005, D-0005-01). Near the camera, the near chunks have
 // the real trees.
+// Report 0005, D-0005-09: the hill slopes have a dense cover of bushes (the
+// scrub of plan 0020 near the camera, and a pattern of bushes here), with
+// bare ground only on rock and steep granite. The dry season is olive and
+// yellow-brown, not ochre. The town ground seen from far is a pattern of roofs
+// and trees, until plan 0009 builds the houses. The sand below the last high
+// water is wet: darker, shiny, with small pools.
 shader_type spatial;
 render_mode cull_back;
 
@@ -31,17 +37,27 @@ uniform float rock_normal_y = 0.819;
 uniform float dryness = 0.0;
 // The rocks of the Hòn Bà path below this height hold water at low tide (tide pools).
 uniform float pool_level = -100.0;
-uniform vec3 dry_grass_color : source_color = vec3(0.6, 0.48, 0.3);
-uniform vec3 dry_orange_color : source_color = vec3(0.72, 0.47, 0.24);
+uniform vec3 dry_grass_color : source_color = vec3(0.45, 0.44, 0.24);
+uniform vec3 dry_orange_color : source_color = vec3(0.52, 0.43, 0.26);
+// The bushes of the hill slopes (D-0005-09): dark green and olive, and some yellow-brown in the dry season.
+uniform vec3 bush_dark : source_color = vec3(0.11, 0.19, 0.07);
+uniform vec3 bush_olive : source_color = vec3(0.22, 0.29, 0.11);
+uniform vec3 bush_dry : source_color = vec3(0.36, 0.33, 0.17);
+// The town seen from far: roof colors of data/world/palette.json (VungTau sets them), and trees.
+uniform vec3 roof_colors[8] : source_color;
+uniform float roof_near = 120.0;
+uniform float roof_far = 220.0;
+// The highest sea level of the last 12 hours: the sand below it is wet.
+uniform float last_high = -100.0;
 uniform vec3 shell_color : source_color = vec3(0.85, 0.82, 0.76);
 uniform vec3 pool_color : source_color = vec3(0.1, 0.22, 0.24);
 uniform float forest_height = 12.0;
 // The canopy starts at canopy_near meters from the camera, and it is full at canopy_far.
 uniform float canopy_near = 200.0;
 uniform float canopy_far = 400.0;
-uniform vec3 canopy_dark : source_color = vec3(0.13, 0.22, 0.09);
-uniform vec3 canopy_light : source_color = vec3(0.24, 0.35, 0.14);
-uniform vec3 canopy_dry : source_color = vec3(0.5, 0.33, 0.18);
+uniform vec3 canopy_dark : source_color = vec3(0.11, 0.19, 0.08);
+uniform vec3 canopy_light : source_color = vec3(0.2, 0.3, 0.12);
+uniform vec3 canopy_dry : source_color = vec3(0.4, 0.33, 0.17);
 
 varying vec3 world_position;
 varying vec3 world_normal;
@@ -53,7 +69,7 @@ void vertex() {
 
 // The scanned textures give the detail. The tropical plants are greener than
 // the textures, so the grass, the wood, and the rock take their color here.
-uniform vec3 grass_color : source_color = vec3(0.36, 0.47, 0.2);
+uniform vec3 grass_color : source_color = vec3(0.22, 0.3, 0.11);
 uniform vec3 wood_color : source_color = vec3(0.2, 0.32, 0.13);
 // The rocks of Vũng Tàu are light grey-brown granite (report 0005, D-0005-05:
 // Hòn Bà was almost black).
@@ -83,7 +99,7 @@ void fragment() {
 	vec3 color = grass_color * grass_detail;
 	// In the dry season, the grass is dry in patches: brown and orange (R12a).
 	float patches = value_noise(world_position.xz * 0.02) * 0.7 + value_noise(world_position.xz * 0.15) * 0.3;
-	float dry = dryness * smoothstep(0.3, 0.6, patches + dryness * 0.25);
+	float dry = dryness * 0.75 * smoothstep(0.35, 0.65, patches + dryness * 0.2);
 	vec3 dry_color = mix(dry_grass_color, dry_orange_color, value_noise(world_position.xz * 0.05)) * grass_detail;
 	color = mix(color, dry_color, dry);
 	// The rock mask: 1 for boulders, about 0.55 for the low rocks with pebbles
@@ -97,6 +113,34 @@ void fragment() {
 	color = mix(color, wood, mask.b * 0.85);
 	// On a hill with wood, the wood is stronger than the town (the roads up the hill).
 	color = mix(color, texture(town_texture, uv).rgb, mask.g * (1.0 - mask.b * 0.75));
+	// The hill ground: the same rule as VungTau.is_scrub().
+	float hill_ground = max(max(smoothstep(0.35, 0.45, mask.b),
+			step(forest_height * 0.5, world_position.y) * (1.0 - smoothstep(0.25, 0.35, mask.g))),
+			step(forest_height, world_position.y));
+	float camera_distance = distance(world_position, CAMERA_POSITION_WORLD);
+	// The town seen from far: blocks of roofs, with streets and trees between them.
+	vec2 lot = world_position.xz / vec2(9.0, 11.0);
+	vec2 cell = floor(lot);
+	vec2 in_lot = fract(lot);
+	float pick = hash2(cell + vec2(3.1, 7.7));
+	vec3 roof = roof_colors[int(floor(hash2(cell) * 7.99))];
+	// The shade between the houses makes the roofs darker from far.
+	roof *= in_lot.x < 0.5 ? 0.52 : 0.66;
+	float street = step(0.86, max(in_lot.x, in_lot.y));
+	vec3 lot_color = pick < 0.16 ? canopy_light * (0.7 + 0.5 * value_noise(world_position.xz * 0.4)) : roof;
+	lot_color = mix(lot_color, texture(town_texture, uv).rgb, street);
+	float town = mask.g * (1.0 - mask.b * 0.75) * (1.0 - hill_ground);
+	color = mix(color, lot_color, town * smoothstep(roof_near, roof_far, camera_distance));
+	// The bushes of the hill slopes: blobs of about 2 to 3 m over most of the
+	// ground. Near the camera, the scrub of plan 0020 stands there, so the
+	// pattern is weaker (the shade under the bushes).
+	float blobs = value_noise(world_position.xz * 0.38) * 0.65 + value_noise(world_position.xz * 1.3) * 0.35;
+	float bush = smoothstep(0.38, 0.5, blobs);
+	vec3 bush_color = mix(bush_dark, bush_olive, value_noise(world_position.xz * 0.11 + 5.0));
+	bush_color = mix(bush_color, bush_dry, smoothstep(0.6, 0.68, value_noise(world_position.xz * 0.21 + 3.0)) * dryness * 0.8);
+	bush_color *= mix(0.75, 1.1, smoothstep(0.5, 0.8, blobs));
+	float bush_strength = mix(0.8, 1.0, smoothstep(30.0, 90.0, camera_distance));
+	color = mix(color, bush_color, bush * hill_ground * bush_strength * (1.0 - mask.r));
 	color = mix(color, texture(sand_texture, uv).rgb * 1.15, mask.r);
 	float rock = smoothstep(rock_normal_y + 0.04, rock_normal_y - 0.04, normalize(world_normal).y);
 	// The rock texture is dark (a mean linear brightness of 0.07), so the
@@ -138,6 +182,19 @@ void fragment() {
 			color = mix(color, pool_color, 0.85);
 			roughness = 0.05;
 		}
+	}
+	// The ground below the last high water is wet: darker and shiny. The
+	// higher parts were out of the water for longer, so they are drier. Small
+	// pools stay in the low places of the sand (D-0005-09).
+	float span = max(last_high - sea_level, 0.05);
+	float wet = pow(clamp((last_high - world_position.y) / span, 0.0, 1.0), 0.6) * step(sea_level, world_position.y);
+	wet *= 1.0 - max(rock, bare_rock) * 0.5;
+	color *= mix(1.0, 0.55, wet);
+	roughness = mix(roughness, 0.38, wet);
+	float puddle = value_noise(world_position.xz * 0.5 + 11.0) * 0.7 + value_noise(world_position.xz * 1.7) * 0.3;
+	if (wet > 0.5 && puddle > 0.72 && mask.r > 0.5) {
+		color = mix(color, pool_color * 1.6, 0.6);
+		roughness = 0.05;
 	}
 	// The ground under the water is darker and wet.
 	float under = smoothstep(sea_level + 0.2, sea_level - 0.6, world_position.y);

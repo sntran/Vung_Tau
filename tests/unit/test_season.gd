@@ -10,8 +10,10 @@ func test_dry_and_rainy_months() -> void:
 
 
 func test_hills_are_dry_in_the_dry_season_and_green_in_the_rainy_season() -> void:
-	assert_gt(Season.dryness(12, 8), 0.4, "day 1 (8 December) has dry hills")
-	assert_gt(Season.dryness(3, 15), 0.9, "March is the driest")
+	var day_one := Season.dryness(1, 22)
+	assert_between(day_one, 0.4, 0.65, "day 1 (22 January) is between the rainy and the driest look (D-0005-09)")
+	assert_eq(Season.dryness(4, 15), 1.0, "April is the driest")
+	assert_gt(Season.dryness(3, 15), 0.9, "March is almost the driest")
 	assert_eq(Season.dryness(8, 15), 0.0, "August is green")
 	assert_gt(Season.bare_share(2, 15), 0.2, "some hill trees are bare in February")
 	assert_eq(Season.bare_share(8, 15), 0.0, "no hill tree is bare in August")

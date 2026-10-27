@@ -16,6 +16,11 @@ extends RefCounted
 # green, and the flame trees show red flowers. The other runs are on day 1, in
 # the dry season: the hills are partly dry. Each run also looks up the Hải Đăng
 # road, where the flame trees stand.
+# At 12:00 on day 1 (report 0005, D-0005-09): in the views from Núi Lớn, from
+# Núi Nhỏ, and on the Hải Đăng road, 30 % or more of the land pixels are green
+# (green is the largest channel), and the mean value of the land is 0.40 to
+# 0.55. In the view from Núi Lớn, 40 % or more of the town pixels have a
+# saturation above 0.2.
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=06:00
 # phase: --world=vung_tau --start-time=12:00
@@ -37,6 +42,13 @@ const CANOPY_SHARE := 0.6
 ## 3 km makes all differences smaller), or greener by this value (G minus R).
 const CROWN_DARKER := 0.07
 const CROWN_GREENER := 0.04
+## D-0005-09: the land of the views at 12:00 on day 1.
+const LAND_VIEWS := ["nui_lon_south_east", "nui_nho_north", "hai_dang_road"]
+const MIN_GREEN := 0.3
+const VALUE_RANGE := Vector2(0.4, 0.55)
+const MIN_TOWN_SATURATED := 0.4
+const LAND_STEP_M := 20.0
+const LAND_RADIUS_M := 1500.0
 
 
 func run(d: PlaytestDriver) -> void:
@@ -64,6 +76,8 @@ func run(d: PlaytestDriver) -> void:
 			d.expect(in_frame(d, point), "%s: %s is in the frame" % [view.name, record.name_vi])
 		if view.name == "nui_nho_north" and (time == "1200" or time == "june"):
 			await _check_canopy(d, w, time)
+		if time == "1200" and view.name in LAND_VIEWS:
+			_check_land(d, w, view.name)
 	d.fly_end()
 
 
@@ -106,6 +120,68 @@ static func _check_canopy(d: PlaytestDriver, w: VungTau, time: String) -> void:
 	d.expect(points.size() >= 50, "the view from Núi Nhỏ shows the slopes of Núi Lớn: %d points" % points.size())
 	d.expect(crowns >= CANOPY_SHARE * total, "%d %% of the slopes of Núi Lớn show a crown color, it must be %d %% or more" % [
 			roundi(100.0 * crowns / total), roundi(CANOPY_SHARE * 100)])
+
+
+## D-0005-09: the colors of the land in the view, from points on a grid of
+## the ground that are in the frame and not behind other ground.
+static func _check_land(d: PlaytestDriver, w: VungTau, view_name: String) -> void:
+	var camera := d.viewport().get_camera_3d()
+	var eye := camera.global_position
+	var land: Array[Vector2] = []
+	var land_near: Array[bool] = []
+	var town: Array[Vector2] = []
+	# On a road the land is near; on a hill top the view goes far.
+	var high := eye.y - w.ground_height(eye.x, eye.z) > 5.0
+	var radius := LAND_RADIUS_M if high else 400.0
+	var step := LAND_STEP_M if high else 5.0
+	var steps := int(radius / step)
+	for j in range(-steps, steps + 1):
+		for i in range(-steps, steps + 1):
+			var x := eye.x + i * step
+			var z := eye.z + j * step
+			var h := w.data.overview_height(x, z)
+			if h < maxf(w.last_high, 1.0) + 0.5:
+				continue
+			var point := Vector3(x, h, z)
+			if not in_frame(d, point) or not _clear_view(w, eye, point):
+				continue
+			var screen := camera.unproject_position(point)
+			land.append(screen)
+			land_near.append(eye.distance_to(point) < 300.0)
+			var mask := w.surface_at(x, z)
+			if mask.g > 0.5 and mask.b < 0.3 and h < VungTau.FOREST_HEIGHT * 0.5:
+				town.append(screen)
+	var colors := pixel_colors(d, land)
+	var green := 0
+	var value := 0.0
+	var near_sum := Vector2.ZERO
+	for k in colors.size():
+		var c := colors[k]
+		if c.g >= c.r and c.g >= c.b:
+			green += 1
+		value += c.v
+		if land_near[k]:
+			near_sum += Vector2(c.v, 1.0)
+	d.step("%s: eye %.0f m above the ground; %d points nearer than 300 m, with a mean value of %.2f" % [
+			view_name, eye.y - w.ground_height(eye.x, eye.z), near_sum.y, near_sum.x / maxf(near_sum.y, 1.0)])
+	var n := maxf(colors.size(), 1)
+	d.step("%s, 12:00 day 1: %d land points, %.0f %% green, mean value %.2f" % [view_name, colors.size(), 100.0 * green / n, value / n])
+	d.expect(colors.size() >= 30, "%s: the view shows land: %d points" % [view_name, colors.size()])
+	d.expect(green >= MIN_GREEN * n, "%s: %.0f %% of the land is green, it must be %.0f %% or more (D-0005-09)" % [
+			view_name, 100.0 * green / n, MIN_GREEN * 100.0])
+	d.expect(value / n >= VALUE_RANGE.x and value / n <= VALUE_RANGE.y, "%s: the mean value of the land is %.2f, it must be %.2f to %.2f (D-0005-09)" % [
+			view_name, value / n, VALUE_RANGE.x, VALUE_RANGE.y])
+	if view_name == "nui_lon_south_east":
+		var town_colors := pixel_colors(d, town)
+		var saturated := 0
+		for c: Color in town_colors:
+			if c.s > 0.2:
+				saturated += 1
+		var t := maxf(town_colors.size(), 1)
+		d.step("%s: %d town points, %.0f %% with a saturation above 0.2" % [view_name, town_colors.size(), 100.0 * saturated / t])
+		d.expect(town_colors.size() >= 30, "%s: the view shows the town: %d points" % [view_name, town_colors.size()])
+		d.expect(saturated >= MIN_TOWN_SATURATED * t, "%s: %.0f %% of the town has a saturation above 0.2, it must be %.0f %% or more (D-0005-09)" % [
+				view_name, 100.0 * saturated / t, MIN_TOWN_SATURATED * 100.0])
 
 
 ## The mean time of 10 frames in milliseconds.

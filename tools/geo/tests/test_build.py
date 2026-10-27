@@ -193,6 +193,7 @@ def test_trees(small_build):
     assert "flame" in trees, "the OSM tree with the genus Delonix is a flame tree"
     assert "casuarina" in trees, "the coast road has casuarinas"
     assert any(k in trees for k in ("coconut", "fan_palm")), "the park near Bãi Trước has palms"
+    assert "tall_shade" in trees, "Lê Lợi has its own trees (named_roads, plan 0020)"
     for points in trees.values():
         for x, h, z in points:
             assert x > -20.0, "no tree is in the sea"

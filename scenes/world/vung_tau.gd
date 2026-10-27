@@ -1,7 +1,7 @@
 class_name VungTau
 extends Node3D
 ## The real ground of Vũng Tàu (plan 0005): ground chunks, the sea with the
-## tide, the sky, the sun, the roads, simple trees, and the landmark markers.
+## tide, the sky, the sun, the roads, the trees (plan 0020), and the landmark markers.
 ##
 ## The ground is in chunks of 256 m. Each chunk with data has a far mesh from
 ## the overview grid all the time, so there is never a hole. Near the player,
@@ -56,6 +56,8 @@ var environment: Environment
 var sea: MeshInstance3D
 ## The tide model (D12), or null when tide.json is not there.
 var tide: TideModel
+## The highest sea level of the last 12 hours.
+var last_high := -100.0
 ## The sea level now, in meters above mean sea level.
 var sea_level := 0.0
 ## The line of the Hòn Bà ridge in game coordinates, its top height, and its width (R8h).
@@ -67,16 +69,19 @@ var load_times: Array[float] = []
 var _ground_material: ShaderMaterial
 var _sea_material: ShaderMaterial
 var _road_materials: Dictionary = {}
-var _tree_mesh: Mesh
-var _tree_material: ShaderMaterial
 ## The band of rocks around the Hòn Bà path (R8h): polygons in game X, Z.
 var band_polygons: Array[PackedVector2Array] = []
 var street_trees: StreetTrees
+## All trees in their three forms (plan 0020).
+var trees: TreeField
 ## The far form of the hill trees (D-0005-01).
 var canopy: HillCanopy
 ## The outlines of the small islands in game X, Z, and their bounds.
 var _islands: Array[PackedVector2Array] = []
 var _island_bounds: Array[Rect2] = []
+## The hill tree mix (data/trees/types.json, "hills") and its areas.
+var _hill_settings: Dictionary = {}
+var _hill_areas: Array = []
 var sea_objects: SeaObjects
 var roadworks: Roadworks
 ## The season values of the game day (R12a), from Season.of_day().
@@ -129,10 +134,13 @@ func setup(folder := GeoData.ROOT) -> bool:
 	add_child(canopy)
 	canopy.setup(self)
 	set_canopy(true)
+	trees = TreeField.new()
+	trees.name = "Trees"
+	add_child(trees)
+	trees.setup(TreeLibrary.shared())
+	_read_hill_mix()
 	street_trees = StreetTrees.new()
-	street_trees.name = "StreetTrees"
-	add_child(street_trees)
-	street_trees.setup(data.root.path_join("trees.json"))
+	street_trees.setup(data.root.path_join("trees.json"), trees)
 	sea_objects = SeaObjects.new()
 	sea_objects.name = "SeaObjects"
 	add_child(sea_objects)
@@ -272,13 +280,23 @@ func loaded_counts() -> Dictionary:
 ## Sets the sun and the sky for the clock time (D9, R14).
 func update_time(minutes: int, day: int) -> void:
 	if tide:
-		sea_level = tide.level(GameCalendar.unix_time(day, minutes))
+		var now := GameCalendar.unix_time(day, minutes)
+		sea_level = tide.level(now)
+		# The highest water of the last 12 hours: the sand below it is still wet (D-0005-09).
+		var high := sea_level
+		for i in range(1, 25):
+			high = maxf(high, tide.level(now - i * 1800.0))
+		last_high = high
 	sea.position.y = sea_level
 	_ground_material.set_shader_parameter("sea_level", sea_level)
+	_ground_material.set_shader_parameter("last_high", last_high)
 	if day != _season_day:
 		_apply_season(day)
 	if roadworks:
 		roadworks.update_time(minutes)
+	if not Wind.held:
+		var wind := Wind.of_time(TreeLibrary.shared().settings.get("wind", {}), minutes)
+		Wind.apply(wind.direction, wind.strength)
 	var origin: Dictionary = data.world.get("origin", {})
 	var sun_now := SunPosition.at(float(origin.get("lat", 10.35)), float(origin.get("lon", 107.08)),
 			GameCalendar.day_of_year(day), minutes)
@@ -316,11 +334,9 @@ func _apply_season(day: int) -> void:
 	_season_day = day
 	season = Season.of_day(day)
 	_ground_material.set_shader_parameter("dryness", season.dryness)
-	TreeKit.apply_season("hill", _tree_material, season)
+	TreeLibrary.shared().apply_season(day)
 	if canopy:
 		canopy.apply_season(season)
-	if street_trees:
-		street_trees.apply_season(season)
 
 
 ## The colors of the sky (the top and the horizon) for the sun elevation in degrees.
@@ -468,7 +484,9 @@ func _show_fine(key: Vector2i, result: Dictionary) -> void:
 		body.add_child(shape)
 		node.add_child(body)
 		_add_roads(node, body, result.roads)
-		_add_trees(node, result.trees)
+		_add_trees(key, result.trees)
+	else:
+		trees.remove_source(key)
 	var was_far: bool = state.detail == Detail.FAR
 	state.fine = node
 	state.detail = result.detail
@@ -481,6 +499,7 @@ func _show_far(key: Vector2i) -> void:
 	if state.fine:
 		state.fine.queue_free()
 		state.fine = null
+	trees.remove_source(key)
 	state.detail = Detail.FAR
 	_rebuild_far_tile(state.tile)
 
@@ -537,34 +556,115 @@ func is_on_island(x: float, z: float) -> bool:
 
 
 ## Runs in a worker thread. Trees grow in woods and on the hills, not in towns,
-## on sand, on steep rock, or on roads.
-func _tree_transforms(key: Vector2i, heights: PackedFloat32Array) -> Array[Transform3D]:
-	var result: Array[Transform3D] = []
+## on sand, on steep rock, or on roads. Returns type -> transforms in world
+## space: the hill trees (a mix of the hill types, R1) and a dense cover of
+## scrub on the hill slopes (report 0005, D-0005-09).
+func _tree_transforms(key: Vector2i, heights: PackedFloat32Array) -> Dictionary:
+	var result := {}
 	if _surface_image == null:
 		return result
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(key)
-	var n := data.samples
+	var origin := Vector2(key.x * data.chunk_size, key.y * data.chunk_size)
 	var count := int(data.chunk_size / TREE_SPACING)
 	for j in count:
 		for i in count:
 			var local := Vector2((i + rng.randf()) * TREE_SPACING, (j + rng.randf()) * TREE_SPACING)
-			var col := clampi(int(local.x / data.grid), 1, n - 2)
-			var row := clampi(int(local.y / data.grid), 1, n - 2)
-			var h := heights[row * n + col]
-			var slope := maxf(absf(heights[row * n + col + 1] - heights[row * n + col - 1]),
-					absf(heights[(row + 1) * n + col] - heights[(row - 1) * n + col])) / (2.0 * data.grid)
-			var world := Vector2(key.x * data.chunk_size, key.y * data.chunk_size) + local
-			if not is_forest(world.x, world.y, h, slope):
+			var ground := _ground_at(heights, local)
+			var world := origin + local
+			if not is_forest(world.x, world.y, ground.x, ground.y):
 				continue
 			if rng.randf() > (WOOD_DENSITY if _mask_at(world).b > 0.4 else HILL_DENSITY):
 				continue
 			if not data.road_at(world.x, world.y).is_empty():
 				continue
-			var size := rng.randf_range(0.7, 1.3)
-			var basis := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * size)
-			result.append(Transform3D(basis, Vector3(local.x, h - 0.1, local.y)))
+			var type := _pick(_hill_mix_at(world), rng.randf())
+			_add_place(result, type, world, ground.x, rng.randf_range(0.7, 1.3), rng.randf() * TAU)
+	var scrub: Dictionary = _hill_settings.get("scrub", {})
+	var spacing := float(scrub.get("spacing_m", 4.0))
+	var density := float(scrub.get("density", 0.55))
+	var max_slope := float(scrub.get("max_slope", 0.85))
+	count = int(data.chunk_size / spacing)
+	for j in count:
+		for i in count:
+			var local := Vector2((i + rng.randf()) * spacing, (j + rng.randf()) * spacing)
+			var ground := _ground_at(heights, local)
+			var world := origin + local
+			if ground.y > max_slope or rng.randf() > density:
+				continue
+			if not is_scrub(world.x, world.y, ground.x, ground.y):
+				continue
+			if not data.road_at(world.x, world.y).is_empty():
+				continue
+			_add_place(result, "scrub", world, ground.x, rng.randf_range(0.7, 1.4), rng.randf() * TAU)
 	return result
+
+
+## The height and the slope (rise for each meter) of the ground at a local point of a chunk.
+func _ground_at(heights: PackedFloat32Array, local: Vector2) -> Vector2:
+	var n := data.samples
+	var col := clampi(int(local.x / data.grid), 1, n - 2)
+	var row := clampi(int(local.y / data.grid), 1, n - 2)
+	var h := heights[row * n + col]
+	var slope := maxf(absf(heights[row * n + col + 1] - heights[row * n + col - 1]),
+			absf(heights[(row + 1) * n + col] - heights[(row - 1) * n + col])) / (2.0 * data.grid)
+	return Vector2(h, slope)
+
+
+static func _add_place(result: Dictionary, type: String, world: Vector2, h: float, size: float, turn: float) -> void:
+	if not result.has(type):
+		result[type] = [] as Array[Transform3D]
+	var basis := Basis(Vector3.UP, turn).scaled(Vector3.ONE * size)
+	(result[type] as Array[Transform3D]).append(Transform3D(basis, Vector3(world.x, h - 0.1, world.y)))
+
+
+## True when scrub grows at the point: on the hill ground (also below the
+## forest height, but not in the town), not on rock, sand, or water.
+func is_scrub(x: float, z: float, h: float, slope: float) -> bool:
+	if _surface_image == null or h < FOREST_LOWEST or is_on_island(x, z):
+		return false
+	var mask := _mask_at(Vector2(x, z))
+	if mask.r > 0.3:
+		return false
+	return mask.b > 0.4 or (mask.g <= 0.3 and h > FOREST_HEIGHT * 0.5) or (mask.g > 0.3 and h > FOREST_HEIGHT)
+
+
+func _read_hill_mix() -> void:
+	_hill_settings = TreeLibrary.shared().settings.get("hills", {})
+	_hill_areas.clear()
+	for area: Dictionary in _hill_settings.get("areas", []):
+		var landmark := data.landmark(str(area.get("landmark", "")))
+		if landmark.is_empty():
+			continue
+		var p: Array = landmark.position
+		_hill_areas.append({"center": Vector2(p[0], p[1]), "radius": float(area.radius_m), "mix": area.mix})
+
+
+func _hill_mix_at(world: Vector2) -> Dictionary:
+	for area: Dictionary in _hill_areas:
+		if world.distance_to(area.center) <= area.radius:
+			return area.mix
+	return _hill_settings.get("mix", {"hill_a": 1.0})
+
+
+## A type from a mix (type -> share) for a random value from 0 to 1.
+static func _pick(mix: Dictionary, value: float) -> String:
+	var total := 0.0
+	for type: String in mix:
+		total += float(mix[type])
+	var at := value * total
+	var last := ""
+	for type: String in mix:
+		last = type
+		at -= float(mix[type])
+		if at <= 0.0:
+			return type
+	return last
+
+
+## The surface mask at a point: R sand, G town, B wood, A the distance to the coast.
+func surface_at(x: float, z: float) -> Color:
+	return _mask_at(Vector2(x, z))
 
 
 func _mask_at(world: Vector2) -> Color:
@@ -576,21 +676,11 @@ func _mask_at(world: Vector2) -> Color:
 	return _surface_image.get_pixel(x, y)
 
 
-func _add_trees(node: Node3D, transforms: Array[Transform3D]) -> void:
-	if transforms.is_empty():
-		return
-	var multimesh := MultiMesh.new()
-	multimesh.transform_format = MultiMesh.TRANSFORM_3D
-	multimesh.mesh = _tree_mesh
-	multimesh.instance_count = transforms.size()
-	for i in transforms.size():
-		multimesh.set_instance_transform(i, transforms[i])
-	var instance := MultiMeshInstance3D.new()
-	instance.name = "Trees"
-	instance.multimesh = multimesh
-	instance.material_override = _tree_material
-	instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	node.add_child(instance)
+## The trees of a near chunk go into the tree field, in place of the trees before.
+func _add_trees(key: Vector2i, placed: Dictionary) -> void:
+	trees.remove_source(key)
+	for type: String in placed:
+		trees.add_trees(key, type, placed[type])
 
 
 # --- Setup -------------------------------------------------------------------
@@ -611,7 +701,7 @@ func _make_environment() -> void:
 	environment.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
 	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	environment.fog_enabled = true
-	environment.fog_density = 0.00008
+	environment.fog_density = 0.00004
 	environment.fog_sky_affect = 0.0
 	var world_environment := WorldEnvironment.new()
 	world_environment.name = "Environment"
@@ -656,6 +746,7 @@ func _make_materials() -> void:
 	_ground_material.set_shader_parameter("mask_origin", mask_origin)
 	_ground_material.set_shader_parameter("mask_size", size)
 	_ground_material.set_shader_parameter("forest_height", FOREST_HEIGHT)
+	_ground_material.set_shader_parameter("roof_colors", roof_colors())
 	_sea_material = ShaderMaterial.new()
 	_sea_material.shader = load("res://shaders/water.gdshader")
 	_sea_material.set_shader_parameter("surface_mask", mask_texture)
@@ -684,10 +775,27 @@ func _make_materials() -> void:
 				material.albedo_color = Color("#E8E6DC")
 				material.roughness = 0.7
 		_road_materials[kind] = material
-	_tree_mesh = TreeKit.mesh("hill")
-	_tree_material = TreeKit.material("hill")
 	var rock_ridge: Dictionary = data.world.get("hon_ba_ridge", {})
 	_ground_material.set_shader_parameter("pool_level", float(rock_ridge.get("top_m", -100.0)) - 0.12)
+
+
+## Eight roof colors of data/world/palette.json for the town seen from far
+## (D-0005-09): the tiles, the metal sheets, and one concrete terrace.
+static func roof_colors() -> Array[Color]:
+	var result: Array[Color] = []
+	var file := "res://data/world/palette.json"
+	var palette: Variant = JSON.parse_string(FileAccess.get_file_as_string(file)) if FileAccess.file_exists(file) else null
+	if palette is Dictionary:
+		for hex: String in (palette.roof_tiles.colors as Array).slice(0, 2):
+			result.append(Color(hex))
+		var metal: Array = palette.metal_roofs.colors.duplicate()
+		metal.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return Color(a.color).s > Color(b.color).s)
+		for entry: Dictionary in metal.slice(0, 5):
+			result.append(Color(str(entry.color)))
+		result.append(Color(str(palette.terraces.colors[0].color)))
+	while result.size() < 8:
+		result.append(Color("#B28469"))
+	return result
 
 
 func _texture_or_color(texture_kind: String, color_kind: String) -> Texture2D:

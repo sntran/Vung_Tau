@@ -120,8 +120,14 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
             side_trees(road, float(bai_truoc["spacing_m"]), bai_truoc["mix"], "bai_truoc_road", sea_side=True)
         elif road.name in coast["names"]:
             side_trees(road, float(coast["spacing_m"]), coast["mix"], "coast_roads")
+    named = spec.get("named_roads", {})
     for road in roads:
-        if road.type in street["road_types"] and road.name != coast_road and road.name not in coast["names"]:
+        if road.name == coast_road or road.name in coast["names"]:
+            continue
+        if road.name in named:
+            # A road with its own trees (plan 0020, Q1): for example the tall shade trees of Trần Hưng Đạo.
+            side_trees(road, float(named[road.name]["spacing_m"]), named[road.name]["mix"], "named_roads")
+        elif road.type in street["road_types"]:
             side_trees(road, float(street["spacing_m"]), street["mix"], "street")
 
     park_spec = spec["parks"]
