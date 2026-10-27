@@ -253,3 +253,21 @@ These notes record how the builder read the parts of the plan that were not full
   - The wet sand: `VungTau.last_high` is the highest sea level of the last 12 hours. Below it, the ground is darker and smoother (shiny), and small pools stay in the low places of the sand. The higher parts were out of the water for longer, so they are drier.
   - PT-33 at 12:00 on day 1 reads the colors of the land at points on a grid of the ground in the frame: from Núi Lớn 67 % of the land is green and the mean value is 0.52; from Núi Nhỏ 59 % and 0.51; on the Hải Đăng road 86 % and 0.43. From Núi Lớn, 67 % of the town points have a saturation above 0.2. The view from Núi Nhỏ is 1 m higher than the trees of the canopy map within 8 m of it, and the canopy check hides the near trees, because the hill trees of the top are as tall as the map says (up to 17 m). Without the far form of the trees, the canopy check shows grass under the trees (the reference of the check).
   - D-0005-07 (the foam): the sea shader finds the floor behind the water (the depth texture), its depth under the surface, and its slope (from the screen derivatives of its position). The distance to the water line is the depth over the slope, and the foam is a band of about 4 m at the line, with noise at its edge. In the calm bay of Bãi Trước (1 200 m around the beach) the foam is at 12 %, and on the rocks (the rock mask) it is full. PT-35 checks at the low tide of day 1, from the sand of Bãi Trước, that 5 % or less of the water points are near white: now 2.3 %.
+- **N40. The detail levels of the ground (report 0005, D-0005-10).** I measured the views of PT-54 first: on Low, the far clumps of the hill trees (`HillCanopy`, 72 triangles each) had about 900 000 triangles at "Núi Nhỏ top", the far tiles (16 m) 300 000, and the near chunks (2 m to 300 m) 230 000.
+  - The near chunks: each one is 4 × 4 patches of 64 m. A patch has a grid of 2 m, 4 m, or 8 m by its distance from the view (`VungTau.GROUND_DETAIL`: High and Ultra 2 m to 150 m and 4 m to 400 m, Medium 100 m and 250 m, Low 50 m and 140 m), and goes back to a coarser grid only 20 m farther. A worker thread makes the patch again from the heights of the chunk. The collision stays the height map of 2 m.
+  - The sun shadow: a mesh of 8 m for each near chunk only casts the shadow, and the patches cast none.
+  - The mid chunks (8 m) go to 1 000 m on High and Ultra, 800 m on Medium, and 400 m on Low. The far tiles have a grid of 16 m, 32 m, or 64 m by distance (High 2 500 m and 5 000 m; Low 700 m and 1 500 m).
+  - The skirts of the patches and of the far meshes (3 m down at each edge) hide the gaps between the levels.
+  - The far clumps: the first clump of one cell of each 2 × 2 is a sparse clump, the others are dense clumps. The dense clumps show to 1 000 m (Medium), 1 500 m (High), or 2 000 m (Ultra), and never on Low. Farther, the sparse clumps grow to 2.4 times their size, so that they cover the hills as before. On Low, the sparse clumps have one crown of 5 m (24 triangles), 2 times larger near and 4 times larger from 1 600 m. The ground shows the far forest darker, as dark as the clumps.
+  - `Quality.apply()` sets the levels (`VungTau.set_ground_detail()`).
+  - PT-54 checks the whole view against R12 again (Low and High; Medium and Ultra have no limit and are recorded). Under lavapipe at 1 280 × 720, at the three views, before and after:
+
+    | Preset | Triangles before | Triangles after | Frame time before | Frame time after |
+    |---|---|---|---|---|
+    | Low | 750 000 to 1 552 000 | 226 000 to 275 000 (limit 300 000) | 191 to 311 ms | 140 to 144 ms |
+    | Medium | 928 000 to 1 684 000 | 520 000 to 812 000 | 372 to 446 ms | 269 to 349 ms |
+    | High | 1 304 000 to 2 090 000 | 1 080 000 to 1 287 000 (limit 2 000 000) | 688 to 879 ms | 541 to 674 ms |
+    | Ultra | 2 290 000 to 2 996 000 | 1 858 000 to 2 430 000 | 806 to 1 030 ms | 739 to 917 ms |
+
+    The draw calls are 227 to 347 (limits 600 and 2 000). On Low, at "Bãi Trước road", the trees have 130 000 triangles, the far clumps 46 000, the far tiles 43 000, the sea objects 26 000, and the near chunks 17 000.
+
