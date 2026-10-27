@@ -1,4 +1,8 @@
-"""The street trees and the park trees (plan 0005, R12a)."""
+"""The street trees and the park trees (plan 0005, R12a). With the tree tops
+of the canopy map (report 0020, D-0020-03): on the confirmed roads and in the
+park of Bãi Trước, the rows of the photos stay, and each tree moves to the
+nearest free tree top within snap_m; on the other roads and in the other
+parks, a tree stands only on a tree top of the map."""
 
 import math
 
@@ -7,6 +11,7 @@ import shapely
 from shapely import STRtree
 from shapely.geometry import LineString, Point
 from shapely.prepared import prep
+from scipy.spatial import cKDTree
 
 from . import blocks as blocks_module
 
@@ -66,21 +71,70 @@ class _Place:
         return True
 
 
+class _Tops:
+    """The tree tops of the canopy map (map x, y): each one takes one tree."""
+
+    def __init__(self, points):
+        self.points = np.asarray(points, dtype=float) if points is not None and len(points) else np.zeros((0, 2))
+        self.tree = cKDTree(self.points) if len(self.points) else None
+        self.used = np.zeros(len(self.points), dtype=bool)
+
+    def nearest(self, point, radius: float):
+        """The index of the nearest free tree top within radius, or -1."""
+        if self.tree is None:
+            return -1
+        for i in sorted(self.tree.query_ball_point(point, radius), key=lambda i: np.hypot(*(self.points[i] - point))):
+            if not self.used[i]:
+                return i
+        return -1
+
+    def within(self, shape) -> list[int]:
+        """The free tree tops in a shape."""
+        if self.tree is None:
+            return []
+        min_x, min_y, max_x, max_y = shape.bounds
+        box = np.nonzero((self.points[:, 0] >= min_x) & (self.points[:, 0] <= max_x)
+                         & (self.points[:, 1] >= min_y) & (self.points[:, 1] <= max_y) & ~self.used)[0]
+        prepared = prep(shape)
+        return [int(i) for i in box if prepared.contains(Point(*self.points[i]))]
+
+
 def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: list, osm_rows: list,
-         coast_road: str, beach_outline, near_point, sample_height) -> tuple[dict, dict]:
-    """The trees for the build folder and the counts for the report.
+         coast_road: str, beach_outline, near_point, sample_height, tops=None) -> tuple[dict, dict, dict]:
+    """The trees for the build folder, the counts for the report, and the
+    points of each group (map x, y) for the report.
     parks: park shapes (map). osm_trees: (x, y, tags). osm_rows: (LineString, tags).
     near_point: the map point of the landmark for the parks near it.
-    sample_height(x, y): the ground height at map points (arrays)."""
+    sample_height(x, y): the ground height at map points (arrays).
+    tops: the tree tops of the canopy map (map x, y), or None for the rules alone."""
     rng = np.random.default_rng(int(spec.get("seed", 1)))
     street = spec["street"]
     place = _Place(land, beaches, roads, float(street["skip_near_road_m"]))
     found: dict[str, list] = {}
     counts: dict[str, int] = {}
+    groups: dict[str, list] = {}
+    canopy = spec.get("canopy", {})
+    use_tops = tops is not None and canopy.get("use", True)
+    tree_tops = _Tops(tops if use_tops else None)
+    snap_m = float(canopy.get("snap_m", 6.0))
+    edge_m = float(canopy.get("edge_m", 6.0))
 
     def add(kind: str, point, source: str) -> None:
         found.setdefault(kind, []).append((float(point[0]), float(point[1])))
+        groups.setdefault(source, []).append((float(point[0]), float(point[1])))
         counts[source] = counts.get(source, 0) + 1
+
+    def snapped(point, source: str):
+        """The point, or the nearest free tree top within snap_m."""
+        i = tree_tops.nearest(point, snap_m)
+        if i < 0:
+            return point, -1
+        return tree_tops.points[i], i
+
+    def take(i: int, source: str) -> None:
+        if i >= 0:
+            tree_tops.used[i] = True
+            counts[source + "_snapped"] = counts.get(source + "_snapped", 0) + 1
 
     genus = spec["osm_trees"]["genus"]
 
@@ -109,9 +163,36 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
                 chosen = (1,) if beach_outline.distance(Point(left)) < beach_outline.distance(Point(right)) else (-1,)
             for side in chosen:
                 tree = point + normal * offset * side
+                # A tree moves to the nearest tree top of the canopy map, where there is a free one.
+                moved, top = snapped(tree, source)
                 # A tree on a sidewalk is on the road surface of its own road.
-                if place.free(tree, spacing * 0.6, own_road=road if road.sidewalk else None):
+                if top >= 0 and place.free(moved, spacing * 0.6, own_road=road if road.sidewalk else None):
+                    take(top, source)
+                    add(_pick(mix, rng), moved, source)
+                elif place.free(tree, spacing * 0.6, own_road=road if road.sidewalk else None):
                     add(_pick(mix, rng), tree, source)
+
+    def top_trees(road, mix: dict, source: str) -> None:
+        """A tree on each free tree top of the canopy map within edge_m of the road
+        edge, out of the road surface: no tree where the map has none."""
+        line = LineString(road.points)
+        half = road.width / 2.0
+        offset = half - float(street["in_from_edge_m"]) if road.sidewalk else half + float(street["out_from_edge_m"])
+        gap = float(street["spacing_m"]) * 0.5
+        for i in tree_tops.within(line.buffer(half + edge_m)):
+            point = tree_tops.points[i]
+            along = line.project(Point(*point))
+            on_line = np.array(line.interpolate(along).coords[0])
+            out = point - on_line
+            distance = float(np.linalg.norm(out))
+            if distance < offset:
+                # A crown over the road: the trunk stands at the edge, on the same side.
+                if distance < 0.01:
+                    continue
+                point = on_line + out / distance * offset
+            if place.free(point, gap, own_road=road if road.sidewalk else None):
+                take(i, source)
+                add(_pick(mix, rng), point, source)
 
     coast = spec["coast_roads"]
     bai_truoc = spec["bai_truoc_road"]
@@ -128,20 +209,37 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
             # A road with its own trees (plan 0020, Q1): for example the tall shade trees of Trần Hưng Đạo.
             side_trees(road, float(named[road.name]["spacing_m"]), named[road.name]["mix"], "named_roads")
         elif road.type in street["road_types"]:
-            side_trees(road, float(street["spacing_m"]), street["mix"], "street")
+            if use_tops:
+                top_trees(road, street["mix"], "street")
+            else:
+                side_trees(road, float(street["spacing_m"]), street["mix"], "street")
 
     park_spec = spec["parks"]
     spacing = float(park_spec["spacing_m"])
     for park in parks:
         near = near_point is not None and park.distance(near_point) <= float(park_spec["near_m"])
         mix = park_spec["mix_near"] if near else park_spec["mix"]
+        source = "park_bai_truoc" if near else "parks"
+        if use_tops and not near:
+            # The other parks: a tree on each tree top of the canopy map in the park.
+            for i in tree_tops.within(park):
+                if place.free(tree_tops.points[i], spacing * 0.5):
+                    take(i, source)
+                    add(_pick(mix, rng), tree_tops.points[i], source)
+            continue
         min_x, min_y, max_x, max_y = park.bounds
         prepared = prep(park)
         for x in np.arange(min_x + spacing / 2, max_x, spacing):
             for y in np.arange(min_y + spacing / 2, max_y, spacing):
                 point = np.array([x + rng.uniform(-2, 2), y + rng.uniform(-2, 2)])
-                if prepared.contains(Point(*point)) and place.free(point, spacing * 0.6):
-                    add(_pick(mix, rng), point, "parks")
+                if not prepared.contains(Point(*point)):
+                    continue
+                moved, top = snapped(point, source)
+                if top >= 0 and prepared.contains(Point(*moved)) and place.free(moved, spacing * 0.6):
+                    take(top, source)
+                    add(_pick(mix, rng), moved, source)
+                elif place.free(point, spacing * 0.6):
+                    add(_pick(mix, rng), point, source)
 
     result = {"note": "Made by tools/geo/build.py from data/geo/trees.json and OSM. Do not change by hand. "
                       "Each point is [X, height, Z] in game coordinates.", "types": {}}
@@ -150,4 +248,4 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
         h = sample_height(xy[:, 0], xy[:, 1])
         result["types"][kind] = [[round(float(x), 1), round(float(hh), 2), round(-float(y), 1)]
                                  for (x, y), hh in zip(points, h)]
-    return result, counts
+    return result, counts, groups

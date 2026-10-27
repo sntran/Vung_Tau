@@ -1,6 +1,12 @@
 {
-	"note": "The street trees and the park trees (plans 0005 and 0020). tools/geo/build.py puts them along the roads and in the parks and writes data/geo/build/trees.json. The trees on the hills come from the surface mask in the game, with the mix of data/trees/types.json. A mix gives the share of each tree type. The game shows each type in the season of the game date. Tree types (data/trees/types.json): bang, shade, tall_shade, flame, frangipani, casuarina, coconut, fan_palm, araucaria. The mixes and the spacings are builder values from photos and the culture notes: check.",
+	"note": "The street trees and the park trees (plans 0005 and 0020). tools/geo/build.py puts them along the roads and in the parks and writes data/geo/build/trees.json. The trees on the hills come from the canopy map (data/geo/build/canopy_trees.json) in the game, with the types of data/trees/types.json. A mix gives the share of each tree type. The game shows each type in the season of the game date. Tree types (data/trees/types.json): bang, shade, tall_shade, flame, frangipani, casuarina, coconut, fan_palm, araucaria. The mixes and the spacings are builder values from photos and the culture notes: check.",
 	"seed": 21,
+	"canopy": {
+		"comment": "Report 0020, D-0020-03: the tree tops of the canopy map of 2019. On the roads of my photos (Quang Trung, the coast roads, and the named roads) and in the park of Bãi Trước, the rows stay, and a tree moves to the nearest free tree top within snap_m. On the other main roads, a tree stands on each tree top within edge_m of the road edge, and in the other parks on each tree top in the park. Builder values: check.",
+		"use": true,
+		"snap_m": 6.0,
+		"edge_m": 6.0
+	},
 	"street": {
 		"road_types": [
 			"trunk",

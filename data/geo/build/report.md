@@ -97,14 +97,14 @@ None.
 
 ## Trees (R12a)
 
-- bang: 6102
+- bang: 1994
 - casuarina: 3509
-- coconut: 902
-- flame: 4835
-- frangipani: 2471
-- shade: 11057
-- tall_shade: 184
-- From: bai_truoc_road 192, coast_roads 3956, named_roads 502, osm 385, parks 2151, street 21874.
+- coconut: 909
+- flame: 1623
+- frangipani: 753
+- shade: 3576
+- tall_shade: 186
+- From: bai_truoc_road 194, bai_truoc_road_snapped 15, coast_roads 3970, coast_roads_snapped 321, named_roads 503, named_roads_snapped 114, osm 385, park_bai_truoc 305, park_bai_truoc_snapped 61, parks 1376, parks_snapped 1376, street 5817, street_snapped 5817.
 
 ## Land cover and trees (report 0005, D-0005-09; plan 0020, D8)
 
@@ -129,38 +129,17 @@ Dark green: tree cover. Yellow: grassland. Red: built-up. Gray: bare. Blue: wate
 
 Light green (1 m) to dark green (25 m or more): the canopy height. Gray: land with no canopy. Blue: the sea.
 
-- The canopy map shows no tree within 5 m of 14600 of the 29060 street and park trees (plan 0020, R10a): bang 2937 of 6102, casuarina 2499 of 3509, coconut 536 of 902, flame 2296 of 4835, frangipani 1125 of 2471, shade 5192 of 11057, tall_shade 15 of 184. They stay, and I check them on photos. The first ones:
-  - (91, 197)
-  - (101, 159)
-  - (106, 136)
-  - (108, 121)
-  - (112, 96)
-  - (113, 91)
-  - (112, 75)
-  - (112, 66)
-  - (110, 52)
-  - (108, 43)
-  - (106, 37)
-  - (105, 30)
-  - (102, 20)
-  - (101, 14)
-  - (93, -18)
-  - (84, -47)
-  - (72, -79)
-  - (56, -122)
-  - (50, -139)
-  - (41, -160)
-  - (37, -168)
-  - (35, -173)
-  - (32, -182)
-  - (15, -209)
-  - (11, -215)
-  - (6, -223)
-  - (2, -229)
-  - (-2, -234)
-  - (-8, -242)
-  - (-11, -246)
-  - and 14570 more.
+The street and park trees and the canopy map (report 0020, D-0020-03): on the roads of my photos and in the park of Bãi Trước the rows stay, and a tree moves to the nearest tree top of the canopy map within 6 m; on the other roads and in the other parks, a tree stands only on a tree top of the map. "Not in the map": no canopy of 2 m or more within 5 m.
+
+| Group | Trees | Moved to a tree top | Not in the map |
+|---|---|---|---|
+| Quang Trung (Bãi Trước) | 194 | 8 % | 72 % |
+| Thùy Vân, Hạ Long, Trần Phú | 3970 | 8 % | 72 % |
+| Trần Hưng Đạo, Ba Cu | 503 | 23 % | 35 % |
+| The trees of OSM | 385 | 0 % | 36 % |
+| The park of Bãi Trước | 305 | 20 % | 21 % |
+| The other parks | 1376 | 100 % | 0 % |
+| The other main roads | 5817 | 100 % | 0 % |
 
 ## Town anchors (R6a)
 

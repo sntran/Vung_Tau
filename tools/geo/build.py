@@ -279,7 +279,19 @@ def build(raw: Path, out: Path, geo: Path) -> int:
         log(f"{len(sea_objects['cargo_ships'])} cargo ships, {len(sea_objects['fishing_boats'])} fishing boats, "
             f"{len(sea_objects['basket_boats'])} basket boats, {len(sea_objects['fishing_stakes']['rows'])} rows of "
             f"stakes, {len(sea_objects['groynes']['lines'])} groynes")
-    tree_record, tree_counts = None, {}
+    # The places with no trees and no bushes, and the roads with no tree trunks (report 0020, D-0020-01).
+    places = clearings.place_shapes(data.areas, lambda g: to_map_geometry(g, projection), found_by_id, config.clearings)
+    place_mask = terrain.rasterize(grid, [p for shape in places for p in polygons_of(shape)])
+    road_mask = terrain.rasterize(grid, clearings.road_shapes(roads, config.clearings))
+    canopy = None
+    tops = None
+    if (raw / "canopy.tif").exists():
+        canopy = terrain.load_raster(grid, raw / "canopy.tif", projection, terrain.Resampling.max)
+        # The tree tops of all the land, also of the town, for the street trees (report 0020, D-0020-03).
+        rows, cols = landcover.tree_places(canopy, grid.step, land_mask & ~place_mask & ~road_mask)
+        tops = np.column_stack([grid.x0 + cols * grid.step, -(grid.z0 + rows * grid.step)]).astype(float)
+        log(f"{len(tops)} tree tops of the canopy map on the land")
+    tree_record, tree_counts, tree_groups = None, {}, {}
     if config.trees is not None:
         osm_trees, osm_rows = [], []
         for n in data.nodes:
@@ -293,9 +305,9 @@ def build(raw: Path, out: Path, geo: Path) -> int:
                 osm_rows.append((shapely.LineString(np.column_stack([x, y])), w.tags))
         near = found_by_id.get(config.trees["parks"]["near_landmark"])
         near_point = shapely.Point(near["position"][0], -near["position"][1]) if near and near.get("found") else None
-        tree_record, tree_counts = trees_module.make(
+        tree_record, tree_counts, tree_groups = trees_module.make(
             config.trees, roads, land, beaches, parks, osm_trees, osm_rows, home.get("coast_road", ""), beach_outline,
-            near_point, lambda x, y: grid.sample(np.asarray(x), -np.asarray(y)))
+            near_point, lambda x, y: grid.sample(np.asarray(x), -np.asarray(y)), tops)
         log(f"{sum(len(v) for v in tree_record['types'].values())} trees: {tree_counts}")
 
     # Write the files. Keep the files of tide.py.
@@ -320,11 +332,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
                             out / "surface.png", rock_mask, out / "rock.png", pebble_mask)
     write_keep_import(out / "surface.png")
     write_keep_import(out / "rock.png")
-    # The places with no trees and no bushes, and the roads with no tree trunks (report 0020, D-0020-01).
-    places = clearings.place_shapes(data.areas, lambda g: to_map_geometry(g, projection), found_by_id, config.clearings)
-    place_mask = terrain.rasterize(grid, [p for shape in places for p in polygons_of(shape)])
-    road_mask = terrain.rasterize(grid, clearings.road_shapes(roads, config.clearings))
-    cover_record = write_cover(grid, raw, out, projection, land_mask, area, found_by_id, place_mask, road_mask)
+    cover_record = write_cover(grid, raw, out, projection, land_mask, area, found_by_id, place_mask, road_mask, canopy)
 
     lon_min, lat_min = projection.map_to_lonlat(box.bounds[0], box.bounds[1])
     lon_max, lat_max = projection.map_to_lonlat(box.bounds[2], box.bounds[3])
@@ -396,13 +404,13 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     if tree_record is not None:
         write_json(out / "trees.json", tree_record, None)
         if cover_record is not None:
-            # Plan 0020, R10a: the street trees that the canopy map does not show are in the report.
-            canopy = cover_record.pop("canopy_values")
-            by_type = {kind: (len(points), landcover.street_trees_without_canopy(points, grid, canopy))
-                       for kind, points in tree_record["types"].items()}
-            cover_record["street"] = {"count": sum(n for n, _ in by_type.values()),
-                                      "missing": [p for _, m in by_type.values() for p in m],
-                                      "by_type": {kind: (n, len(m)) for kind, (n, m) in by_type.items()}}
+            # Report 0020, D-0020-03: the share of the street and park trees of each group that the canopy map shows.
+            canopy_values = cover_record.pop("canopy_values")
+            cover_record["street"] = {
+                group: {"count": len(points), "snapped": tree_counts.get(group + "_snapped", 0),
+                        "missing": len(landcover.street_trees_without_canopy(
+                            [[x, 0.0, -y] for x, y in points], grid, canopy_values))}
+                for group, points in sorted(tree_groups.items())}
     center = mapdraw.center_of(home)
     if center is not None:
         mapdraw.draw(out / "homestay_area.png", center, roads, land, beaches, block_list, buildings, home)
@@ -508,7 +516,8 @@ def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods,
 COVER_HILLS = {"nui_lon": (1100.0, 20.0), "nui_nho": (700.0, 20.0)}
 
 
-def write_cover(grid, raw, out, projection, land_mask, area, found_by_id, place_mask=None, road_mask=None) -> dict | None:
+def write_cover(grid, raw, out, projection, land_mask, area, found_by_id, place_mask=None, road_mask=None,
+                canopy=None) -> dict | None:
     """The land cover and the canopy heights (report 0005, D-0005-09; plan 0020,
     D8): cover.png (on the grid of surface.png: R tree cover, G bushes, B grass,
     A bare ground), canopy.png (the canopy height for the trees and the bushes
@@ -517,7 +526,8 @@ def write_cover(grid, raw, out, projection, land_mask, area, found_by_id, place_
         return None
     classes = terrain.load_raster(grid, raw / "worldcover.tif", projection, terrain.Resampling.nearest)
     classes = np.nan_to_num(classes, nan=0.0).astype(np.uint8)
-    canopy = terrain.load_raster(grid, raw / "canopy.tif", projection, terrain.Resampling.max)
+    if canopy is None:
+        canopy = terrain.load_raster(grid, raw / "canopy.tif", projection, terrain.Resampling.max)
     masks = landcover.cover_masks(classes, canopy, land_mask)
     if place_mask is not None:
         # No trees and no bushes on the paved places: the ground there is the town ground.
@@ -561,6 +571,11 @@ def write_cover(grid, raw, out, projection, land_mask, area, found_by_id, place_
             "clear_m2": round(float(place_mask.sum()) * grid.step ** 2) if place_mask is not None else 0, "info": info, "canopy_values": canopy}
 
 
+GROUP_NAMES = {"bai_truoc_road": "Quang Trung (Bãi Trước)", "coast_roads": "Thùy Vân, Hạ Long, Trần Phú",
+               "named_roads": "Trần Hưng Đạo, Ba Cu", "street": "The other main roads",
+               "park_bai_truoc": "The park of Bãi Trước", "parks": "The other parks", "osm": "The trees of OSM"}
+
+
 def cover_report_lines(cover: dict) -> list[str]:
     info = cover.get("info", {})
     years = info.get("canopy", {}).get("image_years", {})
@@ -594,14 +609,16 @@ def cover_report_lines(cover: dict) -> list[str]:
               "Light green (1 m) to dark green (25 m or more): the canopy height. Gray: land with no canopy. Blue: the sea."]
     street = cover.get("street")
     if street:
-        missing = street["missing"]
-        lines += ["", f"- The canopy map shows no tree within {landcover.STREET_RADIUS_M:.0f} m of {len(missing)} of the "
-                  f"{street['count']} street and park trees (plan 0020, R10a): "
-                  + ", ".join(f"{kind} {m} of {n}" for kind, (n, m) in street["by_type"].items())
-                  + ". They stay, and I check them on photos. The first ones:"]
-        lines += [f"  - ({p[0]:.0f}, {p[2]:.0f})" for p in missing[:30]]
-        if len(missing) > 30:
-            lines.append(f"  - and {len(missing) - 30} more.")
+        lines += ["", "The street and park trees and the canopy map (report 0020, D-0020-03): on the roads of my photos "
+                  "and in the park of Bãi Trước the rows stay, and a tree moves to the nearest tree top of the canopy "
+                  "map within 6 m; on the other roads and in the other parks, a tree stands only on a tree top of the map. "
+                  f"\"Not in the map\": no canopy of {landcover.STREET_MIN_M:.0f} m or more within "
+                  f"{landcover.STREET_RADIUS_M:.0f} m.", "",
+                  "| Group | Trees | Moved to a tree top | Not in the map |", "|---|---|---|---|"]
+        for group, values in street.items():
+            n = max(values["count"], 1)
+            lines.append(f"| {GROUP_NAMES.get(group, group)} | {values['count']} | {values['snapped'] * 100 / n:.0f} % | "
+                         f"{values['missing'] * 100 / n:.0f} % |")
     return lines
 
 
