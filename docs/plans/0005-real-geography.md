@@ -27,6 +27,10 @@ All shapes in this plan come from open data. Nothing comes from photos or from a
 | Roads, coastline, beaches, water, land use, names, building outlines | [OpenStreetMap](https://www.openstreetmap.org) | ODbL 1.0 | Shapes, names, road types, road widths |
 | Ground height | [Copernicus DEM GLO-30](https://documentation.dataspace.copernicus.eu/APIs/SentinelHub/Data/DEM/resources/license/License-COPDEM-30.pdf) | Copernicus DEM license (free, also for commercial use, with notices) | Height of the land, 30 m grid |
 | Ground materials (sand, grass, rock, asphalt, concrete) | [Poly Haven](https://polyhaven.com) or [ambientCG](https://ambientcg.com) | CC0 | Scanned textures of real surfaces |
+| Sea floor, intertidal zone | Sentinel-2 L2A images ([Earth Search](https://earth-search.aws.element84.com/v1)) and the EOT20 tide | Copernicus Sentinel data terms (free, with the notice) | Added 2026-10-26 (R8g, Q14) |
+| Sea floor, deeper water | [GEBCO 2025 grid](https://gebco.net/data_and_products/gridded_bathymetry_data/) | Public domain, GEBCO terms of use | Added 2026-10-26 (R8g, Q14) |
+| Land cover: trees, shrubs, grass, crops, built-up, bare ground, water, mangrove (10 m) | [ESA WorldCover 2021](https://worldcover2021.esa.int) (v200) | CC BY 4.0 (the builder checks it) | Added 2026-10-26 (D-0005-09): where the hills have trees, bushes, grass, or bare ground |
+| Tree canopy height (about 1 m, from Maxar images) | [Meta and WRI canopy height maps](https://registry.opendata.aws/dataforgood-fb-forests/) ([Land & Carbon Lab](https://landcarbonlab.org/data/global-tree-canopy-height)) | CC BY 4.0 | Added 2026-10-26 (D-0005-09, plan 0020): where the real trees stand and how tall they are |
 
 Required notices. Show them on a "Credits" screen in the game and in `assets/CREDITS.md`:
 

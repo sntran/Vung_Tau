@@ -31,6 +31,7 @@ The box shapes of plan 0005 (`TreeKit`) go away.
 | D5 | Each type has at least 3 variants with different seeds. The world adds a random turn and size to each tree. | Copies of one tree in a row look false. |
 | D6 | Wind moves the trees in the vertex shader: the trunk a little, the branches more, the palm fronds and the leaves most. The wind of the game sets the strength and the direction. | Trees that do not move look dead. A shader costs almost nothing. |
 | D7 | Only facts with the status "Source" or "Confirmed" in `docs/content/culture-notes.md` choose the tree types of a place. | I know the town. A guess must not become a fact. |
+| D8 | Where trees stand on the hills, and how tall they are, comes from public data: the Meta and WRI canopy height maps (about 1 m) and ESA WorldCover 2021 (10 m classes), both CC BY 4.0 (added 2026-10-26, report 0005, D-0005-09). | The game must not guess the forest. The data shows the real gaps, the dense parts, and the bare granite. |
 
 ## 4. Requirements
 
@@ -75,6 +76,7 @@ The box shapes of plan 0005 (`TreeKit`) go away.
 ### In the world
 
 - **R10.** `StreetTrees` and the hill trees of `scenes/world/vung_tau.gd` use the new types. The mixes in `data/geo/trees.json` use the new type names. Bãi Trước has coconut palms along the shore and in the park (culture notes).
+- **R10a.** The hill trees stand where the canopy height map has trees. The height of each tree comes from the map (the type sets the shape, the map sets the size), and the crowns are as wide as the canopy patches. Where WorldCover says shrubland, the hills have `scrub`. Where it says grassland or bare, the ground shows. The street and park trees keep the rules of `data/geo/trees.json`, but a street tree that the canopy map does not show (a gap of 5 m or more) is checked in the report.
 - **R11.** No tree stands on the sand of Bãi Trước or in the water. The boats are in the bay, as plan 0005 (Q6) says.
 - **R12.** Budget (plan 0004, R14): at the views of PT-54, Low stays at 600 draw calls and 300 000 triangles or less, and High at 2 000 draw calls and 2 000 000 triangles or less.
 - **R13.** On a phone (Mobile renderer), the near form ends at 15 m, and the middle form at 80 m.
