@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | In progress |
+| Status | Built |
 | Branch | `feat/0020-real-trees` |
 | Depends on | 0005 (status "Built"). Uses the quality presets of 0004. |
 
