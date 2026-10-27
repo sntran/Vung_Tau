@@ -253,6 +253,39 @@ def template_spray(seed, rosettes, leaves, shape, lift=0.2) -> Template:
     return t
 
 
+def template_cluster(seed, twigs, leaves, leaf_length, leaf_width=0.45, leaf_triangles=2) -> Template:
+    """A spray of many small leaves (report 0020, D-0020-02): a stem along y with
+    short twigs to both sides, each with "leaves" small leaves, in the box
+    x -0.5..0.5, y 0..1. A leaf is a diamond of 2 triangles, or 1 triangle (a
+    narrow leaf from its wide base), so that more leaves cost the same. The
+    crown is a mass of small leaves with gaps, not some large leaves."""
+    r = random.Random(seed)
+    t = Template((-0.5, 0.5, 0.0, 1.0))
+    for i in range(twigs):
+        y = 0.12 + 0.8 * (i + 0.5) / twigs + r.uniform(-0.03, 0.03)
+        side = 1.0 if i % 2 else -1.0
+        twig_len = r.uniform(0.25, 0.42) * (1.0 - 0.35 * y)
+        d = Vector((side * r.uniform(0.75, 1.0), r.uniform(0.2, 0.6), 0.0)).normalized()
+        base = Vector((r.uniform(-0.04, 0.04), y, 0.004 * i))
+        for k in range(leaves):
+            u = (k + 0.6) / leaves
+            at = base + d * (twig_len * u) + Vector((0.0, 0.0, r.uniform(-0.02, 0.03)))
+            # The leaves stand to both sides of the twig, toward the tip.
+            turn = (1.0 if k % 2 else -1.0) * r.uniform(0.6, 1.1)
+            ld = (d * math.cos(turn) + Vector((-d.y, d.x, 0.0)) * math.sin(turn)).normalized()
+            ln = leaf_length * r.uniform(0.8, 1.2)
+            wd = ln * leaf_width * 0.5
+            sd = Vector((-ld.y, ld.x, 0.0))
+            lift = Vector((0.0, 0.0, ln * r.uniform(0.05, 0.3)))
+            if leaf_triangles == 1:
+                pts = [at + sd * wd, at + ld * ln + lift, at - sd * wd]
+            else:
+                pts = [at, at + ld * (ln * 0.45) + sd * wd + lift * 0.5, at + ld * ln + lift,
+                       at + ld * (ln * 0.45) - sd * wd + lift * 0.5]
+            t.leaf_poly(pts, (UP * 1.0 - ld * 0.3).normalized(), r.random())
+    return t
+
+
 def template_palm_side(seed, pairs, dead=False) -> Template:
     """One side of a part of a palm frond: the rachis is on the y axis, the
     leaflets go out in +x and hang (the frame of the group gives the hang)."""
@@ -375,6 +408,10 @@ def templates_for(gen, v):
         return [template_palm_side(100 + i, pairs) for i in range(3)] + [template_palm_side(200, pairs - 3, dead=True)]
     if gen == "fan_palm":
         return [template_fan(110 + i, v.get("fan_segments", 22)) for i in range(3)]
+    if gen in ("broadleaf", "scrub") and "leaf_cluster" in v:
+        c = v["leaf_cluster"]
+        return [template_cluster(170 + i, c["twigs"], c["leaves"], c["leaf_length"], c.get("leaf_width", 0.45),
+                                 c.get("leaf_triangles", 2)) for i in range(3)]
     if gen in ("bang", "broadleaf", "scrub"):
         shape = v.get("leaf_shape", "obovate" if gen == "bang" else "elliptic")
         return [template_spray(120 + i, v.get("rosettes_per_spray", 3), v.get("leaves_per_rosette", 8), shape)
@@ -463,15 +500,17 @@ def gen_fan_palm(v, seed, variant):
     top = pts[-1]
     for i in range(v["leaves"]):
         az = i * 2.39996 + r.uniform(-0.15, 0.15)
-        up = math.radians(15 + 85 * (i / v["leaves"]) + r.uniform(-8, 8))
+        # From up to a little below the horizon: the fans stand out on their stems
+        # (report 0020, D-0020-04: the crown was a round mass).
+        up = math.radians(v.get("up_from", 15) + v.get("up_range", 85) * (i / v["leaves"]) + r.uniform(-8, 8))
         d = Vector((math.sin(up) * math.cos(az), math.sin(up) * math.sin(az), math.cos(up)))
         stem_len = v["stem_length"] * r.uniform(0.8, 1.2)
         end = top + d * stem_len - Vector((0, 0, 0.1 * stem_len * math.sin(up)))
         tree.tubes.append(([top, (top + end) / 2, end], [0.03, 0.025, 0.02], 1))
         out = Vector((math.cos(az), math.sin(az), 0))
         rad = v["leaf_radius"] * r.uniform(0.85, 1.1)
-        # The fan faces up and out.
-        ey = (d + UP * 0.3).normalized()
+        # The fan faces up and out, along its stem.
+        ey = (d + UP * v.get("fan_up", 0.3)).normalized()
         tree.groups.append(Group(end, out.cross(UP), ey, rad, rad, r.randrange(3)))
     tree.crown_center = top + Vector((0, 0, 0.3))
     reach = v["stem_length"] + v["leaf_radius"]

@@ -105,6 +105,12 @@ func range_scale(type: String) -> float:
 	return float(types.get(type, {}).get("range_scale", 1.0))
 
 
+## The part of the near range for the type, after range_scale: the types with
+## many small leaves have their near form only nearer (report 0020, D-0020-02).
+func near_scale(type: String) -> float:
+	return float(types.get(type, {}).get("near_scale", 1.0))
+
+
 ## True when the far form of the type is an impostor. The bushes have no far form.
 func has_far(type: String) -> bool:
 	return bool(types.get(type, {}).get("far", true))
@@ -171,6 +177,7 @@ func materials(type: String) -> Dictionary:
 		var material := ShaderMaterial.new()
 		material.shader = load(SHADERS[shader_key])
 		material.set_shader_parameter("range_scale", range_scale(type))
+		material.set_shader_parameter("near_scale", near_scale(type))
 		material.set_shader_parameter("wood_color", Color(str(v.wood)))
 		material.set_shader_parameter("leaf_color", Color(str(v.leaf)))
 		material.set_shader_parameter("leaf_young", Color(str(v.get("leaf_young", v.leaf))))

@@ -58,40 +58,40 @@
 				"sha256": "1672e07a63e3cb795b221cebfa6586fd9271dd994cf74d487dac2e2999b9c51a",
 				"normal_sha256": "f796684366a8a30ff64cefbea5ab94052f74c4bc82c7ceb57a90597a10b73227"
 			},
-			"source_hash": "55c07c7cbfad9e07b0cac8f3c90a3bd708b5196ee674847bec8fafe11fda7ab2"
+			"source_hash": "a336d691e4c75abffd7211486899a6d2f086ee1d2a33d523bf6d37867ec32098"
 		},
 		"fan_palm": {
 			"generator": "fan_palm",
 			"variants": [
 				{
 					"file": "fan_palm_1.glb",
-					"near_triangles": 2348,
-					"mid_triangles": 340,
-					"cards": 22,
-					"height": 8.9,
-					"radius": 2.34,
-					"impostor_size": 9.171,
-					"sha256": "40518322081660c1b07c4f3b6625a0b6a2a261ec4c537261b571c84b74c01ac8"
+					"near_triangles": 1564,
+					"mid_triangles": 228,
+					"cards": 14,
+					"height": 9.29,
+					"radius": 3.35,
+					"impostor_size": 9.573,
+					"sha256": "f6f814c84115483359adba178c0fcb1a8ba102a138ed981253e8b8597ec8ce33"
 				},
 				{
 					"file": "fan_palm_2.glb",
-					"near_triangles": 2348,
-					"mid_triangles": 340,
-					"cards": 22,
-					"height": 8.2,
-					"radius": 2.35,
-					"impostor_size": 8.446,
-					"sha256": "93ec7e4cf11f7c3e4da29716aa2dd70d76ec2875a383651737791685e4631c80"
+					"near_triangles": 1564,
+					"mid_triangles": 228,
+					"cards": 14,
+					"height": 8.51,
+					"radius": 3.24,
+					"impostor_size": 8.761,
+					"sha256": "a58dd7ed3794e665ddd8097f9c77ca410694f7b5056efd9d883abf51fcaa6bcc"
 				},
 				{
 					"file": "fan_palm_3.glb",
-					"near_triangles": 2348,
-					"mid_triangles": 340,
-					"cards": 22,
-					"height": 6.87,
-					"radius": 2.19,
-					"impostor_size": 7.08,
-					"sha256": "1c532b8dd8965343c755490b03e14535b0bd984140d8ebfd0153144875a44ef1"
+					"near_triangles": 1564,
+					"mid_triangles": 228,
+					"cards": 14,
+					"height": 7.37,
+					"radius": 3.28,
+					"impostor_size": 7.595,
+					"sha256": "45a217cf0b6ec8d9853d0dc7505d9085dc3b25f7cd26652f9cecf41da422c96d"
 				}
 			],
 			"templates": 3,
@@ -111,14 +111,14 @@
 				"views": 8,
 				"rows": 3,
 				"mean": [
-					0.82,
-					0.3371,
-					0.3362
+					0.8523,
+					0.3047,
+					0.3126
 				],
-				"sha256": "5239249486f70cfcdd12943e11f06d03eba2a5c4a48e62996d591b308c9bebeb",
-				"normal_sha256": "7b8c1363ef90fae82221c94a7b72cf6cae9c9b8864dfc27488f4476b18252145"
+				"sha256": "1fcb76a4d1ade0d3f21ff5bf067cc2e57002b7a33ff345c7a277f7bd00ddde5a",
+				"normal_sha256": "d317eff2363438fe8ad368d37425fdb0291a5acbb5da48b3261f3ab26a611afa"
 			},
-			"source_hash": "c6b78fe48f923a7303412df4c2b243a4a13f735cd663037d1c0db31df05940c1"
+			"source_hash": "ce30e78afa32fe047268ec39cbddf1d7a754073085b01458d8670c706882e71f"
 		},
 		"bang": {
 			"generator": "bang",
@@ -425,33 +425,33 @@
 			"variants": [
 				{
 					"file": "shade_1.glb",
-					"near_triangles": 11672,
+					"near_triangles": 21032,
 					"mid_triangles": 244,
 					"cards": 78,
-					"height": 12.41,
-					"radius": 4.61,
-					"impostor_size": 12.78,
-					"sha256": "9b6d09862106a989d86ae65f211bceabdcd6beb7864587fccf547d2a9f565682"
+					"height": 12.39,
+					"radius": 4.59,
+					"impostor_size": 12.762,
+					"sha256": "1758c336fec94e2df2d54b108549958519ef526bac2f9951f7a4ce58dee96440"
 				},
 				{
 					"file": "shade_2.glb",
-					"near_triangles": 11672,
+					"near_triangles": 21032,
 					"mid_triangles": 244,
 					"cards": 78,
-					"height": 12.58,
-					"radius": 5.23,
-					"impostor_size": 12.955,
-					"sha256": "ea70d218d347e42d4bb46c3b0248bcd6d61498cb851cae03d1f730c0ef2fc1ae"
+					"height": 12.51,
+					"radius": 5.22,
+					"impostor_size": 12.883,
+					"sha256": "62eac85a05df02fae99133445bf9b585ee96e015bac8d39afdb7b12992345edf"
 				},
 				{
 					"file": "shade_3.glb",
-					"near_triangles": 14048,
+					"near_triangles": 25388,
 					"mid_triangles": 214,
 					"cards": 63,
 					"height": 11.9,
-					"radius": 4.79,
+					"radius": 4.74,
 					"impostor_size": 12.253,
-					"sha256": "c90a2c842e3bec9b188cf31f8d820f3fde9b8a5ba8ae0e94a319abe808205783"
+					"sha256": "e6b923a19ab626248e9db810301c7996bfa260303d966e8482f70e5c764422ac"
 				}
 			],
 			"templates": 3,
@@ -460,10 +460,10 @@
 				"cells": 3,
 				"mean": [
 					0.9997,
-					0.4853,
+					0.4852,
 					0.5
 				],
-				"sha256": "fc8d4243ec39d97baf8cc336f41ca4b73cf9f526495b43889de300892456404b"
+				"sha256": "1938a2fe675233037124805d1cd6cb1e370ea4af98283c5f1096913360d43e6a"
 			},
 			"impostor": {
 				"file": "shade_impostor.png",
@@ -471,14 +471,14 @@
 				"views": 8,
 				"rows": 3,
 				"mean": [
-					0.9165,
-					0.3115,
-					0.3119
+					0.9202,
+					0.2577,
+					0.2561
 				],
-				"sha256": "be59c915359b56a9ae261d7a86adaf4fd1273b7c789e79427e7e59f62545c5ff",
-				"normal_sha256": "713ce113042bb711318b8d343c93de9755f952b83e5de1e3368a03b143eef3e7"
+				"sha256": "ae563cec089a642563af4db3185b621f64380f5465591c99321df8c59fbc5a91",
+				"normal_sha256": "c7a5fff7d5c1880157ba9e40c6222288f8f93c050daf90eb7a193de1ccd16f45"
 			},
-			"source_hash": "6fae7cf41daca9cfd1692ad57c6c065ad0b43b705a7a54ecf442c7e09d3f2521"
+			"source_hash": "1ab73d3138fbc7e6b9ced387ac8bb7058b5b25b98c5988cb601821bbffeae7cf"
 		},
 		"tall_shade": {
 			"generator": "broadleaf",
@@ -545,33 +545,33 @@
 			"variants": [
 				{
 					"file": "hill_a_1.glb",
-					"near_triangles": 5328,
-					"mid_triangles": 192,
-					"cards": 52,
-					"height": 7.84,
-					"radius": 4.91,
-					"impostor_size": 10.109,
-					"sha256": "2274de681744f7ea22979a7d56ef531b9df553e0eac212160be893052866aed1"
+					"near_triangles": 20636,
+					"mid_triangles": 190,
+					"cards": 51,
+					"height": 8.0,
+					"radius": 5.11,
+					"impostor_size": 10.517,
+					"sha256": "dfbbff8c2fba4bfeb82fecda91105a9850e6f189a6224891eca788e04b529f02"
 				},
 				{
 					"file": "hill_a_2.glb",
-					"near_triangles": 5328,
+					"near_triangles": 21032,
 					"mid_triangles": 192,
 					"cards": 52,
-					"height": 7.82,
-					"radius": 4.95,
-					"impostor_size": 10.199,
-					"sha256": "ab9717b0f18901496d3bb071bdd57c7394b7fabe4dde871c50bfe6c64f9a672e"
+					"height": 8.03,
+					"radius": 4.81,
+					"impostor_size": 9.9,
+					"sha256": "4763161a69ff02d31c36d571acc320218e2ba0b585c28168fadf20b721bb817b"
 				},
 				{
 					"file": "hill_a_3.glb",
-					"near_triangles": 5328,
+					"near_triangles": 21032,
 					"mid_triangles": 192,
 					"cards": 52,
-					"height": 9.47,
-					"radius": 5.34,
-					"impostor_size": 10.993,
-					"sha256": "b6359950142caae34baa86d9725272935e7cbac24c9edbd0bede3231f10bd08d"
+					"height": 9.63,
+					"radius": 5.38,
+					"impostor_size": 11.075,
+					"sha256": "8c962f2e202e210b0279752399050648d20b0ca46c7467a64d7d797af672897d"
 				}
 			],
 			"templates": 3,
@@ -580,10 +580,10 @@
 				"cells": 3,
 				"mean": [
 					0.9997,
-					0.4645,
+					0.4852,
 					0.5
 				],
-				"sha256": "fe3cfe0ec82893bdaa0a68c89c6a71eb353e2466fff692000b79dc968a9a2e27"
+				"sha256": "1938a2fe675233037124805d1cd6cb1e370ea4af98283c5f1096913360d43e6a"
 			},
 			"impostor": {
 				"file": "hill_a_impostor.png",
@@ -591,47 +591,47 @@
 				"views": 8,
 				"rows": 3,
 				"mean": [
-					0.9498,
-					0.27,
-					0.2709
+					0.9394,
+					0.3198,
+					0.3205
 				],
-				"sha256": "fd7e3cf4afc9f7e00e12c2fa054b345d0d4338cdaa030c42f818906fcbee616a",
-				"normal_sha256": "8be8280ca6fa198d023d1dc7548b552e0282054ff144dc3b3f3d989b5de98bd7"
+				"sha256": "64cc41e9e30e9a97556072663097c7e6ce884991aa902ff0c461921628230f0a",
+				"normal_sha256": "9e9085570e5aae1cabf26d75382a2e7bd1e94a4c65f87b6413ebb9f8ed05d388"
 			},
-			"source_hash": "dc14d6824d4cf9514b00afed73e1de9fd14f59379537bdac2cd98c5bcc47721d"
+			"source_hash": "47fbe3553de2a82e337d1cf0234801034a12fc4fec2cc82e73345b3696c2a91d"
 		},
 		"hill_b": {
 			"generator": "broadleaf",
 			"variants": [
 				{
 					"file": "hill_b_1.glb",
-					"near_triangles": 4026,
-					"mid_triangles": 154,
-					"cards": 39,
-					"height": 12.68,
-					"radius": 3.99,
-					"impostor_size": 13.06,
-					"sha256": "3bfef9736400be4271baa2d340bc2b2bb35f2dedabc4b72aa43c18d473dcccd4"
+					"near_triangles": 15804,
+					"mid_triangles": 194,
+					"cards": 59,
+					"height": 12.57,
+					"radius": 3.89,
+					"impostor_size": 12.945,
+					"sha256": "64776ce3507365b7018041ff6df4b70c599cba4ea05b34c31063009aa07a9791"
 				},
 				{
 					"file": "hill_b_2.glb",
-					"near_triangles": 4026,
-					"mid_triangles": 154,
-					"cards": 39,
-					"height": 12.65,
-					"radius": 4.05,
-					"impostor_size": 13.026,
-					"sha256": "5a5e3ec7c3bdae6270ce1ce718714c406973234b9240e976f1b950a062a6357a"
+					"near_triangles": 15804,
+					"mid_triangles": 194,
+					"cards": 59,
+					"height": 12.32,
+					"radius": 3.81,
+					"impostor_size": 12.694,
+					"sha256": "168b6b45d7d97c040eb22c77ef48021e23bd858c3cbc0b85968afa976f4e5969"
 				},
 				{
 					"file": "hill_b_3.glb",
-					"near_triangles": 4026,
-					"mid_triangles": 154,
-					"cards": 39,
-					"height": 11.89,
-					"radius": 3.89,
-					"impostor_size": 12.242,
-					"sha256": "da7a2892489d528e8ca86fcb85e331dab9c16c9a6e31791a23b6a28687968f58"
+					"near_triangles": 15804,
+					"mid_triangles": 194,
+					"cards": 59,
+					"height": 11.88,
+					"radius": 4.06,
+					"impostor_size": 12.237,
+					"sha256": "5033fe9ab181f3f3eea57f518a72eacb7ef9d4a5411ce8086fa6c8fe4808a38c"
 				}
 			],
 			"templates": 3,
@@ -640,10 +640,10 @@
 				"cells": 3,
 				"mean": [
 					0.9997,
-					0.4645,
+					0.4852,
 					0.5
 				],
-				"sha256": "fe3cfe0ec82893bdaa0a68c89c6a71eb353e2466fff692000b79dc968a9a2e27"
+				"sha256": "1938a2fe675233037124805d1cd6cb1e370ea4af98283c5f1096913360d43e6a"
 			},
 			"impostor": {
 				"file": "hill_b_impostor.png",
@@ -651,47 +651,47 @@
 				"views": 8,
 				"rows": 3,
 				"mean": [
-					0.9151,
-					0.2171,
-					0.217
+					0.9136,
+					0.2729,
+					0.272
 				],
-				"sha256": "0d33b430a54154777f63f03976a5c80fed6b30997761e122df353231cfe25737",
-				"normal_sha256": "07014e68134885a0a896cf77c4b8b4a0f135932dc2119ec74547521f0bd30bbc"
+				"sha256": "03e0b94a4e76af9771f0ebe891c03fc61075dce40c66ba89b01ae6f56e5bcacc",
+				"normal_sha256": "a59db1ad9a2db2c108b8ea88b2cefe88d889df4b9df7aba82658f1c5cb1b6102"
 			},
-			"source_hash": "a521088208cd0bd36246880f9e07cf17cc106296874fdbbe1d3e03dda21caf26"
+			"source_hash": "0a6b263179dbb4dd18d8b181e84f01332c006191fa278a6f057a4fe137e1fdb4"
 		},
 		"hill_c": {
 			"generator": "broadleaf",
 			"variants": [
 				{
 					"file": "hill_c_1.glb",
-					"near_triangles": 4858,
-					"mid_triangles": 182,
-					"cards": 47,
-					"height": 5.07,
-					"radius": 3.41,
-					"impostor_size": 7.032,
-					"sha256": "ccce5aac50923cb32e720432f220318c038e3fdc24638288514510b80ea92eb0"
+					"near_triangles": 17468,
+					"mid_triangles": 174,
+					"cards": 43,
+					"height": 5.3,
+					"radius": 3.4,
+					"impostor_size": 6.995,
+					"sha256": "f4815eaadcc96f48942272e37b0d4a291d7178c3d8b82fc6ecdb8a2e8f5b1407"
 				},
 				{
 					"file": "hill_c_2.glb",
-					"near_triangles": 4858,
-					"mid_triangles": 182,
-					"cards": 47,
-					"height": 5.13,
-					"radius": 3.45,
-					"impostor_size": 7.101,
-					"sha256": "363ffca5e875fe1c88650bd7b2f116f95b2e63fb5b9ba4cb91144bbdf0974ce4"
+					"near_triangles": 18656,
+					"mid_triangles": 180,
+					"cards": 46,
+					"height": 5.19,
+					"radius": 3.34,
+					"impostor_size": 6.886,
+					"sha256": "3f0f5e885815f23b40003364669c5356fb5dba04a5293c24e2641d1a7050362e"
 				},
 				{
 					"file": "hill_c_3.glb",
-					"near_triangles": 4482,
-					"mid_triangles": 174,
-					"cards": 43,
-					"height": 4.34,
-					"radius": 3.22,
-					"impostor_size": 6.635,
-					"sha256": "f9087f46d38576d982cd4ae2ae910b758d893d0a96d0127e47a7e59078ba08eb"
+					"near_triangles": 14696,
+					"mid_triangles": 196,
+					"cards": 54,
+					"height": 4.1,
+					"radius": 3.32,
+					"impostor_size": 6.846,
+					"sha256": "804cd4d3ee62a54f79c9c4ccd8bb880986a326af684c6fd34fbc05bc7e3cc259"
 				}
 			],
 			"templates": 3,
@@ -700,10 +700,10 @@
 				"cells": 3,
 				"mean": [
 					0.9997,
-					0.4645,
+					0.4852,
 					0.5
 				],
-				"sha256": "fe3cfe0ec82893bdaa0a68c89c6a71eb353e2466fff692000b79dc968a9a2e27"
+				"sha256": "1938a2fe675233037124805d1cd6cb1e370ea4af98283c5f1096913360d43e6a"
 			},
 			"impostor": {
 				"file": "hill_c_impostor.png",
@@ -711,14 +711,14 @@
 				"views": 8,
 				"rows": 3,
 				"mean": [
-					0.9454,
-					0.3098,
-					0.3135
+					0.9345,
+					0.3546,
+					0.3537
 				],
-				"sha256": "db3db092b6c9258c5714a3930d32793cfeb5490c72a0a588961afa7f2e65d382",
-				"normal_sha256": "d6d1fc44a27a230ccf51bd6bb84852ef87ad541287157af1cb3109054629d80b"
+				"sha256": "0d7c0d697d52530fdf05f962be3c8776f132af2838f27ee7fbb8fac40f4dc6b9",
+				"normal_sha256": "01b7f4b5e3af836769f416465e58b0a83414f5f1fe2929df78e92257a96a142b"
 			},
-			"source_hash": "582393f161e91c66c97c8383c6cfd4cb160f1c2797be34bb58cdf6f96a51c2c7"
+			"source_hash": "de84090ab3c21e300f998feaa90227fd3d2bd7f3c57eb09c20237c7f6501a452"
 		},
 		"teak": {
 			"generator": "broadleaf",
@@ -785,33 +785,33 @@
 			"variants": [
 				{
 					"file": "scrub_1.glb",
-					"near_triangles": 1760,
-					"mid_triangles": 140,
-					"cards": 40,
-					"height": 2.21,
-					"radius": 2.02,
-					"impostor_size": 4.158,
-					"sha256": "4cce4e84480ceda72ef95c51dbae4e1d55383f64b3c7c36df4cc3326660e8b05"
+					"near_triangles": 3296,
+					"mid_triangles": 136,
+					"cards": 38,
+					"height": 2.2,
+					"radius": 1.95,
+					"impostor_size": 4.019,
+					"sha256": "3758430ed44fc80f8eaf289ee4b357656bf367ca6ce20ec62883382baac8e585"
 				},
 				{
 					"file": "scrub_2.glb",
-					"near_triangles": 1760,
-					"mid_triangles": 140,
-					"cards": 40,
-					"height": 2.59,
-					"radius": 1.95,
-					"impostor_size": 4.01,
-					"sha256": "ca315ad7cd59253e39c41b79cfd5740d6764a5e38e9ea3c145c8ecce7bbde38e"
+					"near_triangles": 3296,
+					"mid_triangles": 136,
+					"cards": 38,
+					"height": 2.5,
+					"radius": 1.94,
+					"impostor_size": 4.003,
+					"sha256": "e1b1b6f3a4cb6a2c4667a728605331825204d1df87889e35804d66655dd91ea3"
 				},
 				{
 					"file": "scrub_3.glb",
-					"near_triangles": 1760,
-					"mid_triangles": 140,
-					"cards": 40,
+					"near_triangles": 3296,
+					"mid_triangles": 136,
+					"cards": 38,
 					"height": 2.38,
-					"radius": 1.98,
-					"impostor_size": 4.087,
-					"sha256": "221f84f9e608c807169855e74ffe10b22ded874d6c70f6ed579681aab4af07cd"
+					"radius": 1.9,
+					"impostor_size": 3.913,
+					"sha256": "016b3fe8fb26d5aa655a2096b83530eea59b8d95109ec43f279e41a6b4e7d400"
 				}
 			],
 			"templates": 3,
@@ -820,10 +820,10 @@
 				"cells": 3,
 				"mean": [
 					0.9997,
-					0.46,
+					0.4791,
 					0.5
 				],
-				"sha256": "70abe488bbae9f70ffeb9b2c8ecd0e48793835400cfb1a79c0abcf8a8cf60757"
+				"sha256": "77cbf4294bac79f602a8714170624ea378f91a960b6a0d0052cbf36bdb51a3c6"
 			},
 			"impostor": {
 				"file": "scrub_impostor.png",
@@ -831,14 +831,14 @@
 				"views": 8,
 				"rows": 3,
 				"mean": [
-					0.9349,
-					0.4486,
-					0.4527
+					0.9288,
+					0.455,
+					0.4544
 				],
-				"sha256": "f6520fd97d4dee9fb0b26c36dfc48476d61834d3edd85e81486ff94e13f92629",
-				"normal_sha256": "8aecb08a7d7c0706e0703a42ff9d8a5c38467b17edd7c027292cacbdbc10cc42"
+				"sha256": "7d555d2c54119ca04685f7c1c59f3163d343608613d013cc7e7e633ab84dcf4a",
+				"normal_sha256": "422df3b6cb2a7d441f49df29e7223457dd283cce7c0e4af3007da344a4c98779"
 			},
-			"source_hash": "89af85faf41ac5efed124c830c36a3a23865a68c03d0fcd4de058486140660ba"
+			"source_hash": "b4e7e0d4f55e27c27aacdd49b5fb310bf8e6900fb14ba468fd5a6f6712a5a4c0"
 		}
 	},
 	"note": "Made by tools/trees/build.py from data/trees/types.json (plan 0020). Do not change by hand.",

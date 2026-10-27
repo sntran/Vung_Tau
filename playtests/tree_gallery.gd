@@ -85,6 +85,11 @@ func run(d: PlaytestDriver) -> void:
 		for distance: float in DISTANCES:
 			await _look(d, i, info, distance)
 			await d.screenshot("%s_%dm_%s" % [type, int(distance), run_name])
+			# A type with no far form (the scrub) ends at its middle range: the
+			# ground draws the bushes farther away (plan 0020, N3).
+			if not library.has_far(type) and distance > TreeLibrary.ranges.y * library.range_scale(type):
+				d.step("%s at %d m: no far form, farther than its middle range" % [type, int(distance)])
+				continue
 			var share := _leaf_share(d, crown)
 			d.expect(share >= MIN_LEAF_SHARE, "%s at %d m: %.0f %% of the crown area has a leaf color, it must be %.0f %% or more" % [
 					type, int(distance), share * 100.0, MIN_LEAF_SHARE * 100.0])
@@ -185,7 +190,7 @@ static func _check_form_changes(d: PlaytestDriver, w: VungTau, type_index: int, 
 		crown: Dictionary) -> void:
 	var scale := w.trees.library.range_scale(type)
 	var saved := TreeLibrary.ranges
-	var ends := [{"name": "near to middle", "at": saved.x * scale,
+	var ends := [{"name": "near to middle", "at": saved.x * scale * w.trees.library.near_scale(type),
 			"before": Vector3(saved.x * 3.0, saved.y * 3.0, saved.z), "after": Vector3(saved.x * 0.3, saved.y, saved.z)}]
 	if w.trees.library.has_far(type):
 		ends.append({"name": "middle to far", "at": saved.y * scale,

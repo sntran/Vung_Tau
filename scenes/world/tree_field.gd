@@ -228,7 +228,7 @@ func _sort_cell(key: Vector2i, view: Vector3, lists: Dictionary, far_only: bool,
 		for id: int in by_mesh:
 			var type := library.names[id / 8]
 			var scale := library.range_scale(type)
-			var near_end := _ranges.x * scale
+			var near_end := _ranges.x * scale * library.near_scale(type)
 			var mid_end := _ranges.y * scale
 			var far_end := _ranges.z * scale
 			var near_start := near_end - _fade(near_end)

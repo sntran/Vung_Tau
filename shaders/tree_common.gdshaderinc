@@ -18,6 +18,8 @@ global uniform vec3 tree_ranges;
 
 // The ranges of this type, as a part of tree_ranges (the bushes end sooner).
 uniform float range_scale = 1.0;
+// The part of the near range, after range_scale (report 0020, D-0020-02).
+uniform float near_scale = 1.0;
 uniform vec3 leaf_color : source_color = vec3(0.24, 0.42, 0.12);
 uniform vec3 leaf_young : source_color = vec3(0.45, 0.6, 0.2);
 uniform vec3 red_color : source_color = vec3(0.64, 0.23, 0.11);
@@ -52,7 +54,7 @@ float tree_fade_width(float range) {
 // The middle form shows where the near form goes away, and the far form
 // where the middle form goes away, with the same dither (R6).
 vec3 tree_forms(float d) {
-	float n = tree_ranges.x * range_scale;
+	float n = tree_ranges.x * range_scale * near_scale;
 	float m = tree_ranges.y * range_scale;
 	float f = tree_ranges.z * range_scale;
 	float near = 1.0 - smoothstep(n - tree_fade_width(n), n, d);
