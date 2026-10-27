@@ -27,6 +27,9 @@ func run(d: PlaytestDriver) -> void:
 	var beach := w.data.landmark("bai_truoc")
 	if not d.expect(not beach.is_empty(), "the data has Bãi Trước"):
 		return
+	# The chunks of the start point are made at once: they must show their ground too (report 0005, D-0005-10).
+	d.expect(w.chunks_without_ground().is_empty(), "each near chunk shows its ground: %s have no patches" % [
+			w.chunks_without_ground()])
 	d.step("the trees of each type: %s" % [w.trees.counts])
 	_check_places(d, w, beach)
 	for view: Dictionary in views(w, beach):

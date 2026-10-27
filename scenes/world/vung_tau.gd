@@ -202,7 +202,7 @@ func prepare_at(point: Vector3, radius := 64.0) -> void:
 		_chunks[key].asked = Time.get_ticks_msec()
 		_chunks[key].busy = true
 		_tasks += 1
-		_build_chunk(key, Detail.NEAR)
+		_build_chunk(key, Detail.NEAR, _patch_strides(key))
 		_chunks[key].wanted = Detail.NEAR
 	while true:
 		_mutex.lock()
@@ -470,18 +470,14 @@ func _start_tasks() -> void:
 	state.busy = true
 	state.asked = Time.get_ticks_msec()
 	_tasks += 1
-	var strides := {}
-	if state.wanted == Detail.NEAR:
-		for j in PATCHES:
-			for i in PATCHES:
-				strides[Vector2i(i, j)] = _patch_stride(best, Vector2i(i, j), 0)
+	var strides := _patch_strides(best) if state.wanted == Detail.NEAR else {}
 	WorkerThreadPool.add_task(_build_chunk.bind(best, int(state.wanted), strides), false, "ground chunk")
 
 
 ## Runs in a worker thread: decodes the heights and makes the mesh arrays. A
 ## near chunk gets its patches with the grids of "strides" (patch -> samples),
 ## and a shadow mesh of 8 m.
-func _build_chunk(key: Vector2i, detail: int, strides := {}) -> void:
+func _build_chunk(key: Vector2i, detail: int, strides: Dictionary) -> void:
 	var result := {"key": key, "detail": detail}
 	var heights := data.chunk_heights(key)
 	if not heights.is_empty():
@@ -596,6 +592,26 @@ func _patch_stride(key: Vector2i, at: Vector2i, current: int) -> int:
 			stride = 1 << level
 			break
 	return stride
+
+
+## The grids of all patches of a near chunk now: patch -> samples.
+func _patch_strides(key: Vector2i) -> Dictionary:
+	var strides := {}
+	for j in PATCHES:
+		for i in PATCHES:
+			strides[Vector2i(i, j)] = _patch_stride(key, Vector2i(i, j), 0)
+	return strides
+
+
+## The near chunks that show no ground (a near chunk must have all its
+## patches), for the tests (report 0005, D-0005-10).
+func chunks_without_ground() -> Array[Vector2i]:
+	var result: Array[Vector2i] = []
+	for key: Vector2i in _chunks:
+		var state: Dictionary = _chunks[key]
+		if state.detail == Detail.NEAR and state.get("patches", {}).size() != PATCHES * PATCHES:
+			result.append(key)
+	return result
 
 
 ## Runs in a worker thread: the mesh arrays of a patch with a grid of "stride" samples.

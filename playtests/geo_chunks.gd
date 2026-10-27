@@ -1,7 +1,8 @@
 extends RefCounted
 # PT-37 geo_chunks. Walk 2 km with tap to walk. At each frame, a ray down from
 # the camera hits the ground or the sea. Record the time to load each chunk. No
-# chunk takes more than 2 s under lavapipe.
+# chunk takes more than 2 s under lavapipe. Each near chunk shows its ground
+# (all its patches, report 0005, D-0005-10), also the chunks of the start point.
 # The walk is on Thùy Vân, the road along Bãi Sau. The game runs 5 times
 # faster, and the walk is in 4 runs of 500 m, so that each run is shorter than
 # 180 s under lavapipe. Each run starts where the last run stops (a setup step).
@@ -35,6 +36,9 @@ func run(d: PlaytestDriver) -> void:
 	var next := PlaytestDriver.route_point(route, from + 5.0)
 	await d.start_at(point, rad_to_deg(atan2(-(next.x - point.x), -(next.z - point.z))))
 	w.load_times.clear()
+	# The chunks of the start point are made at once, not in a worker thread.
+	d.expect(w.chunks_without_ground().is_empty(), "at the start, each near chunk shows its ground: %s have no patches" % [
+			w.chunks_without_ground()])
 	var space: PhysicsDirectSpaceState3D = d.main().get_world_3d().direct_space_state
 	var misses := [0]
 	var frames := [0]
@@ -81,4 +85,7 @@ func run(d: PlaytestDriver) -> void:
 	d.step("frame time under lavapipe: %.0f fps, %.1f ms of process time in a frame" % [
 			Engine.get_frames_per_second(), frame_ms[0] / maxf(frames[0], 1.0)])
 	d.expect(slowest <= MAX_LOAD_MS, "no chunk takes more than 2 s to load: %.0f ms" % slowest)
+	await d.wait_ground(60.0)
+	d.expect(w.chunks_without_ground().is_empty(), "at the end, each near chunk shows its ground: %s have no patches" % [
+			w.chunks_without_ground()])
 	await d.screenshot("end_%d" % d.phase)
