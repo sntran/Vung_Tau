@@ -4,10 +4,11 @@ extends RefCounted
 # the Vũng Tàu world on each preset: the top of Núi Nhỏ, the Bãi Trước road
 # (Quang Trung), and the Bãi Sau road (Thùy Vân). The test measures each view
 # again without the trees. R12 sets the limits of the whole view (Low: 600
-# draw calls and 300 000 triangles; High: 2 000 and 2 000 000). The ground of
-# plan 0005 alone is more than the limit of Low (plan 0020, Q7), so the test
-# checks the part of the trees: not more than half of each limit. It records
-# the whole view against R12 in the log and in tree_budget_PRESET.json.
+# draw calls and 300 000 triangles; High: 2 000 and 2 000 000; Medium and
+# Ultra have no limit and are recorded). With the detail levels of the ground
+# (report 0005, D-0005-10), the test checks the whole view against R12 again,
+# and the part of the trees: not more than half of each limit. It records the
+# values in the log and in tree_budget_PRESET.json.
 # sizes: 1280x720
 # phase: --world=vung_tau --renderer=forward_plus --quality=low --start-time=12:00
 # phase: --world=vung_tau --renderer=forward_plus --quality=medium --start-time=12:00
@@ -53,8 +54,10 @@ func run(d: PlaytestDriver) -> void:
 		d.step("%s, view %s without the trees: %d draw calls, %d triangles" % [preset, view.name, bare_calls, bare_triangles])
 		if LIMITS.has(preset):
 			var limit: Array = LIMITS[preset]
-			d.step("%s, view %s: the whole view against R12: %d of %d draw calls, %d of %d triangles" % [
-					preset, view.name, draw_calls, limit[0], triangles, limit[1]])
+			d.expect(draw_calls <= limit[0], "%s, view %s: %d draw calls, not more than %d (R12)" % [
+					preset, view.name, draw_calls, limit[0]])
+			d.expect(triangles <= limit[1], "%s, view %s: %d triangles, not more than %d (R12)" % [
+					preset, view.name, triangles, limit[1]])
 			var tree_calls := draw_calls - bare_calls
 			var tree_triangles := triangles - bare_triangles
 			d.expect(tree_calls <= limit[0] * TREE_PART, "%s, view %s: the trees add %d draw calls, not more than %d" % [

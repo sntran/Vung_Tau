@@ -33,7 +33,7 @@ const FAR_TILE := 4
 ## the mid chunks (a grid of 8 m), and the distances to which a far tile has a
 ## grid of 16 m and of 32 m (then 64 m). Low uses the coarser grids sooner.
 const GROUND_DETAIL := {
-	"low": {"near": [60.0, 160.0], "mid": 500.0, "far": [900.0, 2000.0]},
+	"low": {"near": [50.0, 140.0], "mid": 400.0, "far": [700.0, 1500.0]},
 	"medium": {"near": [100.0, 250.0], "mid": 800.0, "far": [2000.0, 4000.0]},
 	"high": {"near": [150.0, 400.0], "mid": 1000.0, "far": [2500.0, 5000.0]},
 	"ultra": {"near": [150.0, 400.0], "mid": 1000.0, "far": [3000.0, 6000.0]},

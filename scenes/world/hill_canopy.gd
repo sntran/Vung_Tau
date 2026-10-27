@@ -14,28 +14,39 @@ const NEAR_HIDE := 280.0
 ## The part of the forest cells that get a clump, and the part that get a second one.
 const DENSITY := 0.9
 const SECOND := 0.5
-## Low (report 0005, D-0005-10): only the first clump of each fourth cell (one
-## cell of each 2 x 2), with a mesh of one crown (5 m wide), LOW_SCALE times
-## larger, and LOW_SCALE_FAR times larger far away (the shader changes the
-## scale from 400 m to 1600 m): so the crowns cover about as much of the hills
-## as the clumps of the other presets.
-const LOW_SCALE := 2.0
-const LOW_SCALE_FAR := 4.0
+## The detail of the clumps (report 0005, D-0005-10). The sparse clumps are
+## the first clump of each fourth cell (one cell of each 2 x 2); the other
+## clumps are the dense clumps. For each preset: the mesh of the sparse clumps
+## (one crown of 5 m on Low, a clump on the others), their scale near and far
+## (the shader changes it between the two distances of "scale_m"), and the
+## distance to which the dense clumps show (0: never). Far away, the sparse
+## clumps are larger, so that they cover about as much of the hills as all
+## the clumps.
+const DETAIL := {
+	"low": {"crown": true, "scale": [2.0, 4.0], "scale_m": [400.0, 1600.0], "dense_m": 0.0},
+	"medium": {"crown": false, "scale": [1.0, 2.4], "scale_m": [900.0, 1500.0], "dense_m": 1000.0},
+	"high": {"crown": false, "scale": [1.0, 2.4], "scale_m": [1300.0, 2000.0], "dense_m": 1500.0},
+	"ultra": {"crown": false, "scale": [1.0, 2.4], "scale_m": [1800.0, 2600.0], "dense_m": 2000.0},
+}
 
-## The number of clumps, and the number that Low shows.
+## The number of clumps, and the number of sparse clumps.
 var count := 0
-var low_count := 0
+var sparse_count := 0
+## The material of the sparse clumps and of the dense clumps.
 var material: ShaderMaterial
+var dense_material: ShaderMaterial
 var _mesh: Mesh
-var _low_mesh: Mesh
-## Each tile: [MultiMeshInstance3D, the number of its clumps on Low].
-var _tiles: Array = []
+var _crown_mesh: Mesh
+## The MultiMeshInstance3D of the sparse clumps and of the dense clumps of each tile.
+var _sparse: Array[MultiMeshInstance3D] = []
+var _dense: Array[MultiMeshInstance3D] = []
 
 
 func setup(world: VungTau) -> void:
 	material = ShaderMaterial.new()
 	material.shader = load("res://shaders/canopy.gdshader")
 	material.set_shader_parameter("near_hide", NEAR_HIDE)
+	dense_material = material.duplicate()
 	var overview := world.data.overview
 	if overview.is_empty():
 		return
@@ -64,32 +75,35 @@ func setup(world: VungTau) -> void:
 				var key := Vector2i(floori(p.x / TILE), floori(p.y / TILE))
 				if not tiles.has(key):
 					tiles[key] = [[], []]
-				var low := i == 0 and row % 2 == 0 and col % 2 == 0
+				var sparse := i == 0 and row % 2 == 0 and col % 2 == 0
 				var size := rng.randf_range(1.0, 1.5)
 				var basis := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(size, size * rng.randf_range(0.8, 1.1), size))
 				# The clumps stand a little into the ground: the overview grid is
 				# smoother than the near ground.
 				var y := world.data.overview_height(p.x, p.y) - 1.5
-				tiles[key][0 if low else 1].append(Transform3D(basis, Vector3(p.x, y, p.y)))
+				tiles[key][0 if sparse else 1].append(Transform3D(basis, Vector3(p.x, y, p.y)))
 	_mesh = clump_mesh()
-	_low_mesh = crown_mesh()
+	_crown_mesh = crown_mesh()
 	for key: Vector2i in tiles:
-		# The clumps of Low first, so that Low shows the first ones of the MultiMesh.
-		_add_tile(key, tiles[key][0] + tiles[key][1], tiles[key][0].size())
+		_sparse.append(_add_tile(key, tiles[key][0], material, "Sparse"))
+		_dense.append(_add_tile(key, tiles[key][1], dense_material, "Dense"))
+		sparse_count += tiles[key][0].size()
 
 
-## Sets the clumps of a quality preset: Low shows fewer and larger clumps with one crown.
+## Sets the clumps of a quality preset (DETAIL).
 func set_preset(preset: String) -> void:
-	var low := preset == "low"
-	material.set_shader_parameter("clump_scale", LOW_SCALE if low else 1.0)
-	material.set_shader_parameter("clump_scale_far", LOW_SCALE_FAR if low else 1.0)
-	for tile: Array in _tiles:
-		var instance: MultiMeshInstance3D = tile[0]
-		instance.multimesh.mesh = _low_mesh if low else _mesh
-		instance.multimesh.visible_instance_count = tile[1] if low else -1
+	var detail: Dictionary = DETAIL.get(preset, DETAIL.low)
+	material.set_shader_parameter("clump_scale", detail.scale[0])
+	material.set_shader_parameter("clump_scale_far", detail.scale[1])
+	material.set_shader_parameter("scale_range", Vector2(detail.scale_m[0], detail.scale_m[1]))
+	for instance: MultiMeshInstance3D in _sparse:
+		instance.multimesh.mesh = _crown_mesh if detail.crown else _mesh
+	for instance: MultiMeshInstance3D in _dense:
+		instance.visible = float(detail.dense_m) > 0.0
+		instance.visibility_range_end = float(detail.dense_m)
 
 
-func _add_tile(key: Vector2i, transforms: Array, low: int) -> void:
+func _add_tile(key: Vector2i, transforms: Array, tile_material: Material, kind: String) -> MultiMeshInstance3D:
 	var origin := Vector3((key.x + 0.5) * TILE, 0.0, (key.y + 0.5) * TILE)
 	var multimesh := MultiMesh.new()
 	multimesh.transform_format = MultiMesh.TRANSFORM_3D
@@ -99,23 +113,23 @@ func _add_tile(key: Vector2i, transforms: Array, low: int) -> void:
 		var t: Transform3D = transforms[i]
 		multimesh.set_instance_transform(i, Transform3D(t.basis, t.origin - origin))
 	count += transforms.size()
-	low_count += low
 	var instance := MultiMeshInstance3D.new()
-	instance.name = "Canopy_%d_%d" % [key.x, key.y]
+	instance.name = "%s_%d_%d" % [kind, key.x, key.y]
 	instance.multimesh = multimesh
-	instance.material_override = material
+	instance.material_override = tile_material
 	instance.position = origin
 	instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	instance.visibility_range_end = VISIBLE_RANGE
 	instance.visibility_range_end_margin = 200.0
 	add_child(instance)
-	_tiles.append([instance, low])
+	return instance
 
 
 ## Sets the season (plan 0005, R12a): the dry leaves and the bare trees, as on the near hill trees.
 func apply_season(season: Dictionary) -> void:
-	material.set_shader_parameter("dryness", season.dryness * 0.8)
-	material.set_shader_parameter("bare_share", season.bare_share)
+	for each: ShaderMaterial in [material, dense_material]:
+		each.set_shader_parameter("dryness", season.dryness * 0.8)
+		each.set_shader_parameter("bare_share", season.bare_share)
 
 
 ## The mesh of one clump: three round crowns, about 9 m wide and 8 m high
