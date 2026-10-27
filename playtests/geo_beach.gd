@@ -10,6 +10,9 @@ extends RefCounted
 # height. Beyond the edge of the data, the floor goes down by 0.5 m or more in
 # the next 50 m. Run 1 is at the high tide of day 1 (15:30), and
 # run 2 at the low tide (08:30), with a screenshot from the sand at each tide.
+# At low tide, from the sand of Bãi Trước, 5 % or less of the water pixels are
+# near white: the foam is a narrow band at the water line, weak in the calm
+# bay (report 0005, D-0005-07).
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=15:30
 # phase: --world=vung_tau --start-time=08:30
@@ -113,7 +116,40 @@ func _check_depths(d: PlaytestDriver, w: VungTau) -> void:
 	await d.wait_ground(60.0)
 	await d.wait_frames(5)
 	await d.screenshot("sea_floor_" + tide.replace(" ", "_"))
+	if d.phase == 2:
+		_check_foam(d, w, eye)
 	d.fly_end()
+
+
+## D-0005-07: the part of the water pixels that are near white, from points
+## of the floor under the water in the frame.
+static func _check_foam(d: PlaytestDriver, w: VungTau, eye: Vector3) -> void:
+	var camera := d.viewport().get_camera_3d()
+	var points: Array[Vector2] = []
+	for j in range(-60, 61):
+		for i in range(-60, 61):
+			var x := eye.x + i * 5.0
+			var z := eye.z + j * 5.0
+			if w.ground_height(x, z) > w.sea_level - 0.02:
+				continue
+			var point := Vector3(x, w.sea_level, z)
+			if camera.is_position_behind(point):
+				continue
+			var screen := camera.unproject_position(point)
+			if d.viewport().get_visible_rect().has_point(screen):
+				points.append(screen)
+	var image := d.viewport().get_texture().get_image()
+	var scale := Vector2(image.get_size()) / d.viewport().get_visible_rect().size
+	var white := 0
+	for point: Vector2 in points:
+		var at := (point * scale).floor()
+		var c := image.get_pixel(clampi(int(at.x), 0, image.get_width() - 1), clampi(int(at.y), 0, image.get_height() - 1))
+		if c.v > 0.82 and c.s < 0.15:
+			white += 1
+	var share := float(white) / maxf(points.size(), 1)
+	d.step("low tide, from the sand: %d water points, %.1f %% near white" % [points.size(), share * 100.0])
+	d.expect(points.size() >= 100, "the view shows the water: %d points" % points.size())
+	d.expect(share <= 0.05, "%.1f %% of the water is near white, it must be 5 %% or less (D-0005-07)" % (share * 100.0))
 
 
 static func _height_on_line(points: Array, distance: float) -> float:

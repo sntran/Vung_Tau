@@ -4,6 +4,11 @@
 // water is thin: the depth texture gives the ground behind the water, so the
 // foam follows the water line at each tide (the coastline of the data is near
 // the high tide, and at high tide the water covers the low beach).
+// Report 0005, D-0005-07: over a wide shallow floor, the thin water made a
+// white sheet. The foam is now a narrow band at the water line: the distance
+// to the line is the depth of the water over the slope of the floor. It is
+// strong on the open coast and on the rocks, and weak in the calm bay of
+// Bãi Trước, with no hard edges.
 shader_type spatial;
 render_mode cull_back, specular_schlick_ggx;
 
@@ -19,8 +24,15 @@ uniform sampler2D foam_noise : filter_linear_mipmap, repeat_enable;
 uniform vec3 deep_color : source_color = vec3(0.04, 0.22, 0.32);
 uniform vec3 shallow_color : source_color = vec3(0.16, 0.48, 0.5);
 uniform vec3 foam_color : source_color = vec3(0.92, 0.95, 0.95);
-// The foam is where the water is thinner than this, along the view (m).
+// The width of the foam band at the water line (m) on the open coast.
+uniform float foam_band = 4.0;
+// The foam is never where the water is deeper than this (m).
 uniform float foam_depth = 1.2;
+// The calm bay of Bãi Trước: little foam there.
+uniform vec2 calm_center = vec2(0.0);
+uniform float calm_radius = 0.0;
+uniform float calm_foam = 0.12;
+uniform sampler2D rock_mask : filter_linear, repeat_disable;
 uniform sampler2D depth_texture : hint_depth_texture, filter_nearest;
 
 varying vec3 world_position;
@@ -58,12 +70,24 @@ void fragment() {
 	vec3 ndc = vec3(SCREEN_UV * 2.0 - 1.0, raw_depth);
 #endif
 	vec4 behind = INV_PROJECTION_MATRIX * vec4(ndc, 1.0);
-	float thickness = max(0.0, -behind.z / behind.w + VERTEX.z);
+	vec3 behind_view = behind.xyz / behind.w;
+	float thickness = max(0.0, -behind_view.z + VERTEX.z);
+	// The floor behind the water in world space: its depth under the surface and its slope.
+	vec3 ground = (INV_VIEW_MATRIX * vec4(behind_view, 1.0)).xyz;
+	float depth = max(0.0, world_position.y - ground.y);
+	vec3 ground_normal = normalize(cross(dFdx(ground), dFdy(ground)));
+	float slope = length(ground_normal.xz) / max(abs(ground_normal.y), 0.05);
+	float to_line = depth / max(slope, 0.01);
 	float noise = texture(foam_noise, p * 0.08 + vec2(TIME * 0.02, 0.0)).r;
-	float wave = 0.5 + 0.5 * sin(thickness * 6.0 - TIME * 1.4);
-	float edge = 1.0 - smoothstep(0.0, foam_depth, thickness + (noise - 0.5) * 0.5);
+	float calm = calm_radius > 0.0 ? 1.0 - smoothstep(calm_radius * 0.7, calm_radius, distance(p, calm_center)) : 0.0;
+	float on_rock = inside ? smoothstep(0.25, 0.5, texture(rock_mask, uv).r) : 0.0;
+	float strength = max(mix(1.0, calm_foam, calm), on_rock);
+	float band = foam_band * mix(0.5, 1.0, strength);
+	float wave = 0.5 + 0.5 * sin(to_line * 2.0 - TIME * 1.4);
+	float edge = (1.0 - smoothstep(0.0, band, to_line + (noise - 0.5) * band * 0.8))
+			* (1.0 - smoothstep(foam_depth * 0.5, foam_depth, depth));
 	color = mix(color, shallow_color * 1.15, 1.0 - smoothstep(0.0, 3.0, thickness));
-	float foam = edge * smoothstep(0.35, 0.75, noise * 0.7 + wave * 0.5);
+	float foam = edge * strength * smoothstep(0.35, 0.75, noise * 0.7 + wave * 0.5);
 	color = mix(color, foam_color, foam * 0.85);
 	ALBEDO = color;
 	ROUGHNESS = mix(0.06, 0.6, foam);

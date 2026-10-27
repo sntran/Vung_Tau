@@ -38,6 +38,8 @@ const HILL_DENSITY := 0.75
 ## ISLAND_TREE_HEIGHT, also between the boulders (D-0005-05).
 const ISLAND_TREE_HEIGHT := 7.0
 const ISLAND_TREE_SLOPE := 1.2
+## The calm water around Bãi Trước: little foam (report 0005, D-0005-07).
+const CALM_BAY_RADIUS := 1200.0
 const NIGHT_AMBIENT := Color("#2B3754")
 const TWILIGHT_AMBIENT := Color("#C8A48E")
 const DAY_AMBIENT := Color("#BCD0E2")
@@ -739,10 +741,12 @@ func _make_materials() -> void:
 		_ground_material.set_shader_parameter(kind + "_texture", _texture_or_color(texture_kind, kind))
 	_ground_material.set_shader_parameter("surface_mask", mask_texture)
 	var rock_path := data.root.path_join(str(data.surface.get("rock", "rock.png")))
+	var rock_texture: Texture2D = null
 	if FileAccess.file_exists(rock_path):
 		var rock_image := Image.new()
 		rock_image.load_png_from_buffer(FileAccess.get_file_as_bytes(rock_path))
-		_ground_material.set_shader_parameter("rock_mask", ImageTexture.create_from_image(rock_image))
+		rock_texture = ImageTexture.create_from_image(rock_image)
+		_ground_material.set_shader_parameter("rock_mask", rock_texture)
 	_ground_material.set_shader_parameter("mask_origin", mask_origin)
 	_ground_material.set_shader_parameter("mask_size", size)
 	_ground_material.set_shader_parameter("forest_height", FOREST_HEIGHT)
@@ -756,6 +760,12 @@ func _make_materials() -> void:
 	_sea_material.set_shader_parameter("wave_normal_a", _noise_texture(1, 0.012, true))
 	_sea_material.set_shader_parameter("wave_normal_b", _noise_texture(2, 0.03, true))
 	_sea_material.set_shader_parameter("foam_noise", _noise_texture(3, 0.02, false))
+	_sea_material.set_shader_parameter("rock_mask", rock_texture)
+	# Bãi Trước is a calm bay: no white surf at the swimming beach (my photos, D-0005-07).
+	var bay := data.landmark("bai_truoc")
+	if not bay.is_empty():
+		_sea_material.set_shader_parameter("calm_center", Vector2(bay.position[0], bay.position[1]))
+		_sea_material.set_shader_parameter("calm_radius", CALM_BAY_RADIUS)
 	for kind: String in ["asphalt", "concrete", "dirt", "sidewalk", "lines"]:
 		var material := StandardMaterial3D.new()
 		material.cull_mode = BaseMaterial3D.CULL_DISABLED
