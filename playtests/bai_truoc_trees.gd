@@ -5,7 +5,11 @@ extends RefCounted
 # coconut palms are in the frame (the trees of the TreeField near the view,
 # R10). The test also checks that no tree stands on the sand of the main beach
 # or in the water (R11).
+# High takes the views in two runs (the first two views, then the other two):
+# with the patches of the start chunks (report 0005, D-0005-10), one run of the
+# four views took more than 300 s in CI. Low takes the four views in one run.
 # sizes: 1280x720
+# phase: --world=vung_tau --start-time=16:30 --quality=high --renderer=forward_plus
 # phase: --world=vung_tau --start-time=16:30 --quality=high --renderer=forward_plus
 # phase: --world=vung_tau --start-time=16:30 --quality=low --renderer=forward_plus
 
@@ -23,7 +27,7 @@ func run(d: PlaytestDriver) -> void:
 		return
 	# Forward+ under lavapipe needs more time for the first ground.
 	await d.wait_ground(120.0)
-	var preset: String = ["high", "low"][d.phase - 1]
+	var preset: String = ["high", "high", "low"][d.phase - 1]
 	var beach := w.data.landmark("bai_truoc")
 	if not d.expect(not beach.is_empty(), "the data has Bãi Trước"):
 		return
@@ -32,7 +36,11 @@ func run(d: PlaytestDriver) -> void:
 			w.chunks_without_ground()])
 	d.step("the trees of each type: %s" % [w.trees.counts])
 	_check_places(d, w, beach)
-	for view: Dictionary in views(w, beach):
+	var all_views := views(w, beach)
+	# The views of this run: the first half or the second half on High, all on Low.
+	var half := ceili(all_views.size() / 2.0)
+	var run_views: Array = [all_views.slice(0, half), all_views.slice(half), all_views][d.phase - 1]
+	for view: Dictionary in run_views:
 		await d.fly_to(view.eye, view.target)
 		await d.wait_ground(60.0)
 		await d.wait_frames(6)
