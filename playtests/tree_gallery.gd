@@ -207,6 +207,7 @@ static func _check_form_changes(d: PlaytestDriver, w: VungTau, type_index: int, 
 		var a: Color = means[0]
 		var b: Color = means[1]
 		var change := Vector3(a.r - b.r, a.g - b.g, a.b - b.b).length() / maxf(Vector3(a.r, a.g, a.b).length(), 0.05)
+		d.step("%s, %s at %.0f m: the change of form is %.1f %%" % [type, end.name, at, change * 100.0])
 		d.expect(change <= MAX_FORM_CHANGE, "%s, %s at %.0f m: the mean color of the crown area changes by %.1f %% (%s to %s), it must be %.0f %% or less" % [
 				type, end.name, at, change * 100.0, a.to_html(false), b.to_html(false), MAX_FORM_CHANGE * 100.0])
 	await d.wait_frames(3)

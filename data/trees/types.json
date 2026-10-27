@@ -456,7 +456,7 @@
 			"rosettes_per_spray": 2,
 			"spray_length": 1.6,
 			"range_scale": 0.7,
-			"card_scale": 1.15,
+			"card_scale": 1.05,
 			"leaf_cluster": {
 				"twigs": 12,
 				"leaves": 10,
@@ -509,7 +509,7 @@
 			"rosettes_per_spray": 2,
 			"spray_length": 1.6,
 			"range_scale": 0.7,
-			"card_scale": 1.15,
+			"card_scale": 1.05,
 			"leaf_cluster": {
 				"twigs": 12,
 				"leaves": 10,
@@ -563,7 +563,7 @@
 			"max_cards": 64,
 			"rosettes_per_spray": 2,
 			"spray_length": 1.6,
-			"card_scale": 1.0,
+			"card_scale": 0.92,
 			"leaf_cluster": {
 				"twigs": 12,
 				"leaves": 10,

@@ -551,7 +551,7 @@
 					"height": 8.0,
 					"radius": 5.11,
 					"impostor_size": 10.517,
-					"sha256": "dfbbff8c2fba4bfeb82fecda91105a9850e6f189a6224891eca788e04b529f02"
+					"sha256": "272a7c1b90ae2083c5e51044fbf4d6ed18bfaa2339c0937e6e286f867488cefa"
 				},
 				{
 					"file": "hill_a_2.glb",
@@ -561,7 +561,7 @@
 					"height": 8.03,
 					"radius": 4.81,
 					"impostor_size": 9.9,
-					"sha256": "4763161a69ff02d31c36d571acc320218e2ba0b585c28168fadf20b721bb817b"
+					"sha256": "ba9ecaf8e9fe2b4e1906ad7d2768ab01f878ec5bb64a2a7607a10f902a33111e"
 				},
 				{
 					"file": "hill_a_3.glb",
@@ -571,7 +571,7 @@
 					"height": 9.63,
 					"radius": 5.38,
 					"impostor_size": 11.075,
-					"sha256": "8c962f2e202e210b0279752399050648d20b0ca46c7467a64d7d797af672897d"
+					"sha256": "e50d4b126fa8a85c8920577d68592aa936b1440be6649440f3a777d1487d63c0"
 				}
 			],
 			"templates": 3,
@@ -598,7 +598,7 @@
 				"sha256": "64cc41e9e30e9a97556072663097c7e6ce884991aa902ff0c461921628230f0a",
 				"normal_sha256": "9e9085570e5aae1cabf26d75382a2e7bd1e94a4c65f87b6413ebb9f8ed05d388"
 			},
-			"source_hash": "47fbe3553de2a82e337d1cf0234801034a12fc4fec2cc82e73345b3696c2a91d"
+			"source_hash": "fa2c1a7d3c45673d2b40c9fbd1a733f1db6b73ce0f731a4019ddf0ee987dcf00"
 		},
 		"hill_b": {
 			"generator": "broadleaf",
@@ -611,7 +611,7 @@
 					"height": 12.57,
 					"radius": 3.89,
 					"impostor_size": 12.945,
-					"sha256": "64776ce3507365b7018041ff6df4b70c599cba4ea05b34c31063009aa07a9791"
+					"sha256": "ead66903dbbddcaaf9a9448cca89d1494fede8a3c1e1be3bf8fd72c84bccecf2"
 				},
 				{
 					"file": "hill_b_2.glb",
@@ -621,7 +621,7 @@
 					"height": 12.32,
 					"radius": 3.81,
 					"impostor_size": 12.694,
-					"sha256": "168b6b45d7d97c040eb22c77ef48021e23bd858c3cbc0b85968afa976f4e5969"
+					"sha256": "3c9743279aa289175612dc93f0f952517127cbfc89e6c59143123d08dc344fde"
 				},
 				{
 					"file": "hill_b_3.glb",
@@ -631,7 +631,7 @@
 					"height": 11.88,
 					"radius": 4.06,
 					"impostor_size": 12.237,
-					"sha256": "5033fe9ab181f3f3eea57f518a72eacb7ef9d4a5411ce8086fa6c8fe4808a38c"
+					"sha256": "7694e31c96bc4e644d4b83962b56a11aabb6e4eef29ccf5c6e7ca4efd3e4a5ba"
 				}
 			],
 			"templates": 3,
@@ -658,7 +658,7 @@
 				"sha256": "03e0b94a4e76af9771f0ebe891c03fc61075dce40c66ba89b01ae6f56e5bcacc",
 				"normal_sha256": "a59db1ad9a2db2c108b8ea88b2cefe88d889df4b9df7aba82658f1c5cb1b6102"
 			},
-			"source_hash": "0a6b263179dbb4dd18d8b181e84f01332c006191fa278a6f057a4fe137e1fdb4"
+			"source_hash": "bc7628cbdc47c99633aeed46434ebbb24ead41a5ebd5111acacc35c72699b1c7"
 		},
 		"hill_c": {
 			"generator": "broadleaf",
@@ -671,7 +671,7 @@
 					"height": 5.3,
 					"radius": 3.4,
 					"impostor_size": 6.995,
-					"sha256": "f4815eaadcc96f48942272e37b0d4a291d7178c3d8b82fc6ecdb8a2e8f5b1407"
+					"sha256": "c579076554c98563f7b453397904b6c078bb4fc1501fac8a3afc30781a3aeef2"
 				},
 				{
 					"file": "hill_c_2.glb",
@@ -681,7 +681,7 @@
 					"height": 5.19,
 					"radius": 3.34,
 					"impostor_size": 6.886,
-					"sha256": "3f0f5e885815f23b40003364669c5356fb5dba04a5293c24e2641d1a7050362e"
+					"sha256": "05b326bf37bd7177726432c37afddcafbc8bdd095edf2ee0bec5886706f199cd"
 				},
 				{
 					"file": "hill_c_3.glb",
@@ -691,7 +691,7 @@
 					"height": 4.1,
 					"radius": 3.32,
 					"impostor_size": 6.846,
-					"sha256": "804cd4d3ee62a54f79c9c4ccd8bb880986a326af684c6fd34fbc05bc7e3cc259"
+					"sha256": "4335111770c650a5714b09a368facb3d852bb55639b8047f3ba2d57a6104a5dd"
 				}
 			],
 			"templates": 3,
@@ -718,7 +718,7 @@
 				"sha256": "0d7c0d697d52530fdf05f962be3c8776f132af2838f27ee7fbb8fac40f4dc6b9",
 				"normal_sha256": "01b7f4b5e3af836769f416465e58b0a83414f5f1fe2929df78e92257a96a142b"
 			},
-			"source_hash": "de84090ab3c21e300f998feaa90227fd3d2bd7f3c57eb09c20237c7f6501a452"
+			"source_hash": "8eee840dc7321bf25886162275d3a5437927f5cdfebabe61ddab47f6b81ce0ad"
 		},
 		"teak": {
 			"generator": "broadleaf",
