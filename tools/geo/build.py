@@ -25,7 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from geodata import blocks as blocks_module  # noqa: E402
 from geodata import anchors as anchors_module  # noqa: E402
-from geodata import coast, homestay, landcover, landmarks, mapdraw, osm, roads as roads_module, terrain  # noqa: E402
+from geodata import clearings, coast, homestay, landcover, landmarks, mapdraw, osm, roads as roads_module, terrain  # noqa: E402
 from geodata import roadworks as roadworks_module, sea as sea_module, seafloor, trees as trees_module  # noqa: E402
 from geodata.config import BUILD, GEO, RAW, ROOT, Config, load_json, write_json  # noqa: E402
 from geodata.projection import Projection, map_to_game  # noqa: E402
@@ -320,7 +320,11 @@ def build(raw: Path, out: Path, geo: Path) -> int:
                             out / "surface.png", rock_mask, out / "rock.png", pebble_mask)
     write_keep_import(out / "surface.png")
     write_keep_import(out / "rock.png")
-    cover_record = write_cover(grid, raw, out, projection, land_mask, area, found_by_id)
+    # The places with no trees and no bushes, and the roads with no tree trunks (report 0020, D-0020-01).
+    places = clearings.place_shapes(data.areas, lambda g: to_map_geometry(g, projection), found_by_id, config.clearings)
+    place_mask = terrain.rasterize(grid, [p for shape in places for p in polygons_of(shape)])
+    road_mask = terrain.rasterize(grid, clearings.road_shapes(roads, config.clearings))
+    cover_record = write_cover(grid, raw, out, projection, land_mask, area, found_by_id, place_mask, road_mask)
 
     lon_min, lat_min = projection.map_to_lonlat(box.bounds[0], box.bounds[1])
     lon_max, lat_max = projection.map_to_lonlat(box.bounds[2], box.bounds[3])
@@ -504,7 +508,7 @@ def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods,
 COVER_HILLS = {"nui_lon": (1100.0, 20.0), "nui_nho": (700.0, 20.0)}
 
 
-def write_cover(grid, raw, out, projection, land_mask, area, found_by_id) -> dict | None:
+def write_cover(grid, raw, out, projection, land_mask, area, found_by_id, place_mask=None, road_mask=None) -> dict | None:
     """The land cover and the canopy heights (report 0005, D-0005-09; plan 0020,
     D8): cover.png (on the grid of surface.png: R tree cover, G bushes, B grass,
     A bare ground), canopy.png (the canopy height for the trees and the bushes
@@ -515,6 +519,10 @@ def write_cover(grid, raw, out, projection, land_mask, area, found_by_id) -> dic
     classes = np.nan_to_num(classes, nan=0.0).astype(np.uint8)
     canopy = terrain.load_raster(grid, raw / "canopy.tif", projection, terrain.Resampling.max)
     masks = landcover.cover_masks(classes, canopy, land_mask)
+    if place_mask is not None:
+        # No trees and no bushes on the paved places: the ground there is the town ground.
+        for name in masks:
+            masks[name] &= ~place_mask
     every = int(area["land_mask_grid_m"] / grid.step)
     landcover.write_cover(masks, every, out / "cover.png")
     write_keep_import(out / "cover.png")
@@ -524,7 +532,8 @@ def write_cover(grid, raw, out, projection, land_mask, area, found_by_id) -> dic
     landcover.draw_canopy_map(out / "canopy_map.png", canopy, land_mask, every * 2)
     write_keep_import(out / "cover_map.png")
     write_keep_import(out / "canopy_map.png")
-    rows, cols = landcover.tree_places(canopy, grid.step, masks["tree"])
+    allowed = masks["tree"] & ~road_mask if road_mask is not None else masks["tree"]
+    rows, cols = landcover.tree_places(canopy, grid.step, allowed)
     tops = landcover.write_trees(out / "canopy_trees.json", grid, canopy, rows, cols)
     hills = {}
     for hill_id, (radius, lowest) in COVER_HILLS.items():
@@ -548,7 +557,8 @@ def write_cover(grid, raw, out, projection, land_mask, area, found_by_id) -> dic
     log(f"cover: {int(rows.size)} trees on the open land; " +
         ", ".join(f"{k} {v['tree'] * 100:.0f} % trees, {v['bush'] * 100:.0f} % bushes" for k, v in hills.items()))
     return {"world": {"file": "cover.png", "canopy": canopy_place, "trees": "canopy_trees.json"},
-            "hills": hills, "trees": tops, "info": info, "canopy_values": canopy}
+            "hills": hills, "trees": tops,
+            "clear_m2": round(float(place_mask.sum()) * grid.step ** 2) if place_mask is not None else 0, "info": info, "canopy_values": canopy}
 
 
 def cover_report_lines(cover: dict) -> list[str]:
@@ -569,6 +579,9 @@ def cover_report_lines(cover: dict) -> list[str]:
              f"the highest canopy first, then on the lower canopy, at a spacing of {landcover.SPACING_PER_M} of its height "
              f"({landcover.SPACING_MIN_M:.0f} m to {landcover.SPACING_MAX_M:.0f} m): the map has one height top for each "
              f"group of crowns. The crown of a tree is the canopy that is nearer to it than to another tree.",
+             f"- No trees and no bushes on {cover.get('clear_m2', 0) / 1e4:.1f} ha of paved places and platforms (the OSM "
+             f"areas and the landmarks of `data/geo/clearings.json`), and no tree trunks on the roads and the paths "
+             f"(report 0020, D-0020-01).",
              "", "| Hill | Area (km²) | Tree cover | Bushes | Grass | Bare | Trees | WorldCover classes |", "|---|---|---|---|---|---|---|---|"]
     for hill in cover.get("hills", {}).values():
         classes = ", ".join(f"{k} {v * 100:.0f} %" for k, v in sorted(hill["classes"].items(), key=lambda kv: -kv[1]))

@@ -1,0 +1,16 @@
+{
+	"note": "The places with no trees and no bushes (report 0020, D-0020-01). tools/geo/build.py reads this file. Builder values: check.",
+	"osm_keys": ["man_made", "tourism", "amenity", "historic", "building"],
+	"osm_pedestrian_areas": true,
+	"max_area_m2": 30000,
+	"margin_m": 2.0,
+	"landmarks": {
+		"nui_nho": 25.0,
+		"hai_dang": 20.0,
+		"chua_kito_vua": 25.0,
+		"nui_lon": 15.0,
+		"duc_me_bai_dau": 12.0,
+		"mieu_hon_ba": 6.0
+	},
+	"road_margin_m": 1.5
+}

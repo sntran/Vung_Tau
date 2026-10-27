@@ -40,6 +40,8 @@ class Config:
         self.sea_objects = load_json(sea_objects) if sea_objects.exists() else None
         trees = geo / "trees.json"
         self.trees = load_json(trees) if trees.exists() else None
+        clearings = geo / "clearings.json"
+        self.clearings = load_json(clearings) if clearings.exists() else {}
 
     @property
     def bbox(self) -> tuple[float, float, float, float]:

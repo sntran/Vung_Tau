@@ -49,6 +49,10 @@ const VALUE_RANGE := Vector2(0.4, 0.55)
 const MIN_TOWN_SATURATED := 0.4
 const LAND_STEP_M := 20.0
 const LAND_RADIUS_M := 1500.0
+## Report 0020, D-0020-01: things nearer than NEAR_M to the camera (for
+## example a tree crown at the eye) cover NEAR_SHARE of a view or less.
+const NEAR_M := 3.0
+const NEAR_SHARE := 0.05
 ## The scrub check near the Bãi Sau view (plan 0020, R10a).
 const SCRUB_RADIUS_M := 250.0
 
@@ -72,6 +76,11 @@ func run(d: PlaytestDriver) -> void:
 		await d.wait_ground(60.0)
 		await d.wait_frames(5)
 		await d.screenshot("%s_%s" % [view.name, time])
+		if time == "1200":
+			var near := await near_share(d, w)
+			d.step("%s: %.1f %% of the frame is nearer than %.0f m" % [view.name, near * 100.0, NEAR_M])
+			d.expect(near <= NEAR_SHARE, "%s: things nearer than %.0f m cover %.1f %% of the frame, %.0f %% or less (D-0020-01)" % [
+					view.name, NEAR_M, near * 100.0, NEAR_SHARE * 100.0])
 		for place: String in view.get("frame", []):
 			var record := w.data.landmark(place)
 			var point := Vector3(record.position[0], maxf(float(record.get("height", 0.0)), 0.0), record.position[1])
@@ -131,6 +140,50 @@ static func _check_canopy(d: PlaytestDriver, w: VungTau, time: String) -> void:
 	d.expect(points.size() >= 50, "the view from Núi Nhỏ shows the slopes of Núi Lớn: %d points" % points.size())
 	d.expect(crowns >= CANOPY_SHARE * total, "%d %% of the slopes of Núi Lớn show a crown color, it must be %d %% or more" % [
 			roundi(100.0 * crowns / total), roundi(CANOPY_SHARE * 100)])
+
+
+## The part of the frame that shows things nearer than NEAR_M (report 0020,
+## D-0020-01). The test draws the view two times with the far plane of the
+## camera at NEAR_M and the background in two colors: a pixel that is the same
+## in both pictures shows a near thing. The phone button and the action button
+## are not counted.
+static func near_share(d: PlaytestDriver, w: VungTau) -> float:
+	var camera := d.viewport().get_camera_3d()
+	var env := w.environment
+	var saved := [camera.far, env.background_mode, env.background_color, env.fog_enabled, env.reflected_light_source]
+	camera.far = NEAR_M
+	env.background_mode = Environment.BG_COLOR
+	env.fog_enabled = false
+	env.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
+	var pictures: Array[Image] = []
+	for color: Color in [Color(1, 0, 1), Color(0, 1, 0)]:
+		env.background_color = color
+		await d.wait_frames(4)
+		pictures.append(d.viewport().get_texture().get_image())
+	camera.far = saved[0]
+	env.background_mode = saved[1]
+	env.background_color = saved[2]
+	env.fog_enabled = saved[3]
+	env.reflected_light_source = saved[4]
+	await d.wait_frames(2)
+	var m: Node = d.main()
+	var skip: Array[Rect2] = [m.phone.button.get_global_rect()]
+	if m.action_button.visible:
+		skip.append(m.action_button.get_global_rect())
+	var scale := Vector2(pictures[0].get_size()) / d.viewport().get_visible_rect().size
+	var near := 0
+	var total := 0
+	for y in range(0, pictures[0].get_height(), 6):
+		for x in range(0, pictures[0].get_width(), 6):
+			var at := Vector2(x, y) / scale
+			if skip.any(func(r: Rect2) -> bool: return r.has_point(at)):
+				continue
+			total += 1
+			var a := pictures[0].get_pixel(x, y)
+			var b := pictures[1].get_pixel(x, y)
+			if absf(a.r - b.r) + absf(a.g - b.g) + absf(a.b - b.b) < 0.1:
+				near += 1
+	return float(near) / maxf(total, 1)
 
 
 ## Plan 0020, R10a: the scrub near the view stands on the bushes and the

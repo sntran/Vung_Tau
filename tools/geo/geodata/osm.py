@@ -88,7 +88,10 @@ class _Handler(osmium.SimpleHandler):
         self.data.ways.append(Way(w.id, dict(w.tags), [nd.ref for nd in w.nodes], coords))
 
     def area(self, a):
-        if not any(k in a.tags for k in AREA_KEYS):
+        # A pedestrian area (highway=pedestrian, area=yes) is a place with no
+        # trees (report 0020, D-0020-01). Other closed roads are not areas.
+        pedestrian = "highway" in a.tags and a.tags.get("area") == "yes"
+        if not pedestrian and not any(k in a.tags for k in AREA_KEYS):
             return
         try:
             geometry = shapely.wkb.loads(self.wkb.create_multipolygon(a), hex=True)

@@ -4,6 +4,8 @@ D-0005-09, correction 0; plan 0020, D8 and R10a)."""
 import json
 from types import SimpleNamespace
 
+from shapely.geometry import Point
+
 import numpy as np
 import pytest
 
@@ -134,3 +136,39 @@ def test_write_canopy_place(tmp_path):
 def test_worldcover_tile_and_quadkey():
     assert fetch.worldcover_tile(107.08, 10.35) == "N09E105"
     assert fetch.quadkey(107.08, 10.35, 9) == "132231002"
+
+
+def test_clearings_keep_trees_off_places_and_roads():
+    from shapely.geometry import box
+    from geodata import clearings
+    area = SimpleNamespace(tags={"highway": "pedestrian", "area": "yes"}, geometry=box(0, 0, 10, 10))
+    road_area = SimpleNamespace(tags={"highway": "residential"}, geometry=box(20, 0, 30, 10))
+    huge = SimpleNamespace(tags={"tourism": "attraction"}, geometry=box(0, 0, 1000, 1000))
+    temple = SimpleNamespace(tags={"amenity": "place_of_worship"}, geometry=box(40, 0, 50, 10))
+    config = {"osm_keys": ["amenity", "tourism"], "max_area_m2": 30000, "margin_m": 2.0,
+              "landmarks": {"top": 25.0, "missing": 10.0}, "road_margin_m": 1.5}
+    found = {"top": {"found": True, "position": [100.0, -200.0]}}
+    shapes = clearings.place_shapes([area, road_area, huge, temple], lambda g: g, found, config)
+    # The pedestrian area and the temple with their margin, and the circle of the landmark (game z is map -y).
+    assert len(shapes) == 3
+    assert shapes[0].area == pytest.approx(14 * 14, rel=0.05)
+    assert shapes[2].centroid.x == pytest.approx(100.0) and shapes[2].centroid.y == pytest.approx(200.0, abs=0.01)
+    road = SimpleNamespace(points=np.array([[0.0, 0.0], [100.0, 0.0]]), width=6.0)
+    (strip,) = clearings.road_shapes([road], config)
+    assert strip.contains(Point(50.0, 4.4)) and not strip.contains(Point(50.0, 4.6))
+
+
+def test_osm_pedestrian_area_is_read(tmp_path):
+    from geodata import osm
+    xml = tmp_path / "small.osm"
+    xml.write_text("""<?xml version='1.0' encoding='UTF-8'?>
+<osm version="0.6">
+  <node id="1" lat="10.0" lon="107.0"/><node id="2" lat="10.0" lon="107.001"/>
+  <node id="3" lat="10.001" lon="107.001"/><node id="4" lat="10.001" lon="107.0"/>
+  <way id="10"><nd ref="1"/><nd ref="2"/><nd ref="3"/><nd ref="4"/><nd ref="1"/>
+    <tag k="highway" v="pedestrian"/><tag k="area" v="yes"/></way>
+  <way id="11"><nd ref="1"/><nd ref="2"/><nd ref="3"/><nd ref="1"/>
+    <tag k="highway" v="residential"/></way>
+</osm>""")
+    data = osm.read(xml)
+    assert [a.id for a in data.areas] == [10]
