@@ -171,7 +171,8 @@ func _physics_process(delta: float) -> void:
 		velocity.y -= GRAVITY * delta
 	var wanted := horizontal * delta
 	move_and_slide()
-	if walk_limit.is_valid() and not walk_limit.call(global_position, start):
+	var limited: bool = walk_limit.is_valid() and not walk_limit.call(global_position, start)
+	if limited:
 		global_position = Vector3(start.x, global_position.y, start.z)
 		velocity = Vector3.ZERO
 		if walking:
@@ -183,6 +184,15 @@ func _physics_process(delta: float) -> void:
 	if horizontal.length() > 0.01 and is_on_wall() and _wall_is_step():
 		var moved := Vector3(global_position.x - start.x, 0, global_position.z - start.z)
 		if moved.length() < wanted.length() * 0.5:
+			_try_step(wanted - moved)
+	# On a walkable slope of a height map, move_and_slide can stop: the motion
+	# hits the floor triangle (also reported as a wall) and does not slide (the
+	# edge of the Hải Đăng road at a hairpin, PT-36). When all the contacts are
+	# walkable, a small step up goes on. A slope steeper than floor_max_angle
+	# still stops the player.
+	elif horizontal.length() > 0.01 and not limited and is_on_floor() and _contacts_are_walkable():
+		var moved := Vector3(global_position.x - start.x, 0, global_position.z - start.z)
+		if moved.length() < wanted.length() * 0.1:
 			_try_step(wanted - moved)
 	var walked := Vector2(global_position.x - start.x, global_position.z - start.z).length()
 	if walked > 0.0001:
@@ -238,12 +248,22 @@ func _wall_is_step() -> bool:
 	return false
 
 
+## True when each contact of the last move_and_slide is a walkable floor (not steeper than floor_max_angle).
+func _contacts_are_walkable() -> bool:
+	for i in get_slide_collision_count():
+		if get_slide_collision(i).get_angle(0, up_direction) > floor_max_angle:
+			return false
+	return true
+
+
 func _try_step(motion: Vector3) -> void:
 	var up := Vector3(0, STEP_HEIGHT, 0)
 	if test_move(global_transform, up):
 		return
 	var raised := global_transform.translated(up)
 	if test_move(raised, motion):
+		return
+	if walk_limit.is_valid() and not walk_limit.call(global_position + motion, global_position):
 		return
 	global_position += up + motion
 	apply_floor_snap()

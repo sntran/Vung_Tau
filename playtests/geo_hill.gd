@@ -6,7 +6,9 @@ extends RefCounted
 # 6 times faster, and the walk is in 12 runs, so that each run is shorter than
 # 180 s under lavapipe. Each run starts where the last run stops (a setup step).
 # The last run finds a slope that is steeper than 45° for 6 m on Núi Nhỏ or Núi
-# Lớn, with no road near it, and checks it.
+# Lớn, with no road near it, and checks it. First it checks that the player
+# walks up a walkable slope at the edge of the road in a hairpin, where the
+# player stopped before.
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=08:00
 # phase: --world=vung_tau --start-time=08:00
@@ -23,6 +25,8 @@ extends RefCounted
 # phase: --world=vung_tau --start-time=08:00
 
 const WALK_RUNS := 12
+## A point at the edge of the Hải Đăng road, on a walkable slope where the player stopped.
+const ROAD_EDGE := Vector3(522.2, 0.0, 891.6)
 
 
 func run(d: PlaytestDriver) -> void:
@@ -31,6 +35,7 @@ func run(d: PlaytestDriver) -> void:
 		return
 	await d.wait_ground()
 	if d.phase > WALK_RUNS:
+		await _road_edge(d)
 		await _steep_slope(d, w)
 		return
 	var road: Dictionary = w.data.homestay.get("lighthouse_road", {})
@@ -71,6 +76,21 @@ func run(d: PlaytestDriver) -> void:
 		var distance := top.distance_to(Vector2(s.player.x, s.player.z))
 		d.expect(distance < 40.0, "the player is at the top of Núi Nhỏ, %.0f m from the lighthouse" % distance)
 		d.expect(float(s.ground) > 120.0, "the player is high on the hill: %.0f m" % s.ground)
+
+
+## At the edge of the Hải Đăng road in a hairpin, the ground is a walkable
+## slope of 32 degrees. There the player stopped with the joystick pushed
+## toward the road: move_and_slide reported the floor triangle as a wall (CI,
+## run 8). The player must walk on.
+func _road_edge(d: PlaytestDriver) -> void:
+	await d.start_at(ROAD_EDGE, 90.0)
+	await d.wait_frames(5)
+	var before: Vector3 = d.state().player
+	await d.hold_stick(Vector2(0, -1), 1.5)
+	var after: Vector3 = d.state().player
+	var moved := Vector2(after.x - before.x, after.z - before.z).length()
+	d.expect(moved > 1.5, "at the edge of the Hải Đăng road (%.0f, %.0f), the player walks up the slope of 32 degrees: %.2f m" % [
+			ROAD_EDGE.x, ROAD_EDGE.z, moved])
 
 
 ## Finds a slope steeper than 45 degrees on Núi Nhỏ or Núi Lớn, with no road
