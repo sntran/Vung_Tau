@@ -5,7 +5,7 @@
 | Status | Approved |
 | Branch | `feat/0006-people` |
 | Depends on | 0003 (status "Built"). Uses the quality presets of 0004 when 0004 is built. |
-| Changed by | 0023 (Draft): the person models come from the `person` blueprint of World (0023, D6). Do not start R2 to R11 until I decide plan 0023. |
+| Changed by | 0023: the person models come from the `person` blueprint of World (0023, D6). I decided (2026-10-28): plan 0006 waits for the people of World. Do not start it until I say that World is ready. |
 
 ## 1. Goal
 

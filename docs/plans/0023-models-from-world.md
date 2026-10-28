@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft |
+| Status | Draft. It waits until I say that World is ready (Q3). |
 | Branch | `feat/0023-models-from-world` |
 | Depends on | 0004 (the house kit), 0005 (the Vũng Tàu world). Uses the quality presets of 0004 and the impostor method of 0020. |
 | Changes | 0006 (the person models come from World, D6), 0008, 0009, 0010, 0011 to 0015, 0018, 0021, 0022: each of these plans takes its models from the catalog of section 9. |
@@ -37,7 +37,7 @@ This picture shows the models of World on 2026-10-28 (commit `4ebf010`), rendere
 | D1 | World is the one source of the 3D models of the game. The game makes no model in code, except the shapes of the geodata (section 2). `scripts/greybox.gd` goes away when each of its shapes has a model of World. | My decision (2026-10-28). One correction in World corrects each project. World gives each size of a part a source (a standard, a data sheet, or a measurement), so the models are true to size. |
 | D2 | The game gets the files of World when it is built, not when it runs. The files are in the repository (`assets/world/`), and `data/world/lock.json` pins them to one commit of World. A new version of World comes in with one commit and a new review sheet. | The game runs offline on desktop and phones. The URL of a model on the factory changes when World corrects a part (`Cache-Control: max-age=300`), and a release must not change. The trees are in the repository in the same way (54 MB). |
 | D3 | World gives the shape, the parts, and the joints. The game gives the look: each material role of World (`brick`, `concrete`, `glass`, `tile`, `paint`, `chrome`, `rubber`, `skin`, and so on) has a material of the game in `data/world/materials.json`. | The town must have one look: the plaster with damp and wear of plan 0004, the measured palette, the light by time, and the quality presets. The GLB files of World name each material by its role and have no textures (except the skin and the clothes of people), so this is easy. |
-| D4 | No brand on a model in the game: no badge, no name, no logo, no real livery. A model can have the shape of a common make of 2019. The game text uses the general words: "xe tay ga" (a scooter), "xe số" (a step-through motorbike with gears). The names of World (for example `honda_vision_110`) stay in the data files. They never show on the screen. | The rule "No real businesses" of `AGENTS.md`. The town of 2019 was full of a few common makes, so a generic shape looks wrong. Q1 asks if the shapes are permitted. |
+| D4 | The models are real: they have the shapes of the common makes of 2019 (Q1). No badge, no name, no logo, and no real livery is on a model in the game. The game text uses the general words: "xe tay ga" (a scooter), "xe số" (a step-through motorbike with gears). The names of World (for example `honda_vision_110`) stay in the data files. They never show on the screen. | I want the town to look real, and the town of 2019 was full of a few common makes. The rule "No real businesses" of `AGENTS.md` keeps the names and the logos out. |
 | D5 | World gives three levels (near, mid, far). The game adds a fourth level for the models in rows and crowds (parked scooters, boats far out, people far away): an impostor, made with the method of the trees (plan 0020, D3). | A far scooter of World has about 4 000 triangles. 40 parked scooters along one street are 160 000 triangles, more than half of the Low budget (300 000). An impostor is two triangles. |
 | D6 | The person models of plan 0006 come from the `person` blueprint of World. World already uses MakeHuman, with a skeleton of 53 bones, as plan 0006 does (D2 there). The approved look of `docs/prototype/people/` is the target for World. The game part of plan 0006 stays in plan 0006: the animations in the game, the head and the eyes, the blinks, the faces, and the lip sync. The model part of plan 0006 (R2 to R11, `tools/people/build.py`) waits for the World requests W3 to W6. | One person blueprint for all my projects. Phượt and Vũng Tàu need the same people. World has no face shapes and no visemes now, and plan 0006 needs them for the lip sync. |
 | D7 | The trees stay in `tools/trees/` until World has a plant blueprint (W12) that makes the 14 types of `data/trees/types.json` with the same look (the sheets of report 0020) and with the same triangles or fewer. Then the tree values move to World as orders. | The trees just passed my review. A move now puts the look at risk. |
@@ -112,10 +112,10 @@ PT-01, PT-03 to PT-55 must still pass.
 
 ## 8. Open questions
 
-- **Q1.** Can a model have the shape of a real make (for example the Honda Vision, the Honda Wave, or the Ford Transit van of the bus station) when it has no badge, no name, and no logo (D4)? If not, World must make generic shapes for Vũng Tàu.
-- **Q2.** Do I add the requests of section 10 to World `TODO.md` myself, or does the architect add them? The architect can write to World only with push access.
-- **Q3.** Are the first models of R9 the correct first step? Another choice: wait until World has the tube house (W1) and the people (W3 to W6), and swap them first.
-- **Q4.** Plan 0006 waits for World (D6). Is this correct, or do I want plan 0006 as it is now, and a move to World later?
+- **Q1.** Answered (2026-10-28): yes. We want the models to be real, so a model has the shape of the real make (for example the Honda Vision, the Honda Wave, or the Ford Transit van of the bus station). D4 keeps the badges, the names, and the logos off.
+- **Q2.** Answered (2026-10-28): the architect added the requests of section 10 to World `TODO.md`, section "For Vũng Tàu" (World commit `b06a20d`).
+- **Q3.** Answered (2026-10-28): wait. World is still in work. I say when it is ready. Then I approve this plan, and the builder starts. Until then the builder does not start R1 to R14.
+- **Q4.** Answered (2026-10-28): yes. Plan 0006 waits for the people of World (D6).
 - **Q5.** The catalog has facts with the status "Check". Each one is in the table of its group. Please answer them when you have time. A fact with "Check" does not go into the game.
 
 ## 9. The catalog of models
@@ -231,7 +231,7 @@ The people of plan 0006 and the people of the street. All people come from the `
 | ID | What | Where, when, plan | World | Status |
 |---|---|---|---|---|
 | A1 | Chickens and pigs | The homestay garden. 0022. | New | Confirmed. |
-| A2 | Dogs and cats | Houses and the hẻm. 0009. | New | Check. |
+| A2 | Dogs and cats | Houses and the hẻm. 0009. | Close (`street_dog`, World `303dfaf`), cats New | Check. |
 | A3 | Monkeys (long-tailed macaques) | Chùa Tam Bảo and the Vi Ba road. 0017. | New | Confirmed (place); the species: Check. |
 | A4 | Fish, crabs, snails | The pond, the market, the tide pools of Hòn Bà. 0016, 0022. | New | Source. |
 | A5 | Birds in cages | The house fronts. 0009. | New | Check. |
@@ -257,7 +257,7 @@ Each one is an order with a drawing (D9). The sizes need sources. These are the 
 
 ## 10. Requests to World
 
-These are the changes that Vũng Tàu needs from World. The numbers W1 to W16 are for this plan only. I put each one in World `TODO.md` or in a step of World (Q2).
+These are the changes that Vũng Tàu needs from World. The numbers W1 to W16 are for this plan only. W1 to W15 are in World `TODO.md`, section "For Vũng Tàu" (Q2). W16 was already there ("Godot import").
 
 | ID | Request | For |
 |---|---|---|
