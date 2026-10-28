@@ -171,4 +171,5 @@ Status values:
 ## Games for reference
 
 - **Venba** (Visai Games): a cooking game about Tamil food. The recipes are puzzles. The player learns by trial and error, with a gentle reaction to mistakes. [Wikipedia](https://en.wikipedia.org/wiki/Venba_(video_game))
+- **Long Quan Returns**: the game that I found in a post of GameWatch (2026-10). Its streets have rows of parked motorbikes and people on the sidewalks. I want this sidewalk life in our streets (plan 0023, section 9.4).
 - **Brother Hai's Pho Restaurant**: a Vietnamese indie game made with Godot. Players liked its true details of daily life, such as short stools and floor tiles. [Wikipedia](https://en.wikipedia.org/wiki/Brother_Hai%27s_Pho_Restaurant)
