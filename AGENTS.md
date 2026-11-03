@@ -109,6 +109,8 @@ Verified in the development workspace (Linux, 2 CPUs, no GPU, no Vulkan):
 - Hugging Face is reachable from the workspace. VieNeu-TTS v3 Turbo (`vieneu==3.8.3`) runs on the CPU with ONNX Runtime: about 2 s for each line with 4 CPUs. ONNX Runtime 1.23 and later refuse the model files in the Hugging Face cache ("External data path escapes model directory"), so `tools/voices/requirements.txt` pins 1.22.1.
 - A quit in the first seconds after the start does not end the process: the main thread waits for a task of the worker threads, and no worker runs it (seen with the house kit of plan 0004, with `gdb`). The play-test system waits 1 s of game time after the end of a run before it quits.
 - `TaskStop` on a play-test run stops the shell, but the Godot processes go on and use the CPU. Look for them with `pgrep -fa godot` and stop them.
+- Godot 4.7 does not read the glTF extension `EXT_mesh_gpu_instancing`: a node with it shows its mesh one time only. The editor plugin `addons/gpu_instancing/` (enabled in `project.godot`) imports such a node as a `MultiMeshInstance3D`. The headless renderer (`--headless`: the import and the export in CI) does not keep `MultiMesh.set_instance_transform()`, but it keeps `MultiMesh.buffer`. So the plugin writes the buffer: for each instance, 12 floats, a row of the basis and the origin at a time.
+- A node with a negative scale (a mirror, as the left shoe of a pair from World) renders correctly in Godot: the renderer turns its faces over. `Node3D.scale` gives a mirror as a turn and a negative scale on each axis, so a check uses `basis.determinant()`.
 - An Ogg stream that still plays when Godot quits is not freed ("resources still in use at exit"). The play-test system stops the voices some frames before it quits (`stop_sounds()` in `scenes/main.gd`).
 
 Commands that work:
@@ -230,6 +232,8 @@ The audio driver prints ALSA errors in the workspace. These errors are not defec
 | `scripts/` | Classes with no scene (`trees/`: the tree library of plan 0020; `wind.gd`): clock math, save format, content checks, voice clips, subtitle split, light by time, greybox shapes, mesh batches, quality presets, sounds, UI theme, play-test driver, the lunar calendar, the game calendar, the seasons. `geo/`: the projection, the geodata reader, the 16-bit PNG reader, the sun position, the tide model, and the ground and road mesh builders. |
 | `shaders/` | The ground shader, the sea shader, the tree shaders of plan 0020 (`tree_*.gdshader`, `tree_common.gdshaderinc`), and the canopy shader (the far hill trees) of the Vũng Tàu world. |
 | `tests/unit/` | GUT unit tests. |
+| `tests/data/world/` | The test file of the GPU instancing import (`instancing.glb`) and the script that makes it. |
+| `addons/` | `gut/` (the unit tests) and `gpu_instancing/` (the import of `EXT_mesh_gpu_instancing` for the GLB files of World). |
 | `playtests/` | Play-test scenarios PT-01, PT-03 to PT-17, PT-18 to PT-24 of plan 0003, PT-25 to PT-32 of plan 0004, PT-33 to PT-39 of plan 0005, and PT-52 to PT-55 of plan 0020 (PT-02 and PT-07 were removed in plan 0002). |
 | `tools/` | `setup.sh`, `test.sh`, `playtest.sh`, `voices/` (the voice build and its tests), `trees/` (the tree build of plan 0020), and `geo/` (the geodata pipeline: `fetch.py`, `build.py`, `tide.py`, the `geodata` package, and its tests). |
 | `assets/` | Fonts, icons, voices, and `CREDITS.md`. |

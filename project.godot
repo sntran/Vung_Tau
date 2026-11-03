@@ -27,6 +27,10 @@ Content="*res://autoload/content.gd"
 GameState="*res://autoload/game_state.gd"
 Playtest="*res://autoload/playtest.gd"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gpu_instancing/plugin.cfg")
+
 [display]
 
 window/size/viewport_width=1280
