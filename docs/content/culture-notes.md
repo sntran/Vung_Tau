@@ -101,6 +101,9 @@ Status values:
 | At the end of the Vi Ba road, a few small shops sell yogurt (sữa chua) and soft-boiled eggs (trứng lòng đào). | Confirmed | First-hand |
 | In the middle of the Vi Ba road is a pagoda with many monkeys. People stop to watch them. | Confirmed | First-hand |
 | The pagoda with the monkeys is Chùa Tam Bảo (chùa Khỉ), 72 Vi Ba. | Confirmed | First-hand; [Foody](https://www.foody.vn/vung-tau/chua-tam-bao); [VinWonders](https://vinwonders.com/vi/wonderpedia/news/nui-lon-vung-tau/) |
+| A cable car goes from Trần Phú up Núi Lớn to Hồ Mây, a park and resort on the top. | Confirmed | First-hand, 2026-11-04 |
+| The cable car of Hồ Mây: the lower station is at 1A Trần Phú, Phường 1. It opened in 2010, so it runs in 2019. Cabins of 8 seats, about 10 minutes to the top station at about 250 m. A source of 2020 to 2021 gives 400.000₫ for a return ticket and the hours 07:00 to 22:00. | Source | [Mia.vn](https://mia.vn/cam-nang-du-lich/kinh-nghiem-di-cap-treo-vung-tau-duong-len-tien-canh-doc-dao-tai-dia-danh-nui-lon-1628) |
+| Hồ Mây today has a large Maitreya Buddha statue (about 30 m), a lake, pine woods, an old French bunker, rides, a water park, and shows. Which of these were there in 2019? | Check | [Mia.vn](https://mia.vn/cam-nang-du-lich/kinh-nghiem-di-cap-treo-vung-tau-duong-len-tien-canh-doc-dao-tai-dia-danh-nui-lon-1628) |
 | Wild monkeys on Núi Lớn sometimes go into houses and bite people. | Source | [Tuổi Trẻ](https://tuoitre.vn/nui-lon.html) |
 | Town anchors that have been in the same place for a long time: the main bus station, the old markets, the big roundabout, and Ngã Năm. | Confirmed | First-hand. I will name the markets and the roundabout. |
 | The homestay hẻm is only homes. The slope of Núi Nhỏ is on one side, and there is just enough space for one row of houses on the other side. There are also houses on the slope side. Nobody sells anything in it. | Confirmed | First-hand, 2026-10-24 and 2026-10-26 |
