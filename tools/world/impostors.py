@@ -277,6 +277,31 @@ def make_impostor(model_id: str, color_of, out_dir: Path) -> dict:
     return {"size": round(size, 4), "views": VIEWS, "cell_px": CELL_PX}
 
 
+# --check: as the trees (tools/trees/build.py), a picture at a quarter of its
+# size can differ in this part of its pixels by more than CHECK_STEP of 255:
+# another processor rounds some edge pixels in another way.
+CHECK_PIXELS = 0.01
+CHECK_STEP = 24
+
+
+def compare_picture(made: Path, kept: Path) -> str:
+    """The problem of a kept picture against the made one, or ""."""
+    import numpy as np  # noqa: PLC0415
+    from PIL import Image  # noqa: PLC0415
+
+    if not kept.exists():
+        return "it is not in assets/world/"
+    a = np.asarray(Image.open(made), dtype=np.int16)
+    b = np.asarray(Image.open(kept), dtype=np.int16)
+    if a.shape != b.shape:
+        return "the size is different"
+    h, w = (a.shape[0] // 4) * 4, (a.shape[1] // 4) * 4
+    small_a = a[:h, :w].reshape(h // 4, 4, w // 4, 4, -1).mean(axis=(1, 3))
+    small_b = b[:h, :w].reshape(h // 4, 4, w // 4, 4, -1).mean(axis=(1, 3))
+    part = float((np.abs(small_a - small_b) > CHECK_STEP).any(axis=-1).mean())
+    return f"{part * 100.0:.2f} % of the pixels are different" if part > CHECK_PIXELS else ""
+
+
 ## The import of the pictures: no lossy compression (the normal and the paint
 ## mask are data), and mipmaps for the far cards.
 IMPORT_PARAMS = {"compress/mode": "0", "mipmaps/generate": "true", "process/fix_alpha_border": "true"}
@@ -325,10 +350,13 @@ def main(argv=None) -> int:
             for suffix in ("_impostor.png", "_impostor_normal.png"):
                 files[mid + suffix] = file_hash(out / (mid + suffix))
             if args.check:
-                for name, digest in files.items():
-                    if not (wf.ASSETS / name).exists() or file_hash(wf.ASSETS / name) != digest:
-                        problems.append(f"{name} is not what impostors.py makes")
-                if entry != {**key, **values, "files": files}:
+                for name in files:
+                    problem = compare_picture(out / name, wf.ASSETS / name)
+                    if problem:
+                        problems.append(f"{name}: {problem}")
+                # The hashes of the pictures can differ on another processor.
+                kept = {k: v for k, v in entry.items() if k != "files"}
+                if kept != {**key, **values}:
                     problems.append(f"{mid}: impostors.json is not what impostors.py makes")
                 continue
             for name in files:

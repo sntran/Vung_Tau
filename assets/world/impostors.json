@@ -2,8 +2,8 @@
 	"models": {
 		"scooter_tay_ga_1": {
 			"glb": "6230e1f95c428279caadba5e7fdf8d102160c522f587ce9c776e1a14c2f777b7",
-			"materials": "460e716690d3c7aadc0783d9bfefcd1a3615f913152dd1ba88820f4d32e77852",
-			"script": "af0aee556e22fecf1d84c7315ec34de7aea1717a27fb692f8be1206d873d2bf9",
+			"materials": "aa6bf8d860ea311b8197748702a236062031429d274e4d6250d32c6072603434",
+			"script": "6a2254bef1a9ff6f0c20d1482891315022c8d4c5adf6f47d580de9ec573d730f",
 			"version": 1,
 			"size": 2.0002,
 			"views": 8,
