@@ -35,7 +35,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 | 0002 | [First-person walking](0002-first-person.md) | Built |
 | 0003 | [Voices and the phone](0003-voices-and-phone.md) | Done |
 | 0004 | [Desktop and the house detail kit](0004-desktop-and-house-detail.md) | Built |
-| 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Built |
+| 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Done |
 | 0006 | [People](0006-people.md) | Approved |
 | 0007 | [Who you are: the passport and the forms of address](0007-who-you-are.md) | Approved |
 | 0020 | [Real trees](0020-real-trees.md) | Built |
@@ -49,7 +49,7 @@ The order can change. A number is only a name: plans 0020 to 0023 were added aft
 |---|---|---|
 | 0003 | [Voices and the phone](0003-voices-and-phone.md) | Done. People speak aloud in Vietnamese with subtitles. The traveler's phone has Listen (transcribe and translate), Lens, Messages, Sổ tay, Clock, and Settings. It replaces the talk panel and the 2D sheets. |
 | 0004 | [Desktop and the house detail kit](0004-desktop-and-house-detail.md) | Built (all defects fixed; I try the macOS and Windows builds after plan 0008). Desktop becomes the main platform, with the Forward+ renderer and quality presets. Tube houses get depth, brick under plaster and paint, wear, and the clutter of a real street. |
-| 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Built. The real ground, hills, coast, beaches, sea, and roads, from OpenStreetMap and the Copernicus elevation data. |
+| 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Done. The real ground, hills, coast, beaches, sea, and roads, from OpenStreetMap and the Copernicus elevation data. |
 | 0023 | [Models from World](0023-models-from-world.md) | Draft, waits until I say that World is ready. The game gets its 3D models from [World](https://github.com/sntran/World), my one repository of models for all my projects, pinned to one version. The first models: scooters, AC units, ceiling fans, and the morning exercise at Bãi Trước. The catalog of every model that the game needs, with the details, and the list of requests to World. |
 | 0006 | [People](0006-people.md) | Approved. The person models wait for the people of World (plan 0023, D6, Q4); the game part stays. People with real bodies, faces, hair, and clothes, made by code with MPFB 2. Library animations, head and eye movement, blinks, faces for each line, and lip sync from the voice audio. |
 | 0007 | [Who you are](0007-who-you-are.md) | Approved. Cô Nga asks for a photo of the passport for the police registration. The player sets the age and the gender. People address the traveler with the correct kinship words (con, em, anh, chị, chú, cô…), and the traveler answers with the correct words. |

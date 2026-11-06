@@ -230,3 +230,20 @@ Commit `8fa9a0e`. The architect ran PT-33 (12:00), PT-35 (low tide), PT-38 (low 
 | D-0005-05 | Partly fixed | From the beach, Hòn Bà is a low hump with trees. At the end of the path (PT-38), the islet is a smooth brown mound with small stones. My photo shows a pile of large grey and brown boulders. |
 
 **Status:** plan 0005 stays "Built" until D-0005-03 and D-0005-05 are corrected. Add to PT-33 and PT-38: in the view of the cape and in the view at the end of the path, the ground near the camera shows rock (a dark grey or brown color with a value below 0.5 for most pixels), not sand.
+
+
+## Re-check of 2026-11-05
+
+I ran PT-33 `geo_views` (343 s), PT-38 `geo_tide` (139 s), and PT-53 `bai_truoc_trees` on `main` at commit `286e6fa`, at 1280 × 720 on the Mobile renderer. All three pass, and I looked at the screenshots.
+
+| Defect | Result | Evidence |
+|---|---|---|
+| D-0005-03 | Fixed | The view of Mũi Nghinh Phong (`106-nghinh_phong_south_1200.png`) shows dark grey and brown granite boulders on the cape, with the sea behind them. The check reads 75 % rock color on the land points from 3 m to 40 m. The boulders have flat faces, which is correct for Low. |
+| D-0005-05 | Fixed | In PT-38, the view from the beach shows Hòn Bà as a dark rock mound with trees and the wet sand around it. At the end of the path, the ground is dark scree with stones, and the edges have boulders. The big boulders are only at the edge: the top is a smooth hump with a stone texture. This is acceptable. The temple comes with plan 0008. |
+
+Notes for later plans, not defects:
+
+- The Bãi Sau view from the road (`108-bai_sau_from_road_1200.png`) is a flat, empty sand plane with two trees. The life of the beach (people, umbrellas, boats) belongs to plan 0015.
+- The names of places overlap in the views of Bãi Trước (`101-bai_truoc_from_water_1200.png`). This is temporary, until plan 0008 replaces the markers.
+
+**Status:** all defects of this report are fixed. Plan 0005 is "Done".

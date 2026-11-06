@@ -69,3 +69,28 @@
 2. D-0020-03 (the street trees from the canopy map).
 3. D-0020-02 and D-0020-04 (the look).
 4. D-0020-05.
+
+
+## Re-check of 2026-11-05
+
+I ran PT-33, PT-38, and PT-53 on `main` at commit `286e6fa`, at 1280 × 720 on the Mobile renderer. All pass. I did not run PT-52 (the sheets) and PT-54 (the budget) again, so I did not check D-0020-04 and D-0020-05.
+
+| Defect | Result | Evidence |
+|---|---|---|
+| D-0020-01 | Partly fixed | PT-33 now checks that nothing is nearer than 3 m to the camera, and it passes (0.0 %). But in `103-nui_nho_north_1200.png`, one tree about 5 m from the camera covers about a fifth of the frame, and more trees stand on the grass inside the gravel ring at the top. The ring is the platform of the statue. So the 3 m check does not find the problem that I described, and the top is not clear. |
+| D-0020-02 | Partly fixed | The leaves of the hill trees are smaller than before (`103-nui_nho_north_1200.png`). The leaves of the street trees at Quang Trung and in the park (`101-quang_trung_high.png`, `002-park_high.png`) are still large flat shapes about 20 cm to 30 cm long at 5 m, with gaps between them. They look like paper cutouts. |
+| D-0020-03 | Fixed | The park and Quang Trung show rows of trees on the tree tops of the canopy map, with the coconut palms of the park. |
+
+New, low:
+
+- **D-0020-06.** The dark lower trunks and the upper trunks of the street trees have a hard line between two colors (`101-quang_trung_high.png`, the tree at the right). Make the change of color gradual.
+- **D-0020-07.** In January, the flame trees of the park and of Quang Trung show many red and orange leaves, like flowers (`002-park_high.png`). Flame trees flower from late April to early July. In January they have dry, thin leaves and no flowers. Check the season values of the type `flame` for day 1 (plan 0005, N30).
+
+**Corrections:**
+
+1. D-0020-01: remove the trees from the area inside the gravel ring at the top of Núi Nhỏ. In PT-33, make the check for objects near the camera 8 m for the views from the tops (5 % of the frame at most).
+2. D-0020-02: smaller leaves for the street tree types, in more groups.
+3. D-0020-06 and D-0020-07.
+4. D-0020-04 and D-0020-05 stay open. I check them when I run PT-52 and PT-54 again.
+
+**Status:** plan 0020 stays "Built".
