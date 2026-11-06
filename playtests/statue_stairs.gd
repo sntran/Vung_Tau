@@ -266,6 +266,8 @@ static func _plaza(d: PlaytestDriver, w: VungTau, entry: Dictionary, route: Pack
 	await d.hold_stick(Vector2(0, -1), 4.0)
 	p = d.state().player
 	var r := Vector2(p.x - c.x, p.z - c.z).length()
+	# The parapet is under the eye, near: look down at it.
+	await d.look_at_point(p + out * 2.0 + Vector3(0, 0.6, 0), 4.0, 15.0)
 	await d.screenshot("top_parapet")
 	d.step("after the push, the player is %.1f m from the middle (the parapet is at %.1f m)" % [r, plaza])
 	d.expect(r < plaza, "the player cannot pass the parapet (%.1f m from the middle, the parapet at %.1f m)" % [r, plaza])

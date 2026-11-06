@@ -539,6 +539,11 @@ def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods,
 COVER_HILLS = {"nui_lon": (1100.0, 20.0), "nui_nho": (700.0, 20.0)}
 
 
+# Round a base (plan 0008, R2): the ground climbs at most this grade from the base, in this band.
+BASE_SIDE_GRADE = 0.6
+BASE_SIDE_M = 6.0
+
+
 def level_places(grid, landmarks_config, found_by_id) -> None:
     """Cuts the ground under each known place with a stand-in to the lowest
     point of its outline (or of its plaza), and writes "base_height" (0.1 m
@@ -564,6 +569,15 @@ def level_places(grid, landmarks_config, found_by_id) -> None:
         lowest = float(np.min(grid.sample(ring[:, 0], -ring[:, 1])))
         mask = terrain.rasterize(grid, [shape])
         grid.heights[mask] = lowest
+        # Round the base, the ground is not higher than a slope of BASE_SIDE_GRADE
+        # up from the base: a cut, with no wall of ground over the edge of the base.
+        side = terrain.rasterize(grid, [shape.buffer(BASE_SIDE_M)]) & ~mask
+        rows, cols = np.nonzero(side)
+        if rows.size:
+            x = grid.x0 + cols * grid.step
+            z = grid.z0 + rows * grid.step
+            d = shapely.distance(shape, shapely.points(x, -z))
+            grid.heights[rows, cols] = np.minimum(grid.heights[rows, cols], lowest + BASE_SIDE_GRADE * d)
         record["base_height"] = round(lowest + 0.1, 2)
         log(f"{landmark['id']}: the ground under it is level at {lowest:.2f} m ({int(mask.sum())} cells)")
 
