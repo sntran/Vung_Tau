@@ -4,7 +4,7 @@
 |---|---|
 | Status | Draft |
 | Branch | `feat/0008-known-structures` |
-| Depends on | 0005 (the real ground), 0020 (the clearings of the trees). Vũng Tàu makes these models itself (D3). They do not come from World. |
+| Depends on | 0005 (the real ground), 0020 (the clearings of the trees), and World: the blueprints of buildings and statues (plan 0023, D9, request W13). |
 | Used by | 0010 (the bus ride passes some of these places), 0016 (Hòn Bà), 0017 (the Vi Ba road), 0024 (the cable car), and the activities of the first release: the stairs to the statue, the lighthouse, Bạch Dinh, Cầu Đá. |
 
 ## 1. Goal
@@ -37,10 +37,10 @@ The places are:
 |---|---|---|
 | D1 | One record for each place in `data/geo/landmarks.json`: the id, the name in Vietnamese and English, the position, the direction, the size, the order of its model, the source of each size, and a status (Confirmed, Source, or Check). | Content is data (AGENTS.md, section 4). I must be able to edit it. |
 | D2 | A place with the status "Check" does not go into the game without my approval. | AGENTS.md, section 7. |
-| D3 | Vũng Tàu makes the known structures itself, not World. There are two ways, by the kind of part: (a) the buildings and the statues come from `tools/landmarks/build.py`, with Blender 5.2.3 as a Python module, the same tool chain as the trees (AGENTS.md, section 5d); (b) the parts that sit on the ground (the stairs, the paths, the platforms, the jetty, and the retaining walls) come from the game at the load of a chunk, from the lines of OpenStreetMap and the heights of the DEM, as the roads do. | Each place is one of a kind: it is not a part that other projects use, so it does not belong in World. A building has a fixed form, so a build tool makes it one time and CI checks it. A stair or a jetty must fit the real ground to the centimeter, so the game makes it on the ground. |
+| D3 | World makes the models of the buildings and the statues with its systems: the same assemblies of materials, parts, and physics as its houses, with new blueprints for towers, villas, churches, temples, and statues (plan 0023, W13). Vũng Tàu owns the drawing of each place: an order in `data/landmarks/NAME.json` with its sizes and a source for each size. The parts that sit on the ground (the stairs, the paths, the platforms, the jetty, and the retaining walls) come from the game at the load of a chunk, from the lines of OpenStreetMap and the heights of the DEM, as the roads do. | A temple, a tower, or a statue has a grammar of parts, like a house. A system in World makes many of them from options, for this game and for other projects (for example the temples and the statues of Tre). A stair or a jetty must fit the real ground to the centimeter, so the game makes it on the ground. Changed on 2026-11-06. |
 | D3a | Until a place has its model, it has a stand-in: a plain shape with the real size, in one color. The Lens app does not show it as a finished place. | The placement, the visibility, the paths, and the tests can be built and checked now. The stand-in is replaced one place at a time. |
-| D3b | Each model comes from a drawing in `data/landmarks/NAME.json`: the sizes, the parts, the materials, and a source for each size. The build makes the same bytes each time, and `build.py --check` in CI compares them. | Content is data. A size with no source is a guess, and I can correct a drawing without code. |
-| D3c | A statue is a human figure from the MakeHuman base mesh (MPFB 2, as in `docs/prototype/people/`), in the pose of the statue, with a robe made as a solid shell over the body, and one material of white concrete with the stains of the sea air. The build makes it at the real size. | The statues are human figures. A figure made of boxes does not look like the statue from Bãi Sau or from the sea. The tool chain of the people prototype is already in the repository. |
+| D3b | Each order is data: the blueprint, the options, the sizes, and the sources. `data/world/orders.json` (plan 0023, R1) lists them, and the lock file pins the bytes. | Content is data. A size with no source is a guess, and I can correct a drawing without code. |
+| D3c | A statue is a figure of the person blueprint of World at the real size, in the pose of the statue, cast as one solid: the body and the robe are one shell of concrete or stone, with the stains of the sea air. A statue can be hollow, with stairs and openings inside. | The statues are human figures. A figure made of boxes does not look like the statue from Bãi Sau or from the sea. Visitors climb inside the statue on Núi Nhỏ to its shoulders. |
 | D4 | What the player can see from a place follows the real ground. The game never adds a line of sight. For example, from Bãi Trước the statue is hidden behind the ridge of Núi Nhỏ, and the lighthouse is mostly hidden. From the south part of Bãi Sau the statue shows above the ridge. | I do not see the lighthouse from Bãi Trước in the real town. The DEM gives the same result (culture notes, section Vũng Tàu). |
 | D5 | No floating name labels in the world. The Lens app names the places. The labels stay as a debug option (F3). | The labels overlap and hide the picture (report 0005, D-0005-02). A person who knows the place does not need a label. |
 | D6 | Each place has a Lens card in the data: the name, the Vietnamese phrase, the English meaning, and a short text. A fact with the status "Check" is not in the text. | Plan 0003 (the Lens app). |
@@ -73,13 +73,13 @@ The places are:
 - **R10.** Night: the lighthouse has a turning light. The statue has a light on it. Both have the status "Check" for the times and the color in 2019, so they stay off until I approve them.
 
 
-### The build of the models (D3)
+### The models (D3)
 
-- **R12.** `tools/landmarks/build.py` (Blender 5.2.3 as a Python module, the packages of `tools/landmarks/requirements.txt`) reads `data/landmarks/*.json` and writes `assets/landmarks/NAME.glb` (near, mid, and far forms), the collision boxes as named nodes, and `manifest.json`. `--only NAME` builds one place. `--check` builds again and compares (CI). The build of all places takes less than 5 minutes in the workspace.
-- **R13.** Shared builders in `tools/landmarks/`: a tower (the lighthouse: a tapered body, a gallery with a rail, the lantern room, the cap), a Southern temple roof (tiles, the curved ends of the ridges), a French villa (Bạch Dinh: the walls, the roof, the balustrades, the tile band under the roof), a church (the steep gable and the bell tower), and a figure (D3c). A place uses the builders, and its drawing gives the values.
-- **R14.** The statue on Núi Nhỏ: the figure is 32 m high, with arms 18.4 m wide from hand to hand, on a base with the carvings of Christ and the twelve apostles. The stairs from the road have 811 steps (Wikipedia, vi; the status is Source until I confirm). The inside of the statue (133 steps to the shoulders) is not in this plan.
-- **R15.** The ground parts (D3 (b)) come from `scripts/geo/` builders: the stairs follow the OSM line with steps of 15 cm to 18 cm and landings, the jetty follows the OSM outline with its stone edge, and a platform is level with a retaining wall on its low side. The materials come from the same roles as the houses (plan 0023, D3).
-- **R16.** The review sheet of each model: the model next to the links of its photos in `landmarks.md`, from the front, the side, and the far distance. I approve each place on its sheet before the stand-in goes.
+- **R12.** One order for each place in `data/landmarks/NAME.json`, and its entry in `data/world/orders.json`. The game imports the files of World as plan 0023 (R2, R6) says: near, mid, and far forms, the collision boxes, and the ports.
+- **R13.** The first orders, in this order: the statue on Núi Nhỏ, the lighthouse, Bạch Dinh, Miếu Hòn Bà, Cầu Đá (the ground part only), then the others. Each order waits for the blueprint of World that it needs (W13).
+- **R14.** The statue on Núi Nhỏ: the figure is 32 m high, with arms 18.4 m wide from hand to hand, on a base with the carvings of Christ and the twelve apostles. The stairs from the road have 811 steps. Inside, 133 steps in a spiral go up to the shoulders, where visitors look out (I confirm this). This plan makes the inside as part of the model, closed to the player. A later plan opens it.
+- **R15.** The ground parts (D3) come from `scripts/geo/` builders: the stairs follow the OSM line with steps of 15 cm to 18 cm and landings, the jetty follows the OSM outline with its stone edge, and a platform is level with a retaining wall on its low side. The materials come from the same roles as the houses (plan 0023, D3).
+- **R16.** The review sheet of each model: the render of World next to the links of its photos in `landmarks.md`, from the front, the side, and the far distance. I approve each place on its sheet before the stand-in goes.
 
 ### Sources
 
@@ -91,7 +91,7 @@ The places are:
 2. Placement and the bases (R2, R5).
 3. Paths, stairs, and collision (R6, R7).
 4. The visibility tests and the far form (R8, R9).
-5. The build tool and the shared builders (R12, R13), then the models one place at a time: the statue and the lighthouse first (R14), because the player sees them from far.
+5. The orders and the models of World, one place at a time (R12 to R14): the statue and the lighthouse first, because the player sees them from far.
 6. The ground parts (R15): the stairs to the statue, the steps of Miếu Hòn Bà, the jetty of Cầu Đá.
 
 ## 6. Play-test scenarios
@@ -107,7 +107,7 @@ The places are:
 
 | # | Criterion |
 |---|---|
-| 1 | The unit tests and PT-59 to PT-64 pass, and `tools/landmarks/build.py --check` passes in CI. |
+| 1 | The unit tests and PT-59 to PT-64 pass, and the lock file of World passes its check (plan 0023, R4). |
 | 2 | I look at the sheets of PT-63 and agree that I know each place. |
 | 3 | The visibility of PT-60 matches the real ground, and the labels are gone. |
 | 4 | Each place has its sources in `landmarks.md`, and no fact with "Check" is in the game. |
@@ -117,5 +117,4 @@ The places are:
 - **Q1.** The sizes of the places. Which sources do we use for the height of the statue, the lighthouse, and the width of Bạch Dinh? The architect finds them and I confirm them.
 - **Q2.** The state in 2019: did Khách sạn Hải Âu stand? Could visitors climb the lighthouse? Was Bạch Dinh a museum, and when was it open? Which temples and pagodas stood above Hạ Long? These facts have the status "Check".
 - **Q3.** The names. The Lens card of the statue uses "Tượng Chúa Kitô Vua", and the Vietnamese phrase uses what people say, "tượng Chúa giang tay". I confirm the other names.
-- **Q4.** The order of the places after the statue and the lighthouse. My proposal: Bạch Dinh, Miếu Hòn Bà, Cầu Đá, then the others.
-- **Q5.** In 2019, visitors climbed inside the statue to its shoulders. Is that an activity for a later plan?
+- **Q5.** Answered: in 2019, visitors climbed inside the statue to its shoulders. A later plan makes it an activity (R14).

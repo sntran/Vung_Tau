@@ -42,7 +42,7 @@ This picture shows the models of World on 2026-10-28 (commit `4ebf010`), rendere
 | D6 | The person models of plan 0006 come from the `person` blueprint of World. World already uses MakeHuman, with a skeleton of 53 bones, as plan 0006 does (D2 there). The approved look of `docs/prototype/people/` is the target for World. The game part of plan 0006 stays in plan 0006: the animations in the game, the head and the eyes, the blinks, the faces, and the lip sync. The model part of plan 0006 (R2 to R11, `tools/people/build.py`) waits for the World requests W3 to W6. | One person blueprint for all my projects. Phượt and Vũng Tàu need the same people. World has no face shapes and no visemes now, and plan 0006 needs them for the lip sync. |
 | D7 | The trees stay in `tools/trees/` until World has a plant blueprint (W12) that makes the 14 types of `data/trees/types.json` with the same look (the sheets of report 0020) and with the same triangles or fewer. Then the tree values move to World as orders. | The trees just passed my review. A move now puts the look at risk. |
 | D8 | Houses: World makes the parts of the house kit and the houses near the player. The game puts them on the lots. The far town stays as blocks (section 2). | The play area has thousands of buildings. A GLB for each building is too many files. The kit parts in MultiMeshes (plan 0004) are fast, and PT-32 measures them. |
-| D9 | The known structures of plan 0008 do not come from World. Vũng Tàu makes them (plan 0008, D3). | Each one is one of a kind and belongs only to this game. Changed on 2026-11-06. |
+| D9 | The known structures of plan 0008 come from World, from blueprints for buildings and statues (W13). Vũng Tàu owns the orders: the sizes and their sources (plan 0008, D3). | A temple, a tower, or a statue is an assembly of parts, like a house, and other projects need them too. Changed on 2026-11-06. |
 | D10 | The models of World are under the AGPL-3.0. I have the copyright of World, so Vũng Tàu uses them with no change to its license (World `README.md`, "The license"). The parts from MakeHuman are CC0. `assets/CREDITS.md` lists World with the commit of the lock. | The license is clear, and each player can see where the models come from. |
 
 ## 4. Requirements
@@ -238,7 +238,7 @@ The people of plan 0006 and the people of the street. All people come from the `
 
 ### 9.9 Known structures (plan 0008)
 
-Vũng Tàu makes these itself (D9, plan 0008). The list stays here so that the catalog is complete. The sizes need sources. These are the facts that we have now.
+Each one is an order of a blueprint of World (D9, W13). The sizes need sources. These are the facts that we have now.
 
 | ID | What | Known facts | Status |
 |---|---|---|---|
@@ -273,7 +273,7 @@ These are the changes that Vũng Tàu needs from World. The numbers W1 to W23 ar
 | W10 | Boats: the ghe (options: length, colors, cabin, flags, load), the thúng chai, the stakes with nets, the ships (far level), the fast ferry, the swim rings, the beach furniture. | B1 to B7 |
 | W11 | Animals: chickens, pigs, dogs, cats, monkeys, fish, birds, with their skeletons and a few animations (walk, eat, sit). | A1 to A5 |
 | W12 | Plants from rules (World `TODO.md`) that can make the 14 tree types of plan 0020 with the same look and budget, and the Tết plants, the garden plants, and the potted plants. Then the trees move to World (D7). | T1, T2, G2, G3, H5 |
-| W13 | Removed on 2026-11-06: plan 0008 makes the statues and the known places in Vũng Tàu. | — |
+| W13 | Blueprints for buildings and statues: a tower, a French villa, a church, a Southern temple (đình, chùa, miếu), and a statue from the person blueprint (cast, hollow with stairs inside, on a base with reliefs). An order gives the outline, the sizes, and the sources. | L1 to L12 |
 | W14 | The same order and the same commit give the same bytes on the factory and with `mix world.order` in a clone (R4). A `license` field in the receipt. A copy that never changes for a release (`/v/VERSION/`, an idea in World `docs/factory.md`). | R2 to R4, D10 |
 | W15 | A far level that is light enough for rows and crowds: at most about 500 triangles for a scooter, 1 500 for a person, 300 for a stool. | D5 |
 | W16 | The Godot import of World `TODO.md`: Vũng Tàu makes `WorldModel` (R6). World can point to it or take it. | R6 |
