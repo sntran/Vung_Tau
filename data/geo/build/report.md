@@ -1,6 +1,6 @@
 # Geodata report
 
-Made by `tools/geo/build.py` on 2026-10-27.
+Made by `tools/geo/build.py` on 2026-11-06.
 
 ## Extents
 
@@ -97,27 +97,27 @@ None.
 
 ## Trees (R12a)
 
-- bang: 1994
-- casuarina: 3509
-- coconut: 909
-- flame: 1623
-- frangipani: 753
-- shade: 3576
-- tall_shade: 186
-- From: bai_truoc_road 194, bai_truoc_road_snapped 15, coast_roads 3970, coast_roads_snapped 321, named_roads 503, named_roads_snapped 114, osm 385, park_bai_truoc 305, park_bai_truoc_snapped 61, parks 1376, parks_snapped 1376, street 5817, street_snapped 5817.
+- bang: 1982
+- casuarina: 3551
+- coconut: 871
+- flame: 1615
+- frangipani: 757
+- shade: 3577
+- tall_shade: 184
+- From: bai_truoc_road 195, bai_truoc_road_snapped 14, coast_roads 3974, coast_roads_snapped 309, named_roads 502, named_roads_snapped 107, osm 385, park_bai_truoc 292, park_bai_truoc_snapped 58, parks 1379, parks_snapped 1379, street 5810, street_snapped 5810.
 
 ## Land cover and trees (report 0005, D-0005-09; plan 0020, D8)
 
 - Sources: ESA WorldCover 2021 v200 (10 m classes) and Meta and WRI High Resolution Canopy Height Maps (v1) (about 1 m, kept on a grid of 2.0 m with the highest value). Both CC BY 4.0.
 - The canopy images over the play area are from 2019.42 to 2019.83 (decimal years, mean 2019.73).
 - A canopy of 3 m or more is a tree, and a canopy of 0.6 m to 3 m in tree cover is a bush (WorldCover has almost no shrubland here). Grassland and bare ground show the ground (R10a). The built-up and the cropland classes keep the rules of the town and of `trees.json`.
-- 86882 trees on the open land, with a mean height of 6.9 m and a mean crown radius of 4.5 m (`canopy_trees.json`, R10a). A tree stands on the highest canopy first, then on the lower canopy, at a spacing of 0.9 of its height (5 m to 12 m): the map has one height top for each group of crowns. The crown of a tree is the canopy that is nearer to it than to another tree.
-- No trees and no bushes on 272.6 ha of paved places and platforms (the OSM areas and the landmarks of `data/geo/clearings.json`), and no tree trunks on the roads and the paths (report 0020, D-0020-01).
+- 86883 trees on the open land, with a mean height of 6.8 m and a mean crown radius of 4.5 m (`canopy_trees.json`, R10a). A tree stands on the highest canopy first, then on the lower canopy, at a spacing of 0.9 of its height (5 m to 12 m): the map has one height top for each group of crowns. The crown of a tree is the canopy that is nearer to it than to another tree.
+- No trees and no bushes on 272.9 ha of paved places and platforms (the OSM areas and the landmarks of `data/geo/clearings.json`), and no tree trunks on the roads and the paths (report 0020, D-0020-01).
 
 | Hill | Area (km²) | Tree cover | Bushes | Grass | Bare | Trees | WorldCover classes |
 |---|---|---|---|---|---|---|---|
 | Núi Lớn | 2.32 | 73 % | 7 % | 8 % | 0 % | 15771 | tree cover 88 %, built-up 11 %, grassland 1 %, bare or sparse 0 %, water 0 % |
-| Núi Nhỏ | 0.92 | 76 % | 8 % | 6 % | 0 % | 6919 | tree cover 92 %, built-up 7 %, grassland 1 %, bare or sparse 0 % |
+| Núi Nhỏ | 0.92 | 76 % | 8 % | 6 % | 0 % | 6931 | tree cover 92 %, built-up 7 %, grassland 1 %, bare or sparse 0 % |
 
 The hills: the land within 1.1 km of the top of Núi Lớn and 0.7 km of the top of Núi Nhỏ, higher than 20 m.
 
@@ -133,13 +133,13 @@ The street and park trees and the canopy map (report 0020, D-0020-03): on the ro
 
 | Group | Trees | Moved to a tree top | Not in the map |
 |---|---|---|---|
-| Quang Trung (Bãi Trước) | 194 | 8 % | 72 % |
-| Thùy Vân, Hạ Long, Trần Phú | 3970 | 8 % | 72 % |
-| Trần Hưng Đạo, Ba Cu | 503 | 23 % | 35 % |
+| Quang Trung (Bãi Trước) | 195 | 7 % | 71 % |
+| Thùy Vân, Hạ Long, Trần Phú | 3974 | 8 % | 71 % |
+| Trần Hưng Đạo, Ba Cu | 502 | 21 % | 35 % |
 | The trees of OSM | 385 | 0 % | 36 % |
-| The park of Bãi Trước | 305 | 20 % | 21 % |
-| The other parks | 1376 | 100 % | 0 % |
-| The other main roads | 5817 | 100 % | 0 % |
+| The park of Bãi Trước | 292 | 20 % | 22 % |
+| The other parks | 1379 | 100 % | 0 % |
+| The other main roads | 5810 | 100 % | 0 % |
 
 ## Town anchors (R6a)
 

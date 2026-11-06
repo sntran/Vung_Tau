@@ -612,3 +612,22 @@ def test_rocky_coast_has_boulders():
     inside = grid.heights[30:90, 30:90] + 0.5
     assert inside.max() > 1.0, "boulders rise more than 1 m"
     assert np.all(grid.heights[:20, :] == -0.5), "the ground outside does not change"
+
+
+def test_inside_ways_clear_the_area_in_a_closed_way():
+    # Report 0020, the re-check of 2026-11-05: no trees inside the gravel ring at the top of Núi Nhỏ.
+    from types import SimpleNamespace
+
+    from geodata import clearings
+
+    ring = np.array([[0.0, 0.0], [20.0, 0.0], [20.0, 20.0], [0.0, 20.0], [0.0, 2.0]])
+    roads_in = [SimpleNamespace(id=7, width=3.5, points=ring), SimpleNamespace(id=8, width=3.5, points=ring + 100.0)]
+    shapes = clearings.inside_shapes(roads_in, {"inside_ways": [7], "margin_m": 2.0})
+    assert len(shapes) == 1
+    assert shapes[0].contains(shapely.geometry.Point(10.0, 10.0))
+    assert not shapes[0].contains(shapely.geometry.Point(110.0, 110.0))
+    assert clearings.inside_shapes(roads_in, {}) == []
+    # Only the points of the way near a landmark make the ring (map z is the opposite of game z).
+    near = {"top": {"found": True, "position": [10.0, -10.0]}}
+    part = clearings.inside_shapes(roads_in, {"inside_ways": [{"way": 7, "near": "top", "within_m": 15.0}]}, near)
+    assert len(part) == 1 and part[0].contains(shapely.geometry.Point(10.0, 10.0))

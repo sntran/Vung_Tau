@@ -29,6 +29,9 @@ uniform vec3 flower_color : source_color = vec3(0.84, 0.15, 0.12);
 uniform vec3 wood_color : source_color = vec3(0.3, 0.25, 0.2);
 // The parts of the leaves that are red or orange, bare (gone), young, and flowers.
 uniform float red_share = 0.0;
+// The part of the trees of a type that have red and orange leaves (report
+// 0020, D-0020-07: some bàng are part red in January, most stay green).
+uniform float red_trees = 1.0;
 uniform float bare_share = 0.0;
 uniform float young_share = 0.12;
 uniform float flower_share = 0.0;
@@ -107,7 +110,8 @@ vec3 tree_leaf_albedo(float leaf_random, float kind, float shade, float tree_ran
 	float tree_bare = clamp(bare_share * (0.3 + 1.4 * tree_random), 0.0, 1.0);
 	bare = kind > 0.25 && kind < 0.75 && r > 1.0 - tree_bare;
 	vec3 color = leaf_color;
-	float red = red_share * (0.4 + 1.2 * fract(tree_random * 3.7));
+	float pick = fract(tree_random * 3.7);
+	float red = pick < red_trees ? red_share * (0.4 + 1.2 * pick / max(red_trees, 0.001)) : 0.0;
 	if (kind > 0.75) {
 		color = dead_color;
 	} else if (kind < 0.25) {

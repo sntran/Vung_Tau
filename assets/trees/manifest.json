@@ -11,7 +11,7 @@
 					"height": 12.79,
 					"radius": 7.44,
 					"impostor_size": 15.33,
-					"sha256": "1ffd5742e748c1591b3212b294d1dcb440d4a21dad6fdeafff4dd711cd9139ac"
+					"sha256": "e38c7241dfb950857e246fac37585c2a817bc61f9a28c87efda57cb802c9e30e"
 				},
 				{
 					"file": "coconut_2.glb",
@@ -21,7 +21,7 @@
 					"height": 13.18,
 					"radius": 6.5,
 					"impostor_size": 13.576,
-					"sha256": "3b1a9a96f6faca9d1ea6da087a797cb13d99ebb1c2f43b1d52c4a599a9c236e4"
+					"sha256": "c08e3f7875b7d46e9317ce9a236fa7974e00c69a14fc8efcde2d4e40bb8f44c4"
 				},
 				{
 					"file": "coconut_3.glb",
@@ -31,7 +31,7 @@
 					"height": 13.48,
 					"radius": 6.54,
 					"impostor_size": 13.883,
-					"sha256": "a62d9510e1c5483d8c8f978563eb591314a3cddfd02f9a16428ce4fdcee409c5"
+					"sha256": "e6823b5ed753b0ccf8d8cdab9d8688e58901e4fe9d4787cef2a1fbe5abdd7f61"
 				}
 			],
 			"templates": 4,
@@ -58,7 +58,7 @@
 				"sha256": "1672e07a63e3cb795b221cebfa6586fd9271dd994cf74d487dac2e2999b9c51a",
 				"normal_sha256": "f796684366a8a30ff64cefbea5ab94052f74c4bc82c7ceb57a90597a10b73227"
 			},
-			"source_hash": "a336d691e4c75abffd7211486899a6d2f086ee1d2a33d523bf6d37867ec32098"
+			"source_hash": "41a30eae9a57d0ce522507d1b4c124b2241be0a8d994b76a2c547175904b189b"
 		},
 		"fan_palm": {
 			"generator": "fan_palm",
@@ -71,7 +71,7 @@
 					"height": 9.29,
 					"radius": 3.35,
 					"impostor_size": 9.573,
-					"sha256": "f6f814c84115483359adba178c0fcb1a8ba102a138ed981253e8b8597ec8ce33"
+					"sha256": "83ce0c01691b5fc2e5e9a4d7a4465cd4969b8e7d13fbfa0b0f905407377a1fd3"
 				},
 				{
 					"file": "fan_palm_2.glb",
@@ -81,7 +81,7 @@
 					"height": 8.51,
 					"radius": 3.24,
 					"impostor_size": 8.761,
-					"sha256": "a58dd7ed3794e665ddd8097f9c77ca410694f7b5056efd9d883abf51fcaa6bcc"
+					"sha256": "078ef854cf0d371621f2b2eb5ae435a5bfb90d13ff1f8bfbb0d244a94233509d"
 				},
 				{
 					"file": "fan_palm_3.glb",
@@ -91,7 +91,7 @@
 					"height": 7.37,
 					"radius": 3.28,
 					"impostor_size": 7.595,
-					"sha256": "45a217cf0b6ec8d9853d0dc7505d9085dc3b25f7cd26652f9cecf41da422c96d"
+					"sha256": "186a75b543a6c7767885b079d920c7af15da36c7ee13cc8b8d55022605d152d9"
 				}
 			],
 			"templates": 3,
@@ -118,40 +118,40 @@
 				"sha256": "1fcb76a4d1ade0d3f21ff5bf067cc2e57002b7a33ff345c7a277f7bd00ddde5a",
 				"normal_sha256": "d317eff2363438fe8ad368d37425fdb0291a5acbb5da48b3261f3ab26a611afa"
 			},
-			"source_hash": "ce30e78afa32fe047268ec39cbddf1d7a754073085b01458d8670c706882e71f"
+			"source_hash": "0f030088bd0ff99282e37529eb4f532e55098f386a1b12f96ecac02360a70231"
 		},
 		"bang": {
 			"generator": "bang",
 			"variants": [
 				{
 					"file": "bang_1.glb",
-					"near_triangles": 16200,
-					"mid_triangles": 420,
-					"cards": 64,
-					"height": 9.94,
-					"radius": 7.17,
-					"impostor_size": 14.778,
-					"sha256": "62592f073af5c87b37662d85053a5283266582650b5065d7a07884489a5974a0"
+					"near_triangles": 34308,
+					"mid_triangles": 540,
+					"cards": 88,
+					"height": 9.05,
+					"radius": 5.98,
+					"impostor_size": 12.322,
+					"sha256": "a00f9aa0470f66a9173284dc351fb754178a7ddee493fbb0bb6c0e6ea7bacf66"
 				},
 				{
 					"file": "bang_2.glb",
-					"near_triangles": 16200,
-					"mid_triangles": 420,
-					"cards": 64,
-					"height": 10.02,
-					"radius": 7.57,
-					"impostor_size": 15.588,
-					"sha256": "d5c78d3ac91645f692bd301351ec60fb95c4bf44d11c2f7df6126fdd12b86a10"
+					"near_triangles": 34308,
+					"mid_triangles": 540,
+					"cards": 88,
+					"height": 9.24,
+					"radius": 6.63,
+					"impostor_size": 13.656,
+					"sha256": "7424110222ee7554f49829f7bb6e15f4bdb8504a116baff53e929967fe414a74"
 				},
 				{
 					"file": "bang_3.glb",
-					"near_triangles": 16200,
-					"mid_triangles": 420,
-					"cards": 64,
-					"height": 10.66,
-					"radius": 7.13,
-					"impostor_size": 14.697,
-					"sha256": "537793f44db8e8e10539728fcf4082af6dfcf62ea49a7fb7db69a503fc0c51be"
+					"near_triangles": 34308,
+					"mid_triangles": 540,
+					"cards": 88,
+					"height": 9.58,
+					"radius": 6.09,
+					"impostor_size": 12.554,
+					"sha256": "e462b44e4b8d4b561509db3fc3236b87f04eca1a6d126cc10c5a45b984b684b3"
 				}
 			],
 			"templates": 3,
@@ -160,10 +160,10 @@
 				"cells": 3,
 				"mean": [
 					0.9997,
-					0.5279,
+					0.5025,
 					0.5
 				],
-				"sha256": "342245f44e7165c953d2db34a8669f7dd5c394b85709132ee48048ab0c731d5e"
+				"sha256": "f1fed63fa0543d02b90030bace24f61f4db70441e4be12ec4c016fa2e2155436"
 			},
 			"impostor": {
 				"file": "bang_impostor.png",
@@ -171,14 +171,14 @@
 				"views": 8,
 				"rows": 3,
 				"mean": [
-					0.9299,
-					0.3915,
-					0.391
+					0.8175,
+					0.307,
+					0.3077
 				],
-				"sha256": "fba8e46601d369a20426933743ee5eb220f071ba15012497aeeb0470a87e2e1f",
-				"normal_sha256": "16b148ababdc73147f9d6d48b969681903f18d7590b8911f9b6f8b4a860386f6"
+				"sha256": "e09fae46232688ea86c7ad49bf54462a9b5294452a2bf2f4acf887850fd6339f",
+				"normal_sha256": "23fa559c9f7a794e539e1dcf393c068b9870b991b68627c97ab95a70c8389a40"
 			},
-			"source_hash": "bb24834e3d1c2397bc3bd80c810e97ba878de00c74f0353e8523f9f963c9ce3c"
+			"source_hash": "1224a8187ba3ceee9621e234f8a6bcec8fbf5f90685823b200b45ec6c9d0264f"
 		},
 		"casuarina": {
 			"generator": "casuarina",
@@ -191,7 +191,7 @@
 					"height": 13.6,
 					"radius": 4.46,
 					"impostor_size": 14.005,
-					"sha256": "3dde99a7a198901181fbd8bdd8728aafd703edbd2455821e46d5b98f3221679a"
+					"sha256": "f77be1198e339bd044f49ec8927b79a8728e2b03fa218c242fb05ddb3fae997e"
 				},
 				{
 					"file": "casuarina_2.glb",
@@ -201,7 +201,7 @@
 					"height": 12.18,
 					"radius": 4.44,
 					"impostor_size": 12.541,
-					"sha256": "f52258a0c6149850da93066e5ee33e3345445617338991d5db3a173811a1b41a"
+					"sha256": "561054a4b3e62d8925007a0ee45e181a963f27ba47e5ed523a6f1ffff4124666"
 				},
 				{
 					"file": "casuarina_3.glb",
@@ -211,7 +211,7 @@
 					"height": 12.13,
 					"radius": 4.48,
 					"impostor_size": 12.494,
-					"sha256": "0f71d83e3ded9eaec6bb605aa30819031fc4035f9e345fcb65e415ae4812381e"
+					"sha256": "08fbf0d5c4e3d51234a3f89274b8b407d352996060af403ce4d8a1fe6dd4acb0"
 				}
 			],
 			"templates": 3,
@@ -238,7 +238,7 @@
 				"sha256": "d6bf8a9a5d635f3ac50cd1c6edb1f94f9d2796922830e7f8fce29c418f19adfb",
 				"normal_sha256": "b829d2a51bc5bb724071322566c5a43d606052d1aab39d6579c90ce400d81ccd"
 			},
-			"source_hash": "8b90c8fb7a6e965acbe628c190eb85005212d16ff735d14428187074cd952f7d"
+			"source_hash": "0af4c3d206b0f2c1a1a461fa1f860947c22f77006e16cb9ece8e1a3661ea62ab"
 		},
 		"flame": {
 			"generator": "flame",
@@ -251,7 +251,7 @@
 					"height": 6.58,
 					"radius": 7.25,
 					"impostor_size": 14.926,
-					"sha256": "a7f22a5acf7da037d052ed29d785f65e3e99cdfe312f5336b715ee461501997c"
+					"sha256": "525b3449794f9efb5db582cee180e4d9a044d9a5997e15f1d6fc7b8b520fb1b5"
 				},
 				{
 					"file": "flame_2.glb",
@@ -261,7 +261,7 @@
 					"height": 6.11,
 					"radius": 7.04,
 					"impostor_size": 14.497,
-					"sha256": "bcb6a7b7c55ce4c5a96ae97771e7ea75d9f34ef5c8fe6ca7968fe51c5e6cb98f"
+					"sha256": "21bf2eab2ff3ac44b9a5d10465b00e335083d3af202e968c0ce9cc1b5992ee49"
 				},
 				{
 					"file": "flame_3.glb",
@@ -271,7 +271,7 @@
 					"height": 6.1,
 					"radius": 6.46,
 					"impostor_size": 13.31,
-					"sha256": "f5c0deb01c7a617a53f9495cc5f7ba7a1cd0f26eb03bb6122badedd03d78f447"
+					"sha256": "30427f3c5d020db15dd7739809e250bc253b599c8bf0bf648f97e54ec08fa463"
 				}
 			],
 			"templates": 3,
@@ -298,7 +298,7 @@
 				"sha256": "2a117b6db9a5d25d7a09361e7e40cfe7c9272f17520b67632ae00da85dfb806b",
 				"normal_sha256": "66eeec4d318c3746ae0c2e620d3c862c9ff5edaa4a42374031d09f60e1e36c5a"
 			},
-			"source_hash": "d3d514e3c94b3fe59f3df83c1c0b09023bf34728b451a386fcc5359c659d78f0"
+			"source_hash": "df2dbea05e834c76ce42eda00157a82306e2304192de6bebdf34789787601053"
 		},
 		"frangipani": {
 			"generator": "frangipani",
@@ -311,7 +311,7 @@
 					"height": 6.19,
 					"radius": 3.8,
 					"impostor_size": 7.835,
-					"sha256": "467a1830358d7a79a07039c52d1ba5c9931e00d9a3cbfdd0efde96a5cafbf013"
+					"sha256": "195c0e40f4f960e8e69dc24dd5e7542d72e898a078d26c3e67825bdc15d99985"
 				},
 				{
 					"file": "frangipani_2.glb",
@@ -321,7 +321,7 @@
 					"height": 5.57,
 					"radius": 3.39,
 					"impostor_size": 6.983,
-					"sha256": "26502758fa10f1da67ce4b24089e143b2b2a01657eafef2a19b2567ea4b4aa66"
+					"sha256": "97a1ab0ab87bde5542cbe360a5fb13457c93cece752ea642b83a83164cebc0f5"
 				},
 				{
 					"file": "frangipani_3.glb",
@@ -331,7 +331,7 @@
 					"height": 5.09,
 					"radius": 3.22,
 					"impostor_size": 6.636,
-					"sha256": "19b8a9db07443200d92e75bcfc273a7b385c12bb4b6325f2b963fc536065de01"
+					"sha256": "17facd190e573f88a47ac7785fae9f33175961a8a514351862c25127c5e453fe"
 				}
 			],
 			"templates": 3,
@@ -358,7 +358,7 @@
 				"sha256": "bf2ff79582dfb5118d55d54aa6c6ac8fe5a70eb4d1783825e33c6c9bfca118b8",
 				"normal_sha256": "6141c3bd23c19077402feeab59adca4857aa8c347f5cfc5e51639848bfe05e5b"
 			},
-			"source_hash": "0d34e5974309ac5b0ec9f895881b0f3edcc8d019f2eec03295bcd79ace1a6a48"
+			"source_hash": "eff6e7e7f75aa79e51af41a6913339fc65e6d54845835282a4542933bef3fc5f"
 		},
 		"araucaria": {
 			"generator": "araucaria",
@@ -371,7 +371,7 @@
 					"height": 17.43,
 					"radius": 2.77,
 					"impostor_size": 17.956,
-					"sha256": "a00c2131846eddbf03617adacd5d638f1035812fc7c74579a2a8b03a75ccba6d"
+					"sha256": "5155165261c51f4fbbdfb888bf63fe07cceb18a693fac23fcdd238a5b8e47826"
 				},
 				{
 					"file": "araucaria_2.glb",
@@ -381,7 +381,7 @@
 					"height": 19.79,
 					"radius": 2.82,
 					"impostor_size": 20.386,
-					"sha256": "e8dabbcccb69d92d1e6734a6733a8317e7fe228dad7b745bcb4cfc281eb0d98f"
+					"sha256": "e2d5109387dab6e5118985ea066a10242358d8c76f3e4f8c3a085f2b1d3c0eb8"
 				},
 				{
 					"file": "araucaria_3.glb",
@@ -391,7 +391,7 @@
 					"height": 19.43,
 					"radius": 2.91,
 					"impostor_size": 20.017,
-					"sha256": "f3e92d862afa4d038259f4e2002d9b810aba242a6772a01512551a0d91449279"
+					"sha256": "b14a4544ad6382198198982d1b6d2da2189c3ee99050409336908c06b30f396f"
 				}
 			],
 			"templates": 3,
@@ -418,40 +418,40 @@
 				"sha256": "fe8e656daa4f15d65ad94df31d2589cc308a2d509d5aec259c4df312235fdca8",
 				"normal_sha256": "e97c077d014310ae4a6637454e8b1c98d131591db50c3191042476bd5c12fb4a"
 			},
-			"source_hash": "a89e0b0efc8bad64b1c59ee340fe8d8cc4e57577298391751f79e8986bed7621"
+			"source_hash": "505d87fd8fd626d79196702446e4c95948553ac23a79b9da923d937d997fd3fb"
 		},
 		"shade": {
 			"generator": "broadleaf",
 			"variants": [
 				{
 					"file": "shade_1.glb",
-					"near_triangles": 21032,
+					"near_triangles": 21096,
 					"mid_triangles": 244,
 					"cards": 78,
 					"height": 12.39,
 					"radius": 4.59,
 					"impostor_size": 12.762,
-					"sha256": "1758c336fec94e2df2d54b108549958519ef526bac2f9951f7a4ce58dee96440"
+					"sha256": "36287d368bbb30273ffb913abd52a1b44b18b99c71e460c989e90157a33cb154"
 				},
 				{
 					"file": "shade_2.glb",
-					"near_triangles": 21032,
+					"near_triangles": 21096,
 					"mid_triangles": 244,
 					"cards": 78,
 					"height": 12.51,
 					"radius": 5.22,
 					"impostor_size": 12.883,
-					"sha256": "62eac85a05df02fae99133445bf9b585ee96e015bac8d39afdb7b12992345edf"
+					"sha256": "2cd1f82602b8e1ae1b15b0019bb260e92a84e37d7929a9adbb75be6b3bed142c"
 				},
 				{
 					"file": "shade_3.glb",
-					"near_triangles": 25388,
+					"near_triangles": 25452,
 					"mid_triangles": 214,
 					"cards": 63,
 					"height": 11.9,
 					"radius": 4.74,
 					"impostor_size": 12.253,
-					"sha256": "e6b923a19ab626248e9db810301c7996bfa260303d966e8482f70e5c764422ac"
+					"sha256": "414efbf41bf1e997399e091f4f318d2694a7758b24aba20df6946b2210c255d3"
 				}
 			],
 			"templates": 3,
@@ -471,47 +471,47 @@
 				"views": 8,
 				"rows": 3,
 				"mean": [
-					0.9202,
-					0.2577,
-					0.2561
+					0.9203,
+					0.2579,
+					0.2563
 				],
-				"sha256": "ae563cec089a642563af4db3185b621f64380f5465591c99321df8c59fbc5a91",
-				"normal_sha256": "c7a5fff7d5c1880157ba9e40c6222288f8f93c050daf90eb7a193de1ccd16f45"
+				"sha256": "788ee06ed5031c726172a2d6a0875c0328f1cc7e6388aab8a0e33668dce7c0cf",
+				"normal_sha256": "9789bf40635d6fe6c5e9cfaa9ba82ad7e5ba4f79bf26cf5b8bfb9dd9030ac677"
 			},
-			"source_hash": "1ab73d3138fbc7e6b9ced387ac8bb7058b5b25b98c5988cb601821bbffeae7cf"
+			"source_hash": "225265180fe22e0e7cab980e43c48de31fbcfedd82999ddd01ab5d8add2922c5"
 		},
 		"tall_shade": {
 			"generator": "broadleaf",
 			"variants": [
 				{
 					"file": "tall_shade_1.glb",
-					"near_triangles": 11672,
+					"near_triangles": 11736,
 					"mid_triangles": 676,
 					"cards": 78,
 					"height": 20.78,
 					"radius": 6.86,
 					"impostor_size": 21.399,
-					"sha256": "4102d1cb8f50e31d728098d6eb89e59a1b86d5ed2f4fa7a42765953499bcea44"
+					"sha256": "f21d5501a96e5edb029d9e442d9265333545ba749251f1e8f926d8b014e3f22f"
 				},
 				{
 					"file": "tall_shade_2.glb",
-					"near_triangles": 9080,
+					"near_triangles": 9144,
 					"mid_triangles": 496,
 					"cards": 60,
 					"height": 22.56,
 					"radius": 6.09,
 					"impostor_size": 23.24,
-					"sha256": "a1550e77e9556441f2f97a78eef9cbc13e9e6ef635aad7abc2376546f1cc7979"
+					"sha256": "67e5f689ddb57c4ebed3b3240175019f7f9a506ed81d9ca66923c267492f6d6f"
 				},
 				{
 					"file": "tall_shade_3.glb",
-					"near_triangles": 11024,
+					"near_triangles": 11088,
 					"mid_triangles": 632,
 					"cards": 74,
 					"height": 21.98,
 					"radius": 6.93,
 					"impostor_size": 22.641,
-					"sha256": "5e970aca56715422c49a1c40a5bf653a51ca699afe25a9aee3edc5e9bd2d2062"
+					"sha256": "51c168697718a8676ae5cbf18bcd6db0b0f026cdf935905f8ceac7c8e0f21075"
 				}
 			],
 			"templates": 3,
@@ -531,47 +531,47 @@
 				"views": 8,
 				"rows": 3,
 				"mean": [
-					0.8859,
-					0.2294,
-					0.2284
+					0.8862,
+					0.2302,
+					0.2292
 				],
-				"sha256": "df82960048c3b4e757f0de2e31bdd4ac5c7f118bc903b65bdcdc9e90174c4b08",
-				"normal_sha256": "d09345c16d023f379c736eef446379baef82d62b4a7d30e6f9695b9f01ffca7c"
+				"sha256": "3a703f86bd2ec4921d35092587fec6e1b5d4876a9a4500be066be0de6e7c7309",
+				"normal_sha256": "90d73a0495d22e686deb052fd7769592d2a92bffe766263dd99b09f9a0df4cbd"
 			},
-			"source_hash": "bf296d2bd1e966f47605f9863aa9a11a75647c99f66cb944605218a2b8fcee40"
+			"source_hash": "027636ff743bb6108563b6b96bd17aa87d3b9b13e43a616734f8e3124133a3d7"
 		},
 		"hill_a": {
 			"generator": "broadleaf",
 			"variants": [
 				{
 					"file": "hill_a_1.glb",
-					"near_triangles": 20636,
+					"near_triangles": 20700,
 					"mid_triangles": 190,
 					"cards": 51,
 					"height": 8.0,
 					"radius": 5.11,
 					"impostor_size": 10.517,
-					"sha256": "272a7c1b90ae2083c5e51044fbf4d6ed18bfaa2339c0937e6e286f867488cefa"
+					"sha256": "bf0016ca168485147e6dd5ab00769ce129cc7d2fd55e3b47e41c0a0bde202f92"
 				},
 				{
 					"file": "hill_a_2.glb",
-					"near_triangles": 21032,
+					"near_triangles": 21096,
 					"mid_triangles": 192,
 					"cards": 52,
 					"height": 8.03,
 					"radius": 4.81,
 					"impostor_size": 9.9,
-					"sha256": "ba9ecaf8e9fe2b4e1906ad7d2768ab01f878ec5bb64a2a7607a10f902a33111e"
+					"sha256": "39748b56804e246f0966d17b8c55931c0499f7a42ac603323f7e4c522cb7ddd1"
 				},
 				{
 					"file": "hill_a_3.glb",
-					"near_triangles": 21032,
+					"near_triangles": 21096,
 					"mid_triangles": 192,
 					"cards": 52,
 					"height": 9.63,
 					"radius": 5.38,
 					"impostor_size": 11.075,
-					"sha256": "e50d4b126fa8a85c8920577d68592aa936b1440be6649440f3a777d1487d63c0"
+					"sha256": "867a1359fdcac65ac31e7cd32235c99f8d694ea3528c89d4b791b742a4b3c290"
 				}
 			],
 			"templates": 3,
@@ -592,46 +592,46 @@
 				"rows": 3,
 				"mean": [
 					0.9394,
-					0.3198,
-					0.3205
+					0.3199,
+					0.3207
 				],
-				"sha256": "64cc41e9e30e9a97556072663097c7e6ce884991aa902ff0c461921628230f0a",
-				"normal_sha256": "9e9085570e5aae1cabf26d75382a2e7bd1e94a4c65f87b6413ebb9f8ed05d388"
+				"sha256": "2deada9dc6c83082a578321c74449770367be80baed2d3d78336c4d23c92d580",
+				"normal_sha256": "0c07919c54784c9c0df0d2029e48fc26ef38ccfee5ecd55cafc10f5e9ee98634"
 			},
-			"source_hash": "fa2c1a7d3c45673d2b40c9fbd1a733f1db6b73ce0f731a4019ddf0ee987dcf00"
+			"source_hash": "6a522eee7de91ef6adedc9495b1860013c7fcd0ed44df3091f34f4a8bb3fafa7"
 		},
 		"hill_b": {
 			"generator": "broadleaf",
 			"variants": [
 				{
 					"file": "hill_b_1.glb",
-					"near_triangles": 15804,
+					"near_triangles": 15852,
 					"mid_triangles": 194,
 					"cards": 59,
 					"height": 12.57,
 					"radius": 3.89,
 					"impostor_size": 12.945,
-					"sha256": "ead66903dbbddcaaf9a9448cca89d1494fede8a3c1e1be3bf8fd72c84bccecf2"
+					"sha256": "871a03619b8c1be702789b56b81f7c7e00dce5f623d5eaefd09b172fd8c0ceb1"
 				},
 				{
 					"file": "hill_b_2.glb",
-					"near_triangles": 15804,
+					"near_triangles": 15852,
 					"mid_triangles": 194,
 					"cards": 59,
 					"height": 12.32,
 					"radius": 3.81,
 					"impostor_size": 12.694,
-					"sha256": "3c9743279aa289175612dc93f0f952517127cbfc89e6c59143123d08dc344fde"
+					"sha256": "d140ffc780d70269d39caf896b00199cbdef4eae310eb2cdb3115d5625087bca"
 				},
 				{
 					"file": "hill_b_3.glb",
-					"near_triangles": 15804,
+					"near_triangles": 15852,
 					"mid_triangles": 194,
 					"cards": 59,
 					"height": 11.88,
 					"radius": 4.06,
 					"impostor_size": 12.237,
-					"sha256": "7694e31c96bc4e644d4b83962b56a11aabb6e4eef29ccf5c6e7ca4efd3e4a5ba"
+					"sha256": "87493ba4e5ac949911d6ccddbe539219127cfda78a8649be53d6317f98b2c5b4"
 				}
 			],
 			"templates": 3,
@@ -652,46 +652,46 @@
 				"rows": 3,
 				"mean": [
 					0.9136,
-					0.2729,
-					0.272
+					0.2731,
+					0.2722
 				],
-				"sha256": "03e0b94a4e76af9771f0ebe891c03fc61075dce40c66ba89b01ae6f56e5bcacc",
-				"normal_sha256": "a59db1ad9a2db2c108b8ea88b2cefe88d889df4b9df7aba82658f1c5cb1b6102"
+				"sha256": "bf100a45260339d9657e0f7f50f665e17d9181a9c8164326383f7ff259f38746",
+				"normal_sha256": "354e728927fb7e33fe3b7ab96cba73cdd4472ad7dcf76cd7f1dc2f5dc5cdb69d"
 			},
-			"source_hash": "bc7628cbdc47c99633aeed46434ebbb24ead41a5ebd5111acacc35c72699b1c7"
+			"source_hash": "e029d0aed22ad3012bd7ef4c2abd33146bab9f914265ce7185156dc8909ae3fe"
 		},
 		"hill_c": {
 			"generator": "broadleaf",
 			"variants": [
 				{
 					"file": "hill_c_1.glb",
-					"near_triangles": 17468,
+					"near_triangles": 17532,
 					"mid_triangles": 174,
 					"cards": 43,
 					"height": 5.3,
 					"radius": 3.4,
 					"impostor_size": 6.995,
-					"sha256": "c579076554c98563f7b453397904b6c078bb4fc1501fac8a3afc30781a3aeef2"
+					"sha256": "7703161e92918efcc98190043095599a5e789a9350aa39adae8b8f0259e03c59"
 				},
 				{
 					"file": "hill_c_2.glb",
-					"near_triangles": 18656,
+					"near_triangles": 18720,
 					"mid_triangles": 180,
 					"cards": 46,
 					"height": 5.19,
 					"radius": 3.34,
 					"impostor_size": 6.886,
-					"sha256": "05b326bf37bd7177726432c37afddcafbc8bdd095edf2ee0bec5886706f199cd"
+					"sha256": "92ecf6110572fcc1a15fc4d9d1a8015ca147559a420931220c9ee31f51c283c8"
 				},
 				{
 					"file": "hill_c_3.glb",
-					"near_triangles": 14696,
+					"near_triangles": 14760,
 					"mid_triangles": 196,
 					"cards": 54,
 					"height": 4.1,
 					"radius": 3.32,
 					"impostor_size": 6.846,
-					"sha256": "4335111770c650a5714b09a368facb3d852bb55639b8047f3ba2d57a6104a5dd"
+					"sha256": "8f0fa422ae59fbc4d2243f0809367c320712083476fbb28c8a4a9ad323494bf0"
 				}
 			],
 			"templates": 3,
@@ -711,47 +711,47 @@
 				"views": 8,
 				"rows": 3,
 				"mean": [
-					0.9345,
-					0.3546,
-					0.3537
+					0.9344,
+					0.3544,
+					0.3535
 				],
-				"sha256": "0d7c0d697d52530fdf05f962be3c8776f132af2838f27ee7fbb8fac40f4dc6b9",
-				"normal_sha256": "01b7f4b5e3af836769f416465e58b0a83414f5f1fe2929df78e92257a96a142b"
+				"sha256": "acb3326b25bcb583d8dae750dfe149ce5376d8a3500f4ccda0299e47b03fb63e",
+				"normal_sha256": "dd938a4507dff158396443b3b4936267a64dfa7387955fc641778f1881961877"
 			},
-			"source_hash": "8eee840dc7321bf25886162275d3a5437927f5cdfebabe61ddab47f6b81ce0ad"
+			"source_hash": "63689fe012cc0cab01ed5fd094be9e79e5869c4faaba4517a02113becf93c119"
 		},
 		"teak": {
 			"generator": "broadleaf",
 			"variants": [
 				{
 					"file": "teak_1.glb",
-					"near_triangles": 3086,
+					"near_triangles": 3134,
 					"mid_triangles": 192,
 					"cards": 58,
 					"height": 15.18,
 					"radius": 5.31,
 					"impostor_size": 15.633,
-					"sha256": "71345c82403cdaeb2b0d907280458adbaf8d5b5dff98b1a055f62c8fa9809b06"
+					"sha256": "32bdc35b7461c40aa3ae75455bcb57d2a1d188fdbaa6691605ae298845b2152f"
 				},
 				{
 					"file": "teak_2.glb",
-					"near_triangles": 3744,
+					"near_triangles": 3792,
 					"mid_triangles": 148,
 					"cards": 36,
 					"height": 14.99,
 					"radius": 5.52,
 					"impostor_size": 15.437,
-					"sha256": "cdc94c41e5cf90e23b5cfe7f9e267a9b57ce7f4faa8de76461c6d00b79a33740"
+					"sha256": "83030b41a3ccab4c02507eeba0530d53d1f31fa71752d58f3d507dadacc0bf03"
 				},
 				{
 					"file": "teak_3.glb",
-					"near_triangles": 3180,
+					"near_triangles": 3228,
 					"mid_triangles": 196,
 					"cards": 60,
 					"height": 16.53,
 					"radius": 5.44,
 					"impostor_size": 17.03,
-					"sha256": "cb262ee97d6cd4b77767664bcff3716e67d4a0f27dda2753c69f179eb691f4a1"
+					"sha256": "fd54c527fa936b3238c4a41574157a87c0231c3cde2e172b1a4eff4827533acf"
 				}
 			],
 			"templates": 3,
@@ -771,14 +771,14 @@
 				"views": 8,
 				"rows": 3,
 				"mean": [
-					0.9288,
-					0.3205,
-					0.3303
+					0.9289,
+					0.3208,
+					0.3306
 				],
-				"sha256": "a3080a963b25bae9764d3ccd5d239ca0cd76b2884a2ffb450d361ce2d47d0324",
-				"normal_sha256": "01da44f5030b489c863bffd570fc8a42e929a7cbeaabce3c53fd61a45a725378"
+				"sha256": "8eb0c42bb89d7b4d52afa3d23dede6078dc71330435cbbcaccb38d598451f8f5",
+				"normal_sha256": "d85f476b77265291be15881d4c5a1a08ac82a67a5cb2547e49cea9b899bd2db8"
 			},
-			"source_hash": "7fbc9eae6187a357391c1f7bec27bc54294e29a57c663e45334849ffcaeb4770"
+			"source_hash": "bcdbcb5d3a9cd47c2a4441531f83f2e1817c80a9f772b08d32d25e0e507c3c72"
 		},
 		"scrub": {
 			"generator": "scrub",
@@ -791,7 +791,7 @@
 					"height": 2.2,
 					"radius": 1.95,
 					"impostor_size": 4.019,
-					"sha256": "3758430ed44fc80f8eaf289ee4b357656bf367ca6ce20ec62883382baac8e585"
+					"sha256": "9ac68cbea98763d8d79e183ec065901374636eec012ef1502cc1be71d407d690"
 				},
 				{
 					"file": "scrub_2.glb",
@@ -801,7 +801,7 @@
 					"height": 2.5,
 					"radius": 1.94,
 					"impostor_size": 4.003,
-					"sha256": "e1b1b6f3a4cb6a2c4667a728605331825204d1df87889e35804d66655dd91ea3"
+					"sha256": "d7d6a9412b9af1180c6861da9593ee029a3d8be94c273f941ba7176f76133207"
 				},
 				{
 					"file": "scrub_3.glb",
@@ -811,7 +811,7 @@
 					"height": 2.38,
 					"radius": 1.9,
 					"impostor_size": 3.913,
-					"sha256": "016b3fe8fb26d5aa655a2096b83530eea59b8d95109ec43f279e41a6b4e7d400"
+					"sha256": "ad5186a79fe51bf78d9a47b6ecd4ededd9ce47984f1b2b4cb673198e15bff12c"
 				}
 			],
 			"templates": 3,
@@ -838,7 +838,7 @@
 				"sha256": "7d555d2c54119ca04685f7c1c59f3163d343608613d013cc7e7e633ab84dcf4a",
 				"normal_sha256": "422df3b6cb2a7d441f49df29e7223457dd283cce7c0e4af3007da344a4c98779"
 			},
-			"source_hash": "b4e7e0d4f55e27c27aacdd49b5fb310bf8e6900fb14ba468fd5a6f6712a5a4c0"
+			"source_hash": "9a9af90796627a1a317c9bc7291028204b6dbec92d1d17ad7a14ac7425141ef6"
 		}
 	},
 	"note": "Made by tools/trees/build.py from data/trees/types.json (plan 0020). Do not change by hand.",

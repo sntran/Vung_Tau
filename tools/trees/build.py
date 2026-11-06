@@ -202,22 +202,26 @@ class Template:
             self.tris.append((a, c, d))
 
 
-def leaf_outline(length, width, shape):
-    """The points of a leaf from its base along +y: base, left side, tip, right side."""
+def leaf_outline(length, width, shape, simple=False):
+    """The points of a leaf from its base along +y: base, left side, tip, right side.
+    A simple leaf has one point on each side, at its widest place: 2 triangles."""
     if shape == "obovate":       # bàng: wide near the tip
         prof = [(0.0, 0.0), (0.45, 0.25), (0.95, 0.62), (0.7, 0.9), (0.0, 1.0)]
     elif shape == "lance":       # frangipani, long narrow leaves
         prof = [(0.0, 0.0), (0.7, 0.2), (0.9, 0.55), (0.45, 0.85), (0.0, 1.0)]
     else:                        # elliptic
         prof = [(0.0, 0.0), (0.65, 0.18), (1.0, 0.5), (0.6, 0.82), (0.0, 1.0)]
-    # Two points on each side: a leaf is 4 triangles.
+    # Two points on each side: a leaf is 4 triangles (2 for a simple leaf).
     inner = prof[2:4] if shape == "obovate" else prof[1:3]
+    if simple:
+        inner = [max(prof, key=lambda q: q[0])]
     left = [(-w * width * 0.5, y * length) for w, y in inner]
     right = [(w * width * 0.5, y * length) for w, y in reversed(inner)]
     return [(0.0, 0.0)] + left + [(0.0, length)] + right
 
 
-def rosette_leaves(t: Template, r: random.Random, center, count, length, width, shape, lift, spread=1.0):
+def rosette_leaves(t: Template, r: random.Random, center, count, length, width, shape, lift, spread=1.0,
+                   simple=False):
     """count leaves out from the center in the x-y plane, cupped up by lift."""
     for k in range(count):
         a = 2 * math.pi * k / count + r.uniform(-0.25, 0.25) * spread
@@ -226,7 +230,7 @@ def rosette_leaves(t: Template, r: random.Random, center, count, length, width, 
         ln = length * r.uniform(0.8, 1.15)
         rise = lift * r.uniform(0.5, 1.2)
         pts = []
-        for x, y in leaf_outline(ln, width * ln / length, shape):
+        for x, y in leaf_outline(ln, width * ln / length, shape, simple):
             u = y / ln
             pts.append(Vector(center) + d * y + side * x + Vector((0, 0, rise * u * u * ln - 0.06 * x * x / max(width, 1e-3))))
         n = (UP * 1.0 - d * rise * 0.8).normalized()
@@ -242,14 +246,14 @@ def template_rosette(seed, leaves, shape, lift=0.25, long=False) -> Template:
     return t
 
 
-def template_spray(seed, rosettes, leaves, shape, lift=0.2) -> Template:
+def template_spray(seed, rosettes, leaves, shape, lift=0.2, simple=False) -> Template:
     """A twig with some rosettes of leaves along it, in the box x -0.5..0.5, y 0..1."""
     r = random.Random(seed)
     t = Template((-0.5, 0.5, 0.0, 1.0))
     for i in range(rosettes):
         y = 0.25 + 0.6 * i / max(1, rosettes - 1) + r.uniform(-0.05, 0.05)
         x = r.uniform(-0.1, 0.1)
-        rosette_leaves(t, r, (x, y, 0.02 * i), leaves, 0.26, 0.15, shape, lift)
+        rosette_leaves(t, r, (x, y, 0.02 * i), leaves, 0.26, 0.15, shape, lift, simple=simple)
     return t
 
 
@@ -414,7 +418,8 @@ def templates_for(gen, v):
                                  c.get("leaf_triangles", 2)) for i in range(3)]
     if gen in ("bang", "broadleaf", "scrub"):
         shape = v.get("leaf_shape", "obovate" if gen == "bang" else "elliptic")
-        return [template_spray(120 + i, v.get("rosettes_per_spray", 3), v.get("leaves_per_rosette", 8), shape)
+        return [template_spray(120 + i, v.get("rosettes_per_spray", 3), v.get("leaves_per_rosette", 8), shape,
+                               simple=v.get("leaf_triangles", 4) == 2)
                 for i in range(3)]
     if gen == "frangipani":
         return [template_rosette(130 + i, v.get("leaves_per_rosette", 12), "lance", lift=0.5, long=True) for i in range(3)]
@@ -533,7 +538,14 @@ def gen_crowned(v, seed, variant, bang_style):
     lean = Vector((r.uniform(-1, 1), r.uniform(-1, 1), 0)) * v.get("lean", 0.15)
     tpts = [Vector((0.05 * math.sin(i), 0.04 * math.cos(i), fork * i / 5)) + lean * (i / 5) for i in range(6)]
     tr = v["trunk_radius"]
-    tree.tubes.append((tpts, [tr * (1 - 0.12 * i / 5) + (tr * 0.4 if i == 0 else 0) for i in range(6)], 0))
+    # The top of the trunk narrows to the size of the leaders, and the leaders
+    # start inside the trunk, so that the fork has no hard line (report 0020,
+    # D-0020-06).
+    leader_r = tr * 0.62 + 0.03
+    radii = [tr * (1 - 0.12 * i / 5) + (tr * 0.4 if i == 0 else 0) for i in range(6)]
+    radii[5] = max(leader_r * 1.15, radii[4] * 0.8)
+    radii[4] = (radii[3] + radii[5]) / 2.0
+    tree.tubes.append((tpts, radii, 0))
     leaders = v["leaders"]
     sprays_per_branch = v.get("sprays_per_branch", 3)
     spray_len = v.get("spray_length", 1.3) * v.get("leaf_size", 1.0)
@@ -548,7 +560,8 @@ def gen_crowned(v, seed, variant, bang_style):
         for k in range(6):
             s = k / 5
             lp.append(tpts[-1] + out * (spread * s ** 1.2) + Vector((0, 0, (top_h - fork) * s)))
-        tree.tubes.append((lp, [tr * 0.62 * (1 - 0.8 * k / 5) + 0.03 for k in range(6)], 1))
+        # The tube of the leader starts inside the trunk; the branches stay on the leader.
+        tree.tubes.append(([tpts[-2]] + lp, [leader_r] + [tr * 0.62 * (1 - 0.8 * k / 5) + 0.03 for k in range(6)], 1))
         for k in range(layers):
             s = 0.25 + 0.75 * k / max(1, layers - 1)
             base, _ = lerp_path(lp, s)
@@ -798,7 +811,8 @@ def add_tube(surf: Surface, tree: Tree, pts, radii, sides):
             n = a * math.cos(t) + b * math.sin(t)
             q = p + n * radii[i]
             shade = min(1.0, 0.45 + 0.55 * min(1.0, q.z / max(1.0, tree.crown_center.z - tree.crown_radii.z)))
-            ring.append(surf.vert(q, n, (0.0, tree.flex(q), WOOD, shade), (k / sides, length / 1.5)))
+            # The flex of the axis point: a ring moves as one, so the base of the trunk stays.
+            ring.append(surf.vert(q, n, (0.0, tree.flex(p), WOOD, shade), (k / sides, length / 1.5)))
         rings.append(ring)
     for r0, r1 in zip(rings, rings[1:]):
         for k in range(sides):
@@ -1171,9 +1185,12 @@ def build_type(name, v, settings, out_dir, script_hash):
     imp_n_path = os.path.join(out_dir, "%s_impostor_normal.png" % name)
     imp, _ = render_impostor(imp_path, imp_n_path, near_for_impostor, imp_px, views)
     cover = float(v.get("impostor_cover", 1.0))
-    if cover != 1.0:
+    shade = float(v.get("impostor_shade", 1.0))
+    if cover != 1.0 or shade != 1.0:
         # Thin parts (needles) are thinner than a pixel of the picture: more cover keeps them (R6).
         imp[..., 3] = np.clip(imp[..., 3] * cover, 0.0, 1.0)
+        # A dense crown is darker inside than the picture shows: the red channel is the shade (R6).
+        imp[..., 0] = np.clip(imp[..., 0] * shade, 0.0, 1.0)
         Image.fromarray(np.round(imp * 255.0).astype(np.uint8), "RGBA").save(imp_path, optimize=False)
     entry["cards"] = {"file": os.path.basename(cards_path), "cells": len(templates), "mean": mean_leaf_cover(cards),
                       "sha256": file_hash(cards_path)}

@@ -56,6 +56,9 @@ const LAND_RADIUS_M := 1500.0
 ## example a tree crown at the eye) cover NEAR_SHARE of a view or less.
 const NEAR_M := 3.0
 const NEAR_SHARE := 0.05
+## The views from the tops (re-check of 2026-11-05): nothing nearer than 8 m
+## covers more than NEAR_SHARE of the frame.
+const TOP_NEAR_M := 8.0
 ## Report 0005, section 8 (D-0005-03 and D-0005-05): the ground near the
 ## camera in the view of the cape shows rock. ROCK_SHARE or more of the points
 ## of the land from ROCK_M.x to ROCK_M.y from the camera have a dark grey or
@@ -87,10 +90,11 @@ func run(d: PlaytestDriver) -> void:
 		await d.wait_frames(5)
 		await d.screenshot("%s_%s" % [view.name, time])
 		if time == "1200":
-			var near := await near_share(d, w)
-			d.step("%s: %.1f %% of the frame is nearer than %.0f m" % [view.name, near * 100.0, NEAR_M])
+			var near_m := TOP_NEAR_M if view.get("top", false) else NEAR_M
+			var near := await near_share(d, w, near_m)
+			d.step("%s: %.1f %% of the frame is nearer than %.0f m" % [view.name, near * 100.0, near_m])
 			d.expect(near <= NEAR_SHARE, "%s: things nearer than %.0f m cover %.1f %% of the frame, %.0f %% or less (D-0020-01)" % [
-					view.name, NEAR_M, near * 100.0, NEAR_SHARE * 100.0])
+					view.name, near_m, near * 100.0, NEAR_SHARE * 100.0])
 		for place: String in view.get("frame", []):
 			var record := w.data.landmark(place)
 			var point := Vector3(record.position[0], maxf(float(record.get("height", 0.0)), 0.0), record.position[1])
@@ -159,11 +163,11 @@ static func _check_canopy(d: PlaytestDriver, w: VungTau, time: String) -> void:
 ## camera at NEAR_M and the background in two colors: a pixel that is the same
 ## in both pictures shows a near thing. The phone button and the action button
 ## are not counted.
-static func near_share(d: PlaytestDriver, w: VungTau) -> float:
+static func near_share(d: PlaytestDriver, w: VungTau, near_m := NEAR_M) -> float:
 	var camera := d.viewport().get_camera_3d()
 	var env := w.environment
 	var saved := [camera.far, env.background_mode, env.background_color, env.fog_enabled, env.reflected_light_source]
-	camera.far = NEAR_M
+	camera.far = near_m
 	env.background_mode = Environment.BG_COLOR
 	env.fog_enabled = false
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
@@ -407,16 +411,16 @@ static func views(w: VungTau) -> Array[Dictionary]:
 		result.append({"name": "bai_truoc_from_water", "eye": middle + out * BAY_OUT_M + Vector3(0, BAY_HEIGHT_M, 0),
 				"target": middle + Vector3(0, 10.0, 0), "frame": ["nui_lon", "nui_nho", "bai_truoc"]})
 		# Higher than the trees of the top, looking at Bãi Trước with Núi Nhỏ behind it.
-		result.append({"name": "nui_lon_south_east", "eye": big_top + Vector3(0, 18.0, 0),
+		result.append({"name": "nui_lon_south_east", "eye": big_top + Vector3(0, 18.0, 0), "top": true,
 				"target": Vector3(front.position[0], 0.0, front.position[1]),
 				"frame": ["nui_nho", "bai_truoc"]})
 	if d_ok(hill):
 		var top := _top(w, hill)
 		var north := _over_trees(w, top)
-		result.append({"name": "nui_nho_north", "eye": north, "target": north + Vector3(0, -40.0, -400.0),
+		result.append({"name": "nui_nho_north", "eye": north, "target": north + Vector3(0, -40.0, -400.0), "top": true,
 				"frame": ["nui_lon"]})
 		if d_ok(back):
-			result.append({"name": "nui_nho_north_east", "eye": top,
+			result.append({"name": "nui_nho_north_east", "eye": top, "top": true,
 					"target": Vector3(back.position[0], 0.0, back.position[1]), "frame": ["bai_sau"]})
 	var cape := w.data.landmark("mui_nghinh_phong")
 	if d_ok(cape):

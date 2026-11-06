@@ -1,6 +1,12 @@
 {
 	"note": "The places with no trees and no bushes (report 0020, D-0020-01). tools/geo/build.py reads this file. Builder values: check.",
-	"osm_keys": ["man_made", "tourism", "amenity", "historic", "building"],
+	"osm_keys": [
+		"man_made",
+		"tourism",
+		"amenity",
+		"historic",
+		"building"
+	],
 	"osm_pedestrian_areas": true,
 	"max_area_m2": 30000,
 	"margin_m": 2.0,
@@ -12,5 +18,13 @@
 		"duc_me_bai_dau": 12.0,
 		"mieu_hon_ba": 6.0
 	},
-	"road_margin_m": 1.5
+	"road_margin_m": 1.5,
+	"inside_ways": [
+		{
+			"way": 35923584,
+			"near": "nui_nho",
+			"within_m": 70.0
+		}
+	],
+	"inside_ways_note": "The areas inside a ring of a way with no trees (report 0020, the re-check of 2026-11-05): the points of the way within within_m of the landmark near, closed into a polygon. 35923584 is the road that goes around the top of Núi Nhỏ in a hairpin."
 }
