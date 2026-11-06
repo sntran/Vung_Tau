@@ -117,6 +117,17 @@ static func _walk(d: PlaytestDriver, w: VungTau, route: PackedVector3Array, from
 		await d.wait_idle(30.0)
 		var now := PlaytestDriver.route_distance(route, d.state().player)
 		if now <= at + 0.2:
+			# A player taps again when a tap does not move them: once, at a nearer
+			# point. A real block stops this tap too.
+			var again := PlaytestDriver.route_point(route, minf(at + 2.5, to))
+			again.y = maxf(w.ground_height(again.x, again.z), w.places.floor_at(again.x, again.z)) + 0.05
+			await d.look_at_point(again, 3.0, 15.0)
+			if await d.try_tap_floor(again) == "":
+				await d.wait_idle(30.0)
+				now = PlaytestDriver.route_distance(route, d.state().player)
+				if now > at + 0.2:
+					d.step("part %d: a second tap at %.0f m moves the player" % [d.phase, at])
+		if now <= at + 0.2:
 			var p: Vector3 = d.state().player
 			var screen := d.viewport().get_camera_3d().unproject_position(target)
 			var hit: Dictionary = d.main().pick(screen)

@@ -23,6 +23,8 @@ const STEP_MAX := 0.18
 const STEP := 0.165
 ## A step of the stairs comes where the ground is this part of a step from the tread.
 const STEP_FOLLOW := 0.6
+## The order of the corners of a collision face that Godot takes as the upper side.
+const STAIR_FACE_SIGN := -1.0
 ## The invisible slope beside the stairs: its width.
 const SKIRT_M := 1.0
 ## The treads stand this much over the ground of the cut (tools/geo/build.py, cut_stairs()).
@@ -563,9 +565,15 @@ func _stair_surface(entry: Dictionary, walk: PackedVector3Array, width: float) -
 			var b := rows[i][k + 1]
 			var c := rows[i + 1][k + 1]
 			var d := rows[i + 1][k]
-			faces.append_array([a, b, c, a, c, d])
+			for tri: Array in [[a, b, c], [a, c, d]]:
+				# One side only, the side up: a contact with the lower side of a
+				# slope was a wall for the player.
+				var n: Vector3 = (tri[1] - tri[0]).cross(tri[2] - tri[0])
+				if n.y * STAIR_FACE_SIGN < 0.0:
+					tri = [tri[0], tri[2], tri[1]]
+				faces.append_array(PackedVector3Array(tri))
 	var shape := ConcavePolygonShape3D.new()
-	shape.backface_collision = true
+	shape.backface_collision = false
 	shape.set_faces(faces)
 	var node := CollisionShape3D.new()
 	node.shape = shape
