@@ -48,6 +48,11 @@ ROAD_SHOULDER_M = 1.5
 ROAD_SMOOTH_M = 16.0
 # The steepest road: 25 % (14 degrees). Steep streets in Vũng Tàu are near this value.
 MAX_ROAD_GRADE = 0.25
+# The steepest grade of the ground under steps (plan 0008, R6): steps of 16.5 cm
+# with treads of 28 cm climb 0.59, so the steps of the game can follow it.
+MAX_STEPS_GRADE = 0.5
+# Long steep steps (the stairs to the statue on Núi Nhỏ) need a deeper cut.
+MAX_STEPS_CUT_M = 8.0
 # The most that a road goes into the ground or above it.
 MAX_ROAD_CUT_M = 4.0
 # The weight of the round join at a bend of a road, against the segments.
@@ -516,6 +521,20 @@ def limit_grade(profile: np.ndarray, spacing: np.ndarray, grade: float, max_chan
     return h
 
 
+def limit_grade_exact(profile: np.ndarray, spacing: np.ndarray, grade: float, max_change: float) -> np.ndarray:
+    """A profile with no part steeper than "grade" (plan 0008, R6: the ground
+    under steps). It is the mean of the highest such profile that is not over
+    the first one (a cut) and the lowest such profile that is not under it (a
+    fill), so the cut and the fill are equal. A point changes not more than
+    "max_change"."""
+    h = profile.astype(np.float64)
+    s = np.concatenate([[0.0], np.cumsum(spacing)])
+    reach = grade * np.abs(s[:, None] - s[None, :])
+    cut = np.min(h[None, :] + reach, axis=1)
+    fill = np.max(h[None, :] - reach, axis=1)
+    return np.clip((cut + fill) / 2.0, h - max_change, h + max_change)
+
+
 def _profile(grid: Grid, road, step: float, locked: np.ndarray | None = None):
     """The height profile of a road. A point on a surface that is set already
     (a junction with a more important road) keeps the height of that surface."""
@@ -530,7 +549,13 @@ def _profile(grid: Grid, road, step: float, locked: np.ndarray | None = None):
         fixed = locked[rows, cols]
         profile = np.where(fixed, raw, profile)
     spacing = np.hypot(np.diff(x), np.diff(z))
-    profile = limit_grade(np.maximum(profile, LAND_MIN_HEIGHT + 0.05), spacing, MAX_ROAD_GRADE, fixed=fixed)
+    profile = np.maximum(profile, LAND_MIN_HEIGHT + 0.05)
+    if road.type == "steps":
+        profile = limit_grade_exact(profile, spacing, MAX_STEPS_GRADE, MAX_STEPS_CUT_M)
+        if fixed is not None:
+            profile = np.where(fixed, raw, profile)
+    else:
+        profile = limit_grade(profile, spacing, MAX_ROAD_GRADE, fixed=fixed)
     return profile, x, z
 
 

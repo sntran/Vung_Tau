@@ -325,6 +325,11 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     # Plan 0008, R2 and D7: the ground under each known place is level, at the
     # lowest point of its outline; the base of the place is 0.1 m over it.
     level_places(grid, config.landmarks, found_by_id)
+    cut_stairs(grid, config.landmarks, found_by_id, roads)
+    # The roads take the heights of the ground again: the bases and the stairs changed it.
+    for road in roads:
+        if road.points is not None and len(road.points) > 0:
+            road.heights = grid.sample(road.points[:, 0], -road.points[:, 1]).tolist()
     (out / "height").mkdir(parents=True)
     chunks = terrain.write_chunks(grid, land_mask, area["chunk_size_m"], area["sea_chunk_margin_m"],
                                   area["height_offset_m"], area["height_step_m"], out / "height")
@@ -561,6 +566,55 @@ def level_places(grid, landmarks_config, found_by_id) -> None:
         grid.heights[mask] = lowest
         record["base_height"] = round(lowest + 0.1, 2)
         log(f"{landmark['id']}: the ground under it is level at {lowest:.2f} m ({int(mask.sum())} cells)")
+
+
+def cut_stairs(grid, landmarks_config, found_by_id, roads) -> None:
+    """The ground under the stairs of each known place (plan 0008, R6, R15):
+    along the line of the steps, the ground climbs not more than
+    terrain.MAX_STEPS_GRADE, so the steps of the game can follow it and the
+    player can walk up. Each cell within the half width of the steps and 1.5
+    cells of the line takes the height of the nearest point of the line. The
+    other roads near the steps set their surfaces before, so this pass comes last."""
+    by_id = {road.id: road for road in roads}
+    for landmark in landmarks_config:
+        place = landmark.get("place")
+        record = found_by_id.get(landmark["id"])
+        if not place or place.get("status") == "Check" or not record or not record.get("found"):
+            continue
+        for way_id in place.get("stairs", []):
+            road = by_id.get(int(way_id))
+            if road is None or road.points is None or len(road.points) < 2:
+                continue
+            x, z = _dense_line(road.points[:, 0], -road.points[:, 1], 0.5)
+            ground = grid.sample(x, z)
+            spacing = np.hypot(np.diff(x), np.diff(z))
+            profile = terrain.limit_grade_exact(ground, spacing, terrain.MAX_STEPS_GRADE, terrain.MAX_STEPS_CUT_M)
+            band = road.width / 2.0 + grid.step * 1.5
+            rows, cols = grid.shape
+            c0 = max(0, int((x.min() - band - grid.x0) / grid.step))
+            c1 = min(cols - 1, int((x.max() + band - grid.x0) / grid.step) + 1)
+            r0 = max(0, int((z.min() - band - grid.z0) / grid.step))
+            r1 = min(rows - 1, int((z.max() + band - grid.z0) / grid.step) + 1)
+            gx, gz = np.meshgrid(grid.x0 + np.arange(c0, c1 + 1) * grid.step, grid.z0 + np.arange(r0, r1 + 1) * grid.step)
+            d2 = (gx[..., None] - x) ** 2 + (gz[..., None] - z) ** 2
+            nearest = np.argmin(d2, axis=-1)
+            inside = np.take_along_axis(d2, nearest[..., None], axis=-1)[..., 0] <= band * band
+            block = grid.heights[r0:r1 + 1, c0:c1 + 1]
+            block[inside] = profile[nearest[inside]]
+            change = float(np.max(np.abs(profile - ground)))
+            log(f"{landmark['id']}: the ground under the steps {way_id} climbs {terrain.MAX_STEPS_GRADE} at most"
+                f" ({int(inside.sum())} cells, {change:.1f} m of change at most)")
+
+
+def _dense_line(x: np.ndarray, z: np.ndarray, step: float) -> tuple[np.ndarray, np.ndarray]:
+    """The points of a line, with a point each "step" m or less."""
+    xs, zs = [x[0]], [z[0]]
+    for i in range(1, len(x)):
+        n = max(1, int(np.ceil(np.hypot(x[i] - x[i - 1], z[i] - z[i - 1]) / step)))
+        t = np.arange(1, n + 1) / n
+        xs.extend(x[i - 1] + (x[i] - x[i - 1]) * t)
+        zs.extend(z[i - 1] + (z[i] - z[i - 1]) * t)
+    return np.asarray(xs), np.asarray(zs)
 
 
 def write_cover(grid, raw, out, projection, land_mask, area, found_by_id, place_mask=None, road_mask=None,

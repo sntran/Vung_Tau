@@ -645,3 +645,15 @@ def test_the_known_places_clear_their_outline_and_stairs():
     assert union.contains(shapely.geometry.Point(12.0, 0.0))
     assert union.contains(shapely.geometry.Point(0.0, -35.0))
     assert not union.contains(shapely.geometry.Point(100.0, 0.0)), "a place with Check clears nothing"
+
+
+def test_the_ground_under_steps_has_no_part_steeper_than_the_grade():
+    from geodata import terrain
+    # A stair: flat for 30 m, then up 30 m in 35 m (0.86), then flat.
+    s = np.arange(0.0, 100.0, 1.0)
+    h = np.where(s < 30, 0.0, np.where(s < 65, (s - 30) * 0.857, 30.0))
+    out = terrain.limit_grade_exact(h, np.diff(s), 0.5, 8.0)
+    assert np.max(np.abs(np.diff(out))) <= 0.5 + 1e-9
+    assert np.max(np.abs(out - h)) <= 8.0 + 1e-9
+    # The cut and the fill are equal: the middle of the steep part stays.
+    assert abs(out[47] - h[47]) < 0.5

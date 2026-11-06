@@ -21,6 +21,10 @@ const CONFIG := "res://data/geo/landmarks.json"
 const STEP_MIN := 0.15
 const STEP_MAX := 0.18
 const STEP := 0.165
+## A step of the stairs comes where the ground is this part of a step from the tread.
+const STEP_FOLLOW := 0.6
+## The shortest tread of the stairs, in meters.
+const TREAD_M := 0.28
 ## A turn of more than this has a landing (R6).
 const TURN_DEG := 30.0
 const LANDING_M := 1.2
@@ -530,61 +534,65 @@ func _stairs(entry: Dictionary, road: Dictionary) -> void:
 
 ## The treads of stairs on a line: {"treads": [{"from", "to", "height"}],
 ## "walk": the line of the noses of the steps, "steps": the count of steps}.
-## A turn of more than TURN_DEG has a flat landing of LANDING_M (R6). Between
-## two landings is a flight. All steps of the stairs have the same height,
-## STEP_MIN to STEP_MAX (from the rise of the whole stairs), and each landing
-## is a whole number of steps over the bottom, at the step nearest to the
-## ground there. So a short flight never needs a step out of the range.
+## All steps of the stairs have the same height, STEP_MIN to STEP_MAX (from
+## the rise of the whole stairs). The steps follow the ground: along the line,
+## a step goes up or down where the ground is more than STEP_FOLLOW of a step
+## from the tread, with a tread of TREAD_M or more. A turn of more than
+## TURN_DEG has a flat landing of LANDING_M (R6), with no step on it.
 static func stair_profile(line: PackedVector3Array) -> Dictionary:
 	var s := PackedFloat32Array([0.0])
 	for i in range(1, line.size()):
 		s.append(s[i - 1] + Vector2(line[i].x - line[i - 1].x, line[i].z - line[i - 1].z).length())
 	var total := s[s.size() - 1]
-	# The ends of the flights and of the landings, in order.
-	var bounds: Array[Vector2] = []  # landings: [from, to]
+	var landings: Array[Vector2] = []  # [from, to] along the line
 	for i in range(1, line.size() - 1):
 		var d0 := Vector2(line[i].x - line[i - 1].x, line[i].z - line[i - 1].z)
 		var d1 := Vector2(line[i + 1].x - line[i].x, line[i + 1].z - line[i].z)
 		if d0.length() > 0.01 and d1.length() > 0.01 and absf(rad_to_deg(d0.angle_to(d1))) > TURN_DEG:
 			var a := maxf(s[i] - LANDING_M / 2.0, 0.0)
 			var b := minf(s[i] + LANDING_M / 2.0, total)
-			if not bounds.is_empty() and a <= bounds[-1].y:
-				bounds[-1].y = b
+			if not landings.is_empty() and a <= landings[-1].y:
+				landings[-1].y = b
 			else:
-				bounds.append(Vector2(a, b))
-	var treads: Array[Dictionary] = []
-	var walk := PackedVector3Array()
+				landings.append(Vector2(a, b))
 	var base := line[0].y
-	var h := base
 	var rise := absf(_height_at(line, s, total) - base)
 	var step := STEP
 	var steps := roundi(rise / STEP)
 	if steps > 0 and rise / steps >= STEP_MIN and rise / steps <= STEP_MAX:
 		step = rise / steps
-	var at := 0.0
+	var treads: Array[Dictionary] = []
+	var walk := PackedVector3Array([_point_at(line, s, 0.0, base)])
+	var h := base
+	var tread_from := 0.0
 	var count := 0
-	walk.append(_point_at(line, s, 0.0, h))
-	for k in bounds.size() + 1:
-		var flight_end := bounds[k].x if k < bounds.size() else total
-		if flight_end > at + 0.01:
-			var end_h := base + roundf((_height_at(line, s, flight_end) - base) / step) * step
-			var dh := end_h - h
-			var n := roundi(absf(dh) / step)
-			var run := (flight_end - at) / maxf(n, 1)
-			if n == 0:
-				treads.append({"from": _point_at(line, s, at, h), "to": _point_at(line, s, flight_end, h), "height": h})
-			for i in n:
-				h += signf(dh) * step
-				var a := at + i * run
-				treads.append({"from": _point_at(line, s, a, h), "to": _point_at(line, s, a + run, h), "height": h})
-				walk.append(_point_at(line, s, a, h))
-				count += 1
-			walk.append(_point_at(line, s, flight_end, h))
-			at = flight_end
-		if k < bounds.size():
-			treads.append({"from": _point_at(line, s, bounds[k].x, h), "to": _point_at(line, s, bounds[k].y, h), "height": h})
-			walk.append(_point_at(line, s, bounds[k].y, h))
-			at = bounds[k].y
+	var at := TREAD_M
+	while at < total - 0.01:
+		var on_landing := false
+		for l: Vector2 in landings:
+			if at >= l.x - 0.01 and at <= l.y + 0.01:
+				on_landing = true
+		var gap := _height_at(line, s, at) - h
+		if not on_landing and absf(gap) > step * STEP_FOLLOW:
+			treads.append({"from": _point_at(line, s, tread_from, h), "to": _point_at(line, s, at, h), "height": h})
+			h += signf(gap) * step
+			walk.append(_point_at(line, s, at, h))
+			tread_from = at
+			count += 1
+			at += TREAD_M
+		else:
+			at += 0.05
+	# The top: the steps that are left, if the ground there is higher or lower.
+	var end_h := base + roundf((_height_at(line, s, total) - base) / step) * step
+	while absf(end_h - h) > step * 0.5 and total - tread_from > 0.1:
+		var nose := minf(tread_from + maxf((total - tread_from) / 2.0, 0.05), total - 0.05)
+		treads.append({"from": _point_at(line, s, tread_from, h), "to": _point_at(line, s, nose, h), "height": h})
+		h += signf(end_h - h) * step
+		walk.append(_point_at(line, s, nose, h))
+		tread_from = nose
+		count += 1
+	treads.append({"from": _point_at(line, s, tread_from, h), "to": _point_at(line, s, total, h), "height": h})
+	walk.append(_point_at(line, s, total, h))
 	return {"treads": treads, "walk": walk, "steps": count}
 
 

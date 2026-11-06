@@ -64,10 +64,10 @@ func test_the_stairs_have_steps_of_15_to_18_cm_and_landings() -> void:
 	for r in rises:
 		assert_between(r, KnownPlaces.STEP_MIN - 0.001, KnownPlaces.STEP_MAX + 0.001, "a step is 15 cm to 18 cm")
 	assert_almost_eq(heights[-1], 9.0, 0.01, "the stairs end at the top")
-	# The landing at the turn: a tread of LANDING_M at x = 20.
+	# The landing at the turn: one tread covers LANDING_M round the corner at x = 20.
+	var half := KnownPlaces.LANDING_M / 2.0
 	var landing := treads.filter(func(t: Dictionary) -> bool:
-		return Vector2(t.to.x - t.from.x, t.to.z - t.from.z).length() >= KnownPlaces.LANDING_M * 0.49 \
-				and absf(t.from.x - 20.0) < 1.0)
+		return t.from.z < 0.01 and t.from.x <= 20.0 - half + 0.01 and absf(t.to.x - 20.0) < 0.01 and t.to.z >= half - 0.01)
 	assert_false(landing.is_empty(), "a landing at the turn")
 
 
