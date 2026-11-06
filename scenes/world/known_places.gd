@@ -23,8 +23,8 @@ const STEP_MAX := 0.18
 const STEP := 0.165
 ## A step of the stairs comes where the ground is this part of a step from the tread.
 const STEP_FOLLOW := 0.6
-## The order of the corners of a collision face that Godot takes as the upper side.
-const STAIR_FACE_SIGN := -1.0
+## The cell of the height map of the collision of stairs, in meters.
+const STAIR_CELL := 0.25
 ## The invisible slope beside the stairs: its width.
 const SKIRT_M := 1.0
 ## The treads stand this much over the ground of the cut (tools/geo/build.py, cut_stairs()).
@@ -535,48 +535,87 @@ func _stairs(entry: Dictionary, road: Dictionary) -> void:
 	stairs.append({"way": int(road.id), "place": entry.id, "points": walk, "steps": profile.steps, "width": width})
 
 
-## The collision of stairs (R7): one surface (a trimesh) on the walk line,
-## "width" wide, and at each side an invisible slope of SKIRT_M from the edge to
-## the ground (at most SKIRT_M * 0.8 down or up), so that a player who walks
-## beside the stairs can walk onto them (a step up is 0.25 m at most). Boxes on
-## each part of the line had edges at the joints, where the player stopped.
+## The collision of stairs (R7): a height map, as the ground has. In the
+## width of the stairs, a cell has the height of the nearest point of the walk
+## line (the noses of the steps). In SKIRT_M beside the stairs, the height goes
+## from the edge to the ground (at most SKIRT_M * 0.8 down or up), so that a
+## player who walks beside the stairs can walk onto them. Farther out, the map
+## is under the ground. Boxes on each part of the line had edges at the joints,
+## and one surface on the line had steep folds on the inner side of a bend.
 func _stair_surface(entry: Dictionary, walk: PackedVector3Array, width: float) -> void:
 	if walk.size() < 2:
 		return
-	var rows: Array[PackedVector3Array] = []  # [outer left, left, right, outer right] for each point
-	for i in walk.size():
-		var a := walk[maxi(i - 1, 0)]
-		var b := walk[mini(i + 1, walk.size() - 1)]
-		var t := Vector3(b.x - a.x, 0.0, b.z - a.z).normalized()
-		var side := Vector3(-t.z, 0.0, t.x)
-		var p := walk[i]
-		var left := p + side * (width / 2.0)
-		var right := p - side * (width / 2.0)
-		var outer_left := left + side * SKIRT_M
-		var outer_right := right - side * SKIRT_M
-		var reach := SKIRT_M * 0.8
-		outer_left.y = clampf(world.ground_height(outer_left.x, outer_left.z), p.y - reach, p.y + reach)
-		outer_right.y = clampf(world.ground_height(outer_right.x, outer_right.z), p.y - reach, p.y + reach)
-		rows.append(PackedVector3Array([outer_left, left, right, outer_right]))
-	var faces := PackedVector3Array()
-	for i in rows.size() - 1:
-		for k in 3:
-			var a := rows[i][k]
-			var b := rows[i][k + 1]
-			var c := rows[i + 1][k + 1]
-			var d := rows[i + 1][k]
-			for tri: Array in [[a, b, c], [a, c, d]]:
-				# One side only, the side up: a contact with the lower side of a
-				# slope was a wall for the player.
-				var n: Vector3 = (tri[1] - tri[0]).cross(tri[2] - tri[0])
-				if n.y * STAIR_FACE_SIGN < 0.0:
-					tri = [tri[0], tri[2], tri[1]]
-				faces.append_array(PackedVector3Array(tri))
-	var shape := ConcavePolygonShape3D.new()
-	shape.backface_collision = false
-	shape.set_faces(faces)
+	var half := width / 2.0
+	var reach := half + SKIRT_M
+	var low := Vector2(INF, INF)
+	var high := Vector2(-INF, -INF)
+	for p in walk:
+		low = Vector2(minf(low.x, p.x), minf(low.y, p.z))
+		high = Vector2(maxf(high.x, p.x), maxf(high.y, p.z))
+	low -= Vector2.ONE * (reach + STAIR_CELL)
+	high += Vector2.ONE * (reach + STAIR_CELL)
+	var nx := ceili((high.x - low.x) / STAIR_CELL) + 1
+	var nz := ceili((high.y - low.y) / STAIR_CELL) + 1
+	var best_d := PackedFloat32Array()
+	var best_h := PackedFloat32Array()
+	best_d.resize(nx * nz)
+	best_d.fill(INF)
+	best_h.resize(nx * nz)
+	for i in walk.size() - 1:
+		var a := walk[i]
+		var b := walk[i + 1]
+		var a2 := Vector2(a.x, a.z)
+		var b2 := Vector2(b.x, b.z)
+		var ab := b2 - a2
+		var length2 := maxf(ab.length_squared(), 0.0001)
+		var c0 := maxi(0, floori((minf(a.x, b.x) - reach - low.x) / STAIR_CELL))
+		var c1 := mini(nx - 1, ceili((maxf(a.x, b.x) + reach - low.x) / STAIR_CELL))
+		var r0 := maxi(0, floori((minf(a.z, b.z) - reach - low.y) / STAIR_CELL))
+		var r1 := mini(nz - 1, ceili((maxf(a.z, b.z) + reach - low.y) / STAIR_CELL))
+		for r in range(r0, r1 + 1):
+			for c in range(c0, c1 + 1):
+				var q := Vector2(low.x + c * STAIR_CELL, low.y + r * STAIR_CELL)
+				var t := clampf((q - a2).dot(ab) / length2, 0.0, 1.0)
+				var d := q.distance_to(a2 + ab * t)
+				var k := r * nx + c
+				if d < best_d[k]:
+					best_d[k] = d
+					best_h[k] = lerpf(a.y, b.y, t)
+	# Farther out, the map is far under the ground (the ground has its own collision).
+	var deep := INF
+	for p in walk:
+		deep = minf(deep, p.y)
+	deep -= 20.0
+	var heights := PackedFloat32Array()
+	heights.resize(nx * nz)
+	for r in nz:
+		for c in nx:
+			var k := r * nx + c
+			var d := best_d[k]
+			var h := best_h[k]
+			if d <= half:
+				heights[k] = h
+			elif d <= reach:
+				var x := low.x + c * STAIR_CELL
+				var z := low.y + r * STAIR_CELL
+				var g := clampf(world.ground_height(x, z), h - SKIRT_M * 0.8, h + SKIRT_M * 0.8)
+				heights[k] = lerpf(h, g, (d - half) / SKIRT_M)
+			else:
+				heights[k] = deep
+	var shape := HeightMapShape3D.new()
+	shape.map_width = nx
+	shape.map_depth = nz
+	var scaled := PackedFloat32Array()
+	scaled.resize(heights.size())
+	for k in heights.size():
+		scaled[k] = heights[k] / STAIR_CELL
+	shape.map_data = scaled
 	var node := CollisionShape3D.new()
 	node.shape = shape
+	# Godot puts the middle of the map at the origin of the node, with 1 m
+	# between samples: the node has a uniform scale of STAIR_CELL.
+	var center := Vector3(low.x + (nx - 1) * STAIR_CELL / 2.0, 0.0, low.y + (nz - 1) * STAIR_CELL / 2.0)
+	node.transform = Transform3D(Basis().scaled(Vector3.ONE * STAIR_CELL), center)
 	_body(entry).add_child(node)
 
 
