@@ -32,6 +32,9 @@ func run(d: PlaytestDriver) -> void:
 	var route := route_line(w, entry.place.get("route", []))
 	if not d.expect(route.size() >= 2, "the route from the road has points"):
 		return
+	# The walk ends on the plaza: the route ends at its first point 1.5 m inside
+	# the plaza (the ways round the statue come after it).
+	route = _to_plaza(route, entry)
 	var total := PlaytestDriver._length(route)
 	d.step("the route from the road to the plaza: %.0f m, %d stairs, %d steps" % [total, w.places.stairs.size(),
 			w.places.stairs.reduce(func(n: int, s: Dictionary) -> int: return n + int(s.steps), 0)])
@@ -49,6 +52,18 @@ func run(d: PlaytestDriver) -> void:
 		await _walk(d, w, route, from, to)
 	else:
 		await _plaza(d, w, entry, route, total)
+
+
+## The route up to its first point 1.5 m inside the plaza.
+static func _to_plaza(route: PackedVector3Array, entry: Dictionary) -> PackedVector3Array:
+	var c: Vector3 = entry.get("center", Vector3.ZERO)
+	var inside := float(entry.get("plaza", 15.0)) - 1.5
+	var result := PackedVector3Array()
+	for i in route.size():
+		result.append(route[i])
+		if Vector2(route[i].x - c.x, route[i].z - c.z).length() <= inside:
+			break
+	return result
 
 
 ## The route: the OSM ways in their order from the road, joined end to end.

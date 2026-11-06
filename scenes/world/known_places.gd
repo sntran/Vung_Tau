@@ -25,6 +25,8 @@ const STEP := 0.165
 const STEP_FOLLOW := 0.6
 ## The cell of the height map of the collision of stairs, in meters.
 const STAIR_CELL := 0.25
+## The height of a cell is a mean of the parts of the line within this distance of the nearest one.
+const STAIR_BLEND_M := 0.75
 ## The invisible slope beside the stairs: its width, and how far under ground_height() it ends.
 const SKIRT_M := 2.0
 const SKIRT_UNDER := 0.4
@@ -44,6 +46,8 @@ const NEAR_END := 450.0
 const FAR_END := 4500.0
 const PARAPET_HEIGHT := 1.0
 const PARAPET_WIDTH := 0.3
+## The opening of the parapet where stairs or a path come to the plaza.
+const PLAZA_OPENING_M := 3.0
 ## The jetty: its deck is this much over the highest tide of the game year.
 const JETTY_OVER_TIDE := 0.6
 const JETTY_CURB := 0.35
@@ -246,9 +250,12 @@ func _statue(entry: Dictionary) -> void:
 	_prism(near, ring_points(c, plaza, 32), ground_low, y0)
 	# The parapet round the plaza (R6): the player cannot pass it.
 	var outer := ring_points(c, plaza, 32)
+	var openings := _plaza_openings(place, c, plaza)
 	for i in 32:
 		var a := outer[i]
 		var b := outer[(i + 1) % 32]
+		if _in_opening((a + b) / 2.0, openings, PLAZA_OPENING_M / 2.0 + a.distance_to(b) / 2.0):
+			continue
 		var inset := (c - (a + b) / 2.0).normalized() * (PARAPET_WIDTH / 2.0)
 		_wall(near, a + inset, b + inset, y0, y0 + PARAPET_HEIGHT, PARAPET_WIDTH)
 		var mid := (a + b) / 2.0 + inset
@@ -268,7 +275,13 @@ func _statue(entry: Dictionary) -> void:
 	mesh.surface_set_material(0, _material(stone))
 	_add_mesh(entry, mesh, false)
 	# The floor of the plaza and the solid base of the statue (R7).
-	_box_shape(entry, Vector3(plaza * 2.0, 0.6, plaza * 2.0), Transform3D(Basis(), Vector3(c.x, y0 - 0.3, c.y)))
+	var floor_shape := CollisionShape3D.new()
+	var disc := CylinderShape3D.new()
+	disc.radius = plaza
+	disc.height = 0.6
+	floor_shape.shape = disc
+	floor_shape.position = Vector3(c.x, y0 - 0.3, c.y)
+	_body(entry).add_child(floor_shape)
 	_box_shape(entry, Vector3(base_w * 0.92, base_h + 2.0, base_w * 0.92), Transform3D(Basis(), Vector3(c.x, y0 + (base_h + 2.0) / 2.0, c.y)))
 	# The far form (R9): the base, the figure, and the arms.
 	var far := SurfaceTool.new()
@@ -284,6 +297,40 @@ func _statue(entry: Dictionary) -> void:
 	entry.top = dome_top + figure
 	entry.center = Vector3(c.x, y0, c.y)
 	entry.plaza = plaza
+
+
+## The points where the stairs and the route of a place cross the ring of its
+## plaza: the parapet has an opening there (R6).
+func _plaza_openings(place: Dictionary, c: Vector2, radius: float) -> Array[Vector2]:
+	var result: Array[Vector2] = []
+	var ids: Array = place.get("stairs", []) + place.get("route", [])
+	for road: Dictionary in world.data.roads:
+		if not ids.has(road.id) and not ids.has(float(road.id)) and not ids.has(int(road.id)):
+			continue
+		var points: Array = road.points
+		for i in points.size() - 1:
+			var a := Vector2(points[i][0], points[i][2])
+			var b := Vector2(points[i + 1][0], points[i + 1][2])
+			if (a.distance_to(c) - radius) * (b.distance_to(c) - radius) <= 0.0:
+				var t := 0.5
+				var lo := 0.0
+				var hi := 1.0
+				for step in 20:
+					t = (lo + hi) / 2.0
+					var inside_a := a.distance_to(c) < radius
+					if (a.lerp(b, t).distance_to(c) < radius) == inside_a:
+						lo = t
+					else:
+						hi = t
+				result.append(a.lerp(b, t))
+	return result
+
+
+static func _in_opening(p: Vector2, openings: Array[Vector2], half: float) -> bool:
+	for o in openings:
+		if p.distance_to(o) <= half:
+			return true
+	return false
 
 
 ## The arms: a box across the figure, at right angles to the direction of the
@@ -562,26 +609,40 @@ func _stair_surface(entry: Dictionary, walk: PackedVector3Array, width: float) -
 	best_d.resize(nx * nz)
 	best_d.fill(INF)
 	best_h.resize(nx * nz)
-	for i in walk.size() - 1:
-		var a := walk[i]
-		var b := walk[i + 1]
-		var a2 := Vector2(a.x, a.z)
-		var b2 := Vector2(b.x, b.z)
-		var ab := b2 - a2
-		var length2 := maxf(ab.length_squared(), 0.0001)
-		var c0 := maxi(0, floori((minf(a.x, b.x) - reach - low.x) / STAIR_CELL))
-		var c1 := mini(nx - 1, ceili((maxf(a.x, b.x) + reach - low.x) / STAIR_CELL))
-		var r0 := maxi(0, floori((minf(a.z, b.z) - reach - low.y) / STAIR_CELL))
-		var r1 := mini(nz - 1, ceili((maxf(a.z, b.z) + reach - low.y) / STAIR_CELL))
-		for r in range(r0, r1 + 1):
-			for c in range(c0, c1 + 1):
-				var q := Vector2(low.x + c * STAIR_CELL, low.y + r * STAIR_CELL)
-				var t := clampf((q - a2).dot(ab) / length2, 0.0, 1.0)
-				var d := q.distance_to(a2 + ab * t)
-				var k := r * nx + c
-				if d < best_d[k]:
-					best_d[k] = d
-					best_h[k] = lerpf(a.y, b.y, t)
+	# Two passes: the nearest distance of each cell, then a mean of the heights
+	# of the parts of the line within STAIR_BLEND_M of that distance. On the
+	# inner side of a bend, the nearest point jumps from one leg to the other,
+	# and the height of the nearest point jumps with it.
+	var sum_w := PackedFloat32Array()
+	sum_w.resize(nx * nz)
+	for pass_index in 2:
+		for i in walk.size() - 1:
+			var a := walk[i]
+			var b := walk[i + 1]
+			var a2 := Vector2(a.x, a.z)
+			var b2 := Vector2(b.x, b.z)
+			var ab := b2 - a2
+			var length2 := maxf(ab.length_squared(), 0.0001)
+			var c0 := maxi(0, floori((minf(a.x, b.x) - reach - low.x) / STAIR_CELL))
+			var c1 := mini(nx - 1, ceili((maxf(a.x, b.x) + reach - low.x) / STAIR_CELL))
+			var r0 := maxi(0, floori((minf(a.z, b.z) - reach - low.y) / STAIR_CELL))
+			var r1 := mini(nz - 1, ceili((maxf(a.z, b.z) + reach - low.y) / STAIR_CELL))
+			for r in range(r0, r1 + 1):
+				for c in range(c0, c1 + 1):
+					var q := Vector2(low.x + c * STAIR_CELL, low.y + r * STAIR_CELL)
+					var t := clampf((q - a2).dot(ab) / length2, 0.0, 1.0)
+					var d := q.distance_to(a2 + ab * t)
+					var k := r * nx + c
+					if pass_index == 0:
+						best_d[k] = minf(best_d[k], d)
+					else:
+						var weight := 1.0 - (d - best_d[k]) / STAIR_BLEND_M
+						if weight > 0.0:
+							best_h[k] += weight * lerpf(a.y, b.y, t)
+							sum_w[k] += weight
+	for k in best_h.size():
+		if sum_w[k] > 0.0:
+			best_h[k] /= sum_w[k]
 	# Farther out, the map is far under the ground (the ground has its own collision).
 	var deep := INF
 	for p in walk:
