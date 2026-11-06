@@ -98,18 +98,22 @@ static func _walk(d: PlaytestDriver, w: VungTau, route: PackedVector3Array, from
 	while at < to - 1.0 and tries < 120:
 		tries += 1
 		var target := PlaytestDriver.route_point(route, minf(at + TAP_M, to))
-		target.y = w.ground_height(target.x, target.z) + 0.05
+		target.y = maxf(w.ground_height(target.x, target.z), w.places.floor_at(target.x, target.z)) + 0.05
 		await d.look_at_point(target, 3.0, 15.0)
 		if await d.try_tap_floor(target) != "":
 			# The point is not on the screen (a step or a wall in front): a nearer one.
 			target = PlaytestDriver.route_point(route, minf(at + TAP_M * 0.5, to))
-			target.y = w.ground_height(target.x, target.z) + 0.05
+			target.y = maxf(w.ground_height(target.x, target.z), w.places.floor_at(target.x, target.z)) + 0.05
 			await d.look_at_point(target, 3.0, 15.0)
-			if await d.try_tap_floor(target) != "":
+			var error := await d.try_tap_floor(target)
+			if error != "":
+				d.step("part %d: no tap at %.0f m: %s" % [d.phase, at, error])
 				break
 		await d.wait_idle(30.0)
 		var now := PlaytestDriver.route_distance(route, d.state().player)
 		if now <= at + 0.2:
+			var p: Vector3 = d.state().player
+			d.step("part %d: a tap at %s does not move the player from %.0f m (%s)" % [d.phase, target, at, p])
 			break
 		at = now
 	d.main().get_tree().process_frame.disconnect(check)

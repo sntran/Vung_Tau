@@ -23,6 +23,8 @@ const STEP_MAX := 0.18
 const STEP := 0.165
 ## A step of the stairs comes where the ground is this part of a step from the tread.
 const STEP_FOLLOW := 0.6
+## The treads stand this much over the ground of the cut (tools/geo/build.py, cut_stairs()).
+const STAIR_LIFT := 0.12
 ## The shortest tread of the stairs, in meters.
 const TREAD_M := 0.28
 ## A turn of more than this has a landing (R6).
@@ -486,7 +488,7 @@ func _cylinder_shape(entry: Dictionary, c: Vector2, r: float, y0: float, y1: flo
 func _stairs(entry: Dictionary, road: Dictionary) -> void:
 	var line := PackedVector3Array()
 	for p: Array in road.points:
-		line.append(Vector3(p[0], world.ground_height(p[0], p[2]), p[2]))
+		line.append(Vector3(p[0], world.ground_height(p[0], p[2]) + STAIR_LIFT, p[2]))
 	if line.size() < 2:
 		return
 	var width := maxf(float(road.get("width", 2.0)), 1.5)
