@@ -87,3 +87,16 @@ func test_a_box_has_its_faces_to_the_outside() -> void:
 		var face := (vertices[i + 2] - vertices[i]).cross(vertices[i + 1] - vertices[i])
 		assert_gt(face.dot(middle - Vector3(1, 2, 3)), 0.0, "triangle %d faces out" % (i / 3))
 		assert_gt(normals[i].dot(middle - Vector3(1, 2, 3)), 0.0, "the normal of triangle %d points out" % (i / 3))
+
+
+## A short flight between two turns has steps of 15 cm to 18 cm too (PT-61
+## found a step of 14 cm on the way 788327915).
+func test_a_short_flight_has_steps_in_the_range() -> void:
+	var line := PackedVector3Array([Vector3(0, 0, 0), Vector3(4, 0.25, 0), Vector3(4, 0.25, 4), Vector3(14, 3.3, 4)])
+	var profile := KnownPlaces.stair_profile(line)
+	var walk: PackedVector3Array = profile.walk
+	for i in range(1, walk.size()):
+		var r := absf(walk[i].y - walk[i - 1].y)
+		if r > 0.001:
+			assert_between(r, KnownPlaces.STEP_MIN - 0.001, KnownPlaces.STEP_MAX + 0.001, "the step %d is 15 cm to 18 cm" % i)
+	assert_almost_eq(walk[walk.size() - 1].y, 3.3, 0.01, "the stairs end at the top")

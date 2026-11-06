@@ -531,8 +531,10 @@ func _stairs(entry: Dictionary, road: Dictionary) -> void:
 ## The treads of stairs on a line: {"treads": [{"from", "to", "height"}],
 ## "walk": the line of the noses of the steps, "steps": the count of steps}.
 ## A turn of more than TURN_DEG has a flat landing of LANDING_M (R6). Between
-## two landings is a flight: its steps are equal, STEP_MIN to STEP_MAX high,
-## up or down to the ground at the end of the flight.
+## two landings is a flight. All steps of the stairs have the same height,
+## STEP_MIN to STEP_MAX (from the rise of the whole stairs), and each landing
+## is a whole number of steps over the bottom, at the step nearest to the
+## ground there. So a short flight never needs a step out of the range.
 static func stair_profile(line: PackedVector3Array) -> Dictionary:
 	var s := PackedFloat32Array([0.0])
 	for i in range(1, line.size()):
@@ -552,22 +554,27 @@ static func stair_profile(line: PackedVector3Array) -> Dictionary:
 				bounds.append(Vector2(a, b))
 	var treads: Array[Dictionary] = []
 	var walk := PackedVector3Array()
-	var h := line[0].y
+	var base := line[0].y
+	var h := base
+	var rise := absf(_height_at(line, s, total) - base)
+	var step := STEP
+	var steps := roundi(rise / STEP)
+	if steps > 0 and rise / steps >= STEP_MIN and rise / steps <= STEP_MAX:
+		step = rise / steps
 	var at := 0.0
 	var count := 0
 	walk.append(_point_at(line, s, 0.0, h))
 	for k in bounds.size() + 1:
 		var flight_end := bounds[k].x if k < bounds.size() else total
 		if flight_end > at + 0.01:
-			var dh := _height_at(line, s, flight_end) - h
-			var n := roundi(absf(dh) / STEP)
-			if n > 0 and absf(dh) / n > STEP_MAX:
-				n = ceili(absf(dh) / STEP_MAX)
+			var end_h := base + roundf((_height_at(line, s, flight_end) - base) / step) * step
+			var dh := end_h - h
+			var n := roundi(absf(dh) / step)
 			var run := (flight_end - at) / maxf(n, 1)
 			if n == 0:
 				treads.append({"from": _point_at(line, s, at, h), "to": _point_at(line, s, flight_end, h), "height": h})
 			for i in n:
-				h += dh / n
+				h += signf(dh) * step
 				var a := at + i * run
 				treads.append({"from": _point_at(line, s, a, h), "to": _point_at(line, s, a + run, h), "height": h})
 				walk.append(_point_at(line, s, a, h))
@@ -686,14 +693,19 @@ func _jetty(entry: Dictionary) -> void:
 
 
 ## The height of the floor of a place at a game point (x, z): the deck of
-## the jetty. -INF where no place has a floor. The player can stand on such a
-## floor over deep water (VungTau.can_stand()).
+## the jetty or the stairs. -INF where no place has a floor. The player can
+## stand on such a floor over deep water (VungTau.can_stand()).
 func floor_at(x: float, z: float) -> float:
-	if jetty.is_empty():
-		return -INF
-	var line: PackedVector3Array = jetty.line
-	var at := Vector2(x, z)
-	var half := float(jetty.width) / 2.0
+	var best := -INF
+	if not jetty.is_empty():
+		best = _line_floor(jetty.line, float(jetty.width) / 2.0, Vector2(x, z))
+	for s: Dictionary in stairs:
+		best = maxf(best, _line_floor(s.points, float(s.width) / 2.0, Vector2(x, z)))
+	return best
+
+
+## The height of a walk line at a point within "half" of it, or -INF.
+static func _line_floor(line: PackedVector3Array, half: float, at: Vector2) -> float:
 	var best := -INF
 	for i in line.size() - 1:
 		var a := Vector2(line[i].x, line[i].z)

@@ -14,8 +14,12 @@ extends RefCounted
 # phase: --world=vung_tau --start-time=08:00
 # phase: --world=vung_tau --start-time=08:00
 # phase: --world=vung_tau --start-time=08:00
+# phase: --world=vung_tau --start-time=08:00
+# phase: --world=vung_tau --start-time=08:00
+# phase: --world=vung_tau --start-time=08:00
+# phase: --world=vung_tau --start-time=08:00
 
-const PARTS := 4
+const PARTS := 8
 const TAP_M := 7.0
 const OFF_ROUTE_M := 2.0
 
