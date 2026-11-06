@@ -574,7 +574,9 @@ def cut_stairs(grid, landmarks_config, found_by_id, roads) -> None:
     terrain.MAX_STEPS_GRADE, so the steps of the game can follow it and the
     player can walk up. Each cell within the half width of the steps and 1.5
     cells of the line takes the height of the nearest point of the line. The
-    other roads near the steps set their surfaces before, so this pass comes last."""
+    two ends keep the height of the ground, and the cells past an end keep
+    theirs. The other roads near the steps set their surfaces before, so this
+    pass comes last."""
     by_id = {road.id: road for road in roads}
     for landmark in landmarks_config:
         place = landmark.get("place")
@@ -588,7 +590,8 @@ def cut_stairs(grid, landmarks_config, found_by_id, roads) -> None:
             x, z = _dense_line(road.points[:, 0], -road.points[:, 1], 0.5)
             ground = grid.sample(x, z)
             spacing = np.hypot(np.diff(x), np.diff(z))
-            profile = terrain.limit_grade_exact(ground, spacing, terrain.MAX_STEPS_GRADE, terrain.MAX_STEPS_CUT_M)
+            profile = terrain.limit_grade_exact(ground, spacing, terrain.MAX_STEPS_GRADE, terrain.MAX_STEPS_CUT_M,
+                                                keep_ends=True)
             band = road.width / 2.0 + grid.step * 1.5
             rows, cols = grid.shape
             c0 = max(0, int((x.min() - band - grid.x0) / grid.step))
@@ -599,6 +602,11 @@ def cut_stairs(grid, landmarks_config, found_by_id, roads) -> None:
             d2 = (gx[..., None] - x) ** 2 + (gz[..., None] - z) ** 2
             nearest = np.argmin(d2, axis=-1)
             inside = np.take_along_axis(d2, nearest[..., None], axis=-1)[..., 0] <= band * band
+            # A cell past an end of the line keeps its ground: the ground after the end joins it.
+            for end, before in ((0, 1), (len(x) - 1, len(x) - 2)):
+                out_x, out_z = x[end] - x[before], z[end] - z[before]
+                past = ((gx - x[end]) * out_x + (gz - z[end]) * out_z) > 0.0
+                inside &= ~((nearest == end) & past)
             block = grid.heights[r0:r1 + 1, c0:c1 + 1]
             block[inside] = profile[nearest[inside]]
             change = float(np.max(np.abs(profile - ground)))

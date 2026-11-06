@@ -657,3 +657,12 @@ def test_the_ground_under_steps_has_no_part_steeper_than_the_grade():
     assert np.max(np.abs(out - h)) <= 8.0 + 1e-9
     # The cut and the fill are equal: the middle of the steep part stays.
     assert abs(out[47] - h[47]) < 0.5
+
+
+def test_the_ground_under_steps_keeps_its_ends():
+    from geodata import terrain
+    s = np.arange(0.0, 40.0, 0.5)
+    h = np.where(s < 10, 0.0, np.where(s < 25, (s - 10) * 0.9, 13.5))
+    out = terrain.limit_grade_exact(h, np.diff(s), 0.5, 8.0, keep_ends=True)
+    assert abs(out[0] - h[0]) < 1e-9 and abs(out[-1] - h[-1]) < 1e-9
+    assert np.max(np.abs(np.diff(out))) <= 0.5 * 0.5 + 1e-9

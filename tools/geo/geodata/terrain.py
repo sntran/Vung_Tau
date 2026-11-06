@@ -521,18 +521,26 @@ def limit_grade(profile: np.ndarray, spacing: np.ndarray, grade: float, max_chan
     return h
 
 
-def limit_grade_exact(profile: np.ndarray, spacing: np.ndarray, grade: float, max_change: float) -> np.ndarray:
+def limit_grade_exact(profile: np.ndarray, spacing: np.ndarray, grade: float, max_change: float,
+                      keep_ends: bool = False) -> np.ndarray:
     """A profile with no part steeper than "grade" (plan 0008, R6: the ground
     under steps). It is the mean of the highest such profile that is not over
     the first one (a cut) and the lowest such profile that is not under it (a
-    fill), so the cut and the fill are equal. A point changes not more than
-    "max_change"."""
+    fill), so the cut and the fill are equal. With "keep_ends", the two ends
+    keep their heights (when the grade between them allows it), so the ground
+    after the ends joins with no step. A point changes not more than "max_change"."""
     h = profile.astype(np.float64)
     s = np.concatenate([[0.0], np.cumsum(spacing)])
     reach = grade * np.abs(s[:, None] - s[None, :])
     cut = np.min(h[None, :] + reach, axis=1)
     fill = np.max(h[None, :] - reach, axis=1)
-    return np.clip((cut + fill) / 2.0, h - max_change, h + max_change)
+    out = (cut + fill) / 2.0
+    if keep_ends:
+        low = np.maximum(h[0] - grade * s, h[-1] - grade * (s[-1] - s))
+        high = np.minimum(h[0] + grade * s, h[-1] + grade * (s[-1] - s))
+        if np.all(low <= high + 1e-9):
+            out = np.clip(out, low, high)
+    return np.clip(out, h - max_change, h + max_change)
 
 
 def _profile(grid: Grid, road, step: float, locked: np.ndarray | None = None):
