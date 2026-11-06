@@ -26,6 +26,10 @@
 			"text": "Poly Haven (polyhaven.com), CC0."
 		},
 		{
+			"title": "3D models",
+			"text": "The scooters, the ceiling fans, and the people of the morning exercise come from World (github.com/sntran/World), commit 9dae4538d6af6fccc64cac6f9e1c7d0b081ddcf2, under the GNU Affero General Public License 3.0 (AGPL-3.0). The bodies of the people use the data of MakeHuman, CC0. The game gives the materials and the light."
+		},
+		{
 			"title": "Font",
 			"text": "Be Vietnam Pro, by the Be Vietnam Pro Project Authors. SIL Open Font License 1.1."
 		}

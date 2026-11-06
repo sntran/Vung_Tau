@@ -173,8 +173,8 @@ def load_orders(path: Path = ORDERS) -> list[dict]:
         for key in ("id", "order", "levels", "impostor", "uses", "catalog"):
             if key not in model:
                 raise ValueError(f"orders.json: the model {model.get('id', '?')} has no \"{key}\"")
-        if "near" not in model["levels"]:
-            raise ValueError(f"orders.json: the model {model['id']} has no near level")
+        if not model["levels"]:
+            raise ValueError(f"orders.json: the model {model['id']} has no level")
         unknown = set(model["levels"]) - set(LEVEL_SUFFIX)
         if unknown:
             raise ValueError(f"orders.json: the model {model['id']} has the levels {sorted(unknown)}")
@@ -233,7 +233,8 @@ def check(models: list[dict], lock: dict, assets: Path = ASSETS) -> list[str]:
     if assets.exists():
         for path in sorted(assets.iterdir()):
             # The impostors are files of the game (impostors.py), not of World.
-            if path.suffix == ".import" or path.name.endswith(".png") or path.name == "impostors.json":
+            if path.suffix == ".import" or path.name.endswith(("_impostor.png", "_impostor_normal.png")) \
+                    or path.name == "impostors.json":
                 continue
             if path.name not in expected and not path.name.startswith("."):
                 problems.append(f"{path.name}: in assets/world/, but not a file of orders.json")

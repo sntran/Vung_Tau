@@ -44,7 +44,7 @@ func test_each_model_loads_with_the_axes_of_gltf() -> void:
 		for level in WorldModel.levels_of(model_id):
 			var box := model.level_aabb(level)
 			assert_almost_eq(box.position.y, 0.0, 0.01, "%s %s: the lowest point is at y = 0" % [model_id, level])
-			if level == "near":
+			if level == WorldModel.levels_of(model_id)[0]:
 				assert_almost_eq(box.size.y, float(size[2]), float(size[2]) * 0.01,
 						"%s: the height is the height of the receipt (%s)" % [model_id, size])
 		if receipt.get("kind", "") == "vehicle":
@@ -145,3 +145,61 @@ func test_each_role_of_the_palette_of_world_has_a_material() -> void:
 	for role in ["paint", "glass", "tire", "skin", "hair", "cloth", "clothes_shirt", "color_hair", "eyes", "collision"]:
 		var material_name := library.material_name(role)
 		assert_ne(material_name, "", "%s has a material" % role)
+
+
+## R12: the credits name the commit of the lock.
+func test_the_credits_name_the_commit_of_the_lock() -> void:
+	var lock: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/world/lock.json"))
+	var commit: String = lock.world.commit
+	assert_eq(commit.length(), 40, "the lock has a commit")
+	assert_true(FileAccess.get_file_as_string("res://assets/CREDITS.md").contains(commit), "assets/CREDITS.md names the commit %s" % commit)
+	assert_true(FileAccess.get_file_as_string("res://data/credits.json").contains(commit), "the Credits sheet names the commit %s" % commit)
+	assert_true(FileAccess.get_file_as_string("res://data/credits.json").contains("AGPL-3.0"), "the Credits sheet names the license")
+
+
+## R8: a row puts its models in cells of MultiMeshes, with the paint of each model.
+func test_a_row_has_cells_of_multimeshes() -> void:
+	var row := WorldRow.new()
+	var red := Color("#B0302A")
+	for i in 5:
+		row.add("scooter_tay_ga_1", Transform3D(Basis(), Vector3(i * 1.0, 0, 0)), red, {"fork": 20.0})
+	row.add("scooter_tay_ga_1", Transform3D(Basis(), Vector3(20.0, 0, 0)), Color.WHITE)
+	row.build()
+	assert_eq(row.count(), 6)
+	assert_eq(row.cells.size(), 2, "two cells of %.0f m" % WorldRow.CELL)
+	var cell: Dictionary = row.cells[0]
+	assert_gt(cell.near.size(), 0, "the near level has MultiMeshes")
+	assert_gt(cell.mid.size(), 0, "the mid level has MultiMeshes")
+	assert_eq(cell.impostor.size(), 1, "one MultiMesh of impostor cards")
+	var card: MultiMeshInstance3D = cell.impostor[0]
+	assert_eq(card.multimesh.instance_count, 5)
+	var b := card.multimesh.buffer
+	assert_almost_eq(Vector3(b[12], b[13], b[14]), Vector3(red.r, red.g, red.b), Vector3.ONE * 0.001, "the paint of the first model")
+	assert_eq((card.material_override if card.material_override else card.multimesh.mesh.surface_get_material(0)).shader.resource_path,
+			WorldRow.SHADER)
+	WorldModel.set_ranges("low")
+	row.apply_ranges()
+	var near: MultiMeshInstance3D = cell.near[0]
+	assert_eq(near.visibility_range_end, 15.0)
+	assert_eq(card.visibility_range_begin, 40.0)
+	assert_eq(WorldRow.level_at(20.0), "mid")
+	assert_eq(WorldRow.level_at(50.0), "impostor")
+	row.free()
+
+
+## R9a: a parked scooter: 10° to 30° from the curb, the stand on the ground.
+func test_a_parked_scooter_stands_at_an_angle_to_the_curb() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 3
+	for i in 20:
+		var angle := Parked.pick_angle(rng)
+		assert_between(angle, 10.0, 30.0)
+		var t := Parked.transform(Vector3.ZERO, Vector3.RIGHT, Vector3.FORWARD, angle)
+		var front := t.basis.z.normalized()
+		assert_almost_eq(rad_to_deg(front.angle_to(Vector3.RIGHT)), angle, 0.01, "the angle to the curb")
+		assert_lt(front.z, 0.0, "the front turns to the street")
+	var stand := Parked.stand_angle()
+	assert_between(stand, 45.0, 92.0, "the stand is down: %.0f°" % stand)
+	var pose := Parked.pose(rng)
+	assert_gte(absf(pose.fork), Parked.MIN_STEER, "the front wheel is turned")
+	assert_gt(Parked.colors().size(), 4, "the colors of the scooters")

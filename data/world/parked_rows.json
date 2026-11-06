@@ -1,0 +1,18 @@
+{
+	"note": "The rows of parked scooters of the Vũng Tàu world (plan 0023, R9a, PT-57). A row stands on the sidewalk of the road \"road\" near the landmark \"near\": \"count\" scooters on the sides of the road, from the nearest point of the road to the landmark. \"sidewalk\" is the width from the edge of the road to the line of the shop fronts, in meters. \"from\" and \"to\" are the hours of the row (0 to 24: all day). The houses and the shops of plan 0009 add the rows in front of each house.",
+	"status": "check",
+	"rows": [
+		{
+			"id": "cho_xom_luoi",
+			"road": "Phan Bội Châu",
+			"near": "cho_xom_luoi",
+			"count": 40,
+			"sides": [1, -1],
+			"sidewalk": 3.0,
+			"gap": 0.3,
+			"seed": 1902,
+			"from": 0,
+			"to": 24
+		}
+	]
+}

@@ -87,23 +87,22 @@ func material_for(role: String, source: Material, paint := DEFAULT_PAINT, materi
 		m.albedo_color = Color(0, 0, 0, 0)
 		_cache[key] = m
 		return m
-	if not bool(v.get("vertex_mean", false)):
+	# A material that keeps the GLB material keeps its color (the tint of the
+	# order: the hair color, the clothes colors), its texture, and its
+	# transparency (the edges of the hair). Only the roughness and the
+	# metallic value are the values of the game.
+	if not keep_source:
 		var color := Color(str(v.get("color", "#FFFFFF")))
 		if bool(v.get("paint", false)):
 			color = paint
-		if bool(v.get("texture", false)) and m.albedo_texture != null:
-			color = Color(str(v.get("color", "#FFFFFF")))
 		if v.has("alpha"):
 			color.a = float(v.alpha)
 		m.albedo_color = color
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA if v.has("alpha") else BaseMaterial3D.TRANSPARENCY_DISABLED
+		m.vertex_color_use_as_albedo = false
 	m.roughness = float(v.get("roughness", 0.8))
 	m.metallic = float(v.get("metallic", 0.0))
 	m.metallic_specular = 0.5
-	if v.has("alpha"):
-		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	else:
-		m.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED
-	m.vertex_color_use_as_albedo = false
 	_cache[key] = m
 	return m
 

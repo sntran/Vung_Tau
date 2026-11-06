@@ -111,6 +111,10 @@ Verified in the development workspace (Linux, 2 CPUs, no GPU, no Vulkan):
 - `TaskStop` on a play-test run stops the shell, but the Godot processes go on and use the CPU. Look for them with `pgrep -fa godot` and stop them.
 - Godot 4.7 does not read the glTF extension `EXT_mesh_gpu_instancing`: a node with it shows its mesh one time only. The editor plugin `addons/gpu_instancing/` (enabled in `project.godot`) imports such a node as a `MultiMeshInstance3D`. The headless renderer (`--headless`: the import and the export in CI) does not keep `MultiMesh.set_instance_transform()`, but it keeps `MultiMesh.buffer`. So the plugin writes the buffer: for each instance, 12 floats, a row of the basis and the origin at a time.
 - A node with a negative scale (a mirror, as the left shoe of a pair from World) renders correctly in Godot: the renderer turns its faces over. `Node3D.scale` gives a mirror as a turn and a negative scale on each axis, so a check uses `basis.determinant()`.
+- World (plan 0023): `git clone https://github.com/sntran/World` works in the workspace. Hex (`repo.hex.pm`, `builds.hex.pm`) is blocked, so `mix` cannot get the packages of World, and `mix world.order` runs in CI only. World commits the files of its catalog in `priv/models/` (`NAME.glb`, `NAME.mid.glb`, `NAME.far.glb`, `NAME.parts.json`), so `tools/world/fetch.py --source=checkout` copies them from a clone at the commit of the lock, with no build, and writes the receipt from the near GLB. These files and the receipt are the same bytes as the files of the factory for the same commit (the R4 test, 2026-11-06).
+- The World factory (`https://world.mkfifo.com`) answered from the workspace on 2026-11-06 (it answered 403 on 2026-10-28). Its builder can stop for a moment (HTTP 503: "The app stopped", "the builder stopped"), so `fetch.py` tries again. A person order takes about 2 minutes. At commit `9dae453`, the factory refuses each order of a person with a prop in a hand (a fan, a bottle): "it does not stand: its center of mass is not over its base".
+- The glTF import of Godot makes a `VehicleWheel3D` of a node whose name ends with `_wheel` or `-wheel` (and other node types for other suffixes), with the option `nodes/use_name_suffixes`. A joint of World can have such a name (`front_wheel`), so the import files of `assets/world/` turn the option off.
+- A visibility range is for a node. A `MultiMeshInstance3D` shows or hides all its instances at one distance. So a row of models of World (`WorldRow`) is in cells of 6 m.
 - An Ogg stream that still plays when Godot quits is not freed ("resources still in use at exit"). The play-test system stops the voices some frames before it quits (`stop_sounds()` in `scenes/main.gd`).
 
 Commands that work:
@@ -158,6 +162,16 @@ python tools/trees/build.py              # data/trees/types.json to assets/trees
 python tools/trees/build.py --only bang  # one type
 python tools/trees/build.py --check      # check that assets/trees is what the build makes
 tools/playtest.sh tree_gallery --only-phase=3   # PT-52: one group of types at 12:00 on Low
+
+# Models of World (plan 0023). Python 3.10+, no packages (pytest for the tests).
+git clone https://github.com/sntran/World ../World && git -C ../World checkout COMMIT   # COMMIT: data/world/lock.json
+python tools/world/fetch.py --source=checkout --world=../World   # the files of the catalog orders that are not there
+python tools/world/fetch.py --source=factory   # the other orders (the factory must have the commit of the lock)
+python tools/world/fetch.py --check            # no network: assets/world agrees with the lock (CI)
+python tools/world/fetch.py --update --source=factory   # all files from the newest World, and a new lock
+python tools/world/impostors.py               # the impostors (Blender of tools/trees/requirements.txt)
+python -m pytest -q tools/world/tests
+tools/playtest.sh world_models && python tools/world/sheets.py   # PT-56: the review sheets in docs/world/
 
 # Exports (they need the export templates)
 godot --headless --path . --export-release "Web" build/web/index.html
@@ -208,6 +222,18 @@ A play test in the Vũng Tàu world has `--world=vung_tau` in its phase line. `s
 
 The audio driver prints ALSA errors in the workspace. These errors are not defects.
 
+## 5e. Models from World (plan 0023)
+
+- **The orders** (`data/world/orders.json`, R1): each model of the game is an order of [World](https://github.com/sntran/World) (World `docs/factory.md`): `id` (the name in the game), `order` (the blueprint, the options, the colors, the joints, the targets), `levels` (the levels that the game uses), `impostor` (a model in rows and crowds), `uses`, and `catalog` (the ID of the catalog of plan 0023, section 9). A person can use only the mid and far levels (the near level of a person is about 4 MB).
+- **The lock** (`data/world/lock.json`, R3): the commit of World and, for each id, the hash of the order and the SHA-256 of each file. `fetch.py --check` needs no network. The commit message of a new lock is "Update the models of World to COMMIT".
+- **The two sources** (R2, R4): `--source=factory` (`POST /orders`, then `/o/HASH.*`) and `--source=checkout --world=PATH` (a clone at the commit of the lock). From a clone, a catalog order with no colors, joints, or targets is a copy of `priv/models/`; another order needs `--mix=COMMAND` (`mix world.order`, CI only). The factory has the newest World: without `--update`, its commit must be the commit of the lock. `fetch.py` writes the lock after each model.
+- **The import** (R5): `fetch.py` writes the import files of `assets/world/*.glb`: no LODs, no shadow meshes, no name suffixes (the joints are nodes, and `front_wheel` must stay a node), and the animations. A GLB with `EXT_mesh_gpu_instancing` (a wall of bricks) imports with the plugin `addons/gpu_instancing/`.
+- **The materials** (D3, R6, `data/world/materials.json`, `scripts/world/world_materials.gd`): a material of the game for each role of World. The paint takes the color of the model. The skin, the hair, and the clothes of people keep the textures and the colors of the GLB. The set `house` merges the 12 roles of a house into 6 materials (plan 0009, R7a). A role with no material stops the load with an error that names the role and the model.
+- **`WorldModel`** (`scripts/world/world_model.gd`, R6): `WorldModel.make(id, paint)` has the levels as children with the visibility ranges of the preset (`WorldModel.RANGES`: on Low the near level to 15 m, the mid level to 40 m, the far level to 150 m; `Quality.apply()` calls `set_ranges()`). `joint(name)`, `set_pose(pose)` (in the limits, on each level), `parts()`, `receipt()`, `play(animation, start)` (a routine in a loop, from a part of its length), and `spin_rpm` (the joints with the role `spin`).
+- **Rows** (R8, `scripts/world/world_row.gd`): `WorldRow` puts many models in MultiMeshes, in cells of 6 m: the near and the mid level, then the impostor (`shaders/world_impostor.gdshader`). `tools/world/impostors.py` makes `ID_impostor.png` (the color, white where the paint shows) and `ID_impostor_normal.png` (the normal, and the paint mask in the alpha) from 8 directions, and `assets/world/impostors.json`. CI checks them (`--check`).
+- **The first models** (R9): the parked scooters (`scripts/world/parked.gd`: on the center stand, Q7, at 10° to 30° from the curb, the front wheel turned, the colors of `data/world/palette.json`, "scooters") in the test street and in the rows of `data/world/parked_rows.json` (`scenes/world/parked_rows.gd`); the ceiling fan of each shop room of the test street (`tube_house.gd`); and the aerobics group of the morning exercise at Bãi Trước (`data/world/exercise.json`, `scenes/world/morning_exercise.gd`, 05:00 to 06:30). The AC units of the house kit stay (Q6), and the tai chi group with fans waits for World (Q8). The other shapes of `scripts/greybox.gd` stay until World has their models (R10).
+- **Play tests**: PT-56 `world_models` (the review sheets, published at `/world/` on GitHub Pages), PT-57 `parked_rows`, and PT-58 `morning_exercise`.
+
 ## 6. Repository map
 
 | Path | Content |
@@ -229,13 +255,16 @@ The audio driver prints ALSA errors in the workspace. These errors are not defec
 | `data/` | All content: cards, spots and opening hours, people, dialogue, messages, voices, sound captions, the hẻm layout, the house palette, UI text, credits, the calendar. |
 | `data/geo/` | Plan 0005: the play area, the landmarks, the road widths, the OSM corrections and the roadworks (`overrides.json`), the Hòn Bà path (`hon_ba.json`), the sea objects, the trees, the raw extracts (`raw/`, with `manifest.json`), and the game data that `tools/geo/build.py` and `tools/geo/tide.py` make (`build/`, with `report.md`, `tide_report.md`, `anchors.png`, and `homestay_area.png`). ODbL, see `LICENSE` there. |
 | `scenes/` | `main.tscn` (world, input, talk, and UI), `world/` (hẻm, house, beach, `parts/`: the house kit, its shaders, and the palette, and `vung_tau.tscn`, the real ground of plan 0005, with its trees, sea objects, and roadworks), `actors/` (first-person player, NPC with a voice), `ui/` (phone and its apps, subtitles, joystick, center dot), `desktop_controls.gd` (mouse, keys, gamepad). |
-| `scripts/` | Classes with no scene (`trees/`: the tree library of plan 0020; `wind.gd`): clock math, save format, content checks, voice clips, subtitle split, light by time, greybox shapes, mesh batches, quality presets, sounds, UI theme, play-test driver, the lunar calendar, the game calendar, the seasons. `geo/`: the projection, the geodata reader, the 16-bit PNG reader, the sun position, the tide model, and the ground and road mesh builders. |
+| `scripts/` | Classes with no scene (`trees/`: the tree library of plan 0020; `world/`: the models of World of plan 0023; `wind.gd`): clock math, save format, content checks, voice clips, subtitle split, light by time, greybox shapes, mesh batches, quality presets, sounds, UI theme, play-test driver, the lunar calendar, the game calendar, the seasons. `geo/`: the projection, the geodata reader, the 16-bit PNG reader, the sun position, the tide model, and the ground and road mesh builders. |
 | `shaders/` | The ground shader, the sea shader, the tree shaders of plan 0020 (`tree_*.gdshader`, `tree_common.gdshaderinc`), and the canopy shader (the far hill trees) of the Vũng Tàu world. |
 | `tests/unit/` | GUT unit tests. |
+| `data/world/` | Plan 0004: the hẻm layout and the palette. Plan 0023: the orders of World, the lock, the materials of the roles, the parked rows, and the morning exercise. |
+| `assets/world/` | Plan 0023: the files of the models of World that `tools/world/fetch.py` gets, and the impostors. |
+| `docs/world/` | Plan 0023: the review sheets of PT-56 (published at `/world/`). |
 | `tests/data/world/` | The test file of the GPU instancing import (`instancing.glb`) and the script that makes it. |
 | `addons/` | `gut/` (the unit tests) and `gpu_instancing/` (the import of `EXT_mesh_gpu_instancing` for the GLB files of World). |
-| `playtests/` | Play-test scenarios PT-01, PT-03 to PT-17, PT-18 to PT-24 of plan 0003, PT-25 to PT-32 of plan 0004, PT-33 to PT-39 of plan 0005, and PT-52 to PT-55 of plan 0020 (PT-02 and PT-07 were removed in plan 0002). |
-| `tools/` | `setup.sh`, `test.sh`, `playtest.sh`, `voices/` (the voice build and its tests), `trees/` (the tree build of plan 0020), and `geo/` (the geodata pipeline: `fetch.py`, `build.py`, `tide.py`, the `geodata` package, and its tests). |
+| `playtests/` | Play-test scenarios PT-01, PT-03 to PT-17, PT-18 to PT-24 of plan 0003, PT-25 to PT-32 of plan 0004, PT-33 to PT-39 of plan 0005, PT-52 to PT-55 of plan 0020, and PT-56 to PT-58 of plan 0023 (PT-02 and PT-07 were removed in plan 0002). |
+| `tools/` | `setup.sh`, `test.sh`, `playtest.sh`, `voices/` (the voice build and its tests), `trees/` (the tree build of plan 0020), `world/` (the models of World of plan 0023: `fetch.py`, `impostors.py`, `sheets.py`, and the tests), and `geo/` (the geodata pipeline: `fetch.py`, `build.py`, `tide.py`, the `geodata` package, and its tests). |
 | `assets/` | Fonts, icons, voices, and `CREDITS.md`. |
 | `docs/voices/` | The voice audition page (made by the voices workflow). |
 | `.github/workflows/` | `test.yml` (tests on each push), `export.yml` (web, desktop, Android, iOS builds, and GitHub Pages), `voices.yml` (the voice files), `geodata.yml` (download and build the geodata, by hand), and `people-packs.yml` (copies the MakeHuman asset packs to the release `people-packs-1`, by hand only). |

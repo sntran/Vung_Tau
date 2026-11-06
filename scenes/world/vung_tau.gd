@@ -125,6 +125,10 @@ var _canopy_place: Dictionary = {}
 var _canopy_trees: Dictionary = {}
 var sea_objects: SeaObjects
 var roadworks: Roadworks
+## The rows of parked scooters (plan 0023, R9a).
+var parked: ParkedRows
+## The morning exercise at Bãi Trước (plan 0023, R9d).
+var exercise: MorningExercise
 ## The season values of the game day (R12a), from Season.of_day().
 var season: Dictionary = {}
 var _season_day := -1
@@ -206,6 +210,14 @@ func setup(folder := GeoData.ROOT) -> bool:
 	if not roadworks.setup(data.root.path_join("roadworks.json")):
 		roadworks.queue_free()
 		roadworks = null
+	parked = ParkedRows.new()
+	parked.name = "ParkedRows"
+	add_child(parked)
+	parked.setup(self)
+	exercise = MorningExercise.new()
+	exercise.name = "MorningExercise"
+	add_child(exercise)
+	exercise.setup(self)
 	return true
 
 
@@ -356,6 +368,10 @@ func update_time(minutes: int, day: int) -> void:
 		_apply_season(day)
 	if roadworks:
 		roadworks.update_time(minutes)
+	if parked:
+		parked.update_time(minutes)
+	if exercise:
+		exercise.update_time(minutes)
 	if not Wind.held:
 		var wind := Wind.of_time(TreeLibrary.shared().settings.get("wind", {}), minutes)
 		Wind.apply(wind.direction, wind.strength)

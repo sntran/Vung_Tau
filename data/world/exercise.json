@@ -1,0 +1,21 @@
+{
+	"note": "The morning exercise at Bãi Trước (plan 0023, R9d, PT-58). Each group stands on the paved promenade at the edge of the park (the pedestrian way along the beach). \"leader_at\" is the point of the leader (x, z of the game), and \"facing\" the direction from the leader to the group. The people stand in rows of \"per_row\" in front of the leader, \"across\" meters apart, the first row \"first_row\" meters from the leader and the next rows \"row_gap\" meters behind it, as the exercise blueprint of World. Each person starts the loop of the routine at a time of its own. \"from\" and \"to\" are the times of the group. The tai chi group with fans waits for World (Q8).",
+	"status": "check",
+	"groups": [
+		{
+			"id": "aerobics",
+			"routine": "aerobics",
+			"leader": "aerobics_leader",
+			"people": ["aerobics_1", "aerobics_2", "aerobics_3", "aerobics_4", "aerobics_5", "aerobics_6"],
+			"leader_at": [24.6, -11.5],
+			"facing": [0.26, 0.97],
+			"per_row": 3,
+			"across": 1.4,
+			"first_row": 2.2,
+			"row_gap": 1.5,
+			"from": "05:00",
+			"to": "06:30",
+			"seed": 5
+		}
+	]
+}

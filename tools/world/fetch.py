@@ -118,15 +118,13 @@ def checkout_files(model: dict, clone: Path, mix: str | None) -> dict[str, bytes
             path = source / (name + suffix)
             if not path.exists():
                 raise FetchError(f"{model['id']}: {path} is not in the clone: is {name} a model of the catalog?")
-            if level in model["levels"] or level == "near":
+            if level in model["levels"]:
                 files[model["id"] + suffix] = path.read_bytes()
         files[model["id"] + ".parts.json"] = (source / (name + ".parts.json")).read_bytes()
         full = wf.full_order(order)
-        files[model["id"] + ".receipt.json"] = wf.receipt(
-            full, files[model["id"] + ".glb"], wf.world_version(clone)
-        ).encode("utf-8")
-        if "near" not in model["levels"]:
-            del files[model["id"] + ".glb"]
+        # The receipt has the values of the near level, also for a model with no near level.
+        near = (source / (name + ".glb")).read_bytes()
+        files[model["id"] + ".receipt.json"] = wf.receipt(full, near, wf.world_version(clone)).encode("utf-8")
         return files
     if not mix:
         raise FetchError(
@@ -165,6 +163,9 @@ IMPORT_PARAMS = {
     "meshes/create_shadow_meshes": "false",
     "nodes/use_name_suffixes": "false",
     "animation/import": "true",
+    # The textures of people stay in the imported scene: an extracted picture
+    # is a file of Godot in assets/world/, not a file of World.
+    "gltf/embedded_image_handling": "3",
 }
 
 
@@ -260,7 +261,9 @@ def run(args: argparse.Namespace) -> int:
             "files": {name: wf.sha256(data) for name, data in sorted(files.items())},
         }
         count += 1
-        print(f"{model['id']}: {receipt['hash']}")
+        print(f"{model['id']}: {receipt['hash']}", flush=True)
+        # The lock after each model: a stop of the factory keeps the models before it.
+        wf.write_lock(lock, Path(args.lock))
     for model_id in list(lock["models"]):
         if model_id not in {m["id"] for m in models}:
             del lock["models"][model_id]

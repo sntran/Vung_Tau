@@ -3,11 +3,265 @@
 	"models": [
 		{
 			"id": "scooter_tay_ga_1",
-			"order": {"blueprint": "catalog", "options": {"name": "honda_vision_110"}},
-			"levels": ["near", "mid", "far"],
+			"order": {
+				"blueprint": "catalog",
+				"options": {
+					"name": "honda_vision_110"
+				}
+			},
+			"levels": [
+				"near",
+				"mid",
+				"far"
+			],
 			"impostor": true,
 			"uses": "Plan 0023, R9a: the parked scooters of the test street and of the Vũng Tàu world. Plans 0009 and 0018.",
 			"catalog": "V1"
+		},
+		{
+			"id": "ceiling_fan",
+			"order": {
+				"blueprint": "catalog",
+				"options": {
+					"name": "ceiling_fan_52in"
+				}
+			},
+			"levels": [
+				"near",
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0023, R9c: the ceiling fan of the front room of each shop of the test street, with the phở shop. Plan 0011.",
+			"catalog": "S4"
+		},
+		{
+			"id": "aerobics_leader",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 0.0,
+					"age": 44,
+					"height": 0.5,
+					"weight": 0.42,
+					"skin": "middleage_asian_female",
+					"eyebrows": "eyebrow010",
+					"hair": "ponytail01",
+					"clothes": [
+						"female_sportsuit01",
+						"shoes03"
+					],
+					"clothes_colors": [
+						"#c4362c"
+					],
+					"animations": [
+						"aerobics"
+					]
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0023, R9d: the aerobics group of the morning exercise at Bãi Trước, 05:00 to 06:30. The leader faces the group.",
+			"catalog": "P7"
+		},
+		{
+			"id": "aerobics_1",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 0.0,
+					"age": 52,
+					"height": 0.38,
+					"weight": 0.55,
+					"skin": "middleage_asian_female",
+					"eyebrows": "eyebrow010",
+					"hair": "bob02",
+					"clothes": [
+						"female_casualsuit01",
+						"shoes02"
+					],
+					"clothes_colors": [
+						"#e9c7d8"
+					],
+					"animations": [
+						"aerobics"
+					]
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0023, R9d: the aerobics group of the morning exercise at Bãi Trước, 05:00 to 06:30.",
+			"catalog": "P7"
+		},
+		{
+			"id": "aerobics_2",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 0.0,
+					"age": 61,
+					"height": 0.33,
+					"weight": 0.6,
+					"skin": "old_asian_female",
+					"eyebrows": "eyebrow010",
+					"hair": "bob02",
+					"hair_color": "#b4b2ac",
+					"clothes": [
+						"female_casualsuit02",
+						"shoes05"
+					],
+					"clothes_colors": [
+						"#9bd39a"
+					],
+					"animations": [
+						"aerobics"
+					]
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0023, R9d: the aerobics group of the morning exercise at Bãi Trước, 05:00 to 06:30.",
+			"catalog": "P7"
+		},
+		{
+			"id": "aerobics_3",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 1.0,
+					"age": 58,
+					"height": 0.45,
+					"weight": 0.5,
+					"skin": "middleage_asian_male",
+					"eyebrows": "eyebrow001",
+					"hair": "short03",
+					"clothes": [
+						"male_casualsuit03",
+						"shoes01"
+					],
+					"clothes_colors": [
+						"#f2f2f2"
+					],
+					"animations": [
+						"aerobics"
+					]
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0023, R9d: the aerobics group of the morning exercise at Bãi Trước, 05:00 to 06:30.",
+			"catalog": "P7"
+		},
+		{
+			"id": "aerobics_4",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 0.0,
+					"age": 39,
+					"height": 0.52,
+					"weight": 0.4,
+					"skin": "young_asian_female",
+					"eyebrows": "eyebrow010",
+					"hair": "ponytail01",
+					"clothes": [
+						"joepal_crude_t-shirt_female",
+						"cortu_cargo_pants",
+						"shoes04"
+					],
+					"clothes_colors": [
+						"#2f72c4"
+					],
+					"animations": [
+						"aerobics"
+					]
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0023, R9d: the aerobics group of the morning exercise at Bãi Trước, 05:00 to 06:30.",
+			"catalog": "P7"
+		},
+		{
+			"id": "aerobics_5",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 0.0,
+					"age": 47,
+					"height": 0.42,
+					"weight": 0.62,
+					"skin": "middleage_asian_female",
+					"eyebrows": "eyebrow010",
+					"hair": "ponytail01",
+					"clothes": [
+						"female_sportsuit01",
+						"shoes06"
+					],
+					"clothes_colors": [
+						"#f2c33c"
+					],
+					"animations": [
+						"aerobics"
+					]
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0023, R9d: the aerobics group of the morning exercise at Bãi Trước, 05:00 to 06:30.",
+			"catalog": "P7"
+		},
+		{
+			"id": "aerobics_6",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 1.0,
+					"age": 64,
+					"height": 0.4,
+					"weight": 0.45,
+					"skin": "old_asian_male",
+					"eyebrows": "eyebrow001",
+					"hair": "short04",
+					"hair_color": "#b4b2ac",
+					"clothes": [
+						"elvs_crude_t-shirt_male",
+						"cortu_cargo_pants",
+						"shoes02"
+					],
+					"clothes_colors": [
+						"#2f72c4"
+					],
+					"animations": [
+						"aerobics"
+					]
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0023, R9d: the aerobics group of the morning exercise at Bãi Trước, 05:00 to 06:30.",
+			"catalog": "P7"
 		}
 	]
 }

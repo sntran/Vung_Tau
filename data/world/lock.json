@@ -4,6 +4,79 @@
 		"repository": "https://github.com/sntran/World"
 	},
 	"models": {
+		"aerobics_1": {
+			"hash": "e3cc3faf21202dae59cf784301dc9bb5",
+			"files": {
+				"aerobics_1.far.glb": "655863e55fa1be06a5f30e8771c54322758ac47df8b175e98840264ff34e53dd",
+				"aerobics_1.mid.glb": "81edaa840a0bbefe72d061aee9d6843b27657adc31052a6e97e01ec66e01b8f9",
+				"aerobics_1.parts.json": "d0cf9c504212c0c03b73d9e078a7dce781213f01c68a34848ec47f324a022e42",
+				"aerobics_1.receipt.json": "e3485a60fe0d6ccfc5e70a76f449725b9239b19cfb66e4dcda3234e1962beece"
+			}
+		},
+		"aerobics_2": {
+			"hash": "855142b6240530df29231da8adebf47b",
+			"files": {
+				"aerobics_2.far.glb": "ae0ca6d8de098851ea1266b867f9a65f32a352a610c611ee20cfbb01f6bb8bb4",
+				"aerobics_2.mid.glb": "23e76d9c735e4f7d5989aae91bbe612f2b3efa127662dfefd096943e4a9702bf",
+				"aerobics_2.parts.json": "189651af10ee822a5652f767c9d467fa7ed975c08c02eb7ebefad198bb73852f",
+				"aerobics_2.receipt.json": "cb57bf6c731c43aac37f57c7c36ebc275553292e9922471c71ef8a6e65bd38c1"
+			}
+		},
+		"aerobics_3": {
+			"hash": "2ce31c16d125a48f96bf28dd5629fc4f",
+			"files": {
+				"aerobics_3.far.glb": "f7bac978528e1a1e749eeb3c5ff6649a17107d96b883f665964ba4c2605253a7",
+				"aerobics_3.mid.glb": "59b979b83dbcddc1e6441f9c309203b447d33438058734177e91608c30148658",
+				"aerobics_3.parts.json": "7d54bbec2b8e1eb753499a3bd480079f0b0d6c7a045f9e8a3ee961d81311ae23",
+				"aerobics_3.receipt.json": "783bb129254f66a3338920fac14ff05f13b4c9c52cd1f9512650dd3266d83a37"
+			}
+		},
+		"aerobics_4": {
+			"hash": "ee169e81c7215f9226ee8fd57214662f",
+			"files": {
+				"aerobics_4.far.glb": "a68c05f72b4173c68715c5a090af5e4a71d4c2f9c3c67542487a1d30ee9c445d",
+				"aerobics_4.mid.glb": "bc11189e31754785cfdce3874162f5ca8b0308031a5316b7a5f991f3861157bf",
+				"aerobics_4.parts.json": "5aba5629ad24b1002a5e75aa7fd9c88d275fd4eb6b19a937672846fcfa0769fd",
+				"aerobics_4.receipt.json": "455281fd80be9988b0a082759004f1338a541ee79b4ffca46c5b652e0176e44e"
+			}
+		},
+		"aerobics_5": {
+			"hash": "97475aa6f60c3c9c7998cd4b6bea8d3c",
+			"files": {
+				"aerobics_5.far.glb": "f9778e0012541df31a4a17d5883488ec584718467905c9eecfce5f5f89525d68",
+				"aerobics_5.mid.glb": "918ece630602598955366b541fe652b5f8f53f7b879f0f3b762c09f098a6347a",
+				"aerobics_5.parts.json": "b56e792f8f3365723f8e35c2ef994d5e6b799eaa821418edbef1c7c7319b652a",
+				"aerobics_5.receipt.json": "bc0b6d08ed47f8c2d70c621255e227ef36cefa8db10247a14c5f25d1eaa37f9b"
+			}
+		},
+		"aerobics_6": {
+			"hash": "dfc034633a36d5b8aa7305b8c918e929",
+			"files": {
+				"aerobics_6.far.glb": "dad96c4d3d4a7a8db9c13bd664c1fc6234f37c42c111561329f79eec69fbb374",
+				"aerobics_6.mid.glb": "7a2c0fe890ae47e6f2d99cf2fb21aaa11a6afe4e3fc775171ff58b00ca3630fb",
+				"aerobics_6.parts.json": "aa230389786260f5793b7269918d0fc00b4455f7f776f9d076a84f00a9195756",
+				"aerobics_6.receipt.json": "98743578693983e500df5cd002b848e4f0103e2bec7d31badece5c4d0665df4a"
+			}
+		},
+		"aerobics_leader": {
+			"hash": "2816a8194761e78dacde414f636e74d7",
+			"files": {
+				"aerobics_leader.far.glb": "a46811959def94709791c748e2dc96228e8ab68f9ae2505abcd006391dbde456",
+				"aerobics_leader.mid.glb": "a14a81f754ba0a2492c0284d914e6d21bcbf37cd94239a962700477df05b19a2",
+				"aerobics_leader.parts.json": "a7c0bcb8e4a0c99ca1473673e0aaa01881c2bebfdba98ffc5eab81c8a9160d98",
+				"aerobics_leader.receipt.json": "4dd6cb91630e87f4403214fc55de7d15b692459fdc405ba52d6d9a29fd8cf6e0"
+			}
+		},
+		"ceiling_fan": {
+			"hash": "3baef58f1befc276ff522c7260a595a4",
+			"files": {
+				"ceiling_fan.far.glb": "7ee6d8207b75885ce13ab5d0f54af0a4db47b0960557daa25215a4fb948d7263",
+				"ceiling_fan.glb": "9e203818d27681b694aa0f03b10ec8cf613d3bd8d1ab423698a10ff231bd5e4c",
+				"ceiling_fan.mid.glb": "c0b6757606373e359d8781c62c0e73e5d15459ccd080bcf163ad9fa44f5c512f",
+				"ceiling_fan.parts.json": "22714e56e06d7214c48d3429281a49d8f75766a62f9023d5918188dd400ba341",
+				"ceiling_fan.receipt.json": "f4bdbebcf8d0108620cb69aa7d6eef40287663d43de83e0efa073cc0dd31ebcd"
+			}
+		},
 		"scooter_tay_ga_1": {
 			"hash": "176593c8c18de6bff70b0189e26ee31a",
 			"files": {

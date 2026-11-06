@@ -12,6 +12,14 @@
 
 The 3D shapes in plan 0001 are made in code (`scripts/greybox.gd`). They use no model files.
 
+## Models of World (plan 0023)
+
+| Asset | Path | Source | License |
+|---|---|---|---|
+| 3D models: the scooters, the ceiling fans, the people of the morning exercise | `assets/world/*.glb`, `*.parts.json`, `*.receipt.json` | [World](https://github.com/sntran/World), commit `9dae4538d6af6fccc64cac6f9e1c7d0b081ddcf2` (`data/world/lock.json`). The orders are in `data/world/orders.json`. I have the copyright of World. | GNU Affero General Public License 3.0 (AGPL-3.0) |
+| The bodies, the skins, the hair, and the clothes of the people | (in the GLB files of the people) | The data of [MakeHuman](http://www.makehumancommunity.org) through World | CC0 |
+| Impostors of the models of World | `assets/world/*_impostor*.png` | Made by `tools/world/impostors.py` from the GLB files above | AGPL-3.0, as the models |
+
 ## Geodata (plan 0005)
 
 | Asset | Path | Source | License |

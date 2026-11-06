@@ -9,9 +9,18 @@ extends RefCounted
 # have the ranges of the preset; at each change of level the mean color of the
 # model area changes by 12 % or less. The last phase makes one sheet for each
 # model (sheet_ID.png): a row for each preset and level, a column for each
-# view.
+# view. Each preset is in phases of GROUP_SIZE models, so that a phase takes
+# less than the time limit under lavapipe.
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
 # phase: --start-time=12:00
 
@@ -24,27 +33,34 @@ const ORIGIN := Vector3(-3200.0, 4.0, 600.0)
 const SPACING := 12.0
 const MAX_LEVEL_CHANGE := 0.12
 const SHEET_CELL := Vector2i(320, 180)
+## The models of one phase, and the phases of one preset.
+const GROUP_SIZE := 2
+const GROUPS := 5
 
 
 func run(d: PlaytestDriver) -> void:
-	if d.phase == RUNS.size() + 1:
+	if d.phase == RUNS.size() * GROUPS + 1:
 		_make_sheets(d)
 		return
 	var w := d.world()
 	if not d.expect(w != null, "the Vũng Tàu world starts with --world=vung_tau"):
 		return
-	var preset: String = RUNS[d.phase - 1]
+	var preset: String = RUNS[(d.phase - 1) / GROUPS]
+	var group := (d.phase - 1) % GROUPS
 	_build_ground(w)
 	var ids := WorldModel.ids()
+	d.expect(ids.size() <= GROUP_SIZE * GROUPS, "the phases have room for the %d models" % ids.size())
 	var models: Array[WorldModel] = []
-	for i in ids.size():
+	for i in range(group * GROUP_SIZE, mini((group + 1) * GROUP_SIZE, ids.size())):
 		var model := WorldModel.make(ids[i], Color("#B0302A"))
 		if not d.expect(model != null, "%s loads with the materials of the game" % ids[i]):
 			continue
 		model.position = _base(i)
 		w.add_child(model)
 		models.append(model)
-	await d.fly_to(_base(0) + Vector3(0, 3.0, 8.0), _base(0))
+	if models.is_empty():
+		return
+	await d.fly_to(models[0].position + Vector3(0, 3.0, 8.0), models[0].position)
 	await d.wait_ground(120.0)
 	for i in models.size():
 		var model := models[i]
@@ -68,7 +84,7 @@ static func _base(i: int) -> Vector3:
 
 ## The distance of the camera: the whole model fills about half of the screen.
 static func _distance(model: WorldModel) -> float:
-	var box := model.level_aabb("near")
+	var box := model.level_aabb(WorldModel.levels_of(model.id)[0])
 	return maxf(maxf(box.size.x, box.size.z), box.size.y) * 1.6 + 0.8
 
 
@@ -84,10 +100,11 @@ static func _check_model(d: PlaytestDriver, model: WorldModel, preset: String) -
 					d.fail("%s %s: the surface %d of %s has no material of the game" % [model.id, level, s, m.name])
 	var r: Vector3 = WorldModel.RANGES[preset]
 	d.expect(WorldModel.ranges == r, "the ranges of the preset %s: %s" % [preset, WorldModel.ranges])
-	var near := model.level("near").find_children("*", "GeometryInstance3D", true, false)[0] as GeometryInstance3D
-	d.expect(is_equal_approx(near.visibility_range_end, r.x), "%s: the near level ends at %.0f m (%.0f)" % [
-			model.id, r.x, near.visibility_range_end])
-	if model.level("mid") != null:
+	if model.level("near") != null:
+		var near := model.level("near").find_children("*", "GeometryInstance3D", true, false)[0] as GeometryInstance3D
+		d.expect(is_equal_approx(near.visibility_range_end, r.x), "%s: the near level ends at %.0f m (%.0f)" % [
+				model.id, r.x, near.visibility_range_end])
+	if model.level("mid") != null and model.level("near") != null:
 		var mid := model.level("mid").find_children("*", "GeometryInstance3D", true, false)[0] as GeometryInstance3D
 		d.expect(is_equal_approx(mid.visibility_range_begin, r.x) and is_equal_approx(mid.visibility_range_end, r.y),
 				"%s: the mid level shows from %.0f m to %.0f m (%.0f to %.0f)" % [model.id, r.x, r.y,
@@ -115,7 +132,7 @@ static func _show_all(model: WorldModel) -> void:
 
 
 static func _look(d: PlaytestDriver, model: WorldModel, angle: float, distance: float) -> void:
-	var box := model.level_aabb("near")
+	var box := model.level_aabb(WorldModel.levels_of(model.id)[0])
 	var center := model.global_position + Vector3(0, box.size.y * 0.5, 0)
 	var dir := Vector3(sin(deg_to_rad(angle)), 0.0, cos(deg_to_rad(angle)))
 	var eye := center + dir * distance + Vector3(0, maxf(0.6, distance * 0.25), 0)
@@ -126,7 +143,7 @@ static func _look(d: PlaytestDriver, model: WorldModel, angle: float, distance: 
 ## The screen box of the model.
 static func _screen_box(d: PlaytestDriver, model: WorldModel) -> Rect2:
 	var camera := d.viewport().get_camera_3d()
-	var box := model.level_aabb("near")
+	var box := model.level_aabb(WorldModel.levels_of(model.id)[0])
 	var rect := Rect2()
 	var first := true
 	for i in 8:

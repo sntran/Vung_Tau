@@ -409,7 +409,9 @@ func _build_ground() -> void:
 	Greybox.solid_box(self, body, Vector3(0.3, 4.2, hem_width + 0.6), Vector3(start_x - 0.15, 2.1, 0),
 			Color("#B9A98A"), "EndWall")
 	# Parked motorbikes and plants in front of the gates on the opposite row.
-	var scooter_colors := ["#C4362C", "#2F72C4", "#2A2A2A"]
+	# The scooters are models of World (plan 0023, R9a).
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 2019
 	var props := [[1.6, "scooter"], [6.5, "plant"], [11.0, "scooter"], [19.5, "scooter"], [24.5, "plant"]]
 	for i in props.size():
 		var prop_x: float = start_x + float(props[i][0])
@@ -418,8 +420,7 @@ func _build_ground() -> void:
 			Greybox.potted_plant(self, Vector3(prop_x, 0, prop_z))
 			Greybox.solid_shape(body, Vector3(0.5, 1.0, 0.5), Vector3(prop_x, 0.5, prop_z))
 		else:
-			Greybox.scooter(self, Vector3(prop_x, 0, prop_z), Color(scooter_colors[i % scooter_colors.size()]))
-			Greybox.solid_shape(body, Vector3(1.8, 1.1, 0.6), Vector3(prop_x, 0.55, prop_z))
+			_add_scooter(body, Vector3(prop_x, 0, hem_width / 2.0), rng)
 	# The city behind the houses.
 	var far := Color("#7F98A3")
 	for i in 9:
@@ -427,6 +428,21 @@ func _build_ground() -> void:
 		for side: float in [-1.0, 1.0]:
 			Greybox.box(self, Vector3(5.5, h, 4.0),
 					Vector3(start_x - 4.0 + i * 4.4, h / 2.0, side * (22.0 + fmod(i * 13.0, 6.0))), far)
+
+
+## A parked scooter of World in front of a gate of the row at +Z: on its
+## center stand, at an angle to the wall, with the front wheel turned (R9a).
+func _add_scooter(body: StaticBody3D, wall: Vector3, rng: RandomNumberGenerator) -> void:
+	var scooter := WorldModel.make(Parked.MODEL, Parked.pick_color(rng))
+	if scooter == null:
+		return
+	var angle := Parked.pick_angle(rng)
+	scooter.transform = Parked.transform(wall, Vector3.RIGHT, Vector3.FORWARD, angle)
+	scooter.name = "Scooter"
+	scooter.set_pose(Parked.pose(rng))
+	add_child(scooter)
+	var shape := Greybox.solid_shape(body, Vector3(0.66, 1.1, 1.8), scooter.position + Vector3(0, 0.55, 0))
+	shape.basis = scooter.basis
 
 
 ## Concrete poles with thick, sagging bundles of many cables along the hẻm and

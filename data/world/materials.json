@@ -1,5 +1,5 @@
 {
-	"note": "The materials of the game for the material roles of World (plan 0023, D3, R6). \"materials\" are the materials of the game: \"color\" (sRGB), \"roughness\", \"metallic\", \"alpha\" (a transparent material), \"paint\" (the model gives the color: a MultiMesh instance color, or the paint of WorldModel), \"texture\" (keep the color texture of the GLB, as the skin and the clothes of people), \"vertex_mean\" (keep the color of the GLB material), and \"hidden\" (no mesh). \"roles\" gives the material of each role, and \"patterns\" the material of each role that agrees with a pattern. A role with no material stops the load of the model with an error. The first values are the values of the World palette (priv/palette.json at the commit of the lock).",
+	"note": "The materials of the game for the material roles of World (plan 0023, D3, R6). \"materials\" are the materials of the game: \"color\" (sRGB), \"roughness\", \"metallic\", \"alpha\" (a transparent material), \"paint\" (the model gives the color: a MultiMesh instance color, or the paint of WorldModel), \"texture\" (keep the color, the texture, and the transparency of the GLB material, as the skin, the hair, and the clothes of people: the game gives only the roughness and the metallic value), \"vertex_mean\" (the same for the mean colors of the mid and far levels of people), and \"hidden\" (no mesh). \"roles\" gives the material of each role, and \"patterns\" the material of each role that agrees with a pattern. A role with no material stops the load of the model with an error. The first values are the values of the World palette (priv/palette.json at the commit of the lock).",
 	"status": "check",
 	"materials": {
 		"aluminum": {
@@ -106,11 +106,6 @@
 			"roughness": 1.0,
 			"metallic": 0.0
 		},
-		"hair": {
-			"color": "#1C1816",
-			"roughness": 0.7,
-			"metallic": 0.0
-		},
 		"hidden": {
 			"hidden": true,
 			"note": "No mesh shows: the collision boxes of a house (the role collision, the nodes NAME-colonly)."
@@ -192,6 +187,13 @@
 			"color": "#FFFFFF",
 			"roughness": 0.1,
 			"metallic": 0.0
+		},
+		"person_hair": {
+			"texture": true,
+			"color": "#FFFFFF",
+			"roughness": 0.7,
+			"metallic": 0.0,
+			"note": "The hair keeps the texture and the transparency of the GLB, with the hair color of the order."
 		},
 		"person_hole": {
 			"color": "#1A1010",
@@ -372,7 +374,8 @@
 		"glass_dark": "glass_dark",
 		"gray": "gray",
 		"ground": "ground",
-		"hair": "hair",
+		"hair": "person_hair",
+		"hair_edge": "person_hair",
 		"hole": "person_hole",
 		"iron": "iron",
 		"leaf": "leaf",

@@ -19,6 +19,9 @@ const ROLL_HEIGHT := 0.3
 const HALF_HEIGHT := 1.1
 ## The depth of the open room on the ground floor of a shop.
 const ROOM_DEPTH := 4.0
+## The ceiling fan of a front room (plan 0023, R9c), and its turns in a minute.
+const CEILING_FAN := "ceiling_fan"
+const FAN_RPM := 150.0
 ## The thickness of the walls of the room.
 const WALL := 0.2
 ## The thickness of the front wall. The windows are recessed into it.
@@ -339,6 +342,7 @@ func _build_shop() -> void:
 	var lamp := Greybox.lamp(interior, Vector3(w * 0.6, 0.06, 0.06), Vector3(0, OPENING_HEIGHT - 0.1, -2.0),
 			Color("#FFE7A0"), "Lamp")
 	_glow_nodes.append(lamp)
+	_add_ceiling_fan(interior, Vector3(0, OPENING_HEIGHT, -1.4))
 	# The rolled shutter box is inside the top of the opening, behind the
 	# front, so that the sign in front of the wall does not touch it.
 	_box(HouseMaterials.METAL, Vector3(w, ROLL_HEIGHT, 0.3), Vector3(0, OPENING_HEIGHT - ROLL_HEIGHT / 2.0, -FRONT - 0.15),
@@ -404,6 +408,21 @@ func _build_gate() -> void:
 	var lamp := Greybox.lamp(self, Vector3(0.18, 0.18, 0.12), Vector3(opening / 2.0 - 0.2, 2.6, 0.08),
 			Color("#FFE7A0"), "GateLamp")
 	_glow_nodes.append(lamp)
+
+
+## A ceiling fan of World under the ceiling of the front room (plan 0023, R9c).
+## "top" is the point of the ceiling over the fan. The blades turn.
+func _add_ceiling_fan(parent: Node3D, top: Vector3) -> void:
+	var fan := WorldModel.make(CEILING_FAN)
+	if fan == null:
+		return
+	fan.name = "CeilingFan"
+	var height := fan.level_aabb("near").size.y
+	fan.position = top - Vector3(0, height, 0)
+	fan.spin_rpm = FAN_RPM
+	parent.add_child(fan)
+	for geometry in fan.find_children("*", "GeometryInstance3D", true, false):
+		(geometry as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 
 func _build_wall() -> void:

@@ -35,6 +35,7 @@ const GROUP := &"world_models"
 static var ranges := Vector3(15.0, 40.0, 150.0)
 static var _orders: Dictionary = {}
 static var _scenes: Dictionary = {}
+static var _lowest: Dictionary = {}  # id/level -> the lowest point of the level at rest
 
 ## The id of the order in data/world/orders.json.
 var id := ""
@@ -49,7 +50,13 @@ var far_end := 0.0
 ## level, "rest": the rest transform of each node, "kind", "limits", "axis",
 ## "role"}.
 var joints: Dictionary = {}
+## The turns in a minute of the joints with the role "spin" (a fan): 0 stops them.
+var spin_rpm := 0.0:
+	set(value):
+		spin_rpm = value
+		set_process(value != 0.0)
 var _levels: Dictionary = {}  # level -> Node3D
+var _spin_angle := 0.0
 
 
 ## The entry of an id in data/world/orders.json, or {}.
@@ -126,12 +133,35 @@ func _build() -> bool:
 		node.name = level
 		add_child(node)
 		_levels[level] = node
+		# R7: the model stands on y = 0. A mid or far level of World can be
+		# a little higher or lower (the soles of the shoes of a person are
+		# 1 to 2 cm higher at the mid level): the level moves to the ground.
+		node.position.y = -_lowest_of(level, node)
 		if not _apply_materials(node, level):
 			return false
 		_collect_joints(node, level)
 	add_to_group(GROUP)
 	apply_ranges()
 	return true
+
+
+# The lowest point of the meshes of a level at rest, one time for each model.
+func _lowest_of(level_name: String, node: Node3D) -> float:
+	var key := id + "/" + level_name
+	if _lowest.has(key):
+		return _lowest[key]
+	var low := INF
+	for geometry in node.find_children("*", "MeshInstance3D", true, false):
+		var m := geometry as MeshInstance3D
+		if m.mesh == null:
+			continue
+		var t := _global_of(m)
+		for point in m.mesh.get_faces():
+			low = minf(low, (t * point).y)
+	if low == INF:
+		low = 0.0
+	_lowest[key] = low
+	return low
 
 
 func _apply_materials(root: Node, level: String) -> bool:
@@ -184,6 +214,19 @@ func _collect_joints(root: Node, level: String) -> void:
 		joint_entry.rest[level] = (node as Node3D).transform
 		if level == "near":
 			joint_entry.node = node
+
+
+func _ready() -> void:
+	set_process(spin_rpm != 0.0)
+
+
+func _process(delta: float) -> void:
+	# The game time: a fan turns slower when the frame rate is low.
+	_spin_angle = fmod(_spin_angle + spin_rpm * 6.0 * delta, 360.0)
+	var pose := {}
+	for joint_name in joints_with_role("spin"):
+		pose[joint_name] = _spin_angle
+	set_pose(pose)
 
 
 ## Sets the visibility ranges of the levels from the ranges of the preset.
@@ -253,6 +296,47 @@ static func clamp_value(j: Dictionary, value: float) -> float:
 	if limits is Array and (limits as Array).size() == 2:
 		return clampf(value, float(limits[0]), float(limits[1]))
 	return value
+
+
+## Plays an animation of the model (a routine of a person) in a loop, on
+## each level, from a part of its length (0 to 1): each person of a group
+## starts at its own time.
+func play(animation: String, start := 0.0) -> bool:
+	var found := false
+	for player in animation_players():
+		if not player.has_animation(animation):
+			continue
+		var clip := player.get_animation(animation)
+		clip.loop_mode = Animation.LOOP_LINEAR
+		player.play(animation)
+		player.seek(clip.length * fposmod(start, 1.0), true)
+		found = true
+	if not found:
+		push_error("WorldModel: the model \"%s\" has no animation \"%s\"." % [id, animation])
+	return found
+
+
+## The animation players of the levels.
+func animation_players() -> Array[AnimationPlayer]:
+	var result: Array[AnimationPlayer] = []
+	for level_name: String in _levels:
+		for node in (_levels[level_name] as Node).find_children("*", "AnimationPlayer", true, false):
+			result.append(node as AnimationPlayer)
+	return result
+
+
+## The time of the animation now, in seconds (the first level), or -1.
+func animation_time() -> float:
+	for player in animation_players():
+		if player.is_playing():
+			return player.current_animation_position
+	return -1.0
+
+
+## Stops or starts the animations: a hidden group costs no time.
+func set_animation_active(on: bool) -> void:
+	for player in animation_players():
+		player.active = on
 
 
 ## The parts of the model (ID.parts.json): name, kind, count, params, sources.

@@ -48,6 +48,11 @@ func build() -> void:
 		by_cell[key].append(item)
 	for key: Vector2i in by_cell:
 		_build_cell(key, by_cell[key])
+	# The templates are nodes outside the tree: free them, or they stay at the quit.
+	for model_id: String in _templates:
+		if is_instance_valid(_templates[model_id]):
+			(_templates[model_id] as Node).free()
+	_templates.clear()
 	add_to_group(GROUP)
 	apply_ranges()
 
@@ -163,9 +168,25 @@ static func _multimesh_node(mesh: Mesh, transforms: Array, colors: Array) -> Mul
 	multimesh.use_colors = true
 	multimesh.mesh = mesh
 	multimesh.instance_count = transforms.size()
+	# The buffer, not set_instance_transform(): the headless renderer does not
+	# keep the instance transforms (AGENTS.md, section 5). For each instance:
+	# 12 floats of the transform (a row of the basis and the origin at a
+	# time), then 4 floats of the color.
+	var buffer := PackedFloat32Array()
+	buffer.resize(16 * transforms.size())
 	for i in transforms.size():
-		multimesh.set_instance_transform(i, transforms[i])
-		multimesh.set_instance_color(i, colors[i])
+		var t: Transform3D = transforms[i]
+		var c: Color = colors[i]
+		for row in 3:
+			buffer[16 * i + 4 * row] = t.basis.x[row]
+			buffer[16 * i + 4 * row + 1] = t.basis.y[row]
+			buffer[16 * i + 4 * row + 2] = t.basis.z[row]
+			buffer[16 * i + 4 * row + 3] = t.origin[row]
+		buffer[16 * i + 12] = c.r
+		buffer[16 * i + 13] = c.g
+		buffer[16 * i + 14] = c.b
+		buffer[16 * i + 15] = c.a
+	multimesh.buffer = buffer
 	var node := MultiMeshInstance3D.new()
 	node.multimesh = multimesh
 	return node
