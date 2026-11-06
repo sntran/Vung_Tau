@@ -25,8 +25,9 @@ const STEP := 0.165
 const STEP_FOLLOW := 0.6
 ## The cell of the height map of the collision of stairs, in meters.
 const STAIR_CELL := 0.25
-## The invisible slope beside the stairs: its width.
-const SKIRT_M := 1.0
+## The invisible slope beside the stairs: its width, and how far under ground_height() it ends.
+const SKIRT_M := 2.0
+const SKIRT_UNDER := 0.4
 ## The treads stand this much over the ground of the cut (tools/geo/build.py, cut_stairs()).
 const STAIR_LIFT := 0.12
 ## The steps climb to a landing with this grade or less (0.59 is the most for steps of 16.5 cm on treads of 28 cm).
@@ -598,8 +599,16 @@ func _stair_surface(entry: Dictionary, walk: PackedVector3Array, width: float) -
 			elif d <= reach:
 				var x := low.x + c * STAIR_CELL
 				var z := low.y + r * STAIR_CELL
-				var g := clampf(world.ground_height(x, z), h - SKIRT_M * 0.8, h + SKIRT_M * 0.8)
+				# The slope ends under the ground: it comes out of the ground at a
+				# small angle, with no lip (the player does not step up on a height
+				# map). The collision of the ground has 2 m triangles, and it is up
+				# to about 0.3 m under ground_height() on a curved slope.
+				var g := clampf(world.ground_height(x, z) - SKIRT_UNDER, h - SKIRT_M * 0.8, h + SKIRT_M * 0.8)
 				heights[k] = lerpf(h, g, (d - half) / SKIRT_M)
+			elif d <= reach + STAIR_CELL * 2.0:
+				# Just under the ground, so that the faces down to the deep cells
+				# stay under the ground too.
+				heights[k] = world.ground_height(low.x + c * STAIR_CELL, low.y + r * STAIR_CELL) - SKIRT_UNDER - 0.3
 			else:
 				heights[k] = deep
 	var shape := HeightMapShape3D.new()
