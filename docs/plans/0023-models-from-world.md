@@ -257,7 +257,7 @@ Each one is an order with a drawing (D9). The sizes need sources. These are the 
 
 ## 10. Requests to World
 
-These are the changes that Vũng Tàu needs from World. The numbers W1 to W16 are for this plan only. W1 to W15 are in World `TODO.md`, section "For Vũng Tàu" (Q2). W16 was already there ("Godot import").
+These are the changes that Vũng Tàu needs from World. The numbers W1 to W23 are for this plan only. W1 to W15 and W17 to W23 are in World `TODO.md`, section "For Vũng Tàu" (Q2). W16 was already there ("Godot import"). W17 to W23 are the houses for the lots of plan 0009.
 
 | ID | Request | For |
 |---|---|---|
@@ -277,5 +277,12 @@ These are the changes that Vũng Tàu needs from World. The numbers W1 to W16 ar
 | W14 | The same order and the same commit give the same bytes on the factory and with `mix world.order` in a clone (R4). A `license` field in the receipt. A copy that never changes for a release (`/v/VERSION/`, an idea in World `docs/factory.md`). | R2 to R4, D10 |
 | W15 | A far level that is light enough for rows and crowds: at most about 500 triangles for a scooter, 1 500 for a person, 300 for a stool. | D5 |
 | W16 | The Godot import of World `TODO.md`: Vũng Tàu makes `WorldModel` (R6). World can point to it or take it. | R6 |
+| W17 | A whole house from a lot: width 3 to 6 m, depth 8 to 25 m, floors 1 to 8, kind, style, roof, ground floor, front finish, paint age, seed, and for each side wall: shared, free, or bare brick. A back extension and a room on the terrace as options. | H1 to H4 |
+| W18 | Ports in `parts.json` (position, normal, size, kind) for the front parts, the roof parts, and the wires of the power poles. | H5, H6, H7 |
+| W19 | One list of orders gives a set of variants of one kind and width, from seeds. | H1 to H3 |
+| W20 | The option `interior: front_room` (an open ground floor you can enter), and collision boxes as named nodes in every house. | H4, H9 |
+| W21 | The street kit: pieces of 2 m of sidewalk, curb, gutter, scooter ramp, and hẻm paving; the power pole with cables, the street lamp, the trash bin. | H7, H8 |
+| W22 | Levels of a whole house: near 40,000 triangles or fewer, mid 3,000 or fewer, far 300 or fewer with the roof. At most 6 materials in one house. | D5 |
+| W23 | Roles for the walls and roofs, UVs in meters, and a vertex color with the height above the ground and the distance to a corner. | D3 |
 
 ## 11. Builder notes
