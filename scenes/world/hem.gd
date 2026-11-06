@@ -436,12 +436,14 @@ func _add_scooter(body: StaticBody3D, wall: Vector3, rng: RandomNumberGenerator)
 	var scooter := WorldModel.make(Parked.MODEL, Parked.pick_color(rng))
 	if scooter == null:
 		return
-	var angle := Parked.pick_angle(rng)
+	# The hẻm is 2.8 m wide: a scooter stands parallel to the wall (plan 0023, Q9).
+	var angle := Parked.pick_angle(rng, Parked.PARALLEL_ANGLE)
 	scooter.transform = Parked.transform(wall, Vector3.RIGHT, Vector3.FORWARD, angle)
 	scooter.name = "Scooter"
 	scooter.set_pose(Parked.pose(rng))
 	add_child(scooter)
-	var shape := Greybox.solid_shape(body, Vector3(0.66, 1.1, 1.8), scooter.position + Vector3(0, 0.55, 0))
+	# The body of the scooter, 0.45 m wide: the handlebars (0.68 m) are above the hips.
+	var shape := Greybox.solid_shape(body, Vector3(0.45, 1.1, 1.8), scooter.position + Vector3(0, 0.55, 0))
 	shape.basis = scooter.basis
 
 

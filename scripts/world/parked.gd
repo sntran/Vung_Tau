@@ -11,6 +11,8 @@ const MODEL := "scooter_tay_ga_1"
 ## The angle to the line of the curb, in degrees (R9a).
 const MIN_ANGLE := 10.0
 const MAX_ANGLE := 30.0
+## The angles in a narrow hẻm (Q9): parallel to the wall.
+const PARALLEL_ANGLE := Vector2(0.0, 5.0)
 ## The turn of the front wheel, in degrees, to one side or the other.
 const MIN_STEER := 12.0
 const MAX_STEER := 30.0
@@ -92,9 +94,11 @@ static func pose(rng: RandomNumberGenerator) -> Dictionary:
 	return {"stand": stand_angle(), "fork": steer}
 
 
-## An angle to the line of the curb, in degrees.
-static func pick_angle(rng: RandomNumberGenerator) -> float:
-	return rng.randf_range(MIN_ANGLE, MAX_ANGLE)
+## An angle to the line of the curb, in degrees: 10° to 30° on a street (R9a).
+## In a hẻm narrower than about 4 m, a scooter stands parallel to the wall
+## (Q9: PARALLEL_ANGLE).
+static func pick_angle(rng: RandomNumberGenerator, angles := Vector2(MIN_ANGLE, MAX_ANGLE)) -> float:
+	return rng.randf_range(angles.x, angles.y)
 
 
 ## The transform of a parked scooter. "wall" is the point at the foot of the
@@ -113,6 +117,6 @@ static func transform(wall: Vector3, along: Vector3, out: Vector3, angle_deg: fl
 
 ## The depth of a parked scooter from the wall, for an angle: the length and
 ## the width of the model across the line of the curb.
-static func depth(angle_deg: float) -> float:
+static func depth(angle_deg: float, width := 0.68) -> float:
 	var a := deg_to_rad(angle_deg)
-	return 1.86 * sin(a) + 0.68 * cos(a)
+	return 1.86 * sin(a) + width * cos(a)

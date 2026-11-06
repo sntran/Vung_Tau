@@ -45,8 +45,12 @@ func test_each_model_loads_with_the_axes_of_gltf() -> void:
 			var box := model.level_aabb(level)
 			assert_almost_eq(box.position.y, 0.0, 0.01, "%s %s: the lowest point is at y = 0" % [model_id, level])
 			if level == WorldModel.levels_of(model_id)[0]:
-				assert_almost_eq(box.size.y, float(size[2]), float(size[2]) * 0.01,
-						"%s: the height is the height of the receipt (%s)" % [model_id, size])
+				# The receipt has the size of the near level. The mid level of a
+				# person is 1 cm to 2 cm shorter at the soles (plan 0023, builder
+				# notes): a model with no near level in the game has 2 %.
+				var part := 0.01 if level == "near" else 0.02
+				assert_almost_eq(box.size.y, float(size[2]), float(size[2]) * part,
+						"%s %s: the height is the height of the receipt (%s)" % [model_id, level, size])
 		if receipt.get("kind", "") == "vehicle":
 			var steer := model.joints_with_role("steer")
 			assert_false(steer.is_empty(), "%s: the vehicle steers" % model_id)
@@ -198,6 +202,7 @@ func test_a_parked_scooter_stands_at_an_angle_to_the_curb() -> void:
 		var front := t.basis.z.normalized()
 		assert_almost_eq(rad_to_deg(front.angle_to(Vector3.RIGHT)), angle, 0.01, "the angle to the curb")
 		assert_lt(front.z, 0.0, "the front turns to the street")
+	assert_between(Parked.pick_angle(rng, Parked.PARALLEL_ANGLE), 0.0, 5.0, "parallel in a narrow hẻm (Q9)")
 	var stand := Parked.stand_angle()
 	assert_between(stand, 45.0, 92.0, "the stand is down: %.0f°" % stand)
 	var pose := Parked.pose(rng)
