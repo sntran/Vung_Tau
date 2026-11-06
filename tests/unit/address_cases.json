@@ -1,0 +1,44 @@
+{
+	"note": "Test cases of the forms of address (plan 0007, R7 to R11), from the table of R7 and the role rules, with the people of data/address.json. tests/unit/test_address.gd and tools/voices/tests/test_address.py check them.",
+	"words": [
+		{"person": "batu", "gender": "male", "age": 30, "row": "35 or more", "you": "con", "me": "bà", "them": "bà", "self": "con", "name": "Bà Tư"},
+		{"person": "batu", "gender": "female", "age": 25, "row": "35 or more", "you": "con", "me": "bà", "them": "bà", "self": "con", "name": "Bà Tư"},
+		{"person": "batu", "gender": "male", "age": 50, "row": "15 to 34", "you": "con", "me": "cô", "them": "cô", "self": "con", "name": "Cô Tư"},
+		{"person": "batu", "gender": "male", "age": 60, "row": "5 to 14", "you": "em", "me": "chị", "them": "chị", "self": "em", "name": "Chị Tư"},
+		{"person": "batu", "gender": "female", "age": 68, "row": "-4 to 4", "you": "chị", "me": "tui", "them": "chị", "self": "tui", "name": "Chị Tư"},
+		{"person": "batu", "gender": "male", "age": 80, "row": "-5 to -14", "you": "anh", "me": "em", "them": "em", "self": "anh", "name": "Bà Tư"},
+		{"person": "cosau", "gender": "male", "age": 30, "row": "15 to 34 (a seller of 50 or more)", "you": "con", "me": "cô", "them": "cô", "self": "con", "name": "Cô Sáu"},
+		{"person": "cosau", "gender": "female", "age": 50, "row": "5 to 14", "you": "em", "me": "chị", "them": "chị", "self": "em", "name": "Chị Sáu"},
+		{"person": "cosau", "gender": "male", "age": 60, "row": "-5 to -14", "you": "anh", "me": "em", "them": "em", "self": "anh", "name": "Cô Sáu"},
+		{"person": "cosau", "gender": "male", "age": 80, "row": "-15 to -29", "you": "chú", "me": "em", "them": "em", "self": "chú", "name": "Cô Sáu"},
+		{"person": "cosau", "gender": "female", "age": 75, "row": "-15 to -29", "you": "cô", "me": "em", "them": "em", "self": "cô", "name": "Cô Sáu"},
+		{"person": "bacha", "gender": "male", "age": 30, "row": "35 or more, North", "you": "cháu", "me": "bác", "them": "bác", "self": "cháu", "name": "Bác Hà"},
+		{"person": "bacha", "gender": "female", "age": 50, "row": "15 to 34, North", "you": "cháu", "me": "bác", "them": "bác", "self": "cháu", "name": "Bác Hà"},
+		{"person": "bacha", "gender": "male", "age": 68, "row": "-4 to 4, North", "you": "anh", "me": "tôi", "them": "chị", "self": "tôi", "name": "Chị Hà"},
+		{"person": "cout", "gender": "male", "age": 60, "row": "seller younger than the traveler", "you": "anh", "me": "em", "them": "em", "self": "anh", "name": "Cô Út"},
+		{"person": "cout", "gender": "female", "age": 25, "row": "seller 5 or more years older", "you": "chị", "me": "chị", "them": "chị", "self": "em", "name": "Chị Út"},
+		{"person": "cout", "gender": "male", "age": 30, "row": "seller 5 or more years older", "you": "anh", "me": "chị", "them": "chị", "self": "em", "name": "Chị Út"},
+		{"person": "cout", "gender": "male", "age": 40, "row": "seller of the same age", "you": "anh", "me": "em", "them": "em", "self": "anh", "name": "Cô Út"},
+		{"person": "cout", "gender": "female", "age": 20, "row": "seller, traveler under 25", "you": "em", "me": "chị", "them": "chị", "self": "em", "name": "Chị Út"},
+		{"person": "nga", "gender": "female", "age": 25, "row": "15 to 34 (host)", "you": "con", "me": "cô", "them": "cô", "self": "con", "name": "Cô Nga"},
+		{"person": "nga", "gender": "male", "age": 60, "row": "-5 to -14", "you": "anh", "me": "em", "them": "em", "self": "anh", "name": "Cô Nga"},
+		{"person": "nga", "gender": "male", "age": 80, "row": "-30 or less", "you": "chú", "me": "con", "them": "con", "self": "chú", "name": "Cô Nga"}
+	],
+	"fill": [
+		{"text": "Ủa, {you} dậy rồi hả? Ăn sáng chưa {you}?", "words": {"you": "con"}, "result": "Ủa, con dậy rồi hả? Ăn sáng chưa con?"},
+		{"text": "{Me} là {me} Tư đó {you}.", "words": {"you": "em", "me": "chị"}, "result": "Chị là chị Tư đó em."},
+		{"text": "Dạ, {self} cảm ơn {them}.", "words": {"self": "tui", "them": "ông"}, "result": "Dạ, tui cảm ơn ông."},
+		{"text": "{Them} ơi, {Self} đây.", "words": {"them": "ông", "self": "cháu"}, "result": "Ông ơi, Cháu đây."}
+	],
+	"english": [
+		{"text": "Have you had breakfast yet, {dear}?", "words": {"you": "con"}, "result": "Have you had breakfast yet, dear?"},
+		{"text": "Have you had breakfast yet, {dear}?", "words": {"you": "cháu"}, "result": "Have you had breakfast yet, dear?"},
+		{"text": "Have you had breakfast yet, {dear}?", "words": {"you": "anh"}, "result": "Have you had breakfast yet?"},
+		{"text": "Come in, {dear}, sit down!", "words": {"you": "em"}, "result": "Come in, sit down!"}
+	],
+	"keys": [
+		{"words": {"you": "con", "me": "bà", "them": "bà", "self": "con"}, "fields": ["you"], "result": "con"},
+		{"words": {"you": "cô", "me": "chị", "them": "chị", "self": "em"}, "fields": ["you", "me"], "result": "co-chi"},
+		{"words": {"you": "cháu", "me": "bác", "them": "bác", "self": "cháu"}, "fields": ["self", "them"], "result": "bac-chau"}
+	]
+}

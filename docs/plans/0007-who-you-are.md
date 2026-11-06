@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Approved |
+| Status | In progress |
 | Branch | `feat/0007-who-you-are` |
 | Depends on | 0003 (status "Done": the corrections of `docs/playtests/0003-report.md`, mainly D-0003-04, the introductions) |
 
@@ -97,3 +97,9 @@ Unit tests: each row of R7 and each role rule, the capital letter forms, the `{d
 - **Q2.** Partly answered. Bác Hà (from the North) says "cháu", not "con", to a younger traveler. In the South, people can say "dì" where the North says "cô" for a woman of about the age of one's mother. I am not sure, because my family has relatives from the North and the South, and many people from the North live in Vũng Tàu. So the word is a value for each person in `data/address.json` (`aunt_word`: "cô" or "dì"). The first value is "cô" for all, with the status "check".
 - **Q3.** Answered: with people of about the same age, the traveler and the person say "tui" (the Southern spoken form of "tôi"). It is friendlier than "tôi".
 - **Q4.** Answered: a person who is younger than the traveler keeps the name that the neighbors use, for example "Cô Út" (R8).
+- **Q5.** (Builder, 2026-11-06.) Four values are not in R7, so I set them in `data/address.json` with the status "check":
+  1. The goal says that a woman of 25 hears "em" from Cô Út, but R7 says that a seller younger than 50 calls a traveler of 25 or more "chị". Cô Út is about 40 (plan 0006, R3), so the rule gives "chị". I followed R7. Is the age limit "25 or more", or "older than 25"?
+  2. A seller younger than 50 and a traveler younger than 25: the general rule gives "con" (Cô Út is 15 or more years older). The culture notes say that a seller of about 40 does not say "con". I set "em" (and "chị" or "anh" for the seller).
+  3. A seller older than the traveler: "calls themself em or chị". I set "chị" (or "anh") when the seller is 5 or more years older, else "em". The traveler then says "chị" and "em", or "em" and "anh".
+  4. The row "−15 or less" has "con, cháu, em". I set "em" to 29 years younger, and "con" (or "cháu" in the North) from 30 years younger. Also, Bác Hà (from the North) says "tôi", not "tui", to a traveler of about her age.
+

@@ -37,7 +37,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 | 0004 | [Desktop and the house detail kit](0004-desktop-and-house-detail.md) | Built |
 | 0005 | [Real geography of Vũng Tàu](0005-real-geography.md) | Done |
 | 0006 | [People](0006-people.md) | Approved |
-| 0007 | [Who you are: the passport and the forms of address](0007-who-you-are.md) | Approved |
+| 0007 | [Who you are: the passport and the forms of address](0007-who-you-are.md) | In progress |
 | 0020 | [Real trees](0020-real-trees.md) | Built |
 | 0008 | [Known structures](0008-known-structures.md) | Draft |
 | 0009 | [Houses on the lots](0009-houses-on-the-lots.md) | Draft |

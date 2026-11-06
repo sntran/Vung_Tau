@@ -1,0 +1,65 @@
+{
+	"note": "The forms of address (plan 0007, R6 to R9). For each pair of a person (the speaker ID) and the traveler: \"you\" is what the person calls the traveler, \"me\" what the person calls themself, \"them\" what the traveler calls the person, and \"self\" what the traveler calls themself. The first rule that agrees with the pair gives the words. A rule can have a \"person\", a \"role\", a \"min\" and a \"max\" of the age difference (the person minus the traveler), and a \"min_person_age\", \"max_person_age\", \"min_traveler_age\", or \"max_traveler_age\". A value is a word, or a word class of \"classes\": a class gives the word by the gender or the region of the person or of the traveler. A person can replace a class with a word of their own (for example \"elder\": \"bác\"). The ages of the people come from plan 0006, R3.",
+	"status": "check",
+	"traveler": {
+		"default": {"gender": "male", "age": 30},
+		"min_age": 18,
+		"max_age": 80
+	},
+	"classes": {
+		"child": {"by": "person_region", "south": "con", "north": "cháu"},
+		"elder": {"by": "person_gender", "female": "bà", "male": "ông"},
+		"parent": {"by": "person_gender", "female": "aunt", "male": "chú"},
+		"sibling": {"by": "person_gender", "female": "chị", "male": "anh"},
+		"i": {"by": "person_region", "south": "tui", "north": "tôi"},
+		"traveler_sibling": {"by": "traveler_gender", "female": "chị", "male": "anh"},
+		"traveler_parent": {"by": "traveler_gender", "female": "aunt", "male": "chú"},
+		"aunt": {"by": "person", "field": "aunt_word"}
+	},
+	"people": {
+		"batu": {"name": "Bà Tư", "given": "Tư", "age": 70, "gender": "female", "role": "elder", "region": "south", "aunt_word": "cô"},
+		"cosau": {"name": "Cô Sáu", "given": "Sáu", "age": 55, "gender": "female", "role": "seller", "region": "south", "aunt_word": "cô"},
+		"bacha": {"name": "Bác Hà", "given": "Hà", "age": 68, "gender": "female", "role": "seller", "region": "north", "aunt_word": "cô", "elder": "bác", "parent": "bác"},
+		"cout": {"name": "Cô Út", "given": "Út", "age": 40, "gender": "female", "role": "seller", "region": "south", "aunt_word": "cô"},
+		"nga": {"name": "Cô Nga", "given": "Nga", "age": 48, "gender": "female", "role": "host", "region": "south", "aunt_word": "cô"},
+		"chubay": {"name": "Chú Bảy", "given": "Bảy", "age": 62, "gender": "male", "role": "neighbor", "region": "south", "aunt_word": "cô"},
+		"chuchin": {"name": "Chú Chín", "given": "Chín", "age": 60, "gender": "male", "role": "neighbor", "region": "south", "aunt_word": "cô"}
+	},
+	"rules": [
+		{"note": "A seller younger than 50 calls a traveler of 25 or more \"anh\" or \"chị\" (my decision, 2026-10-24). An older seller (5 years or more) calls themself \"chị\" or \"anh\".", "role": "seller", "max_person_age": 49, "min_traveler_age": 25, "min": 5, "you": "traveler_sibling", "me": "sibling", "them": "sibling", "self": "em"},
+		{"role": "seller", "max_person_age": 49, "min_traveler_age": 25, "you": "traveler_sibling", "me": "em", "them": "em", "self": "traveler_sibling"},
+		{"note": "Builder value (Q5): a seller younger than 50 does not say \"con\" to a younger traveler either.", "role": "seller", "max_person_age": 49, "max_traveler_age": 24, "you": "em", "me": "sibling", "them": "sibling", "self": "em"},
+		{"min": 35, "you": "child", "me": "elder", "them": "elder", "self": "child"},
+		{"min": 15, "max": 34, "you": "child", "me": "parent", "them": "parent", "self": "child"},
+		{"min": 5, "max": 14, "you": "em", "me": "sibling", "them": "sibling", "self": "em"},
+		{"min": -4, "max": 4, "you": "traveler_sibling", "me": "i", "them": "sibling", "self": "i"},
+		{"min": -14, "max": -5, "you": "traveler_sibling", "me": "em", "them": "em", "self": "traveler_sibling"},
+		{"note": "Builder value (Q5): \"em\" to 29 years younger, \"con\" or \"cháu\" from 30 years younger.", "min": -29, "max": -15, "you": "traveler_parent", "me": "em", "them": "em", "self": "traveler_parent"},
+		{"max": -30, "you": "traveler_parent", "me": "child", "them": "child", "self": "traveler_parent"}
+	],
+	"display_name": {
+		"note": "R8: the display name is the traveler's word for the person (\"them\") and the given name. With these words, it is the name that the neighbors use (\"name\").",
+		"keep_name": ["em", "con", "cháu"]
+	},
+	"dear": {
+		"note": "R9: {dear} in the English text is \"dear\" for these words of \"you\", and empty for the others (with the comma or the space before it).",
+		"words": ["con", "cháu"],
+		"text": "dear"
+	},
+	"meanings": {
+		"note": "R14: the meaning of each word in the Listen app, the first 3 times.",
+		"con": "'child', from an older person",
+		"cháu": "'grandchild' or 'niece, nephew', from an older person",
+		"em": "'younger sibling'",
+		"anh": "'older brother'",
+		"chị": "'older sister'",
+		"chú": "'uncle', a man younger than one's father",
+		"cô": "'aunt', a woman of about one's parents' age",
+		"dì": "'aunt', a woman of about one's mother's age",
+		"bác": "'uncle' or 'aunt', older than one's parents",
+		"ông": "'grandfather'",
+		"bà": "'grandmother'",
+		"tui": "'I', between people of about the same age",
+		"tôi": "'I', between people of about the same age"
+	}
+}
