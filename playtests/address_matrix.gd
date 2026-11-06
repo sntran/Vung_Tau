@@ -55,8 +55,11 @@ func _talk(d: PlaytestDriver, npc_id: String) -> void:
 	if not d.expect(line_id != "", "%s speaks" % npc_id):
 		return
 	await d.screenshot("%s_%s_%d" % [npc_id, _gender, _age])
-	if not await d.wait_answer():
+	# Some lines have no answer (a call of a seller): then the talk ends.
+	if Content.line(line_id).get("replies", []).is_empty():
 		await d.wait_quiet()
+		return
+	if not await d.wait_answer():
 		return
 	var words := PlaytestDriver.expected_words(npc_id, _gender, _age)
 	await d.open_app("listen")

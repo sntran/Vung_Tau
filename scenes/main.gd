@@ -831,11 +831,14 @@ func _update_chats(delta: float) -> void:
 		_chat_left[npc_id] -= delta
 		if _chat_left[npc_id] <= 0.0:
 			_chat_left[npc_id] = float(chat.every_s)
+			# The speaker of the line says it: a chat of two neighbors can start
+			# with a line of the other one (PT-49 found that the voice came from
+			# the wrong person).
+			var first: String = lines[index] if chat.has("lines") else chat.line
 			if chat.has("lines"):
 				_chat_index[npc_id] = index + 1
-				speak(npc_id, lines[index])
-			else:
-				speak(npc_id, chat.line)
+			var speaker: String = Content.line(first).get("speaker", npc_id)
+			speak(speaker if hem.npcs.has(speaker) else npc_id, first)
 
 
 ## True while a line of the chat that starts with the line plays or waits.
