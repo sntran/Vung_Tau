@@ -130,3 +130,22 @@ func test_the_walk_line_of_stairs_is_not_too_steep() -> void:
 		var rise := absf(walk[i].y - walk[i - 1].y)
 		if rise > 0.001:
 			assert_lt(rad_to_deg(atan2(rise, flat)), 40.0, "the part %d of the walk line" % i)
+
+
+## The faces of a prism face out, and its top faces up (the plaza, the base,
+## and the dome of the statue showed their inside), for a polygon in each order.
+func test_a_prism_has_its_faces_to_the_outside() -> void:
+	for points: PackedVector2Array in [KnownPlaces.ring_points(Vector2(3, 4), 2.0, 8),
+			PackedVector2Array([Vector2(0, 0), Vector2(0, 2), Vector2(3, 2), Vector2(3, 0)])]:
+		var st := SurfaceTool.new()
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+		KnownPlaces._prism(st, points, 1.0, 3.0)
+		var arrays := st.commit_to_arrays()
+		var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+		var middle := Vector3.ZERO
+		for p in points:
+			middle += Vector3(p.x, 2.0, p.y) / points.size()
+		for i in range(0, vertices.size(), 3):
+			var center := (vertices[i] + vertices[i + 1] + vertices[i + 2]) / 3.0
+			var face := (vertices[i + 2] - vertices[i]).cross(vertices[i + 1] - vertices[i])
+			assert_gt(face.dot(center - middle), 0.0, "triangle %d faces out" % (i / 3))

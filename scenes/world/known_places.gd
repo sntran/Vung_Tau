@@ -935,12 +935,13 @@ static func _prism(st: SurfaceTool, points: PackedVector2Array, y0: float, y1: f
 		var p1 := Vector3(b.x, y0, b.y)
 		var p2 := Vector3(b.x, y1, b.y)
 		var p3 := Vector3(a.x, y1, a.y)
+		# Godot draws the faces with a clockwise order seen from the outside.
 		if ccw:
-			st.add_vertex(p0); st.add_vertex(p2); st.add_vertex(p1)
-			st.add_vertex(p0); st.add_vertex(p3); st.add_vertex(p2)
-		else:
 			st.add_vertex(p0); st.add_vertex(p1); st.add_vertex(p2)
 			st.add_vertex(p0); st.add_vertex(p2); st.add_vertex(p3)
+		else:
+			st.add_vertex(p0); st.add_vertex(p2); st.add_vertex(p1)
+			st.add_vertex(p0); st.add_vertex(p3); st.add_vertex(p2)
 	var tris := Geometry2D.triangulate_polygon(points)
 	for t in range(0, tris.size(), 3):
 		var a := points[tris[t]]
@@ -949,9 +950,9 @@ static func _prism(st: SurfaceTool, points: PackedVector2Array, y0: float, y1: f
 		var ab := b - a
 		var ac := c - a
 		if ab.x * ac.y - ab.y * ac.x > 0.0:
-			st.add_vertex(Vector3(a.x, y1, a.y)); st.add_vertex(Vector3(c.x, y1, c.y)); st.add_vertex(Vector3(b.x, y1, b.y))
-		else:
 			st.add_vertex(Vector3(a.x, y1, a.y)); st.add_vertex(Vector3(b.x, y1, b.y)); st.add_vertex(Vector3(c.x, y1, c.y))
+		else:
+			st.add_vertex(Vector3(a.x, y1, a.y)); st.add_vertex(Vector3(c.x, y1, c.y)); st.add_vertex(Vector3(b.x, y1, b.y))
 
 
 ## A wall from a to b (x-z), from y0 to y1, with a thickness.

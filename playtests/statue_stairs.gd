@@ -61,6 +61,11 @@ static func _to_plaza(route: PackedVector3Array, entry: Dictionary) -> PackedVec
 	var result := PackedVector3Array()
 	for i in route.size():
 		var r := Vector2(route[i].x - c.x, route[i].z - c.z).length()
+		if i > 0:
+			# A part of the line can pass inside with its two ends outside.
+			var near := Geometry2D.get_closest_point_to_segment(Vector2(c.x, c.z), Vector2(route[i - 1].x, route[i - 1].z),
+					Vector2(route[i].x, route[i].z))
+			r = minf(r, near.distance_to(Vector2(c.x, c.z)))
 		if r <= inside and i > 0:
 			# The point on the line from the last point where it comes to "inside".
 			var a := route[i - 1]
@@ -238,8 +243,25 @@ static func _plaza(d: PlaytestDriver, w: VungTau, entry: Dictionary, route: Pack
 	d.expect(Vector2(p.x - c.x, p.z - c.z).length() <= plaza + 1.0, "the end of the route is on the plaza")
 	await d.look_at_point(c + Vector3(0, 20.0, 0), 4.0, 15.0)
 	await d.screenshot("top_statue")
-	# Out to the parapet: away from the statue.
-	var out := Vector3(p.x - c.x, 0.0, p.z - c.z).normalized()
+	# Out to the parapet, away from the statue, where the parapet is farthest
+	# from its openings (the stairs come in at an opening).
+	var openings: Array[Vector2] = w.places._plaza_openings(entry.place, Vector2(c.x, c.z), plaza)
+	var out := Vector3.ZERO
+	var best := -1.0
+	for k in 32:
+		var a := TAU * k / 32.0
+		var edge := Vector2(c.x, c.z) + Vector2(cos(a), sin(a)) * plaza
+		var gap := INF
+		for o in openings:
+			gap = minf(gap, edge.distance_to(o))
+		if gap > best:
+			best = gap
+			out = Vector3(cos(a), 0.0, sin(a))
+	d.step("the parapet is %.1f m from the nearest opening in the direction of the push (%d openings)" % [best, openings.size()])
+	var inner := c + out * (plaza - 3.0)
+	await d.start_at(inner, rad_to_deg(atan2(-out.x, -out.z)))
+	await d.wait_frames(10)
+	p = d.state().player
 	await d.look_at_point(p + out * 10.0 + Vector3(0, Player.EYE_HEIGHT, 0), 6.0, 15.0)
 	await d.hold_stick(Vector2(0, -1), 4.0)
 	p = d.state().player
