@@ -569,8 +569,8 @@ def level_places(grid, landmarks_config, found_by_id) -> None:
 
 
 def cut_stairs(grid, landmarks_config, found_by_id, roads) -> None:
-    """The ground under the stairs of each known place (plan 0008, R6, R15):
-    along the line of the steps, the ground climbs not more than
+    """The ground under the stairs and the route of each known place (plan
+    0008, R6, R15): along the line of each way, the ground climbs not more than
     terrain.MAX_STEPS_GRADE, so the steps of the game can follow it and the
     player can walk up. Each cell within the half width of the steps and 1.5
     cells of the line takes the height of the nearest point of the line. The
@@ -583,10 +583,21 @@ def cut_stairs(grid, landmarks_config, found_by_id, roads) -> None:
         record = found_by_id.get(landmark["id"])
         if not place or place.get("status") == "Check" or not record or not record.get("found"):
             continue
-        for way_id in place.get("stairs", []):
+        # The stairs and the other ways of the route to the place (a footway on
+        # a steep slope had a side slope of 52 degrees within 0.5 m of its line).
+        # A way of the route on the plaza is not cut: the plaza is level (R2).
+        stairs = [int(w) for w in place.get("stairs", [])]
+        ways = list(dict.fromkeys(stairs + [int(w) for w in place.get("route", [])]))
+        plaza = place.get("sizes", {}).get("plaza_radius")
+        for way_id in ways:
             road = by_id.get(int(way_id))
             if road is None or road.points is None or len(road.points) < 2:
                 continue
+            if plaza and way_id not in stairs:
+                cx, cz = record["position"]
+                near = np.hypot(road.points[:, 0] - cx, -road.points[:, 1] - cz).min()
+                if near < float(plaza["value"]) + 2.0:
+                    continue
             x, z = _dense_line(road.points[:, 0], -road.points[:, 1], 0.5)
             ground = grid.sample(x, z)
             spacing = np.hypot(np.diff(x), np.diff(z))
@@ -610,7 +621,7 @@ def cut_stairs(grid, landmarks_config, found_by_id, roads) -> None:
             block = grid.heights[r0:r1 + 1, c0:c1 + 1]
             block[inside] = profile[nearest[inside]]
             change = float(np.max(np.abs(profile - ground)))
-            log(f"{landmark['id']}: the ground under the steps {way_id} climbs {terrain.MAX_STEPS_GRADE} at most"
+            log(f"{landmark['id']}: the ground under the way {way_id} climbs {terrain.MAX_STEPS_GRADE} at most"
                 f" ({int(inside.sum())} cells, {change:.1f} m of change at most)")
 
 

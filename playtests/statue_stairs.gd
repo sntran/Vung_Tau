@@ -130,7 +130,7 @@ static func _walk(d: PlaytestDriver, w: VungTau, route: PackedVector3Array, from
 				d.step("part %d: no tap at %.0f m: %s" % [d.phase, at, error])
 				break
 		await d.wait_idle(30.0)
-		var now := PlaytestDriver.route_distance(route, d.state().player)
+		var now := _distance_near(route, d.state().player, at)
 		if now <= at + 0.2:
 			# A player taps again when a tap does not move them: once, at a nearer
 			# point. A real block stops this tap too.
@@ -139,7 +139,7 @@ static func _walk(d: PlaytestDriver, w: VungTau, route: PackedVector3Array, from
 			await d.look_at_point(again, 3.0, 15.0)
 			if await d.try_tap_floor(again) == "":
 				await d.wait_idle(30.0)
-				now = PlaytestDriver.route_distance(route, d.state().player)
+				now = _distance_near(route, d.state().player, at)
 				if now > at + 0.2:
 					d.step("part %d: a second tap at %.0f m moves the player" % [d.phase, at])
 		if now <= at + 0.2:
@@ -172,6 +172,24 @@ static func _cuts_corner(route: PackedVector3Array, from: Vector3, at: float, to
 			return true
 		k += 0.5
 	return false
+
+
+## The distance along the route of the point of the route nearest to "p",
+## from 2 m back to 20 m ahead of "at". At a U-turn, the nearest point of the
+## whole route can be on the other leg.
+static func _distance_near(route: PackedVector3Array, p: Vector3, at: float) -> float:
+	var best := at
+	var best_gap := INF
+	var k := maxf(at - 2.0, 0.0)
+	var end := minf(at + 20.0, PlaytestDriver._length(route))
+	while k <= end:
+		var q := PlaytestDriver.route_point(route, k)
+		var gap := Vector2(q.x - p.x, q.z - p.z).length()
+		if gap < best_gap:
+			best_gap = gap
+			best = k
+		k += 0.1
+	return best
 
 
 static func _off_route(route: PackedVector3Array, p: Vector3) -> float:
