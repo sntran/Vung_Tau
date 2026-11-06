@@ -41,7 +41,8 @@ func run(d: PlaytestDriver) -> void:
 	d.expect(not s.phone_up, "the phone is down")
 	d.expect(s.subtitle.get("line_id", "") == "batu.greet" and s.subtitle.get("speaker", "") == "Bà Tư",
 			"the Vietnamese subtitle shows: %s" % [s.subtitle])
-	var vi: String = Content.line("batu.greet").vi
+	# The line with the words for the default traveler (plan 0007, R4: a man of 30).
+	var vi: String = Content.spoken("batu.greet").vi
 	d.expect(" ".join(s.subtitle.get("lines", [])).contains(vi.substr(0, 10)), "the subtitle is in Vietnamese: %s" % [s.subtitle])
 	await d.screenshot("subtitle")
 	await d.open_app("listen")
@@ -77,8 +78,11 @@ func run(d: PlaytestDriver) -> void:
 	d.expect(m.talk.get("state", "") == "speaking", "the talk goes on: %s" % m.talk.get("state", ""))
 	await d.wait_answer()
 	var transcript := d.transcript()
-	d.expect(transcript.size() == 2 and transcript[0].vi == vi and transcript[0].en == Content.line("batu.greet").en
-			and transcript[0].speaker == "Bà Tư", "the transcript shows the line in Vietnamese and English: %s" % [transcript])
+	# Plan 0007, R14: the English line explains "con" the first 3 times.
+	d.expect(transcript.size() == 2 and transcript[0].vi == vi
+			and str(transcript[0].en).begins_with(Content.spoken("batu.greet").en)
+			and str(transcript[0].en).contains("[con: ") and transcript[0].speaker == "Bà Tư",
+			"the transcript shows the line in Vietnamese and English: %s" % [transcript])
 	await d.screenshot("transcript")
 	# Save a line: the banner shows, and it covers no part of the phone (D-0003-07).
 	await d.tap_phone_id("listen.entry.0")

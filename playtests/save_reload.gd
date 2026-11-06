@@ -44,7 +44,8 @@ func _play(d: PlaytestDriver) -> void:
 	var coc_x: float = d.main().hem.lot_x["coc"]
 	await d.walk_toward(coc_x, 0.3)
 	var s := d.state()
-	d.expect(s.cards == ["anSang", "banhmi"], "two cards are in the Sổ tay: %s" % [s.cards])
+	# The first "con" of Bà Tư also teaches the card "Xưng hô" (plan 0007, R13).
+	d.expect(s.cards == ["xungHo", "anSang", "banhmi"], "three cards are in the Sổ tay: %s" % [s.cards])
 	d.expect(s.phrases.size() == 1, "one phrase is in the Sổ tay: %s" % [s.phrases])
 	await d.screenshot("before_quit")
 	var file := FileAccess.open(_expected_path(d), FileAccess.WRITE)

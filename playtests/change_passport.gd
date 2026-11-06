@@ -15,7 +15,7 @@ func run(d: PlaytestDriver) -> void:
 	await d.lower_phone()
 	var line := await d.talk_to("cosau")
 	d.expect(line == "cosau.open", "Cô Sáu says the line of the open shop: %s" % line)
-	var before := Content.spoken(line).vi
+	var before: String = Content.spoken(line).vi
 	d.expect(before.contains(" con"), "for a woman of 25, Cô Sáu says \"con\": %s" % before)
 	if not await d.wait_answer():
 		return
