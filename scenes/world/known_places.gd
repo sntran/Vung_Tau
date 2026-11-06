@@ -280,7 +280,9 @@ func _statue(entry: Dictionary) -> void:
 	disc.radius = plaza
 	disc.height = 0.6
 	floor_shape.shape = disc
-	floor_shape.position = Vector3(c.x, y0 - 0.3, c.y)
+	# The top of the floor is at the level ground under the plaza (R2: the base
+	# is 0.1 m over it), so the floor has no edge at the openings of the parapet.
+	floor_shape.position = Vector3(c.x, y0 - 0.1 - 0.3, c.y)
 	_body(entry).add_child(floor_shape)
 	_box_shape(entry, Vector3(base_w * 0.92, base_h + 2.0, base_w * 0.92), Transform3D(Basis(), Vector3(c.x, y0 + (base_h + 2.0) / 2.0, c.y)))
 	# The far form (R9): the base, the figure, and the arms.

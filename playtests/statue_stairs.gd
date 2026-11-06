@@ -60,8 +60,23 @@ static func _to_plaza(route: PackedVector3Array, entry: Dictionary) -> PackedVec
 	var inside := float(entry.get("plaza", 15.0)) - 1.5
 	var result := PackedVector3Array()
 	for i in route.size():
+		var r := Vector2(route[i].x - c.x, route[i].z - c.z).length()
+		if r <= inside and i > 0:
+			# The point on the line from the last point where it comes to "inside".
+			var a := route[i - 1]
+			var lo := 0.0
+			var hi := 1.0
+			for step in 24:
+				var t := (lo + hi) / 2.0
+				var q := a.lerp(route[i], t)
+				if Vector2(q.x - c.x, q.z - c.z).length() > inside:
+					lo = t
+				else:
+					hi = t
+			result.append(a.lerp(route[i], hi))
+			break
 		result.append(route[i])
-		if Vector2(route[i].x - c.x, route[i].z - c.z).length() <= inside:
+		if r <= inside:
 			break
 	return result
 
