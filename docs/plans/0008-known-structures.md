@@ -140,4 +140,5 @@ The places are:
   | The sea in front of Bãi Trước | 0.0 | 0.0 |
 
   The DEM and the game give the same values for each view. No view was changed.
+- **N9. The sheets (PT-63).** Each place has its three screenshots. From 10 m, Bạch Dinh is behind the trees of the slope, and from 50 m the lighthouse is behind the trees of Núi Nhỏ (D4). From 10 m, Miếu Hòn Bà is behind the rocks of the islet. The clearings round the places are 3 m (R5): tell me if you want the views of the sheets from other points.
 - **N8. Phase 5 waits.** The orders of the models (R12 to R14, R16) wait for the blueprints of World (W13). Each place keeps its stand-in until World has its model.
