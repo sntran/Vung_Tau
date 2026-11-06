@@ -5,61 +5,250 @@
 	"sample_rate": 48000,
 	"loudness_lufs": -16.0,
 	"clips": {
-		"bacha.call_after": {
-			"file": "bacha.call_after.ogg",
+		"bacha.call_after@anh": {
+			"file": "bacha.call_after@anh.ogg",
+			"duration_s": 0.83,
+			"hash": "ad2a58320d44e2cdccefcd428d04d77fe400179be0aa46bcb218230c7f8614da",
+			"voice": "Ngọc Huyền",
+			"text": "Anh đi đâu đấy?"
+		},
+		"bacha.call_after@chau": {
+			"file": "bacha.call_after@chau.ogg",
 			"duration_s": 0.85,
 			"hash": "12b7a195fdfe9b0808136e9b828f049fe40e42146532d57dc9e03af446854a42",
 			"voice": "Ngọc Huyền",
 			"text": "Cháu đi đâu đấy?"
 		},
-		"bacha.english": {
-			"file": "bacha.english.ogg",
+		"bacha.call_after@chi": {
+			"file": "bacha.call_after@chi.ogg",
+			"duration_s": 0.82,
+			"hash": "d7a13337377588d0dfdb61000e3467aaa5eeae106b5f79ccce0319c91d6d95c1",
+			"voice": "Ngọc Huyền",
+			"text": "Chị đi đâu đấy?"
+		},
+		"bacha.call_after@em": {
+			"file": "bacha.call_after@em.ogg",
+			"duration_s": 0.82,
+			"hash": "9ddcd074e4e9f698567b193c8942624354ac3bbcefff79ea17c8600b607c8d3c",
+			"voice": "Ngọc Huyền",
+			"text": "Em đi đâu đấy?"
+		},
+		"bacha.english@anh": {
+			"file": "bacha.english@anh.ogg",
+			"duration_s": 2.02,
+			"hash": "1a63d389c0b490cf057294b9ba5824382dfc0dec947f0c6ec4fcf70d5f68b02e",
+			"voice": "Ngọc Huyền",
+			"text": "Welcome, welcome! Mời anh ngồi."
+		},
+		"bacha.english@chau": {
+			"file": "bacha.english@chau.ogg",
 			"duration_s": 2.0,
 			"hash": "1d8b2274af9f0db40bc45fa10b8321ef2469f0d15c7f2a37ce9b27414132c68a",
 			"voice": "Ngọc Huyền",
 			"text": "Welcome, welcome! Mời cháu ngồi."
 		},
-		"bacha.intro": {
-			"file": "bacha.intro.ogg",
+		"bacha.english@chi": {
+			"file": "bacha.english@chi.ogg",
+			"duration_s": 2.2,
+			"hash": "0e947529cf2e3307b29c2a72dee22bd285e5917c60bd861712208b4dbde3ae47",
+			"voice": "Ngọc Huyền",
+			"text": "Welcome, welcome! Mời chị ngồi."
+		},
+		"bacha.english@em": {
+			"file": "bacha.english@em.ogg",
+			"duration_s": 1.99,
+			"hash": "1e35568f59ddd08fcbce2be9eea8a6c427fbff4fba221342d11d7a545ba70828",
+			"voice": "Ngọc Huyền",
+			"text": "Welcome, welcome! Mời em ngồi."
+		},
+		"bacha.intro@bac": {
+			"file": "bacha.intro@bac.ogg",
 			"duration_s": 1.79,
 			"hash": "77dbb3e7ea04c785b62ea77343cfbcb7cdccf4db5f1cbb4492a585661beeaca1",
 			"voice": "Ngọc Huyền",
 			"text": "Bác là bác Hà, bác nấu phở Bắc."
 		},
-		"bacha.open": {
-			"file": "bacha.open.ogg",
+		"bacha.intro@chi": {
+			"file": "bacha.intro@chi.ogg",
+			"duration_s": 1.79,
+			"hash": "aceec8329cae162bd5c3d46c4ce9f28fe681b08f1ea39285858f3f0cb76c0005",
+			"voice": "Ngọc Huyền",
+			"text": "Chị là chị Hà, chị nấu phở Bắc."
+		},
+		"bacha.intro@em": {
+			"file": "bacha.intro@em.ogg",
+			"duration_s": 1.64,
+			"hash": "c10a62534c552fd8b2f5501b7c029b77965c33d743cf09bdce819faefca26ca6",
+			"voice": "Ngọc Huyền",
+			"text": "Em là Hà, em nấu phở Bắc."
+		},
+		"bacha.intro@toi": {
+			"file": "bacha.intro@toi.ogg",
+			"duration_s": 1.6,
+			"hash": "05a346184de1a95fb0063732e4906613cb7ea07ead5bdfadf0e0da11b1b2a47e",
+			"voice": "Ngọc Huyền",
+			"text": "Tôi là Hà, tôi nấu phở Bắc."
+		},
+		"bacha.open@anh": {
+			"file": "bacha.open@anh.ogg",
+			"duration_s": 1.11,
+			"hash": "074c0ee69a48aef8a346a45207b0a0d4fc0c9508307fb140e1e5ac1d4901c98e",
+			"voice": "Ngọc Huyền",
+			"text": "Mời anh vào ăn phở!"
+		},
+		"bacha.open@chau": {
+			"file": "bacha.open@chau.ogg",
 			"duration_s": 1.14,
 			"hash": "e782b653ebefc5fcfa8d8a697b506b9a660ec3fd19e904364dae804c3dee38a1",
 			"voice": "Ngọc Huyền",
 			"text": "Mời cháu vào ăn phở!"
 		},
-		"bacha.thanks": {
-			"file": "bacha.thanks.ogg",
+		"bacha.open@chi": {
+			"file": "bacha.open@chi.ogg",
+			"duration_s": 1.1,
+			"hash": "eb6eca800e76fe5a3c8a233e2712027e833ac6e33cbc3d52f4a9f23492ce00e7",
+			"voice": "Ngọc Huyền",
+			"text": "Mời chị vào ăn phở!"
+		},
+		"bacha.open@em": {
+			"file": "bacha.open@em.ogg",
+			"duration_s": 1.15,
+			"hash": "a1679a1709693b57cbd12ce4c91b7b4576700a0bf511424f2a50b15ef4de66af",
+			"voice": "Ngọc Huyền",
+			"text": "Mời em vào ăn phở!"
+		},
+		"bacha.thanks@anh": {
+			"file": "bacha.thanks@anh.ogg",
+			"duration_s": 1.05,
+			"hash": "34b4588bdedda88b147701413081f854bb443feb9ecfe751741b0ff182255c6f",
+			"voice": "Ngọc Huyền",
+			"text": "Anh cứ tự nhiên nhé."
+		},
+		"bacha.thanks@chau": {
+			"file": "bacha.thanks@chau.ogg",
 			"duration_s": 1.05,
 			"hash": "747ff6374e74a029aadb17dd11ae366a8e9d5deb606e5d0dabded5f0965701f8",
 			"voice": "Ngọc Huyền",
 			"text": "Cháu cứ tự nhiên nhé."
 		},
-		"batu.call_after": {
-			"file": "batu.call_after.ogg",
+		"bacha.thanks@chi": {
+			"file": "bacha.thanks@chi.ogg",
+			"duration_s": 1.05,
+			"hash": "4d97e9dab3166580cfd8b7c63702b70745837f5fd23107a2c6e7042ff465889f",
+			"voice": "Ngọc Huyền",
+			"text": "Chị cứ tự nhiên nhé."
+		},
+		"bacha.thanks@em": {
+			"file": "bacha.thanks@em.ogg",
+			"duration_s": 1.03,
+			"hash": "266c16bbdbbdafb141b59df93dfb6beaa88a18c1fa07a9ffbb001e17962dc49c",
+			"voice": "Ngọc Huyền",
+			"text": "Em cứ tự nhiên nhé."
+		},
+		"batu.call_after@anh": {
+			"file": "batu.call_after@anh.ogg",
+			"duration_s": 2.45,
+			"hash": "f7805664860298753d1daedbba32f68004c33ce5682353ec29c42d4dadb16029",
+			"voice": "Thục Đoan",
+			"text": "Đi đâu đó anh? Nhớ ăn sáng nghen!"
+		},
+		"batu.call_after@chi": {
+			"file": "batu.call_after@chi.ogg",
+			"duration_s": 2.32,
+			"hash": "83cf3adde76a14eb43b24d25f6ba5eb2fb3825db442af491dfcc0de5b2c9f53f",
+			"voice": "Thục Đoan",
+			"text": "Đi đâu đó chị? Nhớ ăn sáng nghen!"
+		},
+		"batu.call_after@con": {
+			"file": "batu.call_after@con.ogg",
 			"duration_s": 2.51,
 			"hash": "cf55a2579bcc604f07e195a8d256b5d82afdc0082f2bd24985814e63024dd5a5",
 			"voice": "Thục Đoan",
 			"text": "Đi đâu đó con? Nhớ ăn sáng nghen!"
 		},
-		"batu.greet": {
-			"file": "batu.greet.ogg",
+		"batu.call_after@em": {
+			"file": "batu.call_after@em.ogg",
+			"duration_s": 2.47,
+			"hash": "9c588ab2e1de2ae1df76e29fbf90dcdd01cbcff0cc01fe7939bc14562ba41c66",
+			"voice": "Thục Đoan",
+			"text": "Đi đâu đó em? Nhớ ăn sáng nghen!"
+		},
+		"batu.greet@anh": {
+			"file": "batu.greet@anh.ogg",
+			"duration_s": 2.68,
+			"hash": "40ed55be6accc4e6b676748117cc0718aa24231c4f644224ead8aa85fe57d135",
+			"voice": "Thục Đoan",
+			"text": "Ủa, anh dậy rồi hả? Ăn sáng chưa anh?"
+		},
+		"batu.greet@chi": {
+			"file": "batu.greet@chi.ogg",
+			"duration_s": 2.46,
+			"hash": "0aa1f875738b491bbcdf1464cda66701e5d0d450397ef8fdb38d3619e7c4b672",
+			"voice": "Thục Đoan",
+			"text": "Ủa, chị dậy rồi hả? Ăn sáng chưa chị?"
+		},
+		"batu.greet@con": {
+			"file": "batu.greet@con.ogg",
 			"duration_s": 3.07,
 			"hash": "e81a51ea53e9ec52acd81b325a6e9ef2cc77943dd42dfe7ef9447fc66021238a",
 			"voice": "Thục Đoan",
 			"text": "Ủa, con dậy rồi hả? Ăn sáng chưa con?"
 		},
-		"batu.intro": {
-			"file": "batu.intro.ogg",
+		"batu.greet@em": {
+			"file": "batu.greet@em.ogg",
+			"duration_s": 2.57,
+			"hash": "8333467d43ae9b3066036c9ad6924cac8b2bb96d993534a32e7dea754d5ba2dd",
+			"voice": "Thục Đoan",
+			"text": "Ủa, em dậy rồi hả? Ăn sáng chưa em?"
+		},
+		"batu.intro@anh-em": {
+			"file": "batu.intro@anh-em.ogg",
+			"duration_s": 1.09,
+			"hash": "74bc02d575076264ed4c12d4e049256bf6bd398a0f8003e4c4182cd249da770b",
+			"voice": "Thục Đoan",
+			"text": "Em là Tư đó anh."
+		},
+		"batu.intro@anh-tui": {
+			"file": "batu.intro@anh-tui.ogg",
+			"duration_s": 1.09,
+			"hash": "cb7bd363fa2a4690ad91276ec4ed31ea80b353171db68dc2c5bc1548fdc42256",
+			"voice": "Thục Đoan",
+			"text": "Tui là Tư đó anh."
+		},
+		"batu.intro@chi-em": {
+			"file": "batu.intro@chi-em.ogg",
+			"duration_s": 1.22,
+			"hash": "101ae56144c707a4370d43a7cdf43e46ae7b340367b189634e41180e108098b5",
+			"voice": "Thục Đoan",
+			"text": "Em là Tư đó chị."
+		},
+		"batu.intro@chi-tui": {
+			"file": "batu.intro@chi-tui.ogg",
+			"duration_s": 1.24,
+			"hash": "df867958720417cea41264cc6c0aa8ff9ad0e59523059c2a498f7939940238c1",
+			"voice": "Thục Đoan",
+			"text": "Tui là Tư đó chị."
+		},
+		"batu.intro@con-ba": {
+			"file": "batu.intro@con-ba.ogg",
 			"duration_s": 1.23,
 			"hash": "b774fb6db355b7915d134fec8a74f91cab3c7380948c5e2775e65fd6cf486ea7",
 			"voice": "Thục Đoan",
 			"text": "Bà là bà Tư đó con."
+		},
+		"batu.intro@con-co": {
+			"file": "batu.intro@con-co.ogg",
+			"duration_s": 1.29,
+			"hash": "ed8a33208e4dc3ae7320f2e3ba5819074dbdded5de690add1955dfe71723df26",
+			"voice": "Thục Đoan",
+			"text": "Cô là cô Tư đó con."
+		},
+		"batu.intro@em-chi": {
+			"file": "batu.intro@em-chi.ogg",
+			"duration_s": 1.32,
+			"hash": "8b5fa2f84aad17ffeebb28678af92ad33f47afef4151947fd6d6e9e034259e0a",
+			"voice": "Thục Đoan",
+			"text": "Chị là chị Tư đó em."
 		},
 		"batu.reply_chua": {
 			"file": "batu.reply_chua.ogg",
@@ -68,12 +257,33 @@
 			"voice": "Thục Đoan",
 			"text": "Chưa hả? Đi qua Cô Sáu ăn tô phở đi, kẻo hết!"
 		},
-		"batu.reply_chua_said": {
-			"file": "batu.reply_chua_said.ogg",
+		"batu.reply_chua_said@anh": {
+			"file": "batu.reply_chua_said@anh.ogg",
+			"duration_s": 4.98,
+			"hash": "ccac7b9b88a71a3194073749d5c3bf39cccbd44196907c08cc50560132a4f3fc",
+			"voice": "Thục Đoan",
+			"text": "[cười] Trời, anh nói tiếng Việt giỏi quá! Qua Cô Sáu ăn tô phở đi anh, kẻo hết."
+		},
+		"batu.reply_chua_said@chi": {
+			"file": "batu.reply_chua_said@chi.ogg",
+			"duration_s": 5.09,
+			"hash": "b14b01152b3a7a5c9b2ba9ddd47b027ed03588f122d7b0e0bbe5a8ef9697e72b",
+			"voice": "Thục Đoan",
+			"text": "[cười] Trời, chị nói tiếng Việt giỏi quá! Qua Cô Sáu ăn tô phở đi chị, kẻo hết."
+		},
+		"batu.reply_chua_said@con": {
+			"file": "batu.reply_chua_said@con.ogg",
 			"duration_s": 5.07,
 			"hash": "cfd504bcebaef04b497a7607f6aebc29bc0f16e552529fe0dc5ccacb4da2e07d",
 			"voice": "Thục Đoan",
 			"text": "[cười] Trời, con nói tiếng Việt giỏi quá! Qua Cô Sáu ăn tô phở đi con, kẻo hết."
+		},
+		"batu.reply_chua_said@em": {
+			"file": "batu.reply_chua_said@em.ogg",
+			"duration_s": 5.06,
+			"hash": "481f90c71b8f8a46966062545f56919a2c392f91de07b7313c07d8742c203680",
+			"voice": "Thục Đoan",
+			"text": "[cười] Trời, em nói tiếng Việt giỏi quá! Qua Cô Sáu ăn tô phở đi em, kẻo hết."
 		},
 		"batu.reply_english": {
 			"file": "batu.reply_english.ogg",
@@ -152,19 +362,89 @@
 			"voice": "Đức Trí",
 			"text": "Thôi, một ly đủ rồi. Ngồi chơi chút nữa."
 		},
-		"cosau.call_after": {
-			"file": "cosau.call_after.ogg",
+		"cosau.call_after@anh": {
+			"file": "cosau.call_after@anh.ogg",
+			"duration_s": 1.97,
+			"hash": "7a10cd0a199e660435bb720132441582f642b3e19767bfe369aee93210ed580e",
+			"voice": "Kim Thanh",
+			"text": "Ủa, đi đâu vậy anh?"
+		},
+		"cosau.call_after@chi": {
+			"file": "cosau.call_after@chi.ogg",
+			"duration_s": 1.69,
+			"hash": "0503ab93d0ecedd6de787312f909faa42c394318d4eb2cbb4a64806f7e71960e",
+			"voice": "Kim Thanh",
+			"text": "Ủa, đi đâu vậy chị?"
+		},
+		"cosau.call_after@chu": {
+			"file": "cosau.call_after@chu.ogg",
+			"duration_s": 1.78,
+			"hash": "52997c5aecbb5a18daacc7759b756c9b4849529d70851f1853d96e6dbb477097",
+			"voice": "Kim Thanh",
+			"text": "Ủa, đi đâu vậy chú?"
+		},
+		"cosau.call_after@co": {
+			"file": "cosau.call_after@co.ogg",
+			"duration_s": 1.62,
+			"hash": "15c3587529f479867c738307d96d90660341d1826e96263183475e077815a9f6",
+			"voice": "Kim Thanh",
+			"text": "Ủa, đi đâu vậy cô?"
+		},
+		"cosau.call_after@con": {
+			"file": "cosau.call_after@con.ogg",
 			"duration_s": 1.75,
 			"hash": "e9ff494d87ab43776466319f3ce90188363d7fec3585320508a0568395020a74",
 			"voice": "Kim Thanh",
 			"text": "Ủa, đi đâu vậy con?"
 		},
-		"cosau.closed_before": {
-			"file": "cosau.closed_before.ogg",
+		"cosau.call_after@em": {
+			"file": "cosau.call_after@em.ogg",
+			"duration_s": 1.56,
+			"hash": "8d36cf2ef47d190829739c8e3974c41fee3d6fdcdbc29068a70be86aadd5e89f",
+			"voice": "Kim Thanh",
+			"text": "Ủa, đi đâu vậy em?"
+		},
+		"cosau.closed_before@anh": {
+			"file": "cosau.closed_before@anh.ogg",
+			"duration_s": 2.27,
+			"hash": "77d748ff699d1cb8a19e1816343a2322aaa1ba78556b5370b82358e99260d857",
+			"voice": "Kim Thanh",
+			"text": "Chưa mở anh ơi, chút nữa nghen."
+		},
+		"cosau.closed_before@chi": {
+			"file": "cosau.closed_before@chi.ogg",
+			"duration_s": 2.28,
+			"hash": "1234f21fa793a0043e2d184cedcc1f8b4fec365b1fb62037b956814a050b2657",
+			"voice": "Kim Thanh",
+			"text": "Chưa mở chị ơi, chút nữa nghen."
+		},
+		"cosau.closed_before@chu": {
+			"file": "cosau.closed_before@chu.ogg",
+			"duration_s": 2.33,
+			"hash": "c5d8204b5045ecf24fb2bf7d9890bf7567a218461a3feb8d68e921919981a57b",
+			"voice": "Kim Thanh",
+			"text": "Chưa mở chú ơi, chút nữa nghen."
+		},
+		"cosau.closed_before@co": {
+			"file": "cosau.closed_before@co.ogg",
+			"duration_s": 2.5,
+			"hash": "dac8468b40809285cb7d3836db838223eb56a2cf9540cba68bde133030a4fa8f",
+			"voice": "Kim Thanh",
+			"text": "Chưa mở cô ơi, chút nữa nghen."
+		},
+		"cosau.closed_before@con": {
+			"file": "cosau.closed_before@con.ogg",
 			"duration_s": 2.41,
 			"hash": "2b99c36584e6d56015e3955aa6fc6ce355cd1213037dfb0cc08aeb8444899ccb",
 			"voice": "Kim Thanh",
 			"text": "Chưa mở con ơi, chút nữa nghen."
+		},
+		"cosau.closed_before@em": {
+			"file": "cosau.closed_before@em.ogg",
+			"duration_s": 2.22,
+			"hash": "00c90f274fd7916c3b4aa0b74e65cf084bf9577abd2a6e391b6abb0dbded94c4",
+			"voice": "Kim Thanh",
+			"text": "Chưa mở em ơi, chút nữa nghen."
 		},
 		"cosau.english": {
 			"file": "cosau.english.ogg",
@@ -173,110 +453,670 @@
 			"voice": "Kim Thanh",
 			"text": "Ô kê, ô kê! Ngồi, ngồi!"
 		},
-		"cosau.intro": {
-			"file": "cosau.intro.ogg",
-			"duration_s": 2.95,
-			"hash": "001ca14ac7abb3b7f328299d86a89a6d5e302b66148d438afafb5c87c1cd1f8e",
+		"cosau.intro@ba": {
+			"file": "cosau.intro@ba.ogg",
+			"duration_s": 2.78,
+			"hash": "4f3fc3061ee24140c82b7197073ad72d037777931bb2002fd7522c0b8ddd34b0",
 			"voice": "Kim Thanh",
-			"text": "Cô là Cô Sáu, bán phở ở đây nè."
+			"text": "Bà là bà Sáu, bán phở ở đây nè."
 		},
-		"cosau.open": {
-			"file": "cosau.open.ogg",
+		"cosau.intro@chi": {
+			"file": "cosau.intro@chi.ogg",
+			"duration_s": 2.9,
+			"hash": "85adde96ed4046ad9b0655a14ad6a83dab491db6785c9069baac71d76f6a2f5e",
+			"voice": "Kim Thanh",
+			"text": "Chị là chị Sáu, bán phở ở đây nè."
+		},
+		"cosau.intro@co": {
+			"file": "cosau.intro@co.ogg",
+			"duration_s": 2.88,
+			"hash": "cf87fe4ce2091f45c44f76567b76282779749aae54648f8ead984d78197dac85",
+			"voice": "Kim Thanh",
+			"text": "Cô là cô Sáu, bán phở ở đây nè."
+		},
+		"cosau.intro@em": {
+			"file": "cosau.intro@em.ogg",
+			"duration_s": 2.58,
+			"hash": "21a4fd8f7893c95176af5f4d3a98d97a63ed28a860052390044a6406e75b1e79",
+			"voice": "Kim Thanh",
+			"text": "Em là Sáu, bán phở ở đây nè."
+		},
+		"cosau.intro@tui": {
+			"file": "cosau.intro@tui.ogg",
+			"duration_s": 2.67,
+			"hash": "d5d53d5c7bccb317820b7212bf4b529ae29362b58a5b645dfc27e7065907cd47",
+			"voice": "Kim Thanh",
+			"text": "Tui là Sáu, bán phở ở đây nè."
+		},
+		"cosau.open@anh": {
+			"file": "cosau.open@anh.ogg",
+			"duration_s": 1.91,
+			"hash": "94c638a36fb34a613217fdf762c8d5fdda31cb120611db0283512ca26031dddb",
+			"voice": "Kim Thanh",
+			"text": "Vô đây anh, ngồi đi!"
+		},
+		"cosau.open@chi": {
+			"file": "cosau.open@chi.ogg",
+			"duration_s": 2.01,
+			"hash": "878f06595041598b881a8a2bbac5c46fcb73c15c1d9651c50b6d8cd6a577ad93",
+			"voice": "Kim Thanh",
+			"text": "Vô đây chị, ngồi đi!"
+		},
+		"cosau.open@chu": {
+			"file": "cosau.open@chu.ogg",
+			"duration_s": 1.72,
+			"hash": "5b4a0f9e0dab86b0f48241d7f389c5038aaa10774230dbeff31bdd35c822851c",
+			"voice": "Kim Thanh",
+			"text": "Vô đây chú, ngồi đi!"
+		},
+		"cosau.open@co": {
+			"file": "cosau.open@co.ogg",
+			"duration_s": 1.68,
+			"hash": "369ca1f91e07b91e0def2fffbc4a08f83a86c6320ad9616da361167e5c89358d",
+			"voice": "Kim Thanh",
+			"text": "Vô đây cô, ngồi đi!"
+		},
+		"cosau.open@con": {
+			"file": "cosau.open@con.ogg",
 			"duration_s": 1.88,
 			"hash": "158247f9d0694a49e28d0675cebfd933e8c2aabbc0f315083df0d0015df7c537",
 			"voice": "Kim Thanh",
 			"text": "Vô đây con, ngồi đi!"
 		},
-		"cosau.sit": {
-			"file": "cosau.sit.ogg",
+		"cosau.open@em": {
+			"file": "cosau.open@em.ogg",
+			"duration_s": 1.74,
+			"hash": "8c77366da001709d7b946f25d4db223d41bb0a46a7bd4eb00c45ca07646265fd",
+			"voice": "Kim Thanh",
+			"text": "Vô đây em, ngồi đi!"
+		},
+		"cosau.sit@anh": {
+			"file": "cosau.sit@anh.ogg",
+			"duration_s": 1.84,
+			"hash": "930281a1b8365146c6bf42d1d6ea34a7666a5a0becdfed6f2992c6f40151e4fc",
+			"voice": "Kim Thanh",
+			"text": "Đó, ngồi đó đi anh."
+		},
+		"cosau.sit@chi": {
+			"file": "cosau.sit@chi.ogg",
+			"duration_s": 1.93,
+			"hash": "d9ce8b788e67b89e7b52985d3b787ba45229fc63d1165bb96aa018aee371c511",
+			"voice": "Kim Thanh",
+			"text": "Đó, ngồi đó đi chị."
+		},
+		"cosau.sit@chu": {
+			"file": "cosau.sit@chu.ogg",
+			"duration_s": 1.86,
+			"hash": "47a07f68c511c7bfe38dd081fb32eaa57237b1c437a65f54d1d0d6765035ad81",
+			"voice": "Kim Thanh",
+			"text": "Đó, ngồi đó đi chú."
+		},
+		"cosau.sit@co": {
+			"file": "cosau.sit@co.ogg",
+			"duration_s": 1.81,
+			"hash": "97efcf1dc0974f65556af2a5512a3d8a8e5bf2de2c2f1aaa8d9d2d707dc4351f",
+			"voice": "Kim Thanh",
+			"text": "Đó, ngồi đó đi cô."
+		},
+		"cosau.sit@con": {
+			"file": "cosau.sit@con.ogg",
 			"duration_s": 2.03,
 			"hash": "8039de4deb51ccb6c2e2845665d007f3a4df7868827600f4d96bce0e8a693ac8",
 			"voice": "Kim Thanh",
 			"text": "Đó, ngồi đó đi con."
 		},
-		"cosau.sold_out": {
-			"file": "cosau.sold_out.ogg",
+		"cosau.sit@em": {
+			"file": "cosau.sit@em.ogg",
+			"duration_s": 1.71,
+			"hash": "4749017724d4d80d7a42bf437026263e4b40f5e6de9b7096b6ddd877b0af28d0",
+			"voice": "Kim Thanh",
+			"text": "Đó, ngồi đó đi em."
+		},
+		"cosau.sold_out@anh": {
+			"file": "cosau.sold_out@anh.ogg",
+			"duration_s": 3.52,
+			"hash": "9c6558160ec333a49fdeccd9dbf1322ff38818ade2f1454d1c1b71bdd99a8c5e",
+			"voice": "Kim Thanh",
+			"text": "Hết rồi anh ơi! Sáng mai đi sớm sớm nghen."
+		},
+		"cosau.sold_out@chi": {
+			"file": "cosau.sold_out@chi.ogg",
+			"duration_s": 3.6,
+			"hash": "a1e44d477cc690a144426ce08705ef1cefcec0fa9ec34320e986e62f4712b7fc",
+			"voice": "Kim Thanh",
+			"text": "Hết rồi chị ơi! Sáng mai đi sớm sớm nghen."
+		},
+		"cosau.sold_out@chu": {
+			"file": "cosau.sold_out@chu.ogg",
+			"duration_s": 3.27,
+			"hash": "ed61e39547f4f31836564b18db026a9f1eacbf687c728b78343cc6222b46c4dd",
+			"voice": "Kim Thanh",
+			"text": "Hết rồi chú ơi! Sáng mai đi sớm sớm nghen."
+		},
+		"cosau.sold_out@co": {
+			"file": "cosau.sold_out@co.ogg",
+			"duration_s": 3.41,
+			"hash": "6e1c1b5b72dd5719ee9c48aa2dd366fdf3d8863e586c96d94501606a87101c60",
+			"voice": "Kim Thanh",
+			"text": "Hết rồi cô ơi! Sáng mai đi sớm sớm nghen."
+		},
+		"cosau.sold_out@con": {
+			"file": "cosau.sold_out@con.ogg",
 			"duration_s": 3.69,
 			"hash": "befb6972d06193578a1e862233cb24efc2f57ffb0a76c250867a2b307a722e6b",
 			"voice": "Kim Thanh",
 			"text": "Hết rồi con ơi! Sáng mai đi sớm sớm nghen."
 		},
-		"cosau.thanks": {
-			"file": "cosau.thanks.ogg",
+		"cosau.sold_out@em": {
+			"file": "cosau.sold_out@em.ogg",
+			"duration_s": 3.64,
+			"hash": "a76ae7743872682268eed7936b92909f31c45841a8879da589ed3bc4e18360d9",
+			"voice": "Kim Thanh",
+			"text": "Hết rồi em ơi! Sáng mai đi sớm sớm nghen."
+		},
+		"cosau.thanks@anh-em": {
+			"file": "cosau.thanks@anh-em.ogg",
+			"duration_s": 1.95,
+			"hash": "6419d05057744b71e72af176670535448130eee64f703a157159445a517a373d",
+			"voice": "Kim Thanh",
+			"text": "Dạ, ngồi chơi đi anh."
+		},
+		"cosau.thanks@anh-tui": {
+			"file": "cosau.thanks@anh-tui.ogg",
+			"duration_s": 1.82,
+			"hash": "8d82515f02abd15f30bcbf991f2c5e141704e628368bbf7ccd5b1321becd64ba",
+			"voice": "Kim Thanh",
+			"text": "Ừ, ngồi chơi đi anh."
+		},
+		"cosau.thanks@chi-em": {
+			"file": "cosau.thanks@chi-em.ogg",
+			"duration_s": 1.93,
+			"hash": "a9fda86f237737076d25a6844f12194a002adea66238f18ceac31e3b22f07db6",
+			"voice": "Kim Thanh",
+			"text": "Dạ, ngồi chơi đi chị."
+		},
+		"cosau.thanks@chi-tui": {
+			"file": "cosau.thanks@chi-tui.ogg",
+			"duration_s": 1.76,
+			"hash": "db869dd182be4ea87789d937cb38aaf41021dd0bc312d9eddaecae6edc6364e4",
+			"voice": "Kim Thanh",
+			"text": "Ừ, ngồi chơi đi chị."
+		},
+		"cosau.thanks@chu-em": {
+			"file": "cosau.thanks@chu-em.ogg",
+			"duration_s": 1.8,
+			"hash": "9e91c56cb451bd09af69bf690075293e503b6da245a1b485f49d115f6be79a59",
+			"voice": "Kim Thanh",
+			"text": "Dạ, ngồi chơi đi chú."
+		},
+		"cosau.thanks@co-em": {
+			"file": "cosau.thanks@co-em.ogg",
+			"duration_s": 1.72,
+			"hash": "bb15458c75a3a567d9723ada40000a0600efcc0ec9fbb7a9f7f0199faf37b4fe",
+			"voice": "Kim Thanh",
+			"text": "Dạ, ngồi chơi đi cô."
+		},
+		"cosau.thanks@con-ba": {
+			"file": "cosau.thanks@con-ba.ogg",
 			"duration_s": 1.86,
 			"hash": "1dd6436085c29e38fab4260a9e10a888cbb1eb1437a593952abf30ad36f76bc1",
 			"voice": "Kim Thanh",
 			"text": "Ừ, ngồi chơi đi con."
 		},
-		"cosau.thanks_said": {
-			"file": "cosau.thanks_said.ogg",
+		"cosau.thanks@con-co": {
+			"file": "cosau.thanks@con-co.ogg",
+			"duration_s": 1.86,
+			"hash": "1dd6436085c29e38fab4260a9e10a888cbb1eb1437a593952abf30ad36f76bc1",
+			"voice": "Kim Thanh",
+			"text": "Ừ, ngồi chơi đi con."
+		},
+		"cosau.thanks@em-chi": {
+			"file": "cosau.thanks@em-chi.ogg",
+			"duration_s": 1.76,
+			"hash": "797b3a7c811f48adc1e9dc6a8ecac1c449a14f24cf09157641d1b56faeaae970",
+			"voice": "Kim Thanh",
+			"text": "Ừ, ngồi chơi đi em."
+		},
+		"cosau.thanks_said@anh": {
+			"file": "cosau.thanks_said@anh.ogg",
+			"duration_s": 3.54,
+			"hash": "34df816f803f579207a842d4808e1cc961cb602eae120eff77fe2914cfe32cf9",
+			"voice": "Kim Thanh",
+			"text": "[cười] Trời ơi, dễ thương quá! Ngồi đi anh."
+		},
+		"cosau.thanks_said@chi": {
+			"file": "cosau.thanks_said@chi.ogg",
+			"duration_s": 3.65,
+			"hash": "d1bc4cc6d4f456a6b5e6e7ec4432f82fd2778d0385122a3448aba77d62d413dc",
+			"voice": "Kim Thanh",
+			"text": "[cười] Trời ơi, dễ thương quá! Ngồi đi chị."
+		},
+		"cosau.thanks_said@chu": {
+			"file": "cosau.thanks_said@chu.ogg",
+			"duration_s": 3.57,
+			"hash": "2c1592971b3cafbf65904f0515e50d328c2057a97ce37d446da1797613048bbd",
+			"voice": "Kim Thanh",
+			"text": "[cười] Trời ơi, dễ thương quá! Ngồi đi chú."
+		},
+		"cosau.thanks_said@co": {
+			"file": "cosau.thanks_said@co.ogg",
+			"duration_s": 3.67,
+			"hash": "b08f86861b3342228c1b4e60701409b022d6833efa574535acdf9d21552c1b25",
+			"voice": "Kim Thanh",
+			"text": "[cười] Trời ơi, dễ thương quá! Ngồi đi cô."
+		},
+		"cosau.thanks_said@con": {
+			"file": "cosau.thanks_said@con.ogg",
 			"duration_s": 3.15,
 			"hash": "61ab43b9fc2604439c34a4b27d1f4d37fc45d3a5ba5ea19c6d83dc7480d00ab4",
 			"voice": "Kim Thanh",
 			"text": "[cười] Trời ơi, dễ thương quá! Ngồi đi con."
 		},
-		"cosau.wait": {
-			"file": "cosau.wait.ogg",
+		"cosau.thanks_said@em": {
+			"file": "cosau.thanks_said@em.ogg",
+			"duration_s": 3.62,
+			"hash": "09daf0449e96b514784225ca9a7446e436cf7112b6327cfaecffad55b8ec3d6a",
+			"voice": "Kim Thanh",
+			"text": "[cười] Trời ơi, dễ thương quá! Ngồi đi em."
+		},
+		"cosau.wait@anh-em": {
+			"file": "cosau.wait@anh-em.ogg",
+			"duration_s": 2.48,
+			"hash": "b10cdf7e43792d4197d0f02bba4a633eac7206ef8fae0f85f527298dc7512cc7",
+			"voice": "Kim Thanh",
+			"text": "Dạ, năm giờ rưỡi mở nghen anh."
+		},
+		"cosau.wait@anh-tui": {
+			"file": "cosau.wait@anh-tui.ogg",
 			"duration_s": 2.27,
 			"hash": "d0f8a43acbdbc223c009623a70ca770360b73a0c7329398c3f57c73f0d96b4b8",
 			"voice": "Kim Thanh",
 			"text": "Ừ, năm giờ rưỡi mở nghen."
 		},
-		"cout.call": {
-			"file": "cout.call.ogg",
+		"cosau.wait@chi-em": {
+			"file": "cosau.wait@chi-em.ogg",
+			"duration_s": 2.55,
+			"hash": "a5abe3f719713cc0fce0b46f561350b0aa0736aa3f561fe4bd7e4829d2aea209",
+			"voice": "Kim Thanh",
+			"text": "Dạ, năm giờ rưỡi mở nghen chị."
+		},
+		"cosau.wait@chi-tui": {
+			"file": "cosau.wait@chi-tui.ogg",
+			"duration_s": 2.27,
+			"hash": "d0f8a43acbdbc223c009623a70ca770360b73a0c7329398c3f57c73f0d96b4b8",
+			"voice": "Kim Thanh",
+			"text": "Ừ, năm giờ rưỡi mở nghen."
+		},
+		"cosau.wait@chu-em": {
+			"file": "cosau.wait@chu-em.ogg",
+			"duration_s": 2.49,
+			"hash": "ad37f71bb725722a62547714c17c9c0a16dd7e9cf5caedf85c8e27a421d5b59b",
+			"voice": "Kim Thanh",
+			"text": "Dạ, năm giờ rưỡi mở nghen chú."
+		},
+		"cosau.wait@co-em": {
+			"file": "cosau.wait@co-em.ogg",
+			"duration_s": 2.49,
+			"hash": "272f3f6a979f2c82b652a1bb1ecad46ade4e56a77fa22f03374d2708579b01b1",
+			"voice": "Kim Thanh",
+			"text": "Dạ, năm giờ rưỡi mở nghen cô."
+		},
+		"cosau.wait@con-ba": {
+			"file": "cosau.wait@con-ba.ogg",
+			"duration_s": 2.27,
+			"hash": "d0f8a43acbdbc223c009623a70ca770360b73a0c7329398c3f57c73f0d96b4b8",
+			"voice": "Kim Thanh",
+			"text": "Ừ, năm giờ rưỡi mở nghen."
+		},
+		"cosau.wait@con-co": {
+			"file": "cosau.wait@con-co.ogg",
+			"duration_s": 2.27,
+			"hash": "d0f8a43acbdbc223c009623a70ca770360b73a0c7329398c3f57c73f0d96b4b8",
+			"voice": "Kim Thanh",
+			"text": "Ừ, năm giờ rưỡi mở nghen."
+		},
+		"cosau.wait@em-chi": {
+			"file": "cosau.wait@em-chi.ogg",
+			"duration_s": 2.27,
+			"hash": "d0f8a43acbdbc223c009623a70ca770360b73a0c7329398c3f57c73f0d96b4b8",
+			"voice": "Kim Thanh",
+			"text": "Ừ, năm giờ rưỡi mở nghen."
+		},
+		"cout.call@anh": {
+			"file": "cout.call@anh.ogg",
 			"duration_s": 1.54,
 			"hash": "f27c9fc8ea8b803c34f62b896eca863d36279641f99e5a760121f01341643f69",
 			"voice": "Thùy Dung",
 			"text": "Bánh khọt nè! Ăn thử đi anh!"
 		},
-		"cout.intro": {
-			"file": "cout.intro.ogg",
+		"cout.call@chi": {
+			"file": "cout.call@chi.ogg",
+			"duration_s": 1.77,
+			"hash": "608cb8194cc1ef97cf3a755f9fbf56d7970c441685e767978b134b1641803422",
+			"voice": "Thùy Dung",
+			"text": "Bánh khọt nè! Ăn thử đi chị!"
+		},
+		"cout.call@em": {
+			"file": "cout.call@em.ogg",
+			"duration_s": 1.6,
+			"hash": "613dffd341604d819fbca90c517298ddf70d79b2cdfe3d3e4447c5a360a352c8",
+			"voice": "Thùy Dung",
+			"text": "Bánh khọt nè! Ăn thử đi em!"
+		},
+		"cout.intro@anh": {
+			"file": "cout.intro@anh.ogg",
 			"duration_s": 1.11,
 			"hash": "df38e3cbdbe36c3bc5b9a13eff0c574fa6ff18974f4c332856da5d5e5efdb4b4",
 			"voice": "Thùy Dung",
 			"text": "Bánh khọt Cô Út đây anh!"
 		},
-		"nga.call_after": {
-			"file": "nga.call_after.ogg",
+		"cout.intro@chi": {
+			"file": "cout.intro@chi.ogg",
+			"duration_s": 1.23,
+			"hash": "9c6fe28655de4cd29bb1cab2498bb7b75ad8e3b69bc430edb49dfba8bf3ce163",
+			"voice": "Thùy Dung",
+			"text": "Bánh khọt Cô Út đây chị!"
+		},
+		"cout.intro@em": {
+			"file": "cout.intro@em.ogg",
+			"duration_s": 1.21,
+			"hash": "16ab8a49ddbae7e12e3f770ce3faa1f57a04df5d3c78ada6cc35a6472794aa1c",
+			"voice": "Thùy Dung",
+			"text": "Bánh khọt Cô Út đây em!"
+		},
+		"nga.call_after@anh": {
+			"file": "nga.call_after@anh.ogg",
+			"duration_s": 1.4,
+			"hash": "083e1e8078c5bf46927feb7b56d849811bd4201df74bcb17fa903f502e9fd268",
+			"voice": "Mỹ Duyên",
+			"text": "Đi cẩn thận nghen anh!"
+		},
+		"nga.call_after@chi": {
+			"file": "nga.call_after@chi.ogg",
+			"duration_s": 1.54,
+			"hash": "ef8b1e6f4b6eb1c324aaaa38e5ee713262a0a1ee8c50c51194d6fd1588324d3b",
+			"voice": "Mỹ Duyên",
+			"text": "Đi cẩn thận nghen chị!"
+		},
+		"nga.call_after@chu": {
+			"file": "nga.call_after@chu.ogg",
+			"duration_s": 1.42,
+			"hash": "eb5075f60ce04d7121ba3970364868eefb20e54e231a91688b2735649d8b7fe2",
+			"voice": "Mỹ Duyên",
+			"text": "Đi cẩn thận nghen chú!"
+		},
+		"nga.call_after@co": {
+			"file": "nga.call_after@co.ogg",
+			"duration_s": 1.49,
+			"hash": "cc8522fe244237b2d1564659e46ae7ba6dddc1e191d0b6051c1ba3967555b484",
+			"voice": "Mỹ Duyên",
+			"text": "Đi cẩn thận nghen cô!"
+		},
+		"nga.call_after@con": {
+			"file": "nga.call_after@con.ogg",
 			"duration_s": 3.19,
 			"hash": "eaf614af297814e94fba2b2d233bed4c6cc2375204862172e6afa2f3400b8984",
 			"voice": "Mỹ Duyên",
 			"text": "Đi cẩn thận nghen con!"
 		},
-		"nga.english": {
-			"file": "nga.english.ogg",
+		"nga.call_after@em": {
+			"file": "nga.call_after@em.ogg",
+			"duration_s": 1.45,
+			"hash": "435b2c2b162faa52c15b7356fcb173d92c5d43ce20c6a9fb77ac69eaabe48bc9",
+			"voice": "Mỹ Duyên",
+			"text": "Đi cẩn thận nghen em!"
+		},
+		"nga.english@anh": {
+			"file": "nga.english@anh.ogg",
+			"duration_s": 3.34,
+			"hash": "4629763697223e7a2672802b12b1ff3e346c65406c085bfc8bc4d9806e5eda99",
+			"voice": "Mỹ Duyên",
+			"text": "Good, good! Đi chơi vui nghen anh."
+		},
+		"nga.english@chi": {
+			"file": "nga.english@chi.ogg",
+			"duration_s": 3.17,
+			"hash": "f228dbfa18188406e8700e184534c3bd2270567f488d4e41cacf6b4e255d9f1a",
+			"voice": "Mỹ Duyên",
+			"text": "Good, good! Đi chơi vui nghen chị."
+		},
+		"nga.english@chu": {
+			"file": "nga.english@chu.ogg",
+			"duration_s": 2.9,
+			"hash": "75f35304158e2293281660917d238d8940fdf76b9c78bdb51aea28bc80e6448c",
+			"voice": "Mỹ Duyên",
+			"text": "Good, good! Đi chơi vui nghen chú."
+		},
+		"nga.english@co": {
+			"file": "nga.english@co.ogg",
+			"duration_s": 2.97,
+			"hash": "4340032253a7cde28087446de72fbb87d74c31ed731e9d58ad5e1faf3fdde279",
+			"voice": "Mỹ Duyên",
+			"text": "Good, good! Đi chơi vui nghen cô."
+		},
+		"nga.english@con": {
+			"file": "nga.english@con.ogg",
 			"duration_s": 3.25,
 			"hash": "d3e039a52a032bf7e4c03e687de0d64ae21d4c714db2dcf60136f541f8870102",
 			"voice": "Mỹ Duyên",
 			"text": "Good, good! Đi chơi vui nghen con."
 		},
-		"nga.glad": {
-			"file": "nga.glad.ogg",
+		"nga.english@em": {
+			"file": "nga.english@em.ogg",
+			"duration_s": 2.8,
+			"hash": "0dded68d82331172b7f81578b1351d5d2afdd56eaf71b7826023a385fd60618c",
+			"voice": "Mỹ Duyên",
+			"text": "Good, good! Đi chơi vui nghen em."
+		},
+		"nga.glad@chi": {
+			"file": "nga.glad@chi.ogg",
+			"duration_s": 1.55,
+			"hash": "4b4d9d98bb821126f836f8f551615e50e833b221145106aa69ca460c31cd8454",
+			"voice": "Mỹ Duyên",
+			"text": "Vậy là chị mừng rồi."
+		},
+		"nga.glad@co": {
+			"file": "nga.glad@co.ogg",
 			"duration_s": 1.47,
 			"hash": "ae8e0c306731644a5fab218d2bd1e8b17fc05508f4cfe50a5d19cd7f68cc805a",
 			"voice": "Mỹ Duyên",
 			"text": "Vậy là cô mừng rồi."
 		},
-		"nga.glad_said": {
-			"file": "nga.glad_said.ogg",
+		"nga.glad@con": {
+			"file": "nga.glad@con.ogg",
+			"duration_s": 2.74,
+			"hash": "b18c79d978aa84d926a498fedf9b2c09029e81f18c4fb966ce2d07cb7eb6fa1f",
+			"voice": "Mỹ Duyên",
+			"text": "Vậy là con mừng rồi."
+		},
+		"nga.glad@em": {
+			"file": "nga.glad@em.ogg",
+			"duration_s": 3.53,
+			"hash": "a5151551691ab4404f2b12d92f596ed8cd0e54d4b0ab3c2fd1433ba9f17c1395",
+			"voice": "Mỹ Duyên",
+			"text": "Vậy là em mừng rồi."
+		},
+		"nga.glad@tui": {
+			"file": "nga.glad@tui.ogg",
+			"duration_s": 2.7,
+			"hash": "99a7ba7eebe499de8a1bb32f6cea84801f02d093fe45ef4ff9b9126096599e04",
+			"voice": "Mỹ Duyên",
+			"text": "Vậy là tui mừng rồi."
+		},
+		"nga.glad_said@anh-em": {
+			"file": "nga.glad_said@anh-em.ogg",
+			"duration_s": 3.44,
+			"hash": "c9701e63e328eb23ae7d8875105c98ff34684ce5a1284d17df40e5eb1dfb6481",
+			"voice": "Mỹ Duyên",
+			"text": "[cười] Ui, anh nói giỏi ghê! Em mừng lắm."
+		},
+		"nga.glad_said@anh-tui": {
+			"file": "nga.glad_said@anh-tui.ogg",
+			"duration_s": 3.73,
+			"hash": "7874b5651fc58bdb975e52b6d895712f1856f330f7c56312aa030036da3ae755",
+			"voice": "Mỹ Duyên",
+			"text": "[cười] Ui, anh nói giỏi ghê! Tui mừng lắm."
+		},
+		"nga.glad_said@chi-em": {
+			"file": "nga.glad_said@chi-em.ogg",
+			"duration_s": 3.39,
+			"hash": "88abe6d0dcd5487ac36c9f6dc1e44cee7a934f37d7cf0cc561efb34c16151009",
+			"voice": "Mỹ Duyên",
+			"text": "[cười] Ui, chị nói giỏi ghê! Em mừng lắm."
+		},
+		"nga.glad_said@chi-tui": {
+			"file": "nga.glad_said@chi-tui.ogg",
+			"duration_s": 3.4,
+			"hash": "6c4fb7991a772f16388a2410bc062ca8133f4ad4db598cb831c1b8cc448a69ff",
+			"voice": "Mỹ Duyên",
+			"text": "[cười] Ui, chị nói giỏi ghê! Tui mừng lắm."
+		},
+		"nga.glad_said@chu-con": {
+			"file": "nga.glad_said@chu-con.ogg",
+			"duration_s": 3.48,
+			"hash": "4ddbdac777c4125e517d91e2b0da3e38a00692d13d9ae64f3808771724618f41",
+			"voice": "Mỹ Duyên",
+			"text": "[cười] Ui, chú nói giỏi ghê! Con mừng lắm."
+		},
+		"nga.glad_said@chu-em": {
+			"file": "nga.glad_said@chu-em.ogg",
+			"duration_s": 3.38,
+			"hash": "fab50a7e921d99ccdbb92c7f1861d7408303450cbd9545ed40c0e329c1daefdd",
+			"voice": "Mỹ Duyên",
+			"text": "[cười] Ui, chú nói giỏi ghê! Em mừng lắm."
+		},
+		"nga.glad_said@co-con": {
+			"file": "nga.glad_said@co-con.ogg",
+			"duration_s": 3.61,
+			"hash": "6f0291551b80bb75170fb29669a7ab8ea815c2ff546c2328dcf3941ce9da9300",
+			"voice": "Mỹ Duyên",
+			"text": "[cười] Ui, cô nói giỏi ghê! Con mừng lắm."
+		},
+		"nga.glad_said@co-em": {
+			"file": "nga.glad_said@co-em.ogg",
+			"duration_s": 3.4,
+			"hash": "e17eab6ef0708d40686160ebafb575325b892eac638ae9e93ac1ee57368f241b",
+			"voice": "Mỹ Duyên",
+			"text": "[cười] Ui, cô nói giỏi ghê! Em mừng lắm."
+		},
+		"nga.glad_said@con-co": {
+			"file": "nga.glad_said@con-co.ogg",
 			"duration_s": 3.97,
 			"hash": "16d18e9576ce37f210e53016a67a45154c771082d621fa3c6c9548cacef6448c",
 			"voice": "Mỹ Duyên",
 			"text": "[cười] Ui, con nói giỏi ghê! Cô mừng lắm."
 		},
-		"nga.hello": {
-			"file": "nga.hello.ogg",
+		"nga.glad_said@em-chi": {
+			"file": "nga.glad_said@em-chi.ogg",
+			"duration_s": 3.68,
+			"hash": "e1c9ab5cff5ec861d310c718d6a48830acecef4f2e4062231be270dba02b4090",
+			"voice": "Mỹ Duyên",
+			"text": "[cười] Ui, em nói giỏi ghê! Chị mừng lắm."
+		},
+		"nga.hello@anh-em": {
+			"file": "nga.hello@anh-em.ogg",
+			"duration_s": 3.35,
+			"hash": "4f2b7a6fe04d185a62ddda06dd4af4eea990e9c065095c824e51a6722b33d0a9",
+			"voice": "Mỹ Duyên",
+			"text": "Anh đi chơi vui không? Có gì cứ nhắn em nghen."
+		},
+		"nga.hello@anh-tui": {
+			"file": "nga.hello@anh-tui.ogg",
+			"duration_s": 3.56,
+			"hash": "57d53d68db537545bde24c23988e2ff6770ec4c6ef9887c167c831ddea0ea833",
+			"voice": "Mỹ Duyên",
+			"text": "Anh đi chơi vui không? Có gì cứ nhắn tui nghen."
+		},
+		"nga.hello@chi-em": {
+			"file": "nga.hello@chi-em.ogg",
+			"duration_s": 3.24,
+			"hash": "6e847011f6bff59a194fbb7b77d6b11a4d5c5c71c999f23f8b7fdc0e9c8fe3b6",
+			"voice": "Mỹ Duyên",
+			"text": "Chị đi chơi vui không? Có gì cứ nhắn em nghen."
+		},
+		"nga.hello@chi-tui": {
+			"file": "nga.hello@chi-tui.ogg",
+			"duration_s": 3.48,
+			"hash": "a4dd1018b4a306078b18bc8145e79904f1d47a19bc25be1bf8f8957e37c9c242",
+			"voice": "Mỹ Duyên",
+			"text": "Chị đi chơi vui không? Có gì cứ nhắn tui nghen."
+		},
+		"nga.hello@chu-con": {
+			"file": "nga.hello@chu-con.ogg",
+			"duration_s": 3.48,
+			"hash": "2b805a7b1fa2cfaa0275df867000c7011a29712f7c97c475f6dd822a82a314b6",
+			"voice": "Mỹ Duyên",
+			"text": "Chú đi chơi vui không? Có gì cứ nhắn con nghen."
+		},
+		"nga.hello@chu-em": {
+			"file": "nga.hello@chu-em.ogg",
+			"duration_s": 3.56,
+			"hash": "881ec9a3aa1aebfea91e9b1169b65e98140a47df3ebfb41c23a61fa369f75606",
+			"voice": "Mỹ Duyên",
+			"text": "Chú đi chơi vui không? Có gì cứ nhắn em nghen."
+		},
+		"nga.hello@co-con": {
+			"file": "nga.hello@co-con.ogg",
+			"duration_s": 3.41,
+			"hash": "f413f040378df03be29a2dbe73faae39db2576132263669d792693473245d7f5",
+			"voice": "Mỹ Duyên",
+			"text": "Cô đi chơi vui không? Có gì cứ nhắn con nghen."
+		},
+		"nga.hello@co-em": {
+			"file": "nga.hello@co-em.ogg",
+			"duration_s": 3.57,
+			"hash": "e91ccb9138e3c8acb546c458e2f7808b0e8a1a0ce9129f563f0a2656bd791a84",
+			"voice": "Mỹ Duyên",
+			"text": "Cô đi chơi vui không? Có gì cứ nhắn em nghen."
+		},
+		"nga.hello@con-co": {
+			"file": "nga.hello@con-co.ogg",
 			"duration_s": 3.33,
 			"hash": "21fc4e644ce56f828ba30eac55e735178fdeb6ce98131a152f15ee858c8f28e9",
 			"voice": "Mỹ Duyên",
 			"text": "Con đi chơi vui không? Có gì cứ nhắn cô nghen."
 		},
-		"reply.bacha.open.cam_on": {
-			"file": "reply.bacha.open.cam_on.ogg",
+		"nga.hello@em-chi": {
+			"file": "nga.hello@em-chi.ogg",
+			"duration_s": 3.31,
+			"hash": "68d997e22ae84b92e593131724da6e9c70b750c7ecd677df9b680b89de30e1bd",
+			"voice": "Mỹ Duyên",
+			"text": "Em đi chơi vui không? Có gì cứ nhắn chị nghen."
+		},
+		"reply.bacha.open.cam_on@bac-chau": {
+			"file": "reply.bacha.open.cam_on@bac-chau.ogg",
 			"duration_s": 1.22,
 			"hash": "b919b1faac310909de2583d9c0b033e4df3eeb70259bb85bf21c31dd8e8436ce",
 			"voice": "Mai Anh",
 			"text": "Dạ, cháu cảm ơn bác."
+		},
+		"reply.bacha.open.cam_on@chi-em": {
+			"file": "reply.bacha.open.cam_on@chi-em.ogg",
+			"duration_s": 1.19,
+			"hash": "8168bb1442936e6f005962685be3acb8e7137d875ba13df266a8835b0402c415",
+			"voice": "Mai Anh",
+			"text": "Dạ, em cảm ơn chị."
+		},
+		"reply.bacha.open.cam_on@chi-toi": {
+			"file": "reply.bacha.open.cam_on@chi-toi.ogg",
+			"duration_s": 1.32,
+			"hash": "987043dc975f2f26e41138b199f9f4a20b2eb46414d2c3341da2ceb3286f39b2",
+			"voice": "Mai Anh",
+			"text": "Dạ, tôi cảm ơn chị."
+		},
+		"reply.bacha.open.cam_on@em-anh": {
+			"file": "reply.bacha.open.cam_on@em-anh.ogg",
+			"duration_s": 0.76,
+			"hash": "bc77b022eeac4bddbc5dd144df464d8b6dab474f44b4dd30b3cb5f8986281b8e",
+			"voice": "Mai Anh",
+			"text": "Cảm ơn em."
+		},
+		"reply.bacha.open.cam_on@em-chi": {
+			"file": "reply.bacha.open.cam_on@em-chi.ogg",
+			"duration_s": 0.76,
+			"hash": "bc77b022eeac4bddbc5dd144df464d8b6dab474f44b4dd30b3cb5f8986281b8e",
+			"voice": "Mai Anh",
+			"text": "Cảm ơn em."
 		},
 		"reply.batu.greet.chua": {
 			"file": "reply.batu.greet.chua.ogg",
@@ -285,19 +1125,117 @@
 			"voice": "Mai Anh",
 			"text": "Dạ, chưa ạ."
 		},
-		"reply.cosau.closed_before.da": {
-			"file": "reply.cosau.closed_before.da.ogg",
+		"reply.cosau.closed_before.da@ba-con": {
+			"file": "reply.cosau.closed_before.da@ba-con.ogg",
 			"duration_s": 0.92,
 			"hash": "876afc5199b313f1d7078fa976b8b9f4856ca256361bf07bc41b12aafbb5d43d",
 			"voice": "Mai Anh",
 			"text": "Dạ, con đợi."
 		},
-		"reply.cosau.open.cam_on": {
-			"file": "reply.cosau.open.cam_on.ogg",
+		"reply.cosau.closed_before.da@chi-em": {
+			"file": "reply.cosau.closed_before.da@chi-em.ogg",
+			"duration_s": 0.86,
+			"hash": "67f8c44cb71c2bdc6d7197050368ab60f9d24690b6f9d4e79375a91d7fa9c202",
+			"voice": "Mai Anh",
+			"text": "Dạ, em đợi."
+		},
+		"reply.cosau.closed_before.da@chi-tui": {
+			"file": "reply.cosau.closed_before.da@chi-tui.ogg",
+			"duration_s": 0.9,
+			"hash": "190ec92ed07c3c0c722665a5f4e525a86f16c7dfc740ea0afd15cc877064dc04",
+			"voice": "Mai Anh",
+			"text": "Dạ, tui đợi."
+		},
+		"reply.cosau.closed_before.da@co-con": {
+			"file": "reply.cosau.closed_before.da@co-con.ogg",
+			"duration_s": 0.92,
+			"hash": "876afc5199b313f1d7078fa976b8b9f4856ca256361bf07bc41b12aafbb5d43d",
+			"voice": "Mai Anh",
+			"text": "Dạ, con đợi."
+		},
+		"reply.cosau.closed_before.da@em-anh": {
+			"file": "reply.cosau.closed_before.da@em-anh.ogg",
+			"duration_s": 0.77,
+			"hash": "195284f923d1f67ec9a92c52150f5e3d06a9f7dc24d3cee0b9e743cac4811695",
+			"voice": "Mai Anh",
+			"text": "Ừ, anh đợi."
+		},
+		"reply.cosau.closed_before.da@em-chi": {
+			"file": "reply.cosau.closed_before.da@em-chi.ogg",
+			"duration_s": 0.73,
+			"hash": "8ce0bba3907f36c9dd9d4f87f29dbe6fdc52e65fa09dbd5372c72693eacb3b4d",
+			"voice": "Mai Anh",
+			"text": "Ừ, chị đợi."
+		},
+		"reply.cosau.closed_before.da@em-chu": {
+			"file": "reply.cosau.closed_before.da@em-chu.ogg",
+			"duration_s": 0.79,
+			"hash": "e12e17c5dacb9e67d8b50b8fc2b922856a75c37e6c19a62963bd568c893d992f",
+			"voice": "Mai Anh",
+			"text": "Ừ, chú đợi."
+		},
+		"reply.cosau.closed_before.da@em-co": {
+			"file": "reply.cosau.closed_before.da@em-co.ogg",
+			"duration_s": 0.78,
+			"hash": "d2b999304b7cfcf2940b3a372f7105df95d2229e1ef476b5fb840c7a5169ad80",
+			"voice": "Mai Anh",
+			"text": "Ừ, cô đợi."
+		},
+		"reply.cosau.open.cam_on@ba-con": {
+			"file": "reply.cosau.open.cam_on@ba-con.ogg",
+			"duration_s": 1.28,
+			"hash": "fbecc4fbcb2dadd831d126937029ca02706d4ed65e2c9d1a21e9c1ad17b05868",
+			"voice": "Mai Anh",
+			"text": "Dạ, con cảm ơn bà."
+		},
+		"reply.cosau.open.cam_on@chi-em": {
+			"file": "reply.cosau.open.cam_on@chi-em.ogg",
+			"duration_s": 1.19,
+			"hash": "8168bb1442936e6f005962685be3acb8e7137d875ba13df266a8835b0402c415",
+			"voice": "Mai Anh",
+			"text": "Dạ, em cảm ơn chị."
+		},
+		"reply.cosau.open.cam_on@chi-tui": {
+			"file": "reply.cosau.open.cam_on@chi-tui.ogg",
+			"duration_s": 1.35,
+			"hash": "e083a7e3bc01dd9dde0ac4b78759f0c0eec01cee4131fd7bec72bdbe45991c7d",
+			"voice": "Mai Anh",
+			"text": "Dạ, tui cảm ơn chị."
+		},
+		"reply.cosau.open.cam_on@co-con": {
+			"file": "reply.cosau.open.cam_on@co-con.ogg",
 			"duration_s": 1.37,
 			"hash": "68345dc2bf3c8332b20769390750a78fc3e736ba6a336dad7dbda9d5e7072cc5",
 			"voice": "Mai Anh",
 			"text": "Dạ, con cảm ơn cô."
+		},
+		"reply.cosau.open.cam_on@em-anh": {
+			"file": "reply.cosau.open.cam_on@em-anh.ogg",
+			"duration_s": 0.76,
+			"hash": "bc77b022eeac4bddbc5dd144df464d8b6dab474f44b4dd30b3cb5f8986281b8e",
+			"voice": "Mai Anh",
+			"text": "Cảm ơn em."
+		},
+		"reply.cosau.open.cam_on@em-chi": {
+			"file": "reply.cosau.open.cam_on@em-chi.ogg",
+			"duration_s": 0.76,
+			"hash": "bc77b022eeac4bddbc5dd144df464d8b6dab474f44b4dd30b3cb5f8986281b8e",
+			"voice": "Mai Anh",
+			"text": "Cảm ơn em."
+		},
+		"reply.cosau.open.cam_on@em-chu": {
+			"file": "reply.cosau.open.cam_on@em-chu.ogg",
+			"duration_s": 0.76,
+			"hash": "bc77b022eeac4bddbc5dd144df464d8b6dab474f44b4dd30b3cb5f8986281b8e",
+			"voice": "Mai Anh",
+			"text": "Cảm ơn em."
+		},
+		"reply.cosau.open.cam_on@em-co": {
+			"file": "reply.cosau.open.cam_on@em-co.ogg",
+			"duration_s": 0.76,
+			"hash": "bc77b022eeac4bddbc5dd144df464d8b6dab474f44b4dd30b3cb5f8986281b8e",
+			"voice": "Mai Anh",
+			"text": "Cảm ơn em."
 		},
 		"reply.nga.hello.vui": {
 			"file": "reply.nga.hello.vui.ogg",
@@ -306,54 +1244,180 @@
 			"voice": "Mai Anh",
 			"text": "Dạ, vui lắm ạ."
 		},
-		"say_again.bacha": {
-			"file": "say_again.bacha.ogg",
+		"say_again.bacha@bac": {
+			"file": "say_again.bacha@bac.ogg",
 			"duration_s": 1.66,
 			"hash": "6e8ed281ba3ae7c0998b15bb0870e7a40fcb5e9512a1c33e211188a039a28652",
 			"voice": "Mai Anh",
 			"text": "Dạ, bác nói lại được không ạ?"
 		},
-		"say_again.batu": {
-			"file": "say_again.batu.ogg",
+		"say_again.bacha@chi": {
+			"file": "say_again.bacha@chi.ogg",
+			"duration_s": 1.66,
+			"hash": "6aacb809c5c9440aed5ff5de272ee4a2e23c35a4e4de170bcbb9cf328f15c0e2",
+			"voice": "Mai Anh",
+			"text": "Dạ, chị nói lại được không ạ?"
+		},
+		"say_again.bacha@em": {
+			"file": "say_again.bacha@em.ogg",
+			"duration_s": 1.11,
+			"hash": "f69daf23dc0c56c6357c7a20d676e5d7afc8c89a4c48c1ae034e897c43ac9a1f",
+			"voice": "Mai Anh",
+			"text": "Em nói lại được không?"
+		},
+		"say_again.batu@ba": {
+			"file": "say_again.batu@ba.ogg",
 			"duration_s": 1.62,
 			"hash": "857c1b462a6d788f189c209b4bb6f1bd9f261aa72ef130bdd1e733f8bfe4d7ef",
 			"voice": "Mai Anh",
 			"text": "Dạ, bà nói lại được không ạ?"
 		},
-		"say_again.chubay": {
-			"file": "say_again.chubay.ogg",
+		"say_again.batu@chi": {
+			"file": "say_again.batu@chi.ogg",
+			"duration_s": 1.66,
+			"hash": "6aacb809c5c9440aed5ff5de272ee4a2e23c35a4e4de170bcbb9cf328f15c0e2",
+			"voice": "Mai Anh",
+			"text": "Dạ, chị nói lại được không ạ?"
+		},
+		"say_again.batu@co": {
+			"file": "say_again.batu@co.ogg",
+			"duration_s": 1.72,
+			"hash": "a56bae273c4e0c6688584433ee374b9841e07b259305b27459ee1952b4ce57df",
+			"voice": "Mai Anh",
+			"text": "Dạ, cô nói lại được không ạ?"
+		},
+		"say_again.batu@em": {
+			"file": "say_again.batu@em.ogg",
+			"duration_s": 1.11,
+			"hash": "f69daf23dc0c56c6357c7a20d676e5d7afc8c89a4c48c1ae034e897c43ac9a1f",
+			"voice": "Mai Anh",
+			"text": "Em nói lại được không?"
+		},
+		"say_again.chubay@anh": {
+			"file": "say_again.chubay@anh.ogg",
+			"duration_s": 1.61,
+			"hash": "ea412ef62703c4ac6e6ef27c5ff9025a626de20350bf435e6d4d5c1a29ce39d5",
+			"voice": "Mai Anh",
+			"text": "Dạ, anh nói lại được không ạ?"
+		},
+		"say_again.chubay@chu": {
+			"file": "say_again.chubay@chu.ogg",
 			"duration_s": 1.69,
 			"hash": "c47edebd389a346ba7e7465ddfd92245a5be065ef6d8c1453ee691636ad2b850",
 			"voice": "Mai Anh",
 			"text": "Dạ, chú nói lại được không ạ?"
 		},
-		"say_again.chuchin": {
-			"file": "say_again.chuchin.ogg",
+		"say_again.chubay@em": {
+			"file": "say_again.chubay@em.ogg",
+			"duration_s": 1.11,
+			"hash": "f69daf23dc0c56c6357c7a20d676e5d7afc8c89a4c48c1ae034e897c43ac9a1f",
+			"voice": "Mai Anh",
+			"text": "Em nói lại được không?"
+		},
+		"say_again.chubay@ong": {
+			"file": "say_again.chubay@ong.ogg",
+			"duration_s": 1.83,
+			"hash": "2d40cedc4e65235825babe581ac0e05851086bc66f3c04e633300bdd509158c2",
+			"voice": "Mai Anh",
+			"text": "Dạ, ông nói lại được không ạ?"
+		},
+		"say_again.chuchin@anh": {
+			"file": "say_again.chuchin@anh.ogg",
+			"duration_s": 1.61,
+			"hash": "ea412ef62703c4ac6e6ef27c5ff9025a626de20350bf435e6d4d5c1a29ce39d5",
+			"voice": "Mai Anh",
+			"text": "Dạ, anh nói lại được không ạ?"
+		},
+		"say_again.chuchin@chu": {
+			"file": "say_again.chuchin@chu.ogg",
 			"duration_s": 1.69,
 			"hash": "c47edebd389a346ba7e7465ddfd92245a5be065ef6d8c1453ee691636ad2b850",
 			"voice": "Mai Anh",
 			"text": "Dạ, chú nói lại được không ạ?"
 		},
-		"say_again.cosau": {
-			"file": "say_again.cosau.ogg",
+		"say_again.chuchin@em": {
+			"file": "say_again.chuchin@em.ogg",
+			"duration_s": 1.11,
+			"hash": "f69daf23dc0c56c6357c7a20d676e5d7afc8c89a4c48c1ae034e897c43ac9a1f",
+			"voice": "Mai Anh",
+			"text": "Em nói lại được không?"
+		},
+		"say_again.chuchin@ong": {
+			"file": "say_again.chuchin@ong.ogg",
+			"duration_s": 1.83,
+			"hash": "2d40cedc4e65235825babe581ac0e05851086bc66f3c04e633300bdd509158c2",
+			"voice": "Mai Anh",
+			"text": "Dạ, ông nói lại được không ạ?"
+		},
+		"say_again.cosau@ba": {
+			"file": "say_again.cosau@ba.ogg",
+			"duration_s": 1.62,
+			"hash": "857c1b462a6d788f189c209b4bb6f1bd9f261aa72ef130bdd1e733f8bfe4d7ef",
+			"voice": "Mai Anh",
+			"text": "Dạ, bà nói lại được không ạ?"
+		},
+		"say_again.cosau@chi": {
+			"file": "say_again.cosau@chi.ogg",
+			"duration_s": 1.66,
+			"hash": "6aacb809c5c9440aed5ff5de272ee4a2e23c35a4e4de170bcbb9cf328f15c0e2",
+			"voice": "Mai Anh",
+			"text": "Dạ, chị nói lại được không ạ?"
+		},
+		"say_again.cosau@co": {
+			"file": "say_again.cosau@co.ogg",
 			"duration_s": 1.72,
 			"hash": "a56bae273c4e0c6688584433ee374b9841e07b259305b27459ee1952b4ce57df",
 			"voice": "Mai Anh",
 			"text": "Dạ, cô nói lại được không ạ?"
 		},
-		"say_again.cout": {
-			"file": "say_again.cout.ogg",
+		"say_again.cosau@em": {
+			"file": "say_again.cosau@em.ogg",
+			"duration_s": 1.11,
+			"hash": "f69daf23dc0c56c6357c7a20d676e5d7afc8c89a4c48c1ae034e897c43ac9a1f",
+			"voice": "Mai Anh",
+			"text": "Em nói lại được không?"
+		},
+		"say_again.cout@chi": {
+			"file": "say_again.cout@chi.ogg",
+			"duration_s": 1.66,
+			"hash": "6aacb809c5c9440aed5ff5de272ee4a2e23c35a4e4de170bcbb9cf328f15c0e2",
+			"voice": "Mai Anh",
+			"text": "Dạ, chị nói lại được không ạ?"
+		},
+		"say_again.cout@em": {
+			"file": "say_again.cout@em.ogg",
+			"duration_s": 1.11,
+			"hash": "f69daf23dc0c56c6357c7a20d676e5d7afc8c89a4c48c1ae034e897c43ac9a1f",
+			"voice": "Mai Anh",
+			"text": "Em nói lại được không?"
+		},
+		"say_again.nga@chi": {
+			"file": "say_again.nga@chi.ogg",
+			"duration_s": 1.66,
+			"hash": "6aacb809c5c9440aed5ff5de272ee4a2e23c35a4e4de170bcbb9cf328f15c0e2",
+			"voice": "Mai Anh",
+			"text": "Dạ, chị nói lại được không ạ?"
+		},
+		"say_again.nga@co": {
+			"file": "say_again.nga@co.ogg",
 			"duration_s": 1.72,
 			"hash": "a56bae273c4e0c6688584433ee374b9841e07b259305b27459ee1952b4ce57df",
 			"voice": "Mai Anh",
 			"text": "Dạ, cô nói lại được không ạ?"
 		},
-		"say_again.nga": {
-			"file": "say_again.nga.ogg",
-			"duration_s": 1.72,
-			"hash": "a56bae273c4e0c6688584433ee374b9841e07b259305b27459ee1952b4ce57df",
+		"say_again.nga@con": {
+			"file": "say_again.nga@con.ogg",
+			"duration_s": 1.23,
+			"hash": "17c628ed3bce21c67dbed2bf85572730178d09cfbe91e0aebf8aaa83fe49daed",
 			"voice": "Mai Anh",
-			"text": "Dạ, cô nói lại được không ạ?"
+			"text": "Con nói lại được không?"
+		},
+		"say_again.nga@em": {
+			"file": "say_again.nga@em.ogg",
+			"duration_s": 1.11,
+			"hash": "f69daf23dc0c56c6357c7a20d676e5d7afc8c89a4c48c1ae034e897c43ac9a1f",
+			"voice": "Mai Anh",
+			"text": "Em nói lại được không?"
 		}
 	}
 }

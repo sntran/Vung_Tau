@@ -29,6 +29,8 @@ const TALK_IDLE_SECONDS := 45.0
 const LINE_GAP_SECONDS := 0.5
 ## The Listen app keeps this many lines.
 const TRANSCRIPT_MAX := 50
+## Plan 0007, R14: the Listen app explains each form of address this many times.
+const NOTE_TIMES := 3
 ## The player can sleep at the homestay: at this distance from the door or less.
 const HOME_DISTANCE := 5.0
 ## The bottom left part of the screen, where the left thumb holds the joystick.
@@ -497,12 +499,13 @@ func speak(npc_id: String, line_id: String) -> void:
 	var npc: Npc = hem.npcs.get(npc_id)
 	if npc == null or _stopped:
 		return
-	var line := Content.line(line_id)
+	# The line with the forms of address for the traveler now (plan 0007), and the clip of its variant.
+	var line := Content.spoken(line_id)
 	npc.voice.stop()
-	npc.voice.stream = Content.clip_stream(line_id)
+	npc.voice.stream = Content.clip_stream(line.clip)
 	if npc.voice.stream:
 		npc.voice.play()
-	var seconds := Content.clip_duration(line_id)
+	var seconds := Content.clip_duration(line.clip)
 	var heard := can_hear(npc)
 	speech[npc_id] = {"line": line_id, "left": seconds, "heard": heard}
 	if heard:
@@ -520,17 +523,41 @@ func _on_heard(npc_id: String, line_id: String, line: Dictionary, seconds: float
 	# The subtitle names only a person that the player knows (D-0003-04).
 	var speaker := Content.speaker(line.speaker)
 	var known := GameState.has_met(line.speaker)
-	var shown_name: String = speaker.name if known else Content.string("someone")
+	var shown_name: String = Content.display_name(line.speaker) if known else Content.string("someone")
 	var color := Color(speaker.color) if known else UNKNOWN_SPEAKER_COLOR
 	subtitles.show_line(line_id, shown_name, color, line.vi, line.en, GameState.settings.subtitles, seconds)
+	var fields: Array = line.get("fields", [])
+	# Plan 0007, R13: the first kinship word for the traveler teaches the card "Xưng hô".
+	if fields.has("you") and Content.address.has("card"):
+		GameState.learn(str(Content.address.card))
 	if listen_on:
-		transcript.append({"speaker": line.speaker, "line": line_id, "vi": line.vi, "en": line.en})
+		transcript.append({"speaker": line.speaker, "line": line_id, "vi": line.vi,
+				"en": _word_note(line.en, line.get("words", {}), fields), "clip": line.get("clip", line_id)})
 		# The transcript keeps the newest lines only, so that the phone stays fast (D-0003-03).
 		if transcript.size() > TRANSCRIPT_MAX:
 			transcript = transcript.slice(transcript.size() - TRANSCRIPT_MAX)
 	for card_id: String in line.get("learn", []):
 		GameState.learn(card_id)
 	check_messages("heard:" + line_id)
+
+
+## Plan 0007, R14: the English line in the Listen app adds the form of
+## address and its meaning, the first NOTE_TIMES times for each word.
+func _word_note(english: String, words: Dictionary, fields: Array) -> String:
+	if fields.is_empty():
+		return english
+	var word := str(words.get("you" if fields.has("you") else str(fields[0]), ""))
+	var meaning := str(Content.address.get("meanings", {}).get(word, ""))
+	if meaning == "":
+		return english
+	var notes: Dictionary = GameState.flag("address_notes") if GameState.flag("address_notes") is Dictionary else {}
+	var count := int(notes.get(word, 0))
+	if count >= NOTE_TIMES:
+		return english
+	notes = notes.duplicate()
+	notes[word] = count + 1
+	GameState.set_flag("address_notes", notes)
+	return "%s [%s: %s]" % [english, word, meaning]
 
 
 ## The person stops the line at once. The line does not finish, so the talk does not go on.
@@ -694,10 +721,10 @@ func _reply(reply_id: String) -> Dictionary:
 		var phrase := Content.say_again(talk.npc)
 		# While the person speaks, "say again" asks for the line that the person says now.
 		var again: String = talk.line if talk.state == "speaking" else talk.last
-		return {"id": "say_again", "vi": phrase.vi, "en": phrase.en, "next": again}
+		return {"id": "say_again", "vi": phrase.vi, "en": phrase.en, "next": again, "clip": phrase.clip}
 	if talk.state != "answer":
 		return {}
-	for reply: Dictionary in Content.line(talk.answer).get("replies", []):
+	for reply: Dictionary in Content.spoken(talk.answer).get("replies", []):
 		if reply.id == reply_id:
 			return reply
 	return {}
@@ -725,8 +752,7 @@ func reply(reply_id: String, mode: String) -> bool:
 				talk.state = "idle"
 		"play":
 			talk.state = "phone"
-			var clip_id := VoiceClips.say_again_id(talk.npc) if reply_id == "say_again" \
-					else VoiceClips.reply_id(talk.answer, reply_id)
+			var clip_id: String = entry.get("clip", VoiceClips.reply_id(talk.answer, reply_id))
 			phone_voice.stream = Content.clip_stream(clip_id)
 			if phone_voice.stream:
 				phone_voice.play()
@@ -879,18 +905,36 @@ func check_messages(event := "") -> void:
 			continue
 		if message.has("unless_card") and GameState.knows(message.unless_card):
 			continue
-		if message.has("after"):
+		if message.get("unless_passport", false) and GameState.passport_sent():
+			continue
+		if message.has("after_message"):
+			# Some minutes after another message (plan 0007, R4: the reminder).
+			if event != "" or not _message_due(str(message.after_message), int(message.get("delay", 0))):
+				continue
+		elif message.has("after"):
 			if message.after != event:
 				continue
 		elif message.has("at"):
 			if GameState.minutes < int(message.at) or GameState.minutes >= int(message.get("before", 1440)):
 				continue
-		var text := Content.format(message.text, {"day": GameState.day,
-				"time": GameClock.format_time(GameState.minutes)})
+		var text := Content.person_text(Content.format(message.text, {"day": GameState.day,
+				"time": GameClock.format_time(GameState.minutes)}))
 		GameState.add_message(message.id, text)
 
 
+## True when the message came "delay" game minutes ago or more.
+func _message_due(message_id: String, delay: int) -> bool:
+	for message: Dictionary in GameState.messages:
+		if message.id == message_id:
+			var since := (GameState.day - int(message.day)) * 1440 + GameState.minutes - int(message.minutes)
+			return since >= delay
+	return false
+
+
 func _on_message(message: Dictionary) -> void:
+	# The photo that the traveler sends is not news (plan 0007, R3).
+	if message.has("from"):
+		return
 	var sender := Content.sender()
 	phone.notify(Content.format(Content.ui_text("notify_message"), {"name": sender.get("name", ""),
 			"text": message.text}))
@@ -952,6 +996,22 @@ func _on_phone_request(action: String, args: Dictionary) -> void:
 			_apply_settings()
 		"center":
 			center_view()
+		"send_passport":
+			send_passport(args.values)
+		"passport":
+			GameState.set_passport(args.values)
+
+
+## The player sends the photo of the passport to cô Nga (plan 0007, R3): the
+## photo shows in the thread, and cô Nga answers with the new forms of address.
+func send_passport(values: Dictionary) -> void:
+	if GameState.passport_sent():
+		GameState.set_passport(values)
+		return
+	GameState.set_passport(values, true)
+	GameState.add_message("passport_photo", Content.ui_text("messages_passport_photo"), "me")
+	check_messages("passport")
+	phone.open_app("messages")
 
 
 ## A choice of the Clock app: wait, or sleep until morning (R27).
@@ -994,13 +1054,15 @@ func phone_state() -> Dictionary:
 		"lens":
 			return {"lens": lens_card()}
 		"messages":
-			return {"messages": GameState.messages, "sender": Content.sender()}
+			return {"messages": GameState.messages, "sender": Content.sender(), "passport": GameState.passport}
 		"notebook":
 			return {"cards": GameState.cards, "phrases": GameState.phrases}
 		"clock":
 			return {"minutes": GameState.minutes, "day": GameState.day, "at_home": is_at_home()}
 		"settings":
 			return {"settings": GameState.settings, "sound": GameState.sound}
+		"passport":
+			return {"passport": GameState.passport, "day": GameState.day}
 	return {}
 
 
@@ -1017,7 +1079,7 @@ func _refresh_phone() -> void:
 func transcript_view() -> Array:
 	var result := []
 	for entry in transcript:
-		var speaker_name: String = Content.speaker(entry.speaker).name if GameState.has_met(entry.speaker) \
+		var speaker_name: String = Content.display_name(entry.speaker) if GameState.has_met(entry.speaker) \
 				else Content.string("someone")
 		result.append({"speaker": speaker_name, "vi": entry.vi, "en": entry.en})
 	return result
@@ -1032,7 +1094,7 @@ func phrasebook() -> Dictionary:
 	if talk.state == "saying":
 		result.saying = {"vi": talk.saying.vi, "en": talk.saying.en}
 	elif talk.state == "answer":
-		result.replies = Content.line(talk.answer).get("replies", [])
+		result.replies = Content.spoken(talk.answer).get("replies", [])
 	return result
 
 
@@ -1043,13 +1105,14 @@ func lens_card() -> Dictionary:
 		return {}
 	if parts[0] == "npc":
 		var npc_id := parts[1]
-		var shown: String = Content.speaker(npc_id).name if GameState.has_met(npc_id) else Content.string("someone")
+		var shown: String = Content.display_name(npc_id) if GameState.has_met(npc_id) else Content.string("someone")
 		return {"kind": "person", "name": shown}
 	var spot := Content.spot(parts[1])
 	var rule := Content.rule_for(spot, "lens", GameState.minutes)
 	var params := _spot_params(spot)
 	return {"kind": "spot", "id": spot.id, "line": rule.get("line", ""), "name": spot.name, "en": spot.en,
-			"status": params.status, "text": Content.format(Content.line(rule.get("line", "")).get("text", ""), params)}
+			"status": params.status,
+			"text": Content.names(Content.format(Content.line(rule.get("line", "")).get("text", ""), params))}
 
 
 func _learn_from_lens() -> void:

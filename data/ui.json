@@ -97,7 +97,8 @@
 		"notebook": "Sổ tay",
 		"clock": "Clock",
 		"settings": "Settings",
-		"credits": "Credits"
+		"credits": "Credits",
+		"passport": "Passport"
 	},
 	"listen_on": "Listen: on",
 	"listen_off": "Listen: off",
@@ -148,5 +149,38 @@
 		"ultra": "Ultra"
 	},
 	"settings_fullscreen": "Fullscreen",
-	"settings_mouse": "Mouse speed: {value}"
+	"settings_mouse": "Mouse speed: {value}",
+	"passport_page_title": "PASSPORT",
+	"passport_surname": "Surname",
+	"passport_given": "Given names",
+	"passport_nationality": "Nationality",
+	"passport_sex": "Sex",
+	"passport_birth": "Date of birth",
+	"passport_number": "Passport No.",
+	"passport_male": "Male",
+	"passport_female": "Female",
+	"passport_age": "Age on {date}: {age}",
+	"passport_day": "Day: {value}",
+	"passport_month": "Month: {value}",
+	"passport_year": "Year: {value}",
+	"passport_hint": "{name} needs a photo of your passport for the khai báo tạm trú (the registration with the police). Check your details.",
+	"passport_send": "Send a photo to {name}",
+	"passport_sent": "{name} has the photo. A change here takes effect at once.",
+	"passport_months": [
+		"JAN",
+		"FEB",
+		"MAR",
+		"APR",
+		"MAY",
+		"JUN",
+		"JUL",
+		"AUG",
+		"SEP",
+		"OCT",
+		"NOV",
+		"DEC"
+	],
+	"messages_passport_button": "Send a photo of my passport",
+	"messages_passport_photo": "Photo of my passport",
+	"settings_passport": "Change passport details"
 }

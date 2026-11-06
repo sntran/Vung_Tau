@@ -10,6 +10,8 @@ signal slept
 signal sound_changed(on: bool)
 ## A new message from the host family (plan 0003, R24).
 signal message_received(message: Dictionary)
+## The passport changed or the player sent it (plan 0007, R3, R5).
+signal passport_changed
 
 const DEFAULT_SAVE_PATH := "user://save.json"
 ## The homestay door. The player stands here after "Sleep until morning".
@@ -34,6 +36,11 @@ var phrases: Array[Dictionary] = []
 var messages: Array[Dictionary] = []
 ## The number of messages that the player has not read.
 var unread := 0
+## The passport page of the traveler (plan 0007, R1): given, family, gender
+## ("male" or "female"), birth ("YYYY-MM-DD"), number, and sent (true after
+## the player sends the photo to cô Nga). The rules of address use it only
+## after it is sent (R4).
+var passport: Dictionary = {}
 ## Meters walked since the last full game minute.
 var walk_m := 0.0
 ## All meters walked in this run of the game. Play tests read this value.
@@ -81,6 +88,7 @@ func new_game() -> void:
 	phrases = []
 	messages = []
 	unread = 0
+	passport = default_passport()
 
 
 ## Loads the save file. When there is no correct save, starts a new game.
@@ -106,6 +114,7 @@ func load_game() -> bool:
 	phrases = data.phrases
 	messages = data.messages
 	unread = data.unread
+	passport = data.get("passport", default_passport())
 	cards = []
 	for card_id: String in data.cards:
 		if Content.has_card(card_id):
@@ -118,7 +127,50 @@ func to_dict() -> Dictionary:
 		"day": day, "minutes": minutes, "walk_m": walk_m, "cards": cards,
 		"flags": flags, "sound": sound, "player": player_pos, "yaw": yaw, "pitch": pitch,
 		"settings": settings, "met": met, "phrases": phrases, "messages": messages, "unread": unread,
+		"passport": passport,
 	}
+
+
+## The first passport page: the values of data/address.json, not sent.
+static func default_passport() -> Dictionary:
+	return SaveFormat.default_passport()
+
+
+## The traveler for the forms of address (plan 0007): {gender, age}. The
+## default traveler until the passport is sent (R4); then the gender and the
+## age on the game date of the passport.
+func traveler() -> Dictionary:
+	if not bool(passport.get("sent", false)):
+		var default: Dictionary = Content.address.get("traveler", {}).get("default", {"gender": "male", "age": 30})
+		return {"gender": str(default.get("gender", "male")), "age": int(default.get("age", 30))}
+	return {"gender": str(passport.get("gender", "male")), "age": age_on(str(passport.get("birth", "")), day)}
+
+
+## The age on a game day of a person born on "YYYY-MM-DD".
+static func age_on(birth: String, game_day: int) -> int:
+	var parts := birth.split("-")
+	if parts.size() != 3:
+		return 30
+	var date := GameCalendar.date_of(game_day)
+	var age := int(date.year) - int(parts[0])
+	if int(date.month) < int(parts[1]) or (int(date.month) == int(parts[1]) and int(date.day) < int(parts[2])):
+		age -= 1
+	return age
+
+
+## Changes the passport (R3, R5). "send" marks it as sent. A change takes effect at once.
+func set_passport(values: Dictionary, send := false) -> void:
+	for field: String in ["given", "family", "gender", "birth"]:
+		if values.has(field):
+			passport[field] = str(values[field])
+	if send:
+		passport.sent = true
+	passport_changed.emit()
+	queue_save()
+
+
+func passport_sent() -> bool:
+	return bool(passport.get("sent", false))
 
 
 ## Writes the save file now.
@@ -276,11 +328,16 @@ func has_message(message_id: String, repeat := false) -> bool:
 	return false
 
 
-## Adds a message. The Messages app shows it.
-func add_message(message_id: String, text: String) -> void:
+## Adds a message. The Messages app shows it. A message "from" "me" is a
+## message of the traveler (the photo of the passport, plan 0007, R3): it is
+## not unread.
+func add_message(message_id: String, text: String, from := "") -> void:
 	var message := {"id": message_id, "text": text, "day": day, "minutes": minutes}
+	if from != "":
+		message.from = from
 	messages.append(message)
-	unread += 1
+	if from == "":
+		unread += 1
 	message_received.emit(message)
 	queue_save()
 

@@ -68,6 +68,10 @@ func _init() -> void:
 	_center = PhoneUi.button("settings.center", "")
 	_center.pressed.connect(func() -> void: phone.request.emit("center", {}))
 	_column.add_child(_center)
+	# Plan 0007, R5: the passport page opens from here too.
+	var passport := PhoneUi.button("settings.passport", Content.ui_text("settings_passport"))
+	passport.pressed.connect(func() -> void: phone.open_app("passport"))
+	_column.add_child(passport)
 	_credits = PhoneUi.button("settings.credits", "")
 	_credits.pressed.connect(func() -> void: phone.open_app("credits"))
 	_column.add_child(_credits)

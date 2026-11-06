@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["data/dialogue/**", "data/voices.json"]
+    paths: ["data/dialogue/**", "data/voices.json", "data/address.json"]
 
 permissions:
   contents: write

@@ -15,8 +15,17 @@
 			"group": "Xóm",
 			"title": "Names by birth order",
 			"vi": "Hai, Ba, Tư, Năm, Sáu, Bảy…",
-			"body": "In the South, people often call you by your birth order. The oldest child is Hai (two), not Một (one), and the youngest is Út. So Cô Sáu is the fifth child in her family, and Chú Bảy is the sixth in his.",
+			"body": "In the South, people often call you by your birth order. The oldest child is Hai (two), not Một (one), and the youngest is Út. So {name.cosau} is the fifth child in her family, and {name.chubay} is the sixth in his.",
 			"hint": "Ask about the names at the phở shop.",
+			"status": "check"
+		},
+		{
+			"id": "xungHo",
+			"group": "Xóm",
+			"title": "Xưng hô",
+			"vi": "Forms of address",
+			"body": "Vietnamese has no neutral “you” and “I”. People take the words from the family: con (child), em (younger brother or sister), anh and chị (older brother and sister), cô, dì, and chú (aunt and uncle), bác (an aunt or uncle older than your parents), bà and ông (grandmother and grandfather). The words come in pairs, and they depend on the ages, so strangers often ask your age. Bà Tư is old enough to be the grandmother of a young traveler, so she says “bà” for herself and “con” for you. Cô Út sells bánh khọt: a seller younger than 50 says “anh” or “chị” to an adult customer, to be polite, and “em” for herself.",
+			"hint": "Listen to how a neighbor talks to you.",
 			"status": "check"
 		},
 		{
@@ -124,7 +133,7 @@
 			"title": "Nước béo hành trần",
 			"vi": "broth fat with blanched onion",
 			"body": "A small bowl of fat from the top of the pot, with scallion. Many people put the onion in the bowl and use the fat as a dip for the meat, often with a little hoisin and chili mixed in. You have to ask for it.",
-			"hint": "Ask about Chú Bảy's order.",
+			"hint": "Ask about {name.chubay}'s order.",
 			"status": "source"
 		},
 		{
@@ -133,7 +142,7 @@
 			"title": "Chén trứng",
 			"vi": "a small bowl with an egg",
 			"body": "Ask for an egg in its own small bowl. Spoon hot broth over it so it cooks soft, then eat it on the side or slide it into your phở.",
-			"hint": "Ask about Chú Bảy's order.",
+			"hint": "Ask about {name.chubay}'s order.",
 			"status": "check"
 		},
 		{
@@ -178,7 +187,7 @@
 			"title": "Phở Bắc and phở Nam",
 			"vi": "North and South",
 			"body": "Phở came South with Northern families after 1954. In the South the broth got richer and the herb plate bigger. A Northern-style bowl has clear broth, wide noodles, few herbs, and often no hoisin on the table.",
-			"hint": "Ask about the hoisin, or visit Bác Hà.",
+			"hint": "Ask about the hoisin, or visit {name.bacha}.",
 			"status": "source"
 		},
 		{

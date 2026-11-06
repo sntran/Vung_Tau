@@ -18,22 +18,29 @@ def test_hash_is_from_the_text_the_voice_and_the_model():
 
 def test_clips_of_a_dialogue():
     dialogue = {
-        "speakers": {"batu": {"name": "Bà Tư", "address": "bà"}, "cosau": {"name": "Cô Sáu", "address": "cô"}},
-        "say_again": {"vi": "Dạ, {address} nói lại được không ạ?"},
+        "speakers": {"batu": {"name": "Bà Tư"}, "cosau": {"name": "Cô Sáu"}},
+        "say_again": {"vi": "Dạ, {them} nói lại được không ạ?"},
         "lines": {
-            "a": {"speaker": "batu", "vi": "Ăn sáng chưa con?", "replies": [
+            "a": {"speaker": "batu", "vi": "Ăn sáng chưa {you}?", "replies": [
                 {"id": "chua", "vi": "Dạ, chưa ạ."}, {"id": "en", "english": True, "en": "Good morning!"}]},
             "b": {"speaker": "cosau", "vi": "Một trăm", "say": "Một trăm ngàn", "voice_style": "[cười]"},
             "c": {"text": "A description, no voice."},
         },
     }
     voices = {"speakers": {"batu": "V1", "cosau": "V2"}, "phone": "P"}
-    clips = {c["id"]: c for c in build.collect_clips(dialogue, voices)}
-    assert set(clips) == {"a", "reply.a.chua", "b", "say_again.batu", "say_again.cosau"}
-    assert clips["a"]["voice"] == "V1"
+    rules = {
+        "traveler": {"min_age": 20, "max_age": 21},
+        "people": {"batu": {"age": 70, "gender": "female"}, "cosau": {"age": 21, "gender": "female"}},
+        "rules": [{"min": 35, "you": "con", "them": "bà"}, {"you": "anh", "them": "chị"}],
+    }
+    clips = {c["id"]: c for c in build.collect_clips(dialogue, voices, rules)}
+    # Plan 0007, R11: a line with a field has a clip for each variant of its speaker.
+    assert set(clips) == {"a@con", "reply.a.chua", "b", "say_again.batu@ba", "say_again.cosau@chi"}
+    assert clips["a@con"]["voice"] == "V1"
+    assert clips["a@con"]["text"] == "Ăn sáng chưa con?"
     assert clips["reply.a.chua"]["voice"] == "P"
     assert clips["b"]["text"] == "[cười] Một trăm ngàn"
-    assert clips["say_again.batu"]["text"] == "Dạ, bà nói lại được không ạ?"
+    assert clips["say_again.batu@ba"]["text"] == "Dạ, bà nói lại được không ạ?"
 
 
 def test_trim_and_loudness():

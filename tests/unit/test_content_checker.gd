@@ -9,6 +9,7 @@ var ui: Dictionary
 var messages: Dictionary
 var voices: Dictionary
 var manifest: Dictionary
+var address: Dictionary
 
 
 func before_each() -> void:
@@ -20,11 +21,13 @@ func before_each() -> void:
 	messages = Content.messages.duplicate(true)
 	voices = Content.voices.duplicate(true)
 	manifest = Content.manifest.duplicate(true)
+	address = Content.address.duplicate(true)
 
 
 func _check(audio_exists := Callable()) -> PackedStringArray:
 	return ContentChecker.check_all({"cards": cards, "spots": spots, "dialogue": dialogue, "layout": layout,
-			"ui": ui, "messages": messages, "voices": voices, "sounds": Content.sounds, "manifest": manifest},
+			"ui": ui, "messages": messages, "voices": voices, "sounds": Content.sounds, "address": address,
+			"manifest": manifest},
 			audio_exists)
 
 
@@ -92,7 +95,7 @@ func test_spot_points_to_missing_card() -> void:
 
 func test_message_needs_a_time_or_an_event() -> void:
 	messages.messages[0].erase("after")
-	_assert_error(_check(), "a message must have \"at\" or \"after\"")
+	_assert_error(_check(), "a message must have \"at\", \"after\", or \"after_message\"")
 	messages.messages[0].after = "heard:no.such.line"
 	_assert_error(_check(), "line ID \"no.such.line\" that does not exist")
 
@@ -106,19 +109,19 @@ func test_each_speaker_has_a_voice() -> void:
 func test_manifest_check() -> void:
 	assert_eq(_check(), PackedStringArray(), "the real manifest is correct")
 	# A changed text: the hash does not match.
-	dialogue.lines["batu.greet"].vi = "Ủa, con dậy rồi hả?"
-	_assert_error(_check(), "clip \"batu.greet\": the text, the voice, or the model changed")
+	dialogue.lines["batu.greet"].vi = "Ủa, {you} dậy rồi hả?"
+	_assert_error(_check(), "clip \"batu.greet@con\": the text, the voice, or the model changed")
 	dialogue.lines["batu.greet"].vi = Content.dialogue.lines["batu.greet"].vi
 	# A changed voice.
 	voices.speakers.batu = "Kim Thanh"
-	_assert_error(_check(), "clip \"batu.greet\": the text, the voice, or the model changed")
+	_assert_error(_check(), "clip \"batu.greet@con\": the text, the voice, or the model changed")
 	voices.speakers.batu = Content.voices.speakers.batu
-	# A clip with no entry, and a missing file.
-	manifest.clips.erase("cosau.open")
-	_assert_error(_check(), "clip \"cosau.open\": the clip has no audio file")
+	# A clip with no entry, and a missing file. Plan 0007, R12: each variant has a clip.
+	manifest.clips.erase("cosau.open@chi")
+	_assert_error(_check(), "clip \"cosau.open@chi\": the clip has no audio file")
 	manifest = Content.manifest.duplicate(true)
-	var no_file := func(path: String) -> bool: return not path.ends_with("/nga.hello.ogg")
-	_assert_error(_check(no_file), "the file res://assets/voices/nga.hello.ogg is missing")
+	var no_file := func(path: String) -> bool: return not path.ends_with("/nga.hello@con-co.ogg")
+	_assert_error(_check(no_file), "the file res://assets/voices/nga.hello@con-co.ogg is missing")
 
 
 ## The same hash as tools/voices/build.py (tools/voices/tests/test_build.py checks the same value).
@@ -127,14 +130,22 @@ func test_clip_hash_is_the_same_as_the_voice_build() -> void:
 			"1264a4278e2d8c788c4537d24b974a8d7e290f7618357d25a5643d26b7249ca3")
 
 
-## R20: the form of address of the "say again" phrase matches the speaker.
+## R20: the form of address of the "say again" phrase matches the speaker
+## (for the default traveler of plan 0007, R4: a man of 30).
 func test_say_again_form_of_address() -> void:
 	assert_eq(Content.say_again("batu").vi, "Dạ, bà nói lại được không ạ?")
 	assert_eq(Content.say_again("cosau").vi, "Dạ, cô nói lại được không ạ?")
 	assert_eq(Content.say_again("bacha").vi, "Dạ, bác nói lại được không ạ?")
 	assert_eq(Content.say_again("chubay").vi, "Dạ, chú nói lại được không ạ?")
-	dialogue.speakers.batu.address = "ông bà"
-	_assert_error(_check(), "address \"ông bà\" must be one of")
+	assert_eq(Content.say_again("batu").clip, "say_again.batu@ba")
+	address.people.erase("batu")
+	_assert_error(_check(), "the speaker \"batu\" of the dialogue has no entry")
+
+
+## Plan 0007, R9: each line resolves for each traveler with no field left in the text.
+func test_a_field_that_the_rules_do_not_give() -> void:
+	dialogue.lines["batu.greet"].vi = "Ủa, {ban} dậy rồi hả?"
+	_assert_error(_check(), "has a field that the rules do not give")
 
 
 func test_reply_points_to_missing_card() -> void:

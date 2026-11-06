@@ -12,7 +12,7 @@ signal request(action: String, args: Dictionary)
 signal raised(up: bool)
 signal app_changed(app: String)
 
-const APPS := ["listen", "lens", "messages", "notebook", "clock", "settings"]
+const APPS := ["listen", "lens", "messages", "notebook", "clock", "settings", "passport"]
 const MAX_FRACTION := 0.38
 const MAX_WIDTH := 560.0
 const MARGIN := 12.0
@@ -160,6 +160,7 @@ func _build_device() -> void:
 	apps.notebook = NotebookApp.new()
 	apps.clock = ClockApp.new()
 	apps.settings = SettingsApp.new()
+	apps.passport = PassportApp.new()
 	# The credits page has no icon on the home screen: the Settings app opens it.
 	apps.credits = CreditsApp.new()
 	for app_id: String in apps:

@@ -71,6 +71,41 @@ func test_save_of_plan_0003_loads_with_the_defaults_of_plan_0004() -> void:
 	assert_almost_eq(data.settings.mouse_sensitivity, SaveFormat.MOUSE_SENSITIVITY_RANGE.y, 0.001)
 
 
+## Plan 0007, R5: the save keeps the passport.
+func test_the_save_keeps_the_passport() -> void:
+	var state := _state()
+	state.passport = {"given": "Lan", "family": "Tran", "gender": "female", "birth": "1994-01-01",
+			"number": "X04817263", "sent": true}
+	var data := SaveFormat.from_json(SaveFormat.to_json(state))
+	assert_eq(data.passport, state.passport)
+	assert_eq(data.flags, {"intro_done": true})
+	assert_eq(data.messages[0].id, "welcome")
+
+
+## Plan 0007, R5: a save of plan 0003 (version 2) loads with the default
+## traveler, and the first message (the passport) comes again.
+func test_save_of_plan_0003_loads_with_the_default_traveler() -> void:
+	var json: Dictionary = JSON.parse_string(SaveFormat.to_json(_state()))
+	json.version = SaveFormat.OLD_VERSION
+	json.erase("passport")
+	var data := SaveFormat.from_json(JSON.stringify(json))
+	assert_false(data.is_empty(), "a save of version 2 loads")
+	assert_false(bool(data.passport.sent), "the default traveler until the passport is sent")
+	assert_eq(data.passport.gender, GameStateScript.default_passport().gender)
+	assert_false(data.flags.has("intro_done"), "the start messages come again")
+	assert_eq(data.messages.size(), 0, "the old first message is gone, so that the new one comes")
+	assert_eq(data.day, 3)
+	assert_eq(data.cards, ["anSang", "coc"] as Array[String])
+
+
+func test_age_on_the_game_date() -> void:
+	# Day 1 is 22 January 2019 (data/calendar.json).
+	assert_eq(GameStateScript.age_on("1988-06-15", 1), 30)
+	assert_eq(GameStateScript.age_on("1994-01-22", 1), 25, "the birthday is on day 1")
+	assert_eq(GameStateScript.age_on("1994-01-23", 1), 24)
+	assert_eq(GameStateScript.age_on("1994-01-23", 2), 25)
+
+
 func test_version_1_save_is_not_loaded() -> void:
 	# Plan 0002 changed the save to version 2. A save of version 1 starts a new game.
 	var json: Dictionary = JSON.parse_string(SaveFormat.to_json(_state()))

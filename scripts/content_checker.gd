@@ -12,10 +12,13 @@ const HOUSE_KINDS := ["tube", "villa", "hotel"]
 const HOUSE_STYLES := ["old", "new"]
 const ROOF_KINDS := ["flat", "metal", "tiles"]
 const FRONT_TILES := ["none", "ground", "full"]
-## The forms of address of plan 0003 (R20).
-const ADDRESS_FORMS := ["bà", "cô", "chú", "bác", "anh", "chị", "em"]
+## The fields of the person data of data/address.json (plan 0007, R6).
+const PERSON_FIELDS := ["name", "given", "age", "gender", "role", "region", "aunt_word"]
+const ROLES := ["elder", "host", "seller", "neighbor"]
 ## The events that start a message (data/messages.json).
-const MESSAGE_EVENTS := ["start", "wake"]
+const MESSAGE_EVENTS := ["start", "wake", "passport"]
+## The buttons of a message (plan 0007, R2).
+const MESSAGE_BUTTONS := ["passport"]
 const MINUTES_PER_DAY := 1440
 const SUBTITLE_IDS := ["vi", "en", "both", "off"]
 
@@ -23,8 +26,8 @@ var errors: PackedStringArray = []
 
 
 ## Checks all content. "files" has the parsed JSON of each file: cards,
-## spots, dialogue, layout, ui, messages, voices, sounds, and manifest (the
-## voice manifest). "audio_exists" tells if an audio file exists (the tests
+## spots, dialogue, layout, ui, messages, voices, sounds, address (the forms
+## of address of plan 0007), and manifest (the voice manifest). "audio_exists" tells if an audio file exists (the tests
 ## replace it).
 static func check_all(files: Dictionary, audio_exists := Callable()) -> PackedStringArray:
 	var checker := ContentChecker.new()
@@ -35,7 +38,8 @@ static func check_all(files: Dictionary, audio_exists := Callable()) -> PackedSt
 func _check_all(files: Dictionary, audio_exists: Callable) -> void:
 	var names := {"cards": "cards.json", "spots": "spots.json", "dialogue": "dialogue/hem.json",
 			"layout": "world/hem_layout.json", "ui": "ui.json", "messages": "messages.json",
-			"voices": "voices.json", "sounds": "sounds.json", "manifest": "assets/voices/manifest.json"}
+			"voices": "voices.json", "sounds": "sounds.json", "address": "address.json",
+			"manifest": "assets/voices/manifest.json"}
 	for key: String in names:
 		if not _is_dict(files.get(key), names[key], "file"):
 			return
@@ -47,7 +51,8 @@ func _check_all(files: Dictionary, audio_exists: Callable) -> void:
 	_check_messages(files.messages, files.dialogue, card_ids)
 	_check_voices(files.voices, files.dialogue)
 	_check_sounds(files.sounds)
-	_check_audio(files.dialogue, files.voices, files.manifest, audio_exists)
+	_check_address(files.address, files.dialogue, card_ids)
+	_check_audio(files.dialogue, files.voices, files.address, files.manifest, audio_exists)
 	for key: String in names:
 		if key != "manifest":
 			_check_text_nfc(files[key], names[key])
@@ -178,8 +183,8 @@ func _check_dialogue(dialogue: Dictionary, card_ids: Dictionary) -> Dictionary:
 		speakers = dialogue.speakers
 	if _require(dialogue, "say_again", TYPE_DICTIONARY, file, "file"):
 		if _require(dialogue.say_again, "vi", TYPE_STRING, file, "say_again") \
-				and not "{address}" in dialogue.say_again.vi:
-			_error(file, "say_again", "\"vi\" must have \"{address}\"")
+				and not "{them}" in dialogue.say_again.vi and not "{Them}" in dialogue.say_again.vi:
+			_error(file, "say_again", "\"vi\" must have \"{them}\" (plan 0007, R10)")
 		_require(dialogue.say_again, "en", TYPE_STRING, file, "say_again")
 		_check_status(dialogue.say_again, file, "say_again")
 	if _require(dialogue, "strings", TYPE_DICTIONARY, file, "file"):
@@ -198,8 +203,6 @@ func _check_dialogue(dialogue: Dictionary, card_ids: Dictionary) -> Dictionary:
 			continue
 		_require(speaker, "name", TYPE_STRING, file, where)
 		_require(speaker, "color", TYPE_STRING, file, where)
-		if _require(speaker, "address", TYPE_STRING, file, where) and not ADDRESS_FORMS.has(speaker.address):
-			_error(file, where, "address \"%s\" must be one of %s" % [speaker.address, ADDRESS_FORMS])
 		if speaker.has("call_after"):
 			_check_speech_ref(speaker.call_after, kinds, file, where, "call_after")
 			var call: Variant = dialogue.lines.get(speaker.call_after)
@@ -420,8 +423,19 @@ func _check_messages(messages: Dictionary, dialogue: Dictionary, card_ids: Dicti
 			ids[message.id] = true
 		_require(message, "text", TYPE_STRING, file, where)
 		_check_status(message, file, where)
-		if not message.has("at") and not message.has("after"):
-			_error(file, where, "a message must have \"at\" or \"after\"")
+		if not message.has("at") and not message.has("after") and not message.has("after_message"):
+			_error(file, where, "a message must have \"at\", \"after\", or \"after_message\"")
+		if message.has("after_message"):
+			if typeof(message.get("delay")) not in [TYPE_INT, TYPE_FLOAT] or message.delay < 0:
+				_error(file, where, "\"after_message\" needs a \"delay\" in minutes (0 or more)")
+			var other_exists := false
+			for other: Variant in messages.messages:
+				if typeof(other) == TYPE_DICTIONARY and other.get("id") == message.after_message:
+					other_exists = true
+			if not other_exists:
+				_error(file, where, "\"after_message\" points to message ID \"%s\" that does not exist" % message.after_message)
+		if message.has("button") and not MESSAGE_BUTTONS.has(message.button):
+			_error(file, where, "\"button\" must be one of %s" % [MESSAGE_BUTTONS])
 		for field: String in ["at", "before"]:
 			if message.has(field):
 				_check_minute(message[field], file, where, field)
@@ -464,8 +478,79 @@ func _check_sounds(sounds: Dictionary) -> void:
 		_check_status(sound, file, where)
 
 
-## Checks that each clip has an audio file with the correct hash (R4).
-func _check_audio(dialogue: Dictionary, voices: Dictionary, manifest: Dictionary, audio_exists: Callable) -> void:
+## Checks the forms of address (plan 0007, R6 to R10): each speaker of the
+## dialogue has an entry, and each spoken line and reply has words for each
+## traveler, with no field left in the text.
+func _check_address(address: Dictionary, dialogue: Dictionary, card_ids: Dictionary) -> void:
+	var file := "address.json"
+	var people: Dictionary = {}
+	if _require(address, "people", TYPE_DICTIONARY, file, "file"):
+		people = address.people
+	_require(address, "rules", TYPE_ARRAY, file, "file")
+	_require(address, "classes", TYPE_DICTIONARY, file, "file")
+	if _require(address, "traveler", TYPE_DICTIONARY, file, "file"):
+		for field: String in ["default", "passport"]:
+			_require(address.traveler, field, TYPE_DICTIONARY, file, "traveler")
+	_check_status(address, file, "file")
+	if address.has("card") and typeof(address.card) == TYPE_STRING and not card_ids.has(address.card):
+		_error(file, "card", "card ID \"%s\" does not exist" % address.card)
+	for person_id: String in people:
+		var where := "person \"%s\"" % person_id
+		if not _is_dict(people[person_id], file, where):
+			continue
+		var person: Dictionary = people[person_id]
+		for field: String in PERSON_FIELDS:
+			if not person.has(field):
+				_error(file, where, "required field \"%s\" is missing" % field)
+		if person.get("gender") not in ["male", "female"]:
+			_error(file, where, "\"gender\" must be \"male\" or \"female\"")
+		if person.get("role") not in ROLES:
+			_error(file, where, "\"role\" must be one of %s" % [ROLES])
+		if person.get("region") not in ["south", "north"]:
+			_error(file, where, "\"region\" must be \"south\" or \"north\"")
+	for speaker_id: String in dialogue.get("speakers", {}):
+		if not people.has(speaker_id):
+			_error(file, "people", "the speaker \"%s\" of the dialogue has no entry" % speaker_id)
+	if not errors.is_empty():
+		return
+	var say_again: Dictionary = dialogue.get("say_again", {})
+	for speaker_id: String in people:
+		for words: Dictionary in Address.all_words(address, speaker_id):
+			for field: String in Address.FIELDS:
+				if str(words[field]) == "":
+					_error(file, "person \"%s\"" % speaker_id, "no word for \"%s\" (%s)" % [field, words])
+			_check_resolved(address, say_again, words, "say_again for \"%s\"" % speaker_id)
+	for line_id: String in dialogue.get("lines", {}):
+		var line: Variant = dialogue.lines[line_id]
+		if typeof(line) != TYPE_DICTIONARY or not line.has("speaker") or not people.has(line.speaker):
+			continue
+		for words: Dictionary in Address.all_words(address, line.speaker):
+			_check_resolved(address, line, words, "line \"%s\"" % line_id)
+			for reply: Variant in line.get("replies", []):
+				if typeof(reply) == TYPE_DICTIONARY:
+					_check_resolved(address, reply, words, "line \"%s\" reply \"%s\"" % [line_id, reply.get("id", "")])
+
+
+## A text with the words must have no field left (except "{name.ID}" of a person).
+func _check_resolved(address: Dictionary, item: Dictionary, words: Dictionary, where: String) -> void:
+	for variant: Variant in item.get("variants", []):
+		if typeof(variant) != TYPE_DICTIONARY or typeof(variant.get("when")) != TYPE_DICTIONARY:
+			_error("dialogue/hem.json", where, "each variant must have a \"when\" object")
+			return
+	var resolved := Address.resolve_line(address, item, words)
+	for text_key: String in ["vi", "say", "en"]:
+		var text := str(resolved.get(text_key, ""))
+		for person_id: String in address.get("people", {}):
+			text = text.replace("{name.%s}" % person_id, "")
+		if text.contains("{"):
+			_error("dialogue/hem.json", where, "\"%s\" has a field that the rules do not give: %s" % [text_key, text])
+			return
+
+
+## Checks that each clip has an audio file with the correct hash (R4), also
+## each variant of a line with a form of address (plan 0007, R12).
+func _check_audio(dialogue: Dictionary, voices: Dictionary, address: Dictionary, manifest: Dictionary,
+		audio_exists: Callable) -> void:
 	var file := "assets/voices/manifest.json"
 	var clips: Variant = manifest.get("clips")
 	if typeof(clips) != TYPE_DICTIONARY:
@@ -473,7 +558,7 @@ func _check_audio(dialogue: Dictionary, voices: Dictionary, manifest: Dictionary
 		return
 	if typeof(voices.get("speakers")) != TYPE_DICTIONARY:
 		return
-	for clip: Dictionary in VoiceClips.expected(dialogue, voices):
+	for clip: Dictionary in VoiceClips.expected(dialogue, voices, address):
 		var where := "clip \"%s\"" % clip.id
 		var entry: Variant = clips.get(clip.id)
 		if typeof(entry) != TYPE_DICTIONARY:
@@ -653,10 +738,14 @@ func _check_ui(ui: Dictionary) -> void:
 			"phrase_saved", "lens_empty", "lens_person", "messages_empty", "notify_card", "notify_message",
 			"clock_day", "clock_rest", "clock_sleep_away", "notebook_phrases", "notebook_no_phrases",
 			"settings_sound", "settings_subtitles", "settings_subtitle_size", "settings_subtitle_box",
-			"settings_quality", "settings_fullscreen", "settings_mouse"]:
+			"settings_quality", "settings_fullscreen", "settings_mouse", "passport_page_title", "passport_surname",
+			"passport_given", "passport_nationality", "passport_sex", "passport_birth", "passport_number",
+			"passport_male", "passport_female", "passport_age", "passport_day", "passport_month", "passport_year",
+			"passport_hint", "passport_send", "passport_sent", "messages_passport_button", "messages_passport_photo",
+			"settings_passport"]:
 		_require(ui, field, TYPE_STRING, file, "file")
 	if _require(ui, "apps", TYPE_DICTIONARY, file, "file"):
-		for app: String in ["listen", "lens", "messages", "notebook", "clock", "settings"]:
+		for app: String in ["listen", "lens", "messages", "notebook", "clock", "settings", "passport"]:
 			_require(ui.apps, app, TYPE_STRING, file, "apps")
 	if _require(ui, "quality_presets", TYPE_DICTIONARY, file, "file"):
 		for preset: String in Quality.NAMES:

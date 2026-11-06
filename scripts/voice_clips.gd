@@ -5,13 +5,20 @@ extends RefCounted
 ##
 ## A clip is a spoken line of a person (ID = the line ID), a phrase of the
 ## phrasebook in the neutral phone voice ("reply.LINE.REPLY"), or the "say
-## again" phrase for a person ("say_again.SPEAKER").
+## again" phrase for a person ("say_again.SPEAKER"). A line with a form of
+## address (plan 0007, R11) has one clip for each variant that the rules can
+## make for its speaker: "ID@KEY", where KEY is the resolved words (Address.key()).
 
 const FOLDER := "res://assets/voices/"
 
 
 static func path(clip_id: String) -> String:
 	return FOLDER + clip_id + ".ogg"
+
+
+## The clip ID of a variant: "ID@KEY", or the ID when the key is empty.
+static func variant_id(clip_id: String, variant_key: String) -> String:
+	return clip_id if variant_key == "" else "%s@%s" % [clip_id, variant_key]
 
 
 static func reply_id(line_id: String, reply_id_value: String) -> String:
@@ -38,14 +45,10 @@ static func spoken_text(line: Dictionary) -> String:
 	return "%s %s" % [style, text] if style != "" else text
 
 
-## The "say again" phrase with the form of address of the speaker (R20).
-static func say_again_text(dialogue: Dictionary, speaker_id: String) -> String:
-	var speaker: Dictionary = dialogue.get("speakers", {}).get(speaker_id, {})
-	return str(dialogue.get("say_again", {}).get("vi", "")).replace("{address}", speaker.get("address", ""))
-
-
-## Returns all clips: a list of {id, text, voice, hash}.
-static func expected(dialogue: Dictionary, voices: Dictionary) -> Array[Dictionary]:
+## Returns all clips: a list of {id, text, voice, hash}. "address" is
+## data/address.json: a line with a form of address has a clip for each of
+## its variants.
+static func expected(dialogue: Dictionary, voices: Dictionary, address: Dictionary) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	var model := model_version(voices)
 	var speaker_voices: Dictionary = voices.get("speakers", {})
@@ -56,13 +59,33 @@ static func expected(dialogue: Dictionary, voices: Dictionary) -> Array[Dictiona
 		if typeof(line) != TYPE_DICTIONARY or not line.has("speaker"):
 			continue
 		var voice: String = speaker_voices.get(line.speaker, "")
-		result.append(_clip(line_id, spoken_text(line), voice, model))
+		_add_variants(result, line_id, line, line.speaker, address, voice, model, true)
 		for reply: Variant in line.get("replies", []):
 			if typeof(reply) == TYPE_DICTIONARY and not reply.get("english", false) and reply.has("vi"):
-				result.append(_clip(reply_id(line_id, reply.get("id", "")), reply.vi, phone, model))
+				_add_variants(result, reply_id(line_id, reply.get("id", "")), reply, line.speaker, address, phone, model, false)
+	var say_again: Dictionary = dialogue.get("say_again", {})
 	for speaker_id: String in dialogue.get("speakers", {}):
-		result.append(_clip(say_again_id(speaker_id), say_again_text(dialogue, speaker_id), phone, model))
+		_add_variants(result, say_again_id(speaker_id), say_again, speaker_id, address, phone, model, false)
 	return result
+
+
+## The clips of the variants of a line, a reply, or the "say again" phrase
+## for the person "speaker_id", in the order of Address.all_words().
+static func _add_variants(result: Array[Dictionary], clip_id: String, item: Dictionary, speaker_id: String,
+		address: Dictionary, voice: String, model: String, styled: bool) -> void:
+	var fields := Address.line_fields(item)
+	if fields.is_empty():
+		result.append(_clip(clip_id, spoken_text(item) if styled else str(item.get("vi", "")), voice, model))
+		return
+	var seen := {}
+	for words: Dictionary in Address.all_words(address, speaker_id):
+		var variant_key := Address.key(words, fields)
+		if seen.has(variant_key):
+			continue
+		seen[variant_key] = true
+		var resolved := Address.resolve_line(address, item, words)
+		var text := spoken_text(resolved) if styled else str(resolved.get("vi", ""))
+		result.append(_clip(variant_id(clip_id, variant_key), text, voice, model))
 
 
 static func _clip(clip_id: String, text: String, voice: String, model: String) -> Dictionary:

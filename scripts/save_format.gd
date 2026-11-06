@@ -2,8 +2,13 @@ class_name SaveFormat
 extends RefCounted
 ## The format of the save file. The file is JSON with a "version" field.
 ## A save with a different version is not loaded. The game then starts new.
+## A save of version 2 (plan 0003) loads with the default traveler, and the
+## first message of cô Nga (the passport) comes again (plan 0007, R5).
 
-const VERSION := 2
+const VERSION := 3
+const OLD_VERSION := 2
+## The first message of cô Nga asks for the passport (plan 0007, R2).
+const FIRST_MESSAGE := "welcome"
 
 ## The settings of a new game (plan 0002, R18).
 const DEFAULT_SETTINGS := {
@@ -45,6 +50,7 @@ static func to_json(state: Dictionary) -> String:
 		"phrases": Array(state.get("phrases", [])),
 		"messages": Array(state.get("messages", [])),
 		"unread": int(state.get("unread", 0)),
+		"passport": Dictionary(state.get("passport", {})),
 	}
 	return JSON.stringify(data, "\t")
 
@@ -61,8 +67,9 @@ static func from_json(text: String) -> Dictionary:
 		return {}
 	if not data.has("version") or typeof(data.version) not in [TYPE_INT, TYPE_FLOAT]:
 		return {}
-	if int(data.version) != VERSION:
+	if int(data.version) != VERSION and int(data.version) != OLD_VERSION:
 		return {}
+	var old := int(data.version) == OLD_VERSION
 	var day: Variant = data.get("day")
 	var minutes: Variant = data.get("minutes")
 	var cards: Variant = data.get("cards")
@@ -113,8 +120,17 @@ static func from_json(text: String) -> Dictionary:
 	for message: Variant in _array(data.get("messages")):
 		if typeof(message) == TYPE_DICTIONARY and typeof(message.get("id")) == TYPE_STRING \
 				and typeof(message.get("text")) == TYPE_STRING:
-			messages.append({"id": message.id, "text": message.text, "day": int(message.get("day", 1)),
-					"minutes": int(message.get("minutes", 0))})
+			if old and message.id == FIRST_MESSAGE:
+				continue
+			var entry := {"id": message.id, "text": message.text, "day": int(message.get("day", 1)),
+					"minutes": int(message.get("minutes", 0))}
+			if typeof(message.get("from")) == TYPE_STRING:
+				entry.from = message.from
+			messages.append(entry)
+	var flag_values: Dictionary = flags.duplicate() if typeof(flags) == TYPE_DICTIONARY else {}
+	if old:
+		# The first message comes again at the start (main.gd sends the "start" messages).
+		flag_values.erase("intro_done")
 	return {
 		"met": met,
 		"phrases": phrases,
@@ -125,13 +141,38 @@ static func from_json(text: String) -> Dictionary:
 		"minutes": int(minutes),
 		"walk_m": clampf(float(data.get("walk_m", 0.0)), 0.0, GameClock.METERS_PER_MINUTE),
 		"cards": card_list,
-		"flags": flags if typeof(flags) == TYPE_DICTIONARY else {},
+		"flags": flag_values,
+		"passport": _passport(data.get("passport") if not old else null),
 		"sound": bool(data.get("sound", true)),
 		"player": Vector3(float(player.x), float(player.get("y", 0.0)), float(player.z)),
 		"yaw": float(player.get("yaw", GameClock.HOME_YAW)),
 		"pitch": clampf(float(player.get("pitch", 0.0)), -80.0, 80.0),
 		"settings": settings,
 	}
+
+
+## The first passport page (plan 0007, R1): the values of data/address.json, not sent.
+static func default_passport() -> Dictionary:
+	var values: Dictionary = Content.address.get("traveler", {}).get("passport", {})
+	return {"given": str(values.get("given", "")), "family": str(values.get("family", "")),
+			"gender": str(values.get("gender", "male")), "birth": str(values.get("birth", "1988-06-15")),
+			"number": str(values.get("number", "")), "sent": false}
+
+
+## The passport of a save, or the first passport when it is not correct (plan 0007, R5).
+static func _passport(value: Variant) -> Dictionary:
+	var result := default_passport()
+	if typeof(value) != TYPE_DICTIONARY:
+		return result
+	for field: String in ["given", "family", "number", "birth"]:
+		if typeof(value.get(field)) == TYPE_STRING:
+			result[field] = value[field]
+	if value.get("gender") in ["male", "female"]:
+		result.gender = value.gender
+	if str(result.birth).split("-").size() != 3:
+		result.birth = default_passport().birth
+	result.sent = bool(value.get("sent", false))
+	return result
 
 
 static func _array(value: Variant) -> Array:

@@ -13,6 +13,7 @@ const UI_PATH := "res://data/ui.json"
 const MESSAGES_PATH := "res://data/messages.json"
 const VOICES_PATH := "res://data/voices.json"
 const SOUNDS_PATH := "res://data/sounds.json"
+const ADDRESS_PATH := "res://data/address.json"
 const MANIFEST_PATH := "res://assets/voices/manifest.json"
 
 var cards: Dictionary = {}
@@ -23,6 +24,8 @@ var ui: Dictionary = {}
 var messages: Dictionary = {}
 var voices: Dictionary = {}
 var sounds: Dictionary = {}
+## The forms of address (plan 0007, data/address.json).
+var address: Dictionary = {}
 ## The voice manifest of tools/voices/build.py.
 var manifest: Dictionary = {}
 var errors: PackedStringArray = []
@@ -51,7 +54,7 @@ func load_all() -> bool:
 	errors = []
 	var paths := {"cards": CARDS_PATH, "spots": SPOTS_PATH, "dialogue": DIALOGUE_PATH, "layout": LAYOUT_PATH,
 			"ui": UI_PATH, "messages": MESSAGES_PATH, "voices": VOICES_PATH, "sounds": SOUNDS_PATH,
-			"manifest": MANIFEST_PATH}
+			"address": ADDRESS_PATH, "manifest": MANIFEST_PATH}
 	var parsed := {}
 	for key: String in paths:
 		parsed[key] = read_json(paths[key])
@@ -63,6 +66,7 @@ func load_all() -> bool:
 	messages = _as_dict(parsed.messages)
 	voices = _as_dict(parsed.voices)
 	sounds = _as_dict(parsed.sounds)
+	address = _as_dict(parsed.address)
 	manifest = _as_dict(parsed.manifest)
 	errors.append_array(ContentChecker.check_all(parsed))
 	_cards_by_id = _index(cards.get("cards", []))
@@ -183,9 +187,76 @@ func clip_stream(clip_id: String) -> AudioStream:
 	return load(path)
 
 
-## The "say again" phrase for the speaker (plan 0003, R20): {vi, en}.
+## The "say again" phrase for the speaker (plan 0003, R20), with the forms of
+## address for the traveler now (plan 0007): {vi, en, clip}.
 func say_again(speaker_id: String) -> Dictionary:
-	return {"vi": VoiceClips.say_again_text(dialogue, speaker_id), "en": dialogue.get("say_again", {}).get("en", "")}
+	var phrase := _resolve(dialogue.get("say_again", {}), speaker_id, VoiceClips.say_again_id(speaker_id))
+	return {"vi": phrase.get("vi", ""), "en": phrase.get("en", ""), "clip": phrase.clip}
+
+
+# --- Forms of address (plan 0007) -------------------------------------------
+
+## The forms of address of the person for the traveler now: {you, me, them, self}.
+func words(speaker_id: String) -> Dictionary:
+	return Address.words(address, speaker_id, GameState.traveler())
+
+
+## The name of the person for the traveler now (R8): "Cô Sáu", or "Chị Sáu"
+## for a traveler of 50. The name of the dialogue for a person with no rules.
+func display_name(speaker_id: String) -> String:
+	var shown := Address.display_name(address, speaker_id, GameState.traveler())
+	return shown if shown != "" else str(speaker(speaker_id).get("name", ""))
+
+
+## A spoken line with the forms of address for the traveler now: "vi", "say",
+## "en", and the replies have the words, and "clip" is the clip ID of the
+## variant (R11). Each reply has its "clip" too.
+func spoken(line_id: String) -> Dictionary:
+	var raw := line(line_id)
+	if not raw.has("speaker"):
+		return raw.duplicate(true)
+	var result := _resolve(raw, raw.speaker, line_id)
+	var replies: Array = []
+	for reply: Dictionary in raw.get("replies", []):
+		if reply.get("english", false) or not reply.has("vi"):
+			replies.append(reply.duplicate(true))
+		else:
+			replies.append(_resolve(reply, raw.speaker, VoiceClips.reply_id(line_id, str(reply.get("id", "")))))
+	if raw.has("replies"):
+		result.replies = replies
+	return result
+
+
+func _resolve(item: Dictionary, speaker_id: String, clip_id: String) -> Dictionary:
+	var resolved_words := words(speaker_id)
+	var result := Address.resolve_line(address, item, resolved_words)
+	var fields := Address.line_fields(item)
+	result.clip = VoiceClips.variant_id(clip_id, Address.key(resolved_words, fields))
+	result.words = resolved_words
+	result.fields = fields
+	if result.has("en"):
+		result.en = names(str(result.en))
+	return result
+
+
+## The text with "{name.ID}" replaced by the display name of each person (R8).
+func names(text: String) -> String:
+	var result := text
+	if result.contains("{name."):
+		for person_id: String in address.get("people", {}):
+			result = result.replace("{name.%s}" % person_id, display_name(person_id))
+	return result
+
+
+## A text of the messages: the display names (R8), and the forms of address
+## of cô Nga (the sender of the messages).
+func person_text(text: String) -> String:
+	var result := names(text)
+	var nga := str(sender().get("speaker", ""))
+	if nga != "" and result.contains("{"):
+		var resolved_words := words(nga)
+		result = Address.fill_english(address, Address.fill(result, resolved_words), resolved_words)
+	return result
 
 
 func message_list() -> Array:

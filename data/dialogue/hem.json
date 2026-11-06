@@ -1,49 +1,56 @@
 {
-	"note": "The spoken lines of the hẻm (plan 0003, R1). A line with a speaker is speech: \"vi\" is the subtitle, \"en\" is the meaning in the Listen app, and \"say\" (optional) is the text that the voice reads. A line without a speaker is a description for the Lens app (\"text\"). \"replies\" are the phrasebook answers, \"actions\" are the answers by an action in the world, and \"then\" is the next line of the same talk.",
+	"note": "The spoken lines of the hẻm (plan 0003, R1). A line with a speaker is speech: \"vi\" is the subtitle, \"en\" is the meaning in the Listen app, and \"say\" (optional) is the text that the voice reads. A line without a speaker is a description for the Lens app (\"text\"). \"replies\" are the phrasebook answers, \"actions\" are the answers by an action in the world, and \"then\" is the next line of the same talk. Plan 0007 (R9, R10): \"{you}\", \"{me}\", \"{them}\", and \"{self}\" are the forms of address of data/address.json (\"{You}\" and the other capital letter forms at the start of a sentence), and \"{dear}\" in \"en\" is \"dear\" for \"con\" and \"cháu\". \"variants\" is a list of other texts for some words: the first variant whose \"when\" agrees replaces \"vi\" (and \"say\" or \"en\").",
 	"speakers": {
 		"batu": {
 			"name": "Bà Tư",
 			"color": "#2C7A6E",
-			"address": "bà",
 			"call_after": "batu.call_after"
 		},
 		"cosau": {
 			"name": "Cô Sáu",
 			"color": "#C4362C",
-			"address": "cô",
 			"call_after": "cosau.call_after"
 		},
 		"bacha": {
 			"name": "Bác Hà",
 			"color": "#1F4A3C",
-			"address": "bác",
 			"call_after": "bacha.call_after"
 		},
 		"cout": {
 			"name": "Cô Út",
-			"color": "#2E6B3A",
-			"address": "cô"
+			"color": "#2E6B3A"
 		},
 		"nga": {
 			"name": "Cô Nga",
 			"color": "#8A5A34",
-			"address": "cô",
 			"call_after": "nga.call_after"
 		},
 		"chubay": {
 			"name": "Chú Bảy",
-			"color": "#3F5F8A",
-			"address": "chú"
+			"color": "#3F5F8A"
 		},
 		"chuchin": {
 			"name": "Chú Chín",
-			"color": "#6B4A8A",
-			"address": "chú"
+			"color": "#6B4A8A"
 		}
 	},
 	"say_again": {
-		"vi": "Dạ, {address} nói lại được không ạ?",
+		"vi": "Dạ, {them} nói lại được không ạ?",
 		"en": "Could you say that again, please?",
+		"variants": [
+			{
+				"when": {
+					"them": "em"
+				},
+				"vi": "{Them} nói lại được không?"
+			},
+			{
+				"when": {
+					"them": "con"
+				},
+				"vi": "{Them} nói lại được không?"
+			}
+		],
 		"status": "check"
 	},
 	"strings": {
@@ -54,15 +61,29 @@
 	"lines": {
 		"batu.intro": {
 			"speaker": "batu",
-			"vi": "Bà là bà Tư đó con.",
-			"en": "I'm Bà Tư, dear.",
+			"vi": "{Me} là {me} Tư đó {you}.",
+			"en": "I'm {name.batu}, {dear}.",
+			"variants": [
+				{
+					"when": {
+						"me": "tui"
+					},
+					"vi": "Tui là Tư đó {you}."
+				},
+				{
+					"when": {
+						"me": "em"
+					},
+					"vi": "Em là Tư đó {you}."
+				}
+			],
 			"introduces": "batu",
 			"status": "check"
 		},
 		"batu.greet": {
 			"speaker": "batu",
-			"vi": "Ủa, con dậy rồi hả? Ăn sáng chưa con?",
-			"en": "Oh, you're up? Have you had breakfast yet, dear?",
+			"vi": "Ủa, {you} dậy rồi hả? Ăn sáng chưa {you}?",
+			"en": "Oh, you're up? Have you had breakfast yet, {dear}?",
 			"status": "check",
 			"replies": [
 				{
@@ -94,8 +115,8 @@
 		},
 		"batu.reply_chua_said": {
 			"speaker": "batu",
-			"vi": "Trời, con nói tiếng Việt giỏi quá! Qua Cô Sáu ăn tô phở đi con, kẻo hết.",
-			"en": "My, your Vietnamese is so good! Go have a bowl of phở at Cô Sáu's, dear, before it runs out.",
+			"vi": "Trời, {you} nói tiếng Việt giỏi quá! Qua Cô Sáu ăn tô phở đi {you}, kẻo hết.",
+			"en": "My, your Vietnamese is so good! Go have a bowl of phở at Cô Sáu's, {dear}, before it runs out.",
 			"voice_style": "[cười]",
 			"status": "check"
 		},
@@ -107,26 +128,48 @@
 		},
 		"batu.call_after": {
 			"speaker": "batu",
-			"vi": "Đi đâu đó con? Nhớ ăn sáng nghen!",
-			"en": "Where are you off to, dear? Remember to eat breakfast!",
+			"vi": "Đi đâu đó {you}? Nhớ ăn sáng nghen!",
+			"en": "Where are you off to, {dear}? Remember to eat breakfast!",
 			"status": "check"
 		},
 		"cosau.intro": {
 			"speaker": "cosau",
-			"vi": "Cô là Cô Sáu, bán phở ở đây nè.",
-			"en": "I'm Cô Sáu. I sell phở here.",
+			"vi": "{Me} là {me} Sáu, bán phở ở đây nè.",
+			"en": "I'm {name.cosau}. I sell phở here.",
+			"variants": [
+				{
+					"when": {
+						"me": "tui"
+					},
+					"vi": "Tui là Sáu, bán phở ở đây nè."
+				},
+				{
+					"when": {
+						"me": "em"
+					},
+					"vi": "Em là Sáu, bán phở ở đây nè."
+				}
+			],
 			"introduces": "cosau",
 			"status": "check"
 		},
 		"cosau.closed_before": {
 			"speaker": "cosau",
-			"vi": "Chưa mở con ơi, chút nữa nghen.",
-			"en": "Not open yet, dear. A little later, okay?",
+			"vi": "Chưa mở {you} ơi, chút nữa nghen.",
+			"en": "Not open yet, {dear}. A little later, okay?",
 			"status": "check",
 			"replies": [
 				{
 					"id": "da",
-					"vi": "Dạ, con đợi.",
+					"vi": "Dạ, {self} đợi.",
+					"variants": [
+						{
+							"when": {
+								"them": "em"
+							},
+							"vi": "Ừ, {self} đợi."
+						}
+					],
 					"en": "Okay, I'll wait.",
 					"next": "cosau.wait"
 				}
@@ -136,17 +179,33 @@
 			"speaker": "cosau",
 			"vi": "Ừ, năm giờ rưỡi mở nghen.",
 			"en": "Mm, we open at half past five.",
+			"variants": [
+				{
+					"when": {
+						"me": "em"
+					},
+					"vi": "Dạ, năm giờ rưỡi mở nghen {you}."
+				}
+			],
 			"status": "check"
 		},
 		"cosau.open": {
 			"speaker": "cosau",
-			"vi": "Vô đây con, ngồi đi!",
-			"en": "Come in, dear, sit down!",
+			"vi": "Vô đây {you}, ngồi đi!",
+			"en": "Come in, {dear}, sit down!",
 			"status": "check",
 			"replies": [
 				{
 					"id": "cam_on",
-					"vi": "Dạ, con cảm ơn cô.",
+					"vi": "Dạ, {self} cảm ơn {them}.",
+					"variants": [
+						{
+							"when": {
+								"them": "em"
+							},
+							"vi": "Cảm ơn {them}."
+						}
+					],
 					"en": "Thank you.",
 					"next": "cosau.thanks",
 					"next_said": "cosau.thanks_said"
@@ -169,14 +228,22 @@
 		},
 		"cosau.thanks": {
 			"speaker": "cosau",
-			"vi": "Ừ, ngồi chơi đi con.",
-			"en": "Sure, sit and relax, dear.",
+			"vi": "Ừ, ngồi chơi đi {you}.",
+			"en": "Sure, sit and relax, {dear}.",
+			"variants": [
+				{
+					"when": {
+						"me": "em"
+					},
+					"vi": "Dạ, ngồi chơi đi {you}."
+				}
+			],
 			"status": "check"
 		},
 		"cosau.thanks_said": {
 			"speaker": "cosau",
-			"vi": "Trời ơi, dễ thương quá! Ngồi đi con.",
-			"en": "Oh my, how sweet! Sit down, dear.",
+			"vi": "Trời ơi, dễ thương quá! Ngồi đi {you}.",
+			"en": "Oh my, how sweet! Sit down, {dear}.",
 			"voice_style": "[cười]",
 			"status": "check"
 		},
@@ -188,38 +255,60 @@
 		},
 		"cosau.sit": {
 			"speaker": "cosau",
-			"vi": "Đó, ngồi đó đi con.",
-			"en": "There, sit right there, dear.",
+			"vi": "Đó, ngồi đó đi {you}.",
+			"en": "There, sit right there, {dear}.",
 			"status": "check"
 		},
 		"cosau.sold_out": {
 			"speaker": "cosau",
-			"vi": "Hết rồi con ơi! Sáng mai đi sớm sớm nghen.",
-			"en": "It's all gone, dear! Come early tomorrow morning, okay?",
+			"vi": "Hết rồi {you} ơi! Sáng mai đi sớm sớm nghen.",
+			"en": "It's all gone, {dear}! Come early tomorrow morning, okay?",
 			"status": "check"
 		},
 		"cosau.call_after": {
 			"speaker": "cosau",
-			"vi": "Ủa, đi đâu vậy con?",
-			"en": "Oh, where are you going, dear?",
+			"vi": "Ủa, đi đâu vậy {you}?",
+			"en": "Oh, where are you going, {dear}?",
 			"status": "check"
 		},
 		"bacha.intro": {
 			"speaker": "bacha",
-			"vi": "Bác là bác Hà, bác nấu phở Bắc.",
-			"en": "I'm Bác Hà. I cook Northern phở.",
+			"vi": "{Me} là {me} Hà, {me} nấu phở Bắc.",
+			"en": "I'm {name.bacha}. I cook Northern phở.",
+			"variants": [
+				{
+					"when": {
+						"me": "tôi"
+					},
+					"vi": "Tôi là Hà, tôi nấu phở Bắc."
+				},
+				{
+					"when": {
+						"me": "em"
+					},
+					"vi": "Em là Hà, em nấu phở Bắc."
+				}
+			],
 			"introduces": "bacha",
 			"status": "check"
 		},
 		"bacha.open": {
 			"speaker": "bacha",
-			"vi": "Mời cháu vào ăn phở!",
+			"vi": "Mời {you} vào ăn phở!",
 			"en": "Please come in and have some phở!",
 			"status": "source",
 			"replies": [
 				{
 					"id": "cam_on",
-					"vi": "Dạ, cháu cảm ơn bác.",
+					"vi": "Dạ, {self} cảm ơn {them}.",
+					"variants": [
+						{
+							"when": {
+								"them": "em"
+							},
+							"vi": "Cảm ơn {them}."
+						}
+					],
 					"en": "Thank you.",
 					"next": "bacha.thanks"
 				},
@@ -233,38 +322,38 @@
 		},
 		"bacha.thanks": {
 			"speaker": "bacha",
-			"vi": "Cháu cứ tự nhiên nhé.",
+			"vi": "{You} cứ tự nhiên nhé.",
 			"en": "Make yourself at home.",
 			"status": "check"
 		},
 		"bacha.english": {
 			"speaker": "bacha",
-			"vi": "Welcome, welcome! Mời cháu ngồi.",
+			"vi": "Welcome, welcome! Mời {you} ngồi.",
 			"en": "Welcome! Please sit down.",
 			"status": "check"
 		},
 		"bacha.call_after": {
 			"speaker": "bacha",
-			"vi": "Cháu đi đâu đấy?",
+			"vi": "{You} đi đâu đấy?",
 			"en": "Where are you going?",
 			"status": "check"
 		},
 		"cout.intro": {
 			"speaker": "cout",
-			"vi": "Bánh khọt Cô Út đây anh!",
+			"vi": "Bánh khọt Cô Út đây {you}!",
 			"en": "This is Cô Út's bánh khọt!",
 			"introduces": "cout",
 			"status": "check"
 		},
 		"cout.call": {
 			"speaker": "cout",
-			"vi": "Bánh khọt nè! Ăn thử đi anh!",
+			"vi": "Bánh khọt nè! Ăn thử đi {you}!",
 			"en": "Bánh khọt here! Try some!",
 			"status": "confirmed"
 		},
 		"nga.hello": {
 			"speaker": "nga",
-			"vi": "Con đi chơi vui không? Có gì cứ nhắn cô nghen.",
+			"vi": "{You} đi chơi vui không? Có gì cứ nhắn {me} nghen.",
 			"en": "Are you having fun? If you need anything, just send me a message.",
 			"status": "check",
 			"replies": [
@@ -285,27 +374,27 @@
 		},
 		"nga.glad": {
 			"speaker": "nga",
-			"vi": "Vậy là cô mừng rồi.",
+			"vi": "Vậy là {me} mừng rồi.",
 			"en": "Then I'm happy.",
 			"status": "check"
 		},
 		"nga.glad_said": {
 			"speaker": "nga",
-			"vi": "Ui, con nói giỏi ghê! Cô mừng lắm.",
+			"vi": "Ui, {you} nói giỏi ghê! {Me} mừng lắm.",
 			"en": "Oh, you speak so well! I'm so glad.",
 			"voice_style": "[cười]",
 			"status": "check"
 		},
 		"nga.english": {
 			"speaker": "nga",
-			"vi": "Good, good! Đi chơi vui nghen con.",
-			"en": "Good, good! Have fun out there, dear.",
+			"vi": "Good, good! Đi chơi vui nghen {you}.",
+			"en": "Good, good! Have fun out there, {dear}.",
 			"status": "check"
 		},
 		"nga.call_after": {
 			"speaker": "nga",
-			"vi": "Đi cẩn thận nghen con!",
-			"en": "Take care out there, dear!",
+			"vi": "Đi cẩn thận nghen {you}!",
+			"en": "Take care out there, {dear}!",
 			"status": "check"
 		},
 		"coc.talk.1": {
@@ -376,23 +465,23 @@
 			"status": "check"
 		},
 		"spot.home.look": {
-			"text": "Bà Tư's homestay. Your room upstairs has a fan and a window over the hẻm. From the kitchen comes the smell of nước mắm and something frying.",
+			"text": "{name.batu}'s homestay. Your room upstairs has a fan and a window over the hẻm. From the kitchen comes the smell of nước mắm and something frying.",
 			"status": "confirmed"
 		},
 		"spot.pho.closed_before": {
-			"text": "The shutter is half up. Cô Sáu is tending the pot.",
+			"text": "The shutter is half up. {name.cosau} is tending the pot.",
 			"status": "check"
 		},
 		"spot.pho.open": {
-			"text": "Steam rises from the big pot. Cô Sáu waves people to the low tables.",
+			"text": "Steam rises from the big pot. {name.cosau} waves people to the low tables.",
 			"status": "check"
 		},
 		"spot.pho.sold_out": {
-			"text": "Cô Sáu is washing the last bowls. The pot is empty.",
+			"text": "{name.cosau} is washing the last bowls. The pot is empty.",
 			"status": "check"
 		},
 		"spot.pho.closed_after": {
-			"text": "The shutter is down. Cô Sáu sells phở in the morning only, from {open} until it runs out.",
+			"text": "The shutter is down. {name.cosau} sells phở in the morning only, from {open} until it runs out.",
 			"status": "check"
 		},
 		"spot.banhmi.look": {
@@ -408,11 +497,11 @@
 			"status": "check"
 		},
 		"spot.bac.look": {
-			"text": "Bác Hà speaks with a Northern accent. On her table: chili, lime, and garlic vinegar. No bean sprouts. No hoisin.",
+			"text": "{name.bacha} speaks with a Northern accent. On her table: chili, lime, and garlic vinegar. No bean sprouts. No hoisin.",
 			"status": "source"
 		},
 		"spot.bac.closed": {
-			"text": "Shutter down. Bác Hà sells in the morning only.",
+			"text": "Shutter down. {name.bacha} sells in the morning only.",
 			"status": "check"
 		},
 		"spot.mia.look": {
@@ -420,11 +509,11 @@
 			"status": "source"
 		},
 		"spot.banhkhot.look": {
-			"text": "Cô Út pours rice batter into a hot mold full of little cups, drops a shrimp in each, and covers it. They come out crispy and yellow, one bite each. At the table: lettuce, herbs, and a bowl of nước mắm.",
+			"text": "{name.cout} pours rice batter into a hot mold full of little cups, drops a shrimp in each, and covers it. They come out crispy and yellow, one bite each. At the table: lettuce, herbs, and a bowl of nước mắm.",
 			"status": "source"
 		},
 		"spot.banhkhot.closed": {
-			"text": "Shutter down. Cô Út starts the fire at {open} in the morning.",
+			"text": "Shutter down. {name.cout} starts the fire at {open} in the morning.",
 			"status": "check"
 		},
 		"spot.hvl.look": {

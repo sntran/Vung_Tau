@@ -25,6 +25,11 @@ func refresh(state: Dictionary) -> void:
 	if messages.is_empty():
 		_column.add_child(PhoneUi.label(Content.ui_text("messages_empty"), "Hint"))
 		return
+	var passport: Dictionary = state.get("passport", {})
+	var buttons := {}
+	for data: Dictionary in Content.message_list():
+		if data.has("button"):
+			buttons[data.id] = data.button
 	for i in messages.size():
 		var message: Dictionary = messages[i]
 		var bubble := PhoneUi.card()
@@ -35,6 +40,17 @@ func refresh(state: Dictionary) -> void:
 		box.add_child(PhoneUi.label("%s · %s" % [Content.format(Content.ui_text("clock_day"), {"day": message.day}),
 				GameClock.format_time(int(message.minutes))], "Hint"))
 		box.add_child(PhoneUi.label(message.text))
+		if message.get("from", "") == "me":
+			# The photo of the passport that the traveler sent (plan 0007, R3).
+			bubble.size_flags_horizontal = Control.SIZE_SHRINK_END
+			bubble.custom_minimum_size.x = 300
+			box.add_child(PassportApp.page(passport))
+		elif buttons.get(message.id, "") == "passport" and not bool(passport.get("sent", false)):
+			# The button of the first message opens the Passport app (R2).
+			var open := PhoneUi.button("message.%s.passport" % message.id, Content.ui_text("messages_passport_button"),
+					"", "PrimaryButton")
+			open.pressed.connect(func() -> void: phone.open_app("passport"))
+			box.add_child(open)
 		_column.add_child(bubble)
 	# Show the newest message.
 	(func() -> void: scroll_vertical = int(get_v_scroll_bar().max_value)).call_deferred()

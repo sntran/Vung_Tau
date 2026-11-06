@@ -12,6 +12,10 @@ person, a phrase of the phrasebook (the neutral phone voice), or the "say
 again" phrase for each person. A file is made again only when its hash
 changes: the hash is from the text that the voice reads, the voice, and the
 model version. The game checks the same hash (autoload/content.gd).
+
+A line with a form of address (plan 0007, R11) has one clip for each variant
+that the rules of data/address.json can make for its speaker: "LINE@KEY",
+where KEY is the resolved words (address.key()).
 """
 
 import argparse
@@ -24,8 +28,12 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import address  # noqa: E402
+
 DIALOGUE = ROOT / "data" / "dialogue"
 VOICES = ROOT / "data" / "voices.json"
+ADDRESS = ROOT / "data" / "address.json"
 OUT = ROOT / "assets" / "voices"
 SAMPLE_RATE = 48000
 LOUDNESS_LUFS = -16.0
@@ -66,28 +74,46 @@ def spoken_text(line: dict) -> str:
     return f"{style} {text}" if style else text
 
 
-def collect_clips(dialogue: dict, voices: dict) -> list[dict]:
+def variant_clips(clip_id: str, item: dict, speaker_id: str, rules: dict, voice: str, styled: bool) -> list[dict]:
+    """The clips of the variants of a line, a reply, or the "say again" phrase for the speaker (R11).
+    The same list and order as VoiceClips._add_variants() in the game."""
+    fields = address.line_fields(item)
+    if not fields:
+        return [{"id": clip_id, "text": spoken_text(item) if styled else item["vi"], "voice": voice}]
+    clips, seen = [], set()
+    for words in address.all_words(rules, speaker_id):
+        key = address.key(words, fields)
+        if key in seen:
+            continue
+        seen.add(key)
+        resolved = address.resolve_line(rules, item, words)
+        clips.append({"id": f"{clip_id}@{key}", "text": spoken_text(resolved) if styled else resolved["vi"],
+                      "voice": voice})
+    return clips
+
+
+def collect_clips(dialogue: dict, voices: dict, rules: dict) -> list[dict]:
     """All clips of one dialogue file. Each clip has an ID, the text, and the voice."""
     clips = []
-    speakers = dialogue["speakers"]
     for line_id, line in dialogue["lines"].items():
         if "speaker" not in line:
             continue
-        clips.append({"id": line_id, "text": spoken_text(line), "voice": voices["speakers"][line["speaker"]]})
+        clips += variant_clips(line_id, line, line["speaker"], rules, voices["speakers"][line["speaker"]], True)
         for reply in line.get("replies", []):
             if not reply.get("english", False):
-                clips.append({"id": f"reply.{line_id}.{reply['id']}", "text": reply["vi"], "voice": voices["phone"]})
-    template = dialogue["say_again"]["vi"]
-    for speaker_id, speaker in speakers.items():
-        clips.append({"id": f"say_again.{speaker_id}", "text": template.replace("{address}", speaker["address"]),
-                      "voice": voices["phone"]})
+                clips += variant_clips(f"reply.{line_id}.{reply['id']}", reply, line["speaker"], rules,
+                                       voices["phone"], False)
+    for speaker_id in dialogue["speakers"]:
+        clips += variant_clips(f"say_again.{speaker_id}", dialogue["say_again"], speaker_id, rules,
+                               voices["phone"], False)
     return clips
 
 
 def all_clips(voices: dict) -> list[dict]:
+    rules = load_json(ADDRESS)
     clips = []
     for path in sorted(DIALOGUE.glob("*.json")):
-        clips += collect_clips(load_json(path), voices)
+        clips += collect_clips(load_json(path), voices, rules)
     return clips
 
 
@@ -165,22 +191,36 @@ def build(check_only: bool) -> int:
     manifest_path = OUT / "manifest.json"
     old = load_json(manifest_path)["clips"] if manifest_path.exists() else {}
     todo = []
+    # A clip with a new ID and the hash of an old clip (for example a line
+    # that got a form of address, plan 0007) takes a copy of the old file.
+    by_hash = {entry["hash"]: entry for entry in old.values() if (OUT / entry["file"]).exists()}
+    copies = {}
     for clip in clips:
         clip["hash"] = clip_hash(clip["text"], clip["voice"], model)
         entry = old.get(clip["id"])
         if entry is None or entry["hash"] != clip["hash"] or not (OUT / entry["file"]).exists():
-            todo.append(clip)
-    log(f"{len(clips)} clips, {len(todo)} to make")
+            if clip["hash"] in by_hash:
+                copies[clip["id"]] = by_hash[clip["hash"]]
+            else:
+                todo.append(clip)
+    log(f"{len(clips)} clips, {len(todo)} to make, {len(copies)} to copy")
     if check_only:
         for clip in todo:
             log(f"missing or changed: {clip['id']}")
-        return 1 if todo else 0
+        for clip_id in copies:
+            log(f"missing: {clip_id}")
+        return 1 if todo or copies else 0
     OUT.mkdir(parents=True, exist_ok=True)
     tts = load_tts() if todo else None
     entries = {}
     for clip in clips:
         file = f"{clip['id']}.ogg"
-        if clip in todo:
+        if clip["id"] in copies:
+            source = copies[clip["id"]]
+            shutil.copyfile(OUT / source["file"], OUT / file)
+            duration = source["duration_s"]
+            log(f"{clip['id']}: a copy of {source['file']}")
+        elif clip in todo:
             started = time.time()
             wav = make_audio(tts, clip["text"], clip["voice"], clip["hash"])
             soundfile.write(OUT / file, wav, SAMPLE_RATE, format="OGG", subtype="VORBIS")
@@ -217,6 +257,7 @@ def audition(folder: Path) -> None:
     tts = load_tts()
     dialogue = load_json(DIALOGUE / "hem.json")
     voices = load_json(VOICES)
+    rules = load_json(ADDRESS)
     if folder.exists():
         shutil.rmtree(folder)
     folder.mkdir(parents=True)
@@ -230,6 +271,8 @@ def audition(folder: Path) -> None:
         files = []
         for k, line_id in enumerate(AUDITION_LINES):
             line = dialogue["lines"][line_id]
+            # The audition reads the words for the default traveler (plan 0007, R4).
+            line = address.resolve_line(rules, line, address.words(rules, line["speaker"], rules["traveler"]["default"]))
             text = spoken_text(line)
             wav = make_audio(tts, text, name, clip_hash(text, name, model_version(voices)))
             file = f"{len(rows[region]) + 1:02d}_{region}_{k + 1}.mp3"

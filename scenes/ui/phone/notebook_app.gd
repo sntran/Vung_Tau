@@ -52,8 +52,8 @@ func _card(card: Dictionary, known: bool) -> Control:
 		title.add_theme_font_override("font", UiTheme.FONT_BOLD)
 		box.add_child(title)
 		box.add_child(PhoneUi.label(card.vi, "Vietnamese"))
-		box.add_child(PhoneUi.label(card.body))
+		box.add_child(PhoneUi.label(Content.names(card.body)))
 	else:
 		box.add_child(PhoneUi.label(Content.ui_text("notebook_locked")))
-		box.add_child(PhoneUi.label(Content.format(Content.ui_text("notebook_hint"), {"hint": card.hint}), "Hint"))
+		box.add_child(PhoneUi.label(Content.format(Content.ui_text("notebook_hint"), {"hint": Content.names(card.hint)}), "Hint"))
 	return panel

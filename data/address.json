@@ -1,10 +1,13 @@
 {
 	"note": "The forms of address (plan 0007, R6 to R9). For each pair of a person (the speaker ID) and the traveler: \"you\" is what the person calls the traveler, \"me\" what the person calls themself, \"them\" what the traveler calls the person, and \"self\" what the traveler calls themself. The first rule that agrees with the pair gives the words. A rule can have a \"person\", a \"role\", a \"min\" and a \"max\" of the age difference (the person minus the traveler), and a \"min_person_age\", \"max_person_age\", \"min_traveler_age\", or \"max_traveler_age\". A value is a word, or a word class of \"classes\": a class gives the word by the gender or the region of the person or of the traveler. A person can replace a class with a word of their own (for example \"elder\": \"bác\"). The ages of the people come from plan 0006, R3.",
 	"status": "check",
+	"card": "xungHo",
 	"traveler": {
+		"note": "R4: until the player sends the passport, people use the default traveler. R1, R3: the first values of the passport page (the birth date gives the age 30 on day 1, 22 January 2019). The number is a made-up number with no real format.",
 		"default": {"gender": "male", "age": 30},
 		"min_age": 18,
-		"max_age": 80
+		"max_age": 80,
+		"passport": {"given": "Alex", "family": "Morgan", "nationality": "United States of America", "gender": "male", "birth": "1988-06-15", "number": "X04817263"}
 	},
 	"classes": {
 		"child": {"by": "person_region", "south": "con", "north": "cháu"},
