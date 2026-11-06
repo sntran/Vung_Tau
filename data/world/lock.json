@@ -1,0 +1,18 @@
+{
+	"world": {
+		"commit": "9dae4538d6af6fccc64cac6f9e1c7d0b081ddcf2",
+		"repository": "https://github.com/sntran/World"
+	},
+	"models": {
+		"scooter_tay_ga_1": {
+			"hash": "176593c8c18de6bff70b0189e26ee31a",
+			"files": {
+				"scooter_tay_ga_1.far.glb": "c4a23a25ce0edefb5f20970c5f4e63568a3fb87c029317a55ef62a771689e02a",
+				"scooter_tay_ga_1.glb": "6230e1f95c428279caadba5e7fdf8d102160c522f587ce9c776e1a14c2f777b7",
+				"scooter_tay_ga_1.mid.glb": "259e91b2d8e1aabf61ca196976106b7b22df6a3a8e8a75feac88b19e4bebbb6c",
+				"scooter_tay_ga_1.parts.json": "22f67aff87fd5f979b67a44627ef6174eeec3ca8e74930a8b1285448081abda9",
+				"scooter_tay_ga_1.receipt.json": "f83c128a23598a101a8331a57f00fd2f821f1494aa5fb465bc68a8cbbfbbd436"
+			}
+		}
+	}
+}

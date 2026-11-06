@@ -1,0 +1,13 @@
+{
+	"note": "The models of World in the game (plan 0023, R1). Each entry: \"id\" is the name in the game, \"order\" is the order of World (World docs/factory.md), \"levels\" are the levels that the game uses, \"impostor\" is true for a model in rows and crowds (D5, R8), \"uses\" are the plans and the places, and \"catalog\" is the ID of the catalog of plan 0023, section 9. tools/world/fetch.py gets the files to assets/world/, and data/world/lock.json pins them.",
+	"models": [
+		{
+			"id": "scooter_tay_ga_1",
+			"order": {"blueprint": "catalog", "options": {"name": "honda_vision_110"}},
+			"levels": ["near", "mid", "far"],
+			"impostor": true,
+			"uses": "Plan 0023, R9a: the parked scooters of the test street and of the Vũng Tàu world. Plans 0009 and 0018.",
+			"catalog": "V1"
+		}
+	]
+}

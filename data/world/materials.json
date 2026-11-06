@@ -1,0 +1,473 @@
+{
+	"note": "The materials of the game for the material roles of World (plan 0023, D3, R6). \"materials\" are the materials of the game: \"color\" (sRGB), \"roughness\", \"metallic\", \"alpha\" (a transparent material), \"paint\" (the model gives the color: a MultiMesh instance color, or the paint of WorldModel), \"texture\" (keep the color texture of the GLB, as the skin and the clothes of people), \"vertex_mean\" (keep the color of the GLB material), and \"hidden\" (no mesh). \"roles\" gives the material of each role, and \"patterns\" the material of each role that agrees with a pattern. A role with no material stops the load of the model with an error. The first values are the values of the World palette (priv/palette.json at the commit of the lock).",
+	"status": "check",
+	"materials": {
+		"aluminum": {
+			"color": "#C4C8CC",
+			"roughness": 0.5,
+			"metallic": 0.5,
+			"note": "With a metallic value of 1, the belt case showed the blue of the sky on Low (PT-56)."
+		},
+		"asphalt": {
+			"color": "#3A3C3E",
+			"roughness": 0.95,
+			"metallic": 0.0
+		},
+		"bamboo": {
+			"color": "#C4A868",
+			"roughness": 0.55,
+			"metallic": 0.0
+		},
+		"bark": {
+			"color": "#766656",
+			"roughness": 0.9,
+			"metallic": 0.0
+		},
+		"black": {
+			"color": "#1F2328",
+			"roughness": 0.6,
+			"metallic": 0.0
+		},
+		"blue": {
+			"color": "#1056A0",
+			"roughness": 0.45,
+			"metallic": 0.0
+		},
+		"brick": {
+			"color": "#A64E36",
+			"roughness": 0.9,
+			"metallic": 0.0
+		},
+		"brick_ong": {
+			"color": "#B2583C",
+			"roughness": 0.92,
+			"metallic": 0.0
+		},
+		"chrome": {
+			"color": "#E4E6E8",
+			"roughness": 0.08,
+			"metallic": 1.0
+		},
+		"cloth": {
+			"color": "#818CF8",
+			"roughness": 0.95,
+			"metallic": 0.0
+		},
+		"concrete": {
+			"color": "#A09E98",
+			"roughness": 0.95,
+			"metallic": 0.0
+		},
+		"copper": {
+			"color": "#C97B43",
+			"roughness": 0.35,
+			"metallic": 1.0
+		},
+		"dark": {
+			"color": "#3A3F47",
+			"roughness": 0.6,
+			"metallic": 0.0
+		},
+		"eps": {
+			"color": "#ECECE4",
+			"roughness": 0.9,
+			"metallic": 0.0
+		},
+		"fabric": {
+			"color": "#60646C",
+			"roughness": 0.95,
+			"metallic": 0.0
+		},
+		"glass": {
+			"color": "#A5D8F3",
+			"roughness": 0.05,
+			"metallic": 0.0,
+			"alpha": 0.35
+		},
+		"glass_amber": {
+			"color": "#703810",
+			"roughness": 0.05,
+			"metallic": 0.0,
+			"alpha": 0.75
+		},
+		"glass_dark": {
+			"color": "#27313D",
+			"roughness": 0.05,
+			"metallic": 0.0,
+			"alpha": 0.85
+		},
+		"gray": {
+			"color": "#96928C",
+			"roughness": 0.55,
+			"metallic": 0.0
+		},
+		"ground": {
+			"color": "#968C74",
+			"roughness": 1.0,
+			"metallic": 0.0
+		},
+		"hair": {
+			"color": "#1C1816",
+			"roughness": 0.7,
+			"metallic": 0.0
+		},
+		"hidden": {
+			"hidden": true,
+			"note": "No mesh shows: the collision boxes of a house (the role collision, the nodes NAME-colonly)."
+		},
+		"iron": {
+			"color": "#343638",
+			"roughness": 0.55,
+			"metallic": 0.3
+		},
+		"leaf": {
+			"color": "#4A7034",
+			"roughness": 0.7,
+			"metallic": 0.0
+		},
+		"light_back": {
+			"color": "#D62828",
+			"roughness": 0.2,
+			"metallic": 0.0
+		},
+		"light_front": {
+			"color": "#FAF8EB",
+			"roughness": 0.1,
+			"metallic": 0.0
+		},
+		"metal": {
+			"color": "#7B828C",
+			"roughness": 0.45,
+			"metallic": 1.0
+		},
+		"metal_shutter": {
+			"color": "#969CA0",
+			"roughness": 0.5,
+			"metallic": 0.6
+		},
+		"mortar": {
+			"color": "#CCC7BE",
+			"roughness": 0.95,
+			"metallic": 0.0
+		},
+		"orange": {
+			"color": "#EC7018",
+			"roughness": 0.5,
+			"metallic": 0.0
+		},
+		"paint": {
+			"color": "#FFFFFF",
+			"roughness": 0.3,
+			"metallic": 0.1,
+			"paint": true,
+			"note": "The color of the thing: each model gives its paint color (data/world/palette.json for the scooters)."
+		},
+		"person_clothes": {
+			"texture": true,
+			"color": "#FFFFFF",
+			"roughness": 0.95,
+			"metallic": 0.0
+		},
+		"person_color": {
+			"vertex_mean": true,
+			"color": "#FFFFFF",
+			"roughness": 0.95,
+			"metallic": 0.0,
+			"note": "The mean color of an asset at the mid and far levels: the color of the material of the GLB."
+		},
+		"person_eyebrows": {
+			"texture": true,
+			"color": "#FFFFFF",
+			"roughness": 0.8,
+			"metallic": 0.0
+		},
+		"person_eyelashes": {
+			"texture": true,
+			"color": "#FFFFFF",
+			"roughness": 0.8,
+			"metallic": 0.0
+		},
+		"person_eyes": {
+			"texture": true,
+			"color": "#FFFFFF",
+			"roughness": 0.1,
+			"metallic": 0.0
+		},
+		"person_hole": {
+			"color": "#1A1010",
+			"roughness": 1.0,
+			"metallic": 0.0
+		},
+		"person_skin": {
+			"texture": true,
+			"color": "#FFFFFF",
+			"roughness": 0.6,
+			"metallic": 0.0
+		},
+		"person_teeth": {
+			"texture": true,
+			"color": "#F2EEE4",
+			"roughness": 0.3,
+			"metallic": 0.0
+		},
+		"person_tongue": {
+			"texture": true,
+			"color": "#B85A5A",
+			"roughness": 0.5,
+			"metallic": 0.0
+		},
+		"plaster": {
+			"color": "#E0D8C6",
+			"roughness": 0.9,
+			"metallic": 0.0
+		},
+		"plastic": {
+			"color": "#D2D4D7",
+			"roughness": 0.5,
+			"metallic": 0.0
+		},
+		"plywood": {
+			"color": "#DEBA8C",
+			"roughness": 0.85,
+			"metallic": 0.0
+		},
+		"porcelain": {
+			"color": "#F0EEE6",
+			"roughness": 0.12,
+			"metallic": 0.0
+		},
+		"red": {
+			"color": "#C42024",
+			"roughness": 0.45,
+			"metallic": 0.0
+		},
+		"rim": {
+			"color": "#3A3D42",
+			"roughness": 0.35,
+			"metallic": 0.8
+		},
+		"roof_clay": {
+			"color": "#AA5232",
+			"roughness": 0.85,
+			"metallic": 0.0
+		},
+		"roof_corrugated": {
+			"color": "#607082",
+			"roughness": 0.45,
+			"metallic": 0.5
+		},
+		"roof_metal": {
+			"color": "#58646E",
+			"roughness": 0.4,
+			"metallic": 0.6
+		},
+		"rope": {
+			"color": "#D6C4A0",
+			"roughness": 0.85,
+			"metallic": 0.0
+		},
+		"rubber": {
+			"color": "#242527",
+			"roughness": 0.9,
+			"metallic": 0.0
+		},
+		"screen": {
+			"color": "#0E1014",
+			"roughness": 0.08,
+			"metallic": 0.0
+		},
+		"seat": {
+			"color": "#282422",
+			"roughness": 0.8,
+			"metallic": 0.0
+		},
+		"siding": {
+			"color": "#D6DCD4",
+			"roughness": 0.7,
+			"metallic": 0.0
+		},
+		"skin": {
+			"color": "#C69676",
+			"roughness": 0.6,
+			"metallic": 0.0
+		},
+		"solar_cell": {
+			"color": "#161E3A",
+			"roughness": 0.15,
+			"metallic": 0.3
+		},
+		"stainless": {
+			"color": "#C0C3C6",
+			"roughness": 0.28,
+			"metallic": 1.0
+		},
+		"steel": {
+			"color": "#A8ACB2",
+			"roughness": 0.4,
+			"metallic": 1.0
+		},
+		"terracotta": {
+			"color": "#B05C3A",
+			"roughness": 0.85,
+			"metallic": 0.0
+		},
+		"tile": {
+			"color": "#B05434",
+			"roughness": 0.8,
+			"metallic": 0.0
+		},
+		"tile_granite": {
+			"color": "#928886",
+			"roughness": 0.25,
+			"metallic": 0.0
+		},
+		"tile_pattern": {
+			"color": "#CCC6BA",
+			"roughness": 0.35,
+			"metallic": 0.0
+		},
+		"tire": {
+			"color": "#1E1F21",
+			"roughness": 0.92,
+			"metallic": 0.0
+		},
+		"trim": {
+			"color": "#2C2E32",
+			"roughness": 0.7,
+			"metallic": 0.0
+		},
+		"white": {
+			"color": "#E9ECF0",
+			"roughness": 0.4,
+			"metallic": 0.0
+		},
+		"wood": {
+			"color": "#C08F5C",
+			"roughness": 0.8,
+			"metallic": 0.0
+		}
+	},
+	"roles": {
+		"aluminum": "aluminum",
+		"asphalt": "asphalt",
+		"bamboo": "bamboo",
+		"bark": "bark",
+		"black": "black",
+		"blue": "blue",
+		"brick": "brick",
+		"brick_ong": "brick_ong",
+		"chrome": "chrome",
+		"cloth": "cloth",
+		"collision": "hidden",
+		"concrete": "concrete",
+		"copper": "copper",
+		"dark": "dark",
+		"eps": "eps",
+		"eyebrows": "person_eyebrows",
+		"eyelashes": "person_eyelashes",
+		"eyes": "person_eyes",
+		"fabric": "fabric",
+		"glass": "glass",
+		"glass_amber": "glass_amber",
+		"glass_dark": "glass_dark",
+		"gray": "gray",
+		"ground": "ground",
+		"hair": "hair",
+		"hole": "person_hole",
+		"iron": "iron",
+		"leaf": "leaf",
+		"light_back": "light_back",
+		"light_front": "light_front",
+		"metal": "metal",
+		"metal_shutter": "metal_shutter",
+		"mortar": "mortar",
+		"orange": "orange",
+		"paint": "paint",
+		"plaster": "plaster",
+		"plastic": "plastic",
+		"plywood": "plywood",
+		"porcelain": "porcelain",
+		"red": "red",
+		"rim": "rim",
+		"roof_clay": "roof_clay",
+		"roof_corrugated": "roof_corrugated",
+		"roof_metal": "roof_metal",
+		"rope": "rope",
+		"rubber": "rubber",
+		"screen": "screen",
+		"seat": "seat",
+		"siding": "siding",
+		"skin": "person_skin",
+		"solar_cell": "solar_cell",
+		"stainless": "stainless",
+		"steel": "steel",
+		"teeth": "person_teeth",
+		"terracotta": "terracotta",
+		"tile": "tile",
+		"tile_granite": "tile_granite",
+		"tile_pattern": "tile_pattern",
+		"tire": "tire",
+		"tongue": "person_tongue",
+		"trim": "trim",
+		"white": "white",
+		"wood": "wood"
+	},
+	"patterns": {
+		"clothes_*": "person_clothes",
+		"color_*": "person_color"
+	},
+	"house": {
+		"note": "Plan 0009, R7a: a house of World keeps up to 12 roles. The game merges them into these 6 materials. A role of a house that is not here uses \"roles\".",
+		"materials": {
+			"house_walls": {
+				"color": "#E0D8C6",
+				"roughness": 0.9,
+				"metallic": 0.0,
+				"note": "plaster and brick_ong. Plan 0009 gives it the plaster shader of plan 0004."
+			},
+			"house_front": {
+				"color": "#B4AAA2",
+				"roughness": 0.3,
+				"metallic": 0.0,
+				"note": "tile_granite and tile_pattern."
+			},
+			"house_metal": {
+				"color": "#7C8186",
+				"roughness": 0.5,
+				"metallic": 0.5,
+				"note": "metal_shutter, iron, and aluminum."
+			},
+			"house_roof": {
+				"color": "#9A5A3C",
+				"roughness": 0.8,
+				"metallic": 0.1,
+				"note": "roof_corrugated and roof_clay."
+			},
+			"house_concrete": {
+				"color": "#A09E98",
+				"roughness": 0.95,
+				"metallic": 0.0
+			},
+			"house_glass_wood": {
+				"color": "#C08F5C",
+				"roughness": 0.6,
+				"metallic": 0.0,
+				"note": "glass and wood."
+			}
+		},
+		"roles": {
+			"plaster": "house_walls",
+			"brick_ong": "house_walls",
+			"tile_granite": "house_front",
+			"tile_pattern": "house_front",
+			"metal_shutter": "house_metal",
+			"iron": "house_metal",
+			"aluminum": "house_metal",
+			"roof_corrugated": "house_roof",
+			"roof_clay": "house_roof",
+			"concrete": "house_concrete",
+			"glass": "house_glass_wood",
+			"wood": "house_glass_wood"
+		}
+	}
+}

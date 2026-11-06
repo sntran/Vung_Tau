@@ -36,6 +36,8 @@ jobs:
           test -f build/web/index.html
           # The voice audition page of plan 0003 (R9) is at /voices/.
           cp -r docs/voices build/web/voices
+          # The review sheets of the models of World (plan 0023, R11) are at /world/.
+          cp -r docs/world build/web/world
           echo "Size of the web build:"
           du -sh build/web
           ls -l build/web
