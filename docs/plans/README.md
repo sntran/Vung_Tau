@@ -41,7 +41,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 | 0020 | [Real trees](0020-real-trees.md) | Built |
 | 0008 | [Known structures](0008-known-structures.md) | Approved |
 | 0009 | [Houses on the lots](0009-houses-on-the-lots.md) | Draft |
-| 0023 | [Models from World](0023-models-from-world.md) | Approved |
+| 0023 | [Models from World](0023-models-from-world.md) | In progress |
 
 ## Proposed order of the next plans
 

@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Approved |
+| Status | In progress |
 | Branch | `feat/0023-models-from-world` |
 | Depends on | 0004 (the house kit), 0005 (the Vũng Tàu world). Uses the quality presets of 0004 and the impostor method of 0020. |
 | Changes | 0006 (the person models come from World, D6), 0008, 0009, 0010, 0011 to 0015, 0018, 0021, 0022: each of these plans takes its models from the catalog of section 9. |
@@ -117,6 +117,8 @@ PT-01, PT-03 to PT-55 must still pass.
 - **Q3.** Answered (2026-10-28): wait. World is still in work. I say when it is ready. Then I approve this plan, and the builder starts. Until then the builder does not start R1 to R14.
 - **Q4.** Answered (2026-10-28): yes. Plan 0006 waits for the people of World (D6).
 - **Q5.** The catalog has facts with the status "Check". Each one is in the table of its group. Please answer them when you have time. A fact with "Check" does not go into the game.
+- **Q6.** R9b is not correct for World now. `mini_split_mitsubishi_msz_gl12na` is the indoor unit (its parts: `mini_split_body`, `mini_split_panel`, `mini_split_vane`). World has no outdoor unit on a bracket: it is in W2, and World `TODO.md` lists it as work to do. The only outdoor unit of the catalog is `ac_goodman_gsx140361`, a central AC of the US that stands on the ground. Do the AC units of the house kit stay as they are until World has the outdoor unit (as R10)? Answered (2026-11-06): yes. The AC box of the house kit stays until World has the outdoor unit.
+- **Q7.** R9a asks for a scooter on its side stand. `honda_vision_110` has a center stand only (`center_stand_vision`, the joint `stand`, 0° to 92°). Does a parked scooter stand upright on its center stand, with the angle to the curb and the turned front wheel of R9a, until World has a side stand (W8)? Answered (2026-11-06): yes. A parked scooter stands on its center stand until World has a side stand.
 
 ## 9. The catalog of models
 
