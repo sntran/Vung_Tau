@@ -95,3 +95,25 @@ def test_the_two_sources_give_the_same_bytes(tmp_path):
         assert sorted(from_factory) == sorted(from_clone)
         for name in from_factory:
             assert from_factory[name] == from_clone[name], f"{model['order']['options']['name']}: {name} is not the same"
+
+
+def test_a_closed_connection_is_tried_again(monkeypatch):
+    calls = []
+
+    def once(url, body, timeout):
+        calls.append(url)
+        if len(calls) == 1:
+            raise ConnectionResetError(104, "Connection reset by peer")
+        return b"glb"
+
+    monkeypatch.setattr(fetch, "_http_once", once)
+    monkeypatch.setattr(fetch.time, "sleep", lambda s: None)
+    assert fetch._http("https://example.invalid/o/x.glb") == b"glb"
+    assert len(calls) == 2
+
+    def always(url, body, timeout):
+        raise ConnectionResetError(104, "Connection reset by peer")
+
+    monkeypatch.setattr(fetch, "_http_once", always)
+    with pytest.raises(fetch.FetchError):
+        fetch._http("https://example.invalid/o/x.glb")

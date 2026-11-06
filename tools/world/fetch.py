@@ -24,6 +24,7 @@ the hash of the order and the SHA-256 of each file.
 from __future__ import annotations
 
 import argparse
+import http.client
 import json
 import re
 import shlex
@@ -50,14 +51,18 @@ class FetchError(Exception):
 
 
 def _http(url: str, body: bytes | None = None, timeout: float = 600.0, tries: int = 3) -> bytes:
-    # The builder of the factory can stop for a moment (503): try again.
+    # The builder of the factory can stop for a moment (503), and the factory
+    # can close a connection in the middle of a file: try again.
     for attempt in range(tries):
         try:
             return _http_once(url, body, timeout)
         except FetchError as error:
             if "HTTP 503" not in str(error) or attempt == tries - 1:
                 raise
-            time.sleep(5.0 * (attempt + 1))
+        except (ConnectionError, TimeoutError, http.client.HTTPException) as error:
+            if attempt == tries - 1:
+                raise FetchError(f"{url}: {error}") from error
+        time.sleep(5.0 * (attempt + 1))
     raise FetchError(f"{url}: no answer")
 
 
