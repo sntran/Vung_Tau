@@ -113,7 +113,11 @@ static func _walk(d: PlaytestDriver, w: VungTau, route: PackedVector3Array, from
 		var now := PlaytestDriver.route_distance(route, d.state().player)
 		if now <= at + 0.2:
 			var p: Vector3 = d.state().player
-			d.step("part %d: a tap at %s does not move the player from %.0f m (%s)" % [d.phase, target, at, p])
+			var screen := d.viewport().get_camera_3d().unproject_position(target)
+			var hit: Dictionary = d.main().pick(screen)
+			var node: Node = hit.get("node")
+			d.step("part %d: a tap at %s does not move the player from %.0f m (%s); the tap hits %s at %s" % [
+					d.phase, target, at, p, node.get_path() if node else "nothing", hit.get("position")])
 			break
 		at = now
 	d.main().get_tree().process_frame.disconnect(check)

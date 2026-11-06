@@ -25,6 +25,8 @@ const STEP := 0.165
 const STEP_FOLLOW := 0.6
 ## The treads stand this much over the ground of the cut (tools/geo/build.py, cut_stairs()).
 const STAIR_LIFT := 0.12
+## The steps climb to a landing with this grade or less (0.59 is the most for steps of 16.5 cm on treads of 28 cm).
+const LEAD_GRADE := 0.5
 ## The shortest tread of the stairs, in meters.
 const TREAD_M := 0.28
 ## A turn of more than this has a landing (R6).
@@ -540,7 +542,8 @@ func _stairs(entry: Dictionary, road: Dictionary) -> void:
 ## the rise of the whole stairs). The steps follow the ground: along the line,
 ## a step goes up or down where the ground is more than STEP_FOLLOW of a step
 ## from the tread, with a tread of TREAD_M or more. A turn of more than
-## TURN_DEG has a flat landing of LANDING_M (R6), with no step on it.
+## TURN_DEG has a flat landing of LANDING_M (R6), with no step on it, at the
+## highest ground of its length (_stair_goal()).
 static func stair_profile(line: PackedVector3Array) -> Dictionary:
 	var s := PackedFloat32Array([0.0])
 	for i in range(1, line.size()):
@@ -574,20 +577,24 @@ static func stair_profile(line: PackedVector3Array) -> Dictionary:
 		for l: Vector2 in landings:
 			if at >= l.x - 0.01 and at <= l.y + 0.01:
 				on_landing = true
-		var gap := _height_at(line, s, at) - h
-		if not on_landing and absf(gap) > step * STEP_FOLLOW:
+		var gap := _stair_goal(line, s, landings, at) - h
+		# A tread is TREAD_M or more in a straight line: at a bend of the line,
+		# the length along the line is longer than the tread.
+		var far := _flat(_point_at(line, s, at, h)).distance_to(_flat(walk[walk.size() - 1])) >= TREAD_M
+		if not on_landing and far and absf(gap) > step * STEP_FOLLOW:
 			treads.append({"from": _point_at(line, s, tread_from, h), "to": _point_at(line, s, at, h), "height": h})
 			h += signf(gap) * step
 			walk.append(_point_at(line, s, at, h))
 			tread_from = at
 			count += 1
-			at += TREAD_M
-		else:
-			at += 0.05
-	# The top: the steps that are left, if the ground there is higher or lower.
+		at += 0.05
+	# The top: the steps that are left, if the ground there is higher or lower,
+	# with treads of TREAD_M or more.
 	var end_h := base + roundf((_height_at(line, s, total) - base) / step) * step
-	while absf(end_h - h) > step * 0.5 and total - tread_from > 0.1:
-		var nose := minf(tread_from + maxf((total - tread_from) / 2.0, 0.05), total - 0.05)
+	while absf(end_h - h) > step * 0.5:
+		var nose := tread_from + maxf(TREAD_M, (total - tread_from) / 2.0)
+		if nose > total - 0.05 or _flat(_point_at(line, s, nose, h)).distance_to(_flat(walk[walk.size() - 1])) < TREAD_M * 0.99:
+			break
 		treads.append({"from": _point_at(line, s, tread_from, h), "to": _point_at(line, s, nose, h), "height": h})
 		h += signf(end_h - h) * step
 		walk.append(_point_at(line, s, nose, h))
@@ -596,6 +603,22 @@ static func stair_profile(line: PackedVector3Array) -> Dictionary:
 	treads.append({"from": _point_at(line, s, tread_from, h), "to": _point_at(line, s, total, h), "height": h})
 	walk.append(_point_at(line, s, total, h))
 	return {"treads": treads, "walk": walk, "steps": count}
+
+
+## The height that the steps follow at "at": the ground, but not lower than a
+## slope of LEAD_GRADE down from each landing. A landing has the highest ground
+## of its length, so it is never under the ground, and the steps climb to it in time.
+static func _stair_goal(line: PackedVector3Array, s: PackedFloat32Array, landings: Array[Vector2], at: float) -> float:
+	var goal := _height_at(line, s, at)
+	for l: Vector2 in landings:
+		var top := maxf(_height_at(line, s, l.x), _height_at(line, s, l.y))
+		var away := l.x - at if at < l.x else (at - l.y if at > l.y else 0.0)
+		goal = maxf(goal, top - away * LEAD_GRADE)
+	return goal
+
+
+static func _flat(p: Vector3) -> Vector2:
+	return Vector2(p.x, p.z)
 
 
 static func _height_at(line: PackedVector3Array, s: PackedFloat32Array, at: float) -> float:
@@ -714,17 +737,24 @@ func floor_at(x: float, z: float) -> float:
 	return best
 
 
-## The height of a walk line at a point within "half" of it, or -INF.
+## The height of a walk line at a point within "half" of it, or -INF: the
+## height at the nearest point of the line (on stairs, the steps farther up
+## are also within "half").
 static func _line_floor(line: PackedVector3Array, half: float, at: Vector2) -> float:
 	var best := -INF
+	var nearest := half
 	for i in line.size() - 1:
 		var a := Vector2(line[i].x, line[i].z)
 		var b := Vector2(line[i + 1].x, line[i + 1].z)
 		var c := Geometry2D.get_closest_point_to_segment(at, a, b)
-		if c.distance_to(at) > half:
+		var d := c.distance_to(at)
+		if d > nearest + 0.001:
 			continue
 		var t := 0.0 if a.is_equal_approx(b) else clampf((c - a).dot(b - a) / (b - a).length_squared(), 0.0, 1.0)
-		best = maxf(best, lerpf(line[i].y, line[i + 1].y, t))
+		var h := lerpf(line[i].y, line[i + 1].y, t)
+		# Two parts at the same distance (a joint): the higher one.
+		best = h if d < nearest - 0.001 else maxf(best, h)
+		nearest = minf(nearest, d)
 	return best
 
 

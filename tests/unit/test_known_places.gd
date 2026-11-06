@@ -100,3 +100,33 @@ func test_a_short_flight_has_steps_in_the_range() -> void:
 		if r > 0.001:
 			assert_between(r, KnownPlaces.STEP_MIN - 0.001, KnownPlaces.STEP_MAX + 0.001, "the step %d is 15 cm to 18 cm" % i)
 	assert_almost_eq(walk[walk.size() - 1].y, 3.3, 0.01, "the stairs end at the top")
+
+
+## floor_at() gives the height of the nearest part of the stairs, not of the
+## steps farther up within the width of the stairs.
+func test_the_floor_of_stairs_is_the_nearest_step() -> void:
+	var places := KnownPlaces.new()
+	var walk := PackedVector3Array([Vector3(0, 0, 0), Vector3(1, 0.6, 0), Vector3(2, 1.2, 0)])
+	places.stairs.append({"way": 1, "place": "a", "points": walk, "steps": 0, "width": 2.0})
+	assert_almost_eq(places.floor_at(0.5, 0.5), 0.3, 0.001, "the floor in the middle of the first part")
+	assert_almost_eq(places.floor_at(1.0, 0.0), 0.6, 0.001, "the floor at a joint")
+	assert_eq(places.floor_at(0.5, 3.0), -INF, "no floor out of the width")
+	places.free()
+
+
+## The ramp on the noses of the steps is never steeper than the player can walk
+## (40°): a tread is 28 cm or more in a straight line, also at a bend (PT-61
+## found a part of 44°).
+func test_the_walk_line_of_stairs_is_not_too_steep() -> void:
+	var line := PackedVector3Array()
+	for i in 40:
+		# A line that bends 25° at each point (no landing), up 0.8 m in each meter.
+		var a := deg_to_rad(25.0) * float(i)
+		var p := Vector3.ZERO if line.is_empty() else line[line.size() - 1]
+		line.append(p + Vector3(cos(a) * 0.5, 0.4, sin(a) * 0.5) if i > 0 else p)
+	var walk: PackedVector3Array = KnownPlaces.stair_profile(line).walk
+	for i in range(1, walk.size()):
+		var flat := Vector2(walk[i].x - walk[i - 1].x, walk[i].z - walk[i - 1].z).length()
+		var rise := absf(walk[i].y - walk[i - 1].y)
+		if rise > 0.001:
+			assert_lt(rad_to_deg(atan2(rise, flat)), 40.0, "the part %d of the walk line" % i)
