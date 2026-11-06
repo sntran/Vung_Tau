@@ -23,9 +23,8 @@ const STEP_MAX := 0.18
 const STEP := 0.165
 ## A step of the stairs comes where the ground is this part of a step from the tread.
 const STEP_FOLLOW := 0.6
-## The invisible slope beside the stairs: its width, and the lowest edge that has one.
+## The invisible slope beside the stairs: its width.
 const SKIRT_M := 1.0
-const SKIRT_MIN := 0.1
 ## The treads stand this much over the ground of the cut (tools/geo/build.py, cut_stairs()).
 const STAIR_LIFT := 0.12
 ## The steps climb to a landing with this grade or less (0.59 is the most for steps of 16.5 cm on treads of 28 cm).
@@ -524,46 +523,53 @@ func _stairs(entry: Dictionary, road: Dictionary) -> void:
 		instance.name = "Stairs_%d" % int(road.id)
 		instance.visibility_range_end = NEAR_END
 		(entry.node as Node3D).add_child(instance)
-	# The collision: one ramp for each part of the line, on the noses of the steps (R7).
+	# The collision: one surface on the noses of the steps (R7), with no edges
+	# at the joints, and the invisible slopes at its two sides.
 	var walk := PackedVector3Array()
 	for p: Vector3 in profile.walk:
-		walk.append(p)
-	for i in walk.size() - 1:
-		var a := walk[i]
-		var b := walk[i + 1]
-		var d := b - a
-		var flat := Vector2(d.x, d.z).length()
-		if flat < 0.05:
-			continue
-		var basis := Basis.looking_at(Vector3(d.x, d.y, d.z).normalized(), Vector3.UP)
-		var size := Vector3(width, 0.3, d.length() + 0.05)
-		_box_shape(entry, size, Transform3D(basis, (a + b) / 2.0 - basis.y * 0.15))
-		_stair_skirts(entry, a, b, width)
+		if walk.is_empty() or _flat(p).distance_to(_flat(walk[walk.size() - 1])) > 0.02:
+			walk.append(p)
+	_stair_surface(entry, walk, width)
 	stairs.append({"way": int(road.id), "place": entry.id, "points": walk, "steps": profile.steps, "width": width})
 
 
-## The invisible slopes at the two sides of a part of the stairs (R7): where
-## the edge of the stairs is more than SKIRT_MIN over the ground, a slope of
-## SKIRT_M goes from the edge down to the ground, so that a player who walks
-## beside the stairs can walk onto them (a step up is 0.25 m at most).
-func _stair_skirts(entry: Dictionary, a: Vector3, b: Vector3, width: float) -> void:
-	var along := (b - a).normalized()
-	var side := Vector3(-(b - a).z, 0.0, (b - a).x).normalized()
-	var mid := (a + b) / 2.0
-	for k: float in [-1.0, 1.0]:
-		var edge := mid + side * k * (width / 2.0)
-		var outer := edge + side * k * SKIRT_M
-		var drop := minf(mid.y - world.ground_height(outer.x, outer.z), SKIRT_M * 0.8)
-		if drop <= SKIRT_MIN:
-			continue
-		var down := (side * k * SKIRT_M + Vector3(0.0, -drop, 0.0))
-		var across := (down - along * down.dot(along)).normalized()
-		var normal := along.cross(across)
-		if normal.y < 0.0:
-			across = -across
-			normal = -normal
-		var center := edge + down / 2.0 - normal * 0.1
-		_box_shape(entry, Vector3(down.length(), 0.2, (b - a).length() + 0.05), Transform3D(Basis(across, normal, along), center))
+## The collision of stairs (R7): one surface (a trimesh) on the walk line,
+## "width" wide, and at each side an invisible slope of SKIRT_M from the edge to
+## the ground (at most SKIRT_M * 0.8 down or up), so that a player who walks
+## beside the stairs can walk onto them (a step up is 0.25 m at most). Boxes on
+## each part of the line had edges at the joints, where the player stopped.
+func _stair_surface(entry: Dictionary, walk: PackedVector3Array, width: float) -> void:
+	if walk.size() < 2:
+		return
+	var rows: Array[PackedVector3Array] = []  # [outer left, left, right, outer right] for each point
+	for i in walk.size():
+		var a := walk[maxi(i - 1, 0)]
+		var b := walk[mini(i + 1, walk.size() - 1)]
+		var t := Vector3(b.x - a.x, 0.0, b.z - a.z).normalized()
+		var side := Vector3(-t.z, 0.0, t.x)
+		var p := walk[i]
+		var left := p + side * (width / 2.0)
+		var right := p - side * (width / 2.0)
+		var outer_left := left + side * SKIRT_M
+		var outer_right := right - side * SKIRT_M
+		var reach := SKIRT_M * 0.8
+		outer_left.y = clampf(world.ground_height(outer_left.x, outer_left.z), p.y - reach, p.y + reach)
+		outer_right.y = clampf(world.ground_height(outer_right.x, outer_right.z), p.y - reach, p.y + reach)
+		rows.append(PackedVector3Array([outer_left, left, right, outer_right]))
+	var faces := PackedVector3Array()
+	for i in rows.size() - 1:
+		for k in 3:
+			var a := rows[i][k]
+			var b := rows[i][k + 1]
+			var c := rows[i + 1][k + 1]
+			var d := rows[i + 1][k]
+			faces.append_array([a, b, c, a, c, d])
+	var shape := ConcavePolygonShape3D.new()
+	shape.backface_collision = true
+	shape.set_faces(faces)
+	var node := CollisionShape3D.new()
+	node.shape = shape
+	_body(entry).add_child(node)
 
 
 ## The treads of stairs on a line: {"treads": [{"from", "to", "height"}],
