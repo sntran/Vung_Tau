@@ -118,12 +118,12 @@ static func _walk(d: PlaytestDriver, w: VungTau, route: PackedVector3Array, from
 		while reach > 2.0 and _cuts_corner(route, d.state().player, at, minf(at + reach, to)):
 			reach *= 0.7
 		var target := PlaytestDriver.route_point(route, minf(at + reach, to))
-		target.y = maxf(w.ground_height(target.x, target.z), w.places.floor_at(target.x, target.z)) + 0.05
+		target.y = _floor_y(w, target)
 		await d.look_at_point(target, 3.0, 15.0)
 		if await d.try_tap_floor(target) != "":
 			# The point is not on the screen (a step or a wall in front): a nearer one.
 			target = PlaytestDriver.route_point(route, minf(at + TAP_M * 0.5, to))
-			target.y = maxf(w.ground_height(target.x, target.z), w.places.floor_at(target.x, target.z)) + 0.05
+			target.y = _floor_y(w, target)
 			await d.look_at_point(target, 3.0, 15.0)
 			var error := await d.try_tap_floor(target)
 			if error != "":
@@ -135,7 +135,7 @@ static func _walk(d: PlaytestDriver, w: VungTau, route: PackedVector3Array, from
 			# A player taps again when a tap does not move them: once, at a nearer
 			# point. A real block stops this tap too.
 			var again := PlaytestDriver.route_point(route, minf(at + 2.5, to))
-			again.y = maxf(w.ground_height(again.x, again.z), w.places.floor_at(again.x, again.z)) + 0.05
+			again.y = _floor_y(w, again)
 			await d.look_at_point(again, 3.0, 15.0)
 			if await d.try_tap_floor(again) == "":
 				await d.wait_idle(30.0)
@@ -172,6 +172,17 @@ static func _cuts_corner(route: PackedVector3Array, from: Vector3, at: float, to
 			return true
 		k += 0.5
 	return false
+
+
+## A point 3 cm under the floor at the point (the first surface under it):
+## the ray of the tap hits the floor just before it. A ray to a point over the
+## floor passes over it at a small angle, and where the floor goes down after
+## the point (the slope beside the stairs at a turn), it hits the floor farther away.
+static func _floor_y(w: VungTau, p: Vector3) -> float:
+	var top := maxf(w.ground_height(p.x, p.z), w.places.floor_at(p.x, p.z)) + 5.0
+	var hit := w.get_world_3d().direct_space_state.intersect_ray(
+			PhysicsRayQueryParameters3D.create(Vector3(p.x, top, p.z), Vector3(p.x, top - 20.0, p.z)))
+	return float((hit.position as Vector3).y) - 0.03 if not hit.is_empty() else w.ground_height(p.x, p.z)
 
 
 ## The distance along the route of the point of the route nearest to "p",

@@ -587,7 +587,8 @@ def cut_stairs(grid, landmarks_config, found_by_id, roads) -> None:
         # a steep slope had a side slope of 52 degrees within 0.5 m of its line).
         # A way of the route on the plaza is not cut: the plaza is level (R2).
         stairs = [int(w) for w in place.get("stairs", [])]
-        ways = list(dict.fromkeys(stairs + [int(w) for w in place.get("route", [])]))
+        # The stairs come last: where two bands meet, the stairs keep their profile.
+        ways = list(dict.fromkeys([int(w) for w in place.get("route", []) if int(w) not in stairs] + stairs))
         plaza = place.get("sizes", {}).get("plaza_radius")
         for way_id in ways:
             road = by_id.get(int(way_id))
