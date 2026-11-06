@@ -165,7 +165,7 @@
 			"rosettes_per_spray": 4,
 			"leaf_triangles": 2,
 			"near_scale": 0.6,
-			"impostor_shade": 0.9
+			"impostor_shade": 0.75
 		},
 		"casuarina": {
 			"generator": "casuarina",
