@@ -23,6 +23,9 @@ const STEP_MAX := 0.18
 const STEP := 0.165
 ## A step of the stairs comes where the ground is this part of a step from the tread.
 const STEP_FOLLOW := 0.6
+## The invisible slope beside the stairs: its width, and the lowest edge that has one.
+const SKIRT_M := 1.0
+const SKIRT_MIN := 0.1
 ## The treads stand this much over the ground of the cut (tools/geo/build.py, cut_stairs()).
 const STAIR_LIFT := 0.12
 ## The steps climb to a landing with this grade or less (0.59 is the most for steps of 16.5 cm on treads of 28 cm).
@@ -533,7 +536,32 @@ func _stairs(entry: Dictionary, road: Dictionary) -> void:
 		var basis := Basis.looking_at(Vector3(d.x, d.y, d.z).normalized(), Vector3.UP)
 		var size := Vector3(width, 0.3, d.length() + 0.05)
 		_box_shape(entry, size, Transform3D(basis, (a + b) / 2.0 - basis.y * 0.15))
+		_stair_skirts(entry, a, b, width)
 	stairs.append({"way": int(road.id), "place": entry.id, "points": walk, "steps": profile.steps, "width": width})
+
+
+## The invisible slopes at the two sides of a part of the stairs (R7): where
+## the edge of the stairs is more than SKIRT_MIN over the ground, a slope of
+## SKIRT_M goes from the edge down to the ground, so that a player who walks
+## beside the stairs can walk onto them (a step up is 0.25 m at most).
+func _stair_skirts(entry: Dictionary, a: Vector3, b: Vector3, width: float) -> void:
+	var along := (b - a).normalized()
+	var side := Vector3(-(b - a).z, 0.0, (b - a).x).normalized()
+	var mid := (a + b) / 2.0
+	for k: float in [-1.0, 1.0]:
+		var edge := mid + side * k * (width / 2.0)
+		var outer := edge + side * k * SKIRT_M
+		var drop := minf(mid.y - world.ground_height(outer.x, outer.z), SKIRT_M * 0.8)
+		if drop <= SKIRT_MIN:
+			continue
+		var down := (side * k * SKIRT_M + Vector3(0.0, -drop, 0.0))
+		var across := (down - along * down.dot(along)).normalized()
+		var normal := along.cross(across)
+		if normal.y < 0.0:
+			across = -across
+			normal = -normal
+		var center := edge + down / 2.0 - normal * 0.1
+		_box_shape(entry, Vector3(down.length(), 0.2, (b - a).length() + 0.05), Transform3D(Basis(across, normal, along), center))
 
 
 ## The treads of stairs on a line: {"treads": [{"from", "to", "height"}],
