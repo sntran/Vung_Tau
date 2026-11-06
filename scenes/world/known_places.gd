@@ -28,8 +28,8 @@ const STAIR_CELL := 0.25
 ## The height of a cell is a mean of the parts of the line within this distance of the nearest one.
 const STAIR_BLEND_M := 0.75
 ## The invisible slope beside the stairs: its width, and how far under ground_height() it ends.
-const SKIRT_M := 2.0
-const SKIRT_UNDER := 0.4
+const SKIRT_M := 3.0
+const SKIRT_UNDER := 0.35
 ## The treads stand this much over the ground of the cut (tools/geo/build.py, cut_stairs()).
 const STAIR_LIFT := 0.12
 ## The steps climb to a landing with this grade or less (0.59 is the most for steps of 16.5 cm on treads of 28 cm).
