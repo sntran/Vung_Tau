@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft. It waits until I say that World is ready (Q3). |
+| Status | Approved |
 | Branch | `feat/0023-models-from-world` |
 | Depends on | 0004 (the house kit), 0005 (the Vũng Tàu world). Uses the quality presets of 0004 and the impostor method of 0020. |
 | Changes | 0006 (the person models come from World, D6), 0008, 0009, 0010, 0011 to 0015, 0018, 0021, 0022: each of these plans takes its models from the catalog of section 9. |

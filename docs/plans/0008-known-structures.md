@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft |
+| Status | Approved |
 | Branch | `feat/0008-known-structures` |
 | Depends on | 0005 (the real ground), 0020 (the clearings of the trees), and World: the blueprints of buildings and statues (plan 0023, D9, request W13). |
 | Used by | 0010 (the bus ride passes some of these places), 0016 (Hòn Bà), 0017 (the Vi Ba road), 0024 (the cable car), and the activities of the first release: the stairs to the statue, the lighthouse, Bạch Dinh, Cầu Đá. |
