@@ -23,7 +23,7 @@ from shapely.geometry import Polygon
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from geodata import blocks as blocks_module  # noqa: E402
+from geodata import visibility, blocks as blocks_module  # noqa: E402
 from geodata import anchors as anchors_module  # noqa: E402
 from geodata import clearings, coast, homestay, landcover, landmarks, mapdraw, osm, roads as roads_module, terrain  # noqa: E402
 from geodata import roadworks as roadworks_module, sea as sea_module, seafloor, trees as trees_module  # noqa: E402
@@ -283,6 +283,9 @@ def build(raw: Path, out: Path, geo: Path) -> int:
             f"stakes, {len(sea_objects['groynes']['lines'])} groynes")
     # The places with no trees and no bushes, and the roads with no tree trunks (report 0020, D-0020-01).
     places = clearings.place_shapes(data.areas, lambda g: to_map_geometry(g, projection), found_by_id, config.clearings)
+    # The known places of plan 0008 (R5).
+    places += clearings.known_place_shapes(config.landmarks, found_by_id, roads,
+                                           float(config.clearings.get("known_places_margin_m", 3.0)))
     place_mask = terrain.rasterize(grid, [p for shape in places for p in polygons_of(shape)])
     road_mask = terrain.rasterize(grid, clearings.road_shapes(roads, config.clearings))
     canopy = None
@@ -319,6 +322,9 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     out.mkdir(parents=True)
     for name, content in kept.items():
         (out / name).write_bytes(content)
+    # Plan 0008, R2 and D7: the ground under each known place is level, at the
+    # lowest point of its outline; the base of the place is 0.1 m over it.
+    level_places(grid, config.landmarks, found_by_id)
     (out / "height").mkdir(parents=True)
     chunks = terrain.write_chunks(grid, land_mask, area["chunk_size_m"], area["sea_chunk_margin_m"],
                                   area["height_offset_m"], area["height_step_m"], out / "height")
@@ -388,6 +394,13 @@ def build(raw: Path, out: Path, geo: Path) -> int:
                                "game_tide_m": [round(lowest, 2), round(highest, 2)], "bai_truoc_profile": line,
                                "check_distances_m": list(seafloor.CHECK_DISTANCES_M),
                                "dry_at_lowest_m2": {k: round(v) for k, v in dry.items()}}
+    # The views of the known places (plan 0008, R8): the same ground as the height chunks.
+    views_config = GEO / "place_views.json"
+    if views_config.exists():
+        ground = lambda x, z: float(grid.sample(x, z))  # noqa: E731
+        place_views = visibility.views(load_json(views_config), found_by_id, roads, ground)
+        write_json(out / "place_views.json", place_views)
+        log(f"place views: {[(r['eye'], r['place'], r['seen']) for r in place_views['results']]}")
     write_json(out / "world.json", world)
     write_json(out / "coastline.json", {"lines": [map_to_game(l.coords) for l in coast.coastline_lines(data.ways, projection)]}, None)
     write_json(out / "land.json", {"polygons": [blocks_module.polygon_to_game(p.simplify(1.0)) for p in polygons_of(land)]}, None)
@@ -519,6 +532,35 @@ def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods,
 
 # The hills of the cover report: the landmark, the radius (m), and the lowest height (m).
 COVER_HILLS = {"nui_lon": (1100.0, 20.0), "nui_nho": (700.0, 20.0)}
+
+
+def level_places(grid, landmarks_config, found_by_id) -> None:
+    """Cuts the ground under each known place with a stand-in to the lowest
+    point of its outline (or of its plaza), and writes "base_height" (0.1 m
+    over it) in the record of the place (plan 0008, R2)."""
+    from shapely.geometry import Point, Polygon
+
+    for landmark in landmarks_config:
+        place = landmark.get("place")
+        record = found_by_id.get(landmark["id"])
+        if not place or place.get("status") == "Check" or not record or not record.get("found"):
+            continue
+        if place.get("kind") not in ("statue", "tower", "villa", "column", "shrine"):
+            continue
+        plaza = place.get("sizes", {}).get("plaza_radius")
+        if plaza:
+            x, z = record["position"]
+            shape = Point(x, -z).buffer(float(plaza["value"]) + 0.5, 32)
+        elif record.get("outline"):
+            shape = Polygon([(x, -z) for x, z in record["outline"]]).buffer(0.8)
+        else:
+            continue
+        ring = np.array(shape.exterior.coords)
+        lowest = float(np.min(grid.sample(ring[:, 0], -ring[:, 1])))
+        mask = terrain.rasterize(grid, [shape])
+        grid.heights[mask] = lowest
+        record["base_height"] = round(lowest + 0.1, 2)
+        log(f"{landmark['id']}: the ground under it is level at {lowest:.2f} m ({int(mask.sum())} cells)")
 
 
 def write_cover(grid, raw, out, projection, land_mask, area, found_by_id, place_mask=None, road_mask=None,

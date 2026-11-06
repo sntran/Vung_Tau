@@ -50,7 +50,7 @@ def candidates(landmark: dict, data) -> list[dict]:
             if _matches_tags(way.tags, wanted) and _matches_name(way.tags, landmark):
                 lon, lat = way.coords[len(way.coords) // 2]
                 result.append({"rank": rank, "kind": "way", "id": way.id, "tags": way.tags,
-                               "lonlat": (lon, lat), "geometry": None})
+                               "lonlat": (lon, lat), "geometry": None, "coords": list(way.coords)})
     unique, seen = [], set()
     for c in result:
         if (c["kind"], c["id"]) not in seen:
@@ -116,6 +116,12 @@ def find_all(config, data, projection, grid=None) -> list[dict]:
             polygon = max(outline.geoms, key=lambda g: g.area) if hasattr(outline, "geoms") else outline
             record["outline"] = [[round(float(px), 2), round(float(pz), 2)] for px, pz in polygon.exterior.coords]
             record["area_m2"] = round(float(polygon.area), 1)
+        if best.get("coords"):
+            # A place on a line (the jetty of Cầu Đá, plan 0008): the points of the way.
+            xs, zs = projection.to_game(np.array([c[0] for c in best["coords"]]), np.array([c[1] for c in best["coords"]]))
+            record["line"] = [[round(float(px), 2), round(float(pz), 2)] for px, pz in zip(xs, zs)]
+            if grid is not None:
+                record["line_heights"] = [round(float(grid.sample(px, pz)), 2) for px, pz in zip(xs, zs)]
         if landmark.get("hint"):
             record["distance_to_hint_m"] = round(_distance_m(best["lonlat"], (landmark["hint"]["lon"], landmark["hint"]["lat"])), 1)
         result.append(record)

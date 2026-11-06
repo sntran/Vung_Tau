@@ -1,0 +1,117 @@
+{
+	"note": "Made by tools/geo/build.py from data/geo/place_views.json (plan 0008, R8). Do not change by hand.",
+	"samples": 10,
+	"step_m": 1.0,
+	"eyes": {
+		"bai_truoc_beach": [
+			-2.55,
+			2.8,
+			-1.31
+		],
+		"bai_sau_south": [
+			1602.91,
+			1.6,
+			1760.27
+		],
+		"hai_dang_road": [
+			332.79,
+			170.7,
+			1014.55
+		],
+		"bai_truoc_sea": [
+			-379.16,
+			2.0,
+			133.48
+		]
+	},
+	"results": [
+		{
+			"eye": "bai_truoc_beach",
+			"place": "chua_kito_vua",
+			"top_m": 36.0,
+			"target": [
+				1159.87,
+				136.4,
+				1893.39
+			],
+			"seen": 0.0
+		},
+		{
+			"eye": "bai_truoc_beach",
+			"place": "hai_dang",
+			"top_m": 18.0,
+			"target": [
+				402.21,
+				172.47,
+				1056.5
+			],
+			"seen": 0.1
+		},
+		{
+			"eye": "bai_sau_south",
+			"place": "chua_kito_vua",
+			"top_m": 36.0,
+			"target": [
+				1159.87,
+				136.4,
+				1893.39
+			],
+			"seen": 0.8
+		},
+		{
+			"eye": "bai_sau_south",
+			"place": "hai_dang",
+			"top_m": 18.0,
+			"target": [
+				402.21,
+				172.47,
+				1056.5
+			],
+			"seen": 1.0
+		},
+		{
+			"eye": "hai_dang_road",
+			"place": "chua_kito_vua",
+			"top_m": 36.0,
+			"target": [
+				1159.87,
+				136.4,
+				1893.39
+			],
+			"seen": 0.0
+		},
+		{
+			"eye": "hai_dang_road",
+			"place": "hai_dang",
+			"top_m": 18.0,
+			"target": [
+				402.21,
+				172.47,
+				1056.5
+			],
+			"seen": 0.4
+		},
+		{
+			"eye": "bai_truoc_sea",
+			"place": "chua_kito_vua",
+			"top_m": 36.0,
+			"target": [
+				1159.87,
+				136.4,
+				1893.39
+			],
+			"seen": 0.0
+		},
+		{
+			"eye": "bai_truoc_sea",
+			"place": "hai_dang",
+			"top_m": 18.0,
+			"target": [
+				402.21,
+				172.47,
+				1056.5
+			],
+			"seen": 0.0
+		}
+	]
+}

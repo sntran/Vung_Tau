@@ -12,5 +12,6 @@
 		"duc_me_bai_dau": 12.0,
 		"mieu_hon_ba": 6.0
 	},
-	"road_margin_m": 1.5
+	"road_margin_m": 1.5,
+	"known_places_margin_m": 3.0
 }

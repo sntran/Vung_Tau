@@ -1,6 +1,6 @@
 # Geodata report
 
-Made by `tools/geo/build.py` on 2026-10-27.
+Made by `tools/geo/build.py` on 2026-11-06.
 
 ## Extents
 
@@ -66,6 +66,9 @@ Total road length: 692.3 km. Roads with a width tag: 7 of 4123. Hẻm: 2365.
 | Chợ Phường 1 | yes | way/259528309 | 159.09, -708.46 | 8.75 | 1 candidates, 5.2 m from the hint |
 | Vòng xoay Đài tưởng niệm Liệt sĩ | yes | way/975192902 | 1953.62, -562.5 | 9.62 | 8 candidates, 811.8 m from the hint |
 | Ngã Năm | yes | node/3144051066 | 1178.71, -1254.11 | 6.48 | 1 candidates, 5.8 m from the hint |
+| Cầu Đá cổ | yes | way/286293879 | -502.58, 448.48 | -4.0 | 1 candidates, 133.4 m from the hint |
+| Nhà thờ Vũng Tàu | yes | way/791795169 | 362.37, -272.07 | 10.05 | 1 candidates, 13.7 m from the hint |
+| Tượng Trần Hưng Đạo | yes | way/235156180 | 360.93, 141.55 | 7.26 | 1 candidates, 4.1 m from the hint |
 
 ## Homestay hẻm
 
@@ -97,22 +100,22 @@ None.
 
 ## Trees (R12a)
 
-- bang: 1994
-- casuarina: 3509
-- coconut: 909
+- bang: 1990
+- casuarina: 3540
+- coconut: 878
 - flame: 1623
-- frangipani: 753
-- shade: 3576
-- tall_shade: 186
-- From: bai_truoc_road 194, bai_truoc_road_snapped 15, coast_roads 3970, coast_roads_snapped 321, named_roads 503, named_roads_snapped 114, osm 385, park_bai_truoc 305, park_bai_truoc_snapped 61, parks 1376, parks_snapped 1376, street 5817, street_snapped 5817.
+- frangipani: 759
+- shade: 3578
+- tall_shade: 185
+- From: bai_truoc_road 192, bai_truoc_road_snapped 14, coast_roads 3962, coast_roads_snapped 315, named_roads 498, named_roads_snapped 111, osm 385, park_bai_truoc 304, park_bai_truoc_snapped 72, parks 1394, parks_snapped 1394, street 5818, street_snapped 5818.
 
 ## Land cover and trees (report 0005, D-0005-09; plan 0020, D8)
 
 - Sources: ESA WorldCover 2021 v200 (10 m classes) and Meta and WRI High Resolution Canopy Height Maps (v1) (about 1 m, kept on a grid of 2.0 m with the highest value). Both CC BY 4.0.
 - The canopy images over the play area are from 2019.42 to 2019.83 (decimal years, mean 2019.73).
 - A canopy of 3 m or more is a tree, and a canopy of 0.6 m to 3 m in tree cover is a bush (WorldCover has almost no shrubland here). Grassland and bare ground show the ground (R10a). The built-up and the cropland classes keep the rules of the town and of `trees.json`.
-- 86882 trees on the open land, with a mean height of 6.9 m and a mean crown radius of 4.5 m (`canopy_trees.json`, R10a). A tree stands on the highest canopy first, then on the lower canopy, at a spacing of 0.9 of its height (5 m to 12 m): the map has one height top for each group of crowns. The crown of a tree is the canopy that is nearer to it than to another tree.
-- No trees and no bushes on 272.6 ha of paved places and platforms (the OSM areas and the landmarks of `data/geo/clearings.json`), and no tree trunks on the roads and the paths (report 0020, D-0020-01).
+- 86859 trees on the open land, with a mean height of 6.9 m and a mean crown radius of 4.5 m (`canopy_trees.json`, R10a). A tree stands on the highest canopy first, then on the lower canopy, at a spacing of 0.9 of its height (5 m to 12 m): the map has one height top for each group of crowns. The crown of a tree is the canopy that is nearer to it than to another tree.
+- No trees and no bushes on 273.2 ha of paved places and platforms (the OSM areas and the landmarks of `data/geo/clearings.json`), and no tree trunks on the roads and the paths (report 0020, D-0020-01).
 
 | Hill | Area (km²) | Tree cover | Bushes | Grass | Bare | Trees | WorldCover classes |
 |---|---|---|---|---|---|---|---|
@@ -133,13 +136,13 @@ The street and park trees and the canopy map (report 0020, D-0020-03): on the ro
 
 | Group | Trees | Moved to a tree top | Not in the map |
 |---|---|---|---|
-| Quang Trung (Bãi Trước) | 194 | 8 % | 72 % |
-| Thùy Vân, Hạ Long, Trần Phú | 3970 | 8 % | 72 % |
-| Trần Hưng Đạo, Ba Cu | 503 | 23 % | 35 % |
+| Quang Trung (Bãi Trước) | 192 | 7 % | 72 % |
+| Thùy Vân, Hạ Long, Trần Phú | 3962 | 8 % | 72 % |
+| Trần Hưng Đạo, Ba Cu | 498 | 22 % | 35 % |
 | The trees of OSM | 385 | 0 % | 36 % |
-| The park of Bãi Trước | 305 | 20 % | 21 % |
-| The other parks | 1376 | 100 % | 0 % |
-| The other main roads | 5817 | 100 % | 0 % |
+| The park of Bãi Trước | 304 | 24 % | 21 % |
+| The other parks | 1394 | 100 % | 0 % |
+| The other main roads | 5818 | 100 % | 0 % |
 
 ## Town anchors (R6a)
 

@@ -33,3 +33,47 @@ Sizes measured from the photos, on 2026-11-06. The scale is the arm span (18.4 m
 | Base | Under the terrace, a block about 12 m to 14 m wide, with rounded corners. On the front, a wide relief in gold color (about 8 m × 3 m), in a white frame, with a band of letters over it, and small square windows with grilles under it. The front of the block is a little curved. | 1, 4, 5 |
 | Plaza | A round plaza with steps in rings round the base. | 1, 4 |
 | Color | The figure, the dome, and the base are white to light grey (washed stone). The relief is gold. | all |
+
+## Hải đăng Vũng Tàu
+
+Photos:
+
+- [Category:Núi Nhỏ (Wikimedia Commons)](https://commons.wikimedia.org/wiki/Category:N%C3%BAi_Nh%E1%BB%8F): the lighthouse is at the south end of the hill.
+
+Sizes from the sources: a white round tower 18 m high and 3 m wide ([Wikipedia, vi](https://vi.wikipedia.org/wiki/H%E1%BA%A3i_%C4%91%C4%83ng_V%C5%A9ng_T%C3%A0u)). The place is from OpenStreetMap.
+
+## Bạch Dinh
+
+Photos:
+
+- [Category:Bạch Dinh (Wikimedia Commons)](https://commons.wikimedia.org/wiki/Category:B%E1%BA%A1ch_Dinh).
+
+Sizes from the sources: 3 floors, 28 m long, 15 m wide, 19 m high ([Ashui, 2023](https://ashui.com/bach-dinh-vung-tau); [VnExpress, 2015](https://vnexpress.net/biet-thu-trang-o-vung-tau-3300775.html)). The outline and the direction are from OpenStreetMap.
+
+## Tượng Đức Mẹ Bãi Dâu
+
+Photos:
+
+- [File:Đức Mẹ Bãi Dâu 1.JPG (Wikimedia Commons)](https://commons.wikimedia.org/wiki/File:%C4%90%E1%BB%A9c_M%E1%BA%B9_B%C3%A3i_D%C3%A2u_1.JPG).
+
+Sizes from the sources: 25 m high ([Wikipedia, vi](https://vi.wikipedia.org/wiki/%C4%90%E1%BB%A9c_M%E1%BA%B9_B%C3%A3i_D%C3%A2u); [Đại Đoàn Kết, 2016](https://daidoanket.vn/mot-thoang-vung-tau-10046309.html)). The outline is from OpenStreetMap.
+
+## Miếu Hòn Bà
+
+Photos:
+
+- [Category:Hòn Bà (Wikimedia Commons)](https://commons.wikimedia.org/wiki/Category:H%C3%B2n_B%C3%A0).
+
+Sizes from the sources: the miếu is about 4 m over the ground of the islet, and the path of stones is about 300 m ([SGGP, 2020](https://www.sggp.org.vn/con-duong-da-xe-bien-noi-bo-voi-hon-ba-post544948.html)). The outline and the steps are from OpenStreetMap. No source gives the size of the gate, the number of the steps, or the bunkers.
+
+## Cầu Đá
+
+Photos:
+
+- [Category:Port of Vung Tau (Wikimedia Commons)](https://commons.wikimedia.org/wiki/Category:Port_of_Vung_Tau).
+
+Sizes from the sources: about 400 m long, the top about 4 m wide and the base about 15 m, built in 1896 ([Mia.vn, 2023](https://mia.vn/cam-nang-du-lich/check-in-cang-cau-da-vung-tau-di-tich-lich-su-gan-voi-thoi-phap-thuoc-1776)). The line is the OpenStreetMap way 286293879 ("Cầu Đá cổ"), 254 m. Its land end is in the sea: the game goes on along the same line to the shore (plan 0008, Q4).
+
+## The places with no sources of their sizes
+
+Chùa Tam Bảo, Nhà thờ lớn Vũng Tàu, the statue of Trần Hưng Đạo, and the town anchors have no source of their sizes yet. They have the status "Check" in `data/geo/landmarks.json`, and they have no stand-in in the game (plan 0008, Q1, Q2).

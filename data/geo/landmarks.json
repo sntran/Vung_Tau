@@ -1,5 +1,5 @@
 {
-	"note": "The places that tools/geo/build.py finds in the OSM data (plan 0005, R1). Each search is a set of OSM tags and a pattern for the names. A tag value of \"*\" matches each value. The hint is a known position. It helps when the data has more than one match, and fetch.py uses it to check the box. \"exact_name\": true accepts only a name that is the same, not a longer name that contains it (for example \"Vi Ba\", not \"Hẻm 14 Vi Ba\").",
+	"note": "The places that tools/geo/build.py finds in the OSM data (plan 0005, R1). Each search is a set of OSM tags and a pattern for the names. A tag value of \"*\" matches each value. The hint is a known position. It helps when the data has more than one match, and fetch.py uses it to check the box. \"exact_name\": true accepts only a name that is the same, not a longer name that contains it (for example \"Vi Ba\", not \"Hẻm 14 Vi Ba\"). A record with \"place\" is a known place of plan 0008 (D1): its English name, its status (Confirmed, Source, or Check), its kind (the stand-in: statue, tower, villa, column, shrine, jetty, or none), its sizes with the source of each size, its colors, the OSM ways of its stairs and of its route from the road, the order of its model of World (null until World has the blueprint, W13), and its Lens card. A place with the status \"Check\" has no stand-in and no model (D2).",
 	"landmarks": [
 		{
 			"id": "bai_truoc",
@@ -210,6 +210,88 @@
 			"hint": {
 				"lat": 10.3258,
 				"lon": 107.0848
+			},
+			"place": {
+				"name_en": "Christ the King statue",
+				"status": "Source",
+				"kind": "statue",
+				"sizes": {
+					"figure_height": {
+						"value": 32.0,
+						"source": "https://vi.wikipedia.org/wiki/T%C6%B0%E1%BB%A3ng_Ch%C3%BAa_Kit%C3%B4_Vua_(V%C5%A9ng_T%C3%A0u)"
+					},
+					"arm_span": {
+						"value": 18.4,
+						"source": "https://vi.wikipedia.org/wiki/T%C6%B0%E1%BB%A3ng_Ch%C3%BAa_Kit%C3%B4_Vua_(V%C5%A9ng_T%C3%A0u)"
+					},
+					"arm_height": {
+						"value": 27.0,
+						"source": "docs/content/reference/landmarks.md (sizes measured from the photos, 2026-11-06)"
+					},
+					"robe_width": {
+						"value": 4.75,
+						"source": "docs/content/reference/landmarks.md (sizes measured from the photos, 2026-11-06)",
+						"note": "4.5 m to 5 m"
+					},
+					"dome_width": {
+						"value": 8.0,
+						"source": "docs/content/reference/landmarks.md (sizes measured from the photos, 2026-11-06)"
+					},
+					"terrace_width": {
+						"value": 12.5,
+						"source": "docs/content/reference/landmarks.md (sizes measured from the photos, 2026-11-06)",
+						"note": "11 m to 14 m"
+					},
+					"base_width": {
+						"value": 13.0,
+						"source": "docs/content/reference/landmarks.md (sizes measured from the photos, 2026-11-06)",
+						"note": "12 m to 14 m"
+					},
+					"base_height": {
+						"value": 4.0,
+						"source": "https://en.wikipedia.org/wiki/Christ_of_V%C5%A9ng_T%C3%A0u",
+						"note": "the platform under the figure"
+					},
+					"plaza_radius": {
+						"value": 15.0,
+						"source": "OpenStreetMap",
+						"note": "the footways round the statue are 13 m from its middle (ways 35923587, 788327894)"
+					},
+					"steps_from_road": {
+						"value": 811,
+						"source": "https://vi.wikipedia.org/wiki/T%C6%B0%E1%BB%A3ng_Ch%C3%BAa_Kit%C3%B4_Vua_(V%C5%A9ng_T%C3%A0u)"
+					}
+				},
+				"colors": {
+					"stone": "#E6E4DE"
+				},
+				"stairs": [
+					788327902,
+					222906171,
+					788327910,
+					788327915,
+					222906168
+				],
+				"route": [
+					222906174,
+					222906168,
+					259397793,
+					788327915,
+					788327914,
+					788327910,
+					788327909,
+					222906171,
+					788327903,
+					788327902,
+					35923587,
+					788327894
+				],
+				"model": null,
+				"lens": {
+					"phrase_vi": "tượng Chúa giang tay",
+					"phrase_en": "the statue of Christ with open arms",
+					"text": "A statue of Christ on the top of Núi Nhỏ, 32 m high, with arms 18.4 m wide. 811 steps go up to it from the road, and 133 steps inside go up to the shoulders."
+				}
 			}
 		},
 		{
@@ -234,6 +316,30 @@
 			"hint": {
 				"lat": 10.3343,
 				"lon": 107.0776
+			},
+			"place": {
+				"name_en": "Vũng Tàu lighthouse",
+				"status": "Source",
+				"kind": "tower",
+				"sizes": {
+					"height": {
+						"value": 18.0,
+						"source": "https://vi.wikipedia.org/wiki/H%E1%BA%A3i_%C4%91%C4%83ng_V%C5%A9ng_T%C3%A0u"
+					},
+					"diameter": {
+						"value": 3.0,
+						"source": "https://vi.wikipedia.org/wiki/H%E1%BA%A3i_%C4%91%C4%83ng_V%C5%A9ng_T%C3%A0u"
+					}
+				},
+				"colors": {
+					"stone": "#F1F0EA"
+				},
+				"model": null,
+				"lens": {
+					"phrase_vi": "hải đăng",
+					"phrase_en": "lighthouse",
+					"text": "The lighthouse of Vũng Tàu: a white tower of 18 m on the top of Núi Nhỏ. It was started in 1862 and restored in 1913."
+				}
 			}
 		},
 		{
@@ -264,6 +370,39 @@
 			"hint": {
 				"lat": 10.353,
 				"lon": 107.068
+			},
+			"place": {
+				"name_en": "White Palace",
+				"status": "Source",
+				"kind": "villa",
+				"sizes": {
+					"length": {
+						"value": 28.0,
+						"source": "https://ashui.com/bach-dinh-vung-tau"
+					},
+					"width": {
+						"value": 15.0,
+						"source": "https://ashui.com/bach-dinh-vung-tau"
+					},
+					"height": {
+						"value": 19.0,
+						"source": "https://ashui.com/bach-dinh-vung-tau"
+					},
+					"floors": {
+						"value": 3,
+						"source": "https://vnexpress.net/biet-thu-trang-o-vung-tau-3300775.html"
+					}
+				},
+				"colors": {
+					"stone": "#EEEBE3",
+					"roof": "#B5643F"
+				},
+				"model": null,
+				"lens": {
+					"phrase_vi": "Bạch Dinh",
+					"phrase_en": "the White Palace",
+					"text": "A white French villa of three floors on the slope of Núi Lớn, built from 1898 to 1902."
+				}
 			}
 		},
 		{
@@ -298,6 +437,31 @@
 			"hint": {
 				"lat": 10.3715,
 				"lon": 107.0624
+			},
+			"place": {
+				"name_en": "Our Lady of Bãi Dâu",
+				"status": "Source",
+				"kind": "column",
+				"sizes": {
+					"height": {
+						"value": 25.0,
+						"source": "https://vi.wikipedia.org/wiki/%C4%90%E1%BB%A9c_M%E1%BA%B9_B%C3%A3i_D%C3%A2u"
+					},
+					"footprint": {
+						"value": "outline",
+						"source": "OpenStreetMap",
+						"note": "the OSM outline of the statue"
+					}
+				},
+				"colors": {
+					"stone": "#ECEAE4"
+				},
+				"model": null,
+				"lens": {
+					"phrase_vi": "tượng Đức Mẹ",
+					"phrase_en": "the statue of Our Lady",
+					"text": "A white statue of Mary, 25 m high, built in 1992 on the hillside of Núi Lớn over Bãi Dâu."
+				}
 			}
 		},
 		{
@@ -327,6 +491,36 @@
 			"hint": {
 				"lat": 10.3239,
 				"lon": 107.0893
+			},
+			"place": {
+				"name_en": "Hòn Bà shrine",
+				"status": "Source",
+				"kind": "shrine",
+				"sizes": {
+					"height": {
+						"value": 4.0,
+						"source": "https://www.sggp.org.vn/con-duong-da-xe-bien-noi-bo-voi-hon-ba-post544948.html",
+						"note": "over the ground"
+					},
+					"footprint": {
+						"value": "outline",
+						"source": "OpenStreetMap",
+						"note": "the OSM outline of the shrine"
+					}
+				},
+				"colors": {
+					"stone": "#D9CDB0",
+					"roof": "#C8642E"
+				},
+				"stairs": [
+					221906225
+				],
+				"model": null,
+				"lens": {
+					"phrase_vi": "miếu Bà",
+					"phrase_en": "the shrine of the Lady",
+					"text": "The shrine on the islet of Hòn Bà. The path of stones to it, about 300 m, is dry only at low tide."
+				}
 			}
 		},
 		{
@@ -350,6 +544,15 @@
 			"hint": {
 				"lat": 10.3553,
 				"lon": 107.0673
+			},
+			"place": {
+				"name_en": "Tam Bảo pagoda",
+				"status": "Check",
+				"kind": "none",
+				"sizes": {},
+				"model": null,
+				"note": "No source for the sizes yet (plan 0008, Q1, Q2): no stand-in.",
+				"lens": {}
 			}
 		},
 		{
@@ -411,6 +614,15 @@
 			"hint": {
 				"lat": 10.3505,
 				"lon": 107.087
+			},
+			"place": {
+				"name_en": "Vũng Tàu bus station",
+				"status": "Check",
+				"kind": "none",
+				"sizes": {},
+				"model": null,
+				"note": "No source for the sizes yet (plan 0008, Q1, Q2): no stand-in.",
+				"lens": {}
 			}
 		},
 		{
@@ -434,6 +646,15 @@
 			"hint": {
 				"lat": 10.35,
 				"lon": 107.079
+			},
+			"place": {
+				"name_en": "Vũng Tàu market",
+				"status": "Check",
+				"kind": "none",
+				"sizes": {},
+				"model": null,
+				"note": "No source for the sizes yet (plan 0008, Q1, Q2): no stand-in.",
+				"lens": {}
 			}
 		},
 		{
@@ -450,6 +671,15 @@
 			"hint": {
 				"lat": 10.3415,
 				"lon": 107.0761
+			},
+			"place": {
+				"name_en": "Xóm Lưới market",
+				"status": "Check",
+				"kind": "none",
+				"sizes": {},
+				"model": null,
+				"note": "No source for the sizes yet (plan 0008, Q1, Q2): no stand-in.",
+				"lens": {}
 			}
 		},
 		{
@@ -467,7 +697,16 @@
 				"lat": 10.3501,
 				"lon": 107.0755
 			},
-			"note": "An old market near Bãi Trước, at Trần Hưng Đạo and Lê Quý Đôn (plan 0005, Q9, Q12: number 12 on anchors.png, OSM way 259528309)."
+			"note": "An old market near Bãi Trước, at Trần Hưng Đạo and Lê Quý Đôn (plan 0005, Q9, Q12: number 12 on anchors.png, OSM way 259528309).",
+			"place": {
+				"name_en": "Ward 1 market",
+				"status": "Check",
+				"kind": "none",
+				"sizes": {},
+				"model": null,
+				"note": "No source for the sizes yet (plan 0008, Q1, Q2): no stand-in.",
+				"lens": {}
+			}
 		},
 		{
 			"id": "vong_xoay_lon",
@@ -485,6 +724,15 @@
 			"hint": {
 				"lat": 10.346,
 				"lon": 107.085
+			},
+			"place": {
+				"name_en": "the big roundabout",
+				"status": "Check",
+				"kind": "none",
+				"sizes": {},
+				"model": null,
+				"note": "No source for the sizes yet (plan 0008, Q1, Q2): no stand-in.",
+				"lens": {}
 			}
 		},
 		{
@@ -509,7 +757,129 @@
 			"hint": {
 				"lat": 10.3549,
 				"lon": 107.0849
+			},
+			"place": {
+				"name_en": "the five-way crossing",
+				"status": "Check",
+				"kind": "none",
+				"sizes": {},
+				"model": null,
+				"note": "No source for the sizes yet (plan 0008, Q1, Q2): no stand-in.",
+				"lens": {}
+			}
+		},
+		{
+			"id": "cau_da",
+			"name_vi": "Cầu Đá cổ",
+			"other_names": [
+				"Old rocky pier"
+			],
+			"search": [
+				{
+					"tags": {
+						"man_made": "breakwater"
+					}
+				},
+				{
+					"tags": {
+						"historic": "ruins"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3403,
+				"lon": 107.0684
+			},
+			"place": {
+				"name_en": "Cầu Đá stone pier",
+				"status": "Source",
+				"kind": "jetty",
+				"sizes": {
+					"length": {
+						"value": "line",
+						"source": "OpenStreetMap",
+						"note": "the line of the OSM way; about 400 m in the source"
+					},
+					"top_width": {
+						"value": 4.0,
+						"source": "https://mia.vn/cam-nang-du-lich/check-in-cang-cau-da-vung-tau-di-tich-lich-su-gan-voi-thoi-phap-thuoc-1776"
+					},
+					"built": {
+						"value": 1896,
+						"source": "https://mia.vn/cam-nang-du-lich/check-in-cang-cau-da-vung-tau-di-tich-lich-su-gan-voi-thoi-phap-thuoc-1776"
+					}
+				},
+				"colors": {
+					"stone": "#8E8A80"
+				},
+				"model": null,
+				"lens": {
+					"phrase_vi": "Cầu Đá",
+					"phrase_en": "the stone pier",
+					"text": "The old stone pier of Cầu Đá on Hạ Long road. The French built it in 1896."
+				}
+			}
+		},
+		{
+			"id": "nha_tho_vung_tau",
+			"name_vi": "Nhà thờ Vũng Tàu",
+			"exact_name": true,
+			"search": [
+				{
+					"tags": {
+						"building": "church"
+					}
+				},
+				{
+					"tags": {
+						"amenity": "place_of_worship"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.346,
+				"lon": 107.0774
+			},
+			"place": {
+				"name_en": "Vũng Tàu church",
+				"status": "Check",
+				"kind": "none",
+				"sizes": {},
+				"model": null,
+				"note": "No source for the sizes yet (plan 0008, Q1, Q2): no stand-in.",
+				"lens": {}
+			}
+		},
+		{
+			"id": "tuong_tran_hung_dao",
+			"name_vi": "Tượng Trần Hưng Đạo",
+			"exact_name": true,
+			"search": [
+				{
+					"tags": {
+						"historic": "memorial"
+					}
+				},
+				{
+					"tags": {
+						"historic": "*"
+					}
+				}
+			],
+			"hint": {
+				"lat": 10.3424,
+				"lon": 107.0773
+			},
+			"place": {
+				"name_en": "Trần Hưng Đạo statue",
+				"status": "Check",
+				"kind": "none",
+				"sizes": {},
+				"model": null,
+				"note": "No source for the sizes yet (plan 0008, Q1, Q2): no stand-in.",
+				"lens": {}
 			}
 		}
-	]
+	],
+	"stand_in_note": "(A simple shape stands here until its model is made.)"
 }

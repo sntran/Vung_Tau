@@ -612,3 +612,36 @@ def test_rocky_coast_has_boulders():
     inside = grid.heights[30:90, 30:90] + 0.5
     assert inside.max() > 1.0, "boulders rise more than 1 m"
     assert np.all(grid.heights[:20, :] == -0.5), "the ground outside does not change"
+
+
+def test_a_hill_hides_the_top_of_a_place():
+    # Plan 0008, R8: a ray from the eye to the top of the place is blocked by higher ground.
+    from geodata import visibility
+
+    def ground(x, z):
+        return 30.0 if 40.0 < x < 60.0 else 0.0
+
+    eye = [0.0, 1.6, 0.0]
+    assert visibility.seen_part(eye, [100.0, 0.0, 0.0], 36.0, ground) < 1.0
+    assert visibility.seen_part(eye, [100.0, 0.0, 0.0], 36.0, lambda x, z: 0.0) == 1.0
+    assert visibility.seen_part(eye, [100.0, 0.0, 0.0], 18.0, ground) == 0.0
+
+
+def test_the_known_places_clear_their_outline_and_stairs():
+    # Plan 0008, R5: the outline, the plaza, and the stairs of a place, plus 3 m.
+    from types import SimpleNamespace
+
+    from geodata import clearings
+
+    landmarks_in = [
+        {"id": "statue", "place": {"status": "Source", "sizes": {"plaza_radius": {"value": 10.0}}, "stairs": [5]}},
+        {"id": "temple", "place": {"status": "Check"}},
+    ]
+    found = {"statue": {"found": True, "position": [0.0, 0.0], "outline": [[-2, -2], [2, -2], [2, 2], [-2, 2]]},
+             "temple": {"found": True, "position": [100.0, 0.0], "outline": [[98, -2], [102, -2], [102, 2], [98, 2]]}}
+    stairs = SimpleNamespace(id=5, width=2.0, points=np.array([[0.0, -10.0], [0.0, -40.0]]))
+    shapes = clearings.known_place_shapes(landmarks_in, found, [stairs], 3.0)
+    union = shapely.union_all(shapes)
+    assert union.contains(shapely.geometry.Point(12.0, 0.0))
+    assert union.contains(shapely.geometry.Point(0.0, -35.0))
+    assert not union.contains(shapely.geometry.Point(100.0, 0.0)), "a place with Check clears nothing"

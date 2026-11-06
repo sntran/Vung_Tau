@@ -125,6 +125,11 @@ var _canopy_place: Dictionary = {}
 var _canopy_trees: Dictionary = {}
 var sea_objects: SeaObjects
 var roadworks: Roadworks
+## The known places of plan 0008: the stand-ins, the stairs, and the jetty.
+var places: KnownPlaces
+## The name labels of the landmarks (plan 0005, R15). Plan 0008 (D5, R4): they
+## show only with the debug key F3.
+var markers: Array[Label3D] = []
 ## The season values of the game day (R12a), from Season.of_day().
 var season: Dictionary = {}
 var _season_day := -1
@@ -206,7 +211,27 @@ func setup(folder := GeoData.ROOT) -> bool:
 	if not roadworks.setup(data.root.path_join("roadworks.json")):
 		roadworks.queue_free()
 		roadworks = null
+	places = KnownPlaces.new()
+	places.name = "KnownPlaces"
+	add_child(places)
+	places.setup(self)
 	return true
+
+
+## F3 shows and hides the name labels with the debug overlay (plan 0008, R4).
+func _input(event: InputEvent) -> void:
+	var key := event as InputEventKey
+	if key and key.pressed and not key.echo and key.physical_keycode == KEY_F3:
+		set_markers_visible(not markers_visible())
+
+
+func set_markers_visible(on: bool) -> void:
+	for label in markers:
+		label.visible = on
+
+
+func markers_visible() -> bool:
+	return not markers.is_empty() and markers[0].visible
 
 
 ## Builds the near chunks around the point at once (not in a worker thread), so
@@ -241,8 +266,12 @@ func ground_height(x: float, z: float) -> float:
 ## 0.5 m (R13). On the Hòn Bà ridge, the ridge must be dry. A step from the
 ## point "from" that does not go into deeper water is also allowed, so that
 ## the player can always walk back out of the water (the floor of the data is
-## almost flat in places, and the tide can rise under the player).
+## almost flat in places, and the tide can rise under the player). On the
+## floor of a known place (the deck of the jetty, plan 0008), the player can
+## always stand.
 func can_stand(point: Vector3, from := Vector3.INF) -> bool:
+	if places != null and point.y >= places.floor_at(point.x, point.z) - 0.5:
+		return true
 	var ground := ground_height(point.x, point.z)
 	if is_on_ridge(point) and ground <= ridge_top + RIDGE_ABOVE:
 		return sea_level < ground
@@ -1382,6 +1411,8 @@ func _make_markers() -> void:
 		label.fixed_size = true
 		label.pixel_size = 0.0006
 		label.set_meta("test_id", "marker." + str(record.id))
+		label.visible = OS.get_cmdline_user_args().has("--debug")
+		markers.append(label)
 		var pos: Array = record.position
 		var height := float(record.get("height", data.overview_height(pos[0], pos[1])))
 		label.position = Vector3(pos[0], maxf(height, 0.0) + MARKER_HEIGHT, pos[1])

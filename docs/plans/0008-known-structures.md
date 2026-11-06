@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Approved |
+| Status | In progress |
 | Branch | `feat/0008-known-structures` |
 | Depends on | 0005 (the real ground), 0020 (the clearings of the trees), and World: the blueprints of buildings and statues (plan 0023, D9, request W13). |
 | Used by | 0010 (the bus ride passes some of these places), 0016 (Hòn Bà), 0017 (the Vi Ba road), 0024 (the cable car), and the activities of the first release: the stairs to the statue, the lighthouse, Bạch Dinh, Cầu Đá. |
@@ -118,3 +118,25 @@ The places are:
 - **Q2.** The state in 2019: did Khách sạn Hải Âu stand? Could visitors climb the lighthouse? Was Bạch Dinh a museum, and when was it open? Which temples and pagodas stood above Hạ Long? These facts have the status "Check".
 - **Q3.** The names. The Lens card of the statue uses "Tượng Chúa Kitô Vua", and the Vietnamese phrase uses what people say, "tượng Chúa giang tay". I confirm the other names.
 - **Q5.** Answered: in 2019, visitors climbed inside the statue to its shoulders. A later plan makes it an activity (R14).
+- **Q4.** Answered on 2026-11-06: the jetty of Cầu Đá follows the old stone line of OpenStreetMap (way 286293879, "Cầu Đá cổ", 254 m). Its land end is in the sea, about 90 m from the shore. The game goes on along the same line to the first point of the shore over the highest tide (R6, R15).
+- **Q6.** Answered on 2026-11-06: the Lens cards are in `data/geo/landmarks.json`, in the record of each place (D6).
+
+## 9. Builder notes
+
+- **N1. Data (R1, D1, D2).** Each place of the plan has a "place" record in `data/geo/landmarks.json`: the names, the kind of stand-in, the sizes with a source for each, the colors, the status, and the Lens card. `KnownPlaces.check()` checks the records at the start, and PT-59 (`tests/unit/test_known_places.gd`) checks them in the unit tests. Six places have sizes with sources: the statue on Núi Nhỏ, the lighthouse, Bạch Dinh, Đức Mẹ Bãi Dâu, Miếu Hòn Bà, and Cầu Đá. The sources are in `docs/content/reference/landmarks.md`, and the facts of the Lens cards are in `docs/content/culture-notes.md` with the status "Source". Chùa Tam Bảo, Nhà thờ lớn Vũng Tàu, the statue of Trần Hưng Đạo, and the town anchors have no source of their sizes yet: they have the status "Check", no stand-in, and no Lens card (Q1, Q2).
+- **N2. The stand-ins (R3, D3a, D8, R9).** `scenes/world/known_places.gd` makes them: the statue (a figure with arms on a dome, a terrace, and a base, on a round plaza with a parapet), the lighthouse (a tower with a gallery), Bạch Dinh (a block with a roof on the OSM outline), and a prism on the OSM outline for Đức Mẹ Bãi Dâu and Miếu Hòn Bà. The Lens card of a stand-in says "stand-in". The far form of the statue has 50 triangles, and of the lighthouse 44 (R9: 300 or less).
+- **N3. The bases (R2, D7).** `tools/geo/build.py` (`level_places()`) makes the ground level under each place at the lowest point of its outline (or of its plaza) plus 0.1 m, and writes `base_height` in `data/geo/build/landmarks.json`: the statue 136.50 m, the lighthouse 172.57 m, Bạch Dinh 20.27 m, Đức Mẹ Bãi Dâu 55.49 m, Miếu Hòn Bà 7.84 m. The clearings of the trees come from the outline of each place, its stairs, and its jetty, plus 3 m (R5, `clearings.known_place_shapes()`).
+- **N4. The labels (R4, D5).** The markers of plan 0005 are hidden. F3 (or `--debug`) shows them. PT-39 checks that they are hidden, and that F3 shows them.
+- **N5. The stairs (R6, R15).** The stairs follow the OSM lines of `highway=steps` (the statue: ways 788327902, 222906171, 788327910, 788327915, 222906168; Miếu Hòn Bà: way 221906225). `KnownPlaces.stair_profile()` puts a landing of 1.2 m at each turn of more than 30°, and equal steps of 15 cm to 18 cm in each flight between two landings. The collision is one ramp for each part of the line, on the noses of the steps (R7): the player walks up with no stop at each step.
+- **N6. The jetty (R6, R7, Q4).** The deck is 4 m wide (the top width of the source), 0.6 m over the highest tide of the game year (2.05 m), with a stone edge of 0.35 m and invisible walls of 1.1 m at the sides and at the sea end. With the part to the shore, the jetty is 352 m. The player can stand on the deck over deep water: `VungTau.can_stand()` asks `KnownPlaces.floor_at()` first. The faces of the boxes of `known_places.gd` were in the wrong order, so the deck showed its inside (the water was visible through it). A unit test now checks that the faces of a box face out.
+- **N7. The views (R8, D4, PT-60).** `tools/geo/geodata/visibility.py` casts the rays of `data/geo/place_views.json` against the DEM, and writes `data/geo/build/place_views.json`. The game casts the same rays against its own ground. The part of the place that shows (10 samples from the base to the top):
+
+  | Eye | Statue (36 m) | Lighthouse (18 m) |
+  |---|---|---|
+  | The beach of Bãi Trước | 0.0 | 0.1 |
+  | The south part of Bãi Sau | 0.8 | 1.0 |
+  | The Hải Đăng road | 0.0 | 0.4 |
+  | The sea in front of Bãi Trước | 0.0 | 0.0 |
+
+  The DEM and the game give the same values for each view. No view was changed.
+- **N8. Phase 5 waits.** The orders of the models (R12 to R14, R16) wait for the blueprints of World (W13). Each place keeps its stand-in until World has its model.

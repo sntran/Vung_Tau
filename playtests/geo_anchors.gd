@@ -1,6 +1,6 @@
 extends RefCounted
 # PT-39 geo_anchors. Take a screenshot at each town anchor and at each structure
-# in R1, with the marker visible.
+# in R1, with the marker visible. The markers show only with F3 (plan 0008, R4).
 # The places are all the landmarks of data/geo/landmarks.json: the structures
 # of R1 and the town anchors of R6a (the bus station, the markets, the big
 # roundabout, and the junction of five roads). The camera looks at each marker
@@ -36,6 +36,11 @@ func run(d: PlaytestDriver) -> void:
 		await _sea_objects(d, w)
 		await _flat_rocks(d, w)
 		return
+	# Plan 0008, R4 (D5): no name labels in the world; F3 shows them.
+	d.expect(not w.markers_visible(), "the name labels do not show without F3 (plan 0008, R4)")
+	await d.key(KEY_F3)
+	await d.wait_frames(2)
+	d.expect(w.markers_visible(), "F3 shows the name labels")
 	var records: Array = w.data.landmarks.duplicate()
 	records.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return str(a.id) < str(b.id))
 	if d.phase == 1:

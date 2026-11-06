@@ -1,0 +1,15 @@
+{
+	"note": "The views of plan 0008 (D4, R8, PT-60). tools/geo/build.py casts rays from each eye to the targets against the ground of the DEM and writes data/geo/build/place_views.json. PT-60 casts the same rays against the ground of the game. An eye is a landmark (its position, or the end of its outline to the \"side\"), \"out_m\" meters toward the sea from it, at \"height_m\" over the ground (over the sea level for an eye on the sea). A target is the top of a place: its ground plus \"top_m\". A ray goes to each of \"samples\" points from the ground of the target to its top; the part of the points that the eye sees is the result.",
+	"samples": 10,
+	"step_m": 1.0,
+	"eyes": [
+		{"id": "bai_truoc_beach", "landmark": "bai_truoc", "height_m": 1.6},
+		{"id": "bai_sau_south", "landmark": "bai_sau", "side": "south", "inset_m": 40.0, "height_m": 1.6},
+		{"id": "hai_dang_road", "landmark": "duong_hai_dang", "height_m": 1.6},
+		{"id": "bai_truoc_sea", "landmark": "bai_truoc", "out_m": 400.0, "away_from_road": "Quang Trung", "height_m": 2.0}
+	],
+	"targets": [
+		{"place": "chua_kito_vua", "top_m": 36.0},
+		{"place": "hai_dang", "top_m": 18.0}
+	]
+}
