@@ -97,7 +97,12 @@ static func _walk(d: PlaytestDriver, w: VungTau, route: PackedVector3Array, from
 	var tries := 0
 	while at < to - 1.0 and tries < 120:
 		tries += 1
-		var target := PlaytestDriver.route_point(route, minf(at + TAP_M, to))
+		# A player taps along the stairs: at a turn, a nearer point, so that the
+		# straight walk to it stays within 0.5 m of the route.
+		var reach := TAP_M
+		while reach > 2.0 and _cuts_corner(route, d.state().player, at, minf(at + reach, to)):
+			reach *= 0.7
+		var target := PlaytestDriver.route_point(route, minf(at + reach, to))
 		target.y = maxf(w.ground_height(target.x, target.z), w.places.floor_at(target.x, target.z)) + 0.05
 		await d.look_at_point(target, 3.0, 15.0)
 		if await d.try_tap_floor(target) != "":
@@ -126,6 +131,21 @@ static func _walk(d: PlaytestDriver, w: VungTau, route: PackedVector3Array, from
 			d.phase, from, to, at, farthest.off])
 	d.expect(at >= to - 2.0, "part %d: the player comes to %.0f m of the route (%.0f m)" % [d.phase, to, at])
 	d.expect(farthest.off <= OFF_ROUTE_M, "part %d: the player stays on the route (%.1f m from it at most)" % [d.phase, farthest.off])
+
+
+## True when the straight walk from "from" to the route point at "to" leaves
+## the route between "at" and "to" by more than 0.5 m.
+static func _cuts_corner(route: PackedVector3Array, from: Vector3, at: float, to: float) -> bool:
+	var a := Vector2(from.x, from.z)
+	var end := PlaytestDriver.route_point(route, to)
+	var b := Vector2(end.x, end.z)
+	var k := at
+	while k < to:
+		var q := PlaytestDriver.route_point(route, k)
+		if Geometry2D.get_closest_point_to_segment(Vector2(q.x, q.z), a, b).distance_to(Vector2(q.x, q.z)) > 0.5:
+			return true
+		k += 0.5
+	return false
 
 
 static func _off_route(route: PackedVector3Array, p: Vector3) -> float:

@@ -29,7 +29,9 @@ const SKIRT_MIN := 0.1
 ## The treads stand this much over the ground of the cut (tools/geo/build.py, cut_stairs()).
 const STAIR_LIFT := 0.12
 ## The steps climb to a landing with this grade or less (0.59 is the most for steps of 16.5 cm on treads of 28 cm).
-const LEAD_GRADE := 0.5
+const LEAD_GRADE := 0.58
+## The shortest tread when the steps catch up with the ground (a ramp of 36.9° on the noses, under the 40° of the player).
+const TREAD_FAST_M := 0.22
 ## The shortest tread of the stairs, in meters.
 const TREAD_M := 0.28
 ## A turn of more than this has a landing (R6).
@@ -571,7 +573,7 @@ func _stair_skirts(entry: Dictionary, a: Vector3, b: Vector3, width: float) -> v
 ## a step goes up or down where the ground is more than STEP_FOLLOW of a step
 ## from the tread, with a tread of TREAD_M or more. A turn of more than
 ## TURN_DEG has a flat landing of LANDING_M (R6), with no step on it, at the
-## highest ground of its length (_stair_goal()).
+## ground of its middle (_stair_goal()).
 static func stair_profile(line: PackedVector3Array) -> Dictionary:
 	var s := PackedFloat32Array([0.0])
 	for i in range(1, line.size()):
@@ -607,8 +609,11 @@ static func stair_profile(line: PackedVector3Array) -> Dictionary:
 				on_landing = true
 		var gap := _stair_goal(line, s, landings, at) - h
 		# A tread is TREAD_M or more in a straight line: at a bend of the line,
-		# the length along the line is longer than the tread.
-		var far := _flat(_point_at(line, s, at, h)).distance_to(_flat(walk[walk.size() - 1])) >= TREAD_M
+		# the length along the line is longer than the tread. Steps that are
+		# more than two steps from the ground (after landings) catch up with
+		# treads of TREAD_FAST_M.
+		var tread := TREAD_FAST_M if absf(gap) > step * 2.0 else TREAD_M
+		var far := _flat(_point_at(line, s, at, h)).distance_to(_flat(walk[walk.size() - 1])) >= tread
 		if not on_landing and far and absf(gap) > step * STEP_FOLLOW:
 			treads.append({"from": _point_at(line, s, tread_from, h), "to": _point_at(line, s, at, h), "height": h})
 			h += signf(gap) * step
@@ -634,12 +639,13 @@ static func stair_profile(line: PackedVector3Array) -> Dictionary:
 
 
 ## The height that the steps follow at "at": the ground, but not lower than a
-## slope of LEAD_GRADE down from each landing. A landing has the highest ground
-## of its length, so it is never under the ground, and the steps climb to it in time.
+## slope of LEAD_GRADE down from each landing. A landing has the ground of its
+## middle, and the steps climb to it in time (the ground of the cut climbs 0.5
+## at most, so the steps come back to the ground soon after the landing).
 static func _stair_goal(line: PackedVector3Array, s: PackedFloat32Array, landings: Array[Vector2], at: float) -> float:
 	var goal := _height_at(line, s, at)
 	for l: Vector2 in landings:
-		var top := maxf(_height_at(line, s, l.x), _height_at(line, s, l.y))
+		var top := _height_at(line, s, (l.x + l.y) / 2.0)
 		var away := l.x - at if at < l.x else (at - l.y if at > l.y else 0.0)
 		goal = maxf(goal, top - away * LEAD_GRADE)
 	return goal
