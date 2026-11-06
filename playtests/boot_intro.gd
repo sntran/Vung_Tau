@@ -3,9 +3,14 @@ extends RefCounted
 # the phone button has a dot. Read it in the Messages app. Go to Bà Tư. She
 # speaks with a subtitle. Answer "Dạ, chưa ạ" with Play (plan 0003). The card
 # anSang is in the Sổ tay, and a notification shows. A second visit does not
-# add the card again. Then the other path: "Good morning!" in English.
+# add the card again. Then the other path: "Good morning!" in English. The
+# first kinship word of Bà Tư ("con") also teaches the card "Xưng hô" (plan
+# 0007, R13).
 # phase: --start-time=06:00
 # phase: --start-time=06:00 --fresh-save
+
+## The card of the forms of address (the first "con" of Bà Tư), then the card of the greeting.
+const EXPECTED_CARDS: Array[String] = ["xungHo", "anSang"]
 
 
 func run(d: PlaytestDriver) -> void:
@@ -44,7 +49,7 @@ func _path_chua(d: PlaytestDriver) -> void:
 	var line := await d.wait_line("batu")
 	d.expect(line == "batu.reply_chua", "Bà Tư answers \"chưa\", not \"%s\"" % line)
 	var s := d.state()
-	d.expect(s.cards == ["anSang"], "the card anSang is in the Sổ tay: %s" % [s.cards])
+	d.expect(s.cards == EXPECTED_CARDS, "the cards xungHo and anSang are in the Sổ tay: %s" % [s.cards])
 	d.expect(s.notification.contains(Content.card("anSang").title) or s.notification.contains("Ăn sáng"),
 			"a notification shows: %s" % s.notification)
 	await d.screenshot("reply_chua")
@@ -62,7 +67,7 @@ func _path_chua(d: PlaytestDriver) -> void:
 	d.expect(line == "batu.greet", "a second tap on Bà Tư plays her greeting, not \"%s\"" % line)
 	await d.answer("chua", "play")
 	await d.wait_line("batu")
-	d.expect(d.state().cards == ["anSang"], "the card is in the Sổ tay one time only")
+	d.expect(d.state().cards == EXPECTED_CARDS, "each card is in the Sổ tay one time only: %s" % [d.state().cards])
 
 
 func _path_english(d: PlaytestDriver) -> void:
@@ -70,7 +75,7 @@ func _path_english(d: PlaytestDriver) -> void:
 	var line := await d.wait_line("batu")
 	d.expect(line == "batu.reply_english", "Bà Tư answers in English, not \"%s\"" % line)
 	var s := d.state()
-	d.expect(s.cards == ["anSang"], "the card anSang is in the Sổ tay: %s" % [s.cards])
+	d.expect(s.cards == EXPECTED_CARDS, "the cards xungHo and anSang are in the Sổ tay: %s" % [s.cards])
 	await d.screenshot("reply_english")
 	await d.wait_quiet()
 	d.expect(d.state().messages.has("an_sang_english"), "cô Nga sends a tip after the English answer")

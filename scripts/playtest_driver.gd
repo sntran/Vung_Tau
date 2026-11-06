@@ -795,6 +795,57 @@ func tap_phone_id(test_id: String) -> bool:
 	return ok
 
 
+# --- The passport and the forms of address (plan 0007) -----------------------
+
+## Sets the gender ("male" or "female") and the date of birth ("YYYY-MM-DD")
+## in the Passport app with taps on its buttons. With "send", it taps "Send"
+## when the passport is not sent yet (after that, a change takes effect at once).
+func set_passport(gender: String, birth_date: String, send := true) -> bool:
+	if not await open_app("passport"):
+		return false
+	await tap_phone_id("passport.%s" % gender)
+	var want := birth_date.split("-")
+	for part: String in ["year", "month", "day"]:
+		var target := int(want[["year", "month", "day"].find(part)])
+		for i in 400:
+			var now := _passport_part(part)
+			if now == target:
+				break
+			# The month and the day go round, so the short way is not always "+".
+			await tap_phone_id("passport.%s_%s" % [part, "plus" if target > now else "minus"])
+		if not expect(_passport_part(part) == target, "the passport %s is %d: %d" % [part, target, _passport_part(part)]):
+			return false
+	if send and not GameState.passport_sent():
+		await tap_phone_id("passport.send")
+		await wait_frames(3)
+	return expect(str(GameState.passport.birth) == birth_date and str(GameState.passport.gender) == gender,
+			"the passport has %s, %s: %s" % [gender, birth_date, GameState.passport])
+
+
+## A part of the date of birth that the Passport app shows ("year", "month", or "day").
+func _passport_part(part: String) -> int:
+	var app: PassportApp = main().phone.apps.passport
+	var parts := str(app._draft.get("birth", "")).split("-")
+	return int(parts[["year", "month", "day"].find(part)]) if parts.size() == 3 else -1
+
+
+## The forms of address of the person for the traveler now: {you, me, them, self}.
+func address(npc_id: String) -> Dictionary:
+	return Content.words(npc_id)
+
+
+## The forms of address of the person for a traveler, from the rules alone
+## (data/address.json), to check the game against.
+static func expected_words(npc_id: String, gender: String, age: int) -> Dictionary:
+	return Address.words(Content.address, npc_id, {"gender": gender, "age": age})
+
+
+## The clip ID that the person plays now, from its audio file, or "".
+func playing_clip(npc_id: String) -> String:
+	var stream: AudioStream = main().hem.npcs[npc_id].voice.stream
+	return stream.resource_path.get_file().get_basename() if stream else ""
+
+
 ## The visible subtitle: {speaker, lines, line_id, caption}, or an empty dictionary.
 func subtitle() -> Dictionary:
 	var subtitles: Subtitles = main().subtitles
