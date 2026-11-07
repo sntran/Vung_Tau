@@ -41,4 +41,4 @@ Bạch Dinh at 10 m is inside a tree, the lighthouse at 50 m is behind trees, an
 
 - **The number of steps.** The game has 691 steps on its route. The source says 811 (culture notes). The OSM ways can be shorter than the real stairs, or the step height can differ. The builder writes which it is.
 - **The jetty of Cầu Đá in 2019.** The deck is a plain slab with no rails. I remember concrete rails in the 1990s. Their state in 2019 has the status "Check".
-- **Q7 (the plaza of the statue).** See my answer in the plan.
+- **Q7 (the plaza of the statue).** It waits for my answer.
