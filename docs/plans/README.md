@@ -42,6 +42,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 | 0008 | [Known structures](0008-known-structures.md) | Approved |
 | 0009 | [Houses on the lots](0009-houses-on-the-lots.md) | Draft |
 | 0023 | [Models from World](0023-models-from-world.md) | Approved |
+| 0025 | [QA mode: build a house at an address](0025-qa-build-at-address.md) | Draft |
 
 ## Proposed order of the next plans
 
@@ -68,6 +69,7 @@ The order can change. A number is only a name: plans 0020 to 0023 were added aft
 | 0016 | Hòn Bà at low tide | Check the tide, walk the rock path to Miếu Hòn Bà, and come back before the sea covers it. Locals warn the player about the time. |
 | 0017 | Afternoon on the Vi Ba road | Jog or ride up Núi Lớn in the afternoon. Stop at Chùa Tam Bảo to watch the monkeys (and keep your bag closed). At the top, eat sữa chua and trứng lòng đào. |
 | 0024 | The cable car to Hồ Mây | Ride the cable car from Trần Phú up Núi Lớn to Hồ Mây, the park and resort on the top, and see Bãi Trước and the town from above. The facts and the 2019 state are in the culture notes (section Vũng Tàu). |
+| 0025 | [QA mode: build a house at an address](0025-qa-build-at-address.md) | Draft. In QA mode I walk to an address, tell an architect (a language model) what to build, and watch the people of World build it on the lot, element by element; I can pause it, change it, and keep it. The same calls of World get the known places and the houses when the game is made. |
 | 0018 | Scooter | Wear a helmet and ride along the coast in the evening, and up the Vi Ba road. |
 | 0022 | The homestay garden | A small farming game on the terraces behind the homestay: small terraced rice fields (like ruộng bậc thang, but smaller), vegetables and herbs, five fruit trees (mãng cầu, đu đủ, chuối, xoài, dừa), a small fish pond, and a few animals (chickens and pigs). The player plants, waters, picks, and feeds the animals and the fish with Bà Tư, and the food goes to the family meals and the Tết tray. |
 | 0019 | Release | Signed desktop builds (Windows, macOS, Linux), signed Android and iOS builds, store pages, privacy text. |
