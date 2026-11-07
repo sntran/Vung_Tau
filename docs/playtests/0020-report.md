@@ -94,3 +94,18 @@ New, low:
 4. D-0020-04 and D-0020-05 stay open. I check them when I run PT-52 and PT-54 again.
 
 **Status:** plan 0020 stays "Built".
+
+## Second re-check of 2026-11-07
+
+I ran PT-33 (phase 2, 12:00), PT-53, and PT-54 (phase 1, Low) on the branch `feat/0020-real-trees` at commit `2d47234`, at 1280 × 720. All pass.
+
+| Defect | Result | Evidence |
+|---|---|---|
+| D-0020-01 | Fixed | `103-nui_nho_north_1200.png`: the gravel ring at the top of Núi Nhỏ is clear, and the view goes over the trees to the town and Núi Lớn. |
+| D-0020-02 | Fixed | `101-quang_trung_high.png`: the leaves of the street trees are smaller and in groups. |
+| D-0020-06 | Fixed | No hard line on the trunks. Note: the trunks of the street trees are now almost black. Give them the grey brown of bark. |
+| D-0020-07 | Fixed | The red leaves at Quang Trung are on the bàng trees, which turn red in the dry season. That is correct for January. |
+| D-0020-04 | Open | I approve the look of the types from the sheets of PT-52. |
+| D-0020-05 | Open, low | PT-54 on High passes in CI. Phase 1 (Low) passes in the workspace: 279 draw calls and 217 104 triangles at the top of Núi Nhỏ (limit 300 000). |
+
+**Status:** plan 0020 stays "Built" until the branch is on `main` and I approve the sheets of PT-52 (criterion 1).
