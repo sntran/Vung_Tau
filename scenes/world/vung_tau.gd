@@ -270,8 +270,11 @@ func ground_height(x: float, z: float) -> float:
 ## floor of a known place (the deck of the jetty, plan 0008), the player can
 ## always stand.
 func can_stand(point: Vector3, from := Vector3.INF) -> bool:
-	if places != null and point.y >= places.floor_at(point.x, point.z) - 0.5:
-		return true
+	if places != null:
+		# floor_at() is -INF where no place has a floor.
+		var floor_y := places.floor_at(point.x, point.z)
+		if floor_y > -INF and point.y >= floor_y - 0.5:
+			return true
 	var ground := ground_height(point.x, point.z)
 	if is_on_ridge(point) and ground <= ridge_top + RIDGE_ABOVE:
 		return sea_level < ground
