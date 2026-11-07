@@ -4,7 +4,7 @@
 |---|---|
 | Status | Draft |
 | Branch | `feat/0025-qa-build-at-address` |
-| Depends on | 0005 (the roads and the addresses), 0009 (the lots), 0023 (the models from World), and plan 0001 of World ("The people build on demand"): the stream of a construction (`POST /builds`), the blueprints in data, and the MCP tools `plan_build` and `build`. |
+| Depends on | 0005 (the roads and the addresses), 0009 (the lots), 0023 (the models from World), plan 0001 of World ("The people build on demand"): the stream of a construction (`POST /builds`), the blueprints in data, and the MCP tools `plan_build` and `build`; and plan 0002 of World ("The people of World build any blueprint"): a blueprint of the game in the order (or by its hash after `POST /blueprints`), the MCP tool `check_blueprint`, and the skills of the trades (World `docs/skills.md`). |
 | Changes | 0023 R2: the fetch of a model can follow the construction of the model. |
 
 ## 1. Goal
@@ -23,6 +23,14 @@ game.
 The same calls of World get the known places of plan 0008 and the houses
 of the lots of plan 0009 when the game is made (compile time), as plan
 0023 does now.
+
+The game owns its blueprints (World plan 0002, D1): the house of a lot,
+the statue on Núi Nhỏ and the lighthouse are blueprints in data of the
+game, in `data/world/blueprints/`, made of the skills of the trades of
+World (a tube house as on a real site: the frame floor by floor, the
+bricks band by band, the render and the paint; a statue cast in pours).
+The game sends the blueprint with each order. World does not need its
+own models of Vũng Tàu.
 
 ## 2. Out of scope
 
@@ -44,6 +52,7 @@ of the lots of plan 0009 when the game is made (compile time), as plan
 | D5 | The architect is outside the game: a language model that uses the MCP server of World (`list_blueprints`, `get_blueprint`, `check_drawing`, `plan_build`, `build`). The game gives it the lot (its width, its depth, its front, its neighbors) and my words, and gets an order back. The key of the language model is in an environment variable of my computer, never in the repository. | World checks each order, so the architect can make mistakes and correct them with the errors of World. The game does not need the rules of a house. |
 | D6 | When I keep a house, its order goes into `data/world/orders.json` (plan 0023, R1) with the id of the lot, and the lock gets its hash (plan 0023, R3). A blueprint in data or a drawing that is new goes to World as a proposal (`propose_drawing`), and I review it there. | The game has no orders that are not in the lock. World keeps one catalog for all my projects. |
 | D7 | The fetch of plan 0023 (`tools/world/fetch.py --source=factory`) uses `POST /builds` with the stream for a model that the factory does not have yet, and prints the elements as they come. It keeps the same files and the same lock. | A first build of a big model takes a long time. The stream shows that it goes on. |
+| D8 | The blueprints of the game are data of the game: `data/world/blueprints/NAME.json` (the format of World `docs/format.md`, "A blueprint in data"; the skills of World `docs/skills.md`). Each order of `data/world/orders.json` gives its blueprint as `{"hash": HASH}`; the fetch sends the blueprint to `POST /blueprints` first when World does not have its hash. A blueprint that needs a skill that World does not have is a request to the owner of World. | The game decides how its houses look; World decides how the people build them. The hash names the blueprint and its options, so the lock stays the same for the same data. |
 
 ## 4. Requirements
 
@@ -69,14 +78,16 @@ of the lots of plan 0009 when the game is made (compile time), as plan
 ### The fetch at compile time
 
 - **R11.** `tools/world/fetch.py --source=factory` follows the stream of a build when the factory does not have the files, and prints one line for each task that is done. The files and the lock stay as plan 0023 says.
-- **R12.** The known places of plan 0008 that World makes from blueprints in data (the statue on Núi Nhỏ, the lighthouse) are orders of those blueprints in `data/world/orders.json`, with the sizes and the sources of plan 0008.
+- **R12.** The known places of plan 0008 (the statue on Núi Nhỏ, the lighthouse) are orders of blueprints of the game in `data/world/orders.json`, with the sizes and the sources of plan 0008.
+- **R13.** `data/world/blueprints/`: the house of a lot (from the example `tube_house` of World: the width, the depth, the floors, the openings of each floor and the finish of each wall of the lot of plan 0009), the statue and the lighthouse. `tools/world/fetch.py --check` calls the MCP tool `check_blueprint` on each, and fails with the path of each error.
+- **R14.** The fetch sends a blueprint to `POST /blueprints` when an order gives a hash that World does not have (an order with an unknown hash gives the error `blueprint.hash`), then places the order.
 
 ## 5. Phases
 
 1. The client and its test with a recorded stream (R1 to R3).
 2. The build on a lot, with an order that I write by hand (R4 to R6).
 3. The QA panel and the architect (R7 to R10).
-4. The fetch at compile time (R11, R12).
+4. The fetch at compile time and the blueprints of the game (R11 to R14).
 
 ## 6. Play-test scenarios
 
@@ -95,4 +106,5 @@ of the lots of plan 0009 when the game is made (compile time), as plan
 ## 8. Open questions
 
 - **Q1.** Which language model is the architect, and does the game call it, or does a small tool on my computer call it and give the order to the game?
-- **Q2.** The edge of World has 128 MB. A house at near can need more memory than that (World AGENTS.md, "Known problems"). Is the mid level good enough for the QA mode until World measures it?
+- **Q2.** The edge of World has 128 MB. A house at near can need more memory than that (World AGENTS.md, "Known problems"). Is the mid level good enough for the QA mode until World measures it? (World plan 0002 puts the memory later: a node can run on a computer with more memory.)
+- **Q3.** The world page of World shows the yard: the trucks that bring the bricks to the site, the people at work. Does the QA mode show them too, or only the elements on the lot?
