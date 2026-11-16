@@ -1294,11 +1294,13 @@ func set_time_scale(scale: float) -> void:
 ## the ground there, and waits until it is ready. It is the same kind of step
 ## as --start-time: a long walk in phases starts where the last phase stopped.
 ## On the floor of a known place (the deck of the jetty), the player stands on it.
-func start_at(point: Vector3, yaw: float) -> void:
+## "on" is the height of another floor there (for example the walk on the sea
+## wall of the showcase), or -INF.
+func start_at(point: Vector3, yaw: float, on := -INF) -> void:
 	var w := world()
 	w.prepare_at(point)
 	var floor_y := w.places.floor_at(point.x, point.z) if w.places != null else -INF
-	point.y = maxf(w.ground_height(point.x, point.z), floor_y) + 0.05
+	point.y = maxf(maxf(w.ground_height(point.x, point.z), floor_y), on) + 0.05
 	main().player.place(point, yaw)
 	await wait_ground(60.0)
 
@@ -1405,9 +1407,10 @@ static func route_distance(route: PackedVector3Array, point: Vector3) -> float:
 ## Walks along the route with the joystick from "from" to "to" meters: it turns
 ## the view to a point "ahead" meters further on the route, then holds the
 ## joystick forward. "check" runs each frame of the walk. With "may_stop", a
-## stop on the way (for example at deep water) is not a failure.
+## stop on the way (for example at deep water) is not a failure. "max_hold" is
+## the longest hold of the joystick before the view turns again (game seconds).
 func stick_along(route: PackedVector3Array, to: float, check := Callable(), ahead := 12.0,
-		may_stop := false) -> bool:
+		may_stop := false, max_hold := 8.0) -> bool:
 	var hook := func() -> void:
 		if check.is_valid():
 			check.call()
@@ -1438,7 +1441,7 @@ func stick_along(route: PackedVector3Array, to: float, check := Callable(), ahea
 		var target := route_point(route, minf(here + step, to))
 		await look_at_point(Vector3(target.x, pos.y + Player.EYE_HEIGHT, target.z), 4.0 if stuck == 0 else 2.0, 15.0)
 		var length := Vector2(target.x - pos.x, target.z - pos.z).length()
-		await hold_stick(Vector2(0, -1), clampf(length / Player.WALK_SPEED, 0.5, 8.0))
+		await hold_stick(Vector2(0, -1), clampf(length / Player.WALK_SPEED, 0.5, max_hold))
 		var moved: float = Vector2(state().player.x - pos.x, state().player.z - pos.z).length()
 		stuck = stuck + 1 if moved < 0.5 else 0
 		if stuck >= 4:
