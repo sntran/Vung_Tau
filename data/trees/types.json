@@ -142,7 +142,7 @@
 			"crown_height": 7.4,
 			"leaders": 3,
 			"leaf_size": 0.65,
-			"wood": "#3F362D",
+			"wood": "#6F655A",
 			"leaf": "#3C6B1E",
 			"leaf_young": "#7E9E33",
 			"season": {
@@ -182,7 +182,7 @@
 			],
 			"trunk_radius": 0.22,
 			"branches": 40,
-			"wood": "#4A3F36",
+			"wood": "#61574C",
 			"leaf": "#53654A",
 			"leaf_young": "#66784F",
 			"season": {
@@ -313,7 +313,7 @@
 			],
 			"trunk_radius": 0.25,
 			"tiers": 14,
-			"wood": "#5E5045",
+			"wood": "#6A5D51",
 			"leaf": "#3A6634",
 			"leaf_young": "#4E7F42",
 			"season": {
@@ -353,7 +353,7 @@
 			"crown_height": 6.5,
 			"leaders": 4,
 			"leaf_size": 1.0,
-			"wood": "#4E4339",
+			"wood": "#6E6458",
 			"leaf": "#3A6626",
 			"leaf_young": "#5E8A34",
 			"season": {

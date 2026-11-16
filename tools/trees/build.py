@@ -810,7 +810,10 @@ def add_tube(surf: Surface, tree: Tree, pts, radii, sides):
             t = 2 * math.pi * k / sides
             n = a * math.cos(t) + b * math.sin(t)
             q = p + n * radii[i]
-            shade = min(1.0, 0.45 + 0.55 * min(1.0, q.z / max(1.0, tree.crown_center.z - tree.crown_radii.z)))
+            # The base of the trunk is in the shade of the crown, but the light of the
+            # street comes from the sides: 0.45 made the trunks almost black (report 0020,
+            # second re-check of 2026-11-07).
+            shade = min(1.0, 0.72 + 0.28 * min(1.0, q.z / max(1.0, tree.crown_center.z - tree.crown_radii.z)))
             # The flex of the axis point: a ring moves as one, so the base of the trunk stays.
             ring.append(surf.vert(q, n, (0.0, tree.flex(p), WOOD, shade), (k / sides, length / 1.5)))
         rings.append(ring)
