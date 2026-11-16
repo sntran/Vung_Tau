@@ -1,0 +1,436 @@
+{
+	"note": "The requests of the showcase of Bãi Trước to World (plan 0026, D5 and section 7). The kinds: \"rule\" (an order of a blueprint that World has: World can build it now), \"drawing\" (an order of the blueprint drawing: World can build it now), \"new_rule\" (World has no rule for it yet: \"needs\" says what the rule must give), \"world_plan\" (a step of a plan of World), and \"answer\" (an answer to a question of World). A source with an open license can go to World with its credit; another source is a reference only. tools/world/world_requests.py checks the file, and with --check it asks check_order of World for each order. The year of each model is 2019 (Q-W1).",
+	"year": 2019,
+	"requests": [
+		{
+			"id": "Q-W1",
+			"what": "The year of each model of Vũng Tàu is 2019.",
+			"kind": "answer",
+			"to": "World plan 0018, section 6 (\"The year of the model\")",
+			"answer": "2019 for each model of this game. A building that stood in 2019 and is gone now stays (for example the villas of OSC Việt Nam at number 40); the hotel in construction at number 40 (2024) is not in the game. A look that only a photo from before 2017 or after 2021 shows has the status Check, and the owner decides it.",
+			"status": "Confirmed (the owner, 2026-11-16)"
+		},
+		{
+			"id": "Q-W2",
+			"what": "Khách sạn Hải Âu (124 Hạ Long, OSM way 790529523), in front of the jetty of Cầu Đá.",
+			"kind": "rule",
+			"blueprint": "building",
+			"model": "khach_san_hai_au",
+			"order": {
+				"blueprint": "building",
+				"options": {
+					"name": "khach_san_hai_au",
+					"sources": [
+						"The plan is the outline of OpenStreetMap way 790529523 (© OpenStreetMap contributors, ODbL): 70.9 m along Hạ Long and 21.3 m deep. Side 1 faces the sea and Hạ Long. The sides 1, 8, 11, 20, and 22 face the sea; the others are the ends of the wings and the back.",
+						"The look is from two photos of Wikimedia Commons: trungydang, 2014-04-05, CC BY 3.0 (sky blue with white bands), and HappyMidnight, 2010-11-20, CC BY-SA 4.0 (white with light green panels). The color of 2019 is not known: this request uses the color of 2014.",
+						"A guess: 5 storeys for all the building (the photos show wings of 4 to 6 storeys; a hotel page says 6), the storey height, and the bays."
+					],
+					"plan": [
+						[
+							38.21,
+							-1.41
+						],
+						[
+							24.48,
+							0.0
+						],
+						[
+							23.82,
+							-7.05
+						],
+						[
+							26.23,
+							-9.92
+						],
+						[
+							29.32,
+							-10.46
+						],
+						[
+							29.83,
+							-12.07
+						],
+						[
+							27.44,
+							-12.07
+						],
+						[
+							26.78,
+							-15.28
+						],
+						[
+							9.84,
+							-14.26
+						],
+						[
+							12.64,
+							-9.9
+						],
+						[
+							12.34,
+							-5.69
+						],
+						[
+							0.0,
+							-4.2
+						],
+						[
+							0.33,
+							-19.68
+						],
+						[
+							8.86,
+							-21.17
+						],
+						[
+							34.94,
+							-21.27
+						],
+						[
+							35.08,
+							-17.79
+						],
+						[
+							38.02,
+							-17.91
+						],
+						[
+							55.82,
+							-19.13
+						],
+						[
+							70.86,
+							-18.23
+						],
+						[
+							70.0,
+							-10.37
+						],
+						[
+							59.33,
+							-9.74
+						],
+						[
+							60.04,
+							-3.64
+						],
+						[
+							41.3,
+							-2.56
+						],
+						[
+							41.18,
+							-10.4
+						],
+						[
+							37.88,
+							-9.6
+						]
+					],
+					"storeys": 5,
+					"storey": 3.2,
+					"ground": 3.6,
+					"colors": {
+						"wall": "#5b9bd5",
+						"band": "#f4f4f0",
+						"frame": "#f4f4f0",
+						"letters": "#c8262c"
+					},
+					"fronts": [
+						{
+							"side": 1,
+							"style": "loggias",
+							"bays": 6,
+							"rail": "bars"
+						},
+						{
+							"side": 8,
+							"style": "loggias",
+							"bays": 7,
+							"rail": "bars"
+						},
+						{
+							"side": 11,
+							"style": "loggias",
+							"bays": 5,
+							"rail": "bars"
+						},
+						{
+							"side": 20,
+							"style": "windows",
+							"bays": 4
+						},
+						{
+							"side": 22,
+							"style": "loggias",
+							"bays": 8,
+							"rail": "bars"
+						}
+					],
+					"roof": {
+						"kind": "flat",
+						"parapet": 1.0
+					},
+					"letters": [
+						{
+							"text": "HAI AU",
+							"z": 17.5,
+							"high": 1.4
+						}
+					]
+				}
+			},
+			"sources": [
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:Ks_Hai_au,_duong_Ha_Long,_tp_Vung_tau,_Baria_Vungtau,_Vietnam_-_panoramio.jpg",
+					"date": "2014-04-05 (taken)",
+					"license": "CC BY 3.0",
+					"open": true,
+					"author": "trungydang",
+					"shows": "The front from Hạ Long: sky blue walls with white bands, a block of 5 storeys, a tower with the letters HAI AU, a wing of 4 storeys with a glass ground storey, flat roofs."
+				},
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:Hai_Au_Hotel,_Vung_Tau.JPG",
+					"date": "2010-11-20 (taken)",
+					"license": "CC BY-SA 4.0",
+					"open": true,
+					"author": "HappyMidnight",
+					"shows": "The front from the jetty: white walls with light green panels, wings of 4 to 6 storeys with long balconies, flat roofs, the tower with the letters."
+				},
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:Vung_Tau,_Viet_Nam.jpg",
+					"date": "2021-01-30 (taken)",
+					"license": "CC BY-SA 4.0",
+					"open": true,
+					"author": "Tuong Lam Photos",
+					"shows": "Hạ Long and the jetty of Cầu Đá from a drone, with the boats of the bay."
+				}
+			],
+			"status": "Check: the storeys and the color in 2019 (plan 0026, Q1). The name is a landmark that the owner approved if the hotel stood in 2019 (culture notes).",
+			"check": {
+				"date": "2026-11-16",
+				"world": "8fbf36c900beb492882713841c947847b94c3fba",
+				"hash": "aba4ade277b9c69eae1a501350f6a136"
+			}
+		},
+		{
+			"id": "Q-W3",
+			"what": "Nhà khách Hạ Long (102 Hạ Long, OSM way 235149416), on the side of the hill, about 300 m south of Hải Âu.",
+			"kind": "rule",
+			"blueprint": "building",
+			"model": "nha_khach_ha_long",
+			"order": {
+				"blueprint": "building",
+				"options": {
+					"name": "nha_khach_ha_long",
+					"sources": [
+						"The plan is the outline of OpenStreetMap way 235149416 (© OpenStreetMap contributors, ODbL): 21.4 m by 17.1 m, with 8 storeys (building:levels). Side 1 faces Hạ Long and the sea.",
+						"The look is from a photo of Wikimedia Commons: trungydang, 2014-04-06, CC BY 3.0 (a cream block with white window frames and air conditioners). It opened in early 2011 (vietnambooking.com).",
+						"A guess: the storey height, the bays, and the balconies to the sea."
+					],
+					"plan": [
+						[
+							21.36,
+							0.0
+						],
+						[
+							0.0,
+							-0.0
+						],
+						[
+							0.0,
+							-17.07
+						],
+						[
+							21.36,
+							-17.07
+						]
+					],
+					"storeys": 8,
+					"storey": 3.2,
+					"ground": 3.6,
+					"colors": {
+						"wall": "#e8dcc0",
+						"frame": "#f6f4ee"
+					},
+					"fronts": [
+						{
+							"style": "loggias",
+							"bays": 5,
+							"rail": "bars"
+						},
+						{
+							"side": 2,
+							"style": "windows",
+							"bays": 4
+						},
+						{
+							"side": 4,
+							"style": "windows",
+							"bays": 4
+						}
+					],
+					"roof": {
+						"kind": "flat",
+						"parapet": 1.0
+					}
+				}
+			},
+			"sources": [
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:Ha_Long_phường_2,_Vũng_Tàu,_Bà_Rịa_-_Vũng_Tàu,_Việt_Nam_-_panoramio.jpg",
+					"date": "2014-04-06 (taken)",
+					"license": "CC BY 3.0",
+					"open": true,
+					"author": "trungydang",
+					"shows": "Hạ Long to the north, about 140 m south of the building: a cream block of 6 storeys or more on the side of the hill, with white window frames."
+				}
+			],
+			"status": "Check: the front and the balconies in 2019 (plan 0026, Q1).",
+			"check": {
+				"date": "2026-11-16",
+				"world": "8fbf36c900beb492882713841c947847b94c3fba",
+				"hash": "46215eb4132abd9058f79268833548a4"
+			}
+		},
+		{
+			"id": "Q-W4",
+			"what": "Nhà thiếu nhi tỉnh Bà Rịa - Vũng Tàu, the low block, and the office (rows QT-T14 to QT-T16 of the survey of Quang Trung).",
+			"kind": "world_plan",
+			"plan": "World plan 0018, step 4",
+			"sources": [
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:Nha_thieu_nhi_tin_ba_ria_vung_tau-_duong_Quang_trung-Phường_1,_tp._Vũng_Tàu,_Bà_Rịa_-_Vũng_Tàu,_Việt_Nam_-_panoramio.jpg",
+					"date": "2014-04-06 (taken)",
+					"license": "CC BY 3.0",
+					"open": true,
+					"author": "trungydang",
+					"shows": "Nhà thiếu nhi from Quang Trung (not looked at)."
+				}
+			],
+			"status": "Waits for World plan 0018, step 4."
+		},
+		{
+			"id": "Q-W5",
+			"what": "The things of the park of Bãi Trước: the pavilion with the orange tile roof, a bench, a low lamp, the blue lamp pole with a curved arm, the green post with globes, a kiosk, and the sculptures.",
+			"kind": "new_rule",
+			"needs": "A street kit of the park (plan 0023, W21): each thing as a model with its sizes and its roles (concrete, granite, paint, glass, tile). The sculptures wait: the park had 41 granite sculptures from 2006, and which stood in 2019 is not known (Q2). The catalog of World has den_duong (a street lamp of 8 m with an LED head), but not the lamps of these photos.",
+			"sources": [
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:Ha_Long_phường_2,_Vũng_Tàu,_Bà_Rịa_-_Vũng_Tàu,_Việt_Nam_-_panoramio.jpg",
+					"date": "2014-04-06 (taken)",
+					"license": "CC BY 3.0",
+					"open": true,
+					"author": "trungydang",
+					"shows": "Blue lamp poles with a curved arm, and green posts with globes on the sea side of Hạ Long."
+				},
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Phường_1,_tp._Vũng_Tàu,_Bà_Rịa_-_Vũng_Tàu,_Việt_Nam_-_panoramio_(3).jpg",
+					"date": "2014-04-06 (taken)",
+					"license": "CC BY 3.0",
+					"open": true,
+					"author": "trungydang",
+					"shows": "The pavilion with the orange roof in the park (plan 0026, section 3; not looked at for this request)."
+				}
+			],
+			"status": "Check: the place of the pavilion, the kiosks, and the sculptures in 2019 (plan 0026, Q2)."
+		},
+		{
+			"id": "Q-W6",
+			"what": "People of 2019: the clothes of a town in 2019 and a swim ring (phao).",
+			"kind": "new_rule",
+			"needs": "The person blueprint has a T-shirt (world_t_shirt), a shirt (elvs_male_shirt_untucked_bd1), shorts (elvs_male_trouser_short_1, world_quan_dui), long pants (world_pants), sandals (elvs_male_flip_flop_sandals1, elvs_caesar_sandals1), and the nón lá (hat non_la). It does not have: a dress, áo bà ba, a sun jacket with a hood for a ride, swim clothes, a helmet on a person who stands or walks, and a swim ring (a ring of rubber in a bright color, or the tube of a truck tire, that a person holds or sits in). Also, the factory cannot build the near level of a person now (HTTP 503: \"the order needs more memory than the edge has\", 2026-11-16), so it cannot make its receipt.",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 1.0,
+					"age": 34,
+					"clothes": [
+						"world_t_shirt",
+						"elvs_male_trouser_short_1",
+						"elvs_male_flip_flop_sandals1"
+					],
+					"clothes_colors": [
+						"#d8d2c4",
+						"#3c4654"
+					],
+					"hair": "short02",
+					"hair_color": "#2e2925"
+				}
+			},
+			"sources": [],
+			"status": "The order shows the clothes that World has now.",
+			"check": {
+				"date": "2026-11-16",
+				"world": "8fbf36c900beb492882713841c947847b94c3fba",
+				"hash": "a2aaa65c5da4f2b6b1a1818a797ebd58"
+			}
+		},
+		{
+			"id": "Q-W7",
+			"what": "The sea wall of Bãi Trước: a piece of 2 m of the wall of stone blocks and of the low wall of the walk, with the granite border of a lawn.",
+			"kind": "new_rule",
+			"needs": "Pieces of 2 m for a row along a line (as the sidewalk pieces via_he_straight and via_he_corner of the catalog): the sea wall of stone blocks (its slope and its top), the low wall of the walk, and the granite border of a lawn. Each with the roles stone, granite, and concrete.",
+			"sources": [
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:Bo_Ke_Duong_ha_Long,_tp_Vung_tau_Vietnam_-_panoramio.jpg",
+					"date": "2014-04-11 (uploaded)",
+					"license": "CC BY 3.0",
+					"open": true,
+					"author": "trungydang",
+					"shows": "The sea wall of Hạ Long at the junction of Quang Trung (not looked at)."
+				},
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:Bo_ke_duong_ha_long,_Vung_tau_-_panoramio.jpg",
+					"date": "2014-04-05 (taken)",
+					"license": "CC BY 3.0",
+					"open": true,
+					"author": "trungydang",
+					"shows": "The sea wall at Hải Âu and Cầu Đá (not looked at)."
+				},
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:Vung_Tau,_Viet_Nam_2021.jpg",
+					"date": "2021-01-30 (taken)",
+					"license": "CC BY-SA 4.0",
+					"open": true,
+					"author": "Tuong Lam Photos",
+					"shows": "The walk of the sea at the south tip of the park, its lawns, and the low wall, from a drone."
+				}
+			],
+			"status": "World can make it now as a drawing of edits, but a rule of pieces is better: the wall is about 1 km long."
+		},
+		{
+			"id": "Q-W8",
+			"what": "The Araucaria (Norfolk pine), a hedge, and the plants of a flower bed, with the plant blueprint.",
+			"kind": "new_rule",
+			"needs": "Species for the plant blueprint (it has areca, bamboo, banana, coconut, and frangipani): Araucaria heterophylla (layers of flat branches on a straight trunk, up to 20 m), a clipped hedge (a block of small leaves of a length and a height), and the low plants of a flower bed in yellow and red.",
+			"order": {
+				"blueprint": "plant",
+				"options": {
+					"species": "araucaria"
+				}
+			},
+			"sources": [
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:Vung_Tau,_Viet_Nam_2021.jpg",
+					"date": "2021-01-30 (taken)",
+					"license": "CC BY-SA 4.0",
+					"open": true,
+					"author": "Tuong Lam Photos",
+					"shows": "A row of Norfolk pines on the sea side of Hạ Long and at the south tip of the park, and the hedge and the flower beds of the median of Quang Trung."
+				}
+			],
+			"status": "The order shows the error of World now: araucaria is not a species of the plant blueprint.",
+			"check": {
+				"date": "2026-11-16",
+				"world": "8fbf36c900beb492882713841c947847b94c3fba",
+				"errors": [
+					{
+						"message": "must be one of: areca, bamboo, banana, coconut, frangipani",
+						"path": "options.species"
+					}
+				]
+			}
+		}
+	]
+}
