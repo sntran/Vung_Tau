@@ -32,21 +32,21 @@
 			}
 		},
 		"aerobics_4": {
-			"hash": "ee169e81c7215f9226ee8fd57214662f",
+			"hash": "c7265644136b720c1ab08fbce2dfb670",
 			"files": {
-				"aerobics_4.far.glb": "a68c05f72b4173c68715c5a090af5e4a71d4c2f9c3c67542487a1d30ee9c445d",
-				"aerobics_4.mid.glb": "bc11189e31754785cfdce3874162f5ca8b0308031a5316b7a5f991f3861157bf",
-				"aerobics_4.parts.json": "5aba5629ad24b1002a5e75aa7fd9c88d275fd4eb6b19a937672846fcfa0769fd",
-				"aerobics_4.receipt.json": "455281fd80be9988b0a082759004f1338a541ee79b4ffca46c5b652e0176e44e"
+				"aerobics_4.far.glb": "28777b2449b4634d029f29afd985d556dc2f06160709f499dab1c4f0e13ae703",
+				"aerobics_4.mid.glb": "8a50c1d981d86894cdc20c8a980351709af5c8866381b15d58f8ea494f1cc23a",
+				"aerobics_4.parts.json": "b47f6c8414dcdcc36c10e9a03dd75d367e0b3902559e200b57a27614a5a0def4",
+				"aerobics_4.receipt.json": "3a59d678431110261aa7edaf0047f79f3e4ba5b63569080c4d851d0b9b40e0e9"
 			}
 		},
 		"aerobics_5": {
-			"hash": "97475aa6f60c3c9c7998cd4b6bea8d3c",
+			"hash": "3277521b53166a3fc009cab71673b3a2",
 			"files": {
-				"aerobics_5.far.glb": "f9778e0012541df31a4a17d5883488ec584718467905c9eecfce5f5f89525d68",
-				"aerobics_5.mid.glb": "918ece630602598955366b541fe652b5f8f53f7b879f0f3b762c09f098a6347a",
-				"aerobics_5.parts.json": "b56e792f8f3365723f8e35c2ef994d5e6b799eaa821418edbef1c7c7319b652a",
-				"aerobics_5.receipt.json": "bc0b6d08ed47f8c2d70c621255e227ef36cefa8db10247a14c5f25d1eaa37f9b"
+				"aerobics_5.far.glb": "b8aeafc0e24e0bd3fc7b75098c285935c1f69b23c9ddee06343590203abddc7d",
+				"aerobics_5.mid.glb": "39bd4e152cad84a0f816adf1c7a8d34ad10b91a10fe071e835f8ac24436a101a",
+				"aerobics_5.parts.json": "7fc3ac563e3aabd7edaa19c3740b277b08ae0e55f85ed25d17437b5281d1da4c",
+				"aerobics_5.receipt.json": "47a03e1ec060bd5b9f54011f4766f9943c37747d1087ddb7d9dd009b7f533876"
 			}
 		},
 		"aerobics_6": {
@@ -59,12 +59,12 @@
 			}
 		},
 		"aerobics_leader": {
-			"hash": "2816a8194761e78dacde414f636e74d7",
+			"hash": "2c3472ba15ce628c364e9e03cfe6f5b3",
 			"files": {
-				"aerobics_leader.far.glb": "a46811959def94709791c748e2dc96228e8ab68f9ae2505abcd006391dbde456",
-				"aerobics_leader.mid.glb": "a14a81f754ba0a2492c0284d914e6d21bcbf37cd94239a962700477df05b19a2",
-				"aerobics_leader.parts.json": "a7c0bcb8e4a0c99ca1473673e0aaa01881c2bebfdba98ffc5eab81c8a9160d98",
-				"aerobics_leader.receipt.json": "4dd6cb91630e87f4403214fc55de7d15b692459fdc405ba52d6d9a29fd8cf6e0"
+				"aerobics_leader.far.glb": "0be8f8010aeaa448fd231fd969fe0f6e801acf97f558d22f5a0b5a7682fc3958",
+				"aerobics_leader.mid.glb": "ceaec653471493c776d30ffa238ec5a0d09f4379c9aaa57cbef7c1f79cfb406a",
+				"aerobics_leader.parts.json": "a2c3629160bd245f3792b42b77191760a993e752bcded8a0bd91cbf7383910f9",
+				"aerobics_leader.receipt.json": "f85f9255698c5b77be465cf28b77a657eeb2228fde4abd8cdf294bce7a3c5e16"
 			}
 		},
 		"ceiling_fan": {
