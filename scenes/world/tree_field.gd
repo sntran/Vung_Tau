@@ -136,6 +136,7 @@ func commit_far_tiles() -> void:
 		var instance := MultiMeshInstance3D.new()
 		instance.name = "Far_%s_%d" % [type, key / 1000]
 		instance.multimesh = multimesh
+		instance.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
 		instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		instance.visibility_range_end = TreeLibrary.RANGES.ultra.z * library.range_scale(type) + FAR_TILE
 		add_child(instance)
@@ -339,6 +340,10 @@ func _instance(key: String, form: String, id: int) -> MultiMeshInstance3D:
 	var instance := MultiMeshInstance3D.new()
 	instance.name = "%s_%s_%d" % [form.to_pascal_case(), type, id % 8 + 1]
 	instance.multimesh = multimesh
+	# SDFGI (High, Ultra) takes a crown of leaf cards as a solid block: the
+	# trunks under it got almost no sky light and were almost black (report
+	# 0020, second re-check of 2026-11-07). The trees still receive SDFGI.
+	instance.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
 	# The far form, and the middle form farther than the shadow distance, cast no shadow (R7).
 	# The near form casts its shadow with the "shadow" instance (its middle form).
 	match form:

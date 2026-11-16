@@ -141,8 +141,8 @@
 			"crown_width": 12.0,
 			"crown_height": 7.4,
 			"leaders": 3,
-			"leaf_size": 1.4,
-			"wood": "#3F362D",
+			"leaf_size": 0.65,
+			"wood": "#6F655A",
 			"leaf": "#3C6B1E",
 			"leaf_young": "#7E9E33",
 			"season": {
@@ -153,13 +153,19 @@
 					"leaf": "#4D6A24",
 					"red": "#A33A1C",
 					"orange": "#B8742A",
-					"red_share": 0.4,
-					"bare_share": 0.25
+					"red_share": 0.3,
+					"bare_share": 0.25,
+					"red_trees": 0.3
 				}
 			},
-			"sprays_per_branch": 4,
-			"leaves_per_rosette": 6,
-			"layers": 5
+			"sprays_per_branch": 7,
+			"leaves_per_rosette": 7,
+			"layers": 6,
+			"branches_per_layer": 4,
+			"rosettes_per_spray": 4,
+			"leaf_triangles": 2,
+			"near_scale": 0.6,
+			"impostor_shade": 0.75
 		},
 		"casuarina": {
 			"generator": "casuarina",
@@ -176,7 +182,7 @@
 			],
 			"trunk_radius": 0.22,
 			"branches": 40,
-			"wood": "#4A3F36",
+			"wood": "#61574C",
 			"leaf": "#53654A",
 			"leaf_young": "#66784F",
 			"season": {
@@ -307,7 +313,7 @@
 			],
 			"trunk_radius": 0.25,
 			"tiers": 14,
-			"wood": "#5E5045",
+			"wood": "#6A5D51",
 			"leaf": "#3A6634",
 			"leaf_young": "#4E7F42",
 			"season": {
@@ -347,7 +353,7 @@
 			"crown_height": 6.5,
 			"leaders": 4,
 			"leaf_size": 1.0,
-			"wood": "#4E4339",
+			"wood": "#6E6458",
 			"leaf": "#3A6626",
 			"leaf_young": "#5E8A34",
 			"season": {

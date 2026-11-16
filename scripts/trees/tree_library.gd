@@ -219,6 +219,7 @@ func season_of(type: String, month: int, day: int) -> Dictionary:
 	if v.has("flowers"):
 		flowers = Season.by_month(v.flowers, month, day)
 	return {"leaf": leaf, "red_share": float(dry.get("red_share", 0.0)) * dryness,
+			"red_trees": float(dry.get("red_trees", 1.0)),
 			"bare_share": float(dry.get("bare_share", 0.0)) * dryness, "flower_share": flowers}
 
 
@@ -230,5 +231,6 @@ func apply_season(game_day: int) -> void:
 		for material: ShaderMaterial in (_materials[type] as Dictionary).values():
 			material.set_shader_parameter("leaf_color", values.leaf)
 			material.set_shader_parameter("red_share", values.red_share)
+			material.set_shader_parameter("red_trees", values.red_trees)
 			material.set_shader_parameter("bare_share", values.bare_share)
 			material.set_shader_parameter("flower_share", values.flower_share)

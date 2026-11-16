@@ -25,8 +25,13 @@ void fragment() {
 	if (form >= 0 && tree_hidden(form, tree_origin, FRAGCOORD.xy)) {
 		discard;
 	}
-	// Bark: long stripes along the trunk; a palm trunk has rings.
-	float stripes = tree_hash(vec3(floor(UV.x * 14.0), floor(UV.y * 6.0), 1.0));
+	// Bark: long stripes along the trunk; a palm trunk has rings. The value of a
+	// stripe changes smoothly along the trunk: blocks with hard edges made sharp
+	// lines across the trunk (report 0020, D-0020-06).
+	float along = UV.y * 6.0;
+	float column = floor(UV.x * 14.0);
+	float stripes = mix(tree_hash(vec3(column, floor(along), 1.0)), tree_hash(vec3(column, floor(along) + 1.0, 1.0)),
+			smoothstep(0.0, 1.0, fract(along)));
 	float ring = smoothstep(0.35, 0.5, abs(fract(UV.y * 3.0) - 0.5)) * rings;
 	float shade = wood_data.a * mix(0.82, 1.08, stripes) * (1.0 - 0.35 * ring);
 	vec3 color = wood_color;

@@ -283,6 +283,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
             f"stakes, {len(sea_objects['groynes']['lines'])} groynes")
     # The places with no trees and no bushes, and the roads with no tree trunks (report 0020, D-0020-01).
     places = clearings.place_shapes(data.areas, lambda g: to_map_geometry(g, projection), found_by_id, config.clearings)
+    places += clearings.inside_shapes(roads, config.clearings, found_by_id)
     place_mask = terrain.rasterize(grid, [p for shape in places for p in polygons_of(shape)])
     road_mask = terrain.rasterize(grid, clearings.road_shapes(roads, config.clearings))
     canopy = None
