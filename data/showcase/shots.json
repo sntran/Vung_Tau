@@ -1,0 +1,91 @@
+{
+	"note": "The five shots of the showcase of Bãi Trước (plan 0026, R15, section 3). Each shot has the photo that it must match (a link only), the eye (x and z of the game: the eye is eye_height m over the ground, or over the floor of a known place), the point that the camera looks at (x, y, z of the game), and the vertical field of view of the camera in degrees (fov: 40 is about the view of a phone camera at 16:9). PT-72 takes each shot at each time of \"times\", on Low (the Mobile renderer) and on High (Forward+). The positions are from the roads of OpenStreetMap (data/geo/build/roads.json) and from the survey of World plan 0018.",
+	"status": "check",
+	"times": [
+		"17:10",
+		"12:00"
+	],
+	"shots": [
+		{
+			"id": "S1",
+			"name": "The park edge, to the south: the bay, the boats, Hạ Long, the slope of Núi Nhỏ",
+			"photo": "https://commons.wikimedia.org/wiki/File%3AV%C5%A9ng_T%C3%A0u%2C_Ba_Ria_-_Vung_Tau%2C_Vietnam_-_panoramio_%282%29.jpg",
+			"eye": [
+				28.0,
+				105.0
+			],
+			"eye_height": 1.6,
+			"target": [
+				-190.0,
+				14.0,
+				500.0
+			],
+			"fov": 45.0
+		},
+		{
+			"id": "S2",
+			"name": "The park, its palms and paths",
+			"photo": "https://commons.wikimedia.org/wiki/File%3AC%C3%B4ng_Vi%C3%AAn_B%C3%A3i_Tr%C6%B0%E1%BB%9Bc%2C_Quang_Trung%2C_Ph%C6%B0%E1%BB%9Dng_1%2C_tp._V%C5%A9ng_T%C3%A0u%2C_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u%2C_Vi%E1%BB%87t_Nam_-_panoramio_%281%29.jpg",
+			"eye": [
+				46.0,
+				84.0
+			],
+			"eye_height": 1.6,
+			"target": [
+				38.0,
+				5.0,
+				-60.0
+			],
+			"fov": 45.0
+		},
+		{
+			"id": "S3",
+			"name": "Quang Trung to the south, Cảng vụ at the end",
+			"photo": "https://commons.wikimedia.org/wiki/File%3ABai_truoc-duong_Ha_long-Ph%C6%B0%E1%BB%9Dng_2%2C_tp._V%C5%A9ng_T%C3%A0u%2C_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u%2C_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"eye": [
+				62.0,
+				-72.0
+			],
+			"eye_height": 1.6,
+			"target": [
+				121.7,
+				12.0,
+				194.0
+			],
+			"fov": 40.0
+		},
+		{
+			"id": "S4",
+			"name": "The Grand Hotel and the median",
+			"photo": "https://commons.wikimedia.org/wiki/File:Grand_hotel,_quang_trung_street-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"eye": [
+				100.8,
+				21.0
+			],
+			"eye_height": 1.6,
+			"target": [
+				150.0,
+				9.0,
+				18.0
+			],
+			"fov": 45.0
+		},
+		{
+			"id": "S5",
+			"name": "The walk of the sea at dusk",
+			"photo": "https://commons.wikimedia.org/wiki/File%3AVoyage_au_Vi%C3%AAt_Nam_-_panoramio_%2812%29.jpg",
+			"eye": [
+				-97.0,
+				-311.0
+			],
+			"eye_height": 1.6,
+			"target": [
+				-50.0,
+				3.0,
+				-255.0
+			],
+			"fov": 50.0,
+			"note": "The photo of the walk (2015) looks to the south-east along the walk, with the raised lawns of OSM (ways 234797329 and 234797330) on its left. Its geotag (x -18, z -266) is about 50 m from that place, so the eye is on the walk at the north-west end of the raised lawns."
+		}
+	]
+}
