@@ -430,6 +430,8 @@ func update_time(minutes: int, day: int) -> void:
 		parked.update_time(minutes)
 	if exercise:
 		exercise.update_time(minutes)
+	if showcase:
+		showcase.update_time(minutes)
 	if not Wind.held:
 		var wind := Wind.of_time(TreeLibrary.shared().settings.get("wind", {}), minutes)
 		Wind.apply(wind.direction, wind.strength)

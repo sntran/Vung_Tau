@@ -22,9 +22,13 @@ func setup(world: VungTau, path := PATH) -> bool:
 
 
 func _add_row(world: VungTau, entry: Dictionary) -> void:
-	var road := _road(world, str(entry.road), str(entry.near))
+	var road := {}
+	if entry.has("at"):
+		road = _road_near(world, str(entry.road), Vector2(float(entry.at[0]), float(entry.at[1])))
+	else:
+		road = _road(world, str(entry.road), str(entry.near))
 	if road.is_empty():
-		push_error("ParkedRows: the row \"%s\" has no road \"%s\" near \"%s\"." % [entry.id, entry.road, entry.near])
+		push_error("ParkedRows: the row \"%s\" has no road \"%s\" near \"%s\"." % [entry.id, entry.road, entry.get("near", entry.get("at"))])
 		return
 	var line: Array[Vector3] = road.line
 	var row := WorldRow.new()
@@ -80,7 +84,11 @@ static func _road(world: VungTau, road_name: String, landmark: String) -> Dictio
 	var mark := world.data.landmark(landmark)
 	if mark.is_empty():
 		return {}
-	var target := Vector2(mark.position[0], mark.position[1])
+	return _road_near(world, road_name, Vector2(mark.position[0], mark.position[1]))
+
+
+## The road with this name nearest to a point (x, z of the game), as _road().
+static func _road_near(world: VungTau, road_name: String, target: Vector2) -> Dictionary:
 	var best := {}
 	var best_d := INF
 	for road: Dictionary in world.data.roads:

@@ -35,7 +35,16 @@ var lengths: Dictionary = {}
 var stand_ins: Array[Dictionary] = []
 ## The models of World at their places (D3): [{id, model, footprint (PackedVector2Array), base}].
 var models: Array[Dictionary] = []
+## The people of R10, or null.
+var people: ShowcasePeople
+## The outlines of the raised lawns (R4): the people of R10 sit on them.
+var planter_rings: Array[PackedVector2Array] = []
 ## The lamps of R9: {kind, at (the base), height}.
+var lamps_lit := false
+var _lamps_set := false
+## The lights of the street lamps (R14) and the colors of the heads that glow at night.
+var lamp_lights: Array[OmniLight3D] = []
+var glow_colors: Array[String] = []
 var lamps: Array[Dictionary] = []
 ## The fine mask of the ground (R the lawns, G the paving) and its place, or null.
 var ground_mask: Image
@@ -80,7 +89,32 @@ func setup(w: VungTau, path := CONFIG) -> bool:
 	if data.has("beached"):
 		_beached(data.beached)
 	_commit()
+	# R10: the people, after the parts (they sit on the raised lawns).
+	if FileAccess.file_exists(ShowcasePeople.PATH):
+		people = ShowcasePeople.new()
+		people.name = "People"
+		add_child(people)
+		people.setup(w, self)
 	return true
+
+
+## The clock time: the people of the hour (R10).
+func update_time(minutes: int) -> void:
+	if people:
+		people.update_time(minutes)
+	var on := DayLight.lamps_on(minutes)
+	if on == lamps_lit and lamp_lights.size() > 0 and _lamps_set:
+		return
+	_lamps_set = true
+	lamps_lit = on
+	for light in lamp_lights:
+		light.visible = on
+	for color in glow_colors:
+		var m := _materials.get(color) as StandardMaterial3D
+		if m:
+			m.emission_enabled = true
+			m.emission = Color(color)
+			m.emission_energy_multiplier = float(data.get("lamp_glow", 3.0)) if on else 0.0
 
 
 ## True when the point (x, z of the game) is in the area.
@@ -169,6 +203,7 @@ func _planter(ring: PackedVector2Array, cfg: Dictionary) -> void:
 	for part: PackedVector2Array in inner:
 		if not Geometry2D.is_polygon_clockwise(part) or part.size() > lawn.size():
 			lawn = part
+	planter_rings.append(ring)
 	var top := func(points: PackedVector2Array, c: String, lift: float) -> void:
 		var indices := Geometry2D.triangulate_polygon(points)
 		for k in range(0, indices.size(), 3):
@@ -883,6 +918,20 @@ func _lamp(kind: String, at: Vector3, along: Vector3) -> void:
 			_box_along(pole, base - flat.normalized() * half * 1.6, base + flat.normalized() * half * 1.6, half * 1.6, h - 0.04, h)
 	_add_length("lamps", 1.0)
 	lamps.append({"kind": kind, "at": base, "height": h})
+	# R14: the head glows at night, and a street lamp lights the ground.
+	if not glow_colors.has(head):
+		glow_colors.append(head)
+	var light_cfg: Dictionary = cfg.get("light", {})
+	if not light_cfg.is_empty():
+		var light := OmniLight3D.new()
+		light.light_color = Color(str(light_cfg.get("color", "#FFD9A0")))
+		light.light_energy = float(light_cfg.get("energy", 1.5))
+		light.omni_range = float(light_cfg.get("range", 12.0))
+		light.shadow_enabled = false
+		light.position = top + Vector3(0, float(light_cfg.get("y", 0.0)), 0)
+		light.visible = false
+		add_child(light)
+		lamp_lights.append(light)
 
 
 ## A prism of the outline from "low" to "top", with a roof of its own color.
@@ -901,6 +950,14 @@ func _prism(color: String, roof: String, ring: PackedVector2Array, low: float, t
 		var r := ring[indices[k + 2]]
 		_mesh(roof).triangle(Vector3(p.x, top, p.y), Vector3(q.x, top, q.y), Vector3(r.x, top, r.y), Vector3.UP)
 		_collision.append_array([Vector3(p.x, top, p.y), Vector3(q.x, top, q.y), Vector3(r.x, top, r.y)])
+
+
+## The length of a line (m).
+static func _line_length(line: PackedVector3Array) -> float:
+	var result := 0.0
+	for i in line.size() - 1:
+		result += line[i].distance_to(line[i + 1])
+	return result
 
 
 static func _area(ring: PackedVector2Array) -> float:

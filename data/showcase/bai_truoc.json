@@ -549,7 +549,7 @@
 		"note": "R5: basket boats (thúng chai) on the sand at the south end of the beach, above the water line: x, z, and the turn in degrees. The landing of the boats of Bãi Trước (Tuổi Trẻ, 2017-08-02) and two thúng chai on the beach on 2019-01-24 (Flickr, Ted McGrath). Their places are a guess (plan 0026, Q3). A point with ground lower than min_ground (m) has no boat."
 	},
 	"lamp_kinds": {
-		"note": "R9: the lamps of the photos, as stand-ins until World has them (request Q-W5). The sizes are by eye from the photos.",
+		"note": "R9: the lamps of the photos, as stand-ins until World has them (request Q-W5). The sizes are by eye from the photos. R14: at night (DayLight.lamps_on()), the heads glow (lamp_glow) and each kind with \"light\" lights the ground. The warm color is the color of the lamps of the photo of S5 at dusk (2015).",
 		"blue_double": {
 			"shape": "arms",
 			"height": 9.0,
@@ -565,7 +565,13 @@
 			],
 			"pole_color": "#7fb4cf",
 			"head_color": "#e9e8e2",
-			"note": "A light blue pole with two curved arms and a head at each end (2014 and 2021)."
+			"note": "A light blue pole with two curved arms and a head at each end (2014 and 2021).",
+			"light": {
+				"color": "#FFC982",
+				"energy": 1.6,
+				"range": 14.0,
+				"y": 0.4
+			}
 		},
 		"globe_post": {
 			"shape": "globes",
@@ -577,7 +583,13 @@
 			"arm_length": 0.42,
 			"pole_color": "#26292a",
 			"head_color": "#f1f0ea",
-			"note": "A black post with white globes (the photo of S2 of 2014, in the park, and the photo from a drone of 2021, at the south tip of the park)."
+			"note": "A black post with white globes (the photo of S2 of 2014, in the park, and the photo from a drone of 2021, at the south tip of the park).",
+			"light": {
+				"color": "#FFE2B8",
+				"energy": 0.8,
+				"range": 7.0,
+				"y": 0.0
+			}
 		},
 		"path_lamp": {
 			"shape": "bollard",
@@ -659,5 +671,6 @@
 			"mean": "#8e8779",
 			"note": "The stand-ins of the buildings."
 		}
-	}
+	},
+	"lamp_glow": 3.0
 }

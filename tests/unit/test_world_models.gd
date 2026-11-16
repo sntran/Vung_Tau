@@ -4,6 +4,10 @@ extends GutTest
 ## data/world/orders.json.
 
 
+## The height of the tallest person of the game, standing (m).
+const MAX_PERSON_HEIGHT := 2.1
+
+
 func _models() -> Array[String]:
 	return WorldModel.ids()
 
@@ -49,8 +53,17 @@ func test_each_model_loads_with_the_axes_of_gltf() -> void:
 				# person is 1 cm to 2 cm shorter at the soles (plan 0023, builder
 				# notes): a model with no near level in the game has 2 %.
 				var part := 0.01 if level == "near" else 0.02
-				assert_almost_eq(box.size.y, float(size[2]), float(size[2]) * part,
-						"%s %s: the height is the height of the receipt (%s)" % [model_id, level, size])
+				var options: Dictionary = WorldModel.order(model_id).get("order", {}).get("options", {})
+				if str(options.get("pose", "stand")) in ["stand", "rest"]:
+					assert_almost_eq(box.size.y, float(size[2]), float(size[2]) * part,
+							"%s %s: the height is the height of the receipt (%s)" % [model_id, level, size])
+				else:
+					# A person in a pose (plan 0026, R10: who sits): Godot gives the box
+					# of the skinned mesh in its bind pose (standing), and the receipt
+					# gives the size in the pose. The box is between the two.
+					assert_between(box.size.y, float(size[2]) * (1.0 - part), MAX_PERSON_HEIGHT,
+							"%s %s: the height is between the height of the pose (%s) and %.1f m" % [
+								model_id, level, size, MAX_PERSON_HEIGHT])
 		if receipt.get("kind", "") == "vehicle":
 			var steer := model.joints_with_role("steer")
 			assert_false(steer.is_empty(), "%s: the vehicle steers" % model_id)
