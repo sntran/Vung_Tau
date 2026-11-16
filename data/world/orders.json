@@ -47,6 +47,7 @@
 					"skin": "middleage_asian_female",
 					"eyebrows": "eyebrow010",
 					"hair": "ponytail01",
+					"hair_color": "#2e2925",
 					"clothes": [
 						"female_sportsuit01",
 						"shoes03"
@@ -79,12 +80,15 @@
 					"skin": "middleage_asian_female",
 					"eyebrows": "eyebrow010",
 					"hair": "bob02",
+					"hair_color": "#2e2925",
 					"clothes": [
-						"female_casualsuit01",
+						"world_t_shirt",
+						"mindfront_female_trousers_1",
 						"shoes02"
 					],
 					"clothes_colors": [
-						"#e9c7d8"
+						"#7d5a9b",
+						"#2b2d35"
 					],
 					"animations": [
 						"aerobics"
@@ -113,11 +117,13 @@
 					"hair": "bob02",
 					"hair_color": "#b4b2ac",
 					"clothes": [
-						"female_casualsuit02",
+						"world_t_shirt",
+						"mindfront_female_trousers_1",
 						"shoes05"
 					],
 					"clothes_colors": [
-						"#9bd39a"
+						"#5f9e74",
+						"#4a4e57"
 					],
 					"animations": [
 						"aerobics"
@@ -144,12 +150,15 @@
 					"skin": "middleage_asian_male",
 					"eyebrows": "eyebrow001",
 					"hair": "short03",
+					"hair_color": "#2e2925",
 					"clothes": [
-						"male_casualsuit03",
+						"namuhekam_male_polo_shirt",
+						"mindfront_male_trousers_1",
 						"shoes01"
 					],
 					"clothes_colors": [
-						"#f2f2f2"
+						"#e8e6e0",
+						"#3a3f4a"
 					],
 					"animations": [
 						"aerobics"
@@ -176,6 +185,7 @@
 					"skin": "young_asian_female",
 					"eyebrows": "eyebrow010",
 					"hair": "ponytail01",
+					"hair_color": "#2e2925",
 					"clothes": [
 						"joepal_crude_t-shirt_female",
 						"cortu_cargo_pants",
@@ -209,6 +219,7 @@
 					"skin": "middleage_asian_female",
 					"eyebrows": "eyebrow010",
 					"hair": "ponytail01",
+					"hair_color": "#2e2925",
 					"clothes": [
 						"female_sportsuit01",
 						"shoes06"

@@ -117,3 +117,47 @@ def test_a_closed_connection_is_tried_again(monkeypatch):
     monkeypatch.setattr(fetch, "_http_once", always)
     with pytest.raises(fetch.FetchError):
         fetch._http("https://example.invalid/o/x.glb")
+
+
+def _glb(extras: dict) -> bytes:
+    """A GLB with a JSON chunk only: a scene with these extras."""
+    import struct
+
+    doc = json.dumps({"asset": {"version": "2.0"}, "scene": 0, "scenes": [{"extras": extras}]}).encode("utf-8")
+    doc += b" " * (-len(doc) % 4)
+    chunk = struct.pack("<I4s", len(doc), b"JSON") + doc
+    return struct.pack("<4sII", b"glTF", 2, 12 + len(chunk)) + chunk
+
+
+def test_a_model_with_no_near_level_gets_the_receipt_of_its_first_level(monkeypatch):
+    # The factory makes the receipt from the near level. The near level of a
+    # person can need more memory than the factory has (HTTP 503).
+    full = {"blueprint": "person", "colors": {}, "joints": {}, "options": {"age": 52.0}}
+    hash_ = wf.order_hash(full)
+    extras = {"name": "person", "kind": "person", "level": "mid", "size": [0.4, 0.36, 1.42],
+              "joints": ["elbow_l"], "limbs": ["arm_l"], "sources": ["MakeHuman (CC0)"]}
+
+    def http(url, body=None, timeout=600.0, tries=3):
+        if url.endswith("/orders"):
+            return json.dumps({"hash": hash_, "order": full}).encode("utf-8")
+        if url.endswith(".glb"):
+            return _glb(extras)
+        if url.endswith(".parts.json"):
+            return b'{"parts": []}'
+        if url.endswith(".receipt.json"):
+            raise fetch.FetchError(f"{url}: HTTP 503: the builder stopped: the order needs more memory than the edge has")
+        if url.endswith("/version.json"):
+            return b'{"commit": "8fbf36c"}'
+        if url.endswith("/mix.exs"):
+            return b'  def project do\n    [app: :world,\n      version: "0.1.0",\n'
+        raise AssertionError(url)
+
+    monkeypatch.setattr(fetch, "_http", http)
+    model = {"id": "p", "order": {"blueprint": "person", "options": {"age": 52}}, "levels": ["mid", "far"]}
+    receipt = json.loads(fetch.factory_files(model)["p.receipt.json"])
+    assert receipt["hash"] == hash_ == wf.order_hash(receipt["order"])
+    assert receipt["level"] == "mid" and receipt["world"] == "0.1.0"
+    assert receipt["size"] == extras["size"] and receipt["joints"] == extras["joints"]
+    # A model that uses its near level needs the receipt of the factory.
+    with pytest.raises(fetch.FetchError):
+        fetch.factory_files({"id": "q", "order": model["order"], "levels": ["near", "mid", "far"]})

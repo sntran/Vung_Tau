@@ -126,14 +126,17 @@ def scene_extras(data: bytes) -> dict:
     return doc["scenes"][doc.get("scene", 0)].get("extras", {})
 
 
-def receipt(full: dict, near_glb: bytes, world_version: str) -> str:
-    """The receipt of an order (World.Orders, receipt/3), from its near GLB."""
+def receipt(full: dict, near_glb: bytes, world_version: str, level: str = "near") -> str:
+    """The receipt of an order (World.Orders, receipt/3), from its near GLB.
+
+    With another level, the receipt has the values of that GLB (fetch.py does
+    this only when the factory cannot build the near level)."""
     extras = scene_extras(near_glb)
     return encode(
         {
             "order": full,
             "hash": order_hash(full),
-            "level": "near",
+            "level": level,
             "world": world_version,
             "name": extras.get("name"),
             "kind": extras.get("kind"),

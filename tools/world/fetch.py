@@ -40,6 +40,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import worldfiles as wf  # noqa: E402
 
 FACTORY = "https://world.mkfifo.com"
+## The files of World on GitHub, by commit (the version of the app, for a receipt that fetch.py makes).
+WORLD_RAW = "https://raw.githubusercontent.com/sntran/World"
 LEVEL_FILES = {"near": "glb", "mid": "mid.glb", "far": "far.glb"}
 
 
@@ -98,8 +100,34 @@ def factory_files(model: dict, base: str = FACTORY) -> dict[str, bytes]:
         if level in model["levels"]:
             files[model["id"] + suffix] = _http(f"{base}/o/{hash_}.{LEVEL_FILES[level]}")
     files[model["id"] + ".parts.json"] = _http(f"{base}/o/{hash_}.parts.json")
-    files[model["id"] + ".receipt.json"] = _http(f"{base}/o/{hash_}.receipt.json")
+    try:
+        files[model["id"] + ".receipt.json"] = _http(f"{base}/o/{hash_}.receipt.json")
+    except FetchError as error:
+        if "near" in model["levels"] or "HTTP 503" not in str(error):
+            raise
+        # The factory makes the receipt from the near level. The near level of a
+        # person can need more memory than the factory has (World 8fbf36c, on
+        # 2026-11-16: "the order needs more memory than the edge has"). The game
+        # does not use the near level of such a model, so the receipt comes from
+        # the first level that it uses: the same keys, the values of that level.
+        level = next(name for name in ("mid", "far") if name in model["levels"])
+        full = placed["order"]
+        if wf.order_hash(full) != hash_:
+            raise FetchError(f"{model['id']}: the hash of the full order is not {hash_}") from error
+        glb = files[model["id"] + wf.LEVEL_SUFFIX[level]]
+        version = factory_world_version(factory_commit(base))
+        files[model["id"] + ".receipt.json"] = wf.receipt(full, glb, version, level).encode("utf-8")
+        print(f"{model['id']}: the factory has no receipt ({error}); the receipt is from the {level} level.", flush=True)
     return files
+
+
+def factory_world_version(commit: str) -> str:
+    """The version of the app of World at a commit (mix.exs on GitHub)."""
+    text = _http(f"{WORLD_RAW}/{commit}/mix.exs", timeout=60.0).decode("utf-8")
+    match = re.search(r'version:\s*"([^"]+)"', text)
+    if not match:
+        raise FetchError(f"no version in mix.exs of World at {commit}")
+    return match.group(1)
 
 
 # --- A clone of World ----------------------------------------------------------------
