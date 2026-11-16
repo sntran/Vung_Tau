@@ -23,7 +23,7 @@ from shapely.geometry import Polygon
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from geodata import blocks as blocks_module  # noqa: E402
+from geodata import visibility, blocks as blocks_module  # noqa: E402
 from geodata import anchors as anchors_module  # noqa: E402
 from geodata import clearings, coast, homestay, landcover, landmarks, mapdraw, osm, roads as roads_module, terrain  # noqa: E402
 from geodata import roadworks as roadworks_module, sea as sea_module, seafloor, trees as trees_module  # noqa: E402
@@ -284,6 +284,9 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     # The places with no trees and no bushes, and the roads with no tree trunks (report 0020, D-0020-01).
     places = clearings.place_shapes(data.areas, lambda g: to_map_geometry(g, projection), found_by_id, config.clearings)
     places += clearings.inside_shapes(roads, config.clearings, found_by_id)
+    # The known places of plan 0008 (R5).
+    places += clearings.known_place_shapes(config.landmarks, found_by_id, roads,
+                                           float(config.clearings.get("known_places_margin_m", 3.0)))
     place_mask = terrain.rasterize(grid, [p for shape in places for p in polygons_of(shape)])
     road_mask = terrain.rasterize(grid, clearings.road_shapes(roads, config.clearings))
     canopy = None
@@ -320,6 +323,14 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     out.mkdir(parents=True)
     for name, content in kept.items():
         (out / name).write_bytes(content)
+    # Plan 0008, R2 and D7: the ground under each known place is level, at the
+    # lowest point of its outline; the base of the place is 0.1 m over it.
+    level_places(grid, config.landmarks, found_by_id)
+    cut_stairs(grid, config.landmarks, found_by_id, roads)
+    # The roads take the heights of the ground again: the bases and the stairs changed it.
+    for road in roads:
+        if road.points is not None and len(road.points) > 0:
+            road.heights = grid.sample(road.points[:, 0], -road.points[:, 1]).tolist()
     (out / "height").mkdir(parents=True)
     chunks = terrain.write_chunks(grid, land_mask, area["chunk_size_m"], area["sea_chunk_margin_m"],
                                   area["height_offset_m"], area["height_step_m"], out / "height")
@@ -389,6 +400,13 @@ def build(raw: Path, out: Path, geo: Path) -> int:
                                "game_tide_m": [round(lowest, 2), round(highest, 2)], "bai_truoc_profile": line,
                                "check_distances_m": list(seafloor.CHECK_DISTANCES_M),
                                "dry_at_lowest_m2": {k: round(v) for k, v in dry.items()}}
+    # The views of the known places (plan 0008, R8): the same ground as the height chunks.
+    views_config = GEO / "place_views.json"
+    if views_config.exists():
+        ground = lambda x, z: float(grid.sample(x, z))  # noqa: E731
+        place_views = visibility.views(load_json(views_config), found_by_id, roads, ground)
+        write_json(out / "place_views.json", place_views)
+        log(f"place views: {[(r['eye'], r['place'], r['seen']) for r in place_views['results']]}")
     write_json(out / "world.json", world)
     write_json(out / "coastline.json", {"lines": [map_to_game(l.coords) for l in coast.coastline_lines(data.ways, projection)]}, None)
     write_json(out / "land.json", {"polygons": [blocks_module.polygon_to_game(p.simplify(1.0)) for p in polygons_of(land)]}, None)
@@ -520,6 +538,118 @@ def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods,
 
 # The hills of the cover report: the landmark, the radius (m), and the lowest height (m).
 COVER_HILLS = {"nui_lon": (1100.0, 20.0), "nui_nho": (700.0, 20.0)}
+
+
+# Round a base (plan 0008, R2): the ground climbs at most this grade from the base, in this band.
+BASE_SIDE_GRADE = 0.6
+BASE_SIDE_M = 6.0
+
+
+def level_places(grid, landmarks_config, found_by_id) -> None:
+    """Cuts the ground under each known place with a stand-in to the lowest
+    point of its outline (or of its plaza), and writes "base_height" (0.1 m
+    over it) in the record of the place (plan 0008, R2)."""
+    from shapely.geometry import Point, Polygon
+
+    for landmark in landmarks_config:
+        place = landmark.get("place")
+        record = found_by_id.get(landmark["id"])
+        if not place or place.get("status") == "Check" or not record or not record.get("found"):
+            continue
+        if place.get("kind") not in ("statue", "tower", "villa", "column", "shrine"):
+            continue
+        plaza = place.get("sizes", {}).get("plaza_radius")
+        if plaza:
+            x, z = record["position"]
+            shape = Point(x, -z).buffer(float(plaza["value"]) + 0.5, 32)
+        elif record.get("outline"):
+            shape = Polygon([(x, -z) for x, z in record["outline"]]).buffer(0.8)
+        else:
+            continue
+        ring = np.array(shape.exterior.coords)
+        lowest = float(np.min(grid.sample(ring[:, 0], -ring[:, 1])))
+        mask = terrain.rasterize(grid, [shape])
+        grid.heights[mask] = lowest
+        # Round the base, the ground is not higher than a slope of BASE_SIDE_GRADE
+        # up from the base: a cut, with no wall of ground over the edge of the base.
+        side = terrain.rasterize(grid, [shape.buffer(BASE_SIDE_M)]) & ~mask
+        rows, cols = np.nonzero(side)
+        if rows.size:
+            x = grid.x0 + cols * grid.step
+            z = grid.z0 + rows * grid.step
+            d = shapely.distance(shape, shapely.points(x, -z))
+            grid.heights[rows, cols] = np.minimum(grid.heights[rows, cols], lowest + BASE_SIDE_GRADE * d)
+        record["base_height"] = round(lowest + 0.1, 2)
+        log(f"{landmark['id']}: the ground under it is level at {lowest:.2f} m ({int(mask.sum())} cells)")
+
+
+def cut_stairs(grid, landmarks_config, found_by_id, roads) -> None:
+    """The ground under the stairs and the route of each known place (plan
+    0008, R6, R15): along the line of each way, the ground climbs not more than
+    terrain.MAX_STEPS_GRADE, so the steps of the game can follow it and the
+    player can walk up. Each cell within the half width of the steps and 1.5
+    cells of the line takes the height of the nearest point of the line. The
+    two ends keep the height of the ground, and the cells past an end keep
+    theirs. The other roads near the steps set their surfaces before, so this
+    pass comes last."""
+    by_id = {road.id: road for road in roads}
+    for landmark in landmarks_config:
+        place = landmark.get("place")
+        record = found_by_id.get(landmark["id"])
+        if not place or place.get("status") == "Check" or not record or not record.get("found"):
+            continue
+        # The stairs and the other ways of the route to the place (a footway on
+        # a steep slope had a side slope of 52 degrees within 0.5 m of its line).
+        # A way of the route on the plaza is not cut: the plaza is level (R2).
+        stairs = [int(w) for w in place.get("stairs", [])]
+        # The stairs come last: where two bands meet, the stairs keep their profile.
+        ways = list(dict.fromkeys([int(w) for w in place.get("route", []) if int(w) not in stairs] + stairs))
+        plaza = place.get("sizes", {}).get("plaza_radius")
+        for way_id in ways:
+            road = by_id.get(int(way_id))
+            if road is None or road.points is None or len(road.points) < 2:
+                continue
+            if plaza and way_id not in stairs:
+                cx, cz = record["position"]
+                near = np.hypot(road.points[:, 0] - cx, -road.points[:, 1] - cz).min()
+                if near < float(plaza["value"]) + 2.0:
+                    continue
+            x, z = _dense_line(road.points[:, 0], -road.points[:, 1], 0.5)
+            ground = grid.sample(x, z)
+            spacing = np.hypot(np.diff(x), np.diff(z))
+            profile = terrain.limit_grade_exact(ground, spacing, terrain.MAX_STEPS_GRADE, terrain.MAX_STEPS_CUT_M,
+                                                keep_ends=True)
+            band = road.width / 2.0 + grid.step * 1.5
+            rows, cols = grid.shape
+            c0 = max(0, int((x.min() - band - grid.x0) / grid.step))
+            c1 = min(cols - 1, int((x.max() + band - grid.x0) / grid.step) + 1)
+            r0 = max(0, int((z.min() - band - grid.z0) / grid.step))
+            r1 = min(rows - 1, int((z.max() + band - grid.z0) / grid.step) + 1)
+            gx, gz = np.meshgrid(grid.x0 + np.arange(c0, c1 + 1) * grid.step, grid.z0 + np.arange(r0, r1 + 1) * grid.step)
+            d2 = (gx[..., None] - x) ** 2 + (gz[..., None] - z) ** 2
+            nearest = np.argmin(d2, axis=-1)
+            inside = np.take_along_axis(d2, nearest[..., None], axis=-1)[..., 0] <= band * band
+            # A cell past an end of the line keeps its ground: the ground after the end joins it.
+            for end, before in ((0, 1), (len(x) - 1, len(x) - 2)):
+                out_x, out_z = x[end] - x[before], z[end] - z[before]
+                past = ((gx - x[end]) * out_x + (gz - z[end]) * out_z) > 0.0
+                inside &= ~((nearest == end) & past)
+            block = grid.heights[r0:r1 + 1, c0:c1 + 1]
+            block[inside] = profile[nearest[inside]]
+            change = float(np.max(np.abs(profile - ground)))
+            log(f"{landmark['id']}: the ground under the way {way_id} climbs {terrain.MAX_STEPS_GRADE} at most"
+                f" ({int(inside.sum())} cells, {change:.1f} m of change at most)")
+
+
+def _dense_line(x: np.ndarray, z: np.ndarray, step: float) -> tuple[np.ndarray, np.ndarray]:
+    """The points of a line, with a point each "step" m or less."""
+    xs, zs = [x[0]], [z[0]]
+    for i in range(1, len(x)):
+        n = max(1, int(np.ceil(np.hypot(x[i] - x[i - 1], z[i] - z[i - 1]) / step)))
+        t = np.arange(1, n + 1) / n
+        xs.extend(x[i - 1] + (x[i] - x[i - 1]) * t)
+        zs.extend(z[i - 1] + (z[i] - z[i - 1]) * t)
+    return np.asarray(xs), np.asarray(zs)
 
 
 def write_cover(grid, raw, out, projection, land_mask, area, found_by_id, place_mask=None, road_mask=None,

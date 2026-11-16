@@ -1293,10 +1293,12 @@ func set_time_scale(scale: float) -> void:
 ## A setup step at the start of a phase: puts the player at the point, makes
 ## the ground there, and waits until it is ready. It is the same kind of step
 ## as --start-time: a long walk in phases starts where the last phase stopped.
+## On the floor of a known place (the deck of the jetty), the player stands on it.
 func start_at(point: Vector3, yaw: float) -> void:
 	var w := world()
 	w.prepare_at(point)
-	point.y = w.ground_height(point.x, point.z) + 0.05
+	var floor_y := w.places.floor_at(point.x, point.z) if w.places != null else -INF
+	point.y = maxf(w.ground_height(point.x, point.z), floor_y) + 0.05
 	main().player.place(point, yaw)
 	await wait_ground(60.0)
 

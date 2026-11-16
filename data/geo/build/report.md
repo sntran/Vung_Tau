@@ -1,6 +1,6 @@
 # Geodata report
 
-Made by `tools/geo/build.py` on 2026-11-06.
+Made by `tools/geo/build.py` on 2026-11-16.
 
 ## Extents
 
@@ -17,7 +17,7 @@ Made by `tools/geo/build.py` on 2026-11-06.
 
 ## Roads
 
-Total road length: 692.3 km. Roads with a width tag: 7 of 4123. Hẻm: 2365.
+Total road length: 692.3 km. Roads with a width tag: 7 of 4124. Hẻm: 2366.
 
 | Type | Roads | Length (km) |
 |---|---|---|
@@ -27,7 +27,7 @@ Total road length: 692.3 km. Roads with a width tag: 7 of 4123. Hẻm: 2365.
 | alley | 871 | 81.38 |
 | secondary | 105 | 41.37 |
 | tertiary | 68 | 28.34 |
-| footway | 251 | 17.46 |
+| footway | 252 | 17.47 |
 | unclassified | 41 | 17.21 |
 | path | 50 | 16.90 |
 | track | 24 | 4.42 |
@@ -66,6 +66,9 @@ Total road length: 692.3 km. Roads with a width tag: 7 of 4123. Hẻm: 2365.
 | Chợ Phường 1 | yes | way/259528309 | 159.09, -708.46 | 8.75 | 1 candidates, 5.2 m from the hint |
 | Vòng xoay Đài tưởng niệm Liệt sĩ | yes | way/975192902 | 1953.62, -562.5 | 9.62 | 8 candidates, 811.8 m from the hint |
 | Ngã Năm | yes | node/3144051066 | 1178.71, -1254.11 | 6.48 | 1 candidates, 5.8 m from the hint |
+| Cầu Đá cổ | yes | way/286293879 | -502.58, 448.48 | -4.0 | 1 candidates, 133.4 m from the hint |
+| Nhà thờ Vũng Tàu | yes | way/791795169 | 362.37, -272.07 | 10.05 | 1 candidates, 13.7 m from the hint |
+| Tượng Trần Hưng Đạo | yes | way/235156180 | 360.93, 141.55 | 7.26 | 1 candidates, 4.1 m from the hint |
 
 ## Homestay hẻm
 
@@ -97,22 +100,22 @@ None.
 
 ## Trees (R12a)
 
-- bang: 1982
-- casuarina: 3551
-- coconut: 871
-- flame: 1615
-- frangipani: 757
-- shade: 3577
-- tall_shade: 184
-- From: bai_truoc_road 195, bai_truoc_road_snapped 14, coast_roads 3974, coast_roads_snapped 309, named_roads 502, named_roads_snapped 107, osm 385, park_bai_truoc 292, park_bai_truoc_snapped 58, parks 1379, parks_snapped 1379, street 5810, street_snapped 5810.
+- bang: 1989
+- casuarina: 3511
+- coconut: 901
+- flame: 1631
+- frangipani: 756
+- shade: 3596
+- tall_shade: 182
+- From: bai_truoc_road 195, bai_truoc_road_snapped 14, coast_roads 3973, coast_roads_snapped 324, named_roads 499, named_roads_snapped 113, osm 385, park_bai_truoc 292, park_bai_truoc_snapped 69, parks 1389, parks_snapped 1389, street 5833, street_snapped 5833.
 
 ## Land cover and trees (report 0005, D-0005-09; plan 0020, D8)
 
 - Sources: ESA WorldCover 2021 v200 (10 m classes) and Meta and WRI High Resolution Canopy Height Maps (v1) (about 1 m, kept on a grid of 2.0 m with the highest value). Both CC BY 4.0.
 - The canopy images over the play area are from 2019.42 to 2019.83 (decimal years, mean 2019.73).
 - A canopy of 3 m or more is a tree, and a canopy of 0.6 m to 3 m in tree cover is a bush (WorldCover has almost no shrubland here). Grassland and bare ground show the ground (R10a). The built-up and the cropland classes keep the rules of the town and of `trees.json`.
-- 86883 trees on the open land, with a mean height of 6.8 m and a mean crown radius of 4.5 m (`canopy_trees.json`, R10a). A tree stands on the highest canopy first, then on the lower canopy, at a spacing of 0.9 of its height (5 m to 12 m): the map has one height top for each group of crowns. The crown of a tree is the canopy that is nearer to it than to another tree.
-- No trees and no bushes on 272.9 ha of paved places and platforms (the OSM areas and the landmarks of `data/geo/clearings.json`), and no tree trunks on the roads and the paths (report 0020, D-0020-01).
+- 86876 trees on the open land, with a mean height of 6.8 m and a mean crown radius of 4.5 m (`canopy_trees.json`, R10a). A tree stands on the highest canopy first, then on the lower canopy, at a spacing of 0.9 of its height (5 m to 12 m): the map has one height top for each group of crowns. The crown of a tree is the canopy that is nearer to it than to another tree.
+- No trees and no bushes on 273.6 ha of paved places and platforms (the OSM areas and the landmarks of `data/geo/clearings.json`), and no tree trunks on the roads and the paths (report 0020, D-0020-01).
 
 | Hill | Area (km²) | Tree cover | Bushes | Grass | Bare | Trees | WorldCover classes |
 |---|---|---|---|---|---|---|---|
@@ -133,13 +136,13 @@ The street and park trees and the canopy map (report 0020, D-0020-03): on the ro
 
 | Group | Trees | Moved to a tree top | Not in the map |
 |---|---|---|---|
-| Quang Trung (Bãi Trước) | 195 | 7 % | 71 % |
-| Thùy Vân, Hạ Long, Trần Phú | 3974 | 8 % | 71 % |
-| Trần Hưng Đạo, Ba Cu | 502 | 21 % | 35 % |
+| Quang Trung (Bãi Trước) | 195 | 7 % | 72 % |
+| Thùy Vân, Hạ Long, Trần Phú | 3973 | 8 % | 71 % |
+| Trần Hưng Đạo, Ba Cu | 499 | 23 % | 35 % |
 | The trees of OSM | 385 | 0 % | 36 % |
-| The park of Bãi Trước | 292 | 20 % | 22 % |
-| The other parks | 1379 | 100 % | 0 % |
-| The other main roads | 5810 | 100 % | 0 % |
+| The park of Bãi Trước | 292 | 24 % | 22 % |
+| The other parks | 1389 | 100 % | 0 % |
+| The other main roads | 5833 | 100 % | 0 % |
 
 ## Town anchors (R6a)
 
@@ -200,6 +203,7 @@ The street and park trees and the canopy map (report 0020, D-0020-03): on the ro
 - add way -2 ({'name': 'Bãi đá ra Hòn Bà', 'natural': 'shoal', 'surface': 'rock', 'tidal': 'yes'}): R8h: OSM has only the line of the path (way 221906223, a track), with no outline of the rocks. This band is 30 m wide: the path line with 15 m on each side, and 12 m more at each end, so that it touches the beach below Mũi Nghinh Phong and the islet. The heights of the rocks are in hon_ba.json.
 - rock coast Mũi Nghinh Phong (150 m around 107.083721, 10.3204661): Mũi Nghinh Phong is a rocky cape (report 0005, D-0005-03). The point is the OSM node natural=cape (node 2435353682). OSM has bare rock, scree, and cliffs on its sides, but not at the tip, and the sea floor in front of the tip showed as sand at low tide.
 - rock shelf Đá ven kè Bãi Trước (25 m wide at -1.0 m): Plan 0005, Q6: at low tide, flat dark rocks show along the sea wall south of the main beach of Bãi Trước, toward Núi Nhỏ, and people walk and fish on them. The ends, the width, and the height are builder values from the map: the rocks are dry when the tide is below -1.0 m, at most low tides of the game days. Check.
+- add way -9001 ({'highway': 'footway'}): Report 0008, D-0008-02: the end of the footway 788327903 and the foot of the steps 788327902 on the route to the statue of Núi Nhỏ are 5.4 m apart in OSM. This footway joins them, so that the player walks on the path the whole way.
 
 ## Problems with the data
 

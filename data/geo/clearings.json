@@ -26,5 +26,6 @@
 			"within_m": 70.0
 		}
 	],
-	"inside_ways_note": "The areas inside a ring of a way with no trees (report 0020, the re-check of 2026-11-05): the points of the way within within_m of the landmark near, closed into a polygon. 35923584 is the road that goes around the top of Núi Nhỏ in a hairpin."
+	"inside_ways_note": "The areas inside a ring of a way with no trees (report 0020, the re-check of 2026-11-05): the points of the way within within_m of the landmark near, closed into a polygon. 35923584 is the road that goes around the top of Núi Nhỏ in a hairpin.",
+	"known_places_margin_m": 3.0
 }

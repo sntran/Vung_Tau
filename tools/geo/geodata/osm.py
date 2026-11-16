@@ -131,7 +131,9 @@ def apply_corrections(data: OsmData, corrections: list[dict]) -> None:
             added += 1
             coords = [tuple(p) for p in c["coords"]]
             # Corrections have negative IDs, so that they cannot be the same as an OSM ID.
-            way = Way(-added, dict(c["tags"]), [-(added * 100000 + i) for i in range(len(coords))], coords, "override")
+            # An "id" (a negative number) lets other data name the way, for example the route of a place.
+            way_id = int(c.get("id", -added))
+            way = Way(way_id, dict(c["tags"]), [-(added * 100000 + i) for i in range(len(coords))], coords, "override")
             if c.get("closed"):
                 way.refs[-1] = way.refs[0]
             data.ways.append(way)

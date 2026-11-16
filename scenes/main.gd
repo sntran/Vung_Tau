@@ -1040,6 +1040,9 @@ func phrasebook() -> Dictionary:
 func lens_card() -> Dictionary:
 	var parts := focus_id.split(".")
 	if parts.size() < 2:
+		# A known place of the Vũng Tàu world in the middle of the view (plan 0008, D6).
+		if vung_tau != null and vung_tau.places != null:
+			return vung_tau.places.lens_card(player.eye_position(), player.view_forward())
 		return {}
 	if parts[0] == "npc":
 		var npc_id := parts[1]
