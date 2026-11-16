@@ -1,5 +1,5 @@
 {
-	"note": "The materials of the game for the material roles of World (plan 0023, D3, R6). \"materials\" are the materials of the game: \"color\" (sRGB), \"roughness\", \"metallic\", \"alpha\" (a transparent material), \"paint\" (the model gives the color: a MultiMesh instance color, or the paint of WorldModel), \"texture\" (keep the color, the texture, and the transparency of the GLB material, as the skin, the hair, and the clothes of people: the game gives only the roughness and the metallic value), \"vertex_mean\" (the same for the mean colors of the mid and far levels of people), and \"hidden\" (no mesh). \"roles\" gives the material of each role, and \"patterns\" the material of each role that agrees with a pattern. A role with no material stops the load of the model with an error. The first values are the values of the World palette (priv/palette.json at the commit of the lock).",
+	"note": "The materials of the game for the material roles of World (plan 0023, D3, R6). \"materials\" are the materials of the game: \"color\" (sRGB), \"roughness\", \"metallic\", \"alpha\" (a transparent material), \"paint\" (the model gives the color: a MultiMesh instance color, or the paint of WorldModel), \"texture\" (keep the color, the texture, and the transparency of the GLB material, as the skin, the hair, and the clothes of people: the game gives only the roughness and the metallic value), \"vertex_mean\" (the same for the mean colors of the mid and far levels of people), and \"hidden\" (no mesh), and \"keep\" (the material of the GLB as it is: its maps of color, normal, occlusion, roughness, metallic value, and light; plan 0026, D4). \"roles\" gives the material of each role, and \"patterns\" the material of each role that agrees with a pattern. A role with no material stops the load of the model with an error. The first values are the values of the World palette (priv/palette.json at the commit of the lock).",
 	"status": "check",
 	"materials": {
 		"aluminum": {
@@ -347,6 +347,10 @@
 			"color": "#C08F5C",
 			"roughness": 0.8,
 			"metallic": 0.0
+		},
+		"part": {
+			"keep": true,
+			"note": "The parts of a building or a sculpture of World (the materials part_01, part_02, ...) have their own maps (World plans 0009 and 0010). The game keeps them as they are (plan 0026, D4, R12)."
 		}
 	},
 	"roles": {
@@ -417,7 +421,8 @@
 	},
 	"patterns": {
 		"clothes_*": "person_clothes",
-		"color_*": "person_color"
+		"color_*": "person_color",
+		"part_*": "part"
 	},
 	"house": {
 		"note": "Plan 0009, R7a: a house of World keeps up to 12 roles. The game merges them into these 6 materials. A role of a house that is not here uses \"roles\".",
@@ -472,5 +477,12 @@
 			"glass": "house_glass_wood",
 			"wood": "house_glass_wood"
 		}
+	},
+	"boat": {
+		"note": "The set of the boats of World (the ghe and the thúng chai): their role paint carries the look of the boat in its texture (the worn paint, the weave of bamboo), so the set keeps the material of the GLB (plan 0026, R5, R8).",
+		"roles": {
+			"paint": "part"
+		},
+		"materials": {}
 	}
 }

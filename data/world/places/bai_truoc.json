@@ -1,0 +1,173 @@
+{
+	"note": "The place of each model of World in the showcase of Bãi Trước (plan 0026, D3). \"front\" is the middle of the front of the model (x and z of the game), \"facing\" the direction that its front looks to (x and z), and \"front_middle_x\" the x of that point in the model, \"box\" the box of the model in its own frame (x from, x to, z from, z to; the front is at z = 0), \"street\" the street that the front looks to (a model of World has its front at z = 0 and looks to +z in Godot). The model stands on the ground at its front. \"ranges\" gives the end of the near, the mid, and the far level for each preset (D6: on Low the near level of a building is its mid level, so the near level has no range). The sources of each place are with it. tools/geo/build.py makes the ground level under the box of each model, at the height of the ground at its front (plan 0009, R8).",
+	"status": "check",
+	"ranges": {
+		"low": [
+			0.0,
+			300.0,
+			1500.0
+		],
+		"medium": [
+			40.0,
+			400.0,
+			1800.0
+		],
+		"high": [
+			80.0,
+			500.0,
+			2000.0
+		],
+		"ultra": [
+			120.0,
+			600.0,
+			2500.0
+		]
+	},
+	"places": [
+		{
+			"id": "quang_trung_4_10",
+			"front": [
+				116.44,
+				163.88
+			],
+			"facing": [
+				-0.9698,
+				-0.2438
+			],
+			"front_middle_x": 0.0,
+			"survey": [
+				"QT-T02",
+				"QT-T03",
+				"QT-T04"
+			],
+			"source": "The middle of the fronts of the survey rows QT-T02, QT-T03, QT-T04 (World priv/surveys/quang_trung.json, the field at), weighted by their widths, at 11.5 m from the line of the road; the front looks to the nearest point of Quang Trung (way 200554615). The model is 24.3 m wide and the lots 3 of the survey are a little narrower, so the models of the row stand one after the other from Cảng vụ to the north (this one +0.9 m along the street from the survey).",
+			"box": [
+				-12.15,
+				12.15,
+				-20.5,
+				9.18
+			],
+			"street": "Quang Trung"
+		},
+		{
+			"id": "quang_trung_12_18",
+			"front": [
+				121.74,
+				139.23
+			],
+			"facing": [
+				-0.9864,
+				-0.1642
+			],
+			"front_middle_x": 0.0,
+			"survey": [
+				"QT-T05",
+				"QT-T06",
+				"QT-T07",
+				"QT-T08"
+			],
+			"source": "The middle of the fronts of the survey rows QT-T05, QT-T06, QT-T07, QT-T08 (World priv/surveys/quang_trung.json, the field at), weighted by their widths, at 11.5 m from the line of the road; the front looks to the nearest point of Quang Trung (way 200554615). The model is 24.2 m wide and the lots 4 of the survey are a little narrower, so the models of the row stand one after the other from Cảng vụ to the north (this one +2.1 m along the street from the survey).",
+			"box": [
+				-12.1,
+				12.1,
+				-20.5,
+				9.18
+			],
+			"street": "Quang Trung"
+		},
+		{
+			"id": "quang_trung_20_26",
+			"front": [
+				125.58,
+				114.96
+			],
+			"facing": [
+				-0.9901,
+				-0.1406
+			],
+			"front_middle_x": 0.0,
+			"survey": [
+				"QT-T09",
+				"QT-T10",
+				"QT-T11"
+			],
+			"source": "The middle of the fronts of the survey rows QT-T09, QT-T10, QT-T11 (World priv/surveys/quang_trung.json, the field at), weighted by their widths, at 11.5 m from the line of the road; the front looks to the nearest point of Quang Trung (way 200554615). The model is 24.3 m wide and the lots 3 of the survey are a little narrower, so the models of the row stand one after the other from Cảng vụ to the north (this one +2.8 m along the street from the survey).",
+			"box": [
+				-12.15,
+				12.15,
+				-20.5,
+				9.18
+			],
+			"street": "Quang Trung"
+		},
+		{
+			"id": "cang_vu_vung_tau",
+			"front": [
+				109.88,
+				190.32
+			],
+			"facing": [
+				-0.9693,
+				-0.2458
+			],
+			"front_middle_x": -6.68,
+			"survey": [
+				"QT-T01"
+			],
+			"source": "The front of the outline of OpenStreetMap (cang_vu: way 259732719), on the side to Quang Trung; the survey row QT-T01.",
+			"box": [
+				-21.7,
+				8.33,
+				-27.4,
+				2.62
+			],
+			"street": "Quang Trung"
+		},
+		{
+			"id": "khach_san_grand_canh_nam",
+			"front": [
+				129.4,
+				56.96
+			],
+			"facing": [
+				-0.9857,
+				0.1686
+			],
+			"front_middle_x": -18.05,
+			"survey": [
+				"QT-T12"
+			],
+			"source": "The front of the outline of OpenStreetMap (grand_south: way 118946705), on the side to Quang Trung; the survey row QT-T12.",
+			"box": [
+				-40.3,
+				4.2,
+				-20.9,
+				4.2
+			],
+			"street": "Quang Trung"
+		},
+		{
+			"id": "khach_san_grand",
+			"front": [
+				154.48,
+				-2.5
+			],
+			"facing": [
+				-0.9782,
+				0.2077
+			],
+			"front_middle_x": -18.6,
+			"survey": [
+				"QT-T13"
+			],
+			"source": "The front of the outline of OpenStreetMap (grand_main: way 118950627), on the side to Quang Trung; the survey row QT-T13.",
+			"box": [
+				-37.8,
+				0.6,
+				-24.6,
+				5.05
+			],
+			"street": "Quang Trung"
+		}
+	]
+}

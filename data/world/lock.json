@@ -67,6 +67,16 @@
 				"aerobics_leader.receipt.json": "f85f9255698c5b77be465cf28b77a657eeb2228fde4abd8cdf294bce7a3c5e16"
 			}
 		},
+		"cang_vu_vung_tau": {
+			"hash": "c1983dfb7a7ab8ec578e19a7ba6469fe",
+			"files": {
+				"cang_vu_vung_tau.far.glb": "aae69318a54f1572b1a5258b6df3a81bc7ea7e6b421b419fc4e77155c2902159",
+				"cang_vu_vung_tau.glb": "2cdab7b7e14a5dcb3f6a2ad340afa735c01f3b9e23b23c6a44333df9879b5ddd",
+				"cang_vu_vung_tau.mid.glb": "2bb0b5dd1f0a5efa8b2e29e2e2c6f62cccad03fe6e9c053d0ea115384b93c9be",
+				"cang_vu_vung_tau.parts.json": "86c863be578063a82edc8cfcdae340235e6703afc73b4e6d57da5b871022536a",
+				"cang_vu_vung_tau.receipt.json": "24aea0642909bc2e4db5af4d197caa71d98dd969b3c1e3ede2497e4bc706a56f"
+			}
+		},
 		"ceiling_fan": {
 			"hash": "3baef58f1befc276ff522c7260a595a4",
 			"files": {
@@ -77,6 +87,56 @@
 				"ceiling_fan.receipt.json": "f4bdbebcf8d0108620cb69aa7d6eef40287663d43de83e0efa073cc0dd31ebcd"
 			}
 		},
+		"khach_san_grand": {
+			"hash": "e9275b929c2a3032a46d60103108618b",
+			"files": {
+				"khach_san_grand.far.glb": "260004ac10bc21f3fbc369f3ef935b88fed9da788f79c6c27fc4a4a3f89aa428",
+				"khach_san_grand.glb": "e9a73b897c25a0ef1658aa4c7d8252968acc2bea2823fd1f01c0fd35f68b8a40",
+				"khach_san_grand.mid.glb": "de3b0b0fc932bacea8bba97c512bff892b537429f0b228756e70ffa040b245ca",
+				"khach_san_grand.parts.json": "a06731a30946e3b6fdae6585f618147610f0ebc319b7717fb4be12f4f05a90f8",
+				"khach_san_grand.receipt.json": "0cd424a28d9c960e4b7c4d9b5781486d4ceb5be7ba1b8610c767dafa005915db"
+			}
+		},
+		"khach_san_grand_canh_nam": {
+			"hash": "dbf760d02f5f1591353fe356e8eabd73",
+			"files": {
+				"khach_san_grand_canh_nam.far.glb": "8d1c0b1d8f15e966adf9caa6a029ca9538abcd86fb44b10c52d0995ba43afb14",
+				"khach_san_grand_canh_nam.glb": "8c33bc16ab742f2226211239cd9b4705182599d96acf81ac2ca7680b0a4f2eb2",
+				"khach_san_grand_canh_nam.mid.glb": "6fc87cb108ebcc9975c22a6e99634cb4b067de061d8f642c7e4596a0ef4a748d",
+				"khach_san_grand_canh_nam.parts.json": "8b20ceac7f196b009b1720646e4166a493d35788fa3233ed845efcc81c9b3689",
+				"khach_san_grand_canh_nam.receipt.json": "6c17dfa033c9370c328a03863564419ff27983b9651bbeb7aa6ec79c300c3d3c"
+			}
+		},
+		"quang_trung_12_18": {
+			"hash": "29bb50d50ec3cfe1909cc519d71091b4",
+			"files": {
+				"quang_trung_12_18.far.glb": "cb0f1df3c33361b1ed035500075deed49eedd01474a8a99dd726c6978cc52df2",
+				"quang_trung_12_18.glb": "37a3d1a6f478d76bf05763c13c8ba682f77ae92f39ce6bf60af6f13fb2337a58",
+				"quang_trung_12_18.mid.glb": "9d0fa0fffe6a9d18ffe1ce02ec71fbe99aa944a486c17373364ada095bb67ee1",
+				"quang_trung_12_18.parts.json": "5d2fd14435f47ff27447fe8a73fbe8a05e4957db70eeb13951a694ea3c0494b8",
+				"quang_trung_12_18.receipt.json": "c04ef7f88e31abe22b4c06dfc96c7b0c7a065f065adec89a3293cb570a377b53"
+			}
+		},
+		"quang_trung_20_26": {
+			"hash": "658b9a8975d6e4b22ce439ffc7363717",
+			"files": {
+				"quang_trung_20_26.far.glb": "fb91eaa0edbb6f64955b21e874881daf53e9885e76d9b49586879e01fc29a1b6",
+				"quang_trung_20_26.glb": "8712208a53899ea4d8c54f7aa3aca76b8026fa7403414d8541913da383eab34f",
+				"quang_trung_20_26.mid.glb": "2b95cf7e6c18f3fd2c26d1c62896e329739eb4f73fcd33236365bf9b082d11c7",
+				"quang_trung_20_26.parts.json": "f4f822a2c47e04f18ebc2bd0e5543da14d3ca7acacd3579e42aac1b9f8383f71",
+				"quang_trung_20_26.receipt.json": "4b81e0aec7dd44edea33a64eaba958cf981203ff681c1a2ccdc158f655f9335b"
+			}
+		},
+		"quang_trung_4_10": {
+			"hash": "f8dea1acc441da975f98d42550fb97dd",
+			"files": {
+				"quang_trung_4_10.far.glb": "a859e33f427f5603f0979bcb24818ce6ab2fc43a4a71cd3a2eec72c8595135aa",
+				"quang_trung_4_10.glb": "3daef5302c3cd083d14e3553ac84be543e0c2695b61e7f39b4ce667b1d2bc483",
+				"quang_trung_4_10.mid.glb": "0a59a1470e2d628a4f08bf30047132b9aec251634bf26e030cab6ece2b20eca2",
+				"quang_trung_4_10.parts.json": "4e89b75e4834a558817ee1b333d6f1a276b9d826b07f51e2cc4e7deb67397a81",
+				"quang_trung_4_10.receipt.json": "f517935aac90bc61b0d2e94f7fa6b95686cb858c6302fdd86e799adebd949ad5"
+			}
+		},
 		"scooter_tay_ga_1": {
 			"hash": "176593c8c18de6bff70b0189e26ee31a",
 			"files": {
@@ -85,6 +145,16 @@
 				"scooter_tay_ga_1.mid.glb": "6a84cd86a60d97b398266e747e81709a774dc85eb5a55e1d4d764c9ba90265bf",
 				"scooter_tay_ga_1.parts.json": "e46f38c3eeb2904b9af8826cc6b2a89430f02c067d9d6e24583f6d62c945366c",
 				"scooter_tay_ga_1.receipt.json": "5460011da13b51eceaba46a97cc2650d9c15bfee580b252d0d8c143aa023f67e"
+			}
+		},
+		"thung_chai": {
+			"hash": "26b0ac46e6a662ac85d6c27ba04983b1",
+			"files": {
+				"thung_chai.far.glb": "7ba570d20091ecefb5b800c433f45a57f5bc2cf90608b5e988cd7fa8f609cff6",
+				"thung_chai.glb": "fa3e4502d4fd97bf19acbef60b7398367f0d92434935bb9c3484be3e8d18a1a8",
+				"thung_chai.mid.glb": "d2a0592b5cd4bcf0f748db92965aa4020975191facd0909d0cf976fcd80c9739",
+				"thung_chai.parts.json": "3ba12ff589c72cd3160d0664e233cbedb01c2e137ea2699f251b77f0bc042e24",
+				"thung_chai.receipt.json": "93e5c370a8d179d5909ed2571c98d78d9340a6419e71056d20844167be8c0714"
 			}
 		}
 	}

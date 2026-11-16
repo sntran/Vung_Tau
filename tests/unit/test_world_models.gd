@@ -208,3 +208,17 @@ func test_a_parked_scooter_stands_at_an_angle_to_the_curb() -> void:
 	var pose := Parked.pose(rng)
 	assert_gte(absf(pose.fork), Parked.MIN_STEER, "the front wheel is turned")
 	assert_gt(Parked.colors().size(), 4, "the colors of the scooters")
+
+
+## Plan 0026, D4: the materials part_NN of a building of World keep their maps.
+func test_a_part_of_a_building_keeps_the_material_of_the_glb() -> void:
+	var library := WorldMaterials.shared()
+	assert_eq(library.material_name("part_01"), "part")
+	assert_eq(library.material_name("part_12"), "part")
+	var source := StandardMaterial3D.new()
+	source.albedo_texture = ImageTexture.create_from_image(Image.create(4, 4, false, Image.FORMAT_RGB8))
+	source.normal_enabled = true
+	source.roughness = 0.42
+	var material := library.material_for("part_03", source)
+	assert_same(material, source, "the game uses the material of the GLB as it is")
+	assert_almost_eq((material as StandardMaterial3D).roughness, 0.42, 0.001)

@@ -33,6 +33,8 @@ const GROUP := &"world_models"
 
 ## The ranges now (Quality.apply() sets them with set_ranges()).
 static var ranges := Vector3(15.0, 40.0, 150.0)
+## The preset of the ranges now.
+static var preset := "low"
 static var _orders: Dictionary = {}
 static var _scenes: Dictionary = {}
 static var _lowest: Dictionary = {}  # id/level -> the lowest point of the level at rest
@@ -55,6 +57,8 @@ var spin_rpm := 0.0:
 	set(value):
 		spin_rpm = value
 		set_process(value != 0.0)
+## The ranges of the levels for each preset (preset name -> Vector3), over WorldModel.RANGES.
+var custom_ranges: Dictionary = {}
 var _levels: Dictionary = {}  # level -> Node3D
 var _spin_angle := 0.0
 
@@ -112,8 +116,9 @@ static func make(model_id: String, model_paint := WorldMaterials.DEFAULT_PAINT, 
 
 
 ## Sets the ranges of the levels for a quality preset.
-static func set_ranges(preset: String, tree: SceneTree = null) -> void:
-	ranges = RANGES.get(preset, RANGES.low)
+static func set_ranges(preset_name: String, tree: SceneTree = null) -> void:
+	ranges = RANGES.get(preset_name, RANGES.low)
+	preset = preset_name if RANGES.has(preset_name) else "low"
 	if tree == null:
 		tree = Engine.get_main_loop() as SceneTree
 	if tree != null:
@@ -232,15 +237,22 @@ func _process(delta: float) -> void:
 ## Sets the visibility ranges of the levels from the ranges of the preset.
 func apply_ranges() -> void:
 	var used := levels_of(id)
-	var far := far_end if far_end > 0.0 else ranges.z
+	# A building of the showcase has the ranges of its place for each preset
+	# (plan 0026, D6: on Low it has no near level).
+	var r: Vector3 = custom_ranges.get(preset, ranges)
+	var far := far_end if far_end > 0.0 else r.z
 	var begin := 0.0
 	for i in used.size():
 		var level: String = used[i]
 		var end := far
 		if i < used.size() - 1:
-			end = ranges.x if level == "near" else ranges.y
+			end = r.x if level == "near" else r.y
 		var node: Node3D = _levels.get(level)
 		if node == null:
+			continue
+		# An end of 0 is no end in Godot: a level with no range does not show.
+		node.visible = end > begin
+		if not node.visible:
 			continue
 		for geometry in node.find_children("*", "GeometryInstance3D", true, false):
 			var g := geometry as GeometryInstance3D

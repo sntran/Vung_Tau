@@ -273,6 +273,125 @@
 			"impostor": false,
 			"uses": "Plan 0023, R9d: the aerobics group of the morning exercise at Bãi Trước, 05:00 to 06:30.",
 			"catalog": "P7"
+		},
+		{
+			"id": "cang_vu_vung_tau",
+			"order": {
+				"blueprint": "catalog",
+				"options": {
+					"name": "cang_vu_vung_tau"
+				}
+			},
+			"levels": [
+				"near",
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R7: Cảng vụ Hàng hải Vũng Tàu, 2 Quang Trung (survey row QT-T01), from World plan 0018. On Low the near level is the mid level (D6).",
+			"catalog": "Plan 0026, R7"
+		},
+		{
+			"id": "quang_trung_4_10",
+			"order": {
+				"blueprint": "catalog",
+				"options": {
+					"name": "quang_trung_4_10"
+				}
+			},
+			"levels": [
+				"near",
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R7: The row of the numbers 4 to 10 of Quang Trung (QT-T02 to QT-T04), from World plan 0018. On Low the near level is the mid level (D6).",
+			"catalog": "Plan 0026, R7"
+		},
+		{
+			"id": "quang_trung_12_18",
+			"order": {
+				"blueprint": "catalog",
+				"options": {
+					"name": "quang_trung_12_18"
+				}
+			},
+			"levels": [
+				"near",
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R7: The row of the numbers 12 to 18 of Quang Trung (QT-T05 to QT-T08), from World plan 0018. On Low the near level is the mid level (D6).",
+			"catalog": "Plan 0026, R7"
+		},
+		{
+			"id": "quang_trung_20_26",
+			"order": {
+				"blueprint": "catalog",
+				"options": {
+					"name": "quang_trung_20_26"
+				}
+			},
+			"levels": [
+				"near",
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R7: The row of the numbers 20 to 26 of Quang Trung (QT-T09 to QT-T11), from World plan 0018. On Low the near level is the mid level (D6).",
+			"catalog": "Plan 0026, R7"
+		},
+		{
+			"id": "khach_san_grand_canh_nam",
+			"order": {
+				"blueprint": "catalog",
+				"options": {
+					"name": "khach_san_grand_canh_nam"
+				}
+			},
+			"levels": [
+				"near",
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R7: The south wing of the Grand Hotel (QT-T12), from World plan 0018. On Low the near level is the mid level (D6).",
+			"catalog": "Plan 0026, R7"
+		},
+		{
+			"id": "khach_san_grand",
+			"order": {
+				"blueprint": "catalog",
+				"options": {
+					"name": "khach_san_grand"
+				}
+			},
+			"levels": [
+				"near",
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R7: The main block of the Grand Hotel (QT-T13), from World plan 0018. On Low the near level is the mid level (D6).",
+			"catalog": "Plan 0026, R7"
+		},
+		{
+			"id": "thung_chai",
+			"order": {
+				"blueprint": "catalog",
+				"options": {
+					"name": "thung_chai_edits"
+				}
+			},
+			"levels": [
+				"near",
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R5: the basket boats (thúng chai) on the sand of Bãi Trước, above the water line; R8: on the water.",
+			"catalog": "B2"
 		}
 	]
 }

@@ -68,6 +68,9 @@ func material_for(role: String, source: Material, paint := DEFAULT_PAINT, materi
 	var v := values(name, material_set)
 	if v.is_empty():
 		return null
+	# A building or a sculpture of World keeps its own maps (plan 0026, D4).
+	if bool(v.get("keep", false)) and source != null:
+		return source
 	var keep_source := bool(v.get("texture", false)) or bool(v.get("vertex_mean", false))
 	var key := "%s/%s" % [material_set, name]
 	if bool(v.get("paint", false)):
