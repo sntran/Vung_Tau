@@ -392,6 +392,301 @@
 			"impostor": false,
 			"uses": "Plan 0026, R5: the basket boats (thúng chai) on the sand of Bãi Trước, above the water line; R8: on the water.",
 			"catalog": "B2"
+		},
+		{
+			"id": "walker_1",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 1.0,
+					"age": 34,
+					"height": 0.5,
+					"weight": 0.45,
+					"hair": "short02",
+					"hair_color": "#2e2925",
+					"clothes": [
+						"world_t_shirt",
+						"elvs_male_trouser_short_1",
+						"elvs_male_flip_flop_sandals1"
+					],
+					"clothes_colors": [
+						"#d8d2c4",
+						"#3c4654"
+					],
+					"animations": [
+						"walk"
+					]
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R10: a person who walks on the walk of the sea and on the paths of the park, in the clothes of 2019 (plan 0023, P2: short sleeves, plain colors, flip-flops or sandals).",
+			"catalog": "P1, P2, P4, P7"
+		},
+		{
+			"id": "walker_2",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 0.0,
+					"age": 29,
+					"height": 0.42,
+					"weight": 0.4,
+					"skin": "young_asian_female",
+					"hair": "ponytail01",
+					"hair_color": "#2a2522",
+					"clothes": [
+						"world_t_shirt",
+						"mindfront_female_trousers_1",
+						"elvs_caesar_sandals1"
+					],
+					"clothes_colors": [
+						"#9fb7d0",
+						"#2f3440"
+					],
+					"animations": [
+						"walk"
+					]
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R10: a person who walks on the walk of the sea and on the paths of the park, in the clothes of 2019 (plan 0023, P2: short sleeves, plain colors, flip-flops or sandals).",
+			"catalog": "P1, P2, P4, P7"
+		},
+		{
+			"id": "walker_3",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 1.0,
+					"age": 58,
+					"height": 0.45,
+					"weight": 0.55,
+					"hair": "short02",
+					"hair_color": "#5a5550",
+					"clothes": [
+						"elvs_male_shirt_untucked_bd1",
+						"world_pants",
+						"elvs_male_flip_flop_sandals1"
+					],
+					"clothes_colors": [
+						"#e7e3d8",
+						"#4b4a45"
+					],
+					"animations": [
+						"walk"
+					]
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R10: a person who walks on the walk of the sea and on the paths of the park, in the clothes of 2019 (plan 0023, P2: short sleeves, plain colors, flip-flops or sandals).",
+			"catalog": "P1, P2, P4, P7"
+		},
+		{
+			"id": "walker_4",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 0.0,
+					"age": 46,
+					"height": 0.4,
+					"weight": 0.52,
+					"skin": "middleage_asian_female",
+					"hair": "bob02",
+					"hair_color": "#2e2925",
+					"clothes": [
+						"world_t_shirt",
+						"world_pants",
+						"elvs_caesar_sandals1"
+					],
+					"clothes_colors": [
+						"#c75b5b",
+						"#2b2d35"
+					],
+					"animations": [
+						"walk"
+					]
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R10: a person who walks on the walk of the sea and on the paths of the park, in the clothes of 2019 (plan 0023, P2: short sleeves, plain colors, flip-flops or sandals).",
+			"catalog": "P1, P2, P4, P7"
+		},
+		{
+			"id": "walker_5",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 1.0,
+					"age": 9,
+					"height": 0.5,
+					"weight": 0.4,
+					"hair": "short02",
+					"hair_color": "#221e1b",
+					"clothes": [
+						"world_t_shirt",
+						"world_quan_dui",
+						"elvs_male_flip_flop_sandals1"
+					],
+					"clothes_colors": [
+						"#e8c64a",
+						"#3a5f8f"
+					],
+					"animations": [
+						"walk"
+					]
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R10: a person who walks on the walk of the sea and on the paths of the park, in the clothes of 2019 (plan 0023, P2: short sleeves, plain colors, flip-flops or sandals).",
+			"catalog": "P1, P2, P4, P7"
+		},
+		{
+			"id": "walker_6",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 1.0,
+					"age": 70,
+					"height": 0.4,
+					"weight": 0.45,
+					"hair": "short02",
+					"hair_color": "#b8b4ad",
+					"clothes": [
+						"elvs_male_shirt_untucked_bd1",
+						"world_pants",
+						"elvs_caesar_sandals1"
+					],
+					"clothes_colors": [
+						"#cfd8df",
+						"#57534b"
+					],
+					"animations": [
+						"walk"
+					]
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R10: a person who walks on the walk of the sea and on the paths of the park, in the clothes of 2019 (plan 0023, P2: short sleeves, plain colors, flip-flops or sandals).",
+			"catalog": "P1, P2, P4, P7"
+		},
+		{
+			"id": "sitter_1",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 0.0,
+					"age": 38,
+					"height": 0.42,
+					"weight": 0.48,
+					"skin": "middleage_asian_female",
+					"hair": "bob02",
+					"hair_color": "#2e2925",
+					"clothes": [
+						"world_t_shirt",
+						"mindfront_female_trousers_1",
+						"elvs_caesar_sandals1"
+					],
+					"clothes_colors": [
+						"#7aa38a",
+						"#33363d"
+					],
+					"pose": "sit"
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R10: a person who sits on the paved edge of the park or on a raised lawn (culture notes: families sit on the paved edge of the park in the evening).",
+			"catalog": "P1, P2, P4, P7"
+		},
+		{
+			"id": "sitter_2",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 1.0,
+					"age": 42,
+					"height": 0.5,
+					"weight": 0.5,
+					"hair": "short02",
+					"hair_color": "#2e2925",
+					"clothes": [
+						"world_t_shirt",
+						"elvs_male_trouser_short_1",
+						"elvs_male_flip_flop_sandals1"
+					],
+					"clothes_colors": [
+						"#3d5a80",
+						"#c9c3b5"
+					],
+					"pose": "sit"
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R10: a person who sits on the paved edge of the park or on a raised lawn (culture notes: families sit on the paved edge of the park in the evening).",
+			"catalog": "P1, P2, P4, P7"
+		},
+		{
+			"id": "sitter_3",
+			"order": {
+				"blueprint": "person",
+				"options": {
+					"gender": 0.0,
+					"age": 12,
+					"height": 0.45,
+					"weight": 0.4,
+					"skin": "young_asian_female",
+					"hair": "ponytail01",
+					"hair_color": "#221e1b",
+					"clothes": [
+						"world_t_shirt",
+						"world_quan_dui",
+						"elvs_caesar_sandals1"
+					],
+					"clothes_colors": [
+						"#f2a7b8",
+						"#4b5c78"
+					],
+					"pose": "sit"
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R10: a person who sits on the paved edge of the park or on a raised lawn (culture notes: families sit on the paved edge of the park in the evening).",
+			"catalog": "P1, P2, P4, P7"
 		}
 	]
 }
