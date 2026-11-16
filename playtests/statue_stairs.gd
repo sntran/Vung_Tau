@@ -7,9 +7,12 @@ extends RefCounted
 # each run reaches the end of its part; the last run reaches the plaza, and
 # the player cannot pass the parapet round it (R6: a push of 4 s with the
 # joystick out to the edge). Screenshots at the bottom, in the middle, and at
-# the top. The 10th run steps to the side of each stair with the joystick: the
-# feet stay within 0.1 m of the visible ground (report 0008, D-0008-01).
+# the top. The runs 10 to 12 step to the side of each stair with the joystick
+# (two stairs in each run): the feet stay within 0.1 m of the visible ground
+# (report 0008, D-0008-01).
 # sizes: 1280x720
+# phase: --world=vung_tau --start-time=08:00
+# phase: --world=vung_tau --start-time=08:00
 # phase: --world=vung_tau --start-time=08:00
 # phase: --world=vung_tau --start-time=08:00
 # phase: --world=vung_tau --start-time=08:00
@@ -22,6 +25,8 @@ extends RefCounted
 # phase: --world=vung_tau --start-time=08:00
 
 const PARTS := 8
+## The runs of the check beside the stairs (report 0008, D-0008-01).
+const BESIDE_RUNS := 3
 const TAP_M := 7.0
 const OFF_ROUTE_M := 2.0
 
@@ -66,8 +71,14 @@ static func _beside(d: PlaytestDriver, w: VungTau) -> void:
 	var space := w.get_world_3d().direct_space_state
 	var worst := 0.0
 	var count := 0
+	# The runs PARTS + 2 to PARTS + 1 + BESIDE_RUNS: one run took more than 180 s in CI.
+	var run := d.phase - PARTS - 2
+	var index := -1
 	for s: Dictionary in w.places.stairs:
 		if s.place != "chua_kito_vua":
+			continue
+		index += 1
+		if index % BESIDE_RUNS != run:
 			continue
 		var line: PackedVector3Array = s.points
 		var length := PlaytestDriver._length(line)
@@ -97,7 +108,9 @@ static func _beside(d: PlaytestDriver, w: VungTau) -> void:
 					d.fail("beside the stairs %d at %.0f %% (%s): the feet are %.2f m from the visible ground" % [
 							s.way, part * 100.0, "right" if side > 0.0 else "left", gap])
 					await d.screenshot("beside_%d_%d" % [s.way, int(part * 100.0)])
-	d.step("beside the stairs: %d places, the feet are at most %.2f m from the visible ground" % [count, worst])
+	d.step("beside the stairs (run %d of %d): %d places, the feet are at most %.2f m from the visible ground" % [
+			run + 1, BESIDE_RUNS, count, worst])
+	d.expect(count > 0, "the run beside the stairs has places")
 
 
 ## The route up to its first point 1.5 m inside the plaza.
