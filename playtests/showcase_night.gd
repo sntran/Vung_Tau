@@ -11,11 +11,13 @@ extends RefCounted
 # phase: --world=vung_tau --start-time=20:00 --quality=low
 # phase: --world=vung_tau --start-time=20:00 --quality=high --renderer=forward_plus
 # phase: --world=vung_tau --start-time=20:00 --quality=high --renderer=forward_plus
+# phase: --world=vung_tau --start-time=20:00 --quality=high --renderer=forward_plus
 
 const SHOTS := "res://data/showcase/shots.json"
 ## For each run: the preset, the shots, and if the run measures the light of a lamp.
-## High takes S3 and S5 in two runs: a run on Forward+ under lavapipe is slow.
-const RUNS := [["low", ["S3", "S5"], true], ["high", ["S3"], true], ["high", ["S5"], false]]
+## High takes S3, S5, and the measure in three runs: a run on Forward+ under
+## lavapipe is slow (one run of S3 and the measure took more than 300 s in CI).
+const RUNS := [["low", ["S3", "S5"], true], ["high", ["S3"], false], ["high", ["S5"], false], ["high", [], true]]
 ## The ground under a street lamp, with the lamps on, against the same view with them off.
 const MIN_LIT_RATIO := 1.5
 
