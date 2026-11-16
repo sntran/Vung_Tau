@@ -89,6 +89,25 @@ uniform vec3 wood_color : source_color = vec3(0.2, 0.32, 0.13);
 // 8: the light color of before looked like sand at the cape). Not black: Hòn
 // Bà was almost black before (D-0005-05).
 uniform vec3 rock_color : source_color = vec3(0.34, 0.31, 0.28);
+// The ground of the showcase of Bãi Trước (plan 0026, R3, R4): a fine mask of
+// the lawns (R) and the paving (G) of OpenStreetMap (data/geo/build/showcase_ground.png).
+uniform sampler2D detail_mask : filter_linear, repeat_disable;
+uniform vec2 detail_origin = vec2(0.0);
+uniform vec2 detail_size = vec2(1.0);
+uniform float detail_on = 0.0;
+// A park lawn: watered, so it is green in the dry season too.
+uniform vec3 lawn_color : source_color = vec3(0.2, 0.31, 0.1);
+uniform vec3 paving_color : source_color = vec3(0.66, 0.64, 0.6);
+uniform vec3 paving_color_b : source_color = vec3(0.56, 0.55, 0.53);
+// The side of a tile (m).
+uniform float paving_tile = 0.4;
+// The texture of the paving (plan 0026, R12: the set walk_slabs), its side (m), and its tint.
+uniform sampler2D paving_texture : source_color, filter_linear_mipmap, repeat_enable;
+uniform bool paving_textured = false;
+uniform float paving_size = 1.8;
+uniform vec3 paving_tint : source_color = vec3(1.0);
+// A gain over the tint: the slabs of the photos are paler than the texture.
+uniform float paving_gain = 1.0;
 
 float luminance(vec3 c) {
 	return dot(c, vec3(0.299, 0.587, 0.114));
@@ -206,6 +225,33 @@ void fragment() {
 	vec3 boulders = low_rock * mix(0.32, 1.1, smoothstep(0.38, 0.62, blocks));
 	low_rock = mix(low_rock, boulders, bare_rock - pebbles);
 	color = mix(color, low_rock, max(rock, bare_rock));
+	// The lawns and the paving of the showcase (plan 0026, R3, R4). They cover
+	// the town ground, the cover map, and the town seen from far.
+	vec2 detail_uv = (world_position.xz - detail_origin) / detail_size;
+	vec4 detail = vec4(0.0);
+	if (detail_on > 0.5 && detail_uv.x >= 0.0 && detail_uv.y >= 0.0 && detail_uv.x <= 1.0 && detail_uv.y <= 1.0) {
+		detail = texture(detail_mask, detail_uv);
+	}
+	float far_shade = mix(1.0, 0.8, smoothstep(150.0, 600.0, camera_distance));
+	vec3 lawn = lawn_color * grass_detail * far_shade;
+	lawn = mix(lawn, dry_color * far_shade, dry * 0.25);
+	color = mix(color, lawn, detail.r);
+	// Square tiles in two tones with dark joints. From far, the pattern fades
+	// to its mean color (no moire).
+	vec2 tile_uv = world_position.xz / paving_tile;
+	vec2 in_tile = fract(tile_uv);
+	float near_pattern = 1.0 - smoothstep(15.0, 45.0, camera_distance);
+	float checker = mod(floor(tile_uv.x) + floor(tile_uv.y), 2.0);
+	float joint = step(0.93, max(in_tile.x, in_tile.y));
+	vec3 paving_mean = (paving_color + paving_color_b) * 0.5;
+	vec3 paving = mix(paving_color, paving_color_b, checker) * (0.94 + 0.12 * value_noise(world_position.xz * 3.0));
+	paving = mix(paving, paving * 0.72, joint);
+	if (paving_textured) {
+		vec3 slab = texture(paving_texture, world_position.xz / paving_size).rgb * paving_tint * paving_gain;
+		paving = mix(slab, paving_mean, smoothstep(40.0, 120.0, camera_distance));
+	}
+	paving = mix(paving_mean, paving, paving_textured ? 1.0 : near_pattern) * far_shade;
+	color = mix(color, paving, detail.g);
 	float roughness = 0.92;
 	if (pebbles > 0.5 && world_position.y < 0.5) {
 		// The Hòn Bà rock path: pebbles and oyster shells on the rocks (R8h).

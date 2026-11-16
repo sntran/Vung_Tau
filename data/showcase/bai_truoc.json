@@ -1,0 +1,663 @@
+{
+	"note": "The showcase area of Bãi Trước (plan 0026, D1, R2 to R7). Positions are x and z of the game (meters, x to the east, z to the south). \"outline\" is the area: inside it, scenes/world/showcase.gd builds the median and the sidewalks of Quang Trung (R2), the granite borders of the paths of the park and the low wall of the walk of the sea (R3, R4), the sea wall of Hạ Long (R4, R6), and a stand-in for each building that World does not have yet (R7). Each road is an OSM way of data/geo/build/roads.json; a side is the side of the way in the direction of its points. Colors are sRGB. The status of each value is \"check\" until I confirm it.",
+	"status": "check",
+	"outline": [
+		[
+			-260,
+			-285
+		],
+		[
+			-150,
+			-365
+		],
+		[
+			-15,
+			-365
+		],
+		[
+			10,
+			-285
+		],
+		[
+			60,
+			-125
+		],
+		[
+			145,
+			-110
+		],
+		[
+			205,
+			-30
+		],
+		[
+			205,
+			125
+		],
+		[
+			155,
+			235
+		],
+		[
+			45,
+			300
+		],
+		[
+			-110,
+			415
+		],
+		[
+			-150,
+			565
+		],
+		[
+			-240,
+			570
+		],
+		[
+			-430,
+			505
+		],
+		[
+			-650,
+			410
+		],
+		[
+			-640,
+			330
+		]
+	],
+	"outline_note": "From the north end of the park (S5 is there) to Hải Âu and the jetty of Cầu Đá, and from the bay to the lots behind Quang Trung. D1 says the north end of Nhà thiếu nhi; the park goes about 150 m farther north (plan 0026, Q5).",
+	"park": [
+		[
+			6.22,
+			221.19
+		],
+		[
+			18.43,
+			213.81
+		],
+		[
+			23.49,
+			209.84
+		],
+		[
+			29.11,
+			204.74
+		],
+		[
+			33.6,
+			199.47
+		],
+		[
+			40.05,
+			190.27
+		],
+		[
+			57.47,
+			206.95
+		],
+		[
+			63.05,
+			206.86
+		],
+		[
+			69.37,
+			204.09
+		],
+		[
+			74.38,
+			196.21
+		],
+		[
+			82.37,
+			165.88
+		],
+		[
+			85.2,
+			154.03
+		],
+		[
+			89.49,
+			136.03
+		],
+		[
+			92.89,
+			111.15
+		],
+		[
+			93.4,
+			91.86
+		],
+		[
+			92.74,
+			73.05
+		],
+		[
+			87.38,
+			41.67
+		],
+		[
+			74.26,
+			-17.7
+		],
+		[
+			60.75,
+			-63.62
+		],
+		[
+			32.49,
+			-136.88
+		],
+		[
+			21.15,
+			-159.07
+		],
+		[
+			1.07,
+			-195.95
+		],
+		[
+			-28.07,
+			-237.92
+		],
+		[
+			-39.06,
+			-250.35
+		],
+		[
+			-49.1,
+			-261.51
+		],
+		[
+			-53.08,
+			-258.14
+		],
+		[
+			-47.19,
+			-250.74
+		],
+		[
+			-45.84,
+			-248.97
+		],
+		[
+			-45.05,
+			-246.66
+		],
+		[
+			-44.4,
+			-232.94
+		],
+		[
+			-43.73,
+			-215.48
+		],
+		[
+			-42.01,
+			-194.84
+		],
+		[
+			-20.13,
+			-145.67
+		],
+		[
+			-24.64,
+			-143.39
+		],
+		[
+			-28.49,
+			-141.69
+		],
+		[
+			-22.49,
+			-121.31
+		],
+		[
+			-13.47,
+			-100.74
+		],
+		[
+			-9.17,
+			-97.58
+		],
+		[
+			-8.18,
+			-97.74
+		],
+		[
+			-6.32,
+			-92.9
+		],
+		[
+			13.3,
+			-41.87
+		],
+		[
+			22.49,
+			1.1
+		],
+		[
+			28.13,
+			27.04
+		],
+		[
+			28.54,
+			54.65
+		],
+		[
+			28.69,
+			87.02
+		],
+		[
+			28.02,
+			109.42
+		],
+		[
+			27.46,
+			121.71
+		],
+		[
+			26.88,
+			124.11
+		],
+		[
+			25.7,
+			129.1
+		],
+		[
+			17.68,
+			144.63
+		],
+		[
+			8.82,
+			161.22
+		],
+		[
+			2.04,
+			173.18
+		],
+		[
+			-1.15,
+			189.95
+		],
+		[
+			0.25,
+			201.37
+		],
+		[
+			0.9,
+			213.55
+		],
+		[
+			6.22,
+			221.19
+		]
+	],
+	"ground": {
+		"note": "R3 and R4: the ground of the park and of the walk of the sea, from the areas of OpenStreetMap. tools/geo/build.py makes data/geo/build/showcase_ground.png (R the lawns, G the paving, cells of cell_m) and data/geo/build/showcase.json. The lawns are the park areas and the grass areas, less the roads and the paths (and road_margin_m, the granite borders), the paved areas, and the areas with a key of not_lawn. The raised lawns are the two grass areas of OSM on the walk of the sea across the park Tam Giác (World survey of Quang Trung, QT-S02: four strips of lawn in low granite borders between the walk and the road; the photo of S5, 2015). The low wall stands along the edges of the walk that are near the beach (the photo of S5, 2014).",
+		"cell_m": 0.5,
+		"road_margin_m": 0.3,
+		"lawns": [
+			"way/220617822",
+			"way/220617816",
+			"way/229240641",
+			"way/234797329",
+			"way/234797330",
+			"way/220821624"
+		],
+		"paving": [
+			"way/220617805",
+			"way/220617809",
+			"way/220617813",
+			"way/220617818",
+			"way/220821620",
+			"way/234797331"
+		],
+		"not_lawn": [
+			[
+				"amenity",
+				"fountain"
+			],
+			[
+				"amenity",
+				"parking"
+			],
+			[
+				"natural",
+				"water"
+			],
+			[
+				"natural",
+				"beach"
+			],
+			[
+				"leisure",
+				"swimming_pool"
+			],
+			[
+				"man_made",
+				"pier"
+			]
+		],
+		"planters": {
+			"osm": [
+				"way/234797329",
+				"way/234797330"
+			],
+			"height": 0.45,
+			"border": 0.25,
+			"color": "#aaa69c",
+			"top_color": "#4f6e35"
+		},
+		"beach_wall": {
+			"walks": [
+				"way/234797331"
+			],
+			"near_beach_m": 4.0,
+			"min_length_m": 3.0,
+			"style": "balustrade",
+			"height": 0.8,
+			"width": 0.4,
+			"base": 0.3,
+			"rail": 0.14,
+			"post": 0.32,
+			"post_every": 2.4,
+			"color": "#b3ada1"
+		},
+		"paving_texture": {
+			"texture": "walk_slabs",
+			"tint": "#fff2e6",
+			"mean": "#c9bcab",
+			"note": "R12: the slabs of the walk and of the squares (the photos of S5 of 2014 and 2015: pale stone with a pink tone). The texture times tint times gain (the slabs of the photos are paler than the texture); mean is the color from far.",
+			"gain": 1.5
+		}
+	},
+	"park_note": "The outline of OpenStreetMap way 220617822 (leisure=park, Công viên Bãi Trước).",
+	"median": {
+		"ways": [
+			200554615,
+			1558591261
+		],
+		"curb_height": 0.2,
+		"curb_width": 0.3,
+		"curb_colors": [
+			"#b5332c",
+			"#ebe9e1"
+		],
+		"curb_band_m": 1.0,
+		"top_color": "#4f6e35",
+		"hedge": {
+			"width": 1.1,
+			"height": 0.8,
+			"color": "#365c2a"
+		},
+		"min_gap_m": 1.2,
+		"note": "The south part of Quang Trung: two roads of about 10 m with a median of about 3 m (survey of World plan 0018, section 3.1). The curb is red and white in bands (R2), the median has a hedge and a lawn (photos from a drone, 2021-01-30).",
+		"trees": {
+			"type": "araucaria",
+			"spacing_m": 12.0,
+			"from_end_m": 6.0,
+			"note": "R9: a row of Norfolk pines on the median of Quang Trung (Wikimedia Commons, Tuong Lam Photos, a photo from a drone, 2021-01-30, CC BY-SA 4.0; the World survey of Quang Trung, photo c07 of 2014). The spacing is by eye from the photo of 2021."
+		},
+		"lamps": {
+			"kind": "blue_double",
+			"every_m": 36.0,
+			"from_end_m": 12.0,
+			"note": "R9: the light blue lamp poles with two curved arms on the median (the photo from a drone of 2021-01-30; photos of 2014). The spacing is by eye from the photo of 2021."
+		}
+	},
+	"sidewalks": [
+		{
+			"way": 200554615,
+			"side": "right",
+			"width": 6.5,
+			"height": 0.18,
+			"color": "#b9a68d",
+			"curb_color": "#c9c6bd",
+			"note": "The sidewalk of the side of the town, with tiles: about 5.5 m in the survey (section 3.1); 6.5 m reaches the fronts of the survey (11.5 m from the line of the road). Where a model of World stands, its own sidewalk is there."
+		},
+		{
+			"way": 1558591261,
+			"side": "right",
+			"width": 2.5,
+			"height": 0.18,
+			"color": "#b9a68d",
+			"curb_color": "#c9c6bd",
+			"note": "The sidewalk of the side of the park (a guess of its width: Check)."
+		},
+		{
+			"way": 235149400,
+			"side": "right",
+			"width": 3.0,
+			"height": 0.18,
+			"color": "#b9a68d",
+			"curb_color": "#c9c6bd",
+			"note": "The sidewalk of the side of the hill of Hạ Long, from Quang Trung (its width is a guess: Check)."
+		},
+		{
+			"way": 1423071603,
+			"side": "left",
+			"width": 3.0,
+			"height": 0.18,
+			"color": "#b9a68d",
+			"curb_color": "#c9c6bd",
+			"note": "The sidewalk of the side of the hill of Hạ Long (its width is a guess: Check)."
+		},
+		{
+			"way": 200554632,
+			"side": "left",
+			"width": 3.0,
+			"height": 0.18,
+			"color": "#b9a68d",
+			"curb_color": "#c9c6bd",
+			"note": "The sidewalk of the side of the hill of Hạ Long to Hải Âu (its width is a guess: Check)."
+		}
+	],
+	"path_borders": {
+		"types": [
+			"footway",
+			"pedestrian"
+		],
+		"inside": "park",
+		"height": 0.14,
+		"width": 0.16,
+		"color": "#8f8c86",
+		"note": "The lawns of the park have granite borders along the paths (photos of section 3, S5)."
+	},
+	"walls": [
+		{
+			"ways": [
+				458829436,
+				458829438
+			],
+			"side": "left",
+			"style": "balustrade",
+			"height": 0.8,
+			"width": 0.4,
+			"base": 0.3,
+			"rail": 0.14,
+			"post": 0.32,
+			"post_every": 2.4,
+			"color": "#b3ada1",
+			"note": "The low wall of granite blocks between the walk of the sea and the beach (R4): a base, square posts, and a top rail with gaps under it, as in the photo of S5 (2014, Wikimedia Commons, Lam Tr Th, CC BY-SA 3.0). The sizes are by eye from the photo."
+		}
+	],
+	"sea_walls": [
+		{
+			"ways": [
+				200554629,
+				1423071603,
+				200554632
+			],
+			"side": "right",
+			"until_z": 560.0,
+			"width": 7.0,
+			"walk": 3.0,
+			"walk_color": "#b9a68d",
+			"parapet": 0.6,
+			"color": "#77746c",
+			"note": "The walk on the sea side of Hạ Long and the sea wall of stone blocks under it, from Quang Trung to Cầu Đá (R4, R6; photos of trungydang, 2014)."
+		}
+	],
+	"stand_ins": {
+		"storey_m": 3.3,
+		"default_storeys": 1,
+		"color": "#c9c4b8",
+		"roof_color": "#a89f90",
+		"note": "A building of OSM in the area that World does not have yet (R7): its outline, and its storeys from OSM (building:levels). A building with no storeys in OSM has default_storeys (1, a guess until the heights of plan 0009, R1: plan 0026, Q6). A building under a model of World has no stand-in. \"storeys\" gives the storeys of a building from another source, by its OSM id.",
+		"storeys": {
+			"way/259750558": {
+				"storeys": 12,
+				"name": "Khách sạn Bưu điện (158 Hạ Long)",
+				"source": "About 12 storeys counted from a photo from a drone of 2021-01-30 (Wikimedia Commons, Tuong Lam Photos, CC BY-SA 4.0, File:Vung_Tau,_Viet_Nam_2021.jpg); a hotel list gives it an outdoor pool, as the photo shows.",
+				"status": "Source"
+			}
+		}
+	},
+	"beached": {
+		"model": "thung_chai",
+		"material_set": "boat",
+		"min_ground": 1.0,
+		"points": [
+			[
+				-2.0,
+				104.0,
+				20.0
+			],
+			[
+				1.0,
+				112.0,
+				75.0
+			],
+			[
+				-3.0,
+				118.0,
+				140.0
+			],
+			[
+				2.0,
+				126.0,
+				200.0
+			],
+			[
+				3.0,
+				140.0,
+				300.0
+			]
+		],
+		"note": "R5: basket boats (thúng chai) on the sand at the south end of the beach, above the water line: x, z, and the turn in degrees. The landing of the boats of Bãi Trước (Tuổi Trẻ, 2017-08-02) and two thúng chai on the beach on 2019-01-24 (Flickr, Ted McGrath). Their places are a guess (plan 0026, Q3). A point with ground lower than min_ground (m) has no boat."
+	},
+	"lamp_kinds": {
+		"note": "R9: the lamps of the photos, as stand-ins until World has them (request Q-W5). The sizes are by eye from the photos.",
+		"blue_double": {
+			"shape": "arms",
+			"height": 9.0,
+			"base_radius": 0.13,
+			"top_radius": 0.07,
+			"arms": 2,
+			"arm_length": 1.6,
+			"arm_rise": 0.6,
+			"head": [
+				0.55,
+				0.12,
+				0.24
+			],
+			"pole_color": "#7fb4cf",
+			"head_color": "#e9e8e2",
+			"note": "A light blue pole with two curved arms and a head at each end (2014 and 2021)."
+		},
+		"globe_post": {
+			"shape": "globes",
+			"height": 3.6,
+			"base_radius": 0.08,
+			"top_radius": 0.05,
+			"globes": 4,
+			"globe_radius": 0.17,
+			"arm_length": 0.42,
+			"pole_color": "#26292a",
+			"head_color": "#f1f0ea",
+			"note": "A black post with white globes (the photo of S2 of 2014, in the park, and the photo from a drone of 2021, at the south tip of the park)."
+		},
+		"path_lamp": {
+			"shape": "bollard",
+			"height": 0.85,
+			"half": 0.08,
+			"pole_color": "#d6d3cc",
+			"head_color": "#f1f0ea",
+			"note": "A low square lamp at the side of a path of the park (the photo of S2 of 2014)."
+		}
+	},
+	"lamp_rows": [
+		{
+			"way": 1558591261,
+			"side": "right",
+			"offset_m": 0.7,
+			"kind": "blue_double",
+			"every_m": 36.0,
+			"from_end_m": 18.0,
+			"note": "R9: the lamp poles on the sidewalk of the park (the photo from a drone of 2021-01-30)."
+		}
+	],
+	"path_lamps": {
+		"kind": "path_lamp",
+		"types": [
+			"footway"
+		],
+		"every_m": 14.0,
+		"offset_m": 0.45,
+		"from_end_m": 3.0,
+		"note": "R9: the low lamps along the paths of the park, at alternate sides (the photo of S2 of 2014). The spacing is a builder value."
+	},
+	"materials": {
+		"note": "R12: the colors of the parts that take a texture set of data/look/textures.json (shaders/showcase_surface.gdshader). tint multiplies the texture; tones makes the dark and the light of the texture two colors; mean is the color from far. The other colors stay flat. Builder values from the photos of section 3 and the photo from a drone of 2021: I approve them with the shots of PT-72.",
+		"#b9a68d": {
+			"texture": "sidewalk_tiles",
+			"tones": [
+				"#8f8d88",
+				"#dcdad4"
+			],
+			"tone_range": [
+				0.04,
+				0.11
+			],
+			"note": "The sidewalks and the walk of Hạ Long: grey and white tiles in a checker pattern."
+		},
+		"#c9c6bd": {
+			"texture": "granite",
+			"tint": "#e2ded6",
+			"mean": "#a9a5a0",
+			"note": "The curbs of the sidewalks."
+		},
+		"#8f8c86": {
+			"texture": "granite",
+			"tint": "#c8c4bd",
+			"mean": "#a9a5a0",
+			"note": "The borders of the paths of the park."
+		},
+		"#b3ada1": {
+			"texture": "granite",
+			"tint": "#ebe6dc",
+			"mean": "#a9a5a0",
+			"note": "The low wall along the beach."
+		},
+		"#aaa69c": {
+			"texture": "granite",
+			"tint": "#e2ddd3",
+			"mean": "#a9a5a0",
+			"note": "The borders of the raised lawns."
+		},
+		"#77746c": {
+			"texture": "granite",
+			"tint": "#a7a299",
+			"mean": "#a9a5a0",
+			"note": "The sea wall of Hạ Long."
+		},
+		"#c9c4b8": {
+			"texture": "plaster",
+			"tint": "#f1ece2",
+			"mean": "#8e8779",
+			"note": "The stand-ins of the buildings."
+		}
+	}
+}

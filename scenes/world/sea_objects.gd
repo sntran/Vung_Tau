@@ -12,11 +12,18 @@ const PILE_SPACING := 6.0
 const SEA_FLOOR := -4.0
 ## The depth of a small boat in the water.
 const DRAFT := 0.35
+## The thúng chai of World (plan 0026, R8), when data/world/orders.json has it:
+## its diameter in the GLB, and how deep it sits in the water.
+const BASKET_MODEL := "thung_chai"
+const BASKET_MODEL_DIAMETER := 1.84
+const BASKET_DRAFT := 0.15
 
 var ships: Array = []
 var boats: Array = []
 var baskets: Array = []
 var stake_count := 0
+## The basket boats that are models of World (plan 0026, R8).
+var world_baskets := 0
 var pier_parts := 0
 var groyne_count := 0
 var _floating: Node3D
@@ -54,6 +61,8 @@ func setup(path: String) -> bool:
 		_add_afloat(boat_batch, material, "Boat_%d" % i, float(boats[i].get("floor_m", SEA_FLOOR)))
 	baskets = parsed.get("basket_boats", [])
 	for i in baskets.size():
+		if _add_world_basket(baskets[i], "Thung_%d" % i):
+			continue
 		var basket_batch := MeshBatch.new()
 		_add_basket(basket_batch, baskets[i])
 		_add_afloat(basket_batch, material, "Thung_%d" % i, float(baskets[i].get("floor_m", SEA_FLOOR)))
@@ -162,6 +171,29 @@ func _add_boat(batch: MeshBatch, boat: Dictionary) -> void:
 	box.call(Vector3(beam * 0.7, 1.4, length * 0.25), Vector3(0, 1.4, 0.18 * length), Color("#D9D2BE"))
 	box.call(Vector3(beam * 0.8, 0.12, length * 0.3), Vector3(0, 2.15, 0.18 * length), Color("#3C6A9E"))
 	box.call(Vector3(0.12, 3.5, 0.12), Vector3(0, 2.2, -0.15 * length), Color("#6B4E33"))
+
+
+## The thúng chai of World at the place of a basket boat, on the water with the
+## tide (plan 0026, R8). False when the game has no such model.
+func _add_world_basket(basket: Dictionary, name_text: String) -> bool:
+	if WorldModel.order(BASKET_MODEL).is_empty():
+		return false
+	var model := WorldModel.make(BASKET_MODEL, WorldMaterials.DEFAULT_PAINT, "boat")
+	if model == null:
+		return false
+	var p: Array = basket.position
+	var holder := Node3D.new()
+	holder.name = name_text
+	holder.position = Vector3(float(p[0]), 0.0, float(p[1]))
+	_boats_node.add_child(holder)
+	var size := float(basket.diameter_m) / BASKET_MODEL_DIAMETER
+	var basis := Basis(Vector3.UP, deg_to_rad(float(basket.heading_deg))).scaled(Vector3.ONE * size)
+	model.transform = Transform3D(basis, Vector3(0.0, -BASKET_DRAFT, 0.0))
+	holder.add_child(model)
+	model.apply_ranges()
+	_afloat.append([holder, float(basket.get("floor_m", SEA_FLOOR))])
+	world_baskets += 1
+	return true
 
 
 ## A round basket boat (thúng chai): woven bamboo, dark with tar, with a rim.

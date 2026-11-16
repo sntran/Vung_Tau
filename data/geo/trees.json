@@ -78,7 +78,18 @@
 			"frangipani": 0.15,
 			"flame": 0.15
 		},
-		"comment": "Near Bãi Trước: mostly coconut palms, some bàng, a few casuarinas (plan 0020, Q2)."
+		"comment": "Near Bãi Trước: mostly coconut palms, some bàng, a few casuarinas (plan 0020, Q2).",
+		"lean_near": {
+			"types": [
+				"coconut"
+			],
+			"share": 0.55,
+			"deg": [
+				8.0,
+				30.0
+			],
+			"comment": "Plan 0026, R9: many coconut palms of the park of Bãi Trước lean by 10 to 35 degrees, in all directions (the photos of S2 of 2014, Wikimedia Commons, trungydang, CC BY 3.0). The share and the angles are builder values from the photos."
+		}
 	},
 	"osm_trees": {
 		"comment": "OSM natural=tree nodes and natural=tree_row ways. A tag genus or species can select the type.",

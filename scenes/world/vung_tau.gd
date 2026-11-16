@@ -134,6 +134,8 @@ var markers: Array[Label3D] = []
 var parked: ParkedRows
 ## The morning exercise at Bãi Trước (plan 0023, R9d).
 var exercise: MorningExercise
+## The showcase of Bãi Trước (plan 0026): the median, the sidewalks, the walls, and the stand-ins.
+var showcase: Showcase
 ## The season values of the game day (R12a), from Season.of_day().
 var season: Dictionary = {}
 var _season_day := -1
@@ -227,6 +229,10 @@ func setup(folder := GeoData.ROOT) -> bool:
 	exercise.name = "MorningExercise"
 	add_child(exercise)
 	exercise.setup(self)
+	showcase = Showcase.new()
+	showcase.name = "Showcase"
+	add_child(showcase)
+	showcase.setup(self)
 	return true
 
 
@@ -343,6 +349,26 @@ func spawn() -> Dictionary:
 	return {"position": best, "yaw": yaw}
 
 
+## The fine ground mask of the showcase (plan 0026, R3, R4): R the lawns, G the
+## paving, over the box from origin (x, z of the game) of size (m).
+func set_showcase_ground(mask: Texture2D, origin: Vector2, size: Vector2) -> void:
+	_ground_material.set_shader_parameter("detail_mask", mask)
+	_ground_material.set_shader_parameter("detail_origin", origin)
+	_ground_material.set_shader_parameter("detail_size", size)
+	_ground_material.set_shader_parameter("detail_on", 1.0 if mask != null else 0.0)
+
+
+## The texture of the paving of the showcase ground (plan 0026, R12): its side (m) and its tint.
+func set_showcase_paving(texture: Texture2D, size_m: float, tint: Color, mean: Color, gain := 1.0) -> void:
+	_ground_material.set_shader_parameter("paving_texture", texture)
+	_ground_material.set_shader_parameter("paving_textured", texture != null)
+	_ground_material.set_shader_parameter("paving_size", size_m)
+	_ground_material.set_shader_parameter("paving_tint", tint)
+	_ground_material.set_shader_parameter("paving_gain", gain)
+	_ground_material.set_shader_parameter("paving_color", mean)
+	_ground_material.set_shader_parameter("paving_color_b", mean)
+
+
 ## Shows or hides the far form of the hill trees: the clumps, and the canopy
 ## and the tree cover of the ground (D-0005-01). PT-33 compares the hills
 ## with it and without it (then the ground under the trees is grass).
@@ -431,6 +457,21 @@ func update_time(minutes: int, day: int) -> void:
 	environment.fog_light_color = ambient.darkened(0.15)
 	environment.fog_light_energy = lerpf(0.25, 1.0, twilight)
 	var colors := sky_colors(elevation)
+	# The beauty pass (plan 0026, R13): the grading of the hour.
+	var grade := Grading.at(minutes, Quality.current_renderer())
+	if not grade.is_empty():
+		environment.tonemap_exposure *= float(grade.exposure)
+		environment.adjustment_enabled = true
+		environment.adjustment_saturation = float(grade.saturation)
+		environment.adjustment_contrast = float(grade.contrast)
+		sun.light_color = sun.light_color.lerp(grade.sun_color, clampf(float(grade.sun_warmth), 0.0, 1.0))
+		var mix := clampf(float(grade.sky_mix), 0.0, 1.0)
+		colors[0] = colors[0].lerp(grade.sky_top, mix)
+		colors[1] = colors[1].lerp(grade.sky_horizon, mix)
+		environment.glow_enabled = float(grade.glow) > 0.0
+		environment.glow_intensity = float(grade.glow)
+		environment.fog_density = float(grade.haze)
+		environment.fog_light_color = environment.fog_light_color.lerp(grade.haze_color, mix)
 	var sky_material := environment.sky.sky_material as ProceduralSkyMaterial
 	sky_material.sky_top_color = colors[0]
 	sky_material.sky_horizon_color = colors[1]

@@ -119,8 +119,12 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
     snap_m = float(canopy.get("snap_m", 6.0))
     edge_m = float(canopy.get("edge_m", 6.0))
 
-    def add(kind: str, point, source: str) -> None:
+    leans: dict[tuple[str, int], tuple[float, float]] = {}  # (kind, index in found) -> (tilt, direction), degrees
+
+    def add(kind: str, point, source: str, lean: tuple[float, float] | None = None) -> None:
         found.setdefault(kind, []).append((float(point[0]), float(point[1])))
+        if lean is not None:
+            leans[(kind, len(found[kind]) - 1)] = lean
         groups.setdefault(source, []).append((float(point[0]), float(point[1])))
         counts[source] = counts.get(source, 0) + 1
 
@@ -216,6 +220,17 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
 
     park_spec = spec["parks"]
     spacing = float(park_spec["spacing_m"])
+    # Plan 0026, R9: some trees of the parks near the landmark lean (the coconut
+    # palms of the photos of Bãi Trước). Their own random numbers, so the places
+    # of the other trees do not change.
+    lean_spec = park_spec.get("lean_near", {})
+    lean_rng = np.random.default_rng(int(spec.get("seed", 1)) + 7)
+
+    def lean_of(kind: str):
+        if kind not in lean_spec.get("types", []) or lean_rng.uniform() >= float(lean_spec.get("share", 0.0)):
+            return None
+        low, high = lean_spec.get("deg", [5.0, 25.0])
+        return round(float(lean_rng.uniform(low, high)), 1), round(float(lean_rng.uniform(0.0, 360.0)), 1)
     for park in parks:
         near = near_point is not None and park.distance(near_point) <= float(park_spec["near_m"])
         mix = park_spec["mix_near"] if near else park_spec["mix"]
@@ -237,15 +252,23 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
                 moved, top = snapped(point, source)
                 if top >= 0 and prepared.contains(Point(*moved)) and place.free(moved, spacing * 0.6):
                     take(top, source)
-                    add(_pick(mix, rng), moved, source)
+                    kind = _pick(mix, rng)
+                    add(kind, moved, source, lean_of(kind) if near else None)
                 elif place.free(point, spacing * 0.6):
-                    add(_pick(mix, rng), point, source)
+                    kind = _pick(mix, rng)
+                    add(kind, point, source, lean_of(kind) if near else None)
 
     result = {"note": "Made by tools/geo/build.py from data/geo/trees.json and OSM. Do not change by hand. "
-                      "Each point is [X, height, Z] in game coordinates.", "types": {}}
+                      "Each point is [X, height, Z] in game coordinates. A tree that leans has two more "
+                      "values: its tilt and the direction of the tilt (degrees, from +Z to +X).", "types": {}}
     for kind, points in sorted(found.items()):
         xy = np.array(points)
         h = sample_height(xy[:, 0], xy[:, 1])
-        result["types"][kind] = [[round(float(x), 1), round(float(hh), 2), round(-float(y), 1)]
-                                 for (x, y), hh in zip(points, h)]
+        rows = []
+        for index, (point, hh) in enumerate(zip(points, h)):
+            row = [round(float(point[0]), 1), round(float(hh), 2), round(-float(point[1]), 1)]
+            if (kind, index) in leans:
+                row += list(leans[(kind, index)])
+            rows.append(row)
+        result["types"][kind] = rows
     return result, counts, groups
