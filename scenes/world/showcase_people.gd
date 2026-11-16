@@ -9,8 +9,20 @@ extends Node3D
 const PATH := "res://data/showcase/people.json"
 const BODY_RADIUS := 0.28
 const BODY_HEIGHT := 1.7
+## A walker stops when the player is in front of it in its lane (nearer than
+## STOP_GAP ahead and LANE to the side, m), and walks on when the player is not
+## there (plan 0026, PT-74).
+const STOP_GAP := 1.4
+const LANE := 0.7
+## A walker that waits steps aside at this speed (m/s), and goes back to its lane.
+const STEP_ASIDE := 0.8
+## A walker does not move nearer than this to the player (m, foot to foot): the
+## two bodies and a margin.
+const KEEP_GAP := 0.6
 
-## Each walker: {"model", "line" (PackedVector3Array), "length", "at" (m along the line), "speed", "sign"}.
+## Each walker: {"model", "body", "line" (PackedVector3Array), "length", "at" (m along the line),
+## "speed", "sign", "side" (m to the right of the middle of the way), "now" (the side now),
+## "room" (the most side on the way), "stopped"}. The body stops the player.
 var walkers: Array[Dictionary] = []
 ## Each sitter: {"model", "shape"}.
 var sitters: Array[Dictionary] = []
@@ -73,22 +85,67 @@ func _show(people: Array[Dictionary], share: float) -> void:
 		model.set_animation_active(on)
 		if people[i].has("shape"):
 			(people[i].shape as CollisionShape3D).disabled = not on
+		if people[i].has("body"):
+			(people[i].body as CollisionObject3D).collision_layer = Layers.MOVING if on else 0
 
 
 func _process(delta: float) -> void:
+	var camera := get_viewport().get_camera_3d()
 	for w: Dictionary in walkers:
 		var model: WorldModel = w.model
 		if not model.visible:
 			continue
-		var at := float(w.at) + float(w.speed) * float(w.sign) * delta
-		if at < 0.0 or at > float(w.length):
-			w.sign = -float(w.sign)
-			at = clampf(at, 0.0, float(w.length))
-		w.at = at
-		_place_walker(w)
+		# The player in front of the walker: the walker stops and steps aside,
+		# away from the player, in the width of its way.
+		var stop := false
+		var aside := float(w.side)
+		var player := Vector3.INF
+		if camera:
+			player = camera.global_position
+			var to_player := player - model.global_position
+			to_player.y = 0.0
+			var forward := model.global_transform.basis.z
+			forward.y = 0.0
+			forward = forward.normalized()
+			var ahead := to_player.dot(forward)
+			var right := forward.cross(Vector3.UP)
+			stop = ahead > 0.0 and ahead < STOP_GAP and absf(to_player.dot(right)) < LANE
+			if stop:
+				aside = -float(w.room) if to_player.dot(right) > 0.0 else float(w.room)
+		var before := {"at": w.at, "now": w.now, "sign": w.sign}
+		if stop:
+			w.now = move_toward(float(w.now), aside, STEP_ASIDE * delta)
+		else:
+			w.now = move_toward(float(w.now), float(w.side), STEP_ASIDE * 0.5 * delta)
+			var at := float(w.at) + float(w.speed) * float(w.sign) * delta
+			if at < 0.0 or at > float(w.length):
+				w.sign = -float(w.sign)
+				at = clampf(at, 0.0, float(w.length))
+			w.at = at
+		var place := _walker_transform(w)
+		# Never into the player: the walker waits where it is.
+		var near := player != Vector3.INF and Vector2(place.origin.x - player.x, place.origin.z - player.z).length() < KEEP_GAP \
+				and Vector2(place.origin.x - player.x, place.origin.z - player.z).length() \
+				< Vector2(model.global_position.x - player.x, model.global_position.z - player.z).length()
+		if near:
+			w.at = before.at
+			w.now = before.now
+			w.sign = before.sign
+		else:
+			model.transform = place
+		var waits := stop or near
+		if waits != bool(w.stopped):
+			w.stopped = waits
+			model.set_animation_active(not waits)
 
 
 func _place_walker(w: Dictionary) -> void:
+	(w.model as WorldModel).transform = _walker_transform(w)
+
+
+## The place of a walker: "at" m along its line, "now" m to the right of it, its
+## front in the direction of its walk.
+func _walker_transform(w: Dictionary) -> Transform3D:
 	var line: PackedVector3Array = w.line
 	var along := 0.0
 	for i in line.size() - 1:
@@ -96,14 +153,16 @@ func _place_walker(w: Dictionary) -> void:
 		if along + length >= float(w.at) or i == line.size() - 2:
 			var t := clampf((float(w.at) - along) / maxf(length, 0.001), 0.0, 1.0)
 			var p := line[i].lerp(line[i + 1], t)
-			p.y = _world.ground_height(p.x, p.z) + 0.03
 			var dir := (line[i + 1] - line[i]) * float(w.sign)
 			dir.y = 0.0
 			if dir.length() < 0.001:
 				dir = Vector3.BACK
-			(w.model as WorldModel).transform = Transform3D(Basis.looking_at(-dir.normalized(), Vector3.UP), p)
-			return
+			# People keep to the right of the way.
+			p += dir.normalized().cross(Vector3.UP) * float(w.get("now", 0.0))
+			p.y = _world.ground_height(p.x, p.z) + 0.03
+			return Transform3D(Basis.looking_at(-dir.normalized(), Vector3.UP), p)
 		along += length
+	return (w.model as WorldModel).transform
 
 
 ## The walkers: on the ways of the types of the config in the park, or on its ways.
@@ -112,6 +171,7 @@ func _add_walkers(world: VungTau, showcase: Showcase, cfg: Dictionary, rng: Rand
 	var ways: Array = cfg.get("ways", [])
 	var min_length := float(cfg.get("min_length_m", 20.0))
 	var lines: Array[PackedVector3Array] = []
+	var widths: Array[float] = []
 	for road: Dictionary in world.data.roads:
 		var named := ways.has(int(road.id))
 		if not named and not str(road.type) in types:
@@ -127,23 +187,48 @@ func _add_walkers(world: VungTau, showcase: Showcase, cfg: Dictionary, rng: Rand
 				break
 		if line.size() >= 2 and Showcase._line_length(line) >= min_length:
 			lines.append(line)
+			widths.append(float(road.get("width", 2.0)))
 	if lines.is_empty():
 		return
 	var models: Array = cfg.get("models", [])
 	var speed: Array = cfg.get("speed_m_s", [0.9, 1.3])
+	var keep_right: Array = cfg.get("keep_right_m", [0.0, 0.0])
 	for i in int(cfg.get("count", 0)):
 		var model := WorldModel.make(str(models[i % models.size()]))
 		if model == null:
 			continue
-		var line: PackedVector3Array = lines[rng.randi() % lines.size()]
+		var which := rng.randi() % lines.size()
+		var line: PackedVector3Array = lines[which]
 		var length := Showcase._line_length(line)
+		# Not on the borders of the way: the half of the width less a body and a border.
+		var room := maxf(widths[which] / 2.0 - 0.5, 0.0)
+		var side := minf(rng.randf_range(float(keep_right[0]), float(keep_right[1])), room)
 		add_child(model)
 		model.apply_ranges()
 		model.play("walk", rng.randf())
-		var w := {"model": model, "line": line, "length": length, "at": rng.randf() * length,
-				"speed": rng.randf_range(float(speed[0]), float(speed[1])), "sign": 1.0 if rng.randf() < 0.5 else -1.0}
+		var w := {"model": model, "body": _walker_body(model), "line": line, "length": length,
+				"at": rng.randf() * length, "speed": rng.randf_range(float(speed[0]), float(speed[1])),
+				"sign": 1.0 if rng.randf() < 0.5 else -1.0, "side": side, "now": side, "room": maxf(room, 0.7), "stopped": false}
 		_place_walker(w)
 		walkers.append(w)
+
+
+## The body of a walker: it moves with the model, and it stops the player.
+func _walker_body(model: WorldModel) -> AnimatableBody3D:
+	var body := AnimatableBody3D.new()
+	body.name = "Body"
+	body.sync_to_physics = false
+	body.collision_layer = Layers.MOVING
+	body.collision_mask = 0
+	var shape := CollisionShape3D.new()
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = BODY_RADIUS
+	capsule.height = BODY_HEIGHT
+	shape.shape = capsule
+	shape.position = Vector3(0, BODY_HEIGHT / 2.0, 0)
+	body.add_child(shape)
+	model.add_child(body)
+	return body
 
 
 ## The sitters: on the borders of the raised lawns, with their backs to the lawn.
