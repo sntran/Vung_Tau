@@ -37,5 +37,9 @@ The 3D shapes in plan 0001 are made in code (`scripts/greybox.gd`). They use no 
 | Ground texture: rock | `assets/textures/ground/rock/` | [Poly Haven: Rocky Terrain 02](https://polyhaven.com/a/rocky_terrain_02) | CC0 |
 | Ground texture: asphalt | `assets/textures/ground/asphalt/` | [Poly Haven: Asphalt 02](https://polyhaven.com/a/asphalt_02) | CC0 |
 | Ground texture: concrete | `assets/textures/ground/concrete/` | [Poly Haven: Brushed Concrete](https://polyhaven.com/a/brushed_concrete) | CC0 |
+| Showcase texture: sidewalk tiles (plan 0026, R12) | `assets/textures/look/sidewalk_tiles/` | [Poly Haven: Checkered Pavement Tiles](https://polyhaven.com/a/checkered_pavement_tiles) (Amal Kumar) | CC0 |
+| Showcase texture: walk slabs | `assets/textures/look/walk_slabs/` | [Poly Haven: Mixed Stone Tiles](https://polyhaven.com/a/mixed_stone_tiles) (Dimitrios Savva) | CC0 |
+| Showcase texture: granite | `assets/textures/look/granite/` | [Poly Haven: Stone Tile Wall](https://polyhaven.com/a/stone_tile_wall) (Charlotte Baglioni) | CC0 |
+| Showcase texture: plaster | `assets/textures/look/plaster/` | [Poly Haven: White Plaster 02](https://polyhaven.com/a/white_plaster_02) (Rob Tuytel) | CC0 |
 
 `data/geo/raw/manifest.json` records the download URL, the date, and the SHA-256 of each file. The game shows these notices on the Credits sheet (Settings → Credits).

@@ -43,6 +43,10 @@ jobs:
       - name: Run the Python tests
         run: python -m pytest -q tools/geo/tests
 
+      # Plan 0026, R12: the texture sets of the showcase agree with their manifest.
+      - name: Check the texture sets of the showcase
+        run: python tools/look/textures.py --check
+
   world:
     name: Models of World
     runs-on: ubuntu-latest
