@@ -1,0 +1,91 @@
+{
+	"world": {
+		"commit": "8fbf36c900beb492882713841c947847b94c3fba",
+		"repository": "https://github.com/sntran/World"
+	},
+	"models": {
+		"aerobics_1": {
+			"hash": "5c96d5d87acd0e6708eb20f40d2671eb",
+			"files": {
+				"aerobics_1.far.glb": "79b22b261de758b580e1bd32e774c8f7c4a10ec07efe55f7137ff1264bbf32f7",
+				"aerobics_1.mid.glb": "5c09357af08e0ee7427e7262fc3e7ad53f0b30fa05bdc956097f081d422fe6e6",
+				"aerobics_1.parts.json": "74dedfd32ac27ce6c697f9710df11b4fa738b4fd48b4c913248001b775b7166d",
+				"aerobics_1.receipt.json": "eadd412d582cc5ce0bd7e00129b7ff1dc12856bfcfa1a5e6b0962a8330c17b97"
+			}
+		},
+		"aerobics_2": {
+			"hash": "132ea244047156e5b68258ed5a6ba388",
+			"files": {
+				"aerobics_2.far.glb": "804a44fa980d45795c6168d0cdfa6ccd1d1395416a0affb512afcf4d78bd074c",
+				"aerobics_2.mid.glb": "0e7be94379fb25ba9ee6cb00cd420bd6b6fc2fbf199d9686060100f480f4cbe4",
+				"aerobics_2.parts.json": "d754b6daeba9f4f7a48811bc1fe73bc29ab5a3d68ebd1fe503a7ece5d7c882f4",
+				"aerobics_2.receipt.json": "03c6f3fced7b45dcc01f7811a034400ed66473ac569057bd46c74d13db12ca59"
+			}
+		},
+		"aerobics_3": {
+			"hash": "82e4567e7562840d5b4c541d1978507a",
+			"files": {
+				"aerobics_3.far.glb": "327e91c538a1ce0299585c87423b37499da642aae4c4166fb4bf5b69dc52350c",
+				"aerobics_3.mid.glb": "b3c7d8d78ac0d5235ed6786c47a7ee21e199cab6433ea4000da84a71f58444b0",
+				"aerobics_3.parts.json": "a3932bc02244199c6373883405e7026ab04dd1659f55702bcd466c93f04b420a",
+				"aerobics_3.receipt.json": "9fda96b12d2766faf81551cfe07f30b02d4d46755c152bf29e7bed9acee48132"
+			}
+		},
+		"aerobics_4": {
+			"hash": "c7265644136b720c1ab08fbce2dfb670",
+			"files": {
+				"aerobics_4.far.glb": "28777b2449b4634d029f29afd985d556dc2f06160709f499dab1c4f0e13ae703",
+				"aerobics_4.mid.glb": "8a50c1d981d86894cdc20c8a980351709af5c8866381b15d58f8ea494f1cc23a",
+				"aerobics_4.parts.json": "b47f6c8414dcdcc36c10e9a03dd75d367e0b3902559e200b57a27614a5a0def4",
+				"aerobics_4.receipt.json": "3a59d678431110261aa7edaf0047f79f3e4ba5b63569080c4d851d0b9b40e0e9"
+			}
+		},
+		"aerobics_5": {
+			"hash": "3277521b53166a3fc009cab71673b3a2",
+			"files": {
+				"aerobics_5.far.glb": "b8aeafc0e24e0bd3fc7b75098c285935c1f69b23c9ddee06343590203abddc7d",
+				"aerobics_5.mid.glb": "39bd4e152cad84a0f816adf1c7a8d34ad10b91a10fe071e835f8ac24436a101a",
+				"aerobics_5.parts.json": "7fc3ac563e3aabd7edaa19c3740b277b08ae0e55f85ed25d17437b5281d1da4c",
+				"aerobics_5.receipt.json": "47a03e1ec060bd5b9f54011f4766f9943c37747d1087ddb7d9dd009b7f533876"
+			}
+		},
+		"aerobics_6": {
+			"hash": "dfc034633a36d5b8aa7305b8c918e929",
+			"files": {
+				"aerobics_6.far.glb": "91a025d59851c8b26e59561c0d2ad77ebb59ce8b082a9ce47cfaf0c0c9296557",
+				"aerobics_6.mid.glb": "3da08a8d28df9a7a83f3aa3d9f17cd0408ac52215099496fb960336055ff342a",
+				"aerobics_6.parts.json": "aa230389786260f5793b7269918d0fc00b4455f7f776f9d076a84f00a9195756",
+				"aerobics_6.receipt.json": "23a907470c4eda2a35002843f59abffd97429097cf5ff8ba5cc92a1763d01b49"
+			}
+		},
+		"aerobics_leader": {
+			"hash": "2c3472ba15ce628c364e9e03cfe6f5b3",
+			"files": {
+				"aerobics_leader.far.glb": "0be8f8010aeaa448fd231fd969fe0f6e801acf97f558d22f5a0b5a7682fc3958",
+				"aerobics_leader.mid.glb": "ceaec653471493c776d30ffa238ec5a0d09f4379c9aaa57cbef7c1f79cfb406a",
+				"aerobics_leader.parts.json": "a2c3629160bd245f3792b42b77191760a993e752bcded8a0bd91cbf7383910f9",
+				"aerobics_leader.receipt.json": "f85f9255698c5b77be465cf28b77a657eeb2228fde4abd8cdf294bce7a3c5e16"
+			}
+		},
+		"ceiling_fan": {
+			"hash": "3baef58f1befc276ff522c7260a595a4",
+			"files": {
+				"ceiling_fan.far.glb": "7ee6d8207b75885ce13ab5d0f54af0a4db47b0960557daa25215a4fb948d7263",
+				"ceiling_fan.glb": "9e203818d27681b694aa0f03b10ec8cf613d3bd8d1ab423698a10ff231bd5e4c",
+				"ceiling_fan.mid.glb": "c0b6757606373e359d8781c62c0e73e5d15459ccd080bcf163ad9fa44f5c512f",
+				"ceiling_fan.parts.json": "22714e56e06d7214c48d3429281a49d8f75766a62f9023d5918188dd400ba341",
+				"ceiling_fan.receipt.json": "f4bdbebcf8d0108620cb69aa7d6eef40287663d43de83e0efa073cc0dd31ebcd"
+			}
+		},
+		"scooter_tay_ga_1": {
+			"hash": "176593c8c18de6bff70b0189e26ee31a",
+			"files": {
+				"scooter_tay_ga_1.far.glb": "a4603b7fae30c0880aef19da07662c1fbc8a32c87dd8227a42f49e8acbc02015",
+				"scooter_tay_ga_1.glb": "c7aaded4ef4a664bdd297404a2fc0e1f708223ef82073ae43fe982693e9fc0ff",
+				"scooter_tay_ga_1.mid.glb": "6a84cd86a60d97b398266e747e81709a774dc85eb5a55e1d4d764c9ba90265bf",
+				"scooter_tay_ga_1.parts.json": "e46f38c3eeb2904b9af8826cc6b2a89430f02c067d9d6e24583f6d62c945366c",
+				"scooter_tay_ga_1.receipt.json": "5460011da13b51eceaba46a97cc2650d9c15bfee580b252d0d8c143aa023f67e"
+			}
+		}
+	}
+}

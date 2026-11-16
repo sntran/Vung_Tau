@@ -43,6 +43,28 @@ jobs:
       - name: Run the Python tests
         run: python -m pytest -q tools/geo/tests
 
+  world:
+    name: Models of World
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install pytest
+        run: pip install pytest
+
+      # Plan 0023, R3: the files of assets/world agree with data/world/lock.json and orders.json.
+      - name: Check the models of World
+        run: python tools/world/fetch.py --check
+
+      # R4: the factory and a clone of World at the same commit give the same bytes.
+      - name: Run the Python tests
+        run: python -m pytest -q tools/world/tests
+
   trees:
     name: Tree build check
     runs-on: ubuntu-latest
@@ -66,6 +88,10 @@ jobs:
       # Plan 0020, R3: the files in assets/trees are what the build makes from data/trees/types.json.
       - name: Check the tree files
         run: python tools/trees/build.py --check
+
+      # Plan 0023, R8: the impostors of the models of World are what impostors.py makes.
+      - name: Check the impostors of the models of World
+        run: python tools/world/impostors.py --check
 
   unit:
     name: Unit tests

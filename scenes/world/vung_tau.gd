@@ -130,6 +130,10 @@ var places: KnownPlaces
 ## The name labels of the landmarks (plan 0005, R15). Plan 0008 (D5, R4): they
 ## show only with the debug key F3.
 var markers: Array[Label3D] = []
+## The rows of parked scooters (plan 0023, R9a).
+var parked: ParkedRows
+## The morning exercise at Bãi Trước (plan 0023, R9d).
+var exercise: MorningExercise
 ## The season values of the game day (R12a), from Season.of_day().
 var season: Dictionary = {}
 var _season_day := -1
@@ -215,6 +219,14 @@ func setup(folder := GeoData.ROOT) -> bool:
 	places.name = "KnownPlaces"
 	add_child(places)
 	places.setup(self)
+	parked = ParkedRows.new()
+	parked.name = "ParkedRows"
+	add_child(parked)
+	parked.setup(self)
+	exercise = MorningExercise.new()
+	exercise.name = "MorningExercise"
+	add_child(exercise)
+	exercise.setup(self)
 	return true
 
 
@@ -388,6 +400,10 @@ func update_time(minutes: int, day: int) -> void:
 		_apply_season(day)
 	if roadworks:
 		roadworks.update_time(minutes)
+	if parked:
+		parked.update_time(minutes)
+	if exercise:
+		exercise.update_time(minutes)
 	if not Wind.held:
 		var wind := Wind.of_time(TreeLibrary.shared().settings.get("wind", {}), minutes)
 		Wind.apply(wind.direction, wind.strength)

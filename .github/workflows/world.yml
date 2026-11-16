@@ -1,0 +1,117 @@
+name: Models of World
+
+# Gets the models of World that are not in assets/world, or that do not agree
+# with their orders, from a clone of World at the commit of the lock, with
+# `mix world.order` (plan 0023, R2 and R4). The factory of World cannot build
+# some orders (in November 2026 it stopped at most orders of a person: "the
+# order needs more memory than the edge has"). The workspace cannot get the
+# packages of World from Hex, so this build runs in CI only. The job commits
+# the files and the lock to the branch that it runs on, with the message
+# "Update the models of World to COMMIT". A push with the workflow token does
+# not start the test workflow: the next push to the branch starts it.
+on:
+  workflow_dispatch:
+  push:
+    paths: ["data/world/orders.json", "data/world/lock.json"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: world-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  LANG: C.UTF-8
+  # The tools of World (World .github/workflows/ci.yml).
+  BEAM_COM_VERSION: 0.1.0-rc.6
+  BEAM_COM_SHA256: ac841b72180467773d95d0eec1c7a757b67e003e576a6ba34d8debb40fe6b903
+
+jobs:
+  models:
+    name: Build the models of World
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Find the models to build
+        id: need
+        run: |
+          commit=$(python -c 'import json; print(json.load(open("data/world/lock.json"))["world"]["commit"])')
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+          if python tools/world/fetch.py --check; then
+            echo "build=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Get World at the commit of the lock
+        if: steps.need.outputs.build == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: sntran/World
+          ref: ${{ steps.need.outputs.commit }}
+          path: World
+
+      # beam.com is an Actually Portable Executable: its first lines are a
+      # shell script. The runner can give a program that starts with MZ to
+      # WINE. This rule gives it to /bin/sh.
+      - name: Run APE programs with /bin/sh
+        if: steps.need.outputs.build == 'true'
+        run: sudo sh -c 'echo ":APE:M::MZqFpD::/bin/sh:" > /proc/sys/fs/binfmt_misc/register' || true
+
+      - name: Install beam.com
+        if: steps.need.outputs.build == 'true'
+        run: |
+          mkdir -p "$HOME/bin"
+          cd "$HOME/bin"
+          curl -fsSLO "https://github.com/sntran/BEAM.com/releases/download/v$BEAM_COM_VERSION/beam.com"
+          echo "$BEAM_COM_SHA256  beam.com" | sha256sum -c -
+          chmod +x beam.com
+          for tool in mix.com iex.com; do ln -s beam.com "$tool"; done
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
+      - name: Cache the packages of World
+        if: steps.need.outputs.build == 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            World/deps
+            World/_build
+            ~/.mix
+            ~/.hex
+          key: world-mix-${{ env.BEAM_COM_VERSION }}-${{ hashFiles('World/mix.lock') }}
+          restore-keys: world-mix-${{ env.BEAM_COM_VERSION }}-
+
+      - name: Get the packages of World
+        if: steps.need.outputs.build == 'true'
+        working-directory: World
+        run: |
+          mix.com local.hex --force
+          mix.com local.rebar --force
+          mix.com deps.get
+
+      - name: Build the models
+        if: steps.need.outputs.build == 'true'
+        run: python tools/world/fetch.py --source=checkout --world=World --mix=mix.com
+
+      - name: Check the models
+        if: steps.need.outputs.build == 'true'
+        run: python tools/world/fetch.py --check
+
+      - name: Commit the files
+        if: steps.need.outputs.build == 'true'
+        run: |
+          git add assets/world data/world/lock.json
+          if git diff --cached --quiet; then
+            echo "The models did not change."
+            exit 0
+          fi
+          git -c user.name="Sơn Trần-Nguyễn" -c user.email=github@sntran.com -c commit.gpgsign=false \
+            commit -m "Update the models of World to ${{ steps.need.outputs.commit }}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

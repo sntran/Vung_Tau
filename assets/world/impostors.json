@@ -1,0 +1,18 @@
+{
+	"models": {
+		"scooter_tay_ga_1": {
+			"glb": "c7aaded4ef4a664bdd297404a2fc0e1f708223ef82073ae43fe982693e9fc0ff",
+			"materials": "aa6bf8d860ea311b8197748702a236062031429d274e4d6250d32c6072603434",
+			"script": "6a2254bef1a9ff6f0c20d1482891315022c8d4c5adf6f47d580de9ec573d730f",
+			"version": 1,
+			"size": 2.0002,
+			"views": 8,
+			"cell_px": 128,
+			"files": {
+				"scooter_tay_ga_1_impostor.png": "81424c95000ba7f107530051dc20b895dd8a0a370a2e5148b366096e02139671",
+				"scooter_tay_ga_1_impostor_normal.png": "944b5790891ac97842a9ccc74f41c1041e052e5d171c8e745e1af6b5b869dfb0"
+			}
+		}
+	},
+	"note": "The impostors of the models of World (plan 0023, R8): tools/world/impostors.py makes them."
+}
