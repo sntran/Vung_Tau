@@ -42,7 +42,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 | 0008 | [Known structures](0008-known-structures.md) | In progress |
 | 0009 | [Houses on the lots](0009-houses-on-the-lots.md) | Approved |
 | 0023 | [Models from World](0023-models-from-world.md) | In progress |
-| 0026 | [Showcase: Bãi Trước](0026-showcase-bai-truoc.md) | Approved |
+| 0026 | [Showcase: Bãi Trước](0026-showcase-bai-truoc.md) | In progress |
 
 ## Proposed order of the next plans
 

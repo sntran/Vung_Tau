@@ -85,7 +85,7 @@ Verified in the development workspace (Linux, 2 CPUs, no GPU, no Vulkan):
 - `Input.parse_input_event()` with an `InputEventScreenTouch` presses a `Button`. Touch-to-mouse emulation is on by default.
 - GUT 9.7.1 runs with `godot --headless -s addons/gut/gut_cmdln.gd`.
 - GitHub, npm, and PyPI are reachable. Google downloads (Android SDK, Maven) and blender.org are not reachable.
-- The Copernicus DEM bucket (`copernicus-dem-30m.s3.amazonaws.com`) and the Poly Haven API are reachable. The Overpass API, Geofabrik, and `dl.polyhaven.org` are not. So `tools/geo/fetch.py` runs in CI only (plan 0005, D1).
+- The Copernicus DEM bucket (`copernicus-dem-30m.s3.amazonaws.com`) and the Poly Haven API are reachable. The Overpass API and Geofabrik are not. So `tools/geo/fetch.py` runs in CI only (plan 0005, D1). The files of Poly Haven (`dl.polyhaven.org`) were not reachable before; on 2026-11-16 they were, so `tools/look/textures.py` (plan 0026, R12) runs in the workspace.
 - Godot changes a 16-bit PNG file to 8 bits when it loads it. The game reads the 16-bit height files with `Png16` (`scripts/geo/png16.gd`). An import file with `importer="keep"` makes the export keep a file as it is, and Godot does not change that import file.
 - Earth Search (`earth-search.aws.element84.com`, the Sentinel-2 L2A images on `sentinel-cogs.s3.us-west-2.amazonaws.com`) and the GEBCO 2025 files on `dap.ceda.ac.uk` are reachable. rasterio reads a window of these files over HTTP (`/vsicurl/`), so `tools/geo/intertidal.py` downloads only the play area.
 - ESA WorldCover 2021 (`esa-worldcover.s3.eu-central-1.amazonaws.com`) and the Meta and WRI canopy height maps (`dataforgood-fb-data.s3.amazonaws.com`, `forests/v1/alsgedi_global_v6_float/`) are reachable. rasterio reads a window of them, so `tools/geo/landcover.py` downloads only the play area (about 2 MB). The canopy file of Vũng Tàu is the quadkey `132231002` (EPSG:3857, about 1.2 m, heights in whole meters), and `CHM_acquisition_date.tif` gives the image dates as years after 2000 (2019 for the play area). WorldCover has almost no shrubland here, so the bushes come from the canopy heights.
@@ -173,6 +173,10 @@ python tools/world/impostors.py               # the impostors (Blender of tools/
 python -m pytest -q tools/world/tests
 tools/playtest.sh world_models && python tools/world/sheets.py   # PT-56: the review sheets in docs/world/
 
+# The texture sets of the showcase (plan 0026, R12): data/look/textures.json to assets/textures/look/
+python tools/look/textures.py
+python tools/look/textures.py --check   # no network (CI)
+
 # Exports (they need the export templates)
 godot --headless --path . --export-release "Web" build/web/index.html
 godot --headless --path . --export-debug "iOS" build/ios/VungTau.ipa   # Xcode project only on Linux
@@ -242,6 +246,16 @@ The audio driver prints ALSA errors in the workspace. These errors are not defec
 - **The first models** (R9): the parked scooters (`scripts/world/parked.gd`: on the center stand, Q7, at 10° to 30° from the curb on a street and parallel to the wall in a narrow hẻm, Q9, the front wheel turned, the colors of `data/world/palette.json`, "scooters") in the test street and in the rows of `data/world/parked_rows.json` (`scenes/world/parked_rows.gd`); the ceiling fan of each shop room of the test street (`tube_house.gd`); and the aerobics group of the morning exercise at Bãi Trước (`data/world/exercise.json`, `scenes/world/morning_exercise.gd`, 05:00 to 06:30). The AC units of the house kit stay (Q6), and the tai chi group with fans waits for World (Q8). The other shapes of `scripts/greybox.gd` stay until World has their models (R10).
 - **Play tests**: PT-56 `world_models` (the review sheets, published at `/world/` on GitHub Pages), PT-57 `parked_rows`, and PT-58 `morning_exercise`.
 
+## 5g. The showcase of Bãi Trước (plan 0026)
+
+- **Data**: `data/showcase/bai_truoc.json` (the outline of the area, the park, and the parts: the median and the sidewalks of Quang Trung, the borders of the paths, the walls, the sea wall of Hạ Long, the stand-ins, and the basket boats on the sand), `data/showcase/shots.json` (the five shots of R15 with the links of their photos), `data/world/places/bai_truoc.json` (the place, the direction, and the ranges of each model of World, D3), and `data/world/requests/bai_truoc.json` (the requests of section 7 to World).
+- **The ground of the park** (R3, R4): `tools/geo/build.py` (`geodata/showcase.py`) makes `data/geo/build/showcase_ground.png` (a mask of 0.5 m cells: R the lawns, G the paving) and `data/geo/build/showcase.json` (the place of the mask, the raised lawns, and the wall along the beach) from the part `ground` of `data/showcase/bai_truoc.json` and the areas of OpenStreetMap. The ground shader draws the lawns and the tiles of the mask over the town ground (`VungTau.set_showcase_ground()`). After a change of the part `ground`, run the build.
+- **Game** (`scenes/world/showcase.gd`): the parts as a few meshes (one for each color) and one collision shape, the models of World at their places, and a stand-in for each building of OpenStreetMap in the area that World does not have yet. The ground under each model of World is level (`level_world_places()` in `tools/geo/build.py`). On Low a building of World has no near level (D6). The materials `part_*` of World keep the material of the GLB (D4), and the set `boat` keeps the texture of the role `paint` of the boats.
+- **Trees, lamps, and boats** (R8, R9): the Norfolk pines and the lamps of the median, the rows of lamps along a way (`lamp_rows`), and the low lamps of the paths of the park (`path_lamps`) come from `data/showcase/bai_truoc.json`; the lamps are stand-ins of the kinds of `lamp_kinds` until World has them. The trees of the showcase are a source of their own in the tree field (`Showcase.TREE_SOURCE`). A park tree near Bãi Trước can lean (`lean_near` in `data/geo/trees.json`: two more values in `data/geo/build/trees.json`, its tilt and its direction). The basket boats of the sea are the thúng chai of World (`sea_objects.gd`, `_add_world_basket()`).
+- **The look** (R12, R13): the parts of the colors of `materials` in `data/showcase/bai_truoc.json` take a texture set of `data/look/textures.json` (`shaders/showcase_surface.gdshader`: on the world axes, a tint, or two tones), and the paving of the ground takes the set `walk_slabs`. `data/look/grading.json` gives for each hour the exposure, the saturation and the contrast, the warmth of the sun, the colors of the sky, the bloom, and the haze (`scripts/look/grading.gd`, applied in `VungTau.update_time()`), with a part for each renderer.
+- **Requests**: `python tools/world/world_requests.py` checks the file; `--check` asks `check_order` of World (the MCP tool of the factory, `POST /mcp`) for each order, and `--write` keeps the result.
+- **Play tests**: PT-71 `showcase_places` and PT-72 `showcase_shots` (`python tools/showcase/sheets.py` puts the sheets in `docs/showcase/`).
+
 ## 6. Repository map
 
 | Path | Content |
@@ -266,13 +280,17 @@ The audio driver prints ALSA errors in the workspace. These errors are not defec
 | `scripts/` | Classes with no scene (`trees/`: the tree library of plan 0020; `world/`: the models of World of plan 0023; `wind.gd`): clock math, save format, content checks, voice clips, subtitle split, light by time, greybox shapes, mesh batches, quality presets, sounds, UI theme, play-test driver, the lunar calendar, the game calendar, the seasons. `geo/`: the projection, the geodata reader, the 16-bit PNG reader, the sun position, the tide model, and the ground and road mesh builders. |
 | `shaders/` | The ground shader, the sea shader, the tree shaders of plan 0020 (`tree_*.gdshader`, `tree_common.gdshaderinc`), and the canopy shader (the far hill trees) of the Vũng Tàu world. |
 | `tests/unit/` | GUT unit tests. |
-| `data/world/` | Plan 0004: the hẻm layout and the palette. Plan 0023: the orders of World, the lock, the materials of the roles, the parked rows, and the morning exercise. |
+| `data/world/` | Plan 0004: the hẻm layout and the palette. Plan 0023: the orders of World, the lock, the materials of the roles, the parked rows, and the morning exercise. Plan 0026: the places of the models of World (`places/`) and the requests to World (`requests/`). |
 | `assets/world/` | Plan 0023: the files of the models of World that `tools/world/fetch.py` gets, and the impostors. |
 | `docs/world/` | Plan 0023: the review sheets of PT-56 (published at `/world/`). |
+| `data/showcase/` | Plan 0026: the area of the showcase of Bãi Trước and its five shots. |
+| `data/look/` | Plan 0026: the texture sets (`textures.json`) and the grading of each hour (`grading.json`). |
+| `assets/textures/` | `ground/`: the ground textures of plan 0005. `look/`: the texture sets of plan 0026 (Poly Haven, CC0), with `manifest.json`. |
+| `docs/showcase/` | Plan 0026: the sheets of the shots of PT-72. |
 | `tests/data/world/` | The test file of the GPU instancing import (`instancing.glb`) and the script that makes it. |
 | `addons/` | `gut/` (the unit tests) and `gpu_instancing/` (the import of `EXT_mesh_gpu_instancing` for the GLB files of World). |
-| `playtests/` | Play-test scenarios PT-01, PT-03 to PT-17, PT-18 to PT-24 of plan 0003, PT-25 to PT-32 of plan 0004, PT-33 to PT-39 of plan 0005, PT-52 to PT-55 of plan 0020, PT-56 to PT-58 of plan 0023, and PT-60 to PT-64 of plan 0008 (PT-02 and PT-07 were removed in plan 0002). |
-| `tools/` | `setup.sh`, `test.sh`, `playtest.sh`, `voices/` (the voice build and its tests), `trees/` (the tree build of plan 0020), `world/` (the models of World of plan 0023: `fetch.py`, `impostors.py`, `sheets.py`, and the tests), and `geo/` (the geodata pipeline: `fetch.py`, `build.py`, `tide.py`, the `geodata` package, and its tests). |
+| `playtests/` | Play-test scenarios PT-01, PT-03 to PT-17, PT-18 to PT-24 of plan 0003, PT-25 to PT-32 of plan 0004, PT-33 to PT-39 of plan 0005, PT-52 to PT-55 of plan 0020, PT-56 to PT-58 of plan 0023, PT-60 to PT-64 of plan 0008, and PT-71 and PT-72 of plan 0026 (PT-02 and PT-07 were removed in plan 0002). |
+| `tools/` | `setup.sh`, `test.sh`, `playtest.sh`, `voices/` (the voice build and its tests), `trees/` (the tree build of plan 0020), `world/` (the models of World of plan 0023: `fetch.py`, `impostors.py`, `sheets.py`, and the tests; plan 0026: `world_requests.py`), `showcase/` (the sheets of PT-72), `look/` (the texture sets of plan 0026), and `geo/` (the geodata pipeline: `fetch.py`, `build.py`, `tide.py`, the `geodata` package, and its tests). |
 | `assets/` | Fonts, icons, voices, and `CREDITS.md`. |
 | `docs/voices/` | The voice audition page (made by the voices workflow). |
 | `.github/workflows/` | `test.yml` (tests on each push), `export.yml` (web, desktop, Android, iOS builds, and GitHub Pages), `voices.yml` (the voice files), `geodata.yml` (download and build the geodata, by hand), `people-packs.yml` (copies the MakeHuman asset packs to the release `people-packs-1`, by hand only), and `world.yml` (the models of World that the factory cannot make, with `mix world.order`, on a push that changes the orders or the lock). |
