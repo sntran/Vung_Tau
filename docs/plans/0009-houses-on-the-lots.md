@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft. It waits for the houses of World (plan 0023, requests W17 to W23). |
+| Status | Approved (2026-11-16), for the area of plan 0026 first. |
 | Branch | `feat/0009-houses-on-the-lots` |
 | Depends on | 0004 (the house kit and the palette), 0005 (the roads and the ground), 0008 (the known places stay as they are), 0023 (the houses come from World, D8). |
 | Used by | 0010 (the bus ride), 0011 to 0015 (the shops and the streets), 0021 (Tết), 0022 (the garden). |

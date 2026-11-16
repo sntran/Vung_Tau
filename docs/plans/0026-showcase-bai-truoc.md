@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft |
+| Status | Approved (2026-11-16) |
 | Branch | `feat/0026-showcase-bai-truoc` |
 | Depends on | 0023 (models from World), 0020 (trees), 0008 (the known structures: the jetty of Cầu Đá, the views). Their branches go to `main` first (R1). |
 | Uses from later plans | 0006 (people), 0009 (houses), 0015 (the beach in the evening), 0018 (traffic): only the parts that this area needs. Those plans keep the rest of their work. |
@@ -64,7 +64,7 @@ Most photos are from 2014 and 2015. A difference from 2019 that I know is a "Che
 
 ### Before the work
 
-- **R1.** The branches of plans 0023, 0020, and 0008 go to `main` after their reports are clear (report 0008 interim: D-0008-01 to D-0008-05; report 0020: D-0020-04 needs my approval of the PT-52 sheets; plan 0023: my approval of the Phase A sheet). This plan starts from `main`.
+- **R1.** The branches of plans 0023, 0020, and 0008 go to `main` after the defects of their reports are corrected (report 0008 interim: D-0008-01 to D-0008-05; the corrections of report 0020). I do not stop the merge for the sheets: I approve the Phase A sheet of plan 0023 and the PT-52 sheets of plan 0020 with the shots of this plan (PT-72). The builder still corrects the aerobics sheet (it shows the people in pink, with no clothes colors). This plan starts from `main`.
 
 ### The ground
 
@@ -102,7 +102,15 @@ Most photos are from 2014 and 2015. A difference from 2019 that I know is a "Che
 5. The people and the scooters (R10, R11).
 6. The new buildings of World as they come (section 7), and night (R14).
 
-## 7. Requests to World
+## 7. Photos and requests to World
+
+**Photos.** I have no photos of these places. The builder searches for photos at each step and in each place that it can reach: Wikimedia Commons (and its Panoramio photos), Flickr photos with an open license, OpenStreetMap notes and Mapillary, news articles, travel and hotel pages, and videos of walks in Vũng Tàu from 2018 to 2020. The rules:
+
+- A photo with an open license (CC0, CC BY, CC BY-SA, public domain) can go to World as a source of a request, with its credit.
+- Any other photo is a reference only: its link and what it shows go into `docs/content/reference/landmarks.md` or the request, never the photo itself.
+- Do not take pictures out of Google Street View or other map services whose terms forbid it.
+- Each photo has its date. A photo from 2017 to 2021 is the best source for 2019. A size or a look that only an older or newer photo shows is "Check".
+
 
 These are requests of this repository (D5). World builds them from its rules.
 
@@ -137,7 +145,7 @@ These are requests of this repository (D5). World builds them from its rules.
 
 ## 10. Open questions
 
-- **Q1.** Hải Âu and Nhà khách Hạ Long in 2019: their storeys, their colors, and their fronts. Photos from family or friends help.
+- **Q1.** Hải Âu and Nhà khách Hạ Long in 2019: their storeys, their colors, and their fronts. I have no photos: the builder searches (section 7).
 - **Q2.** The park in 2019: the subjects of the sculptures, the place of the pavilion, and the kiosks.
 - **Q3.** The evening swim: the place of the swim ring rentals, and how many people swim at 17:00 on a weekday of January.
 - **Q4.** Moving scooters: are fixed loops (R11) enough for the first video, or does it wait for plan 0018?
