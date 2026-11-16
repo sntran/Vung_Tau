@@ -93,6 +93,24 @@
 			"height_m": -1.0,
 			"rough_m": 0.15,
 			"reason": "Plan 0005, Q6: at low tide, flat dark rocks show along the sea wall south of the main beach of Bãi Trước, toward Núi Nhỏ, and people walk and fish on them. The ends, the width, and the height are builder values from the map: the rocks are dry when the tide is below -1.0 m, at most low tides of the game days. Check."
+		},
+		{
+			"action": "add_way",
+			"id": -9001,
+			"tags": {
+				"highway": "footway"
+			},
+			"coords": [
+				[
+					107.0847706,
+					10.3255305
+				],
+				[
+					107.0847214,
+					10.3255371
+				]
+			],
+			"reason": "Report 0008, D-0008-02: the end of the footway 788327903 and the foot of the steps 788327902 on the route to the statue of Núi Nhỏ are 5.4 m apart in OSM. This footway joins them, so that the player walks on the path the whole way."
 		}
 	]
 }

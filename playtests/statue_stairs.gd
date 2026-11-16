@@ -7,8 +7,10 @@ extends RefCounted
 # each run reaches the end of its part; the last run reaches the plaza, and
 # the player cannot pass the parapet round it (R6: a push of 4 s with the
 # joystick out to the edge). Screenshots at the bottom, in the middle, and at
-# the top.
+# the top. The 10th run steps to the side of each stair with the joystick: the
+# feet stay within 0.1 m of the visible ground (report 0008, D-0008-01).
 # sizes: 1280x720
+# phase: --world=vung_tau --start-time=08:00
 # phase: --world=vung_tau --start-time=08:00
 # phase: --world=vung_tau --start-time=08:00
 # phase: --world=vung_tau --start-time=08:00
@@ -50,8 +52,52 @@ func run(d: PlaytestDriver) -> void:
 		var from := total * (d.phase - 1) / PARTS
 		var to := total * d.phase / PARTS
 		await _walk(d, w, route, from, to)
-	else:
+	elif d.phase == PARTS + 1:
 		await _plaza(d, w, entry, route, total)
+	else:
+		await _beside(d, w)
+
+
+## Report 0008, D-0008-01: beside each stair, at a quarter, the middle, and
+## three quarters of its line, the player steps 1.4 m to each side with the
+## joystick. The feet are then within 0.1 m of the visible ground: the ground
+## of the town, the top of a tread, or the visible side slope of the stairs.
+static func _beside(d: PlaytestDriver, w: VungTau) -> void:
+	var space := w.get_world_3d().direct_space_state
+	var worst := 0.0
+	var count := 0
+	for s: Dictionary in w.places.stairs:
+		if s.place != "chua_kito_vua":
+			continue
+		var line: PackedVector3Array = s.points
+		var length := PlaytestDriver._length(line)
+		for part: float in [0.25, 0.5, 0.75]:
+			var at := PlaytestDriver.route_point(line, length * part)
+			var ahead := PlaytestDriver.route_point(line, minf(length * part + 1.0, length))
+			var yaw := rad_to_deg(atan2(-(ahead.x - at.x), -(ahead.z - at.z)))
+			for side: float in [1.0, -1.0]:
+				await d.start_at(at, yaw)
+				await d.wait_frames(10)
+				await d.hold_stick(Vector2(side, 0.0), 1.0)
+				await d.wait_frames(10)
+				var p: Vector3 = d.state().player
+				var exclude: Array[RID] = []
+				var body: Dictionary = w.places.places[s.place]
+				if body.has("body"):
+					exclude.append((body.body as CollisionObject3D).get_rid())
+				var query := PhysicsRayQueryParameters3D.create(p + Vector3(0, 3.0, 0), p - Vector3(0, 5.0, 0))
+				query.exclude = exclude
+				var hit := space.intersect_ray(query)
+				var ground: float = (hit.position as Vector3).y if not hit.is_empty() else -INF
+				var visible := maxf(ground, w.places.visible_floor_at(p.x, p.z))
+				var gap := p.y - visible
+				worst = maxf(worst, absf(gap))
+				count += 1
+				if absf(gap) > 0.1:
+					d.fail("beside the stairs %d at %.0f %% (%s): the feet are %.2f m from the visible ground" % [
+							s.way, part * 100.0, "right" if side > 0.0 else "left", gap])
+					await d.screenshot("beside_%d_%d" % [s.way, int(part * 100.0)])
+	d.step("beside the stairs: %d places, the feet are at most %.2f m from the visible ground" % [count, worst])
 
 
 ## The route up to its first point 1.5 m inside the plaza.
@@ -152,22 +198,12 @@ static func _walk(d: PlaytestDriver, w: VungTau, route: PackedVector3Array, from
 		await d.wait_idle(30.0)
 		var now := _distance_near(route, d.state().player, at)
 		if now <= at + 0.2:
-			# A player taps again when a tap does not move them: once, at a nearer
-			# point. A real block stops this tap too.
-			var again := PlaytestDriver.route_point(route, minf(at + 2.5, to))
-			again.y = _floor_y(w, again)
-			await d.look_at_point(again, 3.0, 15.0)
-			if await d.try_tap_floor(again) == "":
-				await d.wait_idle(30.0)
-				now = _distance_near(route, d.state().player, at)
-				if now > at + 0.2:
-					d.step("part %d: a second tap at %.0f m moves the player" % [d.phase, at])
-		if now <= at + 0.2:
 			var p: Vector3 = d.state().player
 			var screen := d.viewport().get_camera_3d().unproject_position(target)
 			var hit: Dictionary = d.main().pick(screen)
 			var node: Node = hit.get("node")
-			d.step("part %d: a tap at %s does not move the player from %.0f m (%s); the tap hits %s at %s" % [
+			# Report 0008, D-0008-03: a tap that does not move the player is a defect.
+			d.fail("part %d: a tap at %s does not move the player from %.0f m (%s); the tap hits %s at %s" % [
 					d.phase, target, at, p, node.get_path() if node else "nothing", hit.get("position")])
 			break
 		at = now

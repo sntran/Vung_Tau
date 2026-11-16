@@ -23,6 +23,14 @@ const STEP_MAX := 0.18
 const STEP := 0.165
 ## A step of the stairs comes where the ground is this part of a step from the tread.
 const STEP_FOLLOW := 0.6
+## The colors of the stairs (concrete) and of their side slopes (report 0008, D-0008-04).
+const STEPS_COLOR := "#8F8B83"
+const SLOPES_COLOR := "#7F7867"
+## The paving of a plaza when its place has no color "floor" (report 0008, D-0008-04:
+## the plaza and the walls on it had one color, so the plaza had no edges).
+const FLOOR_COLOR := "#9C978D"
+## The vertex color of the risers and the sides of a step: the edges show in the sun.
+const STEP_SIDE_SHADE := 0.72
 ## The cell of the height map of the collision of stairs, in meters.
 const STAIR_CELL := 0.25
 ## The height of a cell is a mean of the parts of the line within this distance of the nearest one.
@@ -156,12 +164,13 @@ func _size(place: Dictionary, name: String, fallback: float) -> float:
 	return float(value) if value is float or value is int else fallback
 
 
-func _material(color: Color) -> StandardMaterial3D:
-	var key := color.to_html()
+func _material(color: Color, vertex_colors := false) -> StandardMaterial3D:
+	var key := color.to_html() + ("_v" if vertex_colors else "")
 	if not _materials.has(key):
 		var m := StandardMaterial3D.new()
 		m.albedo_color = color
-		m.roughness = 0.85
+		m.roughness = 0.95
+		m.vertex_color_use_as_albedo = vertex_colors
 		_materials[key] = m
 	return _materials[key]
 
@@ -245,9 +254,15 @@ func _statue(entry: Dictionary) -> void:
 	var stone := _color(place, "stone", "#E6E4DE")
 	var near := SurfaceTool.new()
 	near.begin(Mesh.PRIMITIVE_TRIANGLES)
+	# Flat faces: with smooth normals the faces of the base and of the figure
+	# made one white shape in the sun (report 0008, D-0008-04).
+	near.set_smooth_group(-1)
 	var ground_low := minf(y0 - 0.1, _lowest_around(c, plaza)) - 0.5
-	# The plaza and its skirt (D7).
-	_prism(near, ring_points(c, plaza, 32), ground_low, y0)
+	# The plaza and its skirt (D7), in the color of its paving.
+	var paving := SurfaceTool.new()
+	paving.begin(Mesh.PRIMITIVE_TRIANGLES)
+	paving.set_smooth_group(-1)
+	_prism(paving, ring_points(c, plaza, 32), ground_low, y0)
 	# The parapet round the plaza (R6): the player cannot pass it.
 	var outer := ring_points(c, plaza, 32)
 	var openings := _plaza_openings(place, c, plaza)
@@ -273,6 +288,9 @@ func _statue(entry: Dictionary) -> void:
 	near.generate_normals()
 	var mesh := near.commit()
 	mesh.surface_set_material(0, _material(stone))
+	paving.generate_normals()
+	paving.commit(mesh)
+	mesh.surface_set_material(1, _material(_color(place, "floor", FLOOR_COLOR)))
 	_add_mesh(entry, mesh, false)
 	# The floor of the plaza and the solid base of the statue (R7).
 	var floor_shape := CollisionShape3D.new()
@@ -288,6 +306,7 @@ func _statue(entry: Dictionary) -> void:
 	# The far form (R9): the base, the figure, and the arms.
 	var far := SurfaceTool.new()
 	far.begin(Mesh.PRIMITIVE_TRIANGLES)
+	far.set_smooth_group(-1)
 	_prism(far, base, y0, y0 + base_h)
 	_prism(far, ring_points(c, robe / 2.0, 6), y0 + base_h, dome_top + figure)
 	_add_box(far, arms)
@@ -395,6 +414,7 @@ func _villa(entry: Dictionary) -> void:
 	var basis := Basis(Vector3.UP, -angle)
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	st.set_smooth_group(-1)
 	_base_platform(st, entry, y0)
 	_add_box(st, {"center": Vector3(c.x, y0 + (h - 1.2) / 2.0, c.y), "size": Vector3(length, h - 1.2, width), "turn": angle})
 	st.generate_normals()
@@ -430,6 +450,7 @@ func _prism_place(entry: Dictionary) -> void:
 	var c := _center(record)
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	st.set_smooth_group(-1)
 	_base_platform(st, entry, y0)
 	var body_top := y0 + h - (0.6 if place.kind == "shrine" else 0.0)
 	_prism(st, outline, y0, body_top)
@@ -564,12 +585,12 @@ func _stairs(entry: Dictionary, road: Dictionary) -> void:
 		var top := float(tread.height)
 		var mid := (a + b) / 2.0
 		_add_box(st, {"center": Vector3(mid.x, top - 0.3, mid.z), "size": Vector3(run + 0.02, 0.6, width),
-				"turn": atan2(along.z, along.x)})
+				"turn": atan2(along.z, along.x), "shade": STEP_SIDE_SHADE})
 		count += 1
 	st.generate_normals()
 	var mesh := st.commit()
 	if mesh.get_surface_count() > 0:
-		mesh.surface_set_material(0, _material(_color(entry.place, "steps", "#A9A59B")))
+		mesh.surface_set_material(0, _material(_color(entry.place, "steps", STEPS_COLOR), true))
 		var instance := MeshInstance3D.new()
 		instance.mesh = mesh
 		instance.name = "Stairs_%d" % int(road.id)
@@ -581,8 +602,9 @@ func _stairs(entry: Dictionary, road: Dictionary) -> void:
 	for p: Vector3 in profile.walk:
 		if walk.is_empty() or _flat(p).distance_to(_flat(walk[walk.size() - 1])) > 0.02:
 			walk.append(p)
-	_stair_surface(entry, walk, width)
-	stairs.append({"way": int(road.id), "place": entry.id, "points": walk, "steps": profile.steps, "width": width})
+	var surface := _stair_surface(entry, walk, width)
+	stairs.append({"way": int(road.id), "place": entry.id, "points": walk, "steps": profile.steps, "width": width,
+			"treads": profile.treads, "surface": surface})
 
 
 ## The collision of stairs (R7): a height map, as the ground has. In the
@@ -592,9 +614,9 @@ func _stairs(entry: Dictionary, road: Dictionary) -> void:
 ## player who walks beside the stairs can walk onto them. Farther out, the map
 ## is under the ground. Boxes on each part of the line had edges at the joints,
 ## and one surface on the line had steep folds on the inner side of a bend.
-func _stair_surface(entry: Dictionary, walk: PackedVector3Array, width: float) -> void:
+func _stair_surface(entry: Dictionary, walk: PackedVector3Array, width: float) -> Dictionary:
 	if walk.size() < 2:
-		return
+		return {}
 	var half := width / 2.0
 	var reach := half + SKIRT_M
 	var low := Vector2(INF, INF)
@@ -689,6 +711,49 @@ func _stair_surface(entry: Dictionary, walk: PackedVector3Array, width: float) -
 	var center := Vector3(low.x + (nx - 1) * STAIR_CELL / 2.0, 0.0, low.y + (nz - 1) * STAIR_CELL / 2.0)
 	node.transform = Transform3D(Basis().scaled(Vector3.ONE * STAIR_CELL), center)
 	_body(entry).add_child(node)
+	# The side slopes are visible (report 0008, D-0008-01): the visible ground
+	# follows the collision, so the player never stands on air beside the stairs.
+	# A cell is drawn when its four corners are out of the width of the stairs
+	# (the treads are there) and in the slope or just past it.
+	var drawn := PackedByteArray()
+	drawn.resize((nx - 1) * (nz - 1))
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var cells := 0
+	for r in nz - 1:
+		for c in nx - 1:
+			var ks := [r * nx + c, r * nx + c + 1, (r + 1) * nx + c + 1, (r + 1) * nx + c]
+			var inside := true
+			var near := false
+			for k: int in ks:
+				if best_d[k] <= half or heights[k] <= deep + 0.01:
+					inside = false
+				if best_d[k] <= reach:
+					near = true
+			if not inside or not near:
+				continue
+			drawn[r * (nx - 1) + c] = 1
+			cells += 1
+			var p := []
+			for k: int in ks:
+				p.append(Vector3(low.x + (k % nx) * STAIR_CELL, heights[k], low.y + (k / nx) * STAIR_CELL))
+			# The same split as the triangles of the height map: corners 0-2.
+			for tri: Array in [[p[0], p[2], p[1]], [p[0], p[3], p[2]]]:
+				var n: Vector3 = (tri[1] - tri[0]).cross(tri[2] - tri[0])
+				if n.y > 0.0:
+					tri = [tri[0], tri[2], tri[1]]
+				for v: Vector3 in tri:
+					st.add_vertex(v)
+	if cells > 0:
+		st.generate_normals()
+		var mesh := st.commit()
+		mesh.surface_set_material(0, _material(_color(entry.place, "slopes", SLOPES_COLOR)))
+		var instance := MeshInstance3D.new()
+		instance.mesh = mesh
+		instance.name = "StairSlopes"
+		instance.visibility_range_end = NEAR_END
+		(entry.node as Node3D).add_child(instance)
+	return {"low": low, "nx": nx, "nz": nz, "heights": heights, "drawn": drawn}
 
 
 ## The treads of stairs on a line: {"treads": [{"from", "to", "height"}],
@@ -896,6 +961,47 @@ func floor_at(x: float, z: float) -> float:
 	return best
 
 
+## The height of the visible floor of the stairs at a game point (x, z): the
+## top of a tread, or the visible side slope (report 0008, D-0008-01). -INF
+## where the stairs draw nothing. PT-61 compares the feet of the player with it.
+func visible_floor_at(x: float, z: float) -> float:
+	var best := -INF
+	var at := Vector2(x, z)
+	for s: Dictionary in stairs:
+		var half := float(s.width) / 2.0
+		for t: Dictionary in s.get("treads", []):
+			var a := _flat(t.from)
+			var b := _flat(t.to)
+			var c := Geometry2D.get_closest_point_to_segment(at, a, b)
+			if c.distance_to(at) <= half and (c - a).dot(b - a) > 0.0 and (c - b).dot(a - b) > 0.0:
+				best = maxf(best, float(t.height))
+		var grid: Dictionary = s.get("surface", {})
+		if grid.is_empty():
+			continue
+		var low: Vector2 = grid.low
+		var nx := int(grid.nx)
+		var fc := (x - low.x) / STAIR_CELL
+		var fr := (z - low.y) / STAIR_CELL
+		var c0 := floori(fc)
+		var r0 := floori(fr)
+		if c0 < 0 or r0 < 0 or c0 >= nx - 1 or r0 >= int(grid.nz) - 1:
+			continue
+		var drawn: PackedByteArray = grid.drawn
+		if drawn[r0 * (nx - 1) + c0] == 0:
+			continue
+		var h: PackedFloat32Array = grid.heights
+		var u := fc - c0
+		var v := fr - r0
+		var h00 := h[r0 * nx + c0]
+		var h10 := h[r0 * nx + c0 + 1]
+		var h11 := h[(r0 + 1) * nx + c0 + 1]
+		var h01 := h[(r0 + 1) * nx + c0]
+		# The two triangles of the cell, split from corner 00 to corner 11.
+		var y := h00 + u * (h10 - h00) + v * (h11 - h10) if u >= v else h00 + v * (h01 - h00) + u * (h11 - h01)
+		best = maxf(best, y)
+	return best
+
+
 ## The height of a walk line at a point within "half" of it, or -INF: the
 ## height at the nearest point of the line (on stairs, the steps farther up
 ## are also within "half").
@@ -973,8 +1079,14 @@ static func _add_box(st: SurfaceTool, box: Dictionary) -> void:
 	for i in 8:
 		corners.append(c + basis * Vector3(size.x * (1 if i & 1 else -1), size.y * (1 if i & 2 else -1), size.z * (1 if i & 4 else -1)))
 	var faces := [[0, 1, 3, 2], [4, 6, 7, 5], [0, 4, 5, 1], [2, 3, 7, 6], [0, 2, 6, 4], [1, 5, 7, 3]]
+	# "shade" (optional): the vertex color of the side faces, so that the edges
+	# show in the sun (report 0008, D-0008-04). The tops and bottoms are white.
+	var shade := float(box.get("shade", -1.0))
 	for f: Array in faces:
 		var q := [corners[f[0]], corners[f[1]], corners[f[2]], corners[f[3]]]
+		if shade >= 0.0:
+			var n: Vector3 = (q[1] - q[0]).cross(q[2] - q[0]).normalized()
+			st.set_color(Color.WHITE if absf(n.y) > 0.7 else Color(shade, shade, shade))
 		# Godot draws the faces with a clockwise order seen from the outside.
 		st.add_vertex(q[0]); st.add_vertex(q[1]); st.add_vertex(q[2])
 		st.add_vertex(q[0]); st.add_vertex(q[2]); st.add_vertex(q[3])

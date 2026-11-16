@@ -1,5 +1,5 @@
 {
-	"note": "The places that tools/geo/build.py finds in the OSM data (plan 0005, R1). Each search is a set of OSM tags and a pattern for the names. A tag value of \"*\" matches each value. The hint is a known position. It helps when the data has more than one match, and fetch.py uses it to check the box. \"exact_name\": true accepts only a name that is the same, not a longer name that contains it (for example \"Vi Ba\", not \"Hẻm 14 Vi Ba\"). A record with \"place\" is a known place of plan 0008 (D1): its English name, its status (Confirmed, Source, or Check), its kind (the stand-in: statue, tower, villa, column, shrine, jetty, or none), its sizes with the source of each size, its colors, the OSM ways of its stairs and of its route from the road, the order of its model of World (null until World has the blueprint, W13), and its Lens card. A place with the status \"Check\" has no stand-in and no model (D2).",
+	"note": "The places that tools/geo/build.py finds in the OSM data (plan 0005, R1). Each search is a set of OSM tags and a pattern for the names. A tag value of \"*\" matches each value. The hint is a known position. It helps when the data has more than one match, and fetch.py uses it to check the box. \"exact_name\": true accepts only a name that is the same, not a longer name that contains it (for example \"Vi Ba\", not \"Hẻm 14 Vi Ba\"). A record with \"place\" is a known place of plan 0008 (D1): its English name, its status (Confirmed, Source, or Check), its kind (the stand-in: statue, tower, villa, column, shrine, jetty, or none), its sizes with the source of each size, its colors (the colors of a stand-in are light greys, so that its shape reads in the sun: report 0008, D-0008-04; the steps and the side slopes of the stairs take the keys \"steps\" and \"slopes\", and the paving of a plaza the key \"floor\"), the OSM ways of its stairs and of its route from the road, the order of its model of World (null until World has the blueprint, W13), and its Lens card. A place with the status \"Check\" has no stand-in and no model (D2).",
 	"landmarks": [
 		{
 			"id": "bai_truoc",
@@ -263,7 +263,8 @@
 					}
 				},
 				"colors": {
-					"stone": "#E6E4DE"
+					"stone": "#BDBBB5",
+					"floor": "#9C978D"
 				},
 				"stairs": [
 					788327902,
@@ -282,6 +283,7 @@
 					788327909,
 					222906171,
 					788327903,
+					-9001,
 					788327902,
 					35923587,
 					788327894
@@ -332,7 +334,7 @@
 					}
 				},
 				"colors": {
-					"stone": "#F1F0EA"
+					"stone": "#C6C4BE"
 				},
 				"model": null,
 				"lens": {
@@ -394,7 +396,7 @@
 					}
 				},
 				"colors": {
-					"stone": "#EEEBE3",
+					"stone": "#C3C0B8",
 					"roof": "#B5643F"
 				},
 				"model": null,
@@ -454,7 +456,7 @@
 					}
 				},
 				"colors": {
-					"stone": "#ECEAE4"
+					"stone": "#C1BFB9"
 				},
 				"model": null,
 				"lens": {
@@ -509,7 +511,7 @@
 					}
 				},
 				"colors": {
-					"stone": "#D9CDB0",
+					"stone": "#BDB39C",
 					"roof": "#C8642E"
 				},
 				"stairs": [

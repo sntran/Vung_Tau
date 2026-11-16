@@ -1,6 +1,6 @@
 # Geodata report
 
-Made by `tools/geo/build.py` on 2026-11-06.
+Made by `tools/geo/build.py` on 2026-11-16.
 
 ## Extents
 
@@ -17,7 +17,7 @@ Made by `tools/geo/build.py` on 2026-11-06.
 
 ## Roads
 
-Total road length: 692.3 km. Roads with a width tag: 7 of 4123. Hẻm: 2365.
+Total road length: 692.3 km. Roads with a width tag: 7 of 4124. Hẻm: 2366.
 
 | Type | Roads | Length (km) |
 |---|---|---|
@@ -27,7 +27,7 @@ Total road length: 692.3 km. Roads with a width tag: 7 of 4123. Hẻm: 2365.
 | alley | 871 | 81.38 |
 | secondary | 105 | 41.37 |
 | tertiary | 68 | 28.34 |
-| footway | 251 | 17.46 |
+| footway | 252 | 17.47 |
 | unclassified | 41 | 17.21 |
 | path | 50 | 16.90 |
 | track | 24 | 4.42 |
@@ -203,6 +203,7 @@ The street and park trees and the canopy map (report 0020, D-0020-03): on the ro
 - add way -2 ({'name': 'Bãi đá ra Hòn Bà', 'natural': 'shoal', 'surface': 'rock', 'tidal': 'yes'}): R8h: OSM has only the line of the path (way 221906223, a track), with no outline of the rocks. This band is 30 m wide: the path line with 15 m on each side, and 12 m more at each end, so that it touches the beach below Mũi Nghinh Phong and the islet. The heights of the rocks are in hon_ba.json.
 - rock coast Mũi Nghinh Phong (150 m around 107.083721, 10.3204661): Mũi Nghinh Phong is a rocky cape (report 0005, D-0005-03). The point is the OSM node natural=cape (node 2435353682). OSM has bare rock, scree, and cliffs on its sides, but not at the tip, and the sea floor in front of the tip showed as sand at low tide.
 - rock shelf Đá ven kè Bãi Trước (25 m wide at -1.0 m): Plan 0005, Q6: at low tide, flat dark rocks show along the sea wall south of the main beach of Bãi Trước, toward Núi Nhỏ, and people walk and fish on them. The ends, the width, and the height are builder values from the map: the rocks are dry when the tide is below -1.0 m, at most low tides of the game days. Check.
+- add way -9001 ({'highway': 'footway'}): Report 0008, D-0008-02: the end of the footway 788327903 and the foot of the steps 788327902 on the route to the statue of Núi Nhỏ are 5.4 m apart in OSM. This footway joins them, so that the player walks on the path the whole way.
 
 ## Problems with the data
 
