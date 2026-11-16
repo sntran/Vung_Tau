@@ -1,5 +1,6 @@
 extends RefCounted
-# PT-35 geo_beach. Walk from the road across the sand to the water. The player
+# PT-35 geo_beach. Walk from the road across the sand to the water (through the
+# nearest opening of the low wall of the walk of the sea, plan 0026). The player
 # stops at the 0.5 m depth and the message shows. The depth is from the sea
 # level of the tide at that time (R13).
 # The sea floor comes from public data (R8g, Q14). Each run checks the water
@@ -36,6 +37,20 @@ func run(d: PlaytestDriver) -> void:
 	var center := Vector3(beach.position[0], 0.0, beach.position[1])
 	var direction := Vector3(center.x - start.x, 0.0, center.z - start.z).normalized()
 	var route := PackedVector3Array([start, start + direction * 400.0])
+	# The low wall of the walk of the sea (plan 0026): the player goes down to
+	# the sand through its opening nearest to the start, then on to the water.
+	if w.showcase != null and not w.showcase.wall_openings.is_empty():
+		var best: Dictionary = {}
+		for opening: Dictionary in w.showcase.wall_openings:
+			if best.is_empty() or (opening.at as Vector3).distance_to(start) < (best.at as Vector3).distance_to(start):
+				best = opening
+		var at: Vector3 = best.at
+		var along: Vector3 = best.along
+		var across := Vector3(-along.z, 0.0, along.x).normalized()
+		if (at + across).distance_to(center) > (at - across).distance_to(center):
+			across = -across
+		route = PackedVector3Array([start, at - across * 4.0, at + across * 4.0, at + across * 4.0 + direction * 400.0])
+		d.step("the route goes through the opening of the wall at (%.0f, %.0f)" % [at.x, at.z])
 	d.set_time_scale(3.0)
 	var sand := [false]
 	var message := [false]

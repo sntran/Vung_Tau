@@ -22,6 +22,10 @@ const LIFT := 0.04
 const STEP := 2.0
 ## A part stops this far from the edge of another road (a junction).
 const JUNCTION_MARGIN := 1.0
+## A stand-in leaves this much room (m) on each side of the deck of the jetty.
+const PASSAGE_MARGIN := 0.6
+## The types of the ways that do not cut the walk on the sea wall.
+const SEA_WALL_NOT_CUT_BY := ["footway", "path", "steps", "pedestrian", "cycleway", "track"]
 ## The source of the trees of the showcase in the tree field.
 const TREE_SOURCE := Vector2i(-2000000, -2000000)
 
@@ -45,8 +49,18 @@ var _lamps_set := false
 ## The lights of the street lamps (R14) and the colors of the heads that glow at night.
 var lamp_lights: Array[OmniLight3D] = []
 var glow_colors: Array[String] = []
+## The openings of the low walls along the beach (R10): {at (Vector3), along (the
+## direction of the wall)}.
+var wall_openings: Array[Dictionary] = []
 ## The lamps of R9: {kind, at (the base), height}.
 var lamps: Array[Dictionary] = []
+## The way of the people along the sea wall of Hạ Long (PT-74): points every
+## STEP m, on the walk (its top) or on the road where the walk has a gap, and
+## for each point 1 when it is on the walk.
+var sea_walk := PackedVector3Array()
+var sea_walk_on := PackedByteArray()
+## The road beside each point of sea_walk, 2 m in from the curb.
+var sea_road := PackedVector3Array()
 ## The fine mask of the ground (R the lawns, G the paving) and its place, or null.
 var ground_mask: Image
 var ground_origin := Vector2.ZERO
@@ -242,6 +256,20 @@ func _balustrade(line: PackedVector3Array, cfg: Dictionary) -> void:
 	var rail_depth := float(cfg.get("rail", 0.14))
 	var post_every := float(cfg.get("post_every", 2.4))
 	var post_half := float(cfg.get("post", 0.32)) / 2.0
+	# The openings to the sand (R10): one of "opening_m" in the middle of each
+	# "opening_every_m" of the wall.
+	var every := float(cfg.get("opening_every_m", 0.0))
+	var opening := float(cfg.get("opening_m", 0.0))
+	var total := 0.0
+	for i in line.size() - 1:
+		total += line[i].distance_to(line[i + 1])
+	var gaps: Array[Vector2] = []
+	if every > 0.0 and opening > 0.0 and total >= every:
+		var count := floori(total / every)
+		var first := (total - (count - 1) * every) / 2.0
+		for k in count:
+			var mid := first + k * every
+			gaps.append(Vector2(mid - opening / 2.0, mid + opening / 2.0))
 	var along := 0.0
 	var next_post := 0.0
 	for i in line.size() - 1:
@@ -250,16 +278,49 @@ func _balustrade(line: PackedVector3Array, cfg: Dictionary) -> void:
 		a.y = world.ground_height(a.x, a.z) + LIFT
 		b.y = world.ground_height(b.x, b.z) + LIFT
 		var length := a.distance_to(b)
-		_box_along(color, a, b, half, -0.2, base)
-		_box_along(color, a, b, half * 0.85, rail - rail_depth, rail)
+		var dir := (b - a).normalized()
+		for part: Vector2 in _less_gaps(along, along + length, gaps):
+			var p0 := a.lerp(b, (part.x - along) / maxf(length, 0.001))
+			var p1 := a.lerp(b, (part.y - along) / maxf(length, 0.001))
+			_box_along(color, p0, p1, half, -0.2, base)
+			_box_along(color, p0, p1, half * 0.85, rail - rail_depth, rail)
 		while next_post <= along + length:
-			var t := (next_post - along) / maxf(length, 0.001)
-			var at := a.lerp(b, t)
-			var dir := (b - a).normalized()
-			_box_along(color, at - dir * post_half, at + dir * post_half, post_half, base, rail - rail_depth)
+			if not _in_gaps(next_post, gaps, post_half):
+				var at := a.lerp(b, (next_post - along) / maxf(length, 0.001))
+				_box_along(color, at - dir * post_half, at + dir * post_half, post_half, base, rail - rail_depth)
 			next_post += post_every
+		for gap in gaps:
+			var mid := (gap.x + gap.y) / 2.0
+			if mid >= along and mid < along + length:
+				wall_openings.append({"at": a.lerp(b, (mid - along) / maxf(length, 0.001)), "along": dir})
 		along += length
 	_add_length("beach_wall", along)
+	_add_length("wall_openings", gaps.size())
+
+
+## The parts of [from, to] out of the gaps (each a Vector2 of from and to).
+static func _less_gaps(from: float, to: float, gaps: Array[Vector2]) -> Array[Vector2]:
+	var parts: Array[Vector2] = [Vector2(from, to)]
+	for gap in gaps:
+		var next: Array[Vector2] = []
+		for part in parts:
+			if gap.y <= part.x or gap.x >= part.y:
+				next.append(part)
+				continue
+			if gap.x - part.x > 0.01:
+				next.append(Vector2(part.x, gap.x))
+			if part.y - gap.y > 0.01:
+				next.append(Vector2(gap.y, part.y))
+		parts = next
+	return parts
+
+
+## True when the distance is in a gap, or nearer to it than "margin".
+static func _in_gaps(at: float, gaps: Array[Vector2], margin: float) -> bool:
+	for gap in gaps:
+		if at > gap.x - margin and at < gap.y + margin:
+			return true
+	return false
 
 
 ## R2: the median between the two roads of Quang Trung: a raised lawn with a
@@ -440,19 +501,29 @@ func _sea_wall(cfg: Dictionary) -> void:
 	var ids: Array[int] = []
 	for way: Variant in cfg.get("ways", []):
 		ids.append(int(way))
-	var others := _other_roads(ids)
+	# A road that goes to the sea side cuts the walk (a junction). A footway
+	# along the road does not: the walk is the way of the people there (the
+	# OSM path of the sea along Hạ Long), and a road on the side of the hill
+	# does not reach the walk (PT-74: the walk had gaps of 90 m over the bank).
+	var others := _other_roads(ids, SEA_WALL_NOT_CUT_BY)
 	for id in ids:
 		var road: Dictionary = _roads.get(id, {})
 		if road.is_empty():
 			continue
 		var half := float(road.width) / 2.0
-		for run: PackedVector3Array in _runs(_line(road), func(p: Vector3, side: Vector3) -> bool:
-				var at := p + side * sign * (half + walk / 2.0)
-				return contains(at.x, at.z) and at.z <= until_z and not _near_other(at, others, walk / 2.0)):
+		var keep := func(p: Vector3, side: Vector3) -> bool:
+			var at := p + side * sign * (half + walk / 2.0)
+			return contains(at.x, at.z) and at.z <= until_z \
+					and not _reaches_side(p, side * sign, half, at, others, walk / 2.0)
+		_keep_sea_walk(_line(road), keep, half + walk / 2.0, sign, half)
+		for run: PackedVector3Array in _runs(_line(road), keep):
 			var sides := _sides(run)
 			for i in run.size() - 1:
-				var e0 := run[i] + sides[i] * sign * half + Vector3(0, LIFT, 0)
-				var e1 := run[i + 1] + sides[i + 1] * sign * half + Vector3(0, LIFT, 0)
+				# The walk is a step over the ground at the curb (PT-74: where the road
+				# slopes across, the ground at the curb is lower than the middle of the
+				# road, and a walk at the height of the middle was a step of 0.47 m).
+				var e0 := _on_ground(run[i] + sides[i] * sign * half) + Vector3(0, LIFT, 0)
+				var e1 := _on_ground(run[i + 1] + sides[i + 1] * sign * half) + Vector3(0, LIFT, 0)
 				var o0 := e0 + sides[i] * sign * walk
 				var o1 := e1 + sides[i + 1] * sign * walk
 				var up := Vector3(0, 0.15, 0)
@@ -498,11 +569,39 @@ func _stand_ins(cfg: Dictionary) -> void:
 			low = minf(low, world.ground_height(p.x, p.y))
 		var height := float(building.get("height", storeys * storey))
 		var top := low + height
-		_prism(color, roof, ring, low - 0.5, top)
+		for part in _jetty_passage(ring):
+			_prism(color, roof, part, low - 0.5, top)
 		stand_ins.append({"osm": str(building.get("osm", "")), "name": str(building.get("name", "")),
 				"center": Vector3(center.x, low, center.y), "top": top, "outline": ring,
 				"storeys": storeys, "known": not known.is_empty() or building.has("levels") or building.has("height")})
 	_add_length("stand_ins", stand_ins.size())
+
+
+## The outline of a stand-in less a passage along the deck of the jetty of
+## Cầu Đá: OSM puts the old hydrofoil terminal around the land end of the old
+## pier, and a solid stand-in there closed the jetty (PT-74). Holes are dropped.
+func _jetty_passage(ring: PackedVector2Array) -> Array[PackedVector2Array]:
+	var parts: Array[PackedVector2Array] = [ring]
+	if world.places == null or world.places.jetty.is_empty():
+		return parts
+	var line: PackedVector3Array = world.places.jetty.line
+	var half := float(world.places.jetty.width) / 2.0 + PASSAGE_MARGIN
+	for i in line.size() - 1:
+		var a := Vector2(line[i].x, line[i].z)
+		var b := Vector2(line[i + 1].x, line[i + 1].z)
+		var dir := (b - a).normalized()
+		var n := Vector2(-dir.y, dir.x) * half
+		var band := PackedVector2Array([a - dir + n, b + dir + n, b + dir - n, a - dir - n])
+		var next: Array[PackedVector2Array] = []
+		for part in parts:
+			if Geometry2D.intersect_polygons(part, band).is_empty():
+				next.append(part)
+				continue
+			for piece: PackedVector2Array in Geometry2D.clip_polygons(part, band):
+				if not Geometry2D.is_polygon_clockwise(piece):
+					next.append(piece)
+		parts = next
+	return parts
 
 
 ## R7, D3: the models of World at their places, with the ranges of D6.
@@ -682,12 +781,14 @@ func _nearest(line: PackedVector3Array, p: Vector3) -> Vector3:
 
 
 ## The roads near the area that are not in "ids": [[line, half width, box]].
-func _other_roads(ids: Array) -> Array:
+func _other_roads(ids: Array, skip_types: Array = []) -> Array:
 	var result := []
 	for id: int in _roads:
 		if id in ids:
 			continue
 		var road: Dictionary = _roads[id]
+		if str(road.get("type", "")) in skip_types:
+			continue
 		var line := _line(road)
 		var near := false
 		for p in line:
@@ -700,6 +801,22 @@ func _other_roads(ids: Array) -> Array:
 				box = box.expand(Vector2(p.x, p.z))
 			result.append([line, float(road.width) / 2.0, box.grow(float(road.width) / 2.0 + 12.0)])
 	return result
+
+
+## True when another road is within "extra" m (and the margin) of the point
+## "at" and goes past the edge (half) of the road at "p" on the side "side"
+## (a junction on that side).
+func _reaches_side(p: Vector3, side: Vector3, half: float, at: Vector3, others: Array, extra: float) -> bool:
+	for entry: Array in others:
+		if not (entry[2] as Rect2).has_point(Vector2(at.x, at.z)):
+			continue
+		var line: PackedVector3Array = entry[0]
+		for i in line.size() - 1:
+			var q := Geometry3D.get_closest_point_to_segment(at, line[i], line[i + 1])
+			if Vector2(q.x - at.x, q.z - at.z).length() < float(entry[1]) + extra + JUNCTION_MARGIN \
+					and Vector2(q.x - p.x, q.z - p.z).dot(Vector2(side.x, side.z)) > half - 0.5:
+				return true
+	return false
 
 
 ## True when a point is within "extra" m (and the margin) of the edge of another road.
@@ -933,6 +1050,33 @@ func _lamp(kind: String, at: Vector3, along: Vector3) -> void:
 		light.visible = false
 		add_child(light)
 		lamp_lights.append(light)
+
+
+## The way of the people along the sea wall (PT-74): for each point of the
+## road every STEP m, the middle of the walk at its top where the walk is (a run
+## of two points or more, as _runs()), else the road 2 m in from its curb.
+func _keep_sea_walk(line: PackedVector3Array, keep: Callable, offset: float, sign: float, half: float) -> void:
+	var dense := _dense(line, STEP)
+	var sides := _sides(dense)
+	var flags: Array[bool] = []
+	for i in dense.size():
+		flags.append(keep.call(dense[i], sides[i]))
+	for i in dense.size():
+		var on := flags[i] and ((i > 0 and flags[i - 1]) or (i < dense.size() - 1 and flags[i + 1]))
+		var road := _on_ground(dense[i] + sides[i] * sign * (half - 2.0))
+		sea_road.append(road)
+		if on:
+			var walk := dense[i] + sides[i] * sign * offset
+			walk.y = _on_ground(dense[i] + sides[i] * sign * half).y + LIFT + 0.15
+			sea_walk.append(walk)
+		else:
+			sea_walk.append(road)
+		sea_walk_on.append(1 if on else 0)
+
+
+## The point on the ground.
+func _on_ground(p: Vector3) -> Vector3:
+	return Vector3(p.x, world.ground_height(p.x, p.z), p.z)
 
 
 ## A prism of the outline from "low" to "top", with a roof of its own color.

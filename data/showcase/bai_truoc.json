@@ -363,6 +363,8 @@
 			"rail": 0.14,
 			"post": 0.32,
 			"post_every": 2.4,
+			"opening_every_m": 40.0,
+			"opening_m": 2.4,
 			"color": "#b3ada1"
 		},
 		"paving_texture": {
@@ -479,8 +481,10 @@
 			"rail": 0.14,
 			"post": 0.32,
 			"post_every": 2.4,
+			"opening_every_m": 40.0,
+			"opening_m": 2.4,
 			"color": "#b3ada1",
-			"note": "The low wall of granite blocks between the walk of the sea and the beach (R4): a base, square posts, and a top rail with gaps under it, as in the photo of S5 (2014, Wikimedia Commons, Lam Tr Th, CC BY-SA 3.0). The sizes are by eye from the photo."
+			"note": "The low wall of granite blocks between the walk of the sea and the beach (R4): a base, square posts, and a top rail with gaps under it, as in the photo of S5 (2014, Wikimedia Commons, Lam Tr Th, CC BY-SA 3.0). The sizes are by eye from the photo. R10: an opening to the sand of one span (opening_m) in the middle of each opening_every_m of the wall, so that people go down to the beach (PT-35, PT-75): builder values (status check), as I found no photo of the places of the steps."
 		}
 	],
 	"sea_walls": [
