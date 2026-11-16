@@ -39,12 +39,13 @@ var models: Array[Dictionary] = []
 var people: ShowcasePeople
 ## The outlines of the raised lawns (R4): the people of R10 sit on them.
 var planter_rings: Array[PackedVector2Array] = []
-## The lamps of R9: {kind, at (the base), height}.
+## True when the lamps are on (R14).
 var lamps_lit := false
 var _lamps_set := false
 ## The lights of the street lamps (R14) and the colors of the heads that glow at night.
 var lamp_lights: Array[OmniLight3D] = []
 var glow_colors: Array[String] = []
+## The lamps of R9: {kind, at (the base), height}.
 var lamps: Array[Dictionary] = []
 ## The fine mask of the ground (R the lawns, G the paving) and its place, or null.
 var ground_mask: Image

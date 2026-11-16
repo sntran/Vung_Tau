@@ -470,6 +470,8 @@ func update_time(minutes: int, day: int) -> void:
 		var mix := clampf(float(grade.sky_mix), 0.0, 1.0)
 		colors[0] = colors[0].lerp(grade.sky_top, mix)
 		colors[1] = colors[1].lerp(grade.sky_horizon, mix)
+		# The shade of the golden hour takes the blue of the sky (with no SDFGI).
+		environment.ambient_light_color = ambient.lerp(grade.ambient_color, clampf(float(grade.ambient_mix), 0.0, 1.0))
 		environment.glow_enabled = float(grade.glow) > 0.0
 		environment.glow_intensity = float(grade.glow)
 		environment.fog_density = float(grade.haze)
