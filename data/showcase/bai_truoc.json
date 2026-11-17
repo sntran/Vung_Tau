@@ -586,7 +586,48 @@
 		],
 		"extra_note": "Buildings of OSM out of the outline that the shots show (S1, S2): Cao ốc Sen Biển (the Lotus Tower) by Hạ Long.",
 		"jetty_access": 235006085,
-		"jetty_access_note": "The way from the land to the shore end of the jetty of Cầu Đá: the path of the port (OSM way). The shore end of the deck is in the outline of the old hydrofoil terminal, so a stand-in leaves a passage along the deck and a passage from the shore end to the nearest point of this path (report 0026, D-0026-02: with the terminal at its height of the photo, the passage along the deck had no way in from the land; PT-74 run 8)."
+		"jetty_access_note": "The way from the land to the shore end of the jetty of Cầu Đá: the path of the port (OSM way). The shore end of the deck is in the outline of the old hydrofoil terminal, so a stand-in leaves a passage along the deck and a passage from the shore end to the nearest point of this path (report 0026, D-0026-02: with the terminal at its height of the photo, the passage along the deck had no way in from the land; PT-74 run 8).",
+		"footprints": {
+			"fdc62561-316a-4c62-acef-40d6239cbf18": {
+				"storeys": 1,
+				"name": "The low buildings with green roofs by Hạ Long, south-west of the hall with the orange roof",
+				"source": "The photo from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0, Vung_Tau,_Viet_Nam.jpg): by the road, south-west of the hall with the roof of orange tiles, low buildings of one storey with green roofs. The footprint (Microsoft ML Buildings) is the one next to the road there. The roofs are sheets of pale green grey with two slopes: the median color of the roofs in the photo is #a5b8b3 (#c0d2cd in the sun, #80959d in the shade).",
+				"status": "Source",
+				"roof_color": "#a5b8b3"
+			}
+		},
+		"footprints_note": "Footprints of data/geo/build/footprints.json (Overture Maps) with their storeys from a photo: a stand-in on each (report 0026, D-0026-03). footprints_check lists the footprints near Hạ Long that a photo shows, but that I could not match to a building of the photo: they are not built.",
+		"footprints_check": {
+			"ids": [
+				"7cf06628-919e-458c-a8ba-b1ec8df0b8ad",
+				"bc006ac7-527c-4245-8288-b983873d056f",
+				"14e9cc96-7945-4369-844d-3faf5f0a501c",
+				"7385085b-a969-46ae-a22e-ae91d9586356",
+				"2ba1be26-eea3-4b38-8b73-aca7214251e4",
+				"4bd59211-1078-4c78-9206-752ec0033a08",
+				"57b758fc-e8f3-4b70-9444-906f1f0a2156",
+				"1c5a20a3-3f1e-49f0-b5d6-c67489c42609",
+				"47aada3d-e713-469f-a3b5-951a768147d5",
+				"44638a03-21e2-4405-b2d8-a8cce0e21694",
+				"4222f4ed-7112-4e59-81ec-d4f076824dc0",
+				"45174a9a-ead8-4490-84d4-f2dc86f02b46",
+				"738e024c-5f43-4c3b-8180-4b698b6f9465",
+				"d5ec4995-8620-4f45-8bcf-b4ddc29c2e92",
+				"16abe3ee-5b3a-4611-9b9a-c8bab4e84b92",
+				"cfe23015-f259-4e15-a470-b7c84fdfcafd",
+				"0d260804-e804-4c0b-b492-605c21e335c1",
+				"bfba093a-b313-4ecc-96fc-236eafceb9cc",
+				"e777bf07-def7-4685-b0d0-f16fdde292bc",
+				"762c335f-1f46-4f4a-9846-91bfb22b756a",
+				"45b448e9-7ee2-452b-980f-196d0de29d08",
+				"e0d92ead-7af0-44c0-a922-0580f6eb0103",
+				"66f44e96-135e-4157-9a09-a1c0f5ba7bc5",
+				"2037171d-0d9e-40cd-b809-6d827e772db8",
+				"69d6c45d-4a9c-49f8-b43d-e0cdf1eaa009",
+				"9991c136-b4e0-46e0-a80b-d16f9ac2940a"
+			],
+			"reason": "The photo from a drone of 2021-01-30 shows houses, villas, and hotels of one to six storeys on this side of the hill, but these footprints could not be matched one by one to the buildings of the photo: their storeys are Check."
+		}
 	},
 	"beached": {
 		"model": "thung_chai",

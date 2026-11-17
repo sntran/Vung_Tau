@@ -47,6 +47,8 @@ var lengths: Dictionary = {}
 var stand_ins: Array[Dictionary] = []
 ## The OSM buildings of the area with no storeys from a source: not built.
 var stand_ins_left_out: Array[String] = []
+## The footprints of public data of the area (Overture Maps; report 0026, D-0026-03).
+const FOOTPRINTS := "res://data/geo/build/footprints.json"
 ## The models of World at their places (D3): [{id, model, footprint (PackedVector2Array), base}].
 var models: Array[Dictionary] = []
 ## The people of R10, or null.
@@ -754,7 +756,42 @@ func _stand_ins(cfg: Dictionary) -> void:
 		stand_ins.append({"osm": str(building.get("osm", "")), "name": str(building.get("name", "")),
 				"center": Vector3(center.x, low, center.y), "top": top + roof_height, "outline": ring,
 				"storeys": storeys, "known": true})
+	_footprint_stand_ins(cfg)
 	_add_length("stand_ins", stand_ins.size())
+
+
+## Report 0026, D-0026-03: OSM has no building on the side of the hill of Hạ Long
+## between Cao ốc Sen Biển and Hải Âu. data/geo/build/footprints.json has the
+## footprints of public data there (Overture Maps, tools/geo/footprints.py). A
+## footprint is built as a stand-in only when "footprints" (by its id) gives its
+## storeys from a photo; the others stay in footprints_check with the reason.
+func _footprint_stand_ins(cfg: Dictionary) -> void:
+	var known: Dictionary = cfg.get("footprints", {})
+	if known.is_empty() or not FileAccess.file_exists(FOOTPRINTS):
+		return
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(FOOTPRINTS))
+	if not parsed is Dictionary:
+		return
+	var storey := float(cfg.get("storey_m", 3.3))
+	for footprint: Dictionary in parsed.get("footprints", []):
+		var entry: Dictionary = known.get(str(footprint.get("id", "")), {})
+		if entry.is_empty():
+			continue
+		var ring := _points(footprint.get("outline", []))
+		if ring.size() >= 2 and ring[0].distance_to(ring[ring.size() - 1]) < 0.01:
+			ring.remove_at(ring.size() - 1)
+		if ring.size() < 3:
+			continue
+		var low := INF
+		var center := Vector2.ZERO
+		for p in ring:
+			low = minf(low, world.ground_height(p.x, p.y))
+			center += p / ring.size()
+		var top := low + float(entry.get("height", float(entry.get("storeys", 1)) * storey))
+		_prism(str(cfg.get("color", "#c9c4b8")), str(entry.get("roof_color", cfg.get("roof_color", "#a89f90"))), ring, low - 0.5, top)
+		stand_ins.append({"osm": "footprint/" + str(footprint.id), "name": str(entry.get("name", "")),
+				"center": Vector3(center.x, low, center.y), "top": top, "outline": ring,
+				"storeys": float(entry.get("storeys", 1)), "known": true})
 
 
 ## The outline of a stand-in less a passage along the deck of the jetty of

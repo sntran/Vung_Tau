@@ -1,0 +1,48 @@
+name: Footprints
+
+# Report 0026, D-0026-03, and plan 0009, R1 (for the area of plan 0026 first):
+# gets the footprints of the buildings of the showcase from the buildings
+# theme of Overture Maps (tools/geo/footprints.py) and commits
+# data/geo/build/footprints.json to the branch that it runs on (by hand, or on
+# a push that changes the tool). A push with the workflow token does not start
+# the test workflow.
+on:
+  workflow_dispatch:
+  push:
+    paths: ["tools/geo/footprints.py", ".github/workflows/footprints.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: footprints-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  footprints:
+    name: Get the footprints
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install the Python packages
+        run: pip install duckdb pyproj numpy
+
+      - name: Get the footprints of the area of plan 0026
+        run: python tools/geo/footprints.py
+
+      - name: Commit the footprints
+        run: |
+          git add data/geo/build/footprints.json
+          if git diff --cached --quiet; then
+            echo "The footprints are up to date."
+            exit 0
+          fi
+          git -c user.name="Sơn Trần-Nguyễn" -c user.email=github@sntran.com -c commit.gpgsign=false \
+            commit -m "Update the footprints of the area of plan 0026"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

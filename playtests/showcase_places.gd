@@ -7,7 +7,10 @@ extends RefCounted
 # models overlap. The test also
 # counts the parts of the showcase (data/showcase/bai_truoc.json), checks that
 # the basket boats of the sea are models of World (R8), and takes a
-# screenshot of each model from its street.
+# screenshot of each model from its street. Report 0026, D-0026-03: on the side
+# of the hill of Hạ Long, each footprint of public data near the road has a
+# stand-in with its storeys from a photo, or is in the list of the footprints
+# that wait for one (Check); no stand-in has a guessed number of storeys.
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=10:00 --quality=low
 
@@ -22,6 +25,10 @@ const MAX_FRONT_GAP := 0.5
 const MIN_FACING := 0.9
 ## Two footprints can touch: a common area of this much or less is no overlap.
 const MAX_COMMON_M2 := 0.5
+## The side of the hill of Hạ Long (D-0026-03): the footprints this near the road,
+## between these z (from Cao ốc Sen Biển to Hải Âu).
+const HILL_SIDE_M := 70.0
+const HILL_SIDE_Z := Vector2(330.0, 520.0)
 
 
 func run(d: PlaytestDriver) -> void:
@@ -37,6 +44,7 @@ func run(d: PlaytestDriver) -> void:
 	var models: Array[Dictionary] = w.showcase.models
 	d.expect(models.size() == data.size(), "each place has its model: %d of %d" % [models.size(), data.size()])
 	d.step("the parts of the showcase (m, or a count): %s" % [w.showcase.lengths])
+	_check_hill_side(d, w)
 	for kind: String in ["median", "sidewalk", "path_border", "wall", "sea_wall", "stand_ins", "lawn_m2", "paving_m2",
 			"planter", "beach_wall", "median_trees", "lamps", "path_lamps"]:
 		d.expect(float(w.showcase.lengths.get(kind, 0.0)) > 0.0, "the showcase has the part %s" % kind)
@@ -130,3 +138,50 @@ static func _area(ring: PackedVector2Array) -> float:
 		var b := ring[(i + 1) % ring.size()]
 		result += a.x * b.y - b.x * a.y
 	return result / 2.0
+
+
+## Report 0026, D-0026-03: the side of the hill of Hạ Long is not bare. Each
+## footprint of data/geo/build/footprints.json (public data, Overture Maps) near
+## the road has a stand-in with its storeys from a photo, or is listed in
+## stand_ins.footprints_check of data/showcase/bai_truoc.json with its reason;
+## each stand-in has its storeys from a source.
+func _check_hill_side(d: PlaytestDriver, w: VungTau) -> void:
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/geo/build/footprints.json"))
+	if not d.expect(parsed is Dictionary, "the footprints of public data can be read (tools/geo/footprints.py)"):
+		return
+	var road := PackedVector3Array()
+	for entry: Dictionary in w.data.roads:
+		if str(entry.get("name", "")) == "Hạ Long":
+			for p: Array in entry.points:
+				if float(p[2]) > HILL_SIDE_Z.x - HILL_SIDE_M and float(p[2]) < HILL_SIDE_Z.y + HILL_SIDE_M:
+					road.append(Vector3(float(p[0]), 0.0, float(p[2])))
+	var built := {}
+	for entry: Dictionary in w.showcase.stand_ins:
+		d.expect(bool(entry.known), "the stand-in %s has its storeys from a source" % entry.osm)
+		built[str(entry.osm)] = true
+	var check_ids: Array = w.showcase.data.stand_ins.get("footprints_check", {}).get("ids", [])
+	var near := 0
+	var with_building := 0
+	var missing: Array[String] = []
+	for footprint: Dictionary in parsed.get("footprints", []):
+		if "OpenStreetMap" in (footprint.get("sources", []) as Array):
+			continue
+		var middle := Vector2.ZERO
+		var outline: Array = footprint.outline
+		for p: Array in outline:
+			middle += Vector2(float(p[0]), float(p[1])) / outline.size()
+		if middle.y < HILL_SIDE_Z.x or middle.y > HILL_SIDE_Z.y:
+			continue
+		var gap := INF
+		for q in road:
+			gap = minf(gap, Vector2(q.x, q.z).distance_to(middle))
+		if gap > HILL_SIDE_M:
+			continue
+		near += 1
+		if built.has("footprint/" + str(footprint.id)):
+			with_building += 1
+		elif not str(footprint.id) in check_ids:
+			missing.append(str(footprint.id))
+	d.step("the side of the hill of Hạ Long: %d footprints near the road, %d with a stand-in, %d wait for their storeys (Check), %d OSM buildings with no storeys left out" % [
+			near, with_building, near - with_building - missing.size(), w.showcase.stand_ins_left_out.size()])
+	d.expect(missing.is_empty(), "each footprint near Hạ Long has a stand-in or waits for its storeys with a reason: %s" % ", ".join(missing))

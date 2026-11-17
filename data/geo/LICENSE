@@ -9,6 +9,11 @@ https://opendatacommons.org/licenses/odbl/1-0/
 The corrections in overrides.json are a part of this Derivative Database, and
 are also under the ODbL 1.0.
 
+The footprints of the buildings (build/footprints.json) come from the buildings
+theme of the Overture Maps Foundation (overturemaps.org): © OpenStreetMap
+contributors, Microsoft ML Buildings, and Google Open Buildings, under the ODbL
+1.0. The file is a Derivative Database, also under the ODbL 1.0.
+
 The height data (raw/dem.tif, and the height files in build/height/) comes from
 the Copernicus DEM GLO-30:
 
