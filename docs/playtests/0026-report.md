@@ -54,7 +54,7 @@ At 17:00 the 40 people are on about 1.3 km of paths: the shots show 0 to 3 peopl
 
 ### D-0026-08: Plain parts (low)
 
-The low lamps of the park are white posts, and the raised lawns are boxes with a flat green top. They wait for their specs (section 3).
+The low lamps of the park are white posts, and the raised lawns are boxes with a flat green top. Make them as drawings of edits, from photos (D-0026-09).
 
 ### D-0026-09: The requests ask World to make the models (high)
 
