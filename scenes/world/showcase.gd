@@ -18,6 +18,9 @@ const TEXTURES := "res://assets/textures/look"
 const SURFACE_SHADER := "res://shaders/showcase_surface.gdshader"
 ## As RoadBuilder.LIFT: the road surface is this much over its line.
 const LIFT := 0.04
+## The color of a part that a model of this game replaces: the part keeps its
+## collision and draws nothing (report 0026, D-0026-09).
+const HIDDEN := "hidden"
 ## The step of the points of a part along its way.
 const STEP := 2.0
 ## A part stops this far from the edge of another road (a junction).
@@ -91,6 +94,10 @@ var sea_road := PackedVector3Array()
 var ground_mask: Image
 var ground_origin := Vector2.ZERO
 var ground_step := 0.5
+
+## The pieces of the walls that are models of this game (report 0026,
+## D-0026-09): one row of MultiMeshes, the near, mid and far levels.
+var wall_row: WorldRow
 
 var _roads: Dictionary = {}  # OSM id -> the road Dictionary of roads.json
 var _meshes: Dictionary = {}  # color (String) -> _Mesh
@@ -918,6 +925,10 @@ func _places(path: String) -> void:
 		var r: Array = parsed.ranges[preset]
 		ranges[preset] = Vector3(float(r[0]), float(r[1]), float(r[2]))
 	for place: Dictionary in parsed.get("places", []):
+		# A model with the status Check (data/world/drawings/) has its place, but
+		# no order in data/world/orders.json: it waits, and its stand-in stays.
+		if WorldModel.order(str(place.id)).is_empty():
+			continue
 		var model := WorldModel.make(str(place.id))
 		if model == null:
 			continue
@@ -1447,6 +1458,47 @@ func _world_lamp(kind: String, model_id: String, cfg: Dictionary, base: Vector3,
 	_lamp_light(cfg, base + Vector3(0, h, 0))
 
 
+## True when the model has its order in data/world/orders.json and its files.
+static func _has_model(model_id: String) -> bool:
+	if model_id == "" or WorldModel.order(model_id).is_empty():
+		return false
+	var levels := WorldModel.levels_of(model_id)
+	return not levels.is_empty() and ResourceLoader.exists(WorldModel.ROOT + model_id + WorldModel.SUFFIX[levels[0]])
+
+
+## An option of the order of a model: its value in the order, or the default of
+## the param of its blueprint in data.
+static func _option(model_id: String, name: String, default: Variant) -> Variant:
+	var order: Dictionary = WorldModel.order(model_id).get("order", {})
+	var options: Dictionary = order.get("options", {})
+	if options.has(name):
+		return options[name]
+	var blueprint: Variant = order.get("blueprint", {})
+	if blueprint is Dictionary:
+		for param: Dictionary in blueprint.get("params", []):
+			if str(param.get("name", "")) == name and param.has("default"):
+				return param["default"]
+	return default
+
+
+## A piece of a wall (a model of this game along x, from its port "start" at
+## x = -length/2 to its port "end" at x = length/2, the sea to +y, z up) from
+## the point a to the point b: it follows the slope of a to b (a shear), and
+## "up" and "out" scale its height and its depth.
+func _wall_piece(model_id: String, a: Vector3, b: Vector3, sea: Vector3, up := 1.0, out := 1.0) -> void:
+	var length := float(_option(model_id, "length", 2.0))
+	if a.distance_to(b) < 0.05 or length <= 0.0:
+		return
+	if wall_row == null:
+		wall_row = WorldRow.new()
+		wall_row.name = "WallPieces"
+		add_child(wall_row)
+	# The x of World is -x of the GLB: the local -x goes from a to b.
+	var flat_sea := Vector3(sea.x, 0.0, sea.z).normalized()
+	var basis := Basis(-(b - a) / length, Vector3(0.0, up, 0.0), flat_sea * out)
+	wall_row.add(model_id, Transform3D(basis, (a + b) / 2.0))
+
+
 ## The point on the ground.
 func _on_ground(p: Vector3) -> Vector3:
 	return Vector3(p.x, world.ground_height(p.x, p.z), p.z)
@@ -1488,7 +1540,12 @@ static func _area(ring: PackedVector2Array) -> float:
 
 
 func _commit() -> void:
+	if wall_row != null:
+		wall_row.build()
+		_add_length("wall_pieces", float(wall_row.count()))
 	for color: String in _meshes:
+		if color == HIDDEN:
+			continue
 		var arrays: Variant = (_meshes[color] as _Mesh).arrays()
 		if arrays == null:
 			continue

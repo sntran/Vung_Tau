@@ -1,5 +1,5 @@
 {
-	"note": "The place of each model of World in the showcase of Bãi Trước (plan 0026, D3). \"front\" is the middle of the front of the model (x and z of the game), \"facing\" the direction that its front looks to (x and z), and \"front_middle_x\" the x of that point in the model, \"box\" the box of the model in its own frame (x from, x to, z from, z to; the front is at z = 0), \"street\" the street that the front looks to (a model of World has its front at z = 0 and looks to +z in Godot). The model stands on the ground at its front. \"ranges\" gives the end of the near, the mid, and the far level for each preset (D6: on Low the near level of a building is its mid level, so the near level has no range). The sources of each place are with it. tools/geo/build.py makes the ground level under the box of each model, at the height of the ground at its front (plan 0009, R8).",
+	"note": "The place of each model of World in the showcase of Bãi Trước (plan 0026, D3). \"front\" is the middle of the front of the model (x and z of the game), \"facing\" the direction that its front looks to (x and z), and \"front_middle_x\" the x of that point in the model, \"box\" the box of the model in its own frame (x from, x to, z from, z to; the front is at z = 0), \"street\" the street that the front looks to (a model of World has its front at z = 0 and looks to +z in Godot), or \"along\" the walk that a thing with no street of its own is along (a raised lawn). The model stands on the ground at its front. \"ranges\" gives the end of the near, the mid, and the far level for each preset (D6: on Low the near level of a building is its mid level, so the near level has no range). The sources of each place are with it. tools/geo/build.py makes the ground level under the box of each model, at the height of the ground at its front (plan 0009, R8).",
 	"status": "check",
 	"ranges": {
 		"low": [
@@ -186,8 +186,8 @@
 				-12.45,
 				12.45
 			],
-			"street": "the walk of the sea",
-			"source": "The outline of OpenStreetMap way 234797329: its middle, and its long side as the facing; the model has its middle at its origin, so its box goes to both sides of the front (data/world/drawings/bon_co_234797329.json, D-0026-08)."
+			"source": "The outline of OpenStreetMap way 234797329: its middle, and its long side as the facing; the model has its middle at its origin, so its box goes to both sides of the front (data/world/drawings/bon_co_234797329.json, D-0026-08).",
+			"along": "the walk of the sea"
 		},
 		{
 			"id": "bon_co_234797330",
@@ -206,8 +206,8 @@
 				-12.596,
 				12.596
 			],
-			"street": "the walk of the sea",
-			"source": "The outline of OpenStreetMap way 234797330: its middle, and its long side as the facing; the model has its middle at its origin, so its box goes to both sides of the front (data/world/drawings/bon_co_234797330.json, D-0026-08)."
+			"source": "The outline of OpenStreetMap way 234797330: its middle, and its long side as the facing; the model has its middle at its origin, so its box goes to both sides of the front (data/world/drawings/bon_co_234797330.json, D-0026-08).",
+			"along": "the walk of the sea"
 		}
 	]
 }

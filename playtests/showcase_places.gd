@@ -77,8 +77,17 @@ func run(d: PlaytestDriver) -> void:
 		var front := Vector2(float(place.front[0]), float(place.front[1]))
 		var off := Vector2(middle.x, middle.z).distance_to(front)
 		d.expect(off <= MAX_FRONT_GAP, "%s is on its lot: its front is %.2f m from the point of the data" % [entry.id, off])
+		# A thing on the walk with no street of its own (a raised lawn: "along" in
+		# the data) has no front to a street.
+		if not place.has("street"):
+			d.step("%s is along %s: no street to look to" % [entry.id, place.get("along", "?")])
+			d.expect(place.has("along"), "%s names its street, or the walk that it is along" % entry.id)
+			continue
 		var facing := Vector2((t.basis * Vector3.BACK).x, (t.basis * Vector3.BACK).z).normalized()
-		var road := _nearest_road(w, Vector3(middle.x, 0, middle.z), str(place.get("street", "")))
+		var road := _nearest_road(w, Vector3(middle.x, 0, middle.z), str(place.street))
+		d.expect(road != Vector2.INF, "%s has its street %s in the roads" % [entry.id, place.street])
+		if road == Vector2.INF:
+			continue
 		var to_road := (road - Vector2(middle.x, middle.z)).normalized()
 		d.expect(facing.dot(to_road) >= MIN_FACING, "%s looks to its street: cos %.2f (at least %.2f)" % [
 				entry.id, facing.dot(to_road), MIN_FACING])
