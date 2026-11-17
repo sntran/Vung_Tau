@@ -933,7 +933,22 @@
 			"source": "No letters: I did not approve a name of a business on it (the design rules of the game: no real businesses)."
 		}
 	},
-	"looks": [],
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "fa52f111ab1c786f43a1d1d7af92505b",
+			"seen": "The files of the lock (the job \"Models of World\" of 4814dd0), next to photos 0 to 8 (build/look/cao_oc_sen_bien_near.png). The block of white terraces that steps down to the south-west, with the barrel vaults on each terrace and a blue band at each floor, and the tower of green glass with the white strip, the mauve ring, the deck of glass, the white disc, and the spire, as in photos 0, 3, and 4. No letters.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "fa52f111ab1c786f43a1d1d7af92505b",
+			"seen": "The files of the lock (build/look/cao_oc_sen_bien_mid.png): the same terraces, vaults, and tower with less detail.",
+			"changed": "Nothing."
+		}
+	],
 	"status": "Source",
 	"levels": [
 		"near",

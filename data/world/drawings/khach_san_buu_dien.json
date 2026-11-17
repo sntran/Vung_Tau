@@ -1180,7 +1180,22 @@
 			"source": "Photos 0, 4 and 5 show the letters of the hotel (VUNG TAU P&T HOTEL, P&T HOTEL) on the white band. The model has no letters: they are the name of a business, and I did not approve them (the design rules of the game: no real businesses)."
 		}
 	},
-	"looks": [],
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "c660b5fac512441cf6f9075fbc796657",
+			"seen": "The files of the lock (the job \"Models of World\" of 4814dd0), next to photos 0 to 5 (build/look/khach_san_buu_dien_near.png). A white tower of 12 storeys with bands of dark blue windows on the front, the round corner of dark glass at the west end, the red brown pier of granite, the white band and the mast at the top, and the wing of three storeys with the pool on its deck, as in photos 1, 2, 4, and 5. The south face has rows of small windows, as in photo 2. No letters (as the drawing says).",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "c660b5fac512441cf6f9075fbc796657",
+			"seen": "The files of the lock (build/look/khach_san_buu_dien_mid.png): the same tower, corner, pier, and wing with less detail of the windows.",
+			"changed": "Nothing."
+		}
+	],
 	"status": "Source",
 	"levels": [
 		"near",

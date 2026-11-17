@@ -3605,6 +3605,20 @@
 			"hash": "",
 			"seen": "Report 0026, D-0026-13: the three looks before are of a preview from a copy of the building rule of World that I made in Python, not of the model of World. I deleted that copy. The next look is of the files of the lock, after the job \"Models of World\" builds this order.",
 			"changed": "The ground storey 4.1 m and the storey 3.0 m (measured from the man and the car of photo 0); each edit of \"more\" moves with the floors (4.7 m + 3.0 m for each floor, from 4.2 m + 3.3 m)."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "aaa26dbb58bd1d7481a1c748d0030686",
+			"seen": "The files of the lock (the job \"Models of World\" of 4814dd0, mix world.order), next to photos 0, 1, and 2 (build/look/khach_san_hai_au_near.png). The north wing, the middle block of six storeys under the curved canopy, and the south wing with the glazed band and the terraces, as in photo 0. Sky blue walls with white bands at each floor and the round balconies at the north end. The letters HAI AU are red, on the canopy a little north of its middle, as in photo 0. The ground storey is higher than the other storeys, so the porch shows under the canopy.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "aaa26dbb58bd1d7481a1c748d0030686",
+			"seen": "The files of the lock, next to the same photos (build/look/khach_san_hai_au_mid.png): the same blocks, bands, and letters with less detail of the windows. On Low the game shows this level from 0 m (no near level of a building, D6).",
+			"changed": "Nothing."
 		}
 	],
 	"status": "Source",

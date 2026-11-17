@@ -417,6 +417,13 @@
 			"hash": "af006a4cf20449b58390d222b3be6fce",
 			"seen": "The same as the mid look of order 466e5b4b6ca85b817e8ab8eb6c71673d (the views are the same): the light blue wide hat on the woman, as in photos 0 and 1.",
 			"changed": "No change. The near level of a person cannot be built by the factory, so the levels are mid and far."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "af006a4cf20449b58390d222b3be6fce",
+			"seen": "The files of the lock (the job \"Models of World\" of 4814dd0), next to photos 0 and 1 (build/look/non_rong_vanh_mid.png): the woman with the light blue wide hat, a white top, and dark pants, as the look of the factory files of this order.",
+			"changed": "Nothing."
 		}
 	],
 	"hash": "af006a4cf20449b58390d222b3be6fce"

@@ -459,6 +459,13 @@
 			"hash": "92dbbc2521dea90872eae60f31cb8df7",
 			"seen": "6000 triangles: the same clipped dome, with a fine pattern of leaves over it, a lighter top and a dark foot. Next to a crop of photo 1 the leaves look as fine felt: the bushes of the photo show leaves of 3 cm to 5 cm with light edges, and a little bumpy outline. The first build of the near level stopped (HTTP 503: more memory than the edge has); the second built it.",
 			"changed": "Nothing: I build the near level one time."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "92dbbc2521dea90872eae60f31cb8df7",
+			"seen": "The files of the lock (the job \"Models of World\" of 4814dd0), next to photos 0 to 3 (build/look/bui_cay_tron_near.png): the same clipped dome of fine leaves as the look of the factory files of this order, the size and the green of the round bushes of the photos.",
+			"changed": "Nothing."
 		}
 	],
 	"hash": "92dbbc2521dea90872eae60f31cb8df7"
