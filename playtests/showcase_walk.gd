@@ -12,6 +12,11 @@ extends RefCounted
 # in game time, and the checks run at each physics step. The way along the sea
 # wall never turns back, and a hold of the joystick that does not take the
 # player on along the route counts as a stop (D-0026-01).
+# Report 0026, D-0026-04: the walk on the sea wall is one smooth surface from
+# the curb of the road to the parapet, with its tiles along its line: run 1
+# checks the length of the walk with its tiles along the line, the change of
+# the grade between two pieces, and casts rays down between the curb and the
+# walk (each hits the walk).
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=17:00 --quality=low
 # phase: --world=vung_tau --start-time=17:00 --quality=low
@@ -43,6 +48,15 @@ const HAI_AU := "way/790529523"
 const ON_JETTY := 60.0
 ## Higher than this over the ground (m), the player stands on a part, not on the ground.
 const MAX_OVER := 0.4
+## The walk on the sea wall (D-0026-04): the steepest grade along it, and the
+## largest change of the grade from one piece of 2 m to the next.
+const MAX_WALK_GRADE := 0.12
+const MAX_WALK_BEND := 0.08
+## The highest curb of the walk over the road (m). At the junction at (-196,
+## 428) the road of the data falls 0.8 m in 4 m (the junction keeps the height
+## of the other road: tools/geo/geodata/terrain.py, _profile), and the walk
+## stays smooth, 0.7 m over the road at its lowest point.
+const MAX_WALK_CURB := 0.75
 ## Lower than this under the ground or the deck (m), the player falls.
 const MAX_UNDER := 0.3
 ## The cells (m) of the tops of the walk on the sea wall.
@@ -70,6 +84,8 @@ func run(d: PlaytestDriver) -> void:
 	if not d.expect(length > 900.0, "the route is %.0f m long" % length):
 		return
 	d.expect(_backs.is_empty(), "the way along the sea wall of Hạ Long never turns back: %s" % str(_backs))
+	if d.phase == 1:
+		_check_walk_surface(d, w)
 	var jetty_start := length - ON_JETTY
 	var hai_au := _hai_au(w)
 	var hai_au_at := PlaytestDriver.route_distance(route, hai_au) if hai_au != Vector3.INF else -1.0
@@ -342,3 +358,62 @@ func _hai_au(w: VungTau) -> Vector3:
 		if str(entry.osm) == HAI_AU:
 			return entry.center
 	return Vector3.INF
+
+
+## Report 0026, D-0026-04: the walk on the sea wall of Hạ Long had its tiles on
+## the axes of the world (a jagged edge, steps in the pattern) and a strip of
+## bare ground between the curb of the road and the walk.
+func _check_walk_surface(d: PlaytestDriver, w: VungTau) -> void:
+	var lengths: Dictionary = w.showcase.lengths
+	var along := float(lengths.get("sea_walk_along", 0.0))
+	var all := float(lengths.get("sea_wall", 0.0))
+	d.expect(all > 100.0 and absf(along - all) < 1.0,
+			"the tiles of the walk on the sea wall follow its line: %.0f m of %.0f m" % [along, all])
+	var walk: PackedVector3Array = w.showcase.sea_walk
+	var road: PackedVector3Array = w.showcase.sea_road
+	var on: PackedByteArray = w.showcase.sea_walk_on
+	var grade := {"value": 0.0, "at": Vector3.ZERO}
+	var bend := {"value": 0.0, "at": Vector3.ZERO}
+	for i in range(1, walk.size() - 1):
+		if on[i - 1] == 0 or on[i] == 0 or on[i + 1] == 0:
+			continue
+		var g0 := (walk[i].y - walk[i - 1].y) / maxf(Vector2(walk[i].x - walk[i - 1].x, walk[i].z - walk[i - 1].z).length(), 0.1)
+		var g1 := (walk[i + 1].y - walk[i].y) / maxf(Vector2(walk[i + 1].x - walk[i].x, walk[i + 1].z - walk[i].z).length(), 0.1)
+		if absf(g1) > grade.value:
+			grade = {"value": absf(g1), "at": walk[i]}
+		if absf(g1 - g0) > bend.value:
+			bend = {"value": absf(g1 - g0), "at": walk[i]}
+	# The curb: the top of the walk over the ground at the edge of the road.
+	var curb := {"value": 0.0, "at": Vector3.ZERO}
+	for i in walk.size():
+		var edge := road[i] + Vector3(walk[i].x - road[i].x, 0.0, walk[i].z - road[i].z).normalized() * (Showcase.ROAD_INSIDE - 0.1)
+		if on[i] == 1 and walk[i].y - w.ground_height(edge.x, edge.z) > curb.value:
+			curb = {"value": walk[i].y - w.ground_height(edge.x, edge.z), "at": walk[i]}
+	d.step("the walk on the sea wall: the steepest grade %.3f at (%.0f, %.0f), the largest change of grade %.3f at (%.0f, %.0f), the highest curb %.2f m at (%.0f, %.0f)" % [
+			grade.value, grade.at.x, grade.at.z, bend.value, bend.at.x, bend.at.z, curb.value, curb.at.x, curb.at.z])
+	d.expect(curb.value <= MAX_WALK_CURB, "the walk on the sea wall is at most %.2f m over the road at the curb: %.2f m" % [MAX_WALK_CURB, curb.value])
+	d.expect(grade.value <= MAX_WALK_GRADE, "the walk on the sea wall is not steeper than %.2f: %.3f" % [MAX_WALK_GRADE, grade.value])
+	d.expect(bend.value <= MAX_WALK_BEND, "the grade of the walk on the sea wall changes by at most %.2f from piece to piece: %.3f at (%.0f, %.0f)" % [
+			MAX_WALK_BEND, bend.value, bend.at.x, bend.at.z])
+	# From the curb of the road to the middle of the walk, a ray down hits the walk.
+	var space := w.get_world_3d().direct_space_state
+	var tested := 0
+	var misses: Array[String] = []
+	for i in range(0, walk.size(), 3):
+		if i < 2 or i >= walk.size() - 2 or on[i - 2] == 0 or on[i] == 0 or on[i + 2] == 0:
+			continue
+		var side := Vector3(walk[i].x - road[i].x, 0.0, walk[i].z - road[i].z)
+		var reach := side.length()
+		side = side.normalized()
+		# The curb is ROAD_INSIDE m from the point of the road.
+		for k: float in [0.3, 1.0, 2.0]:
+			if Showcase.ROAD_INSIDE + k >= reach:
+				continue
+			var at := road[i] + side * (Showcase.ROAD_INSIDE + k)
+			var query := PhysicsRayQueryParameters3D.create(Vector3(at.x, walk[i].y + 3.0, at.z), Vector3(at.x, walk[i].y - 3.0, at.z))
+			var hit := space.intersect_ray(query)
+			tested += 1
+			if hit.is_empty() or not (hit.collider is Node) or (hit.collider as Node).name != "ShowcaseBody":
+				misses.append("(%.0f, %.0f)" % [at.x, at.z])
+	d.step("the walk on the sea wall from the curb: %d rays, %d miss the walk" % [tested, misses.size()])
+	d.expect(tested > 50 and misses.is_empty(), "the walk on the sea wall goes from the curb of the road: %s" % ", ".join(misses.slice(0, 10)))

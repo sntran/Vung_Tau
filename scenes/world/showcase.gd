@@ -26,6 +26,15 @@ const JUNCTION_MARGIN := 1.0
 const PASSAGE_MARGIN := 0.6
 ## The passage from the land goes to this point behind the shore end of the jetty (m).
 const JETTY_BEHIND := 5.0
+## The inner edge of the walk on the sea wall is this far in front of the curb of the road (m).
+const CURB_FRONT := 0.02
+## The walk on the sea wall is this much higher over the sidewalk of the road that it covers (m).
+const OVER_SIDEWALK_LIFT := 0.02
+## The way of the people goes on the road this far from the curb of the walk (m).
+const ROAD_INSIDE := 1.5
+## The steepest grade of the walk on the sea wall, and the passes of its smoothing.
+const WALK_GRADE := 0.09
+const WALK_SMOOTH_PASSES := 4
 ## The shortest piece of the walk on the sea wall (m).
 const SEA_WALK_MIN_RUN := 8.0
 ## Where two ways of the sea wall meet, their widths change over this length (m).
@@ -512,6 +521,10 @@ func _sea_wall(cfg: Dictionary) -> void:
 	var until_z := float(cfg.get("until_z", INF))
 	var color := str(cfg.get("color", "#77746c"))
 	var walk_color := str(cfg.get("walk_color", "#b9a68d"))
+	# The walk goes from the curb of the road: it covers the sidewalk of the road
+	# on the sea side (report 0026, D-0026-04: a strip of bare ground was between
+	# the road and the walk).
+	var over := RoadBuilder.SIDEWALK_WIDTH if bool(cfg.get("over_sidewalk", false)) else 0.0
 	var ids: Array[int] = []
 	for way: Variant in cfg.get("ways", []):
 		ids.append(int(way))
@@ -550,10 +563,11 @@ func _sea_wall(cfg: Dictionary) -> void:
 			flags.append(contains(at.x, at.z) and at.z <= until_z
 					and not _reaches_side(dense[i], sides[i] * sign, halves[i], at, others, walk / 2.0))
 		var on := _long_runs(dense, flags, SEA_WALK_MIN_RUN)
-		var tops := _walk_tops(dense, sides, halves, sign, walk)
+		var tops := _walk_tops(dense, sides, halves, sign, walk, over)
 		# The way of the people (PT-74).
 		for i in dense.size():
-			var road := _on_ground(dense[i] + sides[i] * sign * (halves[i] - 2.0))
+			# On the road, clear of the curb of the walk (the walk covers the sidewalk).
+			var road := _on_ground(dense[i] + sides[i] * sign * (halves[i] - maxf(2.0, over + ROAD_INSIDE)))
 			sea_road.append(road)
 			if on[i]:
 				var middle := dense[i] + sides[i] * sign * (halves[i] + walk / 2.0)
@@ -572,19 +586,27 @@ func _sea_wall(cfg: Dictionary) -> void:
 			while i < dense.size() and on[i]:
 				i += 1
 			var last := i - 1
+			var along := 0.0
 			for k in range(first, last):
 				var side0 := sides[k] * sign
 				var side1 := sides[k + 1] * sign
-				var e0 := dense[k] + side0 * halves[k]
-				var e1 := dense[k + 1] + side1 * halves[k + 1]
+				# The inner edge is 2 cm in front of the curb of the road, so that its
+				# face hides the curb.
+				var e0 := dense[k] + side0 * (halves[k] - over - (CURB_FRONT if over > 0.0 else 0.0))
+				var e1 := dense[k + 1] + side1 * (halves[k + 1] - over - (CURB_FRONT if over > 0.0 else 0.0))
 				e0.y = tops[k]
 				e1.y = tops[k + 1]
-				var o0 := e0 + side0 * walk
-				var o1 := e1 + side1 * walk
+				var o0 := dense[k] + side0 * (halves[k] + walk)
+				var o1 := dense[k + 1] + side1 * (halves[k + 1] + walk)
+				o0.y = tops[k]
+				o1.y = tops[k + 1]
 				# The face at the curb, from below the ground up to the walk.
 				var face := maxf(tops[k] - world.ground_height(e0.x, e0.z), tops[k + 1] - world.ground_height(e1.x, e1.z)) + 0.1
 				_wall(walk_color, e0 - Vector3(0, face, 0), e1 - Vector3(0, face, 0), face, -side0)
-				_top(walk_color, e0, e1, o0, o1)
+				var step := Vector2(e1.x - e0.x, e1.z - e0.z).length()
+				_top_along(walk_color, e0, e1, o0, o1, along, along + step, e0.distance_to(o0))
+				along += step
+				_add_length("sea_walk_along", step)
 				# The parapet at the outer edge of the walk.
 				_box_along(color, o0 - side0 * 0.15, o1 - side1 * 0.15, 0.15, 0.0, parapet)
 				# The face of stone from the walk down to the ground, then over the ground to the sea.
@@ -601,9 +623,9 @@ func _sea_wall(cfg: Dictionary) -> void:
 				if end == 0 or end == dense.size() - 1:
 					continue
 				var side := sides[end] * sign
-				var e := dense[end] + side * halves[end]
+				var e := dense[end] + side * (halves[end] - over)
 				e.y = tops[end]
-				var o := e + side * walk
+				var o := e + side * (walk + over)
 				var inward := (dense[mini(end + 1, last)] - dense[end]).normalized() if end == first \
 						else (dense[maxi(end - 1, first)] - dense[end]).normalized()
 				_box_along(color, e + inward * 0.15, o + inward * 0.15, 0.15, -0.15, parapet)
@@ -687,29 +709,52 @@ static func _long_runs(dense: PackedVector3Array, flags: Array[bool], min_length
 ## The height of the top of the walk at each point: 0.15 m over the ground at
 ## the curb, and over the ground under the walk, so that the ground does not
 ## come through it (report 0026, D-0026-04), then smoothed along the walk.
-func _walk_tops(dense: PackedVector3Array, sides: PackedVector3Array, halves: PackedFloat32Array, sign: float, walk: float) -> PackedFloat32Array:
+func _walk_tops(dense: PackedVector3Array, sides: PackedVector3Array, halves: PackedFloat32Array, sign: float, walk: float,
+		over := 0.0) -> PackedFloat32Array:
 	var raw := PackedFloat32Array()
+	var last := dense.size() - 1
 	for i in dense.size():
-		var e := dense[i] + sides[i] * sign * halves[i]
+		var e := dense[i] + sides[i] * sign * (halves[i] - over)
 		var high := world.ground_height(e.x, e.z)
 		# Across the walk, and halfway to the next point (the ground between the points).
-		var next := dense[mini(i + 1, dense.size() - 1)] + sides[mini(i + 1, dense.size() - 1)] * sign * halves[mini(i + 1, dense.size() - 1)]
+		var next := dense[mini(i + 1, last)] + sides[mini(i + 1, last)] * sign * (halves[mini(i + 1, last)] - over)
 		for t: float in [0.0, 0.5]:
 			var base := e.lerp(next, t)
-			for k: float in [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]:
-				var q := base + sides[i] * sign * minf(k, walk)
+			var k := 0.0
+			while k <= walk + over + 0.01:
+				var q := base + sides[i] * sign * minf(k, walk + over)
 				high = maxf(high, world.ground_height(q.x, q.z))
-		raw.append(high + LIFT + 0.15)
-	# Smooth: the mean of the points around, but never lower than the point.
-	var result := PackedFloat32Array()
-	for i in raw.size():
-		var total := 0.0
-		var n := 0
-		for k in range(maxi(0, i - 2), mini(raw.size(), i + 3)):
-			total += raw[k]
-			n += 1
-		result.append(maxf(total / n, raw[i]))
+				k += 0.5
+		# Over the sidewalk of the road (0.19 m over the ground) where the walk covers it.
+		raw.append(high + LIFT + 0.15 + (OVER_SIDEWALK_LIFT if over > 0.0 else 0.0))
+	# Smooth, but never lower than the point (report 0026, D-0026-04: where the
+	# road falls 0.8 m in 4 m, the walk had a step): the grade is at most
+	# WALK_GRADE, then the mean of the points around, a few times.
+	var result := raw.duplicate()
+	for pass_index in WALK_SMOOTH_PASSES:
+		result = _limit_grade(dense, result, WALK_GRADE)
+		var next := PackedFloat32Array()
+		for i in result.size():
+			var total := 0.0
+			var n := 0
+			for k in range(maxi(0, i - 2), mini(result.size(), i + 3)):
+				total += result[k]
+				n += 1
+			next.append(maxf(total / n, raw[i]))
+		result = next
 	return result
+
+
+## The values with the points raised so that the grade between two points of
+## the line is at most "grade" (a value is never lowered).
+static func _limit_grade(line: PackedVector3Array, values: PackedFloat32Array, grade: float) -> PackedFloat32Array:
+	for i in range(1, values.size()):
+		var run := Vector2(line[i].x - line[i - 1].x, line[i].z - line[i - 1].z).length()
+		values[i] = maxf(values[i], values[i - 1] - grade * run)
+	for i in range(values.size() - 2, -1, -1):
+		var run := Vector2(line[i + 1].x - line[i].x, line[i + 1].z - line[i].z).length()
+		values[i] = maxf(values[i], values[i + 1] - grade * run)
+	return values
 
 
 ## R7: a stand-in for each building of OSM in the area: its outline and its storeys.
@@ -1138,6 +1183,15 @@ func _top(color: String, a0: Vector3, a1: Vector3, b0: Vector3, b1: Vector3) -> 
 	_collision.append_array([a0, a1, b1, a0, b1, b0])
 
 
+## A face that looks up, with its texture along the line a0 to a1 (report 0026,
+## D-0026-04): v0 and v1 are the distances (m) of a0 and a1 along the line, and
+## "across" the distance (m) from the edge a to the edge b.
+func _top_along(color: String, a0: Vector3, a1: Vector3, b0: Vector3, b1: Vector3, v0: float, v1: float, across: float) -> void:
+	_mesh(color).quad(a0, a1, b1, b0, Vector3.UP,
+			PackedVector2Array([Vector2(0.0, v0), Vector2(0.0, v1), Vector2(across, v1), Vector2(across, v0)]))
+	_collision.append_array([a0, a1, b1, a0, b1, b0])
+
+
 ## A vertical face from the line a to b, "height" m high, that looks to "normal".
 func _wall(color: String, a: Vector3, b: Vector3, height: float, normal: Vector3) -> void:
 	var up := Vector3(0, height, 0)
@@ -1440,22 +1494,39 @@ func _texture_sets() -> Dictionary:
 
 ## The triangles of one color. A face is clockwise when seen from the side of
 ## its normal: the front of a face in Godot.
+## A face can have UVs in meters along a line (UV2.x = 1): the surface shader
+## then puts the texture along the line, not on the world axes.
 class _Mesh:
 	var vertices := PackedVector3Array()
 	var normals := PackedVector3Array()
+	var uvs := PackedVector2Array()
+	var flags := PackedVector2Array()
 
-	func quad(a: Vector3, b: Vector3, c: Vector3, d: Vector3, normal: Vector3) -> void:
+	func quad(a: Vector3, b: Vector3, c: Vector3, d: Vector3, normal: Vector3,
+			uv := PackedVector2Array()) -> void:
+		if uv.size() == 4:
+			triangle(a, b, c, normal, PackedVector2Array([uv[0], uv[1], uv[2]]))
+			triangle(a, c, d, normal, PackedVector2Array([uv[0], uv[2], uv[3]]))
+			return
 		triangle(a, b, c, normal)
 		triangle(a, c, d, normal)
 
-	func triangle(a: Vector3, b: Vector3, c: Vector3, normal: Vector3) -> void:
+	func triangle(a: Vector3, b: Vector3, c: Vector3, normal: Vector3, uv := PackedVector2Array()) -> void:
+		var flag := Vector2(1.0, 0.0) if uv.size() == 3 else Vector2.ZERO
+		if uv.size() != 3:
+			uv = PackedVector2Array([Vector2.ZERO, Vector2.ZERO, Vector2.ZERO])
 		# The cross product of a clockwise face points away from its front.
 		if (b - a).cross(c - a).dot(normal) > 0.0:
 			var t := b
 			b = c
 			c = t
+			var tu := uv[1]
+			uv[1] = uv[2]
+			uv[2] = tu
 		vertices.append_array([a, b, c])
 		normals.append_array([normal, normal, normal])
+		uvs.append_array(uv)
+		flags.append_array([flag, flag, flag])
 
 	func arrays() -> Variant:
 		if vertices.is_empty():
@@ -1464,4 +1535,6 @@ class _Mesh:
 		result.resize(Mesh.ARRAY_MAX)
 		result[Mesh.ARRAY_VERTEX] = vertices
 		result[Mesh.ARRAY_NORMAL] = normals
+		result[Mesh.ARRAY_TEX_UV] = uvs
+		result[Mesh.ARRAY_TEX_UV2] = flags
 		return result

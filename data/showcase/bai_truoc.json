@@ -498,6 +498,8 @@
 			"until_z": 560.0,
 			"width": 7.0,
 			"walk": 3.0,
+			"over_sidewalk": true,
+			"over_sidewalk_note": "The walk goes from the curb of the road to the parapet: it covers the sidewalk of the road on the sea side (2 m, scripts/geo/road_builder.gd). The photo of the sea wall of 2014 (ha_long_slope_2014.jpg) shows the paved walk from the parapet to the curb of the road, with no strip of ground (report 0026, D-0026-04).",
 			"walk_color": "#b9a68d",
 			"parapet": 0.6,
 			"color": "#77746c",
