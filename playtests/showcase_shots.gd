@@ -116,7 +116,7 @@ func run(d: PlaytestDriver) -> void:
 ## The eye of a shot: eye_height over the ground, or over the floor of a known place.
 static func eye_of(w: VungTau, shot: Dictionary) -> Vector3:
 	var eye := Vector3(float(shot.eye[0]), 0.0, float(shot.eye[1]))
-	w.prepare_at(eye, 400.0)
+	w.prepare_at(eye, maxf(400.0, float(VungTau.ground_detail.mid)))
 	var floor_y := w.places.floor_at(eye.x, eye.z) if w.places != null else -INF
 	eye.y = maxf(w.ground_height(eye.x, eye.z), floor_y) + float(shot.get("eye_height", 1.6))
 	return eye

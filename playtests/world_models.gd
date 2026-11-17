@@ -32,6 +32,14 @@ extends RefCounted
 # phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
@@ -65,7 +73,7 @@ const MAX_LEVEL_CHANGE := 0.12
 const SHEET_CELL := Vector2i(320, 180)
 ## The models of one phase, and the phases of one preset.
 const GROUP_SIZE := 2
-const GROUPS := 20
+const GROUPS := 24
 
 
 func run(d: PlaytestDriver) -> void:

@@ -13,6 +13,10 @@ uniform float clump_scale = 1.0;
 uniform float clump_scale_far = 1.0;
 uniform vec2 scale_range = vec2(400.0, 1600.0);
 uniform float height_scale_max = 100.0;
+// The cap of the height holds near (S1, 500 m) and fades out far away: from
+// Núi Nhỏ, the low clumps on Núi Lớn (3 km) left the ground between them
+// (PT-33: 54 % of the slopes with a crown color).
+uniform vec2 height_cap_range = vec2(900.0, 1600.0);
 uniform float fade_m = 60.0;
 // 0 is green, 1 is the driest.
 uniform float dryness = 0.0;
@@ -35,6 +39,8 @@ uniform float far_even = 0.75;
 // values as the far ground (shaders/terrain.gdshader).
 uniform vec3 far_haze_color : source_color = vec3(0.23, 0.38, 0.38);
 uniform vec2 far_haze_range = vec2(150.0, 650.0);
+// As the ground (shaders/terrain.gdshader): the haze fades out far away.
+uniform vec2 far_haze_fade = vec2(1500.0, 2500.0);
 uniform float far_haze = 0.58;
 uniform float far_haze_light = 1.0;
 
@@ -54,7 +60,7 @@ void vertex() {
 	// the clumps cover the hill as one canopy and do not stand on it as houses.
 	float grow = mix(clump_scale, clump_scale_far, smoothstep(scale_range.x, scale_range.y, distance_xz));
 	VERTEX.xz *= near * grow;
-	VERTEX.y *= near * min(grow, height_scale_max);
+	VERTEX.y *= near * min(grow, mix(height_scale_max, grow, smoothstep(height_cap_range.x, height_cap_range.y, distance_xz)));
 	float a = hash(origin.xz);
 	float b = hash(origin.xz + vec2(17.0, 5.0));
 	vec3 color = mix(leaf_dark, leaf_light, a);
@@ -72,7 +78,8 @@ void vertex() {
 	// The vertex color is the shade low on the crowns; far away, less of it (toward a
 	// mean shade of 0.8).
 	float shade = mix(COLOR.r, 0.8, 0.5 * far_even * smoothstep(far_range.x, far_range.y, distance_xz));
-	haze_part = far_haze * smoothstep(far_haze_range.x, far_haze_range.y, distance_xz);
+	haze_part = far_haze * smoothstep(far_haze_range.x, far_haze_range.y, distance_xz)
+			* (1.0 - smoothstep(far_haze_fade.x, far_haze_fade.y, distance_xz));
 	clump_color = color * shade * (1.0 - haze_part);
 }
 

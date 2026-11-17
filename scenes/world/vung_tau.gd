@@ -278,14 +278,21 @@ func prepare_at(point: Vector3, radius := 64.0, with_showcase := true) -> void:
 	_focus = point
 	if with_showcase and _showcase_wanted(point):
 		showcase.build_all()
+	# Each chunk in the radius at the detail that the world wants for it now: a
+	# near chunk with its patches, a mid chunk with its mid grid. (A near build of
+	# all chunks in the radius was built again at the mid detail after it; on
+	# High in CI a shot then waited more than 120 s for the ground, PT-76.)
+	_update_wanted()
 	for key: Vector2i in _chunks:
-		if _distance_to_chunk(key) > radius or _chunks[key].detail == Detail.NEAR:
+		var state: Dictionary = _chunks[key]
+		if _distance_to_chunk(key) > radius or state.busy or state.wanted == Detail.FAR \
+				or state.detail == state.wanted:
 			continue
-		_chunks[key].asked = Time.get_ticks_msec()
-		_chunks[key].busy = true
+		state.asked = Time.get_ticks_msec()
+		state.busy = true
 		_tasks += 1
-		_build_chunk(key, Detail.NEAR, _patch_strides(key))
-		_chunks[key].wanted = Detail.NEAR
+		var detail := int(state.wanted)
+		_build_chunk(key, detail, _patch_strides(key) if detail == Detail.NEAR else {})
 	while true:
 		_mutex.lock()
 		var left := _done.size()
@@ -573,7 +580,10 @@ func _process(delta: float) -> void:
 			if _chunks[key].fine:
 				BoulderBuilder.set_preset(_chunks[key].fine, ground_preset)
 	# After the first frame (report 0026, D-0026-12).
-	if _showcase_wanted(_focus) and Engine.get_frames_drawn() > 0:
+	# The steps of the showcase wait while the ground builds chunks: the loads
+	# of the models of World in other threads made the first ground of PT-33
+	# slower than 30 s in CI.
+	if _showcase_wanted(_focus) and Engine.get_frames_drawn() > 0 and _tasks == 0:
 		showcase.build_some(SHOWCASE_FRAME_MS)
 	_update_wanted()
 	_start_tasks()

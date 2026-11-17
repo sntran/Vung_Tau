@@ -154,7 +154,7 @@ static func crown_mesh() -> Mesh:
 	var tool := SurfaceTool.new()
 	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
 	# Darker than a crown of a clump: one crown has no shade of the other crowns on it.
-	_crown(tool, Vector3(0.0, 2.2, 0.0), Vector3(2.6, 2.0, 2.6), 0.55, 0.8)
+	_crown(tool, Vector3(0.0, 2.2, 0.0), Vector3(2.6, 2.0, 2.6), 0.4, 0.75)
 	tool.index()
 	return tool.commit()
 

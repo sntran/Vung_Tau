@@ -69,6 +69,10 @@ uniform float roof_far_even = 0.8;
 // far clumps of the hill trees (shaders/canopy.gdshader) take the same values.
 uniform vec3 far_haze_color : source_color = vec3(0.23, 0.38, 0.38);
 uniform vec2 far_haze_range = vec2(150.0, 650.0);
+// The haze fades out from far_haze_fade.x to .y m: there the fog of the world
+// covers the land, and the haze took the contrast of the crowns of Núi Lớn
+// from Núi Nhỏ (3 km, PT-33).
+uniform vec2 far_haze_fade = vec2(1500.0, 2500.0);
 uniform float far_haze = 0.58;
 // The light of the haze: 1 in the day, less in the twilight (VungTau sets it).
 uniform float far_haze_light = 1.0;
@@ -315,7 +319,8 @@ void fragment() {
 	// The haze is light that the air scatters, not a lit surface: an emission
 	// with the light of the hour, so that the warm sun of the golden hour does
 	// not make it olive.
-	float haze_part = far_haze * smoothstep(far_haze_range.x, far_haze_range.y, camera_distance) * (1.0 - under);
+	float haze_part = far_haze * smoothstep(far_haze_range.x, far_haze_range.y, camera_distance)
+			* (1.0 - smoothstep(far_haze_fade.x, far_haze_fade.y, camera_distance)) * (1.0 - under);
 	ALBEDO = color * (1.0 - haze_part);
 	EMISSION = far_haze_color * haze_part * far_haze_light;
 	ROUGHNESS = mix(roughness, 0.6, under);
