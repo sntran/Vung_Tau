@@ -110,6 +110,21 @@ func material_for(role: String, source: Material, paint := DEFAULT_PAINT, materi
 	return m
 
 
+## A kept material of a GLB that shows the colors at the points of its mesh,
+## when it has no image map (a sculpture from edits of data/world/drawings/).
+## A material with a map stays as it is: its map has the colors already.
+func with_vertex_colors(source: Material) -> Material:
+	var m := source as StandardMaterial3D
+	if m == null or m.albedo_texture != null or m.vertex_color_use_as_albedo:
+		return source
+	var key := "vertex/%d" % m.get_instance_id()
+	if not _cache.has(key):
+		var copy := m.duplicate() as StandardMaterial3D
+		copy.vertex_color_use_as_albedo = true
+		_cache[key] = copy
+	return _cache[key]
+
+
 ## The color of the game for a role, with no light (the impostor pictures and
 ## the MultiMesh colors use it).
 func color_of(role: String, material_set := "") -> Color:

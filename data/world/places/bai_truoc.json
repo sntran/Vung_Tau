@@ -168,6 +168,46 @@
 				5.05
 			],
 			"street": "Quang Trung"
+		},
+		{
+			"id": "bon_co_234797329",
+			"front": [
+				-77.85,
+				-292.75
+			],
+			"facing": [
+				0.6311,
+				0.7757
+			],
+			"front_middle_x": 0.0,
+			"box": [
+				-2.743,
+				2.743,
+				-12.45,
+				12.45
+			],
+			"street": "the walk of the sea",
+			"source": "The outline of OpenStreetMap way 234797329: its middle, and its long side as the facing; the model has its middle at its origin, so its box goes to both sides of the front (data/world/drawings/bon_co_234797329.json, D-0026-08)."
+		},
+		{
+			"id": "bon_co_234797330",
+			"front": [
+				-60.44,
+				-271.51
+			],
+			"facing": [
+				0.6324,
+				0.7747
+			],
+			"front_middle_x": 0.0,
+			"box": [
+				-2.7,
+				2.7,
+				-12.596,
+				12.596
+			],
+			"street": "the walk of the sea",
+			"source": "The outline of OpenStreetMap way 234797330: its middle, and its long side as the facing; the model has its middle at its origin, so its box goes to both sides of the front (data/world/drawings/bon_co_234797330.json, D-0026-08)."
 		}
 	]
 }

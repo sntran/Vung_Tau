@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
-"""Copies the open photos of the specs into docs/reference/photos/ (plan 0026, R17).
+"""Copies the open photos of the models into docs/reference/photos/ (plan 0026, R17).
 
     python tools/photos/photos.py            # get the open photos that are not there, and write the credits
     python tools/photos/photos.py --check    # no network: each open photo has its copy and its credit
     python tools/photos/photos.py --other DIR  # get the photos that are not open into DIR (not the repository)
 
-A photo is an entry of "photos" in data/world/specs/*.json and in
-data/showcase/shots.json: url (the page), image (the file to get, or the page
-for Wikimedia Commons), date, license, author, open, file, shows. An open photo
-(CC0, CC BY, CC BY-SA, public domain) is copied to docs/reference/photos/FILE,
-and docs/reference/photos/CREDITS.md lists its author, its license, its link,
-and its date. A photo that is not open stays a link: with --other, CI puts it
-in an artifact that it does not keep, so that the builder can look at it.
+A photo is an entry of "sources" in data/world/drawings/*.json (the models
+that this game makes with the tools of World, docs/world-models.md) and of
+"photos" in data/showcase/shots.json: url (the page), image (the file to get,
+or the page for Wikimedia Commons), date, license, author, open, file, shows.
+An open photo (CC0, CC BY, CC BY-SA, public domain) is copied to
+docs/reference/photos/FILE, and docs/reference/photos/CREDITS.md lists its
+author, its license, its link, and its date. A photo that is not open stays a
+link: with --other, CI puts it in an artifact that it does not keep, so that
+the builder can look at it. Its "file" (if it has one) is only its name in that
+folder (tools/world/drawings.py look --other), never a file of the repository.
 
 The workspace cannot reach upload.wikimedia.org, but it can reach the
 thumbnails of Commons through Special:FilePath; CI can reach both.
@@ -29,7 +32,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SPECS = ROOT / "data" / "world" / "specs"
+DRAWINGS = ROOT / "data" / "world" / "drawings"
 SHOTS = ROOT / "data" / "showcase" / "shots.json"
 OUT = ROOT / "docs" / "reference" / "photos"
 OPEN_LICENSES = re.compile(r"^(CC0|CC BY(-SA)? [0-9.]+|CC BY(-SA)?|public domain|PD)", re.IGNORECASE)
@@ -39,14 +42,14 @@ WIDTH = 1920  # a standard size of the thumbnails of Commons (other sizes get HT
 
 
 def photos() -> list[dict]:
-    """Each photo of the specs and the shots, with the file that names it."""
+    """Each photo of the drawings and the shots, with the file that names it."""
     result = []
-    files = sorted(SPECS.glob("*.json")) if SPECS.exists() else []
+    files = sorted(DRAWINGS.glob("*.json")) if DRAWINGS.exists() else []
     if SHOTS.exists():
         files.append(SHOTS)
     for path in files:
         data = json.loads(path.read_text(encoding="utf-8"))
-        entries = list(data.get("photos", []))
+        entries = list(data.get("photos", [])) + [s for s in data.get("sources", []) if isinstance(s, dict)]
         for shot in data.get("shots", []):
             entries.extend(shot.get("photos", []))
         for photo in entries:
@@ -67,8 +70,8 @@ def problems(photo: dict) -> list[str]:
         found.append(f"{where}: \"open\" is true, but the license \"{license_text}\" is not open")
     if photo.get("open") and not photo.get("file"):
         found.append(f"{where}: an open photo has no \"file\" in docs/reference/photos/")
-    if not photo.get("open") and photo.get("file"):
-        found.append(f"{where}: a photo that is not open cannot have a copy (\"file\")")
+    if not photo.get("open") and photo.get("file") and (OUT / str(photo["file"])).exists():
+        found.append(f"{where}: a photo that is not open cannot have a copy in docs/reference/photos/")
     if str(photo.get("shows", "")).strip().lower() in ("not looked at", "?"):
         found.append(f"{where}: nobody looked at the photo (\"shows\")")
     return found
@@ -102,7 +105,7 @@ def credits(open_photos: list[dict]) -> str:
     lines = [
         "# Reference photos",
         "",
-        "Copies of the open photos of the specs of World (`data/world/specs/`) and of the shots of plan 0026",
+        "Copies of the open photos of the models of this game (`data/world/drawings/`) and of the shots of plan 0026",
         "(R17). Made by `tools/photos/photos.py`; do not change by hand. Each photo keeps its license.",
         "",
         "| File | Author | License | Date | Link | Shows |",
@@ -132,7 +135,7 @@ def main() -> int:
                 found.append(f"{photo['_from']}: {photo['url']}: no copy docs/reference/photos/{photo['file']}")
         if (OUT / "CREDITS.md").exists() or open_photos:
             if not (OUT / "CREDITS.md").exists() or (OUT / "CREDITS.md").read_text(encoding="utf-8") != credits(open_photos):
-                found.append("docs/reference/photos/CREDITS.md does not agree with the specs: run tools/photos/photos.py")
+                found.append("docs/reference/photos/CREDITS.md does not agree with the drawings: run tools/photos/photos.py")
         for line in found:
             print(f"ERROR: {line}")
         print(f"{len(all_photos)} photos, {len(open_photos)} open, {len(found)} problems.")
@@ -146,7 +149,7 @@ def main() -> int:
         index = []
         for number, photo in enumerate(p for p in all_photos if not p.get("open")):
             url = image_url(photo)
-            name = f"{number:03d}.jpg"
+            name = str(photo.get("file") or f"{number:03d}.jpg")
             try:
                 (args.other / name).write_bytes(get(url))
                 index.append(f"{name}\t{photo['url']}\t{photo['_from']}")

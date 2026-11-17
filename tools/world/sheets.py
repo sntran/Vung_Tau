@@ -38,7 +38,7 @@ def main() -> int:
         sources = "".join(f"<li>{html.escape(s)}</li>" for s in receipt.get("sources") or [])
         rows.append(
             f"<section><h2>{html.escape(mid)}</h2>"
-            f"<p>Catalog {html.escape(model['catalog'])}. {html.escape(model['uses'])}</p>"
+            (f"<p>Catalog {html.escape(model['catalog'])}. " if model.get('catalog') else f"<p>Made by this game: {html.escape(str(model.get('drawing', '')))}. ") + f"{html.escape(model['uses'])}</p>"
             f"<p>Order: <code>{html.escape(json.dumps(model['order'], ensure_ascii=False))}</code>, "
             f"hash <code>{html.escape(receipt['hash'])}</code>.</p><ul>{sources}</ul>"
             f"<p>Rows: Low near, mid, far; High near, mid, far. Columns: front, side, three quarters. 12:00.</p>"

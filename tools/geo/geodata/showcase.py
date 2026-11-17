@@ -129,7 +129,7 @@ def make(config: dict, areas: list[tuple[str, dict, object]], roads, buildings: 
     # The raised lawns: the grass areas of the walk of the sea.
     planter_cfg = config.get("planters", {})
     planters = []
-    for osm in _ids(planter_cfg.get("osm", [])):
+    for osm in sorted(_ids(planter_cfg.get("osm", []))):
         for geometry in shapes([osm]):
             for part in getattr(geometry, "geoms", [geometry]):
                 if isinstance(part, Polygon) and not part.is_empty:
@@ -141,7 +141,7 @@ def make(config: dict, areas: list[tuple[str, dict, object]], roads, buildings: 
     beach = unary_union([g for _osm, (tags, g) in by_id.items() if tags.get("natural") == "beach" and g.intersects(near)])
     reach = float(wall_cfg.get("near_beach_m", 4.0))
     min_length = float(wall_cfg.get("min_length_m", 3.0))
-    for osm in _ids(wall_cfg.get("walks", [])):
+    for osm in sorted(_ids(wall_cfg.get("walks", []))):
         for geometry in shapes([osm]):
             for part in getattr(geometry, "geoms", [geometry]):
                 if not isinstance(part, Polygon) or beach.is_empty:

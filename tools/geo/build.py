@@ -39,8 +39,9 @@ SEA_ROCK_TAGS = {"rock", "reef", "bare_rock"}
 # scree areas, and cliff lines with CLIFF_ROCK_M on each side.
 LAND_ROCK_TAGS = {"scree"}
 CLIFF_ROCK_M = 6.0
-# tide.py writes these files before build.py runs. build.py keeps them.
-TIDE_FILES = ("tide.json", "tide_report.md")
+# tide.py and footprints.py write these files before build.py runs. build.py
+# keeps them.
+TIDE_FILES = ("tide.json", "tide_report.md", "footprints.json")
 BUILT_LANDUSE = {"residential", "commercial", "retail", "industrial", "construction", "military", "religious"}
 # A place where the roads cover more than this part of the ground (in a
 # Gaussian of TOWN_ROAD_SIGMA_M) is town.
@@ -321,7 +322,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
             near_point, lambda x, y: grid.sample(np.asarray(x), -np.asarray(y)), tops)
         log(f"{sum(len(v) for v in tree_record['types'].values())} trees: {tree_counts}")
 
-    # Write the files. Keep the files of tide.py.
+    # Write the files. Keep the files of tide.py and footprints.py.
     kept = {name: (out / name).read_bytes() for name in TIDE_FILES if (out / name).exists()}
     if out.exists():
         shutil.rmtree(out)

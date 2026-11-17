@@ -184,6 +184,10 @@ func _apply_materials(root: Node, level: String) -> bool:
 				push_error("WorldModel: the role \"%s\" of the model \"%s\" (%s level) has no material in %s." % [
 						role, id, level, WorldMaterials.PATH])
 				return false
+			# A sculpture of this game (data/world/drawings/) has the colors at its
+			# points: a kept material with no image map shows them.
+			if material == source and (mesh.surface_get_format(i) & Mesh.ARRAY_FORMAT_COLOR) != 0:
+				material = library.with_vertex_colors(material)
 			mesh_node.set_surface_override_material(i, material)
 	for node in root.find_children("*", "MultiMeshInstance3D", true, false):
 		var multi := node as MultiMeshInstance3D

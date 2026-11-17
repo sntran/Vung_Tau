@@ -73,6 +73,8 @@ var _lamps_set := false
 ## The lights of the street lamps (R14) and the colors of the heads that glow at night.
 var lamp_lights: Array[OmniLight3D] = []
 var glow_colors: Array[String] = []
+## The materials of the models of World that glow at night (the panes of a lamp).
+var glow_materials: Array[StandardMaterial3D] = []
 ## The openings of the low walls along the beach (R10): {at (Vector3), along (the
 ## direction of the wall)}.
 var wall_openings: Array[Dictionary] = []
@@ -154,6 +156,10 @@ func update_time(minutes: int) -> void:
 			m.emission_enabled = true
 			m.emission = Color(color)
 			m.emission_energy_multiplier = float(data.get("lamp_glow", 3.0)) if on else 0.0
+	for m in glow_materials:
+		m.emission_enabled = true
+		m.emission = Color("#ece8da")
+		m.emission_energy_multiplier = float(data.get("lamp_glow", 3.0)) if on else 0.0
 
 
 ## True when the point (x, z of the game) is in the area.
@@ -195,7 +201,7 @@ func _ground(path: String) -> void:
 		_add_length("paving_m2", float(areas.get("paving_m2", 0.0)))
 	var cfg: Dictionary = data.get("ground", {})
 	for planter: Dictionary in parsed.get("planters", []):
-		_planter(_points(planter.outline), cfg.get("planters", {}))
+		_planter(_points(planter.outline), cfg.get("planters", {}), str(planter.get("osm", "")))
 	for wall: Dictionary in parsed.get("walls", []):
 		var line := PackedVector3Array()
 		for point: Array in wall.points:
@@ -217,9 +223,13 @@ func ground_at(x: float, z: float) -> Color:
 ## R4: a raised lawn: a border of granite round its outline, "height" m over
 ## the ground at each corner (its top follows the slope of the walk), and the
 ## lawn inside the border.
-func _planter(ring: PackedVector2Array, cfg: Dictionary) -> void:
+func _planter(ring: PackedVector2Array, cfg: Dictionary, osm := "") -> void:
 	if ring.size() < 3:
 		return
+	# A raised lawn that is a model of World (D-0026-08) is at its place of
+	# data/world/places/: the stand-in keeps its collision and its seats only.
+	var model_id := str(cfg.get("models", {}).get(osm, ""))
+	var stand_in := model_id == "" or WorldModel.order(model_id).is_empty()
 	var h := float(cfg.get("height", 0.45))
 	var border := float(cfg.get("border", 0.25))
 	var color := str(cfg.get("color", "#aaa69c"))
@@ -234,7 +244,8 @@ func _planter(ring: PackedVector2Array, cfg: Dictionary) -> void:
 		var b_low := Vector3(b.x, world.ground_height(b.x, b.y) - 0.1, b.y)
 		var a_top := Vector3(a.x, top_of.call(a), a.y)
 		var b_top := Vector3(b.x, top_of.call(b), b.y)
-		_mesh(color).quad(a_low, b_low, b_top, a_top, out)
+		if stand_in:
+			_mesh(color).quad(a_low, b_low, b_top, a_top, out)
 		_collision.append_array([a_low, b_low, b_top, a_low, b_top, a_top])
 	# The top: the border ring and the lawn inside it.
 	var inner := Geometry2D.offset_polygon(ring, -border)
@@ -250,12 +261,15 @@ func _planter(ring: PackedVector2Array, cfg: Dictionary) -> void:
 			for n in 3:
 				var q := points[indices[k + n]]
 				t.append(Vector3(q.x, top_of.call(q) + lift, q.y))
-			_mesh(c).triangle(t[0], t[1], t[2], Vector3.UP)
+			if stand_in:
+				_mesh(c).triangle(t[0], t[1], t[2], Vector3.UP)
 			_collision.append_array([t[0], t[1], t[2]])
 	top.call(ring, color, 0.0)
 	if lawn.size() >= 3:
 		top.call(lawn, str(cfg.get("top_color", "#4f6e35")), 0.02)
 	_add_length("planter", 1.0)
+	if not stand_in:
+		_add_length("planter_models", 1.0)
 
 
 ## A flat face of the outline at the height y, that looks up.
@@ -1285,7 +1299,12 @@ func _lamp_row(cfg: Dictionary) -> void:
 		for i in run.size():
 			line.append(run[i] + sides[i] * offset)
 		for at: Array in _every(line, float(cfg.get("every_m", 30.0)), float(cfg.get("from_end_m", 8.0))):
-			_lamp(str(cfg.get("kind", "")), at[0], at[1])
+			# A model with a long arm turns it to its right side: over the way
+			# when the lamp is at the left of the way.
+			var along: Vector3 = at[1]
+			if bool(cfg.get("long_arm_over_way", false)) and sign > 0.0:
+				along = -along
+			_lamp(str(cfg.get("kind", "")), at[0], along)
 
 
 ## R9: the low lamps along the paths of the park, at alternate sides.
@@ -1323,6 +1342,10 @@ func _lamp(kind: String, at: Vector3, along: Vector3) -> void:
 		return
 	var base := at
 	base.y = maxf(at.y, world.ground_height(at.x, at.z))
+	var model_id := str(cfg.get("model", ""))
+	if model_id != "" and not WorldModel.order(model_id).is_empty():
+		_world_lamp(kind, model_id, cfg, base, along)
+		return
 	var h := float(cfg.get("height", 8.0))
 	var pole := str(cfg.get("pole_color", "#7fb3cf"))
 	var top := base + Vector3(0, h, 0)
@@ -1358,7 +1381,7 @@ func _lamp(kind: String, at: Vector3, along: Vector3) -> void:
 				_ball(head, ring + out * reach + Vector3(0, 0.1 + radius, 0), radius)
 			_ball(head, top + Vector3(0, radius, 0), radius)
 		"box_lamp":
-			# A low square lamp (the spec den_vuon_thap): a body of frosted panes
+			# A low square lamp (the stand-in of den_vuon_thap): a body of frosted panes
 			# (the head color: it glows at night) under a wider cap (the pole color).
 			var body := float(cfg.get("body", 0.32)) / 2.0
 			var cap := float(cfg.get("cap", 0.4)) / 2.0
@@ -1377,17 +1400,51 @@ func _lamp(kind: String, at: Vector3, along: Vector3) -> void:
 	# R14: the head glows at night, and a street lamp lights the ground.
 	if not glow_colors.has(head):
 		glow_colors.append(head)
+	_lamp_light(cfg, top)
+
+
+## R14: the light of a lamp of the kind (its "light"), at the top of the lamp.
+func _lamp_light(cfg: Dictionary, top: Vector3) -> void:
 	var light_cfg: Dictionary = cfg.get("light", {})
-	if not light_cfg.is_empty():
-		var light := OmniLight3D.new()
-		light.light_color = Color(str(light_cfg.get("color", "#FFD9A0")))
-		light.light_energy = float(light_cfg.get("energy", 1.5))
-		light.omni_range = float(light_cfg.get("range", 12.0))
-		light.shadow_enabled = false
-		light.position = top + Vector3(0, float(light_cfg.get("y", 0.0)), 0)
-		light.visible = false
-		add_child(light)
-		lamp_lights.append(light)
+	if light_cfg.is_empty():
+		return
+	var light := OmniLight3D.new()
+	light.light_color = Color(str(light_cfg.get("color", "#FFD9A0")))
+	light.light_energy = float(light_cfg.get("energy", 1.5))
+	light.omni_range = float(light_cfg.get("range", 12.0))
+	light.shadow_enabled = false
+	light.position = top + Vector3(0, float(light_cfg.get("y", 0.0)), 0)
+	light.visible = false
+	add_child(light)
+	lamp_lights.append(light)
+
+
+## A lamp that is a model of this game (data/world/drawings/, D-0026-08): at
+## its base, turned along the road. The surfaces of its role "glow_role" glow at
+## night (update_time()).
+func _world_lamp(kind: String, model_id: String, cfg: Dictionary, base: Vector3, along: Vector3) -> void:
+	var model := WorldModel.make(model_id)
+	if model == null:
+		return
+	var flat := Vector3(along.x, 0, along.z)
+	model.transform = Transform3D(Basis(Vector3.UP, atan2(flat.x, flat.z) if flat.length() > 0.01 else 0.0), base)
+	model.far_end = float(cfg.get("far_end_m", 0.0))
+	add_child(model)
+	model.apply_ranges()
+	var role := str(cfg.get("glow_role", ""))
+	if role != "":
+		for node in model.find_children("*", "MeshInstance3D", true, false):
+			var mesh_node := node as MeshInstance3D
+			for i in mesh_node.mesh.get_surface_count():
+				var source := mesh_node.mesh.surface_get_material(i)
+				var used := mesh_node.get_surface_override_material(i) as StandardMaterial3D
+				if source != null and source.resource_name == role and used != null and not glow_materials.has(used):
+					glow_materials.append(used)
+	_add_length("lamps", 1.0)
+	_add_length("world_lamps", 1.0)
+	var h := float(cfg.get("height", 0.7))
+	lamps.append({"kind": kind, "at": base, "height": h, "model": model_id})
+	_lamp_light(cfg, base + Vector3(0, h, 0))
 
 
 ## The point on the ground.

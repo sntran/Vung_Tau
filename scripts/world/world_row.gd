@@ -6,10 +6,11 @@ extends Node3D
 ## add() puts a model with its transform, its paint, and its pose. build()
 ## groups the models in cells of CELL meters. Each cell has a MultiMesh for
 ## each mesh of the near level and of the mid level, and one MultiMesh of
-## cards for the impostor (tools/world/impostors.py). The visibility ranges
-## of the cells come from the quality preset (WorldModel.ranges): the near
-## level to ranges.x, the mid level to ranges.y, then the impostor to
-## ranges.z.
+## cards for the impostor (tools/world/impostors.py). A model with no
+## impostor (a piece of a wall) has its far level in place of the cards. The
+## visibility ranges of the cells come from the quality preset
+## (WorldModel.ranges): the near level to ranges.x, the mid level to
+## ranges.y, then the impostor (or the far level) to ranges.z.
 
 const CELL := 6.0
 const IMPOSTORS := "res://assets/world/impostors.json"
@@ -76,7 +77,10 @@ func _build_cell(key: Vector2i, items: Array) -> void:
 		template.set_pose(_rest_pose(template))
 		template.set_pose(item.pose)
 		var local_at := Transform3D(item.at.basis, item.at.origin - center)
-		for level: String in ROW_LEVELS:
+		var levels := ROW_LEVELS.duplicate()
+		if impostor_values(item.id).is_empty():
+			levels.append("far")
+		for level: String in levels:
 			var level_node := template.level(level)
 			if level_node == null:
 				continue
@@ -93,7 +97,8 @@ func _build_cell(key: Vector2i, items: Array) -> void:
 		var node := _multimesh_node(batch.mesh, batch.transforms, batch.colors)
 		node.name = batch_key.replace("/", "_")
 		cell.add_child(node)
-		entry[batch.level].append(node)
+		# The far level of a model with no impostor takes the range of the cards.
+		entry["impostor" if batch.level == "far" else batch.level].append(node)
 	# The impostor: one card for each model.
 	var by_model := {}
 	for item: Dictionary in items:

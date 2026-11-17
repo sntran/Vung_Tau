@@ -1,7 +1,7 @@
 name: Reference photos
 
 # Plan 0026, R17. Copies the open photos (CC0, CC BY, CC BY-SA, public domain)
-# of the specs of World (data/world/specs/) and of the shots of the showcase
+# of the models of this game (data/world/drawings/) and of the shots of the showcase
 # into docs/reference/photos/, with CREDITS.md, and commits them to the branch
 # that it runs on with the message "Update the reference photos". The
 # workspace cannot reach upload.wikimedia.org; CI can. The photos that are not
@@ -11,7 +11,7 @@ name: Reference photos
 on:
   workflow_dispatch:
   push:
-    paths: ["data/world/specs/**", "data/showcase/shots.json", "tools/photos/**"]
+    paths: ["data/world/drawings/**", "data/showcase/shots.json", "tools/photos/**"]
 
 permissions:
   contents: write

@@ -1,0 +1,114 @@
+{
+	"id": "den_cot_den_cau",
+	"what": "đèn cột đen cầu trắng: the dark post of the park with five white globes",
+	"way": "blueprint",
+	"status": "Source",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026, R9: the lamps of the paths of the park (the kind globe_post of data/showcase/bai_truoc.json).",
+	"order": {
+		"blueprint": {
+			"file": "data/world/blueprints/den_cong_vien.json"
+		},
+		"options": {
+			"kind": "den_cau",
+			"paint": "#3a3d3c",
+			"post": 3.6
+		}
+	},
+	"sources": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(1).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_flower_bed_2014.jpg",
+			"shows": "The park in the morning: a round flower bed with a ring of red leaves and low yellow green plants in it, a low square white lamp, clipped hedges and round clipped bushes, painted cat sculptures, frangipani trees, coconut palms, a black post with white globes, a blue lamp pole far away."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(2).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_paths_2014.jpg",
+			"shows": "The park in the morning: a path of tiles with a granite curb, a low square white lamp at its side, two women on the path, a granite bench, clipped hedges along the paths, round clipped bushes, granite balls on the lawn, frangipani trees, a black post with white globes, raised lawns and coconut palms."
+		},
+		{
+			"url": "https://www.flickr.com/photos/10598985@N07/27942036338/",
+			"image": "https://live.staticflickr.com/832/27942036338_ab67d8172b_b.jpg",
+			"date": "2018-03-08",
+			"license": "all rights reserved",
+			"author": "Flickr user 10598985@N07",
+			"open": false,
+			"file": "flickr_27942036338.jpg",
+			"shows": "The park under frangipani trees: a dark grey post with five white globes near the left edge (its frame, its brackets and the ring on the post), a second post far away by the path with a woman beside it, paths of red tiles, granite benches, low square white lamps."
+		}
+	],
+	"sizes": {
+		"height": {
+			"value": 4.3,
+			"unit": "m",
+			"source": "Photo 2 (2018): the far post is 235 px from its foot to the top of its top globe, and the woman beside it is 90 px (1.6 m), her feet on the same line: 4.2 m. Photo 1 (2014): 143 px against a woman of 1.58 m of 131 px at the same distance (corrected for the distance): 4.3 m."
+		},
+		"post": {
+			"value": "the cross of the frame at 3.6 m; the post 0.12 m to 0.09 m wide",
+			"unit": "",
+			"source": "Photo 2, the near post: the cross is 35 px under the side globes and the top globe is 48 px over them, at 0.0069 m/px (a globe, 55 px for 0.38 m): the top of the top globe is 0.70 m over the cross. The post is 15 px (0.10 m)."
+		},
+		"base": {
+			"value": "0.28 m wide, 0.60 m high, wider at its foot",
+			"unit": "",
+			"source": "Photo 2: the far post has a wider foot of 40 px of its 235 px (0.7 m); photo 1: 20 px of 143 px (0.6 m). The width: the near post of photo 2, about 2.5 times the post."
+		},
+		"globes": {
+			"value": "five globes of 0.38 m: four round the top, 0.45 m out, and one on the top, 0.33 m higher",
+			"unit": "",
+			"source": "Photo 2, the near post: a globe is 55 px; the side globes are 65 px and 67 px from the post (0.45 m) and 48 px under the top globe (0.33 m). The far post: 20 px for a globe (0.36 m)."
+		},
+		"frame": {
+			"value": "a cross of bars under the side globes, with curved brackets down to the post",
+			"unit": "",
+			"source": "Photo 2, the near post (crop at full size). The thickness of the bars: estimate (no source)."
+		},
+		"ring": {
+			"value": "a ring on the post 0.55 m under the cross",
+			"unit": "",
+			"source": "Photo 2, the near post: a wider ring 60 px to 75 px under the cross."
+		},
+		"colors": {
+			"value": "the post #3a3d3c, the globes #efeee8",
+			"unit": "",
+			"source": "Photo 2: the median of the post is #4e4f4e in the light; photos 0 and 1: near black in the shade. White glass."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "4c43611af3bb0ed623c9f5c78c94fd6f",
+			"seen": "Next to photo 2 (2018): five globes (four round the top, one 0.33 m higher), the cross of the frame with its brackets, the slim post, the wider foot. The proportions are as the near post of the photo.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "4c43611af3bb0ed623c9f5c78c94fd6f",
+			"seen": "As the mid level, with the necks of the globes and the ring on the post.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "none",
+			"hash": "be160c87ca6f63435a567715f1487600",
+			"seen": "The same edits of this kind. The blueprint den_cong_vien changed in the kind hai_tay only, so the order of this kind has a new hash.",
+			"changed": "Nothing."
+		}
+	],
+	"hash": "be160c87ca6f63435a567715f1487600"
+}

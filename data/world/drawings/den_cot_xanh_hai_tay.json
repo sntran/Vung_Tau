@@ -1,0 +1,154 @@
+{
+	"id": "den_cot_xanh_hai_tay",
+	"what": "đèn cột xanh hai tay: the blue lamp pole of the park and the walk of the sea, with a long arm and a short arm at the top",
+	"way": "blueprint",
+	"status": "Source",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026, R9: the lamp poles of the sidewalk of the park and of the walk of the sea (lamp_rows of data/showcase/bai_truoc.json, the kind blue_double), about 36 m apart.",
+	"order": {
+		"blueprint": {
+			"file": "data/world/blueprints/den_cong_vien.json"
+		},
+		"options": {
+			"kind": "hai_tay",
+			"paint": "#2f6aa8",
+			"junction": 10.6
+		}
+	},
+	"sources": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:V%C5%A9ng_T%C3%A0u,_Ba_Ria_-_Vung_Tau,_Vietnam_-_panoramio_(5).jpg",
+			"date": "2014-03-09",
+			"license": "CC BY-SA 3.0",
+			"author": "Lam Tr Th",
+			"open": true,
+			"file": "park_blue_lamp_2014.jpg",
+			"shows": "The walk of the park by the low wall of the beach: a blue lamp pole near, with its two arms at the top (a long arm to the right with the head, a short arm to the left), a white globe on a curved arm and a horn speaker at about half its height, a woman and a child near it."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Vung_Tau,_Viet_Nam_2021.jpg",
+			"date": "2021-01-30",
+			"license": "CC BY-SA 4.0",
+			"author": "Tuong Lam Photos",
+			"open": true,
+			"file": "drone_2021_park.jpg",
+			"shows": "From a drone over the south end of Bãi Trước, to the north: Khách sạn Bưu điện (12 storeys) with its pool, Cảng vụ, Quang Trung with the median of Norfolk pines and the curb of red and white bands, the square of the south end of the park with Norfolk pines and flags, the walk of the sea with the low wall, the boats of the bay, Núi Lớn."
+		},
+		{
+			"url": "https://www.flickr.com/photos/146662501@N05/32629550372/",
+			"image": "https://live.staticflickr.com/329/32629550372_e14774cd67_b.jpg",
+			"date": "2017-02-01",
+			"license": "all rights reserved",
+			"author": "Flickr user 146662501@N05",
+			"open": false,
+			"file": "flickr_32629550372.jpg",
+			"shows": "The walk of the sea of Bãi Trước to the south: a light blue pole with a globe on a curved arm, the low square white lamps along the hedge, the high plain wall to the sand."
+		},
+		{
+			"url": "https://tuoitre.vn/vung-tau-sau-30-nam-thanh-lap-thu-ngan-sach-gap-gan-300-lan-20211230155102555.htm",
+			"image": "https://cdn.tuoitre.vn/2021/12/30/logo-du-khach-30-4-2019-20-1640854141848374700459.jpg",
+			"date": "2019-04-30 (in the file name of the photo)",
+			"license": "all rights reserved",
+			"author": "Tuổi Trẻ",
+			"open": false,
+			"file": "tuoitre_2019_lamp.jpg",
+			"shows": "Bãi Trước full of people at the end of the afternoon, to the south. Near the left edge, a light blue pole (crop at full size): a short spike with a small ball over the arms, a long arm to the right and a short arm to the left, each of two bars that curve up to a closed end, a long flat head on the long arm, a stay wire from the spike to the end of each arm, a white globe on a straight arm at the left, and a box with a horn on the pole at the same height."
+		}
+	],
+	"sizes": {
+		"junction": {
+			"value": 10.6,
+			"unit": "m",
+			"source": "Photo 0 (2014): the pole is 660 px from its foot to the arms, and the woman beside it is 70 px (1.6 m) at the same distance (her feet and the foot of the pole on the same line of the walk): 10.6 m with the base. Photo 3 (2019): from the globe to the arms is 357 px, and the globe is 24 px (0.31 m, below): 4.6 m; with the globe at 5.9 m, the arms are at 10.5 m."
+		},
+		"pole": {
+			"value": "0.20 m wide at its foot, 0.11 m under the arms",
+			"unit": "",
+			"source": "Photo 0: 13 px near its foot and 7 px under the arms, at the scale of the woman (0.36 m of shoulders is 22 px). Photo 3: 10 px at the middle (0.13 m)."
+		},
+		"base": {
+			"value": "0.30 m wide, 0.50 m high",
+			"unit": "",
+			"source": "estimate (no source): the hedge hides the foot in photos 0 and 2."
+		},
+		"spike": {
+			"value": "1.25 m over the arms, with a ball of 0.10 m",
+			"unit": "",
+			"source": "Photo 3 (crop at full size): 100 px over the arms at 0.0128 m/px (the globe, 24 px for 0.31 m): 1.28 m."
+		},
+		"long_arm": {
+			"value": "2.0 m out, the end 0.75 m to 0.92 m over the arms",
+			"unit": "",
+			"source": "Photo 3: 145 px out and 65 px up (1.86 m and 0.83 m at 0.0128 m/px); photo 0: 100 px out at the scale of the globe (19 px for 0.31 m): 1.63 m. The arm is a little away from the plane of the photos: 2.0 m."
+		},
+		"short_arm": {
+			"value": "0.85 m out, the end 0.12 m to 0.28 m over the arms",
+			"unit": "",
+			"source": "Photo 3: 55 px (0.73 m); photo 0: 50 px (0.82 m)."
+		},
+		"arm_bars": {
+			"value": "two bars 0.20 m apart at the pole, 0.05 m thick",
+			"unit": "",
+			"source": "Photo 0 (crop at full size): the bars of the short arm are 12 px apart (0.20 m at the scale of the globe). The thickness: estimate (no source)."
+		},
+		"head": {
+			"value": "0.60 m long, 0.24 m wide, 0.10 m thick, along the long arm at 1.45 m",
+			"unit": "",
+			"source": "Photos 0 and 3: a long flat light grey head between the bars of the long arm, from about 1.1 m to 1.8 m. The width and the thickness: estimate (no source). Photos 0 and 3 show no head on the short arm."
+		},
+		"globe": {
+			"value": "0.32 m, its center at 5.9 m and 0.82 m out",
+			"unit": "",
+			"source": "Photo 0: 19 px across (0.31 m at the scale of the woman), 330 px under the arms, 0.9 m left of the pole. Photo 3: 24 px, 60 px left of the pole (0.77 m)."
+		},
+		"globe_arm": {
+			"value": "from the pole at 5.0 m to under the globe",
+			"unit": "",
+			"source": "Photo 0: it leaves the pole 0.85 m under the globe; photo 3: 73 px (0.93 m) under the globe."
+		},
+		"speaker": {
+			"value": "a horn of 0.32 m at its mouth, 0.24 m long, on the side of the long arm at 5.6 m",
+			"unit": "",
+			"source": "Photo 0: the mouth is as wide as the globe, right of the pole, a little under the globe. Photo 3 shows a box with a horn at the same height."
+		},
+		"stays": {
+			"value": "from the top of the spike to the end of each arm",
+			"unit": "",
+			"source": "Photo 3 (crop at full size); photo 0 shows the stay of the left arm."
+		},
+		"colors": {
+			"value": "the pole and the arms #2f6aa8, the head and the globe #e3e4dc, the horn #e8e8e2",
+			"unit": "",
+			"source": "The median of the pixels of the pole: photo 0 (sun) #2b68a5, photo 2 (2017, shade) #0f366d, photo 3 (2019, evening) #2c5785; the paint is #2f6aa8. The globe: white glass (photos 0 and 3)."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "19894581d96a1a7bb8d56509f3817148",
+			"seen": "Next to photos 0 and 3 (crops at full size): the loop arms, the spike, the head on the long arm, the globe on its arm and the horn are as the photos. The front view of the model is the back of the photos (the long arm is to +x).",
+			"changed": "The near level did not build: the order needed more memory than the factory has (one sculpture of 12 m with cells of 1 cm). A version in three parts built each part, but not all three together. Now one part with cells of 1.5 cm at the near level, and stays of 2.4 cm."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "f7b3a08f9256dd077631e9bb121e3b6f",
+			"seen": "As the look before.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "f7b3a08f9256dd077631e9bb121e3b6f",
+			"seen": "Next to the crop of photo 3 (2019): the ball on the spike, the stays to the end of each arm, the two bars of each arm that curve up to a closed end, the head between the bars of the long arm.",
+			"changed": "Nothing."
+		}
+	],
+	"hash": "f7b3a08f9256dd077631e9bb121e3b6f"
+}

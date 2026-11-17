@@ -44,7 +44,7 @@ func run(d: PlaytestDriver) -> void:
 	var models: Array[Dictionary] = w.showcase.models
 	d.expect(models.size() == data.size(), "each place has its model: %d of %d" % [models.size(), data.size()])
 	d.step("the parts of the showcase (m, or a count): %s" % [w.showcase.lengths])
-	_check_specs(d, w)
+	_check_models(d, w)
 	_check_hill_side(d, w)
 	for kind: String in ["median", "sidewalk", "path_border", "wall", "sea_wall", "stand_ins", "lawn_m2", "paving_m2",
 			"planter", "beach_wall", "median_trees", "lamps", "path_lamps"]:
@@ -193,28 +193,33 @@ func _check_hill_side(d: PlaytestDriver, w: VungTau) -> void:
 	d.expect(missing.is_empty(), "each footprint near Hạ Long has a stand-in or waits for its storeys with a reason: %s" % ", ".join(missing))
 
 
-## Report 0026, D-0026-08: each plain part of the showcase (a stand-in of the
-## game for a model of World: the lamps, the borders of the raised lawns, the
-## low wall of the beach, the sea wall of Hạ Long) names its spec, and the spec
-## is in data/world/specs/.
-func _check_specs(d: PlaytestDriver, w: VungTau) -> void:
+## Report 0026, D-0026-08 and D-0026-09: each plain part of the showcase (the
+## lamps, the raised lawns, the low wall of the beach, the sea wall of Hạ Long)
+## names the model that I make for it with the tools of World, and the model is
+## in data/world/drawings/. The game shows the model when its order is in
+## data/world/orders.json, and a stand-in until then.
+func _check_models(d: PlaytestDriver, w: VungTau) -> void:
 	var data: Dictionary = w.showcase.data
 	var named: Array[String] = []
 	for kind: String in data.get("lamp_kinds", {}):
 		if kind != "note":
-			named.append(str(data.lamp_kinds[kind].get("spec", "lamp " + kind)))
-	named.append(str(data.ground.planters.get("spec", "the raised lawns")))
+			named.append(str(data.lamp_kinds[kind].get("model", "lamp " + kind)))
+	for id: Variant in data.ground.planters.get("models", {"the raised lawns": "the raised lawns"}).values():
+		named.append(str(id))
 	for wall: Dictionary in data.get("walls", []):
-		named.append(str(wall.get("spec", "the low wall")))
+		named.append(str(wall.get("model", "the low wall")))
 	for wall: Dictionary in data.get("sea_walls", []):
-		for spec: String in wall.get("specs", ["the sea wall"]):
-			named.append(spec)
+		for id: String in wall.get("models", ["the sea wall"]):
+			named.append(id)
 	var missing: Array[String] = []
-	for spec in named:
-		if not FileAccess.file_exists("res://data/world/specs/%s.json" % spec):
-			missing.append(spec)
-	d.step("the plain parts and their specs: %s" % ", ".join(named))
-	d.expect(missing.is_empty(), "each plain part of the showcase names its spec in data/world/specs/: %s" % ", ".join(missing))
+	var used: Array[String] = []
+	for id in named:
+		if not FileAccess.file_exists("res://data/world/drawings/%s.json" % id):
+			missing.append(id)
+		elif not WorldModel.order(id).is_empty():
+			used.append(id)
+	d.step("the plain parts and their models: %s; in the game as models of World: %s" % [", ".join(named), ", ".join(used)])
+	d.expect(missing.is_empty(), "each plain part of the showcase names its model in data/world/drawings/: %s" % ", ".join(missing))
 
 
 ## Q10: the ghe of World in the bay, near (its mid level) and far (its far level).

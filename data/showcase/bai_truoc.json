@@ -349,7 +349,11 @@
 			"border": 0.25,
 			"color": "#aaa69c",
 			"top_color": "#4f6e35",
-			"spec": "vien_bon_co"
+			"models": {
+				"way/234797329": "bon_co_234797329",
+				"way/234797330": "bon_co_234797330"
+			},
+			"models_note": "The raised lawns that are models of data/world/drawings/ (D-0026-08), at their places of data/world/places/bai_truoc.json: the stand-in keeps only its collision and the seats of the sitters."
 		},
 		"beach_wall": {
 			"walks": [
@@ -482,7 +486,7 @@
 			"opening_m": 2.4,
 			"color": "#b3ada1",
 			"note": "The low wall of granite blocks between the walk of the sea and the beach (R4): a base, square posts, and a top rail with gaps under it, as in the photo of S5 (2014, Wikimedia Commons, Lam Tr Th, CC BY-SA 3.0). The sizes are by eye from the photo. R10: an opening to the sand of one span (opening_m) in the middle of each opening_every_m of the wall, so that people go down to the beach (PT-35, PT-75): builder values (status check), as I found no photo of the places of the steps.",
-			"spec": "tuong_bai_tam"
+			"model": "tuong_bai_tam"
 		}
 	],
 	"sea_walls": [
@@ -502,7 +506,7 @@
 			"parapet": 0.6,
 			"color": "#77746c",
 			"note": "The walk on the sea side of Hạ Long and the sea wall of stone blocks under it, from Quang Trung to Cầu Đá (R4, R6; photos of trungydang, 2014).",
-			"specs": [
+			"models": [
 				"lan_can_ha_long",
 				"tru_lan_can_ha_long",
 				"ke_ha_long"
@@ -527,7 +531,7 @@
 				"pyramid_roof": 6.2,
 				"roof_color": "#c8704a",
 				"name": "The hall with the roof of orange tiles by Hạ Long",
-				"source": "The shot S1 (Commons, trungydang, 2014-04-05, CC BY 3.0): the front of 19 m is 710 px, the walls 145 px (3.9 m), the pyramid roof 230 px (6.2 m); the drone photo of 2021-01-30 (Tuong Lam Photos, CC BY-SA 4.0) and the photo of 2019-04-30 (Tuổi Trẻ) show the same roof. The spec nha_mai_ngoi_cam.",
+				"source": "The shot S1 (Commons, trungydang, 2014-04-05, CC BY 3.0): the front of 19 m is 710 px, the walls 145 px (3.9 m), the pyramid roof 230 px (6.2 m); the drone photo of 2021-01-30 (Tuong Lam Photos, CC BY-SA 4.0) and the photo of 2019-04-30 (Tuổi Trẻ) show the same roof. The model nha_mai_ngoi_cam of data/world/drawings/.",
 				"status": "Source"
 			},
 			"way/580493843": {
@@ -556,8 +560,8 @@
 			},
 			"way/790529523": {
 				"storeys": 6,
-				"name": "Khách sạn Hải Âu (until World builds the spec khach_san_hai_au)",
-				"source": "The photo of Hải Âu (Commons, trungydang, 2014-04-05, CC BY 3.0): the middle block has a ground floor and five storeys (the wings have five storeys). The spec khach_san_hai_au.",
+				"name": "Khách sạn Hải Âu (until the model khach_san_hai_au of data/world/drawings/ is in the game)",
+				"source": "The photo of Hải Âu (Commons, trungydang, 2014-04-05, CC BY 3.0): the middle block has a ground floor and five storeys (the wings have five storeys). The model khach_san_hai_au of data/world/drawings/.",
 				"status": "Source"
 			},
 			"way/200554626": {
@@ -582,7 +586,7 @@
 			"way/225803467": {
 				"storeys": 7,
 				"name": "Cao ốc Sen Biển (the Lotus Tower), its stepped block",
-				"source": "The shot S1 (Commons, trungydang, 2014-04-05, CC BY 3.0): the stepped block of blue and white bands is 135 px high at 574 m, and Khách sạn Bưu điện (12 storeys, about 40 m) 255 px at 511 m: about 24 m, 7 storeys. The photo of 2019-04-30 (Tuổi Trẻ) shows the same block. Its tower of glass (about 46 m) is not in the stand-in: it waits for a spec.",
+				"source": "The shot S1 (Commons, trungydang, 2014-04-05, CC BY 3.0): the stepped block of blue and white bands is 135 px high at 574 m, and Khách sạn Bưu điện (12 storeys, about 40 m) 255 px at 511 m: about 24 m, 7 storeys. The photo of 2019-04-30 (Tuổi Trẻ) shows the same block. Its tower of glass (about 46 m) is not in the stand-in: it waits for a model of data/world/drawings/",
 				"status": "Source"
 			}
 		},
@@ -668,7 +672,7 @@
 		"note": "R5: basket boats (thúng chai) on the sand at the south end of the beach, above the water line: x, z, and the turn in degrees. The landing of the boats of Bãi Trước (Tuổi Trẻ, 2017-08-02) and two thúng chai on the beach on 2019-01-24 (Flickr, Ted McGrath). Their places are a guess (plan 0026, Q3). A point with ground lower than min_ground (m) has no boat."
 	},
 	"lamp_kinds": {
-		"note": "R9: the lamps of the photos, as stand-ins until World has them (request Q-W5). The sizes are by eye from the photos. R14: at night (DayLight.lamps_on()), the heads glow (lamp_glow) and each kind with \"light\" lights the ground. The warm color is the color of the lamps of the photo of S5 at dusk (2015). Each kind names its spec of data/world/specs/ (\"spec\", report 0026, D-0026-08): the stand-in takes the values of the spec with the status Source (the height, the colors, the globes); its other values stay builder values until World builds the model.",
+		"note": "R9: the lamps of the park and of Quang Trung. Each kind names its model (\"model\": data/world/drawings/ID.json, a lamp of the blueprint den_cong_vien that I make with the tools of World, report 0026, D-0026-09). The game shows the model when its order is in data/world/orders.json; until then, it shows a stand-in from the other values of the kind. R14: at night (DayLight.lamps_on()), the surfaces of the role glow_role of a model glow (the head of a stand-in), and each kind with \"light\" lights the ground. The warm color is the color of the lamps of the photo of S5 at dusk (2015).",
 		"blue_double": {
 			"shape": "arms",
 			"height": 10.6,
@@ -684,15 +688,16 @@
 			],
 			"pole_color": "#2f6aa8",
 			"head_color": "#e9e8e2",
-			"note": "A blue pole with a frame of two arms and a head at each end (the spec den_cot_xanh_hai_tay: 10.9 m to the top of the frame, #2f6aa8).",
+			"note": "The blue pole with a long arm and a short arm at the top, a globe and a horn at the middle (the model den_cot_xanh_hai_tay: the arms at 10.6 m). The values of the stand-in follow it.",
 			"light": {
 				"color": "#FFC982",
 				"energy": 1.6,
 				"range": 17.0,
 				"y": 0.4,
-				"note": "The lamp is 10.6 m high (the spec den_cot_xanh_hai_tay): a range of 17 m makes a pool of light of about 13 m on the ground (PT-76)."
+				"note": "The arms of the lamp are at 10.6 m (the model den_cot_xanh_hai_tay): a range of 17 m makes a pool of light of about 13 m on the ground (PT-76)."
 			},
-			"spec": "den_cot_xanh_hai_tay"
+			"model": "den_cot_xanh_hai_tay",
+			"glow_role": "part_02"
 		},
 		"globe_post": {
 			"shape": "globes",
@@ -704,25 +709,28 @@
 			"arm_length": 0.35,
 			"pole_color": "#3a3d3c",
 			"head_color": "#f1f0ea",
-			"note": "A dark post with four white globes round its top and one on it (the spec den_cot_den_cau: 4.3 m to the top of the top globe).",
+			"note": "The dark post with four white globes round its top and one on it (the model den_cot_den_cau: 4.3 m to the top of the top globe). The values of the stand-in follow it.",
 			"light": {
 				"color": "#FFE2B8",
 				"energy": 0.8,
 				"range": 7.0,
 				"y": 0.0
 			},
-			"spec": "den_cot_den_cau"
+			"model": "den_cot_den_cau",
+			"glow_role": "part_02"
 		},
 		"path_lamp": {
 			"shape": "box_lamp",
-			"spec": "den_vuon_thap",
 			"height": 0.7,
 			"body": 0.32,
 			"cap": 0.4,
 			"cap_height": 0.08,
 			"head_color": "#ece8da",
 			"pole_color": "#d8d6ce",
-			"note": "A low square lamp at the side of a path of the park (the spec den_vuon_thap, its values with the status Source): a body of frosted white panes 0.32 m wide from 0.06 m to 0.62 m (it glows at night), under a light grey cap 0.40 m wide and 0.08 m high. The foot and the bars of the frame are Check, so the stand-in has none: the body stands on a foot of its own color."
+			"note": "A low square lamp at the side of a path of the park (the model den_vuon_thap). Its panes (the role part_02) glow at night. Its far level ends at 60 m (a lamp of 0.70 m is some pixels there). The other values are the stand-in.",
+			"model": "den_vuon_thap",
+			"glow_role": "part_02",
+			"far_end_m": 60.0
 		}
 	},
 	"lamp_rows": [
@@ -733,7 +741,9 @@
 			"kind": "blue_double",
 			"every_m": 36.0,
 			"from_end_m": 18.0,
-			"note": "R9: the lamp poles on the sidewalk of the park (the photo from a drone of 2021-01-30)."
+			"note": "R9: the lamp poles on the sidewalk of the park (the photo from a drone of 2021-01-30).",
+			"long_arm_over_way": true,
+			"long_arm_note": "The long arm of the pole reaches over the road. The photos of 2014 and 2019 show the poles of the walk of the sea with the long arm over the walk and the beach; for the poles of Quang Trung, this side is a builder value."
 		}
 	],
 	"path_lamps": {
