@@ -1,0 +1,136 @@
+{
+	"id": "ke_ha_long",
+	"what": "kè đường Hạ Long: a piece of 2 m of the sloped sea wall of concrete panels of Hạ Long, from the outer edge of the walk down to the rocks at the water",
+	"way": "blueprint",
+	"status": "Check",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026, R4, R6, Q12: under the walk of the sea of Hạ Long (sea_walls of data/showcase/bai_truoc.json): the game puts the pieces one after another along the line, the port end of a piece on the port start of the next, the top edge (the origin) at the outer edge of the walk under the parapet, the slope down to +y. There is no walk at the level of the sand along Hạ Long.",
+	"order": {
+		"blueprint": {
+			"file": "data/world/blueprints/ke_bien.json"
+		},
+		"options": {
+			"kind": "ke_ha_long",
+			"length": 2.0,
+			"height": 4.0,
+			"run": 6.0,
+			"rock": 0.7
+		}
+	},
+	"sources": [
+		{
+			"url": "https://www.flickr.com/photos/venanzio_kh/51180048443/",
+			"image": "https://live.staticflickr.com/65535/51180048443_7881a0bd71_b.jpg",
+			"date": "2021-05-10",
+			"license": "all rights reserved",
+			"author": "Venanzio_KH (Flickr)",
+			"open": false,
+			"file": "flickr_51180048443_2021.jpg",
+			"shows": "The sea wall of Hạ Long from its foot, to the north: the sloped face of concrete panels with joints down the slope about 2 m apart, rust brown and dark stains on its lower part, grey and brown rocks of 0.5 m to 0.8 m at the water, the parapet and the road on top, lamp posts of four globes, the hotel with the letters HA LONG HOTEL, the terminal of Cầu Đá."
+		},
+		{
+			"url": "https://www.flickr.com/photos/venanzio_kh/51179824566/",
+			"image": "https://live.staticflickr.com/65535/51179824566_4327182812_z.jpg",
+			"date": "2021-05-10",
+			"license": "all rights reserved",
+			"author": "Venanzio_KH (Flickr)",
+			"open": false,
+			"file": "flickr_51179824566_2021.jpg",
+			"shows": "Hạ Long between Bãi Trước and Cầu Đá: the walk of grey and dark tiles with a low parapet of plain concrete with a round top, the steep slope of concrete down to rocks, a lamp post of four white globes, a bench, houses under Núi Nhỏ."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Bo_ke_duong_ha_long,_Vung_tau_-_panoramio.jpg",
+			"date": "2014-04-05 16:32",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "ha_long_slope_2014.jpg",
+			"shows": "The sea wall of Hạ Long to the north: a smooth sloped face of concrete from the parapet down to rocks at the water, the parapet of rough stone (before its cladding of granite), the walk with lamp posts of white globes, the road, hotels and Bãi Trước far away."
+		},
+		{
+			"url": "https://vnexpress.net/bien-vung-tau-trong-xanh-khi-gian-cach-xa-hoi-4359168.html",
+			"image": "https://vcdn1-dulich.vnecdn.net/2021/09/20/bien-vung-tau-xanh-gian-cach-07-1632118420.jpg",
+			"date": "2021-09",
+			"license": "all rights reserved",
+			"author": "Thành Duy / VnExpress",
+			"open": false,
+			"file": "vne_4359168_07_2021.jpg",
+			"shows": "From a drone over the sea: the light sloped sea wall of Hạ Long from the south end of Bãi Trước to the jetty of Cầu Đá, flat rocks at the foot of the slope, the boats of the bay; no walk at the level of the sand."
+		}
+	],
+	"sizes": {
+		"length": {
+			"value": 2.0,
+			"unit": "m",
+			"source": "A piece of the row, one panel wide. Photo 0: the joints of the panels go down the slope, about as far apart as the parapet is long between two lamp posts divided by five: about 2 m."
+		},
+		"height": {
+			"value": 4.0,
+			"unit": "m",
+			"source": "estimate (no source): the drop from the walk to the foot. The game takes the height of the walk from the ground of plan 0005 (2 m to 9 m over the beach); 4 m is a mean. Photos 0 and 1 do not give it."
+		},
+		"run": {
+			"value": 6.0,
+			"unit": "m",
+			"source": "estimate (no source): photos 0 and 2 show the slope about 1.5 times as long as it is high; not measured."
+		},
+		"rock": {
+			"value": 0.7,
+			"unit": "m",
+			"source": "Photo 0: the rocks at the water are about a third of a panel (2 m): 0.5 m to 0.8 m, blocks with round edges."
+		},
+		"toe": {
+			"value": 1.5,
+			"unit": "m",
+			"source": "estimate (no source): two rows of rocks in front of the foot (photos 0 and 3 show rocks at the foot)."
+		},
+		"colors": {
+			"value": "concrete #b5ada0, rust brown stains #7d5f45 on the lower third and dark wet stains #4f4a42 at the foot, rocks #5f5a52 to #7a7065",
+			"unit": "",
+			"source": "Photo 0 (2021): light grey concrete with rust brown and dark stains near the foot, grey and brown rocks; photo 2 (2014) shows the same face."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "b3ee752f217ff750805a1f9f17f5ad74",
+			"seen": "Next to photos 0 and 2: the slope from the top edge down to the foot and the light concrete are as in the photos. The stains on the lower part hardly show (in photos 0 and 2 the lower third is rust brown and dark). The rocks are too small, too round and too few: in photo 0 they are angular blocks of 0.5 m to 0.8 m in a band at the foot, some on the slope.",
+			"changed": "Stronger stains (the lower third, opacity 0.65) and a dark wet band at the foot; eight rocks of 0.7 m as blocks with round edges at a slant, one on the slope."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "be0930113b9e522a4a7dfeb689788f5a",
+			"seen": "Next to photos 0 and 2: the rocks are now angular blocks in a band at the foot, one on the slope, as in photo 0. The rust brown of the lower third is still weaker than in photo 2 (2014) and photo 0 (2021).",
+			"changed": "The stains to #7d5f45 with an opacity of 0.8."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "e3c24f01fa00d399412c73fc61698152",
+			"seen": "Next to photos 0 and 2: the lower third of the slope is now rust brown, and a dark band is at the foot, as in the photos; the upper part is the light concrete. The rocks are angular blocks.",
+			"changed": "Nothing; the near level next."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "ba220dd2b25c50bc9be489277cebc6e1",
+			"seen": "The mid level of the last blueprint: the same as the look before.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "ba220dd2b25c50bc9be489277cebc6e1",
+			"seen": "Next to photos 0 and 2: the light concrete with the rust brown lower third and the dark foot, angular rocks at the foot, a thin joint down the slope at the start of the piece. In photo 0 the rocks are more and in a wider band, and the panels have more stains and lines of water.",
+			"changed": "Nothing: the last level."
+		}
+	],
+	"hash": "ba220dd2b25c50bc9be489277cebc6e1"
+}

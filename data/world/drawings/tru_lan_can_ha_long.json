@@ -1,0 +1,124 @@
+{
+	"id": "tru_lan_can_ha_long",
+	"what": "trụ lan can đường đi bộ Hạ Long: the panel of red brown granite in the parapet of the walk of Hạ Long, a piece of 0.75 m of the parapet with a body of red brown granite under the grey top slab",
+	"way": "blueprint",
+	"status": "Source",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026: in the row of lan_can_ha_long, between two pieces of 2 m about every 10 m (the interval is from photo 1 of 2021: Check). It has the section and the ports of lan_can_ha_long, so the row goes on with no gap.",
+	"order": {
+		"blueprint": {
+			"file": "data/world/blueprints/ke_bien.json"
+		},
+		"options": {
+			"kind": "tru_lan_can_ha_long",
+			"length": 0.75,
+			"height": 0.9,
+			"width": 0.4,
+			"cap_width": 0.45,
+			"cap": 0.04
+		}
+	},
+	"sources": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:V%C5%A9ng_T%C3%A0u_sunset.jpg",
+			"date": "2019-02-21 17:24",
+			"license": "CC BY-SA 4.0",
+			"author": "Kwozyn",
+			"open": true,
+			"file": "ha_long_parapet_2019.jpg",
+			"shows": "Two men sit on the parapet of the walk of the sea of Hạ Long at sunset, to the north-west: the parapet clad in smooth grey granite with a top slab and a panel of red brown granite, a dark band at its foot, the walk of light tiles with dark square tiles, the boats of the bay, Núi Lớn."
+		},
+		{
+			"url": "https://vnexpress.net/vung-tau-vang-lang-trong-covid-19-4325863.html",
+			"image": "https://vcdn1-vnexpress.vnecdn.net/2021/07/16/DSC07171-1626429691.jpg",
+			"date": "2021-07-16",
+			"license": "all rights reserved",
+			"author": "Trường Hà / VnExpress",
+			"open": false,
+			"file": "vne_4325863_07171_2021.jpg",
+			"shows": "Hạ Long empty in the lockdown, a curve of the road: the parapet of the walk on the sea side, light stone with narrow red brown bands (panels seen at a slant) and dark red blocks a little higher than the parapet about every 10 m, small stone seats, lamp posts of white globes, the road with a double yellow line."
+		}
+	],
+	"sizes": {
+		"length": {
+			"value": 0.75,
+			"unit": "m",
+			"source": "Photo 0: the panel of red brown granite is 143 px to 150 px wide where the parapet is 173 px high (0.9 m): 0.75 m."
+		},
+		"height": {
+			"value": 0.9,
+			"unit": "m",
+			"source": "Photo 0: the panel goes from the dark band at the foot up to the top slab, which goes on over it: the height of the parapet, 0.9 m."
+		},
+		"width": {
+			"value": 0.4,
+			"unit": "m",
+			"source": "Photo 0: the face of the panel is flush with the grey cladding: the body of the parapet, 0.4 m."
+		},
+		"cap_width": {
+			"value": 0.45,
+			"unit": "m",
+			"source": "As lan_can_ha_long (photo 0)."
+		},
+		"cap": {
+			"value": 0.04,
+			"unit": "m",
+			"source": "As lan_can_ha_long (photo 0)."
+		},
+		"colors": {
+			"value": "panel #66403a, top slab #c4c0b8",
+			"unit": "",
+			"source": "Photo 0: dark red brown granite (#281213 in the shade of the evening); photo 1 (2021): dark red (#563932 on the side of a pillar in the shade). The face on the side of the sea is red brown too: estimate (no source)."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "c672a8c6c45529b831e0bb362cffc05a",
+			"seen": "Next to photos 0 and 1: the block of 0.75 m under the grey top slab and the dark band at the foot are as the panel in photo 0. The red brown is too light and too orange: in photo 0 the panel is a dark red brown, and in photo 1 the pillars are dark red.",
+			"changed": "The red brown to #66403a."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "381bdaa5c964550c43046e714b2d2e88",
+			"seen": "Next to photos 0 and 1: the panel is now a dark red brown under the light grey top slab, as in photo 0; its face is flush with the parapet, so the row goes on with no step. In photo 1 (2021) some red blocks stand 0.15 m over the parapet: this piece does not have that.",
+			"changed": "Nothing; the near level next."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "554085ab6f8713d777f10a556c368627",
+			"seen": "The mid level of the last blueprint: the same as the look before.",
+			"changed": "Nothing; the near level next."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "554085ab6f8713d777f10a556c368627",
+			"seen": "Next to photo 0: the edges of the top slab are sharp, the red brown face is even; the near level of a blueprint that I changed after it (the near levels of the other pieces with an image of 1024 texels stopped on the factory), so I built it once more.",
+			"changed": "The images of the near level of all pieces to 512 texels, the joints of the other pieces wider (they are not on this piece)."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "5d04475242eacf38d35a66ca85140b88",
+			"seen": "The mid level of the last blueprint: the same as the look before.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "5d04475242eacf38d35a66ca85140b88",
+			"seen": "The near level of the last blueprint: as the near level before; next to photo 0 the dark red brown panel under the grey top slab with sharp edges, the dark band at the foot.",
+			"changed": "Nothing: the last level."
+		}
+	],
+	"hash": "5d04475242eacf38d35a66ca85140b88"
+}

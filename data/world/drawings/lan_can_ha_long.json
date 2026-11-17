@@ -1,0 +1,141 @@
+{
+	"id": "lan_can_ha_long",
+	"what": "lan can đường đi bộ Hạ Long: a piece of 2 m of the parapet clad in grey granite on the sea side of the walk of Hạ Long, with its top slab of a lighter granite",
+	"way": "blueprint",
+	"status": "Source",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026, R4, R6: the parapet of the walk on the sea wall of Hạ Long, from Quang Trung to Cầu Đá (sea_walls of data/showcase/bai_truoc.json): the game puts the pieces one after another along the line, the port end of a piece on the port start of the next at the outer edge of the walk (the face on +y at the edge).",
+	"order": {
+		"blueprint": {
+			"file": "data/world/blueprints/ke_bien.json"
+		},
+		"options": {
+			"kind": "lan_can_ha_long",
+			"length": 2.0,
+			"height": 0.9,
+			"width": 0.4,
+			"cap_width": 0.45,
+			"cap": 0.04
+		}
+	},
+	"sources": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:V%C5%A9ng_T%C3%A0u_sunset.jpg",
+			"date": "2019-02-21 17:24",
+			"license": "CC BY-SA 4.0",
+			"author": "Kwozyn",
+			"open": true,
+			"file": "ha_long_parapet_2019.jpg",
+			"shows": "Two men sit on the parapet of the walk of the sea of Hạ Long at sunset, to the north-west: the parapet clad in smooth grey granite with a top slab and a panel of red brown granite, a dark band at its foot, the walk of light tiles with dark square tiles, the boats of the bay, Núi Lớn."
+		},
+		{
+			"url": "https://vnexpress.net/vung-tau-vang-lang-trong-covid-19-4325863.html",
+			"image": "https://vcdn1-vnexpress.vnecdn.net/2021/07/16/DSC07171-1626429691.jpg",
+			"date": "2021-07-16",
+			"license": "all rights reserved",
+			"author": "Trường Hà / VnExpress",
+			"open": false,
+			"file": "vne_4325863_07171_2021.jpg",
+			"shows": "Hạ Long empty in the lockdown, a curve of the road: the parapet of the walk on the sea side, light stone with narrow red brown bands (panels seen at a slant) and dark red blocks a little higher than the parapet about every 10 m, small stone seats, lamp posts of white globes, the road with a double yellow line."
+		},
+		{
+			"url": "https://www.flickr.com/photos/venanzio_kh/51179824566/",
+			"image": "https://live.staticflickr.com/65535/51179824566_4327182812_z.jpg",
+			"date": "2021-05-10",
+			"license": "all rights reserved",
+			"author": "Venanzio_KH (Flickr)",
+			"open": false,
+			"file": "flickr_51179824566_2021.jpg",
+			"shows": "Hạ Long between Bãi Trước and Cầu Đá: the walk of grey and dark tiles with a low parapet of plain concrete with a round top, the steep slope of concrete down to rocks, a lamp post of four white globes, a bench, houses under Núi Nhỏ."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Bo_ke_duong_ha_long,_Vung_tau_-_panoramio.jpg",
+			"date": "2014-04-05 16:32",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "ha_long_slope_2014.jpg",
+			"shows": "The sea wall of Hạ Long to the north: a smooth sloped face of concrete from the parapet down to rocks at the water, the parapet of rough stone (before its cladding of granite), the walk with lamp posts of white globes, the road, hotels and Bãi Trước far away."
+		}
+	],
+	"sizes": {
+		"length": {
+			"value": 2.0,
+			"unit": "m",
+			"source": "A piece of the row: I choose 2 m, one joint of the cladding at its start. Photo 0: the joints of the cladding are 1.6 m to 3.2 m apart (620 px between two joints where the parapet is 173 px for 0.9 m)."
+		},
+		"height": {
+			"value": 0.9,
+			"unit": "m",
+			"source": "Photo 0: the man in white sits on the parapet; from his seat to the top of his head he is 160 px (about 0.9 m for a man who sits), and the front of the parapet is 173 px from the walk to the top of the slab: 0.9 m."
+		},
+		"width": {
+			"value": 0.4,
+			"unit": "m",
+			"source": "Photo 0: the top slab is about half the height of the parapet deep (0.45 m) and stands out a little over the face of the cladding: 0.4 m for the body."
+		},
+		"cap_width": {
+			"value": 0.45,
+			"unit": "m",
+			"source": "Photo 0: the top slab is about half the height of the parapet deep: 0.45 m."
+		},
+		"cap": {
+			"value": 0.04,
+			"unit": "m",
+			"source": "Photo 0: the front edge of the top slab is 5 to 8 px of the 173 px of the parapet: 0.03 m to 0.04 m."
+		},
+		"foot_band": {
+			"value": 0.05,
+			"unit": "m",
+			"source": "Photo 0: a dark band of about 10 px at the foot of the cladding: 0.05 m."
+		},
+		"colors": {
+			"value": "cladding #b0aea5 (grey granite with dark and pink grains), top slab #c4c0b8, band at the foot #4d4844, joints #5e5a56",
+			"unit": "",
+			"source": "Photo 0 (2019): smooth speckled grey granite, a lighter top slab and a dark band at the foot, but the face is in the shade of the evening (#33272b). Photo 1 (2021), in the light of day: the face of the same parapet with its red brown panels is #b0aea5."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "84886384bbef287bc5b2fe23847b3795",
+			"seen": "Next to photos 0 and 1: the long box, the thin top slab that stands out a little and the dark band at the foot are as in photo 0. The grey of the face (#8e8984, taken from photo 0) is the grey of a face in the shade of the evening; in photo 1 (2021, day) the face is lighter.",
+			"changed": "The face to #b0aea5 (the median of the face in photo 1) and the top slab to #c4c0b8."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "1b4bf123e9eeaebeb644625a3ae4572c",
+			"seen": "Next to photos 0 and 1: the face is now the light grey of photo 1 and the top slab is lighter, as in both photos; the dark band at the foot is 0.05 m over the walk (the body goes 0.05 m under the walk); the edge of the top slab is round at the mid level (cells of 0.04 m), sharp in the photos.",
+			"changed": "Nothing on this piece."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "22bae9dc8a8228b2ddd4250bf165e93d",
+			"seen": "The mid level of the last blueprint (the near cells are now 0.02 m: the near build with cells of 0.01 m stopped twice on the factory, HTTP 503, not enough memory): the same as the look before.",
+			"changed": "Nothing; the near level next."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "95056aed2bdcf62d2ffb69122e59e056",
+			"seen": "The mid level of the last blueprint (images of 512 texels at the near level, wider joints): the same as the look before.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "95056aed2bdcf62d2ffb69122e59e056",
+			"seen": "Next to photos 0 and 1: sharp edges of the top slab, a thin dark joint at the start of the piece, the dark band at the foot. The grains of the granite do not show at this distance. The end face at the start is dark (the joint paints it): in a row it is hidden, at the end of a row it shows.",
+			"changed": "Nothing: the last level."
+		}
+	],
+	"hash": "95056aed2bdcf62d2ffb69122e59e056"
+}

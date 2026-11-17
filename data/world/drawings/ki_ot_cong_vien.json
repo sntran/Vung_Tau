@@ -1,0 +1,427 @@
+{
+	"id": "ki_ot_cong_vien",
+	"what": "ki-ốt công viên: the light blue kiosk with a red sign and a green roof on the sidewalk of the park of Bãi Trước on Quang Trung",
+	"way": "drawing",
+	"status": "Check",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026: the kiosks on the sidewalk of the park on Quang Trung (the place in 2019 is Q2: Check).",
+	"order": {
+		"blueprint": "drawing",
+		"options": {
+			"drawing": {
+				"name": "ki_ot_cong_vien",
+				"kind": "prop",
+				"sources": [
+					"The light blue kiosk with a red sign on the sidewalk of the park of Bãi Trước on Quang Trung: the photo of 2014-04-06 (Commons, trungydang, CC BY 3.0); the sizes at the scale of a scooter beside it (Vũng Tàu, data/world/drawings/ki_ot_cong_vien.json). No letters: the words of the sign cannot be read."
+				],
+				"materials": {
+					"part_01": {
+						"color": "#ffffff",
+						"roughness": 0.5,
+						"metalness": 0.0
+					}
+				},
+				"nodes": [
+					{
+						"name": "kiosk",
+						"skill": {
+							"sculpt": {
+								"edits": [
+									{
+										"shape": "box",
+										"size": [
+											0.95,
+											0.7,
+											1.1
+										],
+										"at": [
+											0,
+											0,
+											1.1
+										],
+										"material": "part_01",
+										"color": "#86beb6"
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.97,
+											0.72,
+											0.04
+										],
+										"at": [
+											0,
+											0,
+											0.04
+										],
+										"material": "part_01",
+										"color": "#8e918c"
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											0.96,
+											0.71,
+											0.03
+										],
+										"at": [
+											0,
+											0,
+											1.0
+										],
+										"blend": 0.005,
+										"raise": 0.004,
+										"material": "part_01",
+										"color": "#5e9a92"
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											0.04,
+											0.71,
+											1.1
+										],
+										"at": [
+											0,
+											0,
+											1.1
+										],
+										"blend": 0.005,
+										"raise": 0.004,
+										"material": "part_01",
+										"color": "#5e9a92"
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											0.96,
+											0.04,
+											1.1
+										],
+										"at": [
+											0,
+											0,
+											1.1
+										],
+										"blend": 0.005,
+										"raise": 0.004,
+										"material": "part_01",
+										"color": "#5e9a92"
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											0.05,
+											0.05,
+											1.1
+										],
+										"at": [
+											0.95,
+											0.7,
+											1.1
+										],
+										"mirror": [
+											"x",
+											"y"
+										],
+										"blend": 0.005,
+										"material": "part_01",
+										"color": "#5e9a92"
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											0.4,
+											0.02,
+											0.95
+										],
+										"at": [
+											0.45,
+											0.7,
+											1.0
+										],
+										"blend": 0.004,
+										"raise": -0.004,
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#5e9a92"
+									},
+									{
+										"shape": "box",
+										"size": [
+											1.25,
+											1.0,
+											0.21
+										],
+										"at": [
+											0,
+											0,
+											2.41
+										],
+										"material": "part_01",
+										"color": "#b3312a",
+										"roughness": 0.4
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											0.28,
+											0.02,
+											0.18
+										],
+										"at": [
+											0.94,
+											1.0,
+											2.41
+										],
+										"blend": 0.004,
+										"material": "part_01",
+										"color": "#cf6a35"
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											0.02,
+											1.01,
+											0.22
+										],
+										"at": [
+											0.63,
+											0,
+											2.41
+										],
+										"blend": 0.003,
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#f2ede4"
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											0.8,
+											1.01,
+											0.035
+										],
+										"at": [
+											-0.3,
+											0,
+											2.49
+										],
+										"blend": 0.01,
+										"opacity": 0.6,
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#f2ede4"
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											0.85,
+											1.01,
+											0.05
+										],
+										"at": [
+											-0.3,
+											0,
+											2.3400000000000003
+										],
+										"blend": 0.01,
+										"opacity": 0.7,
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#f2ede4"
+									},
+									{
+										"shape": "box",
+										"size": [
+											1.3,
+											1.05,
+											0.025
+										],
+										"at": [
+											0,
+											0,
+											2.645
+										],
+										"material": "part_01",
+										"color": "#5b7f5c",
+										"roughness": 0.6
+									},
+									{
+										"shape": "pyramid",
+										"size": [
+											1.3,
+											1.05,
+											0.115
+										],
+										"at": [
+											0,
+											0,
+											2.785
+										],
+										"material": "part_01",
+										"color": "#5b7f5c",
+										"roughness": 0.6
+									}
+								],
+								"details": [
+									{
+										"edits": [
+											{
+												"shape": "box",
+												"size": [
+													0.012,
+													0.03,
+													0.08
+												],
+												"at": [
+													0.12,
+													0.72,
+													1.05
+												],
+												"material": "part_01",
+												"color": "#c9c9c4",
+												"finish": "metal"
+											}
+										],
+										"cells": {
+											"near": 0.005
+										},
+										"budget": {
+											"near": 60
+										},
+										"levels": [
+											"near"
+										]
+									}
+								],
+								"cells": {
+									"near": 0.035,
+									"mid": 0.04,
+									"far": 0.12
+								},
+								"budget": {
+									"near": 5000,
+									"mid": 500,
+									"far": 60
+								},
+								"bake": {
+									"near": 512,
+									"mid": 256
+								}
+							}
+						}
+					}
+				]
+			}
+		}
+	},
+	"sources": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Quang_trung_street-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"date": "2014-04-06",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "street_kiosk_2014.jpg",
+			"shows": "Quang Trung to the south, by the park: on the sidewalk of the park, a light blue green kiosk of panels with a red sign band under a low green roof, a scooter and a stone bench beside it, Terminalia trees, blue lamp poles."
+		}
+	],
+	"sizes": {
+		"width": {
+			"value": 1.9,
+			"unit": "m",
+			"source": "Photo 0 (2014): the body is 46 px wide, and the scooter beside it on the same line of the sidewalk is 26 px high (about 1.05 m, the height of a scooter to its bars): 1.9 m."
+		},
+		"depth": {
+			"value": 1.4,
+			"unit": "m",
+			"source": "estimate (no source): photo 0 shows the kiosk from its end."
+		},
+		"body_height": {
+			"value": 2.2,
+			"unit": "m",
+			"source": "Photo 0 (2014): 53 px from the sidewalk to the foot of the sign, at the scale of the scooter (26 px for 1.05 m): 2.2 m."
+		},
+		"sign": {
+			"value": "2.5 m wide, 0.42 m high, round the top",
+			"unit": "m",
+			"source": "Photo 0 (2014): the red sign is 61 px wide and 10 px high at the scale of the scooter: 2.5 m and 0.42 m; it is wider than the body. That it goes round the four sides: estimate (no source)."
+		},
+		"roof_height": {
+			"value": 0.23,
+			"unit": "m",
+			"source": "Photo 0 (2014): a low green roof of about 6 px over the sign at the scale of the scooter: 0.23 m."
+		},
+		"height": {
+			"value": 2.9,
+			"unit": "m",
+			"source": "Photo 0 (2014): 69 px from the sidewalk to the top of the roof at the scale of the scooter: 2.85 m; with the base: 2.9 m."
+		},
+		"colors": {
+			"value": "panels #86beb6, frame #5e9a92, sign #b3312a with an orange panel #cf6a35 at its left end, roof #5b7f5c",
+			"unit": "",
+			"source": "Photo 0 (2014), on a dark day under trees: light blue green panels in a darker frame (a rail at half height, posts), a red sign with white letters that cannot be read and an orange panel at its left end, a green roof. The values are a little lighter than the medians of the photo (#35493c, #411e15, #67422c), for the light of a clear day."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "019a6a91d006c1543789ad151b354953",
+			"seen": "Next to photo 0: a light blue green box of panels with a red sign band, wider than the body, under a low green roof, as the photo. With the colors at the points of a mid mesh, the dark frame of the panels makes soft diagonal smears, the orange panel bleeds into the red sign, and the roof shows dents.",
+			"changed": "I gave the near and mid levels maps (a bake of 1024 and 256), so the frame, the sign and the roof have sharp colors and smooth normals."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "d6cac91134a1f7bae79b5884480abb54",
+			"seen": "With the maps, the frame of the panels (a rail at half height and a post in the middle of each side), the red sign and the green roof are sharp, and the proportions agree with photo 0 (the body 1.15 times as high as wide). But the orange panel of the sign and the door are at the right end of the front, and photo 0 shows the orange panel at the left end.",
+			"changed": "I moved the orange panel, the lines of letters and the door to the other half of the front (+x is on the left for a person in front of the kiosk)."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "541816a2cfb118f3f68e244016cc7b99",
+			"seen": "The orange panel is now at the left end of the front sign, as photo 0. The mid level agrees with the photo.",
+			"changed": "Nothing at the mid level. The near level stopped the builder of the factory five times (HTTP 503: more memory than the edge has), with a bake of 1024, then 512, with cells of 0.015 m and 0.02 m, and with four material roles. I made one role (part_01) with a finish on each edit, cells of 0.035 m at near, and the handle of the door a detail with its own small cells."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "5709d33b6a5fc74b01ce4d6185250a63",
+			"seen": "The same mid level: the panels in their frame, the red sign with the orange panel at its left end, the low green roof.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "5709d33b6a5fc74b01ce4d6185250a63",
+			"seen": "The near level: the door in the left half of the front with its handle, the frame of the panels, a thin white line between the orange panel and the red, and two light bands in the place of the letters (the words of photo 0 cannot be read). The bands are brighter and more even than the small letters of the photo.",
+			"changed": "Nothing (one build of the near level). The bands of the letters can be fainter in a later version."
+		}
+	],
+	"hash": "5709d33b6a5fc74b01ce4d6185250a63"
+}

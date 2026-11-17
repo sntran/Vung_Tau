@@ -1,0 +1,321 @@
+{
+	"id": "hang_rao_cong_vien",
+	"what": "hàng rào cây cắt xén: a piece of 2 m of the clipped hedge along the paths of the park of Bãi Trước",
+	"way": "drawing",
+	"status": "Source",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026: the hedges along the paths of the park, in pieces of 2 m in a row along a line (ports start and end), as the pieces of the sidewalk of World.",
+	"order": {
+		"blueprint": "drawing",
+		"options": {
+			"drawing": {
+				"name": "hang_rao_cong_vien",
+				"kind": "plant",
+				"sources": [
+					"A piece of 2 m of the clipped hedge along the paths of the park of Bãi Trước: photos of 2014-04-06 (Commons, trungydang, CC BY 3.0) and 2018-03-08 (Flickr, Ricoucou); the sizes at the scale of the low lamp of the park (0.70 m) and of a stone bench (Vũng Tàu, data/world/drawings/hang_rao_cong_vien.json)."
+				],
+				"materials": {
+					"part_01": {
+						"color": "#ffffff",
+						"roughness": 0.85,
+						"metalness": 0.0
+					}
+				},
+				"nodes": [
+					{
+						"name": "hedge",
+						"skill": {
+							"sculpt": {
+								"edits": [
+									{
+										"shape": "extrude",
+										"size": {
+											"outline": [
+												[
+													-0.25,
+													0.0
+												],
+												[
+													0.25,
+													0.0
+												],
+												[
+													0.25,
+													0.33999999999999997
+												],
+												[
+													0.2473,
+													0.3607
+												],
+												[
+													0.2393,
+													0.38
+												],
+												[
+													0.2266,
+													0.3966
+												],
+												[
+													0.21,
+													0.4093
+												],
+												[
+													0.1907,
+													0.4173
+												],
+												[
+													-0.16999999999999998,
+													0.42
+												],
+												[
+													-0.1907,
+													0.4173
+												],
+												[
+													-0.21,
+													0.4093
+												],
+												[
+													-0.2266,
+													0.3966
+												],
+												[
+													-0.2393,
+													0.38
+												],
+												[
+													-0.2473,
+													0.3607
+												],
+												[
+													-0.25,
+													0.33999999999999997
+												]
+											],
+											"depth": 2.0
+										},
+										"at": [
+											0,
+											0,
+											0
+										],
+										"axis": [
+											1,
+											0,
+											0
+										],
+										"up": [
+											0,
+											0,
+											1
+										],
+										"material": "part_01",
+										"color": "#3a541b",
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.025
+										}
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											1.01,
+											0.26,
+											0.05
+										],
+										"at": [
+											0,
+											0,
+											0.42
+										],
+										"blend": 0.05,
+										"opacity": 0.8,
+										"material": "part_01",
+										"color": "#58772b",
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.03
+										}
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											1.01,
+											0.26,
+											0.06
+										],
+										"at": [
+											0,
+											0,
+											0
+										],
+										"blend": 0.06,
+										"opacity": 0.8,
+										"material": "part_01",
+										"color": "#28390f"
+									}
+								],
+								"ports": {
+									"start": {
+										"at": [
+											-1.0,
+											0,
+											0
+										],
+										"axis": [
+											-1,
+											0,
+											0
+										],
+										"up": [
+											0,
+											0,
+											1
+										]
+									},
+									"end": {
+										"at": [
+											1.0,
+											0,
+											0
+										],
+										"axis": [
+											1,
+											0,
+											0
+										],
+										"up": [
+											0,
+											0,
+											1
+										]
+									}
+								},
+								"cells": {
+									"near": 0.02,
+									"mid": 0.05,
+									"far": 0.1
+								},
+								"budget": {
+									"near": 4000,
+									"mid": 300,
+									"far": 40
+								},
+								"bake": {
+									"near": 512,
+									"mid": 256
+								},
+								"dirt": 0.3
+							}
+						}
+					}
+				]
+			}
+		}
+	},
+	"sources": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(2).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_paths_2014.jpg",
+			"shows": "The park in the morning: a path of tiles with a granite curb, a low square white lamp at its side, clipped hedges along the paths with round top edges, round clipped bushes, two women on the path, a granite bench."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(1).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_flower_bed_2014.jpg",
+			"shows": "The park in the morning: a round flower bed, a low square white lamp, clipped hedges and round clipped bushes, painted cat sculptures, frangipani trees."
+		},
+		{
+			"url": "https://www.flickr.com/photos/10598985@N07/27942036338/",
+			"image": "https://live.staticflickr.com/832/27942036338_ab67d8172b_b.jpg",
+			"date": "2018-03-08",
+			"license": "all rights reserved",
+			"author": "Ricoucou (Flickr user 10598985@N07)",
+			"open": false,
+			"file": "flickr_27942036338_b.jpg",
+			"shows": "The park under frangipani trees: clipped hedges of small bright green leaves along the paths of red tiles, a rough stone bench beside a hedge, low square lamps, benches of granite."
+		},
+		{
+			"url": "https://www.flickr.com/photos/10598985@N07/27942041498/",
+			"image": "https://live.staticflickr.com/974/27942041498_9571d66a9a_b.jpg",
+			"date": "2018-03-08 07:48",
+			"license": "all rights reserved",
+			"author": "Ricoucou (Flickr user 10598985@N07)",
+			"open": false,
+			"file": "flickr_27942041498_b.jpg",
+			"shows": "The garden of sculptures of the park: rows of low clipped hedges with round top edges between lawns, benches of rough stone, stone sculptures, a low square lamp."
+		}
+	],
+	"sizes": {
+		"length": {
+			"value": 2.0,
+			"unit": "m",
+			"source": "Not a size of the hedge: a piece of 2 m, the length of the pieces of World (the spec, Confirmed). The ends are flat, so pieces in a row make one hedge."
+		},
+		"height": {
+			"value": 0.42,
+			"unit": "m",
+			"source": "Photo 0 (2014): at the low lamp (0.70 m, 57 px from its foot to its cap), the top of the hedge behind it is 34 px over the lawn: 0.42 m. Photo 2 (2018): the top of the hedge beside the rough stone bench is a little under the top of its seat (about 0.9 of the height of the bench, and a seat is about 0.45 m high, as the dark bench of the park): 0.40 m."
+		},
+		"width": {
+			"value": 0.5,
+			"unit": "m",
+			"source": "Photo 0 (2014): the hedge by the near path is about 0.7 times the height of the low lamp beside it (0.70 m) wide: 0.49 m (the spec). Photo 2 (2018): the hedge beside the rough stone bench looks about as wide as it is high (0.4 m to 0.5 m)."
+		},
+		"round": {
+			"value": 0.08,
+			"unit": "m",
+			"source": "Photos 0 (2014), 2 and 3 (2018): the top edges of the hedges are round, about a fifth of the height."
+		},
+		"colors": {
+			"value": "leaves #3a541b, the clipped top #58772b, the foot #28390f",
+			"unit": "",
+			"source": "Photo 0 (2014): the median of the hedge in the light of the morning is #27340c in the shade and #4c6a22 in the light; #3f5a1e between them (the spec); a little darker (#3a541b), because the top is painted lighter. Photos 2 and 3 (2018): the top of a hedge is lighter than its sides, and its foot is dark."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "182fd2b141aa031300943e350330a581",
+			"seen": "Next to photos 0 to 3: a long block of clipped leaves with round top edges and flat ends, 0.42 m high and 0.5 m wide, a lighter top and a dark foot, as the hedges along the paths. The clumps of the leaves are larger than the small leaves of the hedges in photos 2 and 3, and the green is a little light next to photo 0.",
+			"changed": "Smaller clumps of leaves (0.025 m), and a little darker green for the mass."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "47a4a1998cd901977855144a54c4b5b6",
+			"seen": "Smaller clumps of leaves, a little darker green, the light top and the dark foot: the hedge agrees with the clipped hedges of photos 0 to 3 in shape, size and color.",
+			"changed": "Nothing at the mid level. The near level with a bake of 1024 stopped the builder of the factory three times (HTTP 503: more memory than the edge has), so the near bake is now 512."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "f5b1de0205a135cfa13ad9d7d2b28b55",
+			"seen": "The same mid level as before (only the near bake changed).",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "f5b1de0205a135cfa13ad9d7d2b28b55",
+			"seen": "A block of small clipped leaves with round top edges, flat ends for the next piece, a lighter top and a dark foot, as photos 0 and 2. The leaves are a pattern of the maps; the outline is smooth, as a hedge that was clipped.",
+			"changed": "Nothing."
+		}
+	],
+	"hash": "f5b1de0205a135cfa13ad9d7d2b28b55"
+}

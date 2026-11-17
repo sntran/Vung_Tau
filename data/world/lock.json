@@ -146,6 +146,16 @@
 				"khach_san_grand_canh_nam.receipt.json": "6c17dfa033c9370c328a03863564419ff27983b9651bbeb7aa6ec79c300c3d3c"
 			}
 		},
+		"lan_can_ha_long": {
+			"hash": "95056aed2bdcf62d2ffb69122e59e056",
+			"files": {
+				"lan_can_ha_long.far.glb": "2ef42a2a27d2737f81b8f93986cca32bfe1b5657a841891a1e409463b15764a1",
+				"lan_can_ha_long.glb": "5c1a42be085e96f92d19f37dccbe478b8366542b5693d63ac1fc19858a6709ab",
+				"lan_can_ha_long.mid.glb": "d488a0641faa150df1d33b4ad7645baef0566a65735f69d83bcbb8b053780dd9",
+				"lan_can_ha_long.parts.json": "a50fa240a8580c61518eabf4b249b1d58441d55a19f7be428cb0f13521e295f4",
+				"lan_can_ha_long.receipt.json": "404a4b8199729b74ab3016a6bd01256b045294478cb08ed9cf75d077a5e1560a"
+			}
+		},
 		"quang_trung_12_18": {
 			"hash": "29bb50d50ec3cfe1909cc519d71091b4",
 			"files": {
@@ -221,6 +231,26 @@
 				"thung_chai.mid.glb": "d2a0592b5cd4bcf0f748db92965aa4020975191facd0909d0cf976fcd80c9739",
 				"thung_chai.parts.json": "3ba12ff589c72cd3160d0664e233cbedb01c2e137ea2699f251b77f0bc042e24",
 				"thung_chai.receipt.json": "93e5c370a8d179d5909ed2571c98d78d9340a6419e71056d20844167be8c0714"
+			}
+		},
+		"tru_lan_can_ha_long": {
+			"hash": "5d04475242eacf38d35a66ca85140b88",
+			"files": {
+				"tru_lan_can_ha_long.far.glb": "f73b9aad271e2c1050c54cdb6bd1aa58ec59bdf7366751789fdb6b51677a4c55",
+				"tru_lan_can_ha_long.glb": "a80169f5397b09976f02be5616ae59a44c60a8b966a893771d0a79e02e124a2b",
+				"tru_lan_can_ha_long.mid.glb": "e523e2ca4f1119c95d3736d2462a174c48c2111dfd446b25a8da39453a459cdb",
+				"tru_lan_can_ha_long.parts.json": "099e551144016cf1e1a7c8962a76a1cb32dd60858aa591ef6df06d8159b37c81",
+				"tru_lan_can_ha_long.receipt.json": "c77c16cfa9e44ae77440c7334c277423363d74c4ab1de919b42849781ac95505"
+			}
+		},
+		"tuong_bai_tam": {
+			"hash": "fa50dec6d68ca4f665e56e1ee2eb4df2",
+			"files": {
+				"tuong_bai_tam.far.glb": "70bfcaf04e8ebe227aa3814506d3a37110d7880d786d3ed26f15bf8bb447b670",
+				"tuong_bai_tam.glb": "99f18b21090a59e6d3931fd0b908b45b4cc19f96b68ceb6686db6a7e758b1124",
+				"tuong_bai_tam.mid.glb": "87cb06835b3a524b2d8eac580a88a20dd3cb1851cd8e054c602aec4b1c96fee5",
+				"tuong_bai_tam.parts.json": "3bd409a2511c1811073cc82f01dcb6f89ee5f5d5ae3863afbcc621da463ff488",
+				"tuong_bai_tam.receipt.json": "3eb516c8b399cd6dde01295dcd4e2ef6b2ba9357bb14181fb665f0e664720ccc"
 			}
 		},
 		"walker_1": {

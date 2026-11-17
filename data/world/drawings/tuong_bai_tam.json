@@ -1,0 +1,176 @@
+{
+	"id": "tuong_bai_tam",
+	"what": "tường lan can bãi tắm: one span of the low wall of rough granite blocks between the walk and the beach of Bãi Trước (a half post at each end, an opening under the rail)",
+	"way": "blueprint",
+	"status": "Source",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026, R4: the low wall along the walk of the park and the walk of the sea (walls and beach_wall of data/showcase/bai_truoc.json): the game puts the pieces one after another along the line, the port end of a piece on the port start of the next (two half posts make a whole post), the origin on the line of the wall at the walk, +y to the sand. At an opening to the sand (R10) the game leaves out the pieces.",
+	"order": {
+		"blueprint": {
+			"file": "data/world/blueprints/ke_bien.json"
+		},
+		"options": {
+			"kind": "tuong_bai_tam",
+			"length": 1.35,
+			"height": 1.0,
+			"width": 0.42,
+			"cap_width": 0.46,
+			"cap": 0.1,
+			"post": 0.45,
+			"base": 0.62,
+			"course": 0.2,
+			"block": 0.3,
+			"blocks": 4,
+			"courses": 3
+		}
+	},
+	"sources": [
+		{
+			"url": "https://vnexpress.net/pho-bien-yen-vang-4079788.html",
+			"image": "https://vcdn1-dulich.vnecdn.net/2020/04/05/11-1586054525.jpg",
+			"date": "2020-04-02",
+			"license": "all rights reserved",
+			"author": "Đỗ Tuấn Hùng / VnExpress",
+			"open": false,
+			"file": "vne_4079788_11_2020.jpg",
+			"shows": "Two women who sell food by the low wall of the beach (a crop): rough grey granite blocks in courses, a square post at the end of a section, a top rail, openings between the posts, a woman in a nón lá who stands beside the wall, a bicycle against it, the boats of the bay through the openings."
+		},
+		{
+			"url": "https://www.flickr.com/photos/155243782@N04/50064549148/",
+			"image": "https://live.staticflickr.com/65535/50064549148_3a65c711b2_b.jpg",
+			"date": "2018-10-21 16:51",
+			"license": "all rights reserved",
+			"author": "Marcus Nguyen (Flickr)",
+			"open": false,
+			"file": "flickr_50064549148_2018.jpg",
+			"shows": "Sunset at Bãi Trước from the walk: frangipani trees in silhouette, the paved walk, and the low wall across the view: a rail on posts with the sea in the openings, each opening about 0.65 of the distance from one post to the next."
+		},
+		{
+			"url": "https://www.flickr.com/photos/155243782@N04/50075678016/",
+			"image": "https://live.staticflickr.com/65535/50075678016_b28a862db8_b.jpg",
+			"date": "2018-09-26 17:40",
+			"license": "all rights reserved",
+			"author": "Marcus Nguyen (Flickr)",
+			"open": false,
+			"file": "flickr_50075678016_2018.jpg",
+			"shows": "The sea and ships through one opening of the low wall: rough grey granite blocks about 0.3 m long with dark joints, the rail over the opening, the opening about 3.4 times as wide as it is high."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:V%C5%A9ng_T%C3%A0u,_Ba_Ria_-_Vung_Tau,_Vietnam_-_panoramio_(6).jpg",
+			"date": "2014-03-09",
+			"license": "CC BY-SA 3.0",
+			"author": "Lam Tr Th",
+			"open": true,
+			"file": "beach_wall_2014.jpg",
+			"shows": "The low wall of the beach along the walk of the park, to the south: rough granite blocks, square posts, a flat top rail that is lighter, low openings between the posts, the walk of tiles, leaning palms, the beach and Núi Nhỏ."
+		},
+		{
+			"url": "https://www.flickr.com/photos/time-to-look/47924741823/",
+			"image": "https://live.staticflickr.com/65535/47924741823_0acc5a1a35_b.jpg",
+			"date": "2019-01-24 10:55",
+			"license": "CC BY-NC-SA 2.0",
+			"author": "Ted McGrath (time-to-look, Flickr)",
+			"open": false,
+			"file": "flickr_47924741823_2019.jpg",
+			"shows": "Painted fishing boats on the sand of Bãi Trước at low tide; behind them the low wall on its wall of blocks, in sections, with a long flight of steps down to the sand, palms and light blue lamp poles."
+		}
+	],
+	"sizes": {
+		"length": {
+			"value": 1.35,
+			"unit": "m",
+			"source": "One span, from the middle of a post to the middle of the next. Photo 1 (2018, the wall across the view): each opening is 0.65 of the distance from one post to the next (48 of 70 px, 42 of 65 px, 37 of 60 px); with openings of 0.9 m: 1.35 m."
+		},
+		"opening": {
+			"value": 0.9,
+			"unit": "m",
+			"source": "Photo 0 (2020): an opening is 130 px wide where the wall is 147 px for 1 m: 0.88 m. Photo 2 (2018): an opening is 3.4 times as wide as it is high (0.28 m): 0.95 m."
+		},
+		"post": {
+			"value": 0.45,
+			"unit": "m",
+			"source": "The span less the opening: 0.45 m, as in photo 0 (a post is about one block and a half)."
+		},
+		"height": {
+			"value": 1.0,
+			"unit": "m",
+			"source": "Photo 0: the woman in a nón lá (1.55 m, 1.67 m with her hat: 225 px) stands a little farther than the wall; at the wall (its foot 170 px under the horizon, her feet 155 px) the scale is 147 px for 1 m, and the wall is 154 px from the walk to the top of the rail: 1.05 m; 1.0 m to 1.05 m."
+		},
+		"cap": {
+			"value": 0.1,
+			"unit": "m",
+			"source": "Photo 0: the rail is 15 px of the 154 px of the wall: 0.1 m."
+		},
+		"opening_height": {
+			"value": 0.28,
+			"unit": "m",
+			"source": "Photo 0: the openings are 44 px high: 0.29 m (the height less the rail and the wall under the openings: 0.28 m)."
+		},
+		"base": {
+			"value": 0.62,
+			"unit": "m",
+			"source": "Photo 0: the wall under the openings is 95 px: 0.62 m."
+		},
+		"width": {
+			"value": 0.42,
+			"unit": "m",
+			"source": "Photos 2 (2018) and 3 (2014): the rail stands out a little over the face of the blocks: 0.42 m under a rail of 0.46 m (the spec: 0.4 m and 0.45 m)."
+		},
+		"cap_width": {
+			"value": 0.46,
+			"unit": "m",
+			"source": "Photo 3 (2014): the rail is as wide as the posts and stands out a little; photo 2 (2018) the same. estimate (no source) of 0.02 m on each side."
+		},
+		"course": {
+			"value": 0.2,
+			"unit": "m",
+			"source": "Photo 0: the courses are 30 px to 35 px high: 0.2 m to 0.24 m (three courses under the openings)."
+		},
+		"block": {
+			"value": 0.3,
+			"unit": "m",
+			"source": "Photo 0: the blocks are about 45 px long: 0.3 m; photo 2: an opening is 2.8 blocks wide."
+		},
+		"colors": {
+			"value": "blocks #9a958b, rail #aba69c, joints #66625b, a darker band at the foot",
+			"unit": "",
+			"source": "Photo 0 (2020): rough grey granite with dark joints; photo 3 (2014): the median of a block in the sun is #9a958b and the top of the rail is lighter, worn by people who sit on it."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "4840a953085e4953da193b07cc931d1e",
+			"seen": "Next to photos 0 to 4: the base, the half posts at the ends, the opening of 0.9 m by 0.28 m and the rail that stands out a little are as in photos 0 and 2; two pieces in a row make a post of 0.45 m, as in photo 1. The grey of the blocks in the sun (#9a958b of photo 3) is right; the joints of the blocks are at the near level only, so the mid level is one rough grey.",
+			"changed": "Nothing at the mid level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "59606c141f62634a6683073679619f23",
+			"seen": "The mid level of the last blueprint: the same as the look before (the joints are at the near level only, and now no joint is on an end face).",
+			"changed": "Nothing; the near level next."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "fa50dec6d68ca4f665e56e1ee2eb4df2",
+			"seen": "The mid level of the last blueprint: the same as the look before.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "fa50dec6d68ca4f665e56e1ee2eb4df2",
+			"seen": "Next to photos 0, 2 and 3: courses of rough grey blocks of 0.3 m by 0.2 m with joints a half block apart from one course to the next, the opening under the rail, the lighter rail. In photo 2 the joints are deep and dark, here they are painted lines; the posts have no joints over the sill.",
+			"changed": "Nothing: the last level."
+		}
+	],
+	"hash": "fa50dec6d68ca4f665e56e1ee2eb4df2"
+}

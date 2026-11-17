@@ -370,7 +370,8 @@
 			"post_every": 2.4,
 			"opening_every_m": 40.0,
 			"opening_m": 2.4,
-			"color": "#b3ada1"
+			"color": "#b3ada1",
+			"model": "tuong_bai_tam"
 		},
 		"paving_texture": {
 			"texture": "walk_slabs",
@@ -510,7 +511,11 @@
 				"lan_can_ha_long",
 				"tru_lan_can_ha_long",
 				"ke_ha_long"
-			]
+			],
+			"parapet_model": "lan_can_ha_long",
+			"pillar_model": "tru_lan_can_ha_long",
+			"pillar_every_m": 10.0,
+			"pieces_note": "The parapet is pieces of the models lan_can_ha_long (grey granite, 2 m) and tru_lan_can_ha_long (a panel of red brown granite, 0.75 m) of data/world/drawings/, a panel about every 10 m (VnExpress, 2021-07-16: the walk of Hạ Long with dark red pillars about every 10 m). The slope of the sea wall (ke_ha_long) is Check: the game keeps its plain face."
 		}
 	],
 	"stand_ins": {

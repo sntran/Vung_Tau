@@ -1,0 +1,147 @@
+{
+	"id": "bac_xuong_cat",
+	"what": "bậc xuống bãi tắm: a piece of 2 m of the flight of granite steps from the walk of the sea down to the sand of Bãi Trước (the steps run along the wall)",
+	"way": "blueprint",
+	"status": "Source",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026, R10, Q11: in the openings of the low wall of the beach (wall_openings of the showcase) and along the sections where the flight of steps runs along the wall (photo 0): the game puts the pieces one after another along the line, the port end of a piece on the port start of the next, the top edge (the origin) at the edge of the walk, the steps down to +y. Their places: Check (the photos do not give them all).",
+	"order": {
+		"blueprint": {
+			"file": "data/world/blueprints/ke_bien.json"
+		},
+		"options": {
+			"kind": "bac_xuong_cat",
+			"length": 2.0,
+			"steps": 8,
+			"step_rise": 0.18,
+			"tread": 0.3,
+			"block": 0.35,
+			"blocks": 6
+		}
+	},
+	"sources": [
+		{
+			"url": "https://www.flickr.com/photos/time-to-look/47924741823/",
+			"image": "https://live.staticflickr.com/65535/47924741823_0acc5a1a35_b.jpg",
+			"date": "2019-01-24 10:55",
+			"license": "CC BY-NC-SA 2.0",
+			"author": "Ted McGrath (time-to-look, Flickr)",
+			"open": false,
+			"file": "flickr_47924741823_2019_steps.jpg",
+			"shows": "Bãi Trước at low tide, a crop of the original: the low wall with its rail and openings on a wall of granite blocks in courses, a band at the level of the walk, and under it a long flight of seven steps of granite down to the sand along the wall; a woman in a nón lá and a man in blue with a crate on the steps; painted fishing boats on the sand."
+		},
+		{
+			"url": "https://www.flickr.com/photos/110569822@N04/48108232968/",
+			"image": "https://live.staticflickr.com/65535/48108232968_ab4f0d0653_b.jpg",
+			"date": "2019-06-22 09:40",
+			"license": "all rights reserved",
+			"author": "Nguyen tan dat Dat (tandat.2301, Flickr)",
+			"open": false,
+			"file": "flickr_48108232968_2019_steps.jpg",
+			"shows": "The north part of Bãi Trước from the sand (a crop of the original): wide flights of granite steps from the walk down to the sand and the water between the sections of the low wall, seen from the side; on the right a section of the low wall on a footing of concrete, with a short flight of three steps at its end; swim rings, people on the sand."
+		},
+		{
+			"url": "https://www.youtube.com/watch?v=haFi_72WxO4",
+			"image": "https://i.ytimg.com/vi/haFi_72WxO4/maxres3.jpg",
+			"date": "2020-06-22",
+			"license": "all rights reserved",
+			"author": "Huy Đi Lang Thang (YouTube)",
+			"open": false,
+			"file": "youtube_haFi_72WxO4_2020_1058.jpg",
+			"shows": "A walk on the sand of Bãi Trước on a calm morning (the video is 14:37; this picture is the third automatic picture of YouTube, at about 11:00): eight courses of granite blocks step down from the walk to the sand, next to the end of a section whose wall of blocks leans back, with the low wall and its openings on top; palms and light blue lamp poles."
+		},
+		{
+			"url": "https://vnexpress.net/bai-bien-vung-tau-dong-nghit-nguoi-4090193.html",
+			"image": "https://vcdn1-vnexpress.vnecdn.net/2020/04/25/Dang-Khoa-Tam-bien-Vung-Tau-2-3443-9097-1587819462.jpg",
+			"date": "2020-04-25",
+			"license": "all rights reserved",
+			"author": "Trường Hà / VnExpress",
+			"open": false,
+			"file": "vne_4090193_2_2020.jpg",
+			"shows": "The south part of the beach full of swimmers at the end of the afternoon: the low wall with its rail and openings in sections on a sloped face of stone, a stair down to the sand in a gap between two sections, swim rings, light blue lamp poles behind the palms."
+		},
+		{
+			"url": "https://www.youtube.com/watch?v=LgCI_HIx5VU",
+			"image": "https://i.ytimg.com/vi/LgCI_HIx5VU/maxres2.jpg",
+			"date": "2017-03-26",
+			"license": "all rights reserved",
+			"author": "Huy Đi Lang Thang (YouTube)",
+			"open": false,
+			"file": "youtube_LgCI_HIx5VU_2017_0210.jpg",
+			"shows": "A walk along the north part of the walk of Bãi Trước (the video is 4:19; this picture is the second automatic picture of YouTube, at about 2:10): the end of a section of the low wall of granite blocks with its rail and narrow openings, and in the gap to the next section a flight of steps down to the sand."
+		}
+	],
+	"sizes": {
+		"length": {
+			"value": 2.0,
+			"unit": "m",
+			"source": "A piece of the row: I choose 2 m. Photo 0: the flight runs along the wall for more than 30 m; photo 1: flights in the gaps between the sections."
+		},
+		"steps": {
+			"value": 8,
+			"unit": "",
+			"source": "Photo 0 (2019-01-24): seven steps of 19 px of the crop under a drop of 0.35 m from the walk, at the scale of the man in blue on the steps (192 px for 1.6 m): a drop of 1.43 m in all. Photo 2 (2020): eight courses of blocks from the sand to the walk. Photos 1, 3 and 4 show flights in the gaps (Q11: five photos of 2017 to 2021)."
+		},
+		"step_rise": {
+			"value": 0.18,
+			"unit": "m",
+			"source": "The drop of 1.43 m (photo 0) over eight steps: 0.18 m; photo 2: each course of blocks is about a block high."
+		},
+		"tread": {
+			"value": 0.3,
+			"unit": "m",
+			"source": "Photo 1: the flights at the left, seen from the side: each tread is about 1.5 times a riser: 0.27 m; 0.3 m."
+		},
+		"drop": {
+			"value": 1.44,
+			"unit": "m",
+			"source": "Eight steps of 0.18 m (photo 0: 1.43 m)."
+		},
+		"block": {
+			"value": 0.35,
+			"unit": "m",
+			"source": "Photo 2: the blocks of the steps are about two times as long as they are high: 0.35 m."
+		},
+		"colors": {
+			"value": "granite #9a958b, the low steps darker #7b766d, joints #66625b",
+			"unit": "",
+			"source": "Photos 0 and 2: grey granite blocks, darker on the low steps by the sand."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "7c6820bcbace78c05c7d566e0d88f818",
+			"seen": "Next to photos 0 to 4: eight steps of 0.18 m by 0.3 m from the edge of the walk down to the sand, as the flight along the wall in photo 0 and the courses of blocks in photo 2; the mass under the last tread is under the sand in the game. The darker low steps hardly show; the joints of the blocks are at the near level only.",
+			"changed": "Nothing at the mid level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "fd9a504e98e79baeb4fe72d1cab8b9cc",
+			"seen": "The mid level of the last blueprint: the same as the look before.",
+			"changed": "Nothing; the near level next."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "504121c2118205fe22ac1abf586737c5",
+			"seen": "The mid level of the last blueprint: the same as the look before.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "504121c2118205fe22ac1abf586737c5",
+			"seen": "Next to photos 0 and 2: eight steps of granite blocks with joints a half block apart from one step to the next, as the flight along the wall in photo 0 and the courses of photo 2. In photo 0 sand lies on the low steps; the game puts the sand.",
+			"changed": "Nothing: the last level."
+		}
+	],
+	"hash": "504121c2118205fe22ac1abf586737c5"
+}

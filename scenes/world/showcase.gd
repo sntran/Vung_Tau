@@ -295,6 +295,12 @@ func _balustrade(line: PackedVector3Array, cfg: Dictionary) -> void:
 	if line.size() < 2:
 		return
 	var color := str(cfg.get("color", "#b3ada1"))
+	# The spans of the model of the low wall (report 0026, D-0026-09): the
+	# parts of the stand-in keep their collision and draw nothing.
+	var model_id := str(cfg.get("model", ""))
+	var span := float(_option(model_id, "length", 1.35)) if _has_model(model_id) else 0.0
+	if span > 0.0:
+		color = HIDDEN
 	var half := float(cfg.get("width", 0.4)) / 2.0
 	var base := float(cfg.get("base", 0.3))
 	var rail := float(cfg.get("height", 0.8))
@@ -314,7 +320,12 @@ func _balustrade(line: PackedVector3Array, cfg: Dictionary) -> void:
 		var first := (total - (count - 1) * every) / 2.0
 		for k in count:
 			var mid := first + k * every
-			gaps.append(Vector2(mid - opening / 2.0, mid + opening / 2.0))
+			if span > 0.0:
+				# Two whole spans of the model (2.7 m for spans of 1.35 m).
+				var k0 := roundi(mid / span) - 1
+				gaps.append(Vector2(k0 * span, (k0 + 2) * span))
+			else:
+				gaps.append(Vector2(mid - opening / 2.0, mid + opening / 2.0))
 	var along := 0.0
 	var next_post := 0.0
 	for i in line.size() - 1:
@@ -341,6 +352,43 @@ func _balustrade(line: PackedVector3Array, cfg: Dictionary) -> void:
 		along += length
 	_add_length("beach_wall", along)
 	_add_length("wall_openings", gaps.size())
+	if span > 0.0:
+		_wall_spans(model_id, line, span, gaps)
+
+
+## The spans of the model of a low wall along the line, end to end by their
+## length, out of the gaps, on the ground; the sand (the lower side) is to +y
+## of the model.
+func _wall_spans(model_id: String, line: PackedVector3Array, span: float, gaps: Array[Vector2]) -> void:
+	var total := _line_length(line)
+	var k := 0
+	while (k + 0.5) * span <= total:
+		var s0 := k * span
+		var s1 := minf((k + 1) * span, total)
+		k += 1
+		var mid := (s0 + s1) / 2.0
+		if _in_gaps(mid, gaps, 0.0):
+			continue
+		var a := _along_line(line, s0)
+		var b := _along_line(line, s1)
+		a.y = world.ground_height(a.x, a.z) + LIFT
+		b.y = world.ground_height(b.x, b.z) + LIFT
+		var middle := (a + b) / 2.0
+		var side := Vector3(-(b - a).z, 0.0, (b - a).x).normalized()
+		var sea := side if world.ground_height(middle.x + side.x * 1.5, middle.z + side.z * 1.5) \
+				< world.ground_height(middle.x - side.x * 1.5, middle.z - side.z * 1.5) else -side
+		_wall_piece(model_id, a, b, sea)
+
+
+## The point at the distance s along the line.
+static func _along_line(line: PackedVector3Array, s: float) -> Vector3:
+	var left := s
+	for i in line.size() - 1:
+		var length := line[i].distance_to(line[i + 1])
+		if left <= length:
+			return line[i].lerp(line[i + 1], left / maxf(length, 0.001))
+		left -= length
+	return line[line.size() - 1]
 
 
 ## The parts of [from, to] out of the gaps (each a Vector2 of from and to).
@@ -545,6 +593,18 @@ func _sea_wall(cfg: Dictionary) -> void:
 	var until_z := float(cfg.get("until_z", INF))
 	var color := str(cfg.get("color", "#77746c"))
 	var walk_color := str(cfg.get("walk_color", "#b9a68d"))
+	# The pieces of the parapet (report 0026, D-0026-09): a panel of red brown
+	# granite every pillar_every_m among the pieces of grey granite.
+	var parapet_id := str(cfg.get("parapet_model", ""))
+	var pillar_id := str(cfg.get("pillar_model", ""))
+	var pieces := _has_model(parapet_id) and _has_model(pillar_id)
+	var pillar_every := float(cfg.get("pillar_every_m", 10.0))
+	var parapet_color := HIDDEN if pieces else color
+	if pieces:
+		parapet = float(_option(parapet_id, "height", parapet))
+	var inset := float(_option(parapet_id, "cap_width", 0.45)) / 2.0
+	var pillar_length := float(_option(pillar_id, "length", 0.75))
+	var next_pillar := pillar_every / 2.0
 	# The walk goes from the curb of the road: it covers the sidewalk of the road
 	# on the sea side (report 0026, D-0026-04: a strip of bare ground was between
 	# the road and the walk).
@@ -611,6 +671,7 @@ func _sea_wall(cfg: Dictionary) -> void:
 				i += 1
 			var last := i - 1
 			var along := 0.0
+			next_pillar = pillar_every / 2.0
 			for k in range(first, last):
 				var side0 := sides[k] * sign
 				var side1 := sides[k + 1] * sign
@@ -632,7 +693,22 @@ func _sea_wall(cfg: Dictionary) -> void:
 				along += step
 				_add_length("sea_walk_along", step)
 				# The parapet at the outer edge of the walk.
-				_box_along(color, o0 - side0 * 0.15, o1 - side1 * 0.15, 0.15, 0.0, parapet)
+				_box_along(parapet_color, o0 - side0 * 0.15, o1 - side1 * 0.15, 0.15, 0.0, parapet)
+				if pieces:
+					var p0 := o0 - side0 * inset
+					var p1 := o1 - side1 * inset
+					var cut := [0.0, 1.0]
+					var kinds := [parapet_id]
+					var start := along - step
+					if next_pillar < along:
+						var t0 := clampf((next_pillar - start) / maxf(step, 0.001), 0.0, 1.0)
+						var t1 := clampf((next_pillar + pillar_length - start) / maxf(step, 0.001), 0.0, 1.0)
+						cut = [0.0, t0, t1, 1.0]
+						kinds = [parapet_id, pillar_id, parapet_id]
+						next_pillar += pillar_every
+					for n in kinds.size():
+						if float(cut[n + 1]) - float(cut[n]) > 0.02:
+							_wall_piece(kinds[n], p0.lerp(p1, cut[n]), p0.lerp(p1, cut[n + 1]), side0)
 				# The face of stone from the walk down to the ground, then over the ground to the sea.
 				var g0 := o0 + side0 * width
 				var g1 := o1 + side1 * width
@@ -1493,9 +1569,14 @@ func _wall_piece(model_id: String, a: Vector3, b: Vector3, sea: Vector3, up := 1
 		wall_row = WorldRow.new()
 		wall_row.name = "WallPieces"
 		add_child(wall_row)
-	# The x of World is -x of the GLB: the local -x goes from a to b.
+	# The x of World is -x of the GLB: the local -x goes from a to b. A
+	# MultiMesh does not turn the faces of a mirrored instance over, so the
+	# basis stays right-handed: when the sea is to the other side, the piece
+	# goes from b to a (its two ends are the same).
 	var flat_sea := Vector3(sea.x, 0.0, sea.z).normalized()
 	var basis := Basis(-(b - a) / length, Vector3(0.0, up, 0.0), flat_sea * out)
+	if basis.determinant() < 0.0:
+		basis.x = -basis.x
 	wall_row.add(model_id, Transform3D(basis, (a + b) / 2.0))
 
 

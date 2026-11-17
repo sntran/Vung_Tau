@@ -1,0 +1,225 @@
+{
+	"id": "ghe_da_cong_vien",
+	"what": "ghế đá công viên: the bench of dark polished granite of the park of Bãi Trước, a slab on two slab legs",
+	"way": "drawing",
+	"status": "Check",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026: the benches by the paths of the park and along the walk of the sea; the sitters of R10 sit on them (ports seat_left and seat_right).",
+	"order": {
+		"blueprint": "drawing",
+		"options": {
+			"drawing": {
+				"name": "ghe_da_cong_vien",
+				"kind": "prop",
+				"sources": [
+					"The bench of dark polished granite of the park of Bãi Trước: a slab on two slab legs. Photos of 2018-03-08 (Flickr, Ricoucou) and 2014-04-06 (Commons, trungydang, CC BY 3.0); the sizes at the scale of a woman beside it (Vũng Tàu, data/world/drawings/ghe_da_cong_vien.json)."
+				],
+				"materials": {
+					"part_01": {
+						"color": "#ffffff",
+						"roughness": 0.25,
+						"metalness": 0.0
+					}
+				},
+				"nodes": [
+					{
+						"name": "bench",
+						"skill": {
+							"sculpt": {
+								"edits": [
+									{
+										"shape": "box",
+										"size": [
+											0.6,
+											0.2,
+											0.05
+										],
+										"at": [
+											0,
+											0,
+											0.4
+										],
+										"material": "part_01",
+										"color": "#45464a"
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.07,
+											0.2,
+											0.178
+										],
+										"at": [
+											0.53,
+											0,
+											0.175
+										],
+										"mirror": "x",
+										"material": "part_01",
+										"color": "#45464a"
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											0.08,
+											0.21000000000000002,
+											0.003
+										],
+										"at": [
+											0.53,
+											0,
+											0.35
+										],
+										"mirror": "x",
+										"blend": 0.002,
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#2c2d30"
+									}
+								],
+								"ports": {
+									"seat_left": {
+										"at": [
+											-0.3,
+											0,
+											0.45
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0,
+											1,
+											0
+										]
+									},
+									"seat_right": {
+										"at": [
+											0.3,
+											0,
+											0.45
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0,
+											1,
+											0
+										]
+									}
+								},
+								"cells": {
+									"near": 0.01,
+									"mid": 0.02,
+									"far": 0.04
+								},
+								"budget": {
+									"near": 4000,
+									"mid": 600,
+									"far": 60
+								}
+							}
+						}
+					}
+				]
+			}
+		}
+	},
+	"sources": [
+		{
+			"url": "https://www.flickr.com/photos/10598985@N07/27942036338/",
+			"image": "https://live.staticflickr.com/832/27942036338_ab67d8172b_b.jpg",
+			"date": "2018-03-08",
+			"license": "all rights reserved",
+			"author": "Ricoucou (Flickr user 10598985@N07)",
+			"open": false,
+			"file": "flickr_27942036338_b.jpg",
+			"shows": "The park under frangipani trees in the morning: a bench of dark polished granite (a slab on two slab legs) at the corner of a path of red tiles and a granite curb, benches of rough light stone, clipped hedges along the paths, a dark post with white globes, low square lamps."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(2).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_paths_2014.jpg",
+			"shows": "The park in the morning: a path of tiles with a granite curb, a low square white lamp at its side, two women on the path, a bench of dark granite behind them and a bench of rough light stone, clipped hedges along the paths."
+		}
+	],
+	"sizes": {
+		"height": {
+			"value": 0.45,
+			"unit": "m",
+			"source": "Photo 1 (2014): the dark bench behind the two women is 30 px from the top of its seat to its foot, and the woman in grey who stands at its right end is 100 px (1.58 m, a mean height of a woman): 0.47 m. The spec measured 28 px at 98 px for 1.58 m: 0.45 m. Photo 0 (2018) has no person near the dark bench."
+		},
+		"length": {
+			"value": 1.2,
+			"unit": "m",
+			"source": "Photo 0 (2018): the dark bench is 92 px long and 37 px high in the photo of 1024 px (2.5 times its height), and it stands nearly square to the view: 2.5 × 0.45 m = 1.12 m, a little more for its turn: 1.2 m. Photo 1 (2014): the part that the walking woman does not hide is 67 px at 63 px for 1 m: at least 1.06 m."
+		},
+		"depth": {
+			"value": 0.4,
+			"unit": "m",
+			"source": "estimate (no source): no photo shows a bench from its end. The top of the seat shows as a thin strip in photo 0 (2018)."
+		},
+		"seat": {
+			"value": 0.1,
+			"unit": "m",
+			"source": "Photo 0 (2018): the front face of the seat slab is about 9 px of the 37 px of the bench (0.24 of its height): 0.11 m; 0.10 m."
+		},
+		"legs": {
+			"value": "2 slab legs, 0.14 m thick, as deep as the seat, flush with the ends of the seat",
+			"unit": "m",
+			"source": "Photo 0 (2018): the front face of the right leg is about 12 px of the 92 px of the bench (0.13 of its length): 0.15 m; the end of the bench is one flat face (the leg is flush with the end of the seat). Photo 1 (2014): two legs."
+		},
+		"color": {
+			"value": "dark polished granite #45464a, joints #2c2d30",
+			"unit": "",
+			"source": "Photo 0 (2018): the median of the end of the bench in the light is #3d4041, and its polished faces show the sky; photo 1 (2014): a dark bench."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "c606fb8c38de026b08a3050127eba1d3",
+			"seen": "Next to photo 0 (2018): a dark slab on two slab legs at its ends, as the photo. The corners of the seat and the inner feet of the legs looked cut off.",
+			"changed": "I made the seat and the legs plain boxes (no round edges), to see if the round edges cut the corners."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "1855530b9bddb3a16d4ac3b0188d1589",
+			"seen": "The same outline. The cut corners are not in the mesh: they are the inner faces of the legs and the top of the seat in the perspective of the views, all in one flat dark color.",
+			"changed": "I raised the budget of the mid level from 300 to 600 triangles, to be sure that the cut to the budget does not move the corners."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "169bd97aae3919c33603c44ecf44e456",
+			"seen": "The same outline as before, so the shape is correct: a dark polished slab of 1.2 m on two legs of 0.14 m flush with its ends, 0.45 m high, as photos 0 and 1.",
+			"changed": "Nothing. Next: the near level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "169bd97aae3919c33603c44ecf44e456",
+			"seen": "The same shape with sharp edges, and the thin dark joint of the seat on each leg. The dark granite color agrees with the end of the bench in photo 0.",
+			"changed": "Nothing."
+		}
+	],
+	"hash": "169bd97aae3919c33603c44ecf44e456"
+}

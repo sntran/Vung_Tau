@@ -39,10 +39,16 @@ func run(d: PlaytestDriver) -> void:
 	if not d.expect(parsed is Dictionary, "%s can be read" % PLACES):
 		return
 	var data: Dictionary = {}
+	var waiting: Array[String] = []
 	for place: Dictionary in parsed.places:
 		data[str(place.id)] = place
+		# A model with the status Check has its place, but no order: it waits.
+		if WorldModel.order(str(place.id)).is_empty():
+			waiting.append(str(place.id))
 	var models: Array[Dictionary] = w.showcase.models
-	d.expect(models.size() == data.size(), "each place has its model: %d of %d" % [models.size(), data.size()])
+	d.step("the places that wait for their models (Check): %s" % ", ".join(waiting))
+	d.expect(models.size() == data.size() - waiting.size(), "each place with an order has its model: %d of %d" % [
+			models.size(), data.size() - waiting.size()])
 	d.step("the parts of the showcase (m, or a count): %s" % [w.showcase.lengths])
 	_check_models(d, w)
 	_check_hill_side(d, w)
@@ -217,6 +223,7 @@ func _check_models(d: PlaytestDriver, w: VungTau) -> void:
 		named.append(str(id))
 	for wall: Dictionary in data.get("walls", []):
 		named.append(str(wall.get("model", "the low wall")))
+	named.append(str(data.ground.get("beach_wall", {}).get("model", "the low wall of the beach")))
 	for wall: Dictionary in data.get("sea_walls", []):
 		for id: String in wall.get("models", ["the sea wall"]):
 			named.append(id)

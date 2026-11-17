@@ -1,0 +1,133 @@
+{
+	"id": "ke_da_bai_truoc",
+	"what": "kè đá Bãi Trước: a piece of 2 m of the sloped sea wall of granite blocks in courses, from the foot of the low wall of the walk down to the sand",
+	"way": "blueprint",
+	"status": "Check",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026, R4: under the low wall of the beach (tuong_bai_tam) where the sea wall slopes (photo 0: the south corner): the game puts the pieces one after another along the line, the port end of a piece on the port start of the next, the top edge (the origin) at the foot of the low wall on the side of the sand, the slope down to +y.",
+	"order": {
+		"blueprint": {
+			"file": "data/world/blueprints/ke_bien.json"
+		},
+		"options": {
+			"kind": "ke_da_bai_truoc",
+			"length": 2.0,
+			"height": 1.4,
+			"run": 2.0,
+			"course": 0.25,
+			"block": 0.4,
+			"blocks": 5,
+			"courses": 5
+		}
+	},
+	"sources": [
+		{
+			"url": "https://www.flickr.com/photos/beos_album/50955595227/",
+			"image": "https://live.staticflickr.com/65535/50955595227_b86c7c86b7_b.jpg",
+			"date": "2019-02-02 17:34",
+			"license": "all rights reserved",
+			"author": "Hữu Nghĩa Nguyễn Huỳnh (beos_album, Flickr)",
+			"open": false,
+			"file": "flickr_50955595227_2019.jpg",
+			"shows": "Bãi Trước at sunset to the south: in the corner a sloped sea wall of rough granite blocks laid in courses along its top edge, the wet sand at its foot, a man with a ball, the boats of the bay, Khách sạn Bưu điện, the tower of Khách sạn Hoa Tiêu."
+		},
+		{
+			"url": "https://www.flickr.com/photos/time-to-look/47924741823/",
+			"image": "https://live.staticflickr.com/65535/47924741823_0acc5a1a35_b.jpg",
+			"date": "2019-01-24 10:55",
+			"license": "CC BY-NC-SA 2.0",
+			"author": "Ted McGrath (time-to-look, Flickr)",
+			"open": false,
+			"file": "flickr_47924741823_2019_steps.jpg",
+			"shows": "Bãi Trước at low tide, a crop of the original: the low wall with its rail and openings on a wall of granite blocks in courses, a band at the level of the walk, and under it a long flight of seven steps of granite down to the sand along the wall; a woman in a nón lá and a man in blue with a crate on the steps; painted fishing boats on the sand."
+		},
+		{
+			"url": "https://vnexpress.net/bai-bien-vung-tau-dong-nghit-nguoi-4090193.html",
+			"image": "https://vcdn1-vnexpress.vnecdn.net/2020/04/25/Dang-Khoa-Tam-bien-Vung-Tau-2-3443-9097-1587819462.jpg",
+			"date": "2020-04-25",
+			"license": "all rights reserved",
+			"author": "Trường Hà / VnExpress",
+			"open": false,
+			"file": "vne_4090193_2_2020.jpg",
+			"shows": "The south part of the beach full of swimmers at the end of the afternoon: the low wall with its rail and openings in sections on a sloped face of stone, a stair down to the sand in a gap between two sections, swim rings, light blue lamp poles behind the palms."
+		},
+		{
+			"url": "https://www.flickr.com/photos/110569822@N04/48108232968/",
+			"image": "https://live.staticflickr.com/65535/48108232968_ab4f0d0653_b.jpg",
+			"date": "2019-06-22 09:40",
+			"license": "all rights reserved",
+			"author": "Nguyen tan dat Dat (tandat.2301, Flickr)",
+			"open": false,
+			"file": "flickr_48108232968_2019_steps.jpg",
+			"shows": "The north part of Bãi Trước from the sand (a crop of the original): wide flights of granite steps from the walk down to the sand and the water between the sections of the low wall, seen from the side; on the right a section of the low wall on a footing of concrete, with a short flight of three steps at its end; swim rings, people on the sand."
+		}
+	],
+	"sizes": {
+		"length": {
+			"value": 2.0,
+			"unit": "m",
+			"source": "A piece of the row: I choose 2 m."
+		},
+		"height": {
+			"value": 1.4,
+			"unit": "m",
+			"source": "Photo 1 (2019-01-24): from the walk to the sand 172 px of the crop, at the scale of the man in blue on the steps (192 px for 1.6 m): 1.43 m. The game takes the heights from the ground of plan 0005."
+		},
+		"run": {
+			"value": 2.0,
+			"unit": "m",
+			"source": "estimate (no source): a slope of about 35 degrees (photo 0 shows the slope at about 35 degrees; not measured)."
+		},
+		"course": {
+			"value": 0.25,
+			"unit": "m",
+			"source": "estimate (no source): photo 0 shows courses of blocks along the top edge, as the courses of the low wall (0.2 m to 0.24 m, tuong_bai_tam)."
+		},
+		"block": {
+			"value": 0.4,
+			"unit": "m",
+			"source": "estimate (no source): photo 0 shows blocks a little longer than those of the low wall."
+		},
+		"colors": {
+			"value": "granite #8f8a82, darker and wet near the sand #5a554d, joints #66625b",
+			"unit": "",
+			"source": "Photo 0 (2019) and photo 2 (2020): grey granite, darker and wet near the sand."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "a84e2428ffa2a58fbad9b869aefc598b",
+			"seen": "Next to photos 0 to 3: the slope of 35 degrees from the top edge to the sand is as in photo 0. The joints of the blocks show at the mid level: the levels of the edits in a group do not count, only the levels of the group edit. A row of joints is on each end face (dark bands in the side view). The wet band at the foot is weak.",
+			"changed": "The group edit at the near level only; the joints of each course start a block or a half block in from the end, so no joint is on an end face; the wet band to #5a554d with an opacity of 0.75."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "fb4519c75ca2d9e56ce95be081f813dd",
+			"seen": "Next to photo 0: the slope from the top edge to the sand, one rough grey, with a darker band at the foot; no joint at the mid level now. The courses of blocks of photo 0 show at the near level only. The footing under the foot is under the sand in the game.",
+			"changed": "Nothing at the mid level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "2169503e65af074813fc6a2ea180dea9",
+			"seen": "The mid level of the last blueprint: the same as the look before.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "2169503e65af074813fc6a2ea180dea9",
+			"seen": "Next to photo 0: courses of grey blocks along the top edge with joints a half block apart, darker near the sand. In photo 0 the blocks are rougher and each course stands out a little; here the slope is flat.",
+			"changed": "Nothing: the last level."
+		}
+	],
+	"hash": "2169503e65af074813fc6a2ea180dea9"
+}

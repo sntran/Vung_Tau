@@ -1,0 +1,1534 @@
+{
+	"id": "nha_mai_ngoi_cam",
+	"what": "nhà mái ngói cam bên đường Hạ Long: the square hall with a pyramid roof of orange tiles by Hạ Long, next to the tower of Cao ốc Sen Biển (in 2014 the sign on its fence said Trạm Hoa tiêu Vũng Tàu)",
+	"way": "drawing",
+	"status": "Check",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026, R7: on its OSM outline (way 225803473, a square of 19 m) by Hạ Long, in place of its stand-in; it is in the shot S1 and in the walk PT-74.",
+	"order": {
+		"blueprint": "drawing",
+		"options": {
+			"drawing": {
+				"name": "nha_mai_ngoi_cam",
+				"kind": "building",
+				"sources": [
+					"The square hall with a pyramid roof of orange tiles by Hạ Long, next to the tower of Cao ốc Sen Biển (the sign on its fence in 2014: Trạm Hoa tiêu Vũng Tàu): photos of 2014-04-05 (Commons, trungydang, CC BY 3.0), 2020-06-06 (Flickr, Viet Nhan Tran) and 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0); its outline of OpenStreetMap (way 225803473, (c) OpenStreetMap contributors, ODbL) (Vũng Tàu, data/world/drawings/nha_mai_ngoi_cam.json)."
+				],
+				"materials": {
+					"part_01": {
+						"color": "#ffffff",
+						"roughness": 0.85,
+						"metalness": 0.0
+					},
+					"part_02": {
+						"color": "#ffffff",
+						"roughness": 0.7,
+						"metalness": 0.0
+					}
+				},
+				"nodes": [
+					{
+						"name": "hall",
+						"skill": {
+							"sculpt": {
+								"edits": [
+									{
+										"shape": "box",
+										"size": [
+											9.0,
+											9.0,
+											1.95
+										],
+										"at": [
+											0,
+											0,
+											1.95
+										],
+										"material": "part_01",
+										"color": "#e6d5a5"
+									},
+									{
+										"shape": "box",
+										"size": [
+											9.06,
+											9.06,
+											0.3
+										],
+										"at": [
+											0,
+											0,
+											0.3
+										],
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#a5654b"
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											9.3,
+											9.3,
+											0.3
+										],
+										"at": [
+											0,
+											0,
+											0.3
+										],
+										"levels": [
+											"mid",
+											"far"
+										],
+										"blend": 0.02,
+										"material": "part_01",
+										"color": "#a5654b"
+									},
+									{
+										"shape": "box",
+										"size": [
+											9.12,
+											9.12,
+											0.15
+										],
+										"at": [
+											0,
+											0,
+											3.75
+										],
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#f1eadb",
+										"roughness": 0.75
+									},
+									{
+										"shape": "box",
+										"size": [
+											9.06,
+											9.06,
+											0.05
+										],
+										"at": [
+											0,
+											0,
+											3.55
+										],
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#f1eadb",
+										"roughness": 0.75
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											9.3,
+											9.3,
+											0.2
+										],
+										"at": [
+											0,
+											0,
+											3.7
+										],
+										"levels": [
+											"mid",
+											"far"
+										],
+										"blend": 0.02,
+										"material": "part_01",
+										"color": "#f1eadb",
+										"roughness": 0.75
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.3,
+											0.3,
+											1.5
+										],
+										"at": [
+											8.78,
+											8.78,
+											2.1
+										],
+										"mirror": [
+											"x",
+											"y"
+										],
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#e6d5a5"
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.2,
+											0.1,
+											1.5
+										],
+										"at": [
+											1.6,
+											9.0,
+											2.1
+										],
+										"mirror": [
+											"x",
+											"y"
+										],
+										"levels": [
+											"near"
+										],
+										"repeat": {
+											"count": 2,
+											"move": [
+												3.2,
+												0,
+												0
+											]
+										},
+										"material": "part_01",
+										"color": "#e6d5a5"
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.1,
+											0.2,
+											1.5
+										],
+										"at": [
+											9.0,
+											1.6,
+											2.1
+										],
+										"mirror": [
+											"x",
+											"y"
+										],
+										"levels": [
+											"near"
+										],
+										"repeat": {
+											"count": 2,
+											"move": [
+												0,
+												3.2,
+												0
+											]
+										},
+										"material": "part_01",
+										"color": "#e6d5a5"
+									},
+									{
+										"shape": "group",
+										"group": "arched_window",
+										"at": [
+											-6.4,
+											-9.0,
+											0
+										],
+										"axis": [
+											0,
+											-1,
+											0
+										],
+										"up": [
+											0,
+											0,
+											1
+										],
+										"repeat": {
+											"count": 5,
+											"move": [
+												3.2,
+												0,
+												0
+											]
+										}
+									},
+									{
+										"shape": "group",
+										"group": "arched_window",
+										"at": [
+											9.0,
+											-6.4,
+											0
+										],
+										"axis": [
+											1,
+											0,
+											0
+										],
+										"up": [
+											0,
+											0,
+											1
+										],
+										"mirror": "x",
+										"repeat": {
+											"count": 5,
+											"move": [
+												0,
+												3.2,
+												0
+											]
+										}
+									},
+									{
+										"shape": "group",
+										"group": "front_window",
+										"at": [
+											3.6,
+											9.0,
+											0
+										],
+										"axis": [
+											0,
+											1,
+											0
+										],
+										"up": [
+											0,
+											0,
+											1
+										],
+										"mirror": "x",
+										"repeat": {
+											"count": 2,
+											"move": [
+												3.2,
+												0,
+												0
+											]
+										}
+									},
+									{
+										"shape": "box",
+										"size": [
+											2.46,
+											0.78,
+											0.3
+										],
+										"at": [
+											0,
+											9.75,
+											0.3
+										],
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#a5654b"
+									},
+									{
+										"shape": "box",
+										"size": [
+											2.4,
+											0.75,
+											1.9
+										],
+										"at": [
+											0,
+											9.75,
+											1.9
+										],
+										"material": "part_01",
+										"color": "#e6d5a5"
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.25,
+											0.08,
+											1.5999999999999999
+										],
+										"at": [
+											2.15,
+											10.5,
+											2.1999999999999997
+										],
+										"mirror": "x",
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#f1eadb",
+										"roughness": 0.75
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											0.25,
+											0.3,
+											1.5999999999999999
+										],
+										"at": [
+											2.15,
+											10.5,
+											2.1999999999999997
+										],
+										"mirror": "x",
+										"levels": [
+											"mid",
+											"far"
+										],
+										"blend": 0.02,
+										"material": "part_01",
+										"color": "#f1eadb",
+										"roughness": 0.75
+									},
+									{
+										"shape": "box",
+										"size": [
+											2.52,
+											0.85,
+											0.15
+										],
+										"at": [
+											0,
+											9.8,
+											3.95
+										],
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#f1eadb",
+										"roughness": 0.75
+									},
+									{
+										"shape": "extrude",
+										"size": {
+											"outline": [
+												[
+													-2.4,
+													4.1
+												],
+												[
+													2.4,
+													4.1
+												],
+												[
+													2.4,
+													4.55
+												],
+												[
+													1.9582,
+													4.7976
+												],
+												[
+													1.4911,
+													4.9936
+												],
+												[
+													1.0049,
+													5.1354
+												],
+												[
+													0.5057,
+													5.2213
+												],
+												[
+													0.0,
+													5.25
+												],
+												[
+													-0.5057,
+													5.2213
+												],
+												[
+													-1.0049,
+													5.1354
+												],
+												[
+													-1.4911,
+													4.9936
+												],
+												[
+													-1.9582,
+													4.7976
+												],
+												[
+													-2.4,
+													4.55
+												]
+											],
+											"depth": 0.4
+										},
+										"at": [
+											0,
+											10.3,
+											0
+										],
+										"axis": [
+											0,
+											1,
+											0
+										],
+										"up": [
+											0,
+											0,
+											1
+										],
+										"material": "part_01",
+										"color": "#f1eadb",
+										"roughness": 0.75
+									},
+									{
+										"mode": "paint",
+										"shape": "extrude",
+										"size": {
+											"outline": [
+												[
+													-2.064,
+													4.1
+												],
+												[
+													2.064,
+													4.1
+												],
+												[
+													2.064,
+													4.46
+												],
+												[
+													1.6840519999999999,
+													4.65808
+												],
+												[
+													1.282346,
+													4.81488
+												],
+												[
+													0.8642139999999999,
+													4.928319999999999
+												],
+												[
+													0.434902,
+													4.99704
+												],
+												[
+													0.0,
+													5.02
+												],
+												[
+													-0.434902,
+													4.99704
+												],
+												[
+													-0.8642139999999999,
+													4.928319999999999
+												],
+												[
+													-1.282346,
+													4.81488
+												],
+												[
+													-1.6840519999999999,
+													4.65808
+												],
+												[
+													-2.064,
+													4.46
+												]
+											],
+											"depth": 0.1
+										},
+										"at": [
+											0,
+											10.5,
+											0
+										],
+										"axis": [
+											0,
+											1,
+											0
+										],
+										"up": [
+											0,
+											0,
+											1
+										],
+										"blend": 0.01,
+										"levels": [
+											"near",
+											"mid"
+										],
+										"material": "part_01",
+										"color": "#e6d5a5"
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.16,
+											0.16,
+											0.25
+										],
+										"at": [
+											2.3,
+											10.35,
+											4.35
+										],
+										"mirror": "x",
+										"material": "part_01",
+										"color": "#f1eadb",
+										"roughness": 0.75
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.35,
+											0.12,
+											0.25
+										],
+										"at": [
+											0,
+											10.5,
+											4.7
+										],
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#f1eadb",
+										"roughness": 0.75
+									},
+									{
+										"mode": "paint",
+										"shape": "extrude",
+										"size": {
+											"outline": [
+												[
+													-1.05,
+													0.58
+												],
+												[
+													1.05,
+													0.58
+												],
+												[
+													1.05,
+													2.55
+												],
+												[
+													0.9701,
+													2.9518
+												],
+												[
+													0.7425,
+													3.2925
+												],
+												[
+													0.4018,
+													3.5201
+												],
+												[
+													0.0,
+													3.6
+												],
+												[
+													-0.4018,
+													3.5201
+												],
+												[
+													-0.7425,
+													3.2925
+												],
+												[
+													-0.9701,
+													2.9518
+												],
+												[
+													-1.05,
+													2.55
+												]
+											],
+											"depth": 0.3
+										},
+										"at": [
+											0,
+											10.5,
+											0
+										],
+										"axis": [
+											0,
+											1,
+											0
+										],
+										"up": [
+											0,
+											0,
+											1
+										],
+										"blend": 0.01,
+										"material": "part_01",
+										"color": "#f1eadb",
+										"roughness": 0.75
+									},
+									{
+										"mode": "subtract",
+										"shape": "extrude",
+										"size": {
+											"outline": [
+												[
+													-0.9,
+													0.6
+												],
+												[
+													0.9,
+													0.6
+												],
+												[
+													0.9,
+													2.55
+												],
+												[
+													0.8315,
+													2.8944
+												],
+												[
+													0.6364,
+													3.1864
+												],
+												[
+													0.3444,
+													3.3815
+												],
+												[
+													0.0,
+													3.45
+												],
+												[
+													-0.3444,
+													3.3815
+												],
+												[
+													-0.6364,
+													3.1864
+												],
+												[
+													-0.8315,
+													2.8944
+												],
+												[
+													-0.9,
+													2.55
+												]
+											],
+											"depth": 1.2
+										},
+										"at": [
+											0,
+											10.5,
+											0
+										],
+										"axis": [
+											0,
+											1,
+											0
+										],
+										"up": [
+											0,
+											0,
+											1
+										],
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#4a3426",
+										"roughness": 0.65
+									},
+									{
+										"mode": "paint",
+										"shape": "extrude",
+										"size": {
+											"outline": [
+												[
+													-0.9,
+													0.6
+												],
+												[
+													0.9,
+													0.6
+												],
+												[
+													0.9,
+													2.55
+												],
+												[
+													0.8315,
+													2.8944
+												],
+												[
+													0.6364,
+													3.1864
+												],
+												[
+													0.3444,
+													3.3815
+												],
+												[
+													0.0,
+													3.45
+												],
+												[
+													-0.3444,
+													3.3815
+												],
+												[
+													-0.6364,
+													3.1864
+												],
+												[
+													-0.8315,
+													2.8944
+												],
+												[
+													-0.9,
+													2.55
+												]
+											],
+											"depth": 0.3
+										},
+										"at": [
+											0,
+											10.5,
+											0
+										],
+										"axis": [
+											0,
+											1,
+											0
+										],
+										"up": [
+											0,
+											0,
+											1
+										],
+										"blend": 0.01,
+										"levels": [
+											"mid",
+											"far"
+										],
+										"material": "part_01",
+										"color": "#4a3426",
+										"roughness": 0.65
+									},
+									{
+										"shape": "box",
+										"size": [
+											1.4,
+											0.45,
+											0.1
+										],
+										"at": [
+											0,
+											10.95,
+											0.1
+										],
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#b8b2a6",
+										"roughness": 0.8
+									},
+									{
+										"shape": "box",
+										"size": [
+											1.3,
+											0.3,
+											0.1
+										],
+										"at": [
+											0,
+											10.8,
+											0.3
+										],
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#b8b2a6",
+										"roughness": 0.8
+									},
+									{
+										"shape": "box",
+										"size": [
+											1.2,
+											0.15,
+											0.1
+										],
+										"at": [
+											0,
+											10.65,
+											0.5
+										],
+										"levels": [
+											"near"
+										],
+										"material": "part_01",
+										"color": "#b8b2a6",
+										"roughness": 0.8
+									}
+								],
+								"groups": {
+									"arched_window": [
+										{
+											"mode": "paint",
+											"shape": "extrude",
+											"size": {
+												"outline": [
+													[
+														-0.84,
+														0.82
+													],
+													[
+														0.84,
+														0.82
+													],
+													[
+														0.84,
+														2.6
+													],
+													[
+														0.7761,
+														2.9215
+													],
+													[
+														0.594,
+														3.194
+													],
+													[
+														0.3215,
+														3.3761
+													],
+													[
+														0.0,
+														3.44
+													],
+													[
+														-0.3215,
+														3.3761
+													],
+													[
+														-0.594,
+														3.194
+													],
+													[
+														-0.7761,
+														2.9215
+													],
+													[
+														-0.84,
+														2.6
+													]
+												],
+												"depth": 0.3
+											},
+											"blend": 0.01,
+											"material": "part_01",
+											"color": "#f1eadb",
+											"roughness": 0.75
+										},
+										{
+											"mode": "subtract",
+											"shape": "extrude",
+											"size": {
+												"outline": [
+													[
+														-0.7,
+														0.9
+													],
+													[
+														0.7,
+														0.9
+													],
+													[
+														0.7,
+														2.6
+													],
+													[
+														0.6467,
+														2.8679
+													],
+													[
+														0.495,
+														3.095
+													],
+													[
+														0.2679,
+														3.2467
+													],
+													[
+														0.0,
+														3.3
+													],
+													[
+														-0.2679,
+														3.2467
+													],
+													[
+														-0.495,
+														3.095
+													],
+													[
+														-0.6467,
+														2.8679
+													],
+													[
+														-0.7,
+														2.6
+													]
+												],
+												"depth": 0.3
+											},
+											"levels": [
+												"near"
+											],
+											"material": "part_01",
+											"color": "#9e5a35",
+											"roughness": 0.65
+										},
+										{
+											"mode": "paint",
+											"shape": "extrude",
+											"size": {
+												"outline": [
+													[
+														-0.7,
+														0.9
+													],
+													[
+														0.7,
+														0.9
+													],
+													[
+														0.7,
+														2.6
+													],
+													[
+														0.6467,
+														2.8679
+													],
+													[
+														0.495,
+														3.095
+													],
+													[
+														0.2679,
+														3.2467
+													],
+													[
+														0.0,
+														3.3
+													],
+													[
+														-0.2679,
+														3.2467
+													],
+													[
+														-0.495,
+														3.095
+													],
+													[
+														-0.6467,
+														2.8679
+													],
+													[
+														-0.7,
+														2.6
+													]
+												],
+												"depth": 0.3
+											},
+											"blend": 0.01,
+											"levels": [
+												"mid",
+												"far"
+											],
+											"material": "part_01",
+											"color": "#9e5a35",
+											"roughness": 0.65
+										},
+										{
+											"shape": "box",
+											"size": [
+												0.85,
+												0.05,
+												0.08
+											],
+											"at": [
+												0,
+												0.8,
+												0.05
+											],
+											"levels": [
+												"near"
+											],
+											"material": "part_01",
+											"color": "#f1eadb",
+											"roughness": 0.75
+										}
+									],
+									"front_window": [
+										{
+											"mode": "paint",
+											"shape": "extrude",
+											"size": {
+												"outline": [
+													[
+														-0.74,
+														0.82
+													],
+													[
+														0.74,
+														0.82
+													],
+													[
+														0.74,
+														2.98
+													],
+													[
+														-0.74,
+														2.98
+													]
+												],
+												"depth": 0.3
+											},
+											"blend": 0.01,
+											"material": "part_01",
+											"color": "#f1eadb",
+											"roughness": 0.75
+										},
+										{
+											"mode": "subtract",
+											"shape": "extrude",
+											"size": {
+												"outline": [
+													[
+														-0.6,
+														0.9
+													],
+													[
+														0.6,
+														0.9
+													],
+													[
+														0.6,
+														2.9
+													],
+													[
+														-0.6,
+														2.9
+													]
+												],
+												"depth": 0.3
+											},
+											"levels": [
+												"near"
+											],
+											"material": "part_01",
+											"color": "#9e5a35",
+											"roughness": 0.65
+										},
+										{
+											"mode": "paint",
+											"shape": "extrude",
+											"size": {
+												"outline": [
+													[
+														-0.6,
+														0.9
+													],
+													[
+														0.6,
+														0.9
+													],
+													[
+														0.6,
+														2.9
+													],
+													[
+														-0.6,
+														2.9
+													]
+												],
+												"depth": 0.3
+											},
+											"blend": 0.01,
+											"levels": [
+												"mid",
+												"far"
+											],
+											"material": "part_01",
+											"color": "#9e5a35",
+											"roughness": 0.65
+										},
+										{
+											"shape": "box",
+											"size": [
+												0.85,
+												0.1,
+												0.07
+											],
+											"at": [
+												0,
+												3.1,
+												0.08
+											],
+											"levels": [
+												"near"
+											],
+											"material": "part_01",
+											"color": "#f1eadb",
+											"roughness": 0.75
+										},
+										{
+											"shape": "box",
+											"size": [
+												0.85,
+												0.05,
+												0.08
+											],
+											"at": [
+												0,
+												0.8,
+												0.05
+											],
+											"levels": [
+												"near"
+											],
+											"material": "part_01",
+											"color": "#f1eadb",
+											"roughness": 0.75
+										}
+									]
+								},
+								"cells": {
+									"near": 0.04,
+									"mid": 0.2,
+									"far": 0.4
+								},
+								"budget": {
+									"near": 12000,
+									"mid": 600,
+									"far": 150
+								},
+								"bake": {
+									"near": 512,
+									"mid": 128
+								},
+								"dirt": 0.2
+							}
+						}
+					},
+					{
+						"name": "roof",
+						"skill": {
+							"sculpt": {
+								"edits": [
+									{
+										"shape": "box",
+										"size": [
+											9.5,
+											9.5,
+											0.1
+										],
+										"at": [
+											0,
+											0,
+											4.0
+										],
+										"material": "part_02",
+										"color": "#e6d38c",
+										"roughness": 0.6
+									},
+									{
+										"shape": "pyramid",
+										"size": [
+											9.45,
+											9.45,
+											3.0
+										],
+										"at": [
+											0,
+											0,
+											7.1
+										],
+										"material": "part_02",
+										"color": "#c66c3e"
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											9.6,
+											9.6,
+											0.012
+										],
+										"at": [
+											0,
+											0,
+											4.27
+										],
+										"blend": 0.012,
+										"raise": 0.01,
+										"levels": [
+											"near"
+										],
+										"repeat": {
+											"count": 29,
+											"move": [
+												0,
+												0,
+												0.2
+											]
+										},
+										"material": "part_02",
+										"color": "#a4532f"
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													9.45,
+													9.45,
+													4.119999999999999
+												],
+												[
+													0,
+													0,
+													10.12
+												]
+											],
+											"radii": [
+												0.12,
+												0.12
+											]
+										},
+										"mirror": [
+											"x",
+											"y"
+										],
+										"levels": [
+											"near"
+										],
+										"material": "part_02",
+										"color": "#e6d38c",
+										"roughness": 0.6
+									},
+									{
+										"mode": "paint",
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													9.6,
+													9.6,
+													3.9999999999999996
+												],
+												[
+													0,
+													0,
+													10.2
+												]
+											],
+											"radii": [
+												0.2,
+												0.2
+											]
+										},
+										"mirror": [
+											"x",
+											"y"
+										],
+										"levels": [
+											"mid",
+											"far"
+										],
+										"blend": 0.02,
+										"material": "part_02",
+										"color": "#e6d38c",
+										"roughness": 0.6
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.2
+										],
+										"at": [
+											0,
+											0,
+											10.1
+										],
+										"material": "part_02",
+										"color": "#e6d38c",
+										"roughness": 0.6
+									}
+								],
+								"cells": {
+									"near": 0.05,
+									"mid": 0.25,
+									"far": 0.4
+								},
+								"budget": {
+									"near": 6000,
+									"mid": 400,
+									"far": 60
+								},
+								"bake": {
+									"near": 512,
+									"mid": 128
+								}
+							}
+						}
+					}
+				]
+			}
+		}
+	},
+	"sources": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:V%C5%A9ng_T%C3%A0u,_Ba_Ria_-_Vung_Tau,_Vietnam_-_panoramio_(2).jpg",
+			"date": "2014-04-05 17:53",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "shot_s1_2014.jpg",
+			"shows": "The beach to the south: the hall with a square roof of orange tiles and light hips by Hạ Long, its cream front with a porch, its fence with blue posts, flags; Khách sạn Bưu điện, the tower of Cao ốc Sen Biển, the hotels on the slope of Núi Nhỏ."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Vung_Tau,_Viet_Nam.jpg",
+			"date": "2021-01-30",
+			"license": "CC BY-SA 4.0",
+			"author": "Tuong Lam Photos",
+			"open": true,
+			"file": "drone_2021_ha_long.jpg",
+			"shows": "From a drone over Hạ Long, to the west: the hall from above, its pyramid roof of orange tiles with light hips and a little porch on the side of the road, its cream walls with pilasters and arched windows with brown shutters on the two sides that the photo shows; the tower and the stepped block of Cao ốc Sen Biển, Hạ Long, Núi Nhỏ."
+		},
+		{
+			"url": "https://www.flickr.com/photos/project-j13/49980798862/",
+			"image": "https://live.staticflickr.com/65535/49980798862_54a3e86a9f_b.jpg",
+			"date": "2020-06-06 17:55",
+			"license": "all rights reserved",
+			"author": "Viet Nhan Tran (Flickr user project-j13)",
+			"open": false,
+			"file": "flickr_49980798862_b.jpg",
+			"shows": "Hạ Long at the end of the afternoon, from across the road: the front of the hall behind its fence with blue posts and frangipani trees, its pyramid roof of tiles with light hips, the white pediment of its porch with a curved top behind the round blue sign; flags; the tower of Cao ốc Sen Biển."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Ks_Hoa_Tieu_Vung_tau-_duong_Ha_Long_-_panoramio.jpg",
+			"image": "https://commons.wikimedia.org/wiki/Special:FilePath/Ks_Hoa_Tieu_Vung_tau-_duong_Ha_Long_-_panoramio.jpg?width=1280",
+			"date": "2014-04-05",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": false,
+			"file": "hall_front_2014b.jpg",
+			"shows": "Hạ Long, from across the road: the hall from the front and its left side: the pyramid roof of orange tiles with yellow cream hips and fascia, cream walls with pilasters, rectangular windows with hoods and brown louvered shutters on the front, arched windows on the side, a red brown plinth, the porch with a white pediment with a curved top and pinnacles; the fence with blue posts and the round blue sign TRẠM HOA TIÊU VŨNG TÀU. An open photo: its copy is not in docs/reference/photos/ yet."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Khach_san_Hoa_tieu-_duong_Ha_long-tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"image": "https://commons.wikimedia.org/wiki/Special:FilePath/Khach_san_Hoa_tieu-_duong_Ha_long-tp._V%C5%A9ng_T%C3%A0u%2C_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u%2C_Vi%E1%BB%87t_Nam_-_panoramio.jpg?width=1280",
+			"date": "2014-04-05 16:23",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": false,
+			"file": "hall_front_2014a.jpg",
+			"shows": "Hạ Long, from across the road: the front of the hall square to the view under its pyramid roof, the porch in the middle of the front with its white pediment, a white ornament and two pinnacles, frangipani trees and the fence. An open photo: its copy is not in docs/reference/photos/ yet."
+		}
+	],
+	"sizes": {
+		"roof_square": {
+			"value": 19.0,
+			"unit": "m",
+			"source": "The outline of OpenStreetMap (way 225803473): a square of 18.97 m by 18.91 m, the roof from above. Photo 1 (2021): a square pyramid with its eaves round the walls."
+		},
+		"wall_square": {
+			"value": 18.0,
+			"unit": "m",
+			"source": "Photo 1 (2021): the eaves go about 0.5 m out of the walls (the spec)."
+		},
+		"wall_height": {
+			"value": 3.9,
+			"unit": "m",
+			"source": "Photo 0 (2014): the walls are 145 px of the 710 px of the front of 19 m (the spec): 3.9 m. Photo 3 (2014): with a camera at 1.5 m, the eaves and the top agree with 3.9 m and 6.1 m. Photo 1 (2021): from the drone, the wall under the eaves is 0.62 of the height of the roof over the eaves (120 px and 195 px in a crop at 5 times): 3.8 m for a roof of 6.2 m."
+		},
+		"roof_height": {
+			"value": 6.2,
+			"unit": "m",
+			"source": "Photo 0 (2014): the roof is 230 px of the 710 px of the front of 19 m (the spec): 6.2 m. Photo 2 (2020): the front of the roof is 280 px wide at the eaves and rises 70 px to the top, square to the view; with the top 9.5 m behind the eaves and a camera at 1.5 m and 40 m to 60 m away, that is a roof of 6.0 m to 6.4 m."
+		},
+		"bays": {
+			"value": "5 arched windows on the back and on each side, 3.2 m apart, with pilasters between them; 2 windows with hoods on each side of the porch on the front",
+			"unit": "",
+			"source": "Photo 1 (2021): five arched windows with brown shutters and pilasters on each of the two sides that the photo shows. The back: estimate (no source), as the sides. Photo 3 (2014): rectangular windows with hoods and louvered shutters on the front, and arched windows on the left side; the front windows only show in the photos of 2014."
+		},
+		"arched_window": {
+			"value": "1.4 m wide, from 0.9 m to 3.3 m",
+			"unit": "m",
+			"source": "Photo 1 (2021): an arch is about half of a bay of 3.2 m wide (1.4 m), and its top is near the cornice. Its sill and height: estimate (no source)."
+		},
+		"plinth": {
+			"value": 0.6,
+			"unit": "m",
+			"source": "Photo 3 (2014): a red brown band at the foot of the walls between the bars of the fence; its height: estimate (no source)."
+		},
+		"porch": {
+			"value": "4.8 m wide, 1.5 m out, the top of its pediment at 5.25 m",
+			"unit": "m",
+			"source": "Photo 4 (2014): the pediment with its two pinnacles is 118 px of the 437 px of the front of 19 m: 5.1 m; the top of the pediment is 32 px over the eaves: 1.4 m over 3.9 m. Photo 2 (2020): the same white pediment with a curved top in the middle of the front. Photo 1 (2021): the porch stands out of the roof on the side of the road. How far it stands out: estimate (no source)."
+		},
+		"hips": {
+			"value": 0.24,
+			"unit": "m",
+			"source": "Photos 0, 3 and 4 (2014), 2 (2020) and 1 (2021): four light hips and a light fascia at the eaves. Their width: estimate (no source)."
+		},
+		"colors": {
+			"value": "roof tiles #c66c3e, hips and fascia #e6d38c, walls #e6d5a5, trim #f1eadb, shutters #9e5a35, plinth #a5654b",
+			"unit": "",
+			"source": "Roof: the median of the side of the roof in the sun is #c77742 in photo 3 (2014), #e59f84 in the sun and #8b5145 in the shade in photo 1 (2021, with haze): #c66c3e. Hips: yellow cream in photo 3 (2014), cream white in photo 2 (2020). Walls: cream yellow in photo 3 (2014) and cream in photo 1 (2021). Shutters: brown in photo 1 (2021, #7a4940 in the shade) and orange brown in photo 3 (2014)."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "22b9e835af0699f8f4dfb5b1fd64f98f",
+			"seen": "Next to photos 0 to 4: the square hall under a steep pyramid roof with light hips, the porch on the middle of the front, in the right proportions (walls 3.9 m, roof 6.2 m over 19 m). But this level has no maps (the maps of 512 and 256 at mid stopped the builder of the factory: HTTP 503, more memory than the edge has), and with the colors at the points of 1,200 triangles the orange of the roof runs down onto the walls in fans, the walls are almost white, and the windows do not show.",
+			"changed": "Maps of 256 at the mid level for the walls and for the roof, and of 512 at near."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "31e56994a030e459c22ba45ca49f1dc2",
+			"seen": "With maps of 128 (the maps of 256 also stopped the builder of the factory), the roof is right: orange tiles, four light hips and a light fascia, as photos 1 and 2. The arched windows show as brown arches. But the walls are broken into folded triangles: the small parts that stand out (pilasters, sills, hoods, the plinth and the cornice) are thinner than the cells of 0.2 m, and with 600 triangles the cut to the budget folds the walls.",
+			"changed": "At mid and far the walls are now one box with the porch: the plinth, the cornice, the pilasters of the porch and the sills, hoods, steps and ornament are at near only, and the plinth, the cornice and the porch pilasters are paints at mid and far."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "982237071acf94af8a5d3dc0238f869f",
+			"seen": "Next to the photos: a square hall of cream walls on a red brown plinth, five brown arched windows on each side (photo 1, 2021), two windows on each side of the porch on the front (photo 3, 2014), the porch with its white pediment over the eaves (photos 2 and 4), and the steep pyramid roof of orange tiles with light hips and fascia (photos 0 to 2). The proportions agree with photos 0 and 2. The roof is a little lighter than the tiles in the sun of photo 3, because of the light of the views.",
+			"changed": "Nothing at the mid level. I kept this order. Its near level (cells of 0.04 m and 0.05 m, maps of 512) and three lighter orders for the near level (cells of 0.08 m to 0.2 m, maps of 256 and 512) stopped the builder of the factory (HTTP 503: more memory than the edge has), so I could not look at the near level. It needs a build with more memory (for example mix world.order in CI)."
+		}
+	],
+	"hash": "982237071acf94af8a5d3dc0238f869f"
+}
