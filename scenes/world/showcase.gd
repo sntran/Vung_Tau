@@ -24,8 +24,11 @@ const STEP := 2.0
 const JUNCTION_MARGIN := 1.0
 ## A stand-in leaves this much room (m) on each side of the deck of the jetty.
 const PASSAGE_MARGIN := 0.6
-## The passage from the land goes to this point behind the shore end of the jetty (m).
-const JETTY_BEHIND := 5.0
+## The passage from the land goes to this point behind the shore end of the
+## jetty (m): a straight approach on the line of the deck, so that a slow
+## computer (2.8 m in a frame at 3 frames per second) does not miss the open
+## end of the deck (PT-74 run 8).
+const JETTY_BEHIND := 10.0
 ## The inner edge of the walk on the sea wall is this far in front of the curb of the road (m).
 const CURB_FRONT := 0.02
 ## The walk on the sea wall is this much higher over the sidewalk of the road that it covers (m).
@@ -1354,6 +1357,15 @@ func _lamp(kind: String, at: Vector3, along: Vector3) -> void:
 				_tube(pole, ring, ring + out * reach + Vector3(0, 0.1, 0), 0.025, 0.025, 4)
 				_ball(head, ring + out * reach + Vector3(0, 0.1 + radius, 0), radius)
 			_ball(head, top + Vector3(0, radius, 0), radius)
+		"box_lamp":
+			# A low square lamp (the spec den_vuon_thap): a body of frosted panes
+			# (the head color: it glows at night) under a wider cap (the pole color).
+			var body := float(cfg.get("body", 0.32)) / 2.0
+			var cap := float(cfg.get("cap", 0.4)) / 2.0
+			var cap_low := h - float(cfg.get("cap_height", 0.08))
+			var dir := flat.normalized() if flat.length() > 0.01 else Vector3.FORWARD
+			_box_along(head, base - dir * body, base + dir * body, body, -0.05, cap_low)
+			_box_along(pole, base - dir * cap, base + dir * cap, cap, cap_low, h)
 		"bollard":
 			# A low square post with a lantern head.
 			var half := float(cfg.get("half", 0.09))

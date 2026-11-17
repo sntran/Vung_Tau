@@ -394,6 +394,22 @@
 			"catalog": "B2"
 		},
 		{
+			"id": "ghe_danh_ca",
+			"order": {
+				"blueprint": "catalog",
+				"options": {
+					"name": "ghe_danh_ca_vung_tau"
+				}
+			},
+			"levels": [
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R8 and Q10: the moored fishing boats of the bay of Bãi Trước (data/geo/sea_objects.json), with the eyes on the bow. The near level (30 000 triangles, 9.9 MB) is not used: the boats are 30 m and more from the walk and the jetty.",
+			"catalog": "B1"
+		},
+		{
 			"id": "walker_1",
 			"order": {
 				"blueprint": "person",

@@ -17,6 +17,16 @@ const DRAFT := 0.35
 const BASKET_MODEL := "thung_chai"
 const BASKET_MODEL_DIAMETER := 1.84
 const BASKET_DRAFT := 0.15
+## The fishing boat (ghe) of World (plan 0026, R8, Q10: with the eyes on the
+## bow): its length (m, along z, from its receipt), how deep it sits in the
+## water (the receipt gives a draft of 1 m with its load; a moored boat has no
+## load: a builder value), and the distance (m) after which the plain boat of
+## plan 0005 stands in for it (a boat there is a few pixels, and 40 boats of
+## 3 000 triangles each are too many for Low).
+const BOAT_MODEL := "ghe_danh_ca"
+const BOAT_MODEL_LENGTH := 11.15
+const BOAT_DRAFT := 0.75
+const BOAT_FAR_END := 400.0
 
 var ships: Array = []
 var boats: Array = []
@@ -24,6 +34,8 @@ var baskets: Array = []
 var stake_count := 0
 ## The basket boats that are models of World (plan 0026, R8).
 var world_baskets := 0
+## The fishing boats that are the ghe of World.
+var world_boats := 0
 var pier_parts := 0
 var groyne_count := 0
 var _floating: Node3D
@@ -58,7 +70,8 @@ func setup(path: String) -> bool:
 	for i in boats.size():
 		var boat_batch := MeshBatch.new()
 		_add_boat(boat_batch, boats[i])
-		_add_afloat(boat_batch, material, "Boat_%d" % i, float(boats[i].get("floor_m", SEA_FLOOR)))
+		var holder := _add_afloat(boat_batch, material, "Boat_%d" % i, float(boats[i].get("floor_m", SEA_FLOOR)))
+		_add_world_boat(boats[i], holder)
 	baskets = parsed.get("basket_boats", [])
 	for i in baskets.size():
 		if _add_world_basket(baskets[i], "Thung_%d" % i):
@@ -90,12 +103,37 @@ func setup(path: String) -> bool:
 	return true
 
 
-func _add_afloat(batch: MeshBatch, material: Material, name_text: String, bottom: float) -> void:
+func _add_afloat(batch: MeshBatch, material: Material, name_text: String, bottom: float) -> Node3D:
 	var holder := Node3D.new()
 	holder.name = name_text
 	_boats_node.add_child(holder)
 	batch.commit(holder, {"hull": material}, name_text)
 	_afloat.append([holder, bottom])
+	return holder
+
+
+## The ghe of World at the place of a fishing boat, in the holder of the plain
+## boat: the ghe to BOAT_FAR_END m, the plain boat beyond (plan 0026, R8, Q10).
+func _add_world_boat(boat: Dictionary, holder: Node3D) -> void:
+	if WorldModel.order(BOAT_MODEL).is_empty():
+		return
+	var model := WorldModel.make(BOAT_MODEL, WorldMaterials.DEFAULT_PAINT, "boat")
+	if model == null:
+		return
+	var size := float(boat.length_m) / BOAT_MODEL_LENGTH
+	var basis := Basis(Vector3.UP, deg_to_rad(-float(boat.heading_deg))).scaled(Vector3.ONE * size)
+	var p: Array = boat.position
+	model.transform = Transform3D(basis, Vector3(float(p[0]), -BOAT_DRAFT * size, float(p[1])))
+	model.far_end = BOAT_FAR_END
+	holder.add_child(model)
+	model.apply_ranges()
+	# The plain boat shows only beyond the ghe.
+	for geometry in holder.find_children("*", "GeometryInstance3D", false, false):
+		var g := geometry as GeometryInstance3D
+		g.visibility_range_begin = BOAT_FAR_END
+		g.visibility_range_begin_margin = WorldModel.FADE
+		g.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
+	world_boats += 1
 
 
 ## Ships and boats float on the sea. The boats rock a little. A boat or a

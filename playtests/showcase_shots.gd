@@ -7,8 +7,9 @@ extends RefCounted
 # a setup step, as fly_to() of PT-33. A shot is a frame of the short video of
 # D7, so the screen UI (the phone button, the center dot) is hidden while it is
 # taken. A shot fails when its ground is not ready.
-# High takes the shots in two runs for each time: one run of five shots on
-# Forward+ takes more than 300 s under lavapipe. The last run makes the sheet
+# High takes the shots in three runs for each time: one run of five shots on
+# Forward+ takes more than 300 s under lavapipe, and in CI a run of three shots
+# of the frames of the photos (report 0026, D-0026-02) took more than 300 s. The last run makes the sheet
 # of each shot (sheet_ID.jpg): the photo (its copy in docs/reference/photos/,
 # R17), then a column for Low and High, a row for each time.
 # Report 0026 (D-0026-02): a shot is the view of its photo. PT-72 checks that
@@ -26,6 +27,8 @@ extends RefCounted
 # phase: --world=vung_tau --start-time=12:00 --quality=low
 # phase: --world=vung_tau --start-time=17:10 --quality=high --renderer=forward_plus
 # phase: --world=vung_tau --start-time=17:10 --quality=high --renderer=forward_plus
+# phase: --world=vung_tau --start-time=17:10 --quality=high --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
 # phase: --start-time=12:00
@@ -36,10 +39,12 @@ const SHEETS_FROM := SHOTS
 const RUNS := [
 	["low", "1710", 0, 4],
 	["low", "1200", 0, 4],
-	["high", "1710", 0, 2],
-	["high", "1710", 3, 4],
-	["high", "1200", 0, 2],
-	["high", "1200", 3, 4],
+	["high", "1710", 0, 1],
+	["high", "1710", 2, 3],
+	["high", "1710", 4, 4],
+	["high", "1200", 0, 1],
+	["high", "1200", 2, 3],
+	["high", "1200", 4, 4],
 ]
 
 

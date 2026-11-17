@@ -87,6 +87,15 @@
 				"ceiling_fan.receipt.json": "f4bdbebcf8d0108620cb69aa7d6eef40287663d43de83e0efa073cc0dd31ebcd"
 			}
 		},
+		"ghe_danh_ca": {
+			"hash": "f57ba2160fab51a90c9b982eaf40ca7b",
+			"files": {
+				"ghe_danh_ca.far.glb": "e05178fcdb9c50f23d52b961861b5fe30f999da2b71d80eb13364efdd81426df",
+				"ghe_danh_ca.mid.glb": "4ab7ab79cc3d9070b4605a1d47c7cfb2395bdd0b2132ec950e9c5af8e6fb3679",
+				"ghe_danh_ca.parts.json": "ba78333de6ee93e9681b867bacb8ba9174ea2a54c30ecb2f3be4e96f8f65c10c",
+				"ghe_danh_ca.receipt.json": "8506f447c76a2f3b9ba94b534ebbd00811633b5cb6d817738039b887648ba042"
+			}
+		},
 		"khach_san_grand": {
 			"hash": "e9275b929c2a3032a46d60103108618b",
 			"files": {

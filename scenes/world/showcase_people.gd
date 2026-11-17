@@ -23,6 +23,12 @@ const KEEP_GAP := 0.6
 ## Each walker: {"model", "body", "line" (PackedVector3Array), "length", "at" (m along the line),
 ## "speed", "sign", "side" (m to the right of the middle of the way), "now" (the side now),
 ## "room" (the most side on the way), "stopped"}. The body stops the player.
+## The ranges of the levels of a person on Low: the mid level (7 000 triangles)
+## to 20 m, the far level (1 500) beyond. The people in the frames of the shots
+## (report 0026, D-0026-07) made S5 330 000 triangles on Low, more than the
+## limit of 300 000 (PT-73). The other presets keep WorldModel.RANGES.
+const PEOPLE_RANGES := {"low": Vector3(15.0, 20.0, 150.0)}
+
 var walkers: Array[Dictionary] = []
 ## Each sitter: {"model", "shape"}.
 var sitters: Array[Dictionary] = []
@@ -230,6 +236,7 @@ func _add_walkers(world: VungTau, showcase: Showcase, cfg: Dictionary, rng: Rand
 			start = (float(spot[1]) + rng.randf_range(0.25, 0.75)) / float(spot[2]) * length
 		var side := minf(rng.randf_range(float(keep_right[0]), float(keep_right[1])), room)
 		add_child(model)
+		model.custom_ranges = PEOPLE_RANGES
 		model.apply_ranges()
 		model.play("walk", rng.randf())
 		var w := {"model": model, "body": _walker_body(model), "line": line, "length": length,
@@ -297,6 +304,7 @@ func _add_sitters(world: VungTau, showcase: Showcase, cfg: Dictionary, rng: Rand
 			continue
 		model.transform = seats[i]
 		add_child(model)
+		model.custom_ranges = PEOPLE_RANGES
 		model.apply_ranges()
 		var shape := CollisionShape3D.new()
 		var capsule := CapsuleShape3D.new()

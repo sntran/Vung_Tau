@@ -44,6 +44,7 @@ func run(d: PlaytestDriver) -> void:
 	var models: Array[Dictionary] = w.showcase.models
 	d.expect(models.size() == data.size(), "each place has its model: %d of %d" % [models.size(), data.size()])
 	d.step("the parts of the showcase (m, or a count): %s" % [w.showcase.lengths])
+	_check_specs(d, w)
 	_check_hill_side(d, w)
 	for kind: String in ["median", "sidewalk", "path_border", "wall", "sea_wall", "stand_ins", "lawn_m2", "paving_m2",
 			"planter", "beach_wall", "median_trees", "lamps", "path_lamps"]:
@@ -52,6 +53,11 @@ func run(d: PlaytestDriver) -> void:
 	d.expect(w.sea_objects != null and w.sea_objects.world_baskets == w.sea_objects.baskets.size(),
 			"each basket boat of the sea is a model of World: %d of %d" % [
 				w.sea_objects.world_baskets if w.sea_objects else 0, w.sea_objects.baskets.size() if w.sea_objects else 0])
+	# R8 and Q10: the moored fishing boats are the ghe of World, with the eyes on the bow.
+	d.expect(w.sea_objects != null and w.sea_objects.world_boats == w.sea_objects.boats.size() and w.sea_objects.boats.size() > 0,
+			"each fishing boat of the bay is the ghe of World: %d of %d" % [
+				w.sea_objects.world_boats if w.sea_objects else 0, w.sea_objects.boats.size() if w.sea_objects else 0])
+	await _boat_view(d, w)
 	for entry: Dictionary in models:
 		var model: WorldModel = entry.model
 		var place: Dictionary = data.get(entry.id, {})
@@ -185,3 +191,50 @@ func _check_hill_side(d: PlaytestDriver, w: VungTau) -> void:
 	d.step("the side of the hill of Hạ Long: %d footprints near the road, %d with a stand-in, %d wait for their storeys (Check), %d OSM buildings with no storeys left out" % [
 			near, with_building, near - with_building - missing.size(), w.showcase.stand_ins_left_out.size()])
 	d.expect(missing.is_empty(), "each footprint near Hạ Long has a stand-in or waits for its storeys with a reason: %s" % ", ".join(missing))
+
+
+## Report 0026, D-0026-08: each plain part of the showcase (a stand-in of the
+## game for a model of World: the lamps, the borders of the raised lawns, the
+## low wall of the beach, the sea wall of Hạ Long) names its spec, and the spec
+## is in data/world/specs/.
+func _check_specs(d: PlaytestDriver, w: VungTau) -> void:
+	var data: Dictionary = w.showcase.data
+	var named: Array[String] = []
+	for kind: String in data.get("lamp_kinds", {}):
+		if kind != "note":
+			named.append(str(data.lamp_kinds[kind].get("spec", "lamp " + kind)))
+	named.append(str(data.ground.planters.get("spec", "the raised lawns")))
+	for wall: Dictionary in data.get("walls", []):
+		named.append(str(wall.get("spec", "the low wall")))
+	for wall: Dictionary in data.get("sea_walls", []):
+		for spec: String in wall.get("specs", ["the sea wall"]):
+			named.append(spec)
+	var missing: Array[String] = []
+	for spec in named:
+		if not FileAccess.file_exists("res://data/world/specs/%s.json" % spec):
+			missing.append(spec)
+	d.step("the plain parts and their specs: %s" % ", ".join(named))
+	d.expect(missing.is_empty(), "each plain part of the showcase names its spec in data/world/specs/: %s" % ", ".join(missing))
+
+
+## Q10: the ghe of World in the bay, near (its mid level) and far (its far level).
+func _boat_view(d: PlaytestDriver, w: VungTau) -> void:
+	if w.sea_objects == null or w.sea_objects.boats.is_empty():
+		return
+	# The boat nearest to the sea wall of Hạ Long.
+	var best: Dictionary = w.sea_objects.boats[0]
+	for boat: Dictionary in w.sea_objects.boats:
+		var p: Array = boat.position
+		var q: Array = best.position
+		if Vector2(float(p[0]), float(p[1])).distance_to(Vector2(-150.0, 380.0)) < Vector2(float(q[0]), float(q[1])).distance_to(Vector2(-150.0, 380.0)):
+			best = boat
+	var at := Vector3(float(best.position[0]), w.sea_level + 1.0, float(best.position[1]))
+	# The eyes are on the sea side of the boat, and look back to it and to the shore.
+	var out := Vector3(at.x + 150.0, 0.0, at.z - 380.0).normalized()
+	for view: Array in [["boat_near", 22.0, 4.0], ["boat_far", 160.0, 12.0]]:
+		var eye := at + out * float(view[1]) + Vector3(0.0, float(view[2]), 0.0)
+		await d.fly_to(eye, at)
+		await d.wait_ground(60.0)
+		await d.wait_frames(6)
+		await d.screenshot(str(view[0]))
+	d.fly_end()
