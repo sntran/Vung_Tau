@@ -103,43 +103,53 @@ Most photos are from 2014 and 2015. A difference from 2019 that I know is a "Che
 5. The people and the scooters (R10, R11).
 6. The new buildings of World as they come (section 7), and night (R14).
 
-## 7. Photos and specs for World
+## 7. Photos and models
 
 **Photos.** I have no photos of these places. The builder searches for photos at each step and in each place that it can reach: Wikimedia Commons (and its Panoramio photos), Flickr photos with an open license, OpenStreetMap notes and Mapillary, news articles, travel and hotel pages, and videos of walks in Vũng Tàu from 2018 to 2020. The rules:
 
-- A photo with an open license (CC0, CC BY, CC BY-SA, public domain) can go to World as a source of a spec, with its credit, and its copy goes into `docs/reference/photos/` (R17).
-- Any other photo is a reference only: its link and what it shows go into `docs/content/reference/landmarks.md` or the spec, never the photo itself.
+- A photo with an open license (CC0, CC BY, CC BY-SA, public domain) can be a source of a model, with its credit, and its copy goes into `docs/reference/photos/` (R17).
+- Any other photo is a reference only: its link and what it shows go into `docs/content/reference/landmarks.md` or the drawing of the model, never the photo itself.
 - Do not take pictures out of Google Street View or other map services whose terms forbid it.
 - Each photo has its date. A photo from 2017 to 2021 is the best source for 2019. A size or a look that only an older or newer photo shows is "Check".
 
+**The models.** Vũng Tàu makes its models with the tools of World (D5, `docs/world-models.md`, report 0026, D-0026-09): `data/world/drawings/ID.json` has the order, the photos that I looked at, each size with how I measured it, the looks of its levels next to the photos, and the status. A model with the status Check is not in the game before I decide (its order is not in `data/world/orders.json`). The families are blueprints in data in `data/world/blueprints/`. The column "Photos" gives the photos of the model, and in brackets the photos of 2017 to 2021. Nhà thiếu nhi and its low block wait for World plan 0018, step 4; the sculptures wait for Q2.
 
-Vũng Tàu gives World a spec for each model (D5, `docs/world-specs.md`): `data/world/specs/ID.json`, with each value, its status, how it was measured, and the photos that it comes from (report 0026, D-0026-09). They replace the requests of 2026-11-16. The year of each model is 2019 (the answer to World plan 0018, section 6). `python tools/world/specs.py --list` lists the values with the status "Check": a model with a Check value can be built, but it is not in the game before I decide the value. Nhà thiếu nhi and its low block wait for World plan 0018, step 4; the sculptures wait for Q2.
+| Model | What | Way | Status | Photos | In the game |
+|---|---|---|---|---|---|
+| `ao_chong_nang` | áo khoác chống nắng | order | Check | 2 (2) | no |
+| `bac_xuong_cat` | bậc xuống bãi tắm | blueprint | Source | 5 (5) | no |
+| `bon_co_234797329` | bồn cỏ | blueprint | Check | 1 (0) | no |
+| `bon_co_234797330` | bồn cỏ | blueprint | Check | 1 (0) | no |
+| `cay_hoa_tim_bon_hoa` | cây hoa tím bồn hoa | drawing | Source | 2 (1) | no |
+| `cay_thong_noel` | cây thông Noel (bách tán, Araucaria heterophylla) | drawing | Source | 5 (3) | no |
+| `cay_vien_bon_hoa_do` | cây viền bồn hoa lá đỏ | drawing | Check | 3 (2) | no |
+| `den_cot_den_cau` | đèn cột đen cầu trắng | blueprint | Source | 3 (1) | yes |
+| `den_cot_xanh_hai_tay` | đèn cột xanh hai tay | blueprint | Source | 4 (3) | yes |
+| `den_vuon_thap` | đèn sân vườn thấp | blueprint | Source | 4 (2) | yes |
+| `ghe_da_cong_vien` | ghế đá công viên | drawing | Check | 2 (1) | no |
+| `hang_rao_cong_vien` | hàng rào cây cắt xén | drawing | Source | 4 (2) | no |
+| `ke_da_bai_truoc` | kè đá Bãi Trước | blueprint | Check | 4 (4) | no |
+| `ke_ha_long` | kè đường Hạ Long | blueprint | Check | 4 (3) | no |
+| `khach_san_hai_au` | Khách sạn Hải Âu (124 Hạ Long), in front of the jetty of Cầu Đá | order | Source | 3 (1) | yes |
+| `khach_san_palace` | The Palace Hotel (1 Nguyễn Trãi), across from the park of Bãi Trước near the Grand Hotel | order | Check | 6 (1) | no |
+| `ki_ot_cong_vien` | ki-ốt công viên | drawing | Check | 1 (0) | no |
+| `lan_can_ha_long` | lan can đường đi bộ Hạ Long | blueprint | Source | 4 (3) | yes |
+| `nha_khach_ha_long` | Nhà khách Hạ Long (khách sạn Hạ Long), the guest house at 102 Hạ Long at the foot of Núi Nhỏ | order | Check | 2 (1) | no |
+| `nha_mai_ngoi_cam` | nhà mái ngói cam bên đường Hạ Long | drawing | Check | 5 (2) | no |
+| `non_rong_vanh` | nón rộng vành | remix | Check | 3 (3) | no |
+| `phao_boi` | phao bơi | drawing | Source | 2 (2) | no |
+| `quan_dui_boi_nam` | quần đùi bơi nam | order | Check | 3 (3) | no |
+| `tru_lan_can_ha_long` | trụ lan can đường đi bộ Hạ Long | blueprint | Source | 2 (2) | yes |
+| `tuong_bai_tam` | tường lan can bãi tắm | blueprint | Source | 5 (4) | yes |
 
-| Spec | What | Photos | Check values |
-|---|---|---|---|
-| `ao_chong_nang` | áo khoác chống nắng, the light jacket with a hood and long sleeves that women wear against the sun | 2 | 7 |
-| `bac_xuong_cat` | bậc xuống bãi tắm, a flight of steps of granite from the walk of the sea down to the sand of Bãi Trước | 3 | 5 |
-| `cay_hoa_tim_bon_hoa` | cây hoa tím bồn hoa, the low plant with purple flowers of the flower beds of the park | 2 | 6 |
-| `cay_thong_noel` | cây thông Noel (bách tán, Araucaria heterophylla), the Norfolk pine | 5 | 3 |
-| `cay_vien_bon_hoa_do` | cây viền bồn hoa lá đỏ, the low plant with red leaves at the edge of a flower bed | 2 | 2 |
-| `den_cot_den_cau` | đèn cột đen cầu trắng, the dark post of the park with five white globes | 3 | 4 |
-| `den_cot_xanh_hai_tay` | đèn cột xanh hai tay, the blue lamp pole of the park with a frame of two arms at the top | 4 | 11 |
-| `den_vuon_thap` | đèn sân vườn thấp, the low square lamp at the side of a path of the park | 3 | 5 |
-| `ghe_da_cong_vien` | ghế đá công viên, the bench of dark granite of the park (a slab on two slab legs) | 2 | 4 |
-| `hang_rao_cong_vien` | hàng rào cây cắt xén, a piece of 2 m of the clipped hedge along the paths of the park | 3 | 0 |
-| `ke_da_bai_truoc` | kè đá Bãi Trước, a piece of 2 m of the sloped sea wall of granite blocks from the low wall of the walk down to the sand | 3 | 5 |
-| `ke_ha_long` | kè đường Hạ Long, a piece of 2 m of the sloped sea wall of concrete of Hạ Long, from the walk down to the rocks at the water | 4 | 5 |
-| `khach_san_hai_au` | khách sạn Hải Âu, the hotel Hải Âu at 124 Hạ Long, in front of the jetty of Cầu Đá | 3 | 17 |
-| `ki_ot_cong_vien` | ki-ốt công viên, the light blue kiosk on the sidewalk of the park | 1 | 15 |
-| `lan_can_ha_long` | lan can đường đi bộ Hạ Long, a piece of 2 m of the parapet clad in grey granite on the sea side of the walk of Hạ Long | 4 | 0 |
-| `nha_khach_ha_long` | nhà khách Hạ Long (khách sạn Hạ Long), the guest house at 102 Hạ Long on the side of the hill | 2 | 10 |
-| `nha_mai_ngoi_cam` | nhà mái ngói cam bên đường Hạ Long, the square hall with a pyramid roof of orange tiles by Hạ Long, next to the tower of Khách sạn Hoa Tiêu | 3 | 6 |
-| `non_rong_vanh` | nón rộng vành, the wide hat of straw or cloth that women wear against the sun | 2 | 4 |
-| `phao_boi` | phao bơi, the inflatable swim ring of the people who swim at Bãi Trước | 3 | 0 |
-| `quan_dui_boi_nam` | quần đùi bơi nam, the swim shorts of a man (to the middle of the thigh or to the knee) | 2 | 5 |
-| `tru_lan_can_ha_long` | trụ lan can đường đi bộ Hạ Long, the panel of red brown granite in the parapet of the walk of Hạ Long | 2 | 2 |
-| `tuong_bai_tam` | tường lan can bãi tắm, a span of the low wall of rough granite blocks between the walk of the sea and the beach of Bãi Trước | 4 | 1 |
-| `vien_bon_co` | viền bồn cỏ đá granite, a piece of 2 m of the border of light granite of a raised lawn of the walk of the sea | 1 | 0 |
+**Tool requests to World** (`request_tool` of the factory, 2026-11-17; each with the smallest order of this game that needs it, and the error or the result that shows the gap; World keeps each one by its hash):
+
+- `e1ee3aaa10ae0fce6b0e2551287e9751`: The factory places and builds the order of a large model (a building of 20 m to 75 m from the blueprint building) in the memory of the edge: the check of a true model at far, and the levels after it.
+- `0d5e1c84e52b1505cf411e148937fde5`: A width for a line of letters of the blueprint building (for example `long`, the length of the line, or `wide`, the width of a letter), so that a sign with narrow letters is made by the rule and needs no tubes of its own in more.chu.
+- `ccb5f94389741d8e2a0437cf50bd212b`: A part of the plan of the blueprint building with its own storeys (a tower over a lower block, a lower wing, a storey set back behind a terrace), and a front for some storeys only (`storeys`: [first, last]), with the walls, the parapet, the deck and the windows of the rule.
+- `6e7bcc4e2af49515f6a5ba9e03578cac`: A porch with a curved front (a quarter of a circle at a corner, with its fascia) and balconies with round ends, in the blueprint building.
+- `42762ad79c2b7a1a3f1da63ded11d3ed`: The levels of an edit inside a group of a sculpture count, as the levels of an edit at the top: or an edit of the shape group takes levels. Then details in a group (the joints of a course of blocks) stay out of the mid and far levels.
+- `41f9313324ef1bff194c60c2d3da1f1b`: The factory builds the near level, and a mid level with maps of 256 or more, of a building from edits of about 20 m: a builder with more memory, or a bake that uses less memory.
 
 ## 8. Play-test scenarios
 
