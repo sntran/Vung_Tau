@@ -24,6 +24,8 @@ func run(d: PlaytestDriver) -> void:
 	if not d.expect(w != null, "the Vũng Tàu world starts"):
 		return
 	await d.wait_ground()
+	if w.showcase != null:
+		await d.wait_showcase()
 	var beach := w.data.landmark("bai_truoc")
 	if not d.expect(not beach.is_empty(), "the data has Bãi Trước"):
 		return

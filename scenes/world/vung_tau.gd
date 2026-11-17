@@ -139,6 +139,11 @@ var parked: ParkedRows
 var exercise: MorningExercise
 ## The showcase of Bãi Trước (plan 0026): the median, the sidewalks, the walls, and the stand-ins.
 var showcase: Showcase
+## The showcase builds its parts when the view is nearer than this to its area
+## (m), some in each frame (ms), so that the start of the world does not wait
+## for them (report 0026, D-0026-12).
+const SHOWCASE_NEAR_M := 600.0
+const SHOWCASE_FRAME_MS := 8.0
 ## The season values of the game day (R12a), from Season.of_day().
 var season: Dictionary = {}
 var _season_day := -1
@@ -256,9 +261,12 @@ func markers_visible() -> bool:
 
 
 ## Builds the near chunks around the point at once (not in a worker thread), so
-## that the ground has collision before the player stands on it.
-func prepare_at(point: Vector3, radius := 64.0) -> void:
+## that the ground has collision before the player stands on it. Near the
+## showcase, also all its parts when "with_showcase" (they have collision too).
+func prepare_at(point: Vector3, radius := 64.0, with_showcase := true) -> void:
 	_focus = point
+	if with_showcase and _showcase_wanted(point):
+		showcase.build_all()
 	for key: Vector2i in _chunks:
 		if _distance_to_chunk(key) > radius or _chunks[key].detail == Detail.NEAR:
 			continue
@@ -391,6 +399,8 @@ func detail_at(point: Vector3) -> int:
 ## True when each chunk has the detail that it needs, and no worker is busy.
 func is_settled() -> bool:
 	if _tasks > 0:
+		return false
+	if _showcase_wanted(_focus):
 		return false
 	for key: Vector2i in _chunks:
 		var state: Dictionary = _chunks[key]
@@ -546,11 +556,19 @@ func _process(delta: float) -> void:
 		for key: Vector2i in _chunks:
 			if _chunks[key].fine:
 				BoulderBuilder.set_preset(_chunks[key].fine, ground_preset)
+	# After the first frame (report 0026, D-0026-12).
+	if _showcase_wanted(_focus) and Engine.get_frames_drawn() > 0:
+		showcase.build_some(SHOWCASE_FRAME_MS)
 	_update_wanted()
 	_start_tasks()
 	_update_patches()
 	_update_far_strides()
 	_apply_done()
+
+
+## True when the showcase has parts to build and the point is near its area.
+func _showcase_wanted(point: Vector3) -> bool:
+	return showcase != null and not showcase.is_built() and showcase.distance_to(point) < SHOWCASE_NEAR_M
 
 
 func _distance_to_chunk(key: Vector2i) -> float:

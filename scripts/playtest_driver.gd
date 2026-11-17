@@ -1108,6 +1108,20 @@ func wait_ground(timeout_s := 30.0) -> bool:
 
 # --- Fixed views (plan 0004) --------------------------------------------------
 
+## Waits until the showcase of Bãi Trước has all its parts (report 0026,
+## D-0026-12: the world builds them in the first frames near the area). The
+## player is at the start point near the area. Returns false after the timeout.
+func wait_showcase(timeout_s := 120.0) -> bool:
+	var w := world()
+	if w == null or w.showcase == null:
+		return false
+	var ok: bool = await wait_until(func() -> bool: return w.showcase.is_built(), timeout_s,
+			"the showcase has all its parts")
+	if ok:
+		step("the showcase has all its parts")
+	return ok
+
+
 ## Puts the camera at a fixed viewpoint for a screenshot (PT-25, PT-28, PT-32,
 ## and PT-33). The player stops: physics does not move it until fly_end(). This
 ## is a test setup step, the same as --start-time.

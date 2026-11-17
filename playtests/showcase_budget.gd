@@ -23,6 +23,8 @@ func run(d: PlaytestDriver) -> void:
 	var w := d.world()
 	if not d.expect(w != null and w.showcase != null, "the Vũng Tàu world has the showcase"):
 		return
+	if not await d.wait_showcase():
+		return
 	var run_values: Array = RUNS[d.phase - 1]
 	var preset: String = run_values[0]
 	d.expect(GameState.settings.quality == preset, "the preset is %s" % GameState.settings.quality)

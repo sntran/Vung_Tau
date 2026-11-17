@@ -28,6 +28,8 @@ func run(d: PlaytestDriver) -> void:
 	var w := d.world()
 	if not d.expect(w != null and w.showcase != null, "the Vũng Tàu world has the showcase"):
 		return
+	if not await d.wait_showcase():
+		return
 	await d.wait_frames(10)
 	d.expect(w.showcase.lamps_lit, "at 20:00 the lamps of the showcase are on")
 	d.expect(w.showcase.lamp_lights.size() > 0, "the street lamps have lights: %d" % w.showcase.lamp_lights.size())

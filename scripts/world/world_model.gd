@@ -37,6 +37,7 @@ static var ranges := Vector3(15.0, 40.0, 150.0)
 static var preset := "low"
 static var _orders: Dictionary = {}
 static var _scenes: Dictionary = {}
+static var _requested: Dictionary = {}  # the paths in the load of request()
 static var _lowest: Dictionary = {}  # id/level -> the lowest point of the level at rest
 
 ## The id of the order in data/world/orders.json.
@@ -95,8 +96,33 @@ static func levels_of(model_id: String) -> Array[String]:
 static func scene(model_id: String, level: String) -> PackedScene:
 	var key := model_id + "/" + level
 	if not _scenes.has(key):
-		_scenes[key] = load(ROOT + model_id + SUFFIX[level]) as PackedScene
+		var path: String = ROOT + model_id + SUFFIX[level]
+		if _requested.has(path):
+			_requested.erase(path)
+			_scenes[key] = ResourceLoader.load_threaded_get(path) as PackedScene
+		else:
+			_scenes[key] = load(path) as PackedScene
 	return _scenes[key]
+
+
+## Starts the load of the files of the levels of a model in other threads, so
+## that make() does not wait for them (report 0026, D-0026-12).
+static func request(model_id: String) -> void:
+	for level: String in levels_of(model_id):
+		var path: String = ROOT + model_id + SUFFIX[level]
+		if _scenes.has(model_id + "/" + level) or _requested.has(path):
+			continue
+		if ResourceLoader.load_threaded_request(path) == OK:
+			_requested[path] = true
+
+
+## True when no file of a level of the model is still in the load of request().
+static func is_loaded(model_id: String) -> bool:
+	for level: String in levels_of(model_id):
+		var path: String = ROOT + model_id + SUFFIX[level]
+		if _requested.has(path) and ResourceLoader.load_threaded_get_status(path) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			return false
+	return true
 
 
 ## A model of World, or null with an error.

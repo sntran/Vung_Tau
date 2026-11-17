@@ -69,6 +69,8 @@ func run(d: PlaytestDriver) -> void:
 	var w := d.world()
 	if not d.expect(w != null, "the Vũng Tàu world starts with --world=vung_tau"):
 		return
+	if not await d.wait_showcase():
+		return
 	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(SHOTS))
 	if not d.expect(data is Dictionary and data.has("shots"), "%s has the shots" % SHOTS):
 		return

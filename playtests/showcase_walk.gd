@@ -80,6 +80,8 @@ func run(d: PlaytestDriver) -> void:
 	if not d.expect(w != null and w.showcase != null and w.places != null and not w.places.jetty.is_empty(),
 			"the Vũng Tàu world has the showcase and the jetty of Cầu Đá"):
 		return
+	if not await d.wait_showcase():
+		return
 	var route := _route(w)
 	var length := PlaytestDriver._length(route)
 	if not d.expect(length > 900.0, "the route is %.0f m long" % length):

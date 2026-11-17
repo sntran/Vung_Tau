@@ -4,15 +4,20 @@ extends Node3D
 ##
 ## Each person is a model of World (a person order with the routine as its
 ## animation), and starts the loop at a time of its own. A capsule body keeps
-## the player out of each person. The groups show from "from" to "to" only.
+## the player out of each person. The groups show from "from" to "to" only. A
+## group is made at the first time when it shows: the load of its people takes
+## about 3 s at the start of the world (report 0026, D-0026-12).
 
 const PATH := "res://data/world/exercise.json"
 ## The body of a person for the collisions of the player.
 const BODY_RADIUS := 0.28
 const BODY_HEIGHT := 1.7
 
-## The groups by id: {"node", "people": [WorldModel], "bodies": [CollisionShape3D], "from", "to"}.
+## The groups that are made, by id: {"node", "people": [WorldModel], "bodies": [CollisionShape3D], "from", "to"}.
 var groups: Dictionary = {}
+## The groups of the data file that are not made yet.
+var _waiting: Array[Dictionary] = []
+var _world: VungTau
 
 
 func setup(world: VungTau, path := PATH) -> bool:
@@ -20,8 +25,9 @@ func setup(world: VungTau, path := PATH) -> bool:
 	if not parsed is Dictionary:
 		push_error("MorningExercise: cannot read %s." % path)
 		return false
+	_world = world
 	for entry: Dictionary in parsed.get("groups", []):
-		_add_group(world, entry)
+		_waiting.append(entry)
 	return true
 
 
@@ -82,6 +88,10 @@ func _add_group(world: VungTau, entry: Dictionary) -> void:
 
 ## Shows the groups at their times, with their bodies.
 func update_time(minutes: int) -> void:
+	for entry: Dictionary in _waiting.duplicate():
+		if minutes >= minutes_of(str(entry.get("from", "05:00"))) and minutes < minutes_of(str(entry.get("to", "06:30"))):
+			_waiting.erase(entry)
+			_add_group(_world, entry)
 	for group_id: String in groups:
 		var g: Dictionary = groups[group_id]
 		var on := minutes >= int(g.from) and minutes < int(g.to)

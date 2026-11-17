@@ -29,7 +29,8 @@ const VIEWS := [
 
 func run(d: PlaytestDriver) -> void:
 	var w := d.world()
-	if not d.expect(w != null and w.showcase != null and w.showcase.people != null, "the showcase has its people"):
+	if not d.expect(w != null and w.showcase != null and await d.wait_showcase() and w.showcase.people != null,
+			"the showcase has its people"):
 		return
 	var people: ShowcasePeople = w.showcase.people
 	await d.wait_frames(10)

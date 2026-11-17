@@ -99,7 +99,27 @@ var ground_step := 0.5
 ## D-0026-09): one row of MultiMeshes, the near, mid and far levels.
 var wall_row: WorldRow
 
+## The world builds the parts when the player comes near (report 0026, D-0026-12).
+signal built
+
 var _roads: Dictionary = {}  # OSM id -> the road Dictionary of roads.json
+## The roads near the area: [[id, type, line, half width, box]] (see _other_roads()).
+var _near_roads: Array = []
+var _near_roads_read := false
+## The steps of the build that are not done yet (Callables).
+var _steps: Array[Callable] = []
+var _built := false
+## The last clock time of update_time(), or -1.
+var _minutes := -1
+## The box of the outline (x, z of the game).
+var _bounds := Rect2()
+## The ids of the models of World at their places, and the state of the load of their files.
+var _place_ids: Array[String] = []
+var _requested := false
+## True in build_all(): a step does not wait for the files of a model.
+var _forced := false
+## Set by a step that waits for the files of a model.
+var _waiting := false
 var _meshes: Dictionary = {}  # color (String) -> _Mesh
 var _collision := PackedVector3Array()
 var _materials: Dictionary = {}
@@ -114,40 +134,101 @@ func setup(w: VungTau, path := CONFIG) -> bool:
 	data = parsed
 	outline = _points(data.get("outline", []))
 	park = _points(data.get("park", []))
+	if not outline.is_empty():
+		_bounds = Rect2(outline[0], Vector2.ZERO)
+		for p in outline:
+			_bounds = _bounds.expand(p)
 	for road: Dictionary in w.data.roads:
 		_roads[int(road.id)] = road
-	_places(PLACES)
+	# The mask of the lawns and the paving is on the ground also from far.
 	_ground(w.data.root.path_join("showcase.json"))
+	# The other parts are steps that the world does when the player comes
+	# near the area (report 0026, D-0026-12).
+	_steps.clear()
+	_place_steps(PLACES)
 	if data.has("median"):
-		_median(data.median)
+		_steps.append(_median.bind(data.median))
 	for sidewalk: Dictionary in data.get("sidewalks", []):
-		_sidewalk(sidewalk)
+		_steps.append(_sidewalk.bind(sidewalk))
 	if data.has("path_borders"):
-		_path_borders(data.path_borders)
+		_steps.append(_path_borders.bind(data.path_borders))
 	for wall: Dictionary in data.get("walls", []):
-		_walls(wall)
+		_steps.append(_walls.bind(wall))
 	for sea_wall: Dictionary in data.get("sea_walls", []):
-		_sea_wall(sea_wall)
+		_steps.append(_sea_wall.bind(sea_wall))
 	for row: Dictionary in data.get("lamp_rows", []):
-		_lamp_row(row)
+		_steps.append(_lamp_row.bind(row))
 	if data.has("path_lamps"):
-		_path_lamps(data.path_lamps)
+		_steps.append(_path_lamps.bind(data.path_lamps))
 	if data.has("stand_ins"):
-		_stand_ins(data.stand_ins)
+		_steps.append(_stand_ins.bind(data.stand_ins))
 	if data.has("beached"):
-		_beached(data.beached)
-	_commit()
+		_steps.append(_beached.bind(data.beached))
+	_steps.append(_commit)
 	# R10: the people, after the parts (they sit on the raised lawns).
-	if FileAccess.file_exists(ShowcasePeople.PATH):
-		people = ShowcasePeople.new()
-		people.name = "People"
-		add_child(people)
-		people.setup(w, self)
+	_steps.append(_add_people)
 	return true
+
+
+## The distance (m) from the point to the box of the area (0 in the box).
+func distance_to(p: Vector3) -> float:
+	var dx := maxf(maxf(_bounds.position.x - p.x, p.x - _bounds.end.x), 0.0)
+	var dz := maxf(maxf(_bounds.position.y - p.z, p.z - _bounds.end.y), 0.0)
+	return Vector2(dx, dz).length()
+
+
+## True when all the parts are there.
+func is_built() -> bool:
+	return _built
+
+
+## Does the next steps of the build, for "budget_ms" ms at most and at least
+## one step (report 0026, D-0026-12).
+func build_some(budget_ms: float) -> void:
+	if not _requested:
+		_requested = true
+		for id: String in _place_ids:
+			WorldModel.request(id)
+	var end := Time.get_ticks_msec() + budget_ms
+	while not _steps.is_empty():
+		_waiting = false
+		var step: Callable = _steps[0]
+		step.call()
+		if _waiting:
+			# The files of the model load in other threads: the next frame.
+			break
+		_steps.pop_front()
+		if Time.get_ticks_msec() >= end:
+			break
+	if _steps.is_empty() and not _built:
+		_built = true
+		if _minutes >= 0:
+			_lamps_set = false
+			update_time(_minutes)
+		built.emit()
+
+
+## Does all the steps of the build that are left.
+func build_all() -> void:
+	_forced = true
+	build_some(INF)
+	_forced = false
+
+
+func _add_people() -> void:
+	if not FileAccess.file_exists(ShowcasePeople.PATH):
+		return
+	people = ShowcasePeople.new()
+	people.name = "People"
+	add_child(people)
+	people.setup(world, self)
 
 
 ## The clock time: the people of the hour (R10).
 func update_time(minutes: int) -> void:
+	_minutes = minutes
+	if not _built:
+		return
 	if people:
 		people.update_time(minutes)
 	var on := DayLight.lamps_on(minutes)
@@ -542,10 +623,20 @@ func _path_borders(cfg: Dictionary) -> void:
 	var height := float(cfg.get("height", 0.14))
 	var width := float(cfg.get("width", 0.16))
 	var color := str(cfg.get("color", "#8f8c86"))
+	if park.size() < 3:
+		return
+	var park_box := Rect2(park[0], Vector2.ZERO)
+	for p in park:
+		park_box = park_box.expand(p)
+	park_box = park_box.grow(float(width) + 4.0)
 	var paths: Array[int] = []
 	for id: int in _roads:
-		if str(_roads[id].type) in types:
-			paths.append(id)
+		if not str(_roads[id].type) in types:
+			continue
+		for p: Array in _roads[id].points:
+			if park_box.has_point(Vector2(float(p[0]), float(p[2]))):
+				paths.append(id)
+				break
 	for id: int in paths:
 		var road: Dictionary = _roads[id]
 		var half := float(road.width) / 2.0 + width / 2.0
@@ -989,7 +1080,7 @@ func _band(a: Vector2, b: Vector2, half: float) -> PackedVector2Array:
 
 
 ## R7, D3: the models of World at their places, with the ranges of D6.
-func _places(path: String) -> void:
+func _place_steps(path: String) -> void:
 	if not FileAccess.file_exists(path):
 		return
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
@@ -1003,26 +1094,35 @@ func _places(path: String) -> void:
 	for place: Dictionary in parsed.get("places", []):
 		# A model with the status Check (data/world/drawings/) has its place, but
 		# no order in data/world/orders.json: it waits, and its stand-in stays.
-		if WorldModel.order(str(place.id)).is_empty():
-			continue
-		var model := WorldModel.make(str(place.id))
-		if model == null:
-			continue
-		model.custom_ranges = ranges
-		var facing := Vector2(float(place.facing[0]), float(place.facing[1])).normalized()
-		var front := Vector3(float(place.front[0]), 0.0, float(place.front[1]))
-		var basis := Basis(Vector3.UP, atan2(facing.x, facing.y))
-		front.y = world.ground_height(front.x, front.z)
-		model.transform = Transform3D(basis, front - basis * Vector3(float(place.get("front_middle_x", 0.0)), 0, 0))
-		add_child(model)
-		model.apply_ranges()
-		var box := _model_box(model)
-		var footprint := PackedVector2Array()
-		for corner: Vector3 in [Vector3(box.position.x, 0, box.position.z), Vector3(box.end.x, 0, box.position.z),
-				Vector3(box.end.x, 0, box.end.z), Vector3(box.position.x, 0, box.end.z)]:
-			var p := model.transform * corner
-			footprint.append(Vector2(p.x, p.z))
-		models.append({"id": str(place.id), "model": model, "footprint": footprint, "base": front.y, "box": box})
+		if not WorldModel.order(str(place.id)).is_empty():
+			_place_ids.append(str(place.id))
+			_steps.append(_place.bind(place, ranges))
+
+
+## One model of World at its place: one step of the build, because the load
+## of a large model takes some time.
+func _place(place: Dictionary, ranges: Dictionary) -> void:
+	if not _forced and not WorldModel.is_loaded(str(place.id)):
+		_waiting = true
+		return
+	var model := WorldModel.make(str(place.id))
+	if model == null:
+		return
+	model.custom_ranges = ranges
+	var facing := Vector2(float(place.facing[0]), float(place.facing[1])).normalized()
+	var front := Vector3(float(place.front[0]), 0.0, float(place.front[1]))
+	var basis := Basis(Vector3.UP, atan2(facing.x, facing.y))
+	front.y = world.ground_height(front.x, front.z)
+	model.transform = Transform3D(basis, front - basis * Vector3(float(place.get("front_middle_x", 0.0)), 0, 0))
+	add_child(model)
+	model.apply_ranges()
+	var box := _model_box(model)
+	var footprint := PackedVector2Array()
+	for corner: Vector3 in [Vector3(box.position.x, 0, box.position.z), Vector3(box.end.x, 0, box.position.z),
+			Vector3(box.end.x, 0, box.end.z), Vector3(box.position.x, 0, box.end.z)]:
+		var p := model.transform * corner
+		footprint.append(Vector2(p.x, p.z))
+	models.append({"id": str(place.id), "model": model, "footprint": footprint, "base": front.y, "box": box})
 
 
 ## R5: the basket boats on the sand above the water line.
@@ -1184,25 +1284,29 @@ func _nearest(line: PackedVector3Array, p: Vector3) -> Vector3:
 
 
 ## The roads near the area that are not in "ids": [[line, half width, box]].
+## The roads near the area are found one time (report 0026, D-0026-12).
 func _other_roads(ids: Array, skip_types: Array = []) -> Array:
-	var result := []
-	for id: int in _roads:
-		if id in ids:
-			continue
-		var road: Dictionary = _roads[id]
-		if str(road.get("type", "")) in skip_types:
-			continue
-		var line := _line(road)
-		var near := false
-		for p in line:
-			if contains(p.x, p.z):
-				near = true
-				break
-		if near:
-			var box := Rect2(Vector2(line[0].x, line[0].z), Vector2.ZERO)
+	if not _near_roads_read:
+		_near_roads_read = true
+		for id: int in _roads:
+			var road: Dictionary = _roads[id]
+			var line := _line(road)
+			var near := false
 			for p in line:
-				box = box.expand(Vector2(p.x, p.z))
-			result.append([line, float(road.width) / 2.0, box.grow(float(road.width) / 2.0 + 12.0)])
+				if contains(p.x, p.z):
+					near = true
+					break
+			if near:
+				var box := Rect2(Vector2(line[0].x, line[0].z), Vector2.ZERO)
+				for p in line:
+					box = box.expand(Vector2(p.x, p.z))
+				_near_roads.append([id, str(road.get("type", "")), line, float(road.width) / 2.0,
+						box.grow(float(road.width) / 2.0 + 12.0)])
+	var result := []
+	for entry: Array in _near_roads:
+		if entry[0] in ids or entry[1] in skip_types:
+			continue
+		result.append([entry[2], entry[3], entry[4]])
 	return result
 
 
