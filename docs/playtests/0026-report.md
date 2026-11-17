@@ -75,7 +75,20 @@ The builder writes these in the plan file on the branch (the plan on `main` is o
 - **Q5.** The whole park and the walk of the sea to z −365 are in the area: yes.
 - **Q6.** Do not wait for plan 0009: count the storeys from the photos (R17), with the status "Source". A stand-in of 1 storey is not correct in a shot.
 - **Q9.** Wait for World to correct its catalog (section 3).
+- **Q7.** I have no memory of the color in 2019. Use the look of the photo of 2014 (sky blue with white bands), the photo nearest to 2019, with the status "Source".
+- **Q8.** Hải Âu stood in 2019, and its name is used: the letters HAI AU go on the model. The same for the name in the game.
+- **Q10.** I do not remember eyes on the bows of the boats of Bãi Trước, but they are not wrong: keep the boat of World with its eyes.
+- **Q11 and Q12.** I have no photos. The builder searches for them (section 6).
 
-## 5. Status
+## 5. Photos
+
+I have no photos of these places. The builder finds as many photos as it can, in each place that it can reach, and uses each one to make the specs more correct:
+
+- image searches (in Vietnamese and in English: "bãi trước vũng tàu", "công viên bãi trước", "đường hạ long vũng tàu", "kè bãi trước", "bậc xuống bãi tắm", "cầu đá vũng tàu", "khách sạn hải âu vũng tàu", with the years 2017 to 2020),
+- Wikimedia Commons, Flickr, Mapillary, news articles, travel blogs, hotel and review pages, and videos of walks in Vũng Tàu.
+
+For each photo it writes the link, the date, the license, and what it shows, in the spec that uses it. An open photo goes into `docs/reference/photos/` (R17). A photo that is not open stays a link: the builder can look at it in a run of CI (an artifact that is not kept), but it does not go into the repository. For Q11 and Q12 (the steps down to the sand and a walk on the sand along Hạ Long), the builder looks for at least three photos from 2017 to 2021 before it decides; with fewer, the value stays "Check".
+
+## 6. Status
 
 The plan stays "In progress". Q9: do not put plan 0023 on `main` with a red test; World corrects its catalog first.
