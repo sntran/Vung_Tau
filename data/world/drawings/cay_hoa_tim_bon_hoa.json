@@ -1,0 +1,576 @@
+{
+	"id": "cay_hoa_tim_bon_hoa",
+	"what": "cây hoa tím bồn hoa: one clump of the low plant with purple flowers of the flower beds of the park of Bãi Trước (it looks as Ruellia simplex, hoa chiều tím; the species is not known) (a drawing of edits)",
+	"way": "drawing",
+	"status": "Source",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026: the inside of the flower beds of the park (many clumps side by side).",
+	"order": {
+		"blueprint": "drawing",
+		"options": {
+			"drawing": {
+				"name": "cay_hoa_tim_bon_hoa",
+				"kind": "plant",
+				"sources": [
+					"One clump of the low plant with purple flowers of the flower beds of the park of Bãi Trước: narrow leaves in a low mass, purple flowers of five lobes on its top; 0.3 m high. From a photo of 2018-03-08 (Flickr) (Vũng Tàu, data/world/drawings/cay_hoa_tim_bon_hoa.json)."
+				],
+				"materials": {
+					"part_01": {
+						"color": "#ffffff",
+						"roughness": 0.7,
+						"metalness": 0.0
+					},
+					"part_02": {
+						"color": "#ffffff",
+						"roughness": 0.6,
+						"metalness": 0.0
+					}
+				},
+				"nodes": [
+					{
+						"name": "clump",
+						"skill": {
+							"sculpt": {
+								"edits": [
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.17,
+											0.17,
+											0.2
+										],
+										"at": [
+											0,
+											0,
+											0.02
+										],
+										"color": "#5a7924",
+										"material": "part_01",
+										"roughness": 0.7,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.03
+										}
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.09,
+											0.08,
+											0.14
+										],
+										"at": [
+											0.12,
+											0.0,
+											0.02
+										],
+										"color": "#46601f",
+										"blend": 0.04,
+										"repeat": {
+											"count": 7
+										},
+										"material": "part_01",
+										"roughness": 0.7,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.03
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.06
+										],
+										"at": [
+											0.0752,
+											0.0274,
+											0.17
+										],
+										"color": "#5a7924",
+										"blend": 0.04,
+										"material": "part_01",
+										"roughness": 0.7,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.03
+										},
+										"repeat": {
+											"count": 5
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.06
+										],
+										"at": [
+											0.0,
+											0.0,
+											0.2
+										],
+										"color": "#5a7924",
+										"blend": 0.04,
+										"material": "part_01",
+										"roughness": 0.7,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.03
+										}
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.4,
+											0.4,
+											0.2
+										],
+										"at": [
+											0,
+											0,
+											-0.2
+										],
+										"mode": "subtract",
+										"material": "part_01",
+										"color": "#46601f"
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.012,
+											0.004,
+											0.06
+										],
+										"at": [
+											0.1,
+											0.0,
+											0.2073
+										],
+										"axis": [
+											0.35,
+											0,
+											0.94
+										],
+										"up": [
+											0,
+											1,
+											0
+										],
+										"material": "part_01",
+										"color": "#5a7924",
+										"levels": [
+											"near"
+										],
+										"repeat": {
+											"count": 9
+										}
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.012,
+											0.004,
+											0.055
+										],
+										"at": [
+											0.17,
+											0.03,
+											0.1139
+										],
+										"axis": [
+											0.6,
+											0.1,
+											0.79
+										],
+										"up": [
+											0,
+											1,
+											0
+										],
+										"material": "part_01",
+										"color": "#46601f",
+										"levels": [
+											"near"
+										],
+										"repeat": {
+											"count": 11
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.028
+										],
+										"at": [
+											0.0394,
+											0.0069,
+											0.2447
+										],
+										"mode": "paint",
+										"material": "part_02",
+										"color": "#9466c8",
+										"blend": 0.01,
+										"levels": [
+											"mid",
+											"far"
+										],
+										"repeat": {
+											"count": 3
+										}
+									},
+									{
+										"shape": "cone",
+										"size": [
+											0.004,
+											0.024,
+											0.012
+										],
+										"at": [
+											0.0414,
+											0.0073,
+											0.2797
+										],
+										"axis": [
+											0.1182,
+											0.0208,
+											1.0
+										],
+										"material": "part_02",
+										"color": "#9466c8",
+										"roughness": 0.6,
+										"levels": [
+											"near"
+										],
+										"repeat": {
+											"count": 3
+										}
+									},
+									{
+										"shape": "cylinder",
+										"size": [
+											0.003,
+											0.02
+										],
+										"at": [
+											0.0394,
+											0.0069,
+											0.2567
+										],
+										"axis": [
+											0.1182,
+											0.0208,
+											1.0
+										],
+										"material": "part_01",
+										"color": "#5b4a5e",
+										"levels": [
+											"near"
+										],
+										"repeat": {
+											"count": 3
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.007
+										],
+										"at": [
+											0.0414,
+											0.0073,
+											0.2907
+										],
+										"mode": "paint",
+										"material": "part_02",
+										"color": "#6a3f8a",
+										"blend": 0.003,
+										"levels": [
+											"near"
+										],
+										"repeat": {
+											"count": 3
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.028
+										],
+										"at": [
+											0.0766,
+											0.0643,
+											0.2173
+										],
+										"mode": "paint",
+										"material": "part_02",
+										"color": "#9466c8",
+										"blend": 0.01,
+										"levels": [
+											"mid",
+											"far"
+										],
+										"repeat": {
+											"count": 7
+										}
+									},
+									{
+										"shape": "cone",
+										"size": [
+											0.004,
+											0.024,
+											0.012
+										],
+										"at": [
+											0.0804,
+											0.0675,
+											0.2523
+										],
+										"axis": [
+											0.2298,
+											0.1928,
+											1.0
+										],
+										"material": "part_02",
+										"color": "#9466c8",
+										"roughness": 0.6,
+										"levels": [
+											"near"
+										],
+										"repeat": {
+											"count": 7
+										}
+									},
+									{
+										"shape": "cylinder",
+										"size": [
+											0.003,
+											0.02
+										],
+										"at": [
+											0.0766,
+											0.0643,
+											0.2293
+										],
+										"axis": [
+											0.2298,
+											0.1928,
+											1.0
+										],
+										"material": "part_01",
+										"color": "#5b4a5e",
+										"levels": [
+											"near"
+										],
+										"repeat": {
+											"count": 7
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.007
+										],
+										"at": [
+											0.0804,
+											0.0675,
+											0.2633
+										],
+										"mode": "paint",
+										"material": "part_02",
+										"color": "#6a3f8a",
+										"blend": 0.003,
+										"levels": [
+											"near"
+										],
+										"repeat": {
+											"count": 7
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.028
+										],
+										"at": [
+											0.1545,
+											0.0414,
+											0.1271
+										],
+										"mode": "paint",
+										"material": "part_02",
+										"color": "#9466c8",
+										"blend": 0.01,
+										"levels": [
+											"mid",
+											"far"
+										],
+										"repeat": {
+											"count": 10
+										}
+									},
+									{
+										"shape": "cone",
+										"size": [
+											0.004,
+											0.024,
+											0.012
+										],
+										"at": [
+											0.1623,
+											0.0435,
+											0.1621
+										],
+										"axis": [
+											0.4636,
+											0.1242,
+											1.0
+										],
+										"material": "part_02",
+										"color": "#9466c8",
+										"roughness": 0.6,
+										"levels": [
+											"near"
+										],
+										"repeat": {
+											"count": 10
+										}
+									},
+									{
+										"shape": "cylinder",
+										"size": [
+											0.003,
+											0.02
+										],
+										"at": [
+											0.1545,
+											0.0414,
+											0.1391
+										],
+										"axis": [
+											0.4636,
+											0.1242,
+											1.0
+										],
+										"material": "part_01",
+										"color": "#5b4a5e",
+										"levels": [
+											"near"
+										],
+										"repeat": {
+											"count": 10
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.007
+										],
+										"at": [
+											0.1623,
+											0.0435,
+											0.1731
+										],
+										"mode": "paint",
+										"material": "part_02",
+										"color": "#6a3f8a",
+										"blend": 0.003,
+										"levels": [
+											"near"
+										],
+										"repeat": {
+											"count": 10
+										}
+									}
+								],
+								"cells": {
+									"near": 0.004,
+									"mid": 0.025,
+									"far": 0.06
+								},
+								"budget": {
+									"near": 5000,
+									"mid": 400,
+									"far": 60
+								},
+								"bake": {
+									"near": 512
+								}
+							}
+						}
+					}
+				]
+			}
+		}
+	},
+	"sources": [
+		{
+			"url": "https://www.flickr.com/photos/10598985@N07/26942383027/",
+			"image": "https://live.staticflickr.com/970/26942383027_d1b9b6b131_o.jpg",
+			"date": "2018-03-08",
+			"license": "all rights reserved",
+			"author": "Flickr user 10598985@N07",
+			"open": false,
+			"file": "hoa_fl2018.jpg",
+			"shows": "The park of Bãi Trước in the morning: a flower bed of low plants with narrow grey green leaves and many purple flowers of five lobes on their tops, a low clipped border of small green leaves in front of it, lawns, frangipani trees, rock sculptures. The file is a crop of the bed at the full size of the photo (4188 px)."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(1).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_flower_bed_2014.jpg",
+			"shows": "The park in the morning: a round flower bed with a ring of red leaves and low yellow green plants in it, a low square white lamp (0.70 m) beside it."
+		}
+	],
+	"sizes": {
+		"height": {
+			"value": 0.3,
+			"unit": "m",
+			"source": "Photo 0 (2018): from the border to the tops of the flowers the plants are about 250 px, and a flower at the front is about 37 px (a flower of this kind is about 4.5 cm across): 0.30 m. Photo 1 (2014): the plants in the round bed are a little higher than the red ring (0.25 m)."
+		},
+		"width": {
+			"value": 0.4,
+			"unit": "m",
+			"source": "estimate (no source): one clump of a bed of many; the clumps touch and make one mass in photo 0."
+		},
+		"flowers": {
+			"value": "about 20 on the top of a clump, 4.5 cm to 5 cm across, purple",
+			"unit": "",
+			"source": "Photo 0: about 6 to 8 flowers in a square of 0.2 m of the top of the bed: about 20 on a clump of 0.4 m. The size: about 37 px at the scale of the front of the bed. The color: purple and violet."
+		},
+		"colors": {
+			"value": "leaves #5a7924 and #46601f, flowers #9466c8, the throat of a flower #6a3f8a",
+			"unit": "",
+			"source": "Photo 0: the median of the green pixels of the bed is #5a7924 and of the purple pixels #a06fd4 (in the morning sun); a little darker for the light of the game."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "6aa7be67b13615cf21cb580be9f76ca2",
+			"seen": "A smooth dome of dark green with purple spots on its top, as a helmet. In photo 0 the bed is a loose, uneven mass of olive green narrow leaves (#5a7924) with violet flowers (#a06fd4) on its top; the dome is too smooth and too dark, the purple too red.",
+			"changed": "Lobes and bumps over the top so the outline is uneven, the leaves #5a7924 and #46601f, the flowers #9466c8; the flowers sit on the true top of the mass (a height of the union of the ellipsoids)."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "9498e6dc41a98b9d860d4ab6bc7a3018",
+			"seen": "An olive green mass 0.42 m wide and 0.26 m high with violet spots of about 5 cm on its top and its upper sides: the colors and the size of the bed of photo 0. The bumps of the top are smooth at the mid level (cells of 2.5 cm, 400 triangles), so the outline is a soft dome; in a bed the clumps touch, and only their tops show. At the mid distance (15 m to 40 m) a clump is 10 px to 25 px.",
+			"changed": "No change. Next: the near level (the narrow leaves, the trumpets of the flowers, the leaves map)."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "9498e6dc41a98b9d860d4ab6bc7a3018",
+			"seen": "A soft mound of olive green leaves with the grain of the map of leaves, narrow leaves that stand out of it, and 20 violet trumpets of about 5 cm with a dark throat on its top: the plants and the flowers of photo 0. The mass is smoother and rounder than the loose plants of the photo, and the narrow leaves are fewer.",
+			"changed": "No change: I build the near level one time."
+		}
+	],
+	"hash": "9498e6dc41a98b9d860d4ab6bc7a3018"
+}

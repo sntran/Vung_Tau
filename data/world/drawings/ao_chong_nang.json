@@ -1,0 +1,117 @@
+{
+	"id": "ao_chong_nang",
+	"what": "áo khoác chống nắng: a woman of Bãi Trước in a light sun jacket with long sleeves and a hood (an order of the person blueprint of World that wears the jacket)",
+	"way": "order",
+	"status": "Check",
+	"levels": [
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026, R10: women on the walk of the sea and on the sand at 17:00, in a sun jacket over a T-shirt.",
+	"order": {
+		"blueprint": "person",
+		"options": {
+			"gender": 0.0,
+			"age": 32,
+			"height": 0.42,
+			"weight": 0.45,
+			"skin": "young_asian_female",
+			"hair": "ponytail01",
+			"hair_color": "#2a2522",
+			"clothes": [
+				"world_rain_shell",
+				"mindfront_female_trousers_1",
+				"elvs_caesar_sandals1"
+			],
+			"clothes_colors": [
+				"#4f8fbe",
+				"#2f3440"
+			],
+			"animations": [
+				"walk"
+			]
+		}
+	},
+	"sources": [
+		{
+			"url": "https://tuoitre.vn/vung-tau-sau-30-nam-thanh-lap-thu-ngan-sach-gap-gan-300-lan-20211230155102555.htm",
+			"image": "https://cdn.tuoitre.vn/2021/12/30/logo-du-khach-30-4-2019-20-1640854141848374700459.jpg",
+			"date": "2019-04-30 (in the file name of the photo)",
+			"license": "all rights reserved",
+			"author": "Đông Hà / Tuổi Trẻ",
+			"open": false,
+			"file": "acn_tt.jpg",
+			"shows": "Bãi Trước at the end of the afternoon of a holiday, to the south. A person in a blue jacket with long sleeves and a hood sits on the low wall of the beach: the hood is down on the back, the jacket ends at the hips, the sleeves go to the wrists. The file is a crop of that person."
+		},
+		{
+			"url": "https://vnexpress.net/pho-bien-yen-vang-4079788.html",
+			"image": "https://vcdn1-dulich.vnecdn.net/2020/04/05/11-1586054525.jpg",
+			"date": "2020-04-02",
+			"license": "all rights reserved",
+			"author": "Đỗ Tuấn Hùng / VnExpress",
+			"open": false,
+			"file": "acn_vne11.jpg",
+			"shows": "A woman who sells fruit by the low wall of Bãi Trước: a jacket of red and blue checks with long sleeves, a hood that is down on the back, a zip at the front, and a green cloth hat with a wide brim. The file is a crop of the woman."
+		}
+	],
+	"sizes": {
+		"height_of_person": {
+			"value": 1.56,
+			"unit": "m",
+			"source": "estimate (no source): the person of World with the height 0.42 (a woman of 32 years). The sizes of the jacket scale with the body."
+		},
+		"length": {
+			"value": "to the hips",
+			"unit": "",
+			"source": "Photo 0: the hem of the blue jacket is at the hips of the person who sits on the wall. Photo 1: the hem of the check jacket is under the basket, at the hips."
+		},
+		"sleeves": {
+			"value": "long, to the wrist",
+			"unit": "",
+			"source": "Photo 0 and photo 1: the sleeves go to the wrists."
+		},
+		"hood": {
+			"value": "down on the back",
+			"unit": "",
+			"source": "Photo 0 and photo 1: the hood is down on the back of the neck. Women also wear the hood up on the head (not in these photos): no source."
+		},
+		"fit": {
+			"value": "loose",
+			"unit": "",
+			"source": "Photo 1: the jacket stands away from the body at the arm and at the side; how much: estimate (no source)."
+		},
+		"zip": {
+			"value": "a zip at the front",
+			"unit": "",
+			"source": "Photo 1: a zip from the hem to the neck."
+		},
+		"colors": {
+			"value": "blue #4f8fbe; also light blue #7fb7de and checks of red and blue",
+			"unit": "",
+			"source": "Photo 0: the median color of the jacket in the shade at the end of the afternoon is #184662; in the light of day it is a medium blue: #4f8fbe (estimate of the light). Photo 1: checks of red and blue. The old spec gives light blue from photo 0. One color for each woman."
+		},
+		"shirt_under": {
+			"value": "none in the order",
+			"unit": "",
+			"source": "Photos 0 and 1 do not show the shirt under the jacket. At the mid and far levels the jacket covers the body from the neck to the hips. An order with a T-shirt under the jacket (four clothes) stops the builder of the factory (HTTP 503), so the order has no T-shirt."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "9c0e86c76adfbd22cc0deaf646429827",
+			"seen": "world_rain_shell in blue #4f8fbe: at the mid level the jacket is a color on the body from the hips to the chin and on the arms to the wrists, as the length and the sleeves of photos 0 and 1. But it is tight (a color on the skin, not a loose jacket), the collar goes up to the chin as a turtleneck, and no hood shows: in photos 0 and 1 the jacket is loose and its hood hangs on the back. The pants show as a dark navy.",
+			"changed": "No change of the order: the person blueprint has no other jacket with a hood that shows at the mid level (a tool request). Next: the far level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "far",
+			"hash": "9c0e86c76adfbd22cc0deaf646429827",
+			"seen": "The far body: the blue jacket from the hips to the chin and on the arms to the wrists, dark pants, brown sandals; the same as the mid level. No hood and no loose cut, as at the mid level.",
+			"changed": "No change (status Check, a tool request for a jacket with a hood that shows at the mid and far levels)."
+		}
+	],
+	"hash": "9c0e86c76adfbd22cc0deaf646429827"
+}
