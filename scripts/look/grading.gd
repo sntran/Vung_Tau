@@ -8,7 +8,12 @@ extends RefCounted
 ## the Mobile renderer): SDFGI does not use it.
 
 const PATH := "res://data/look/grading.json"
-const NUMBERS: Array[String] = ["exposure", "saturation", "contrast", "sun_warmth", "sky_mix", "ambient_mix", "glow", "haze"]
+const NUMBERS: Array[String] = ["exposure", "saturation", "contrast", "sun_warmth", "sky_mix", "ambient_mix", "glow", "haze",
+		"sea_mix"]
+
+## The gloss of shaders/water.gdshader before the grading.
+const SEA_ROUGHNESS := 0.06
+const SEA_SPECULAR := 0.6
 
 static var _data: Dictionary = {}
 
@@ -34,8 +39,11 @@ static func at(minutes: float, renderer := "") -> Dictionary:
 	var extra_hours: Dictionary = _mix(extra.get("hours", []), hour)
 	for key in NUMBERS:
 		result[key] = float(result[key]) + float(extra.get(key, 0.0)) + float(extra_hours.get(key, 0.0))
-	for key: String in ["sun_color", "sky_top", "sky_horizon", "ambient_color", "haze_color"]:
+	for key: String in ["sun_color", "sky_top", "sky_horizon", "ambient_color", "haze_color", "sea_deep", "sea_shallow"]:
 		result[key] = Color(str(data().get(key, "#FFFFFF")))
+	# The gloss of the sea (report 0026, D-0026-06), with the part sea_mix of the hour.
+	result["sea_roughness"] = float(data().get("sea_roughness", SEA_ROUGHNESS))
+	result["sea_specular"] = float(data().get("sea_specular", SEA_SPECULAR))
 	return result
 
 

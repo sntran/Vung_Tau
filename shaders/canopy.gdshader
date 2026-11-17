@@ -24,6 +24,12 @@ uniform vec3 dry_brown : source_color = vec3(0.38, 0.34, 0.18);
 uniform vec3 dry_red : source_color = vec3(0.45, 0.25, 0.14);
 uniform vec3 dry_yellow : source_color = vec3(0.45, 0.42, 0.2);
 uniform vec3 bare_color : source_color = vec3(0.38, 0.35, 0.3);
+// Far away, the clumps take the mean of their colors (report 0026, D-0026-05):
+// one clump is many trees there, and the dark and the light clumps side by side
+// made the slopes of Núi Lớn and Núi Nhỏ look like patches of camouflage. From
+// far_range.x to far_range.y m, far_even of the difference to the mean goes.
+uniform vec2 far_range = vec2(250.0, 900.0);
+uniform float far_even = 0.75;
 
 varying vec3 clump_color;
 
@@ -46,8 +52,15 @@ void vertex() {
 		float kind = hash(origin.xz + vec2(3.0, 11.0));
 		color = kind < 0.4 ? dry_brown : (kind < 0.7 ? dry_red : dry_yellow);
 	}
-	// The vertex color is the shade low on the crowns.
-	clump_color = color * COLOR.r;
+	// The mean of the colors of the clumps of the season.
+	// The same mean as the far canopy of the ground (shaders/terrain.gdshader), so
+	// that the far clumps do not stand out on it.
+	vec3 mean = mix(mix(leaf_dark, leaf_light, 0.5), (dry_brown + dry_red + dry_yellow) / 3.0 * 0.85, dryness * 0.4);
+	color = mix(color, mean, far_even * smoothstep(far_range.x, far_range.y, distance_xz));
+	// The vertex color is the shade low on the crowns; far away, less of it (toward a
+	// mean shade of 0.8).
+	float shade = mix(COLOR.r, 0.8, 0.5 * far_even * smoothstep(far_range.x, far_range.y, distance_xz));
+	clump_color = color * shade;
 }
 
 void fragment() {

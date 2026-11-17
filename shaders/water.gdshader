@@ -24,6 +24,10 @@ uniform sampler2D foam_noise : filter_linear_mipmap, repeat_enable;
 uniform vec3 deep_color : source_color = vec3(0.04, 0.22, 0.32);
 uniform vec3 shallow_color : source_color = vec3(0.16, 0.48, 0.5);
 uniform vec3 foam_color : source_color = vec3(0.92, 0.95, 0.95);
+// The gloss of the water (report 0026, D-0026-06: with a roughness of 0.06 and a
+// specular of 0.6, the water of Bãi Trước at noon was the sky, a pale cyan).
+uniform float gloss_roughness = 0.06;
+uniform float gloss_specular = 0.6;
 // The width of the foam band at the water line (m) on the open coast.
 uniform float foam_band = 4.0;
 // The foam is never where the water is deeper than this (m).
@@ -90,7 +94,7 @@ void fragment() {
 	float foam = edge * strength * smoothstep(0.35, 0.75, noise * 0.7 + wave * 0.5);
 	color = mix(color, foam_color, foam * 0.85);
 	ALBEDO = color;
-	ROUGHNESS = mix(0.06, 0.6, foam);
-	SPECULAR = 0.6;
+	ROUGHNESS = mix(gloss_roughness, 0.6, foam);
+	SPECULAR = gloss_specular;
 	METALLIC = 0.0;
 }

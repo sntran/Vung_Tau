@@ -99,6 +99,9 @@ var ridge_width := 4.0
 var load_times: Array[float] = []
 var _ground_material: ShaderMaterial
 var _sea_material: ShaderMaterial
+## The colors of the sea of shaders/water.gdshader, before the grading of the hour.
+const SEA_DEEP := Color(0.04, 0.22, 0.32)
+const SEA_SHALLOW := Color(0.16, 0.48, 0.5)
 var _road_materials: Dictionary = {}
 ## The band of rocks around the Hòn Bà path (R8h): polygons in game X, Z.
 var band_polygons: Array[PackedVector2Array] = []
@@ -476,6 +479,13 @@ func update_time(minutes: int, day: int) -> void:
 		environment.glow_intensity = float(grade.glow)
 		environment.fog_density = float(grade.haze)
 		environment.fog_light_color = environment.fog_light_color.lerp(grade.haze_color, mix)
+		# The sea is green grey, not cyan (report 0026, D-0026-06).
+		if _sea_material:
+			var sea := clampf(float(grade.sea_mix), 0.0, 1.0)
+			_sea_material.set_shader_parameter("deep_color", SEA_DEEP.lerp(grade.sea_deep, sea))
+			_sea_material.set_shader_parameter("shallow_color", SEA_SHALLOW.lerp(grade.sea_shallow, sea))
+			_sea_material.set_shader_parameter("gloss_roughness", lerpf(Grading.SEA_ROUGHNESS, float(grade.sea_roughness), sea))
+			_sea_material.set_shader_parameter("gloss_specular", lerpf(Grading.SEA_SPECULAR, float(grade.sea_specular), sea))
 	var sky_material := environment.sky.sky_material as ProceduralSkyMaterial
 	sky_material.sky_top_color = colors[0]
 	sky_material.sky_horizon_color = colors[1]

@@ -1,5 +1,5 @@
 {
-	"note": "Plan 0026, R13: the beauty pass of the Vũng Tàu world, for each hour of the day (January). scripts/look/grading.gd gives the values between two hours, and VungTau.update_time() applies them after the light of the sun and the sky. exposure multiplies the exposure of the light code; saturation and contrast are the color adjustment; sun_warmth mixes the sun color to sun_color (the golden hour: warm, not orange); sky_mix mixes the top and the horizon of the sky to sky_top and sky_horizon; ambient_mix mixes the ambient light to ambient_color (the shade of the golden hour takes the blue of the sky: on the presets with no SDFGI, the warm ambient light of the twilight made the whole frame orange); glow is the bloom; haze is the fog density with haze_color. The part of a renderer (mobile: Low on a phone and the Mobile renderer of the workspace; forward_plus: the computer presets) adds its values to the values of the hour, and the values of its own hours (a value that an hour does not give is 0; out of its hours, 0). The golden hour of January is 16:30 to 17:45 (sunset at about 17:50). All values are builder values from the photos of section 3; I approve them with the shots of PT-72.",
+	"note": "Plan 0026, R13: the beauty pass of the Vũng Tàu world, for each hour of the day (January). scripts/look/grading.gd gives the values between two hours, and VungTau.update_time() applies them after the light of the sun and the sky. exposure multiplies the exposure of the light code; saturation and contrast are the color adjustment; sun_warmth mixes the sun color to sun_color (the golden hour: warm, not orange); sky_mix mixes the top and the horizon of the sky to sky_top and sky_horizon; ambient_mix mixes the ambient light to ambient_color (the shade of the golden hour takes the blue of the sky: on the presets with no SDFGI, the warm ambient light of the twilight made the whole frame orange); glow is the bloom; haze is the fog density with haze_color. The part of a renderer (mobile: Low on a phone and the Mobile renderer of the workspace; forward_plus: the computer presets) adds its values to the values of the hour, and the values of its own hours (a value that an hour does not give is 0; out of its hours, 0). The golden hour of January is 16:30 to 17:45 (sunset at about 17:50). All values are builder values from the photos of section 3; I approve them with the shots of PT-72. sea_mix mixes the colors of the sea (shaders/water.gdshader: deep_color and shallow_color) to sea_deep and sea_shallow: the water of Bãi Trước is green grey, not cyan (report 0026, D-0026-06; four photos of 2014 to 2021, the mean of the water #677985). sea_roughness and sea_specular are the gloss of the water with the part sea_mix: a glossy water (0.06 and 0.6) is the color of the sky at a low angle.",
 	"hours": [
 		{
 			"hour": 0.0,
@@ -10,7 +10,8 @@
 			"sky_mix": 0.0,
 			"ambient_mix": 0.0,
 			"glow": 0.25,
-			"haze": 4e-05
+			"haze": 4e-05,
+			"sea_mix": 0.4
 		},
 		{
 			"hour": 5.5,
@@ -21,7 +22,8 @@
 			"sky_mix": 0.0,
 			"ambient_mix": 0.0,
 			"glow": 0.2,
-			"haze": 6e-05
+			"haze": 6e-05,
+			"sea_mix": 0.4
 		},
 		{
 			"hour": 6.5,
@@ -32,7 +34,8 @@
 			"sky_mix": 0.2,
 			"ambient_mix": 0.3,
 			"glow": 0.1,
-			"haze": 8e-05
+			"haze": 8e-05,
+			"sea_mix": 0.6
 		},
 		{
 			"hour": 8.0,
@@ -43,7 +46,8 @@
 			"sky_mix": 0.0,
 			"ambient_mix": 0.0,
 			"glow": 0.0,
-			"haze": 5e-05
+			"haze": 5e-05,
+			"sea_mix": 1.0
 		},
 		{
 			"hour": 12.0,
@@ -54,7 +58,8 @@
 			"sky_mix": 0.0,
 			"ambient_mix": 0.0,
 			"glow": 0.0,
-			"haze": 5e-05
+			"haze": 5e-05,
+			"sea_mix": 1.0
 		},
 		{
 			"hour": 15.5,
@@ -65,7 +70,8 @@
 			"sky_mix": 0.1,
 			"ambient_mix": 0.1,
 			"glow": 0.0,
-			"haze": 5e-05
+			"haze": 5e-05,
+			"sea_mix": 1.0
 		},
 		{
 			"hour": 16.5,
@@ -76,7 +82,8 @@
 			"sky_mix": 0.5,
 			"ambient_mix": 0.55,
 			"glow": 0.08,
-			"haze": 7e-05
+			"haze": 7e-05,
+			"sea_mix": 0.85
 		},
 		{
 			"hour": 17.2,
@@ -87,7 +94,8 @@
 			"sky_mix": 0.7,
 			"ambient_mix": 0.65,
 			"glow": 0.12,
-			"haze": 9e-05
+			"haze": 9e-05,
+			"sea_mix": 0.7
 		},
 		{
 			"hour": 17.75,
@@ -98,7 +106,8 @@
 			"sky_mix": 0.6,
 			"ambient_mix": 0.55,
 			"glow": 0.18,
-			"haze": 0.0001
+			"haze": 0.0001,
+			"sea_mix": 0.6
 		},
 		{
 			"hour": 18.5,
@@ -109,7 +118,8 @@
 			"sky_mix": 0.3,
 			"ambient_mix": 0.2,
 			"glow": 0.25,
-			"haze": 8e-05
+			"haze": 8e-05,
+			"sea_mix": 0.5
 		},
 		{
 			"hour": 20.0,
@@ -120,7 +130,8 @@
 			"sky_mix": 0.0,
 			"ambient_mix": 0.0,
 			"glow": 0.25,
-			"haze": 4e-05
+			"haze": 4e-05,
+			"sea_mix": 0.4
 		},
 		{
 			"hour": 24.0,
@@ -131,7 +142,8 @@
 			"sky_mix": 0.0,
 			"ambient_mix": 0.0,
 			"glow": 0.25,
-			"haze": 4e-05
+			"haze": 4e-05,
+			"sea_mix": 0.4
 		}
 	],
 	"sun_color": "#FFBC78",
@@ -171,5 +183,9 @@
 			"saturation": -0.12,
 			"exposure": -0.04
 		}
-	}
+	},
+	"sea_deep": "#314a42",
+	"sea_shallow": "#687c68",
+	"sea_roughness": 0.35,
+	"sea_specular": 0.25
 }

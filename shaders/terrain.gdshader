@@ -72,6 +72,10 @@ uniform float canopy_far = 400.0;
 uniform vec3 canopy_dark : source_color = vec3(0.08, 0.15, 0.06);
 uniform vec3 canopy_light : source_color = vec3(0.15, 0.24, 0.09);
 uniform vec3 canopy_dry : source_color = vec3(0.4, 0.33, 0.17);
+// From canopy_even_range.x to .y m, canopy_far_even of the pattern of the crowns
+// goes to its mean color (report 0026, D-0026-05).
+uniform vec2 canopy_even_range = vec2(250.0, 900.0);
+uniform float canopy_far_even = 0.75;
 
 varying vec3 world_position;
 varying vec3 world_normal;
@@ -211,9 +215,16 @@ void fragment() {
 	vec2 crown_uv = world_position.xz / 8.0;
 	float crowns = value_noise(crown_uv) * 0.6 + value_noise(crown_uv * 2.7) * 0.4;
 	vec3 canopy = mix(canopy_dark, canopy_light, smoothstep(0.25, 0.75, crowns));
-	float crown_dry = step(hash2(floor(crown_uv * 1.3)), dryness * 0.4);
+	// The dry crowns are round, from a smooth noise: square cells of a hash made
+	// tan squares, and from far the hills looked like camouflage (report 0026,
+	// D-0026-05).
+	float dry_share = dryness * 0.4;
+	float crown_dry = smoothstep(1.0 - dry_share - 0.06, 1.0 - dry_share + 0.06, value_noise(crown_uv * 1.3 + vec2(7.3, 2.1)));
 	canopy = mix(canopy, canopy_dry * (0.6 + 0.5 * crowns), crown_dry);
 	canopy *= mix(0.55, 1.0, smoothstep(0.15, 0.35, crowns));
+	// Far away, one pixel is many crowns: the canopy takes its mean color.
+	vec3 canopy_mean = mix(mix(canopy_dark, canopy_light, 0.5), canopy_dry * 0.85, dry_share) * 0.8;
+	canopy = mix(canopy, canopy_mean, canopy_far_even * smoothstep(canopy_even_range.x, canopy_even_range.y, camera_distance));
 	color = mix(color, canopy, forest * far);
 	// Bare rock below the mean sea level is under the water for half of the
 	// time: it is darker, with algae and shells (the flat rocks along the sea

@@ -14,7 +14,13 @@ extends RefCounted
 # Report 0026 (D-0026-02): a shot is the view of its photo. PT-72 checks that
 # the eye is at the place of the photo, that each subject of the photo is in
 # the frame and that no stand-in hides it, and that each stand-in in the frame
-# has its storeys from a source (Q6).
+# has its storeys from a source (Q6). D-0026-05: in the box "hill" of a shot,
+# the patches of the far trees (the variation of the brightness of blocks of
+# BLOCK px) are at most HILL_MAX times those of the photo in its box. D-0026-06:
+# at 12:00, the water in the box "water" is green grey, not cyan or the pale
+# sky: its saturation is at most WATER_MAX_SATURATION and its value at most
+# WATER_MAX_VALUE (the water of the photos of 2014 to 2021: #5d91ab to
+# #a3b4b7, #6d7f92 in the photo of S1).
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=17:10 --quality=low
 # phase: --world=vung_tau --start-time=12:00 --quality=low
@@ -43,6 +49,12 @@ const SHEET_CELL := Vector2i(640, 360)
 const PHOTOS := "res://docs/reference/photos/"
 ## A stand-in farther than this from the eye does not count as in the frame.
 const VIEW_RANGE := 800.0
+## The blocks of the measure of the patches (px of a frame of 1280 px).
+const BLOCK := 16
+const HILL_MAX := 1.5
+const WATER_MAX_SATURATION := 0.35
+## The water of the photos is 0.45 to 0.7 bright (the value of its mean color).
+const WATER_MAX_VALUE := 0.72
 
 
 func run(d: PlaytestDriver) -> void:
@@ -71,6 +83,7 @@ func run(d: PlaytestDriver) -> void:
 			_check_view(d, w, camera, shot, eye)
 		ui.visible = false
 		await d.wait_frames(8)
+		_check_look(d, shot, str(run_values[0]), str(run_values[1]))
 		await d.screenshot("%s_%s_%s" % [shot.id, run_values[0], run_values[1]])
 		ui.visible = true
 		d.step("%s (%s): eye (%.1f, %.1f, %.1f), fov %.0f" % [shot.id, shot.name, eye.x, eye.y, eye.z, camera.fov])
@@ -133,6 +146,60 @@ func _check_view(d: PlaytestDriver, w: VungTau, camera: Camera3D, shot: Dictiona
 				break
 	d.step("%s: %d stand-ins with a guessed number of storeys in the frame" % [shot.id, guessed.size()])
 	d.expect(guessed.is_empty(), "%s: each stand-in in the frame has its storeys from a source (Q6): %s" % [shot.id, ", ".join(guessed)])
+
+
+## D-0026-05 and D-0026-06: the patches of the far hill and the color of the water.
+func _check_look(d: PlaytestDriver, shot: Dictionary, preset: String, time: String) -> void:
+	var frame := d.viewport().get_texture().get_image()
+	if shot.has("hill"):
+		var game := box_stats(frame, shot.hill.shot)
+		var photo_image := Image.load_from_file(ProjectSettings.globalize_path(PHOTOS + str(shot.photos[0].file)))
+		photo_image.resize(frame.get_width(), int(photo_image.get_height() * float(frame.get_width()) / photo_image.get_width()))
+		var photo := box_stats(photo_image, shot.hill.photo)
+		d.step("%s, %s: the patches of the hill: %.3f (the photo %.3f)" % [shot.id, preset, game.patches, photo.patches])
+		d.expect(float(game.patches) <= float(photo.patches) * HILL_MAX, "%s, %s: the far trees of the hill are not patches: %.3f, at most %.1f times the photo (%.3f)" % [
+				shot.id, preset, game.patches, HILL_MAX, photo.patches])
+	if shot.has("water") and time == "1200":
+		var water := box_stats(frame, shot.water)
+		var color: Color = water.mean
+		d.step("%s, %s: the water at 12:00 is #%s (saturation %.2f)" % [shot.id, preset, color.to_html(false), color.s])
+		d.expect(color.s <= WATER_MAX_SATURATION, "%s, %s: the water at 12:00 is green grey, not cyan: saturation %.2f (at most %.2f)" % [
+				shot.id, preset, color.s, WATER_MAX_SATURATION])
+		d.expect(color.v <= WATER_MAX_VALUE, "%s, %s: the water at 12:00 is not the pale sky: its value is %.2f (at most %.2f)" % [
+				shot.id, preset, color.v, WATER_MAX_VALUE])
+
+
+## The mean color of a box of an image (x0, y0, x1, y1 as parts of its size), and
+## "patches": the standard deviation of the brightness of its blocks of BLOCK px.
+static func box_stats(image: Image, box: Array) -> Dictionary:
+	var size := image.get_size()
+	var x0 := int(float(box[0]) * size.x)
+	var y0 := int(float(box[1]) * size.y)
+	var x1 := int(float(box[2]) * size.x)
+	var y1 := int(float(box[3]) * size.y)
+	var total := Color(0, 0, 0)
+	var count := 0
+	var blocks: Array[float] = []
+	for by in range(y0, y1 - BLOCK + 1, BLOCK):
+		for bx in range(x0, x1 - BLOCK + 1, BLOCK):
+			var light := 0.0
+			var n := 0
+			for y in range(by, by + BLOCK, 2):
+				for x in range(bx, bx + BLOCK, 2):
+					var c := image.get_pixel(x, y)
+					total += c
+					count += 1
+					light += c.get_luminance()
+					n += 1
+			blocks.append(light / maxf(n, 1.0))
+	var mean_light := 0.0
+	for v in blocks:
+		mean_light += v / maxf(blocks.size(), 1.0)
+	var spread := 0.0
+	for v in blocks:
+		spread += (v - mean_light) * (v - mean_light) / maxf(blocks.size(), 1.0)
+	var mean := Color(total.r / maxf(count, 1.0), total.g / maxf(count, 1.0), total.b / maxf(count, 1.0))
+	return {"mean": mean, "patches": sqrt(spread)}
 
 
 ## The stand-in or the model of World that the line from the eye to the point
