@@ -60,4 +60,10 @@ jobs:
           fi
           git -c user.name="Sơn Trần-Nguyễn" -c user.email=github@sntran.com -c commit.gpgsign=false \
             commit -m "Update the reference photos"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          # Another workflow can push to the branch at the same time (the models
+          # and the photos after one push): put this commit on top of it.
+          for attempt in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((attempt * 5))
+          done
+          exit 1
