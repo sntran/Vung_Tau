@@ -206,33 +206,6 @@
 				"scooter_tay_ga_1.receipt.json": "5460011da13b51eceaba46a97cc2650d9c15bfee580b252d0d8c143aa023f67e"
 			}
 		},
-		"sitter_1": {
-			"hash": "d4ab57554a14b7257740cfdeb6d7dad5",
-			"files": {
-				"sitter_1.far.glb": "6e2b2ba82bc2515fc0bf75b024d298e03cd8692e4dc37bedc6848fed568ff430",
-				"sitter_1.mid.glb": "0ba13895c98531a56c88e7d146b320084bcc307bd5fbc64570d90dfe5dda6da8",
-				"sitter_1.parts.json": "e7ad5d9a46c28b706f4d9a544423b335164c2cdea2eef1136a9642669628550a",
-				"sitter_1.receipt.json": "cbe0e16ed1df25d3165fc23cb3a032b3c7b610a4febf09533eab3a74547a3290"
-			}
-		},
-		"sitter_2": {
-			"hash": "3273cbea1b142f049270113b6c4ffcff",
-			"files": {
-				"sitter_2.far.glb": "35d7126096ef2bb47f4a3f1aba27d3bd17dc97da15453378c29b5c21e71a3e6d",
-				"sitter_2.mid.glb": "ad286887deb625acdc152047d721ae9be062d7d3c8525d8c4c5ee07ec02f0618",
-				"sitter_2.parts.json": "3a97cf1280433b6aceece9f9e5fc80cc1db616a6193a35ec836b236ab7691195",
-				"sitter_2.receipt.json": "cbe7dbe16fb9b7013d9b3a89683fb66040b82fc23cb64176c8b17a165d365cb5"
-			}
-		},
-		"sitter_3": {
-			"hash": "239bb80b9f46d3d19ad250e9bfec8210",
-			"files": {
-				"sitter_3.far.glb": "75e1a1fc33f663572d4830dd964c77a301204bf876f089c7491f87195ab46bb7",
-				"sitter_3.mid.glb": "0e4ca603081b18cac49a8797771af7e222f731b375ffb6321233dfd3269d3b0c",
-				"sitter_3.parts.json": "7f7d7091c3a10f50bdba94cb79f06149f06ccb0256fcae326c87e0f3cf11fb45",
-				"sitter_3.receipt.json": "e849df28e296d47b97eb77f426c721f30103216d59420fb135be8781cb6c0295"
-			}
-		},
 		"thung_chai": {
 			"hash": "26b0ac46e6a662ac85d6c27ba04983b1",
 			"files": {
@@ -241,60 +214,6 @@
 				"thung_chai.mid.glb": "d2a0592b5cd4bcf0f748db92965aa4020975191facd0909d0cf976fcd80c9739",
 				"thung_chai.parts.json": "3ba12ff589c72cd3160d0664e233cbedb01c2e137ea2699f251b77f0bc042e24",
 				"thung_chai.receipt.json": "93e5c370a8d179d5909ed2571c98d78d9340a6419e71056d20844167be8c0714"
-			}
-		},
-		"walker_1": {
-			"hash": "4a32d424cd88ec086e12b7fd83ddff4d",
-			"files": {
-				"walker_1.far.glb": "0f8aefc8fb2a6946b01ef3fe15e231838bed527e216803317e1cc0e3accac297",
-				"walker_1.mid.glb": "c7663c2aaf30cb6873cfd10770d1b78597db84d890912eeaff5dd06dae93df43",
-				"walker_1.parts.json": "ef3166b9bbaa954da6a482e200e59dfb25b94a5c30278b00a4f184dece66047e",
-				"walker_1.receipt.json": "c08d8088683fede9ae27ac5b1fc370beb0efa2923da241dd55204c8ce98c4757"
-			}
-		},
-		"walker_2": {
-			"hash": "05535c16c53372f7f938a649cbf48089",
-			"files": {
-				"walker_2.far.glb": "4d253dac2b21150c5180b2396143636b0452671039f8d2be80aef983fac6d888",
-				"walker_2.mid.glb": "de610a0376a915265eb39176c116fd23722e682a3c51ed55d69e70bdfe1470c6",
-				"walker_2.parts.json": "8dea43d070a03b8fcec7f9241ce84af7c4a331b1973de805b6c89332cf2356b4",
-				"walker_2.receipt.json": "1d07a32bea12bbe13ff55bde87be34811a095cd5ad8516404f1fe54e3d920912"
-			}
-		},
-		"walker_3": {
-			"hash": "ea4dc368fa94da0dd28ae66f7a121eed",
-			"files": {
-				"walker_3.far.glb": "60887710e88b09ee2bf0dd44879710ba89661965aa35f429c20cc93772c01fc2",
-				"walker_3.mid.glb": "210f6ce1e3ca7f4c96238947ea0bbe734f0ab883c52189a524869dd4fc4a2706",
-				"walker_3.parts.json": "54153dd3e4195f9ba9fcf37c1d738d25e466b05a9c6c374e8ae80a78813a72b6",
-				"walker_3.receipt.json": "541088157d2c467c6306a378439e9c7197e52004f9dffdaf5ca1366d5b16f769"
-			}
-		},
-		"walker_4": {
-			"hash": "d4ba3e1584ca7dd6119695dc664e4dcf",
-			"files": {
-				"walker_4.far.glb": "be873e3a17d0cac6e179f6526e10c4452ede6ab0183dcb291a87af52baebf760",
-				"walker_4.mid.glb": "5e55dc0229cfdf5e1e6024e3e37dbfae021dd9190becc82bde9c8afcc9d6a8c4",
-				"walker_4.parts.json": "561d76f5f62e407280fb7794c90a0ed1115845c8b443e898b8be90ca59d2b0f8",
-				"walker_4.receipt.json": "a0e080b1f1a873adad28456b62a2b7f4b6a56834677f8e236202c84838081df4"
-			}
-		},
-		"walker_5": {
-			"hash": "ca839e35baeb004fe88fd947febb7d81",
-			"files": {
-				"walker_5.far.glb": "99c896ecbdf02a08cc5152d82b1759a2496468a7b047ff766f2ac447e366568b",
-				"walker_5.mid.glb": "90adc7d05c4c1b56cd2d3a521c1460a13abfc1cc533c9efcb5f6c1789d692b19",
-				"walker_5.parts.json": "5c7f012b0c00c9ba3dd415f079ab7a8674228ee2db08592ace370a238d5348f6",
-				"walker_5.receipt.json": "8688c046367d6c4acdcbe86458107b9e1057153c4a9e9de742f71290da3e39af"
-			}
-		},
-		"walker_6": {
-			"hash": "3f7259f7e77d0b16cbe296c422a3696a",
-			"files": {
-				"walker_6.far.glb": "c75d39fbfde84d9395b1de86886a997490cd00de00e31174b3b677974581ecda",
-				"walker_6.mid.glb": "cee21d7f5483d50ac44556b9b3ffe85525b09ea03400d78218a44fc50a82b521",
-				"walker_6.parts.json": "b444f657ecd3fb0bf51a3a8cc803ab53ff3a3c0d9c53ab07a788058687fc1c67",
-				"walker_6.receipt.json": "7fe3bc1f5c01d556c452138e364be392e3b52242ad29f1aebba8949e2c2dea10"
 			}
 		}
 	}
