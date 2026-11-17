@@ -334,7 +334,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     level_places(grid, config.landmarks, found_by_id)
     # Plan 0026, D3 (and plan 0009, R8): the ground under each model of World
     # of data/world/places/ is level, at the height of the ground at its front.
-    level_world_places(grid, ROOT / "data" / "world" / "places")
+    level_world_places(grid, ROOT / "data" / "world" / "places", roads)
     cut_stairs(grid, config.landmarks, found_by_id, roads)
     # The roads take the heights of the ground again: the bases and the stairs changed it.
     for road in roads:
@@ -571,6 +571,9 @@ BASE_SIDE_GRADE = 0.6
 BASE_SIDE_M = 6.0
 # The level ground round the box of a model of World (plan 0026, D3).
 LEVEL_MARGIN_M = 2.5
+# Under a model against a hill, the cells within this distance of the edge of
+# another road keep their height (one cell of the grid).
+ROAD_KEEP_M = 2.0
 
 
 def level_places(grid, landmarks_config, found_by_id) -> None:
@@ -660,7 +663,7 @@ def world_place_footprint(place: dict) -> list[tuple[float, float]]:
     return [(ox + x * ax + z * fx, oz + x * az + z * fz) for x, z in ((x0, z0), (x1, z0), (x1, 0.0), (x0, 0.0))]
 
 
-def level_world_places(grid, folder) -> None:
+def level_world_places(grid, folder, roads=()) -> None:
     """Makes the ground level under each model of World of the places files
     (plan 0026, D3), at the height of the ground at the middle of its front,
     and LEVEL_MARGIN_M round its box. Where the margins of two models meet,
@@ -677,6 +680,9 @@ def level_world_places(grid, folder) -> None:
     places = []
     for path in sorted(Path(folder).glob("*.json")) if Path(folder).exists() else []:
         places += [p for p in load_json(path).get("places", []) if "box" in p]
+    from shapely.geometry import LineString
+    road_lines = [LineString([(float(q[0]), float(q[1])) for q in r.points]).buffer(r.width / 2.0)
+                  for r in roads if len(r.points) >= 2 and r.type not in ("footway", "path", "steps", "pedestrian")]
     if not places:
         return
     cores = [Polygon([(x, -z) for x, z in world_place_footprint(p)]) for p in places]
@@ -697,7 +703,12 @@ def level_world_places(grid, folder) -> None:
             level_masks[i][rows[owner == i], cols[owner == i]] = True
     for i, place in enumerate(places):
         if place.get("keep_higher"):
-            level_masks[i] &= grid.heights <= levels[i]
+            # Inside its outline the ground is level (cut and fill); the cells
+            # near another road keep their height (Hẻm 2 Hải Đăng runs along the
+            # east wall of Hải Âu, and the grid of 2 m mixes the cells under the
+            # model into it); outside it, the level only fills the lower ground.
+            keep = terrain.rasterize(grid, [r.buffer(ROAD_KEEP_M) for r in road_lines]) if road_lines else np.zeros_like(core_masks[i])
+            level_masks[i] = (core_masks[i] & ~keep) | (level_masks[i] & (grid.heights <= levels[i]))
     all_level = np.logical_or.reduce(level_masks)
     for i, place in enumerate(places):
         grid.heights[level_masks[i]] = levels[i]

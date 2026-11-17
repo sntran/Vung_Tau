@@ -735,7 +735,15 @@
 			"note": "A low square lamp at the side of a path of the park (the model den_vuon_thap). Its panes (the role part_02) glow at night. Its far level ends at 60 m (a lamp of 0.70 m is some pixels there). The other values are the stand-in.",
 			"model": "den_vuon_thap",
 			"glow_role": "part_02",
-			"far_end_m": 60.0
+			"far_end_m": 60.0,
+			"ranges": {
+				"low": [
+					6.0,
+					30.0,
+					60.0
+				]
+			},
+			"ranges_note": "On Low the near level of the low lamp (6 376 triangles) shows to 6 m only, its mid level (300) to 30 m, and its far level to 60 m (PT-73: with the near level to 15 m, the shot S5 had more than 300 000 triangles on Low)."
 		}
 	},
 	"lamp_rows": [
@@ -812,5 +820,16 @@
 			"note": "The stand-ins of the buildings."
 		}
 	},
-	"lamp_glow": 3.0
+	"lamp_glow": 3.0,
+	"wall_pieces": {
+		"cell_m": 24.0,
+		"ranges": {
+			"low": [
+				0.0,
+				40.0,
+				150.0
+			]
+		},
+		"note": "The pieces of the walls that are models of this game (the parapet of Hạ Long, the low wall of the beach): one row of MultiMeshes in cells of cell_m (fewer draw calls than cells of 6 m), and on Low no near level (as the buildings of plan 0026, D6): the mid level to 40 m, the far level to 150 m. PT-73: with the near level on Low and cells of 6 m, S5 had 575 draw calls and 322 686 triangles."
+	}
 }

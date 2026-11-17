@@ -1516,6 +1516,10 @@ func _world_lamp(kind: String, model_id: String, cfg: Dictionary, base: Vector3,
 	var flat := Vector3(along.x, 0, along.z)
 	model.transform = Transform3D(Basis(Vector3.UP, atan2(flat.x, flat.z) if flat.length() > 0.01 else 0.0), base)
 	model.far_end = float(cfg.get("far_end_m", 0.0))
+	# The ranges of the levels of the kind for a preset (the low lamp on Low).
+	for preset: String in cfg.get("ranges", {}):
+		var r: Array = cfg.ranges[preset]
+		model.custom_ranges[preset] = Vector3(float(r[0]), float(r[1]), float(r[2]))
 	add_child(model)
 	model.apply_ranges()
 	var role := str(cfg.get("glow_role", ""))
@@ -1568,6 +1572,11 @@ func _wall_piece(model_id: String, a: Vector3, b: Vector3, sea: Vector3, up := 1
 	if wall_row == null:
 		wall_row = WorldRow.new()
 		wall_row.name = "WallPieces"
+		var cfg: Dictionary = data.get("wall_pieces", {})
+		wall_row.cell_size = float(cfg.get("cell_m", WorldRow.CELL))
+		for preset: String in cfg.get("ranges", {}):
+			var r: Array = cfg.ranges[preset]
+			wall_row.custom_ranges[preset] = Vector3(float(r[0]), float(r[1]), float(r[2]))
 		add_child(wall_row)
 	# The x of World is -x of the GLB: the local -x goes from a to b. A
 	# MultiMesh does not turn the faces of a mirrored instance over, so the

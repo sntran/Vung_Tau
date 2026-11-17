@@ -23,6 +23,13 @@ static var _impostor_materials: Dictionary = {}
 static var _meshes: Dictionary = {}  # model/level/node -> Mesh with the materials of the game
 static var _templates: Dictionary = {}  # model -> WorldModel, not in a tree
 
+## The size of a cell (m): larger cells give fewer draw calls (a row of the
+## pieces of a wall).
+var cell_size := CELL
+## The ranges of the levels for each preset (preset name -> Vector3), over
+## WorldModel.ranges. A near range of 0 hides the near level (the pieces of a
+## wall on Low, as the buildings of plan 0026, D6).
+var custom_ranges: Dictionary = {}
 var _items: Array[Dictionary] = []
 ## The cells: {"near": [MultiMeshInstance3D], "mid": [...], "impostor": [...]}.
 var cells: Array[Dictionary] = []
@@ -43,7 +50,7 @@ func build() -> void:
 	var by_cell := {}
 	for item in _items:
 		var origin: Vector3 = item.at.origin
-		var key := Vector2i(floori(origin.x / CELL), floori(origin.z / CELL))
+		var key := Vector2i(floori(origin.x / cell_size), floori(origin.z / cell_size))
 		if not by_cell.has(key):
 			by_cell[key] = []
 		by_cell[key].append(item)
@@ -222,7 +229,7 @@ static func impostor_material(model_id: String) -> ShaderMaterial:
 
 ## Sets the visibility ranges of the cells from the ranges of the preset.
 func apply_ranges() -> void:
-	var r := WorldModel.ranges
+	var r: Vector3 = custom_ranges.get(WorldModel.preset, WorldModel.ranges)
 	for entry in cells:
 		_set_range(entry.near, 0.0, r.x)
 		_set_range(entry.mid, r.x, r.y)
@@ -231,6 +238,8 @@ func apply_ranges() -> void:
 
 static func _set_range(nodes: Array, begin: float, end: float) -> void:
 	for node: GeometryInstance3D in nodes:
+		# An end of 0 is no end in Godot: a level with no range does not show.
+		node.visible = end > begin
 		node.visibility_range_begin = begin
 		node.visibility_range_end = end
 		node.visibility_range_begin_margin = WorldModel.FADE if begin > 0.0 else 0.0
