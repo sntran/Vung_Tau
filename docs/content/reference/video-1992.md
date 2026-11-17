@@ -5,7 +5,7 @@
 - A video of Vũng Tàu in 1992, shared in public as a Facebook reel by a page with the name "Vũng Tàu …". The link: to come.
 - I made a screen recording of it on 2026-11-16. The part that shows the video is 5 min 44 s long, 838 × 742 pixels.
 - It is a film of a TV screen that plays an old tape. The colors are not correct, and the green flashes are damage on the tape. Do not take a color from it. A size from it is a rough estimate only.
-- It has no open license. The frames are not in this repository. This file gives the times and what each part shows.
+- The person who filmed it is not known, and the page shared it as an old memory. I keep frames of it in this repository, in [`video-1992/`](video-1992/), for reference (my decision, 2026-11-16). Each file name starts with its time (`2-15_palace_hotel.jpg` is at 2:15). [`overview.jpg`](video-1992/overview.jpg) shows 12 of them with their places.
 
 ## Use
 
@@ -41,3 +41,8 @@ The camera goes on a motorcycle behind a white van. From 2:00 to 4:15 it goes on
 
 - Traffic: mostly bicycles and Honda Cub motorcycles, cyclos, a few vans (Toyota HiAce, Volkswagen bus), and old sedans.
 - People: nón lá, shirts with short sleeves, and few people with helmets.
+
+## Frames
+
+The frames do not show faces near the camera or the number plate of the van. The frames at 3:15 to 3:24 (the driver of the van) are not kept.
+
