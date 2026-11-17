@@ -749,3 +749,15 @@ def test_a_twin_road_takes_the_height_of_a_junction():
     out = terrain.blend_to_fixed(profile, raw, fixed, np.full(30, 2.0), terrain.JUNCTION_BLEND_M)
     assert out[-1] == pytest.approx(11.0)
     assert np.abs(np.diff(out)).max() < 0.2
+
+
+def test_a_road_from_a_fixed_junction_is_not_steeper_than_the_grade():
+    """PT-36: after a fixed point (a junction), the profile of a steep road
+    comes under the grade, also where the ground falls fast."""
+    profile = np.array([41.13, 40.6, 39.0, 37.0, 35.5, 34.0, 33.0, 32.5])
+    spacing = np.full(len(profile) - 1, 3.2)
+    fixed = np.zeros(len(profile), dtype=bool)
+    fixed[0] = True
+    result = terrain.limit_grade(profile, spacing, 0.25, fixed=fixed)
+    assert result[0] == pytest.approx(41.13)
+    assert np.max(np.abs(np.diff(result)) / spacing) <= 0.25 + 1e-6

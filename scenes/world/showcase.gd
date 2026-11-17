@@ -522,6 +522,37 @@ func _balustrade(line: PackedVector3Array, cfg: Dictionary) -> void:
 	_add_length("wall_openings", gaps.size())
 	if span > 0.0:
 		_wall_spans(model_id, line, span, gaps)
+	_steps_down(cfg.get("steps", {}), wall_openings.slice(wall_openings.size() - gaps.size()), half)
+
+
+## Report 0026, Q19: the granite steps down to the sand in each opening of the
+## low wall (bac_xuong_cat): the top edge of the piece at the sand face of the
+## wall, at the height of the walk, the steps down to the sand side. The piece
+## is scaled up and down to the drop to the sand at its foot.
+func _steps_down(cfg: Dictionary, openings: Array, half: float) -> void:
+	var model_id := str(cfg.get("model", ""))
+	if not _has_model(model_id):
+		return
+	var drop := float(_option(model_id, "drop", 1.44))
+	var run := float(_option(model_id, "steps", 8)) * float(_option(model_id, "tread", 0.3))
+	for opening: Dictionary in openings:
+		var at: Vector3 = opening.at
+		var along: Vector3 = opening.along
+		var side := Vector3(-along.z, 0.0, along.x).normalized()
+		var sand := side if world.ground_height(at.x + side.x * 2.0, at.z + side.z * 2.0) \
+				< world.ground_height(at.x - side.x * 2.0, at.z - side.z * 2.0) else -side
+		var top := at + sand * half
+		var foot := top + sand * run
+		var fall := top.y - world.ground_height(foot.x, foot.z)
+		if fall < float(cfg.get("min_drop_m", 0.25)):
+			continue
+		var scale := clampf(fall / drop, 0.25, 2.0)
+		# The x of World is along the wall, and its +y (the steps down) is -z of the GLB.
+		var basis := Basis(along, Vector3.UP * scale, -sand)
+		if basis.determinant() < 0.0:
+			basis.x = -basis.x
+		_row_of_walls().add(model_id, Transform3D(basis, top))
+		_add_length("steps_down", 1.0)
 
 
 ## The spans of the model of a low wall along the line, end to end by their
@@ -2034,15 +2065,7 @@ func _wall_piece(model_id: String, a: Vector3, b: Vector3, sea: Vector3, up := 1
 	var length := float(_option(model_id, "length", 2.0))
 	if a.distance_to(b) < 0.05 or length <= 0.0:
 		return
-	if wall_row == null:
-		wall_row = WorldRow.new()
-		wall_row.name = "WallPieces"
-		var cfg: Dictionary = data.get("wall_pieces", {})
-		wall_row.cell_size = float(cfg.get("cell_m", WorldRow.CELL))
-		for preset: String in cfg.get("ranges", {}):
-			var r: Array = cfg.ranges[preset]
-			wall_row.custom_ranges[preset] = Vector3(float(r[0]), float(r[1]), float(r[2]))
-		add_child(wall_row)
+	_row_of_walls()
 	# The x of World is -x of the GLB: the local -x goes from a to b. A
 	# MultiMesh does not turn the faces of a mirrored instance over, so the
 	# basis stays right-handed: when the sea is to the other side, the piece
@@ -2052,6 +2075,20 @@ func _wall_piece(model_id: String, a: Vector3, b: Vector3, sea: Vector3, up := 1
 	if basis.determinant() < 0.0:
 		basis.x = -basis.x
 	wall_row.add(model_id, Transform3D(basis, (a + b) / 2.0))
+
+
+## The row of the pieces of the walls (and the steps down to the sand).
+func _row_of_walls() -> WorldRow:
+	if wall_row == null:
+		wall_row = WorldRow.new()
+		wall_row.name = "WallPieces"
+		var cfg: Dictionary = data.get("wall_pieces", {})
+		wall_row.cell_size = float(cfg.get("cell_m", WorldRow.CELL))
+		for preset: String in cfg.get("ranges", {}):
+			var r: Array = cfg.ranges[preset]
+			wall_row.custom_ranges[preset] = Vector3(float(r[0]), float(r[1]), float(r[2]))
+		add_child(wall_row)
+	return wall_row
 
 
 ## The point on the ground.

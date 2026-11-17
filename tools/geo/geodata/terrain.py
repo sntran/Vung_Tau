@@ -14,6 +14,7 @@ from affine import Affine
 from rasterio import features
 from rasterio.warp import Resampling, reproject
 from scipy import ndimage
+from scipy.spatial import cKDTree
 
 from . import pngio
 
@@ -536,6 +537,19 @@ def limit_grade(profile: np.ndarray, spacing: np.ndarray, grade: float, max_chan
         np.clip(h, original - max_change, original + max_change, out=h)
         if fixed is not None:
             h[fixed] = original[fixed]
+    if fixed is not None and fixed.any():
+        # With fixed points (a junction), the steps above do not always come
+        # under the grade in 200 passes: at a hairpin of the Hải Đăng road the
+        # road fell 1.6 m in 3 m after the junction (PT-36). One pass from each
+        # end brings each free point to the grade from its neighbor, and not
+        # more than max_change from the first profile (a long steep road stays steep).
+        low, high = original - max_change, original + max_change
+        for i in range(len(h) - 1):
+            if not fixed[i + 1]:
+                h[i + 1] = min(max(h[i + 1], h[i] - limit[i], low[i + 1]), max(h[i] + limit[i], low[i + 1]), high[i + 1])
+        for i in range(len(h) - 1, 0, -1):
+            if not fixed[i - 1]:
+                h[i - 1] = min(max(h[i - 1], h[i] - limit[i - 1], low[i - 1]), max(h[i] + limit[i - 1], low[i - 1]), high[i - 1])
     return h
 
 
@@ -622,6 +636,30 @@ def _nearest_points(x: np.ndarray, z: np.ndarray, lx: np.ndarray, lz: np.ndarray
     return px[rows, best], pz[rows, best], d[rows, best]
 
 
+def mark_joined_ends(roads, reach: float = 1.5) -> None:
+    """Sets "open_ends" of each road: (start, end), False where the end touches
+    another road (a point of another road within "reach" m)."""
+    points, owner = [], []
+    for k, road in enumerate(roads):
+        if road.points is None or len(road.points) < 2:
+            continue
+        points.append(road.points)
+        owner.append(np.full(len(road.points), k))
+    if not points:
+        return
+    tree = cKDTree(np.vstack(points))
+    owners = np.concatenate(owner)
+    for k, road in enumerate(roads):
+        if road.points is None or len(road.points) < 2:
+            road.open_ends = (True, True)
+            continue
+        ends = []
+        for end in (road.points[0], road.points[-1]):
+            near = tree.query_ball_point(end, reach)
+            ends.append(not any(owners[j] != k for j in near))
+        road.open_ends = tuple(ends)
+
+
 def find_twins(roads) -> int:
     """Sets "twins" of each road: the other way of the same street with a median
     (the same name, one way each, most of its points within TWIN_M). Returns
@@ -658,6 +696,7 @@ def flatten_roads(grid: Grid, roads, step: float) -> None:
     flat = [r for r in sorted(roads, key=lambda r: r.importance)
             if r.type not in NATURAL_ROADS and not r.bridge and not r.tunnel]
     find_twins(flat)
+    mark_joined_ends(flat)
     # The heights of the two ways of a street, from the ground before any road changes it.
     for road in flat:
         road.twin_raw = None
@@ -782,7 +821,12 @@ def _flatten(grid: Grid, road, profile, x, z, mode: str, locked: np.ndarray | No
         # A segment changes only the cells that are beside it. Else the round end of
         # each segment puts the height of one point on the slope of the next segment.
         # The first and the last segment also change the cells at the ends of the road.
-        beside = (raw_t >= (-np.inf if i == 0 else -0.02)) & (raw_t <= (np.inf if i == len(x) - 2 else 1.02))
+        # An end that joins another road has no round end: the round end of the
+        # surface of a road covered the first metres of the next road with the
+        # height of its end (PT-36, the Hải Đăng road: a bank of 1.5 m).
+        start_open, end_open = getattr(road, "open_ends", (True, True))
+        beside = (raw_t >= (-np.inf if i == 0 and start_open else -0.02)) \
+            & (raw_t <= (np.inf if i == len(x) - 2 and end_open else 1.02))
         if mode == "mix":
             core = (d <= half + grid.step) & beside
             weight = 1.0 / (d + 0.5) ** 2

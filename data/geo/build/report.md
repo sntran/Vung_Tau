@@ -55,11 +55,11 @@ Total road length: 692.3 km. Roads with a width tag: 9 of 4124. Hẻm: 2366.
 | Tượng Chúa Kitô Vua | yes | way/235008112 | 1159.87, 1893.39 | 138.33 | 1 candidates, 83.3 m from the hint |
 | Hải đăng Vũng Tàu | yes | way/229301316 | 402.21, 1056.5 | 173.11 | 1 candidates, 21.8 m from the hint |
 | Bạch Dinh | yes | way/220753354 | -596.69, -776.93 | 28.11 | 1 candidates, 259.6 m from the hint |
-| Tượng Đức Mẹ Bãi Dâu | yes | way/790529433 | -1290.64, -3064.05 | 57.13 | 2 candidates, 7.3 m from the hint |
+| Tượng Đức Mẹ Bãi Dâu | yes | way/790529433 | -1290.64, -3064.05 | 57.18 | 2 candidates, 7.3 m from the hint |
 | Miếu Hòn Bà | yes | way/221906193 | 1677.76, 2174.06 | 11.35 | 8 candidates, 8.4 m from the hint |
 | Chùa Tam Bảo | yes | way/792193852 | -749.18, -1275.61 | 104.03 | 1 candidates, 5.1 m from the hint |
 | Vi Ba | yes | way/35923559 | -722.46, -1106.78 | 75.47 | 5 candidates, 299.0 m from the hint |
-| Hải Đăng | yes | way/35923584 | 332.79, 1014.55 | 169.1 | 3 candidates, 125.2 m from the hint |
+| Hải Đăng | yes | way/35923584 | 332.79, 1014.55 | 169.07 | 3 candidates, 125.2 m from the hint |
 | Bến xe Vũng Tàu | yes | way/220891652 | 1418.58, -757.78 | 6.13 | 2 candidates, 7.3 m from the hint |
 | Chợ Vũng Tàu | yes | way/215166910 | 1299.74, -509.85 | 9.48 | 1 candidates, 785.3 m from the hint |
 | Chợ Xóm Lưới | yes | node/2649575440 | 224.65, 242.56 | 7.88 | 1 candidates, 3.1 m from the hint |
@@ -120,7 +120,7 @@ None.
 
 | Hill | Area (km²) | Tree cover | Bushes | Grass | Bare | Trees | WorldCover classes |
 |---|---|---|---|---|---|---|---|
-| Núi Lớn | 2.31 | 73 % | 7 % | 8 % | 0 % | 15769 | tree cover 88 %, built-up 11 %, grassland 1 %, bare or sparse 0 %, water 0 % |
+| Núi Lớn | 2.31 | 73 % | 7 % | 8 % | 0 % | 15771 | tree cover 88 %, built-up 11 %, grassland 1 %, bare or sparse 0 %, water 0 % |
 | Núi Nhỏ | 0.92 | 76 % | 8 % | 6 % | 0 % | 6892 | tree cover 92 %, built-up 7 %, grassland 1 %, bare or sparse 0 % |
 
 The hills: the land within 1.1 km of the top of Núi Lớn and 0.7 km of the top of Núi Nhỏ, higher than 20 m.

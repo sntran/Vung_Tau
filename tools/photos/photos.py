@@ -27,6 +27,7 @@ import json
 import re
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -39,6 +40,10 @@ OPEN_LICENSES = re.compile(r"^(CC0|CC BY(-SA)? [0-9.]+|CC BY(-SA)?|public domain
 NOT_OPEN = re.compile(r"\b(NC|ND)\b|all rights reserved", re.IGNORECASE)
 AGENT = "vung-tau-photos/1"
 WIDTH = 1920  # a standard size of the thumbnails of Commons (other sizes get HTTP 429)
+# On 2026-11-17 Commons answered HTTP 429 for 1920 px, and for a width at or
+# over the width of the original (it sends the original); 1280 px and 960 px
+# came. The tool tries these standard sizes in turn.
+WIDTHS = (WIDTH, 1280, 960, 500)
 
 
 def photos() -> list[dict]:
@@ -77,24 +82,37 @@ def problems(photo: dict) -> list[str]:
     return found
 
 
-def image_url(photo: dict) -> str:
-    """The URL of the file to get: a thumbnail of WIDTH px for Commons."""
+def image_url(photo: dict, width: int = WIDTH) -> str:
+    """The URL of the file to get: a thumbnail of "width" px for Commons."""
     image = str(photo.get("image") or photo["url"])
-    match = re.search(r"commons\.wikimedia\.org/wiki/File:(.+)$", image)
+    match = re.search(r"commons\.wikimedia\.org/wiki/(?:File:|Special:FilePath/)([^?]+)", image)
     if match:
         name = urllib.parse.unquote(match.group(1))
-        return "https://commons.wikimedia.org/wiki/Special:FilePath/" + urllib.parse.quote(name) + f"?width={WIDTH}"
+        return "https://commons.wikimedia.org/wiki/Special:FilePath/" + urllib.parse.quote(name) + f"?width={width}"
     return image
 
 
-def get(url: str) -> bytes:
-    for attempt in range(4):
+def get_photo(photo: dict) -> bytes:
+    """The bytes of a photo: the first size of WIDTHS that Commons sends."""
+    urls = list(dict.fromkeys(image_url(photo, width) for width in WIDTHS))
+    for k, url in enumerate(urls):
+        try:
+            return get(url, tries=1 if k < len(urls) - 1 else 4)
+        except urllib.error.HTTPError as error:
+            if error.code != 429 or k == len(urls) - 1:
+                raise
+            print(f"  {url}: HTTP 429, a smaller size")
+    raise RuntimeError("not reached")
+
+
+def get(url: str, tries: int = 4) -> bytes:
+    for attempt in range(tries):
         try:
             request = urllib.request.Request(url, headers={"User-Agent": AGENT})
             with urllib.request.urlopen(request, timeout=60) as response:
                 return response.read()
         except Exception as error:  # noqa: BLE001 - a network error: try again
-            if attempt == 3:
+            if attempt == tries - 1:
                 raise
             print(f"  {error}: again in {2 ** attempt} s")
             time.sleep(2 ** attempt)
@@ -151,7 +169,7 @@ def main() -> int:
             url = image_url(photo)
             name = str(photo.get("file") or f"{number:03d}.jpg")
             try:
-                (args.other / name).write_bytes(get(url))
+                (args.other / name).write_bytes(get_photo(photo))
                 index.append(f"{name}\t{photo['url']}\t{photo['_from']}")
                 print(f"got {name}: {url}")
             except Exception as error:  # noqa: BLE001 - keep the others
@@ -166,7 +184,7 @@ def main() -> int:
             continue
         url = image_url(photo)
         print(f"get {photo['file']}: {url}")
-        target.write_bytes(get(url))
+        target.write_bytes(get_photo(photo))
     (OUT / "CREDITS.md").write_text(credits(open_photos), encoding="utf-8")
     print(f"{len(open_photos)} open photos in {OUT.relative_to(ROOT)}.")
     return 0

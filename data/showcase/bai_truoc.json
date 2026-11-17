@@ -378,6 +378,11 @@
 				"from_end_m": 10.0,
 				"in_m": 1.0,
 				"note": "Report 0026, D-0026-19: the blue poles of the walk of the sea along the low wall of the beach, 1 m in from the wall, with the long arm over the walk. The photo of 2014-03-09 (Commons, CC BY-SA 3.0, beach_wall_2014.jpg) shows a pole by the wall; the photo of S1 (2014-04-05) shows the poles along the walk at the left of the beach, and the photo from a drone of 2021-01-30 (drone_2021_park.jpg) the poles at the beach edge of the walk. The spacing of 30 m is by eye from the photo of S1 (an estimate)."
+			},
+			"steps": {
+				"model": "bac_xuong_cat",
+				"min_drop_m": 0.25,
+				"note": "Report 0026, Q19: the granite steps down to the sand in each opening of the low wall (data/world/drawings/bac_xuong_cat.json: 8 steps of 0.18 m on treads of 0.3 m). The piece is scaled up and down to the drop from the walk to the sand at its foot; with less than min_drop_m, the opening has no steps."
 			}
 		},
 		"paving_texture": {
