@@ -1,5 +1,5 @@
 {
-	"note": "The place of each model of World in the showcase of Bãi Trước (plan 0026, D3). \"front\" is the middle of the front of the model (x and z of the game), \"facing\" the direction that its front looks to (x and z), and \"front_middle_x\" the x of that point in the model, \"box\" the box of the model in its own frame (x from, x to, z from, z to; the front is at z = 0), \"street\" the street that the front looks to (a model of World has its front at z = 0 and looks to +z in Godot), or \"along\" the walk that a thing with no street of its own is along (a raised lawn). The model stands on the ground at its front. \"ranges\" gives the end of the near, the mid, and the far level for each preset (D6: on Low the near level of a building is its mid level, so the near level has no range). The sources of each place are with it. tools/geo/build.py makes the ground level under the box of each model, at the height of the ground at its front (plan 0009, R8).",
+	"note": "The place of each model of World in the showcase of Bãi Trước (plan 0026, D3). \"front\" is the middle of the front of the model (x and z of the game), \"facing\" the direction that its front looks to (x and z), and \"front_middle_x\" the x of that point in the model, \"box\" the box of the model in its own frame (x from, x to, z from, z to; the front is at z = 0), \"street\" the street that the front looks to (a model of World has its front at z = 0 and looks to +z in Godot), or \"along\" the walk that a thing with no street of its own is along (a raised lawn). The model stands on the ground at its front. \"ranges\" gives the end of the near, the mid, and the far level for each preset (D6: on Low the near level of a building is its mid level, so the near level has no range). The sources of each place are with it. tools/geo/build.py makes the ground level under the box of each model, at the height of the ground at its front (plan 0009, R8). \"outline\" (x and z of the game) is the outline of the ground to make level, in place of the box, and \"keep_higher\" keeps the ground that is higher than the level, under the model and round it (a model against a hill).",
 	"status": "check",
 	"ranges": {
 		"low": [
@@ -208,6 +208,125 @@
 			],
 			"source": "The outline of OpenStreetMap way 234797330: its middle, and its long side as the facing; the model has its middle at its origin, so its box goes to both sides of the front (data/world/drawings/bon_co_234797330.json, D-0026-08).",
 			"along": "the walk of the sea"
+		},
+		{
+			"id": "khach_san_hai_au",
+			"front": [
+				-207.81,
+				506.3
+			],
+			"facing": [
+				-0.9636,
+				-0.2672
+			],
+			"front_middle_x": -11.65,
+			"box": [
+				-48.1,
+				24.8,
+				-22.8,
+				2.2
+			],
+			"street": "Hạ Long",
+			"source": "The outline of OpenStreetMap way 790529523 (© OpenStreetMap contributors, ODbL): the middle of its front on Hạ Long, and the direction to the road; the model has its front at z = 0 and its canopy 2.2 m in front of it (data/world/drawings/khach_san_hai_au.json). It replaces the stand-in of the same outline. The level ground follows the outline of the way (\"outline\"), not the box: Hẻm 2 Hải Đăng runs along its east wall, inside the box. It stands against the hill (\"keep_higher\"): the ground that is higher than its level stays, and the walls of the model hide the hill inside it.",
+			"outline": [
+				[
+					-207.82,
+					530.58
+				],
+				[
+					-203.63,
+					531.13
+				],
+				[
+					-199.93,
+					534.76
+				],
+				[
+					-195.49,
+					518.38
+				],
+				[
+					-198.5,
+					517.08
+				],
+				[
+					-198.01,
+					514.75
+				],
+				[
+					-199.7,
+					514.91
+				],
+				[
+					-200.85,
+					517.83
+				],
+				[
+					-204.15,
+					519.61
+				],
+				[
+					-210.92,
+					517.53
+				],
+				[
+					-206.74,
+					504.37
+				],
+				[
+					-198.8,
+					506.36
+				],
+				[
+					-197.34,
+					503.29
+				],
+				[
+					-205.0,
+					501.58
+				],
+				[
+					-200.12,
+					483.45
+				],
+				[
+					-194.3,
+					485.39
+				],
+				[
+					-191.51,
+					475.07
+				],
+				[
+					-183.64,
+					475.83
+				],
+				[
+					-185.82,
+					490.74
+				],
+				[
+					-191.34,
+					510.76
+				],
+				[
+					-187.96,
+					511.62
+				],
+				[
+					-193.37,
+					537.13
+				],
+				[
+					-196.56,
+					545.17
+				],
+				[
+					-211.79,
+					542.35
+				]
+			],
+			"keep_higher": true
 		}
 	]
 }

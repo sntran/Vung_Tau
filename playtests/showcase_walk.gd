@@ -44,6 +44,7 @@ const WALK_SOUTH := 458829438
 const TO_HA_LONG := [[20.0, 214.0], [40.0, 207.0], [60.0, 199.0], [67.0, 193.0], [78.0, 197.0]]
 const PORT_PATH := 235006085
 const HAI_AU := "way/790529523"
+const HAI_AU_MODEL := "khach_san_hai_au"
 ## The walk on the deck of the jetty (m).
 const ON_JETTY := 60.0
 ## Higher than this over the ground (m), the player stands on a part, not on the ground.
@@ -352,8 +353,16 @@ func _nearest(line: PackedVector3Array, point: Vector3) -> int:
 	return best
 
 
-## The middle of the stand-in of Hải Âu (its top), or INF.
+## The middle of Hải Âu at the ground: its model (khach_san_hai_au, report
+## 0026, D-0026-09), or its stand-in, or INF.
 func _hai_au(w: VungTau) -> Vector3:
+	for entry: Dictionary in w.showcase.models:
+		if str(entry.id) == HAI_AU_MODEL:
+			var middle := Vector2.ZERO
+			for p: Vector2 in entry.footprint:
+				middle += p
+			middle /= maxf(entry.footprint.size(), 1.0)
+			return Vector3(middle.x, float(entry.base), middle.y)
 	for entry: Dictionary in w.showcase.stand_ins:
 		if str(entry.osm) == HAI_AU:
 			return entry.center

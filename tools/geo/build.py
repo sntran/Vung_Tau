@@ -643,7 +643,12 @@ def write_showcase(areas, roads, buildings, projection, out: Path, config_path: 
 
 def world_place_footprint(place: dict) -> list[tuple[float, float]]:
     """The footprint of the body of a model of World at its place (x and z of
-    the game): its box from its back to its front (z <= 0 in the model)."""
+    the game): its "outline" when the place gives one (the outline of the
+    building in OpenStreetMap: the box of a building with wings can cover a
+    lane behind a wing), else its box from its back to its front (z <= 0 in
+    the model)."""
+    if place.get("outline"):
+        return [(float(x), float(z)) for x, z in place["outline"]]
     fx, fz = place["facing"]
     norm = math.hypot(fx, fz)
     fx, fz = fx / norm, fz / norm
@@ -661,7 +666,12 @@ def level_world_places(grid, folder) -> None:
     and LEVEL_MARGIN_M round its box. Where the margins of two models meet,
     a cell takes the level of the nearest model. Round the level ground, the
     ground changes by not more than BASE_SIDE_GRADE to the level, and no slope
-    goes onto the level ground of a model."""
+    goes onto the level ground of a model. A model against a hill
+    ("keep_higher": true, Hải Âu) keeps all the ground that is higher than
+    its level, also under it: the level only fills the lower ground. The hill
+    and the lane behind it stay (the grid of 2 m mixes the cells under a
+    model into a lane next to its wall), and the walls of the model hide the
+    hill inside it."""
     from shapely.geometry import Polygon
 
     places = []
@@ -685,6 +695,9 @@ def level_world_places(grid, folder) -> None:
         owner = np.argmin(distance, axis=0)
         for i in range(len(places)):
             level_masks[i][rows[owner == i], cols[owner == i]] = True
+    for i, place in enumerate(places):
+        if place.get("keep_higher"):
+            level_masks[i] &= grid.heights <= levels[i]
     all_level = np.logical_or.reduce(level_masks)
     for i, place in enumerate(places):
         grid.heights[level_masks[i]] = levels[i]
@@ -696,7 +709,8 @@ def level_world_places(grid, folder) -> None:
             x = grid.x0 + cols * grid.step
             z = grid.z0 + rows * grid.step
             d = shapely.distance(shape, shapely.points(x, -z))
-            change = np.clip(grid.heights[rows, cols] - levels[i], -BASE_SIDE_GRADE * d, BASE_SIDE_GRADE * d)
+            high = np.inf if place.get("keep_higher") else BASE_SIDE_GRADE * d
+            change = np.clip(grid.heights[rows, cols] - levels[i], -BASE_SIDE_GRADE * d, high)
             grid.heights[rows, cols] = levels[i] + change
         log(f"{place['id']}: the ground under it is level at {levels[i]:.2f} m ({int(level_masks[i].sum())} cells)")
 
