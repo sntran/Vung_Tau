@@ -11,6 +11,15 @@ extends RefCounted
 # of the hill of Hạ Long, each footprint of public data near the road has a
 # stand-in with its storeys from a photo, or is in the list of the footprints
 # that wait for one (Check); no stand-in has a guessed number of storeys.
+# Report 0026, D-0026-11: a scan of each edge of a part that a player walks on
+# (the sidewalks, the median, the walk of Hạ Long): every 0.5 m, a ray down on
+# the top of the part and a ray down just out of it. A step of more than
+# 0.25 m (the step of the player) with no way round it fails: a run of such
+# steps longer than 5 m along an edge (a player who meets a shorter one goes
+# round it in 2.5 m or less; the ledge of D-0026-11 was about 300 m long). A
+# wall is not a step (the outside is more than 1 m higher: the face of a
+# building), and nor is a thing on the part (more than 0.3 m over the edge:
+# the closed end of the walk, the foot of a lamp).
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=10:00 --quality=low
 
@@ -29,6 +38,15 @@ const MAX_COMMON_M2 := 0.5
 ## between these z (from Cao ốc Sen Biển to Hải Âu).
 const HILL_SIDE_M := 70.0
 const HILL_SIDE_Z := Vector2(330.0, 520.0)
+## The edge scan (D-0026-11): the spacing of the rays, the distances in and out
+## of the edge, the highest step, and the height over the top that is a wall.
+const EDGE_EVERY := 0.5
+const EDGE_IN := 0.15
+const EDGE_OUT := 0.3
+const MAX_STEP := 0.25
+const WALL_OVER := 1.0
+const ON_PART := 0.3
+const MAX_LEDGE_RUN := 5.0
 
 
 func run(d: PlaytestDriver) -> void:
@@ -54,6 +72,7 @@ func run(d: PlaytestDriver) -> void:
 	d.step("the parts of the showcase (m, or a count): %s" % [w.showcase.lengths])
 	_check_models(d, w)
 	_check_hill_side(d, w)
+	_scan_edges(d, w)
 	for kind: String in ["median", "sidewalk", "path_border", "wall", "sea_wall", "stand_ins", "lawn_m2", "paving_m2",
 			"planter", "beach_wall", "median_trees", "lamps", "path_lamps"]:
 		d.expect(float(w.showcase.lengths.get(kind, 0.0)) > 0.0, "the showcase has the part %s" % kind)
@@ -168,6 +187,74 @@ static func _area(ring: PackedVector2Array) -> float:
 ## the road has a stand-in with its storeys from a photo, or is listed in
 ## stand_ins.footprints_check of data/showcase/bai_truoc.json with its reason;
 ## each stand-in has its storeys from a source.
+## D-0026-11: the steps at the edges of the parts that a player walks on.
+func _scan_edges(d: PlaytestDriver, w: VungTau) -> void:
+	var space: PhysicsDirectSpaceState3D = d.main().get_world_3d().direct_space_state
+	var points := 0
+	var by_kind: Dictionary = {}  # kind -> {points, ledges, max, first}
+	var all_ledges: Array = []
+	for edge: Dictionary in w.showcase.walk_edges:
+		var a: Vector3 = edge.a
+		var b: Vector3 = edge.b
+		var out: Vector3 = edge.out
+		var length := Vector2(b.x - a.x, b.z - a.z).length()
+		var count := maxi(int(length / EDGE_EVERY), 1)
+		var entry: Dictionary = by_kind.get(edge.kind, {"points": 0, "ledges": 0, "max": 0.0, "first": [],
+				"run": 0, "longest": 0, "last": Vector3.INF, "at": Vector3.ZERO})
+		for k in count:
+			var p := a.lerp(b, (k + 0.5) / count)
+			var top := _floor_at(space, w, p - out * EDGE_IN, p.y + 1.0)
+			var outside := _floor_at(space, w, p + out * EDGE_OUT, top + WALL_OVER + 0.5)
+			var step := top - outside
+			points += 1
+			entry.points += 1
+			# A wall out of the part (the face of a building), or a thing on the
+			# part (the closed end of the walk, the foot of a lamp): not a step.
+			if outside - top > WALL_OVER or top - p.y > ON_PART:
+				continue
+			entry.max = maxf(float(entry.max), absf(step))
+			if absf(step) > MAX_STEP:
+				# A run: the ledge points next to each other along the edge.
+				entry.run = int(entry.run) + 1 if (entry.last as Vector3).distance_to(p) <= EDGE_EVERY * 2.0 else 1
+				entry.last = p
+				if int(entry.run) > int(entry.longest):
+					entry.longest = entry.run
+					entry.at = p
+				entry.ledges += 1
+				all_ledges.append({"kind": edge.kind, "at": [p.x, p.y, p.z], "step": -step, "top": top, "outside": outside})
+				if (entry.first as Array).size() < 3:
+					(entry.first as Array).append("(%.1f, %.1f, %.1f) %+.2f m" % [p.x, p.y, p.z, -step])
+		by_kind[edge.kind] = entry
+	var file := FileAccess.open(d.out_dir.path_join("edges.json"), FileAccess.WRITE)
+	if file:
+		file.store_string(JSON.stringify(all_ledges, "\t"))
+		file.close()
+	var ledges := 0
+	var long_runs: Array[String] = []
+	for kind: String in by_kind:
+		var entry: Dictionary = by_kind[kind]
+		ledges += int(entry.ledges)
+		var longest := int(entry.longest) * EDGE_EVERY
+		d.step("edge %s: %d points, the highest step %.2f m, %d steps over %.2f m %s, the longest run %.1f m" % [
+				kind, entry.points, entry.max, entry.ledges, MAX_STEP, entry.first, longest])
+		if longest > MAX_LEDGE_RUN:
+			var at: Vector3 = entry.at
+			long_runs.append("%s: %.1f m to (%.1f, %.1f, %.1f)" % [kind, longest, at.x, at.y, at.z])
+	d.step("%d of %d points of the edges have a step of more than %.2f m" % [ledges, points, MAX_STEP])
+	d.expect(points > 0 and long_runs.is_empty(), "no step of more than %.2f m with no way round it (a run longer than %.0f m) at an edge of a part that a player walks on: %s" % [
+			MAX_STEP, MAX_LEDGE_RUN, long_runs])
+
+
+## The highest floor under a point (the parts of the showcase and the ground), from the height "from" down.
+static func _floor_at(space: PhysicsDirectSpaceState3D, w: VungTau, p: Vector3, from: float) -> float:
+	var ground := w.ground_height(p.x, p.z)
+	var query := PhysicsRayQueryParameters3D.create(Vector3(p.x, from, p.z), Vector3(p.x, ground - 1.0, p.z), Layers.FLOOR)
+	# In the body of a building, the hit is at the start of the ray: a wall.
+	query.hit_from_inside = true
+	var hit := space.intersect_ray(query)
+	return maxf(ground, (hit.position as Vector3).y) if not hit.is_empty() else ground
+
+
 func _check_hill_side(d: PlaytestDriver, w: VungTau) -> void:
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/geo/build/footprints.json"))
 	if not d.expect(parsed is Dictionary, "the footprints of public data can be read (tools/geo/footprints.py)"):

@@ -38,6 +38,13 @@ const CURB_FRONT := 0.02
 const OVER_SIDEWALK_LIFT := 0.02
 ## The way of the people goes on the road this far from the curb of the walk (m).
 const ROAD_INSIDE := 1.5
+## The smoothing raises the walk on the sea wall by this much at most (m): the
+## step from the road to the walk stays under the step of the player (report
+## 0026, D-0026-11: the smoothing raised it 0.12 m where the road climbs).
+const WALK_SMOOTH_MAX := 0.01
+## The walk on the sea wall is at least this much over the ground under it (m):
+## the build of the geodata puts the ground under it this much under its top.
+const WALK_OVER_GROUND := 0.03
 ## The steepest grade of the walk on the sea wall, and the passes of its smoothing.
 const WALK_GRADE := 0.09
 const WALK_SMOOTH_PASSES := 4
@@ -90,6 +97,10 @@ var sea_walk := PackedVector3Array()
 var sea_walk_on := PackedByteArray()
 ## The road beside each point of sea_walk, 2 m in from the curb.
 var sea_road := PackedVector3Array()
+## The edges of the parts that a player walks on (report 0026, D-0026-11):
+## [{kind, a, b (the ends of the edge on the top of the part), out (the
+## direction out of the part)}]. PT-71 scans the step at each edge.
+var walk_edges: Array[Dictionary] = []
 ## The fine mask of the ground (R the lawns, G the paving) and its place, or null.
 var ground_mask: Image
 var ground_origin := Vector2.ZERO
@@ -106,6 +117,8 @@ var _roads: Dictionary = {}  # OSM id -> the road Dictionary of roads.json
 ## The roads near the area: [[id, type, line, half width, box]] (see _other_roads()).
 var _near_roads: Array = []
 var _near_roads_read := false
+## A model of World higher than this (m) is a building: it has a body that stops the player.
+const MODEL_BODY_MIN_HEIGHT := 2.5
 ## The steps of the build that are not done yet (Callables).
 var _steps: Array[Callable] = []
 var _built := false
@@ -561,6 +574,8 @@ func _median(cfg: Dictionary) -> void:
 		# The curbs: their faces to the roads and their tops.
 		_wall(curb_color, a0, a1, height, -in0)
 		_wall(curb_color, b0, b1, height, in0)
+		_walk_edge("median: the curb of way %s" % ways[0], a0 + up, a1 + up, -in0)
+		_walk_edge("median: the curb of way %s" % ways[1], b0 + up, b1 + up, in0)
 		_top(curb_color, a0 + up, a1 + up, a0 + in0 * curb + up, a1 + in1 * curb + up)
 		_top(curb_color, b0 - in0 * curb + up, b1 - in1 * curb + up, b0 + up, b1 + up)
 		# The lawn between the curbs.
@@ -614,6 +629,8 @@ func _sidewalk(cfg: Dictionary) -> void:
 			_wall(str(cfg.get("curb_color", "#c9c6bd")), e0, e1, height, -sides[i] * sign)
 			_top(str(cfg.get("color", "#b9a68d")), e0 + up, e1 + up, o0 + up, o1 + up)
 			_wall(str(cfg.get("color", "#b9a68d")), o0, o1, height, sides[i] * sign)
+			_walk_edge("sidewalk %s: the curb" % cfg.get("way"), e0 + up, e1 + up, -sides[i] * sign)
+			_walk_edge("sidewalk %s: the outer edge" % cfg.get("way"), o0 + up, o1 + up, sides[i] * sign)
 			_add_length("sidewalk", e0.distance_to(e1))
 
 
@@ -779,6 +796,7 @@ func _sea_wall(cfg: Dictionary) -> void:
 				# The face at the curb, from below the ground up to the walk.
 				var face := maxf(tops[k] - world.ground_height(e0.x, e0.z), tops[k + 1] - world.ground_height(e1.x, e1.z)) + 0.1
 				_wall(walk_color, e0 - Vector3(0, face, 0), e1 - Vector3(0, face, 0), face, -side0)
+				_walk_edge("the walk of Hạ Long: the curb", e0, e1, -side0)
 				var step := Vector2(e1.x - e0.x, e1.z - e0.z).length()
 				_top_along(walk_color, e0, e1, o0, o1, along, along + step, e0.distance_to(o0))
 				along += step
@@ -906,24 +924,35 @@ func _walk_tops(dense: PackedVector3Array, sides: PackedVector3Array, halves: Pa
 	var last := dense.size() - 1
 	for i in dense.size():
 		var e := dense[i] + sides[i] * sign * (halves[i] - over)
-		var high := world.ground_height(e.x, e.z)
+		# The ground over the road (the height of the road at the same place
+		# along the walk: on a road that climbs, the ground halfway to the next
+		# point is higher by the climb, and the walk was 0.1 m too high).
+		var high := world.ground_height(e.x, e.z) - dense[i].y
 		# Across the walk, and halfway to the next point (the ground between the points).
 		var next := dense[mini(i + 1, last)] + sides[mini(i + 1, last)] * sign * (halves[mini(i + 1, last)] - over)
 		for t: float in [0.0, 0.5]:
 			var base := e.lerp(next, t)
+			var road_y := lerpf(dense[i].y, dense[mini(i + 1, last)].y, t)
 			var k := 0.0
 			while k <= walk + over + 0.01:
 				var q := base + sides[i] * sign * minf(k, walk + over)
-				high = maxf(high, world.ground_height(q.x, q.z))
+				high = maxf(high, world.ground_height(q.x, q.z) - road_y)
 				k += 0.5
-		# Over the sidewalk of the road (0.19 m over the ground) where the walk covers it.
-		raw.append(high + LIFT + 0.15 + (OVER_SIDEWALK_LIFT if over > 0.0 else 0.0))
+		# Over the sidewalk of the road (0.19 m over the road) where the walk covers
+		# it, and over the ground under the walk (report 0026, D-0026-11: over the
+		# highest ground across the walk, the walk was up to 0.35 m over the road
+		# at its curb; the build of the geodata puts the ground under the walk
+		# 0.03 m under this top).
+		raw.append(dense[i].y + maxf(LIFT + RoadBuilder.CURB + (OVER_SIDEWALK_LIFT if over > 0.0 else 0.0),
+				high + WALK_OVER_GROUND))
 	# Smooth, but never lower than the point (report 0026, D-0026-04: where the
 	# road falls 0.8 m in 4 m, the walk had a step): the grade is at most
 	# WALK_GRADE, then the mean of the points around, a few times.
 	var result := raw.duplicate()
 	for pass_index in WALK_SMOOTH_PASSES:
 		result = _limit_grade(dense, result, WALK_GRADE)
+		for i in result.size():
+			result[i] = minf(result[i], raw[i] + WALK_SMOOTH_MAX)
 		var next := PackedFloat32Array()
 		for i in result.size():
 			var total := 0.0
@@ -931,7 +960,7 @@ func _walk_tops(dense: PackedVector3Array, sides: PackedVector3Array, halves: Pa
 			for k in range(maxi(0, i - 2), mini(result.size(), i + 3)):
 				total += result[k]
 				n += 1
-			next.append(maxf(total / n, raw[i]))
+			next.append(clampf(total / n, raw[i], raw[i] + WALK_SMOOTH_MAX))
 		result = next
 	return result
 
@@ -1123,6 +1152,19 @@ func _place(place: Dictionary, ranges: Dictionary) -> void:
 		var p := model.transform * corner
 		footprint.append(Vector2(p.x, p.z))
 	models.append({"id": str(place.id), "model": model, "footprint": footprint, "base": front.y, "box": box})
+	# A building stops the player: a box from its back to its front line (the
+	# canopy over the sidewalk does not stop the player; report 0026, D-0026-11).
+	if box.size.y > MODEL_BODY_MIN_HEIGHT and box.position.z < 0.0:
+		var body := StaticBody3D.new()
+		body.name = "Body_" + str(place.id)
+		var shape := CollisionShape3D.new()
+		var cube := BoxShape3D.new()
+		var depth := minf(0.0, box.end.z) - box.position.z
+		cube.size = Vector3(box.size.x, box.size.y, depth)
+		shape.shape = cube
+		shape.position = Vector3(box.get_center().x, box.get_center().y, box.position.z + depth / 2.0)
+		body.add_child(shape)
+		model.add_child(body)
 
 
 ## R5: the basket boats on the sand above the water line.
@@ -1337,6 +1379,11 @@ func _near_other(p: Vector3, others: Array, extra: float) -> bool:
 			if Vector2(q.x - p.x, q.z - p.z).length() < float(entry[1]) + extra + JUNCTION_MARGIN:
 				return true
 	return false
+
+
+## An edge of a part that a player walks on (see walk_edges).
+func _walk_edge(kind: String, a: Vector3, b: Vector3, out: Vector3) -> void:
+	walk_edges.append({"kind": kind, "a": a, "b": b, "out": Vector3(out.x, 0.0, out.z).normalized()})
 
 
 ## R9: trees of plan 0020 at the points, in the tree field of the world (its

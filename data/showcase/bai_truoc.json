@@ -387,7 +387,7 @@
 			200554615,
 			1558591261
 		],
-		"curb_height": 0.2,
+		"curb_height": 0.15,
 		"curb_width": 0.3,
 		"curb_colors": [
 			"#b5332c",
@@ -416,7 +416,7 @@
 			"way": 200554615,
 			"side": "right",
 			"width": 6.5,
-			"height": 0.18,
+			"height": 0.15,
 			"color": "#b9a68d",
 			"curb_color": "#c9c6bd",
 			"note": "The sidewalk of the side of the town, with tiles: about 5.5 m in the survey (section 3.1); 6.5 m reaches the fronts of the survey (11.5 m from the line of the road). Where a model of World stands, its own sidewalk is there."
@@ -425,7 +425,7 @@
 			"way": 1558591261,
 			"side": "right",
 			"width": 2.5,
-			"height": 0.18,
+			"height": 0.15,
 			"color": "#b9a68d",
 			"curb_color": "#c9c6bd",
 			"note": "The sidewalk of the side of the park (a guess of its width: Check)."
@@ -434,7 +434,7 @@
 			"way": 235149400,
 			"side": "right",
 			"width": 3.0,
-			"height": 0.18,
+			"height": 0.15,
 			"color": "#b9a68d",
 			"curb_color": "#c9c6bd",
 			"note": "The sidewalk of the side of the hill of Hạ Long, from Quang Trung (its width is a guess: Check)."
@@ -443,7 +443,7 @@
 			"way": 1423071603,
 			"side": "left",
 			"width": 3.0,
-			"height": 0.18,
+			"height": 0.15,
 			"color": "#b9a68d",
 			"curb_color": "#c9c6bd",
 			"note": "The sidewalk of the side of the hill of Hạ Long (its width is a guess: Check)."
@@ -452,7 +452,7 @@
 			"way": 200554632,
 			"side": "left",
 			"width": 3.0,
-			"height": 0.18,
+			"height": 0.15,
 			"color": "#b9a68d",
 			"curb_color": "#c9c6bd",
 			"note": "The sidewalk of the side of the hill of Hạ Long to Hải Âu (its width is a guess: Check)."

@@ -43,7 +43,18 @@ BEACH_BLEND_M = 10.0
 # mean high water, so the land is above most high tides (D12).
 LAND_MIN_HEIGHT = 1.2
 # The width at each side of a road where the flat road meets the ground.
-ROAD_SHOULDER_M = 1.5
+# The road surface is flat to one grid step past its edge (report 0026,
+# D-0026-11), so the shoulder is wider than that step.
+ROAD_SHOULDER_M = 3.5
+# Where a road takes the height of a more important road at a junction, the
+# difference spreads along it over this length (report 0026, Q14: Hạ Long fell
+# 0.8 m in 4 m at a junction).
+JUNCTION_BLEND_M = 20.0
+# The two ways of a street with a median (the same name, one way each, side by
+# side) take the mean of their heights across, at points this near (report 0026,
+# D-0026-11: the two roads of Quang Trung were 2.8 m apart in height across a
+# median of 4 m, from the surface model).
+TWIN_M = 25.0
 # The length of the moving average of the road height along a road.
 ROAD_SMOOTH_M = 16.0
 # The steepest road: 25 % (14 degrees). Steep streets in Vũng Tàu are near this value.
@@ -543,20 +554,39 @@ def limit_grade_exact(profile: np.ndarray, spacing: np.ndarray, grade: float, ma
     return np.clip(out, h - max_change, h + max_change)
 
 
+def blend_to_fixed(profile: np.ndarray, raw: np.ndarray, fixed: np.ndarray, spacing: np.ndarray,
+                   length: float) -> np.ndarray:
+    """The profile with the heights of "raw" at the fixed points (a junction with
+    a more important road), and the difference at the nearest fixed point
+    spread along the road over "length": the road comes to the height of the
+    other road with a ramp, not a step (report 0026, Q14)."""
+    if not fixed.any():
+        return profile
+    s = np.concatenate([[0.0], np.cumsum(spacing)])
+    fixed_s = s[fixed]
+    delta = (raw - profile)[fixed]
+    nearest = np.abs(s[:, None] - fixed_s[None, :]).argmin(axis=1)
+    distance = np.abs(s - fixed_s[nearest])
+    weight = np.clip(1.0 - distance / length, 0.0, 1.0)
+    return np.where(fixed, raw, profile + weight * delta[nearest])
+
+
 def _profile(grid: Grid, road, step: float, locked: np.ndarray | None = None):
     """The height profile of a road. A point on a surface that is set already
     (a junction with a more important road) keeps the height of that surface."""
     x = road.points[:, 0]
     z = -road.points[:, 1]
     raw = grid.sample(x, z)
+    if getattr(road, "twin_raw", None) is not None:
+        raw = road.twin_raw
     profile = smooth_profile(raw, step, ROAD_SMOOTH_M if not road.hem else ROAD_SMOOTH_M / 2)
+    spacing = np.hypot(np.diff(x), np.diff(z))
     fixed = None
     if locked is not None:
         cols = np.clip(np.round((x - grid.x0) / grid.step).astype(int), 0, grid.shape[1] - 1)
         rows = np.clip(np.round((z - grid.z0) / grid.step).astype(int), 0, grid.shape[0] - 1)
         fixed = locked[rows, cols]
-        profile = np.where(fixed, raw, profile)
-    spacing = np.hypot(np.diff(x), np.diff(z))
+        profile = blend_to_fixed(profile, raw, fixed, spacing, JUNCTION_BLEND_M)
     profile = np.maximum(profile, LAND_MIN_HEIGHT + 0.05)
     if road.type == "steps":
         profile = limit_grade_exact(profile, spacing, MAX_STEPS_GRADE, MAX_STEPS_CUT_M)
@@ -565,6 +595,44 @@ def _profile(grid: Grid, road, step: float, locked: np.ndarray | None = None):
     else:
         profile = limit_grade(profile, spacing, MAX_ROAD_GRADE, fixed=fixed)
     return profile, x, z
+
+
+def _nearest_points(x: np.ndarray, z: np.ndarray, lx: np.ndarray, lz: np.ndarray):
+    """For each point (x, z), the nearest point of the line (lx, lz) and its distance."""
+    ax, az, bx, bz = lx[:-1], lz[:-1], lx[1:], lz[1:]
+    dx, dz = bx - ax, bz - az
+    length2 = np.maximum(dx * dx + dz * dz, 1e-9)
+    t = np.clip(((x[:, None] - ax[None, :]) * dx[None, :] + (z[:, None] - az[None, :]) * dz[None, :]) / length2[None, :],
+                0.0, 1.0)
+    px = ax[None, :] + t * dx[None, :]
+    pz = az[None, :] + t * dz[None, :]
+    d = np.hypot(px - x[:, None], pz - z[:, None])
+    best = d.argmin(axis=1)
+    rows = np.arange(len(x))
+    return px[rows, best], pz[rows, best], d[rows, best]
+
+
+def find_twins(roads) -> int:
+    """Sets "twins" of each road: the other way of the same street with a median
+    (the same name, one way each, most of its points within TWIN_M). Returns
+    the number of pairs."""
+    pairs = 0
+    named: dict[str, list] = {}
+    for road in roads:
+        road.twins = []
+        if road.name and road.oneway and road.type not in NATURAL_ROADS and road.points is not None and len(road.points) >= 2:
+            named.setdefault(road.name, []).append(road)
+    for group in named.values():
+        for i, a in enumerate(group):
+            for b in group[i + 1:]:
+                _, _, near = _nearest_points(a.points[:, 0], -a.points[:, 1], b.points[:, 0], -b.points[:, 1])
+                # Side by side, not one after the other: most points are near, and
+                # the nearest point is not the end of the other way.
+                if np.mean(near <= TWIN_M) >= 0.5 and np.median(near) > 2.0:
+                    a.twins.append(b)
+                    b.twins.append(a)
+                    pairs += 1
+    return pairs
 
 
 def flatten_roads(grid: Grid, roads, step: float) -> None:
@@ -579,6 +647,21 @@ def flatten_roads(grid: Grid, roads, step: float) -> None:
        important road wins only where the two surfaces really cover the same cells."""
     flat = [r for r in sorted(roads, key=lambda r: r.importance)
             if r.type not in NATURAL_ROADS and not r.bridge and not r.tunnel]
+    find_twins(flat)
+    # The heights of the two ways of a street, from the ground before any road changes it.
+    for road in flat:
+        road.twin_raw = None
+        if road.twins:
+            x = road.points[:, 0]
+            z = -road.points[:, 1]
+            raw = grid.sample(x, z)
+            total, count = raw.copy(), np.ones(len(x))
+            for twin in road.twins:
+                tx, tz, near = _nearest_points(x, z, twin.points[:, 0], -twin.points[:, 1])
+                close = near <= TWIN_M
+                total[close] += grid.sample(tx, tz)[close]
+                count[close] += 1.0
+            road.twin_raw = total / count
     for road in reversed(flat):
         profile, x, z = _profile(grid, road, step)
         _flatten(grid, road, profile, x, z, "shoulder")
@@ -624,7 +707,7 @@ def limit_road_sides(grid: Grid, roads, grade: float = ROAD_SIDE_GRADE, iteratio
             gx, gz = np.meshgrid(grid.x0 + np.arange(c0, c1 + 1) * grid.step, grid.z0 + np.arange(r0, r1 + 1) * grid.step)
             t = np.clip(((gx - ax) * dx + (gz - az) * dz) / length2, 0.0, 1.0)
             d = np.hypot(gx - (ax + t * dx), gz - (az + t * dz))
-            surface[r0:r1 + 1, c0:c1 + 1] |= d <= half + grid.step / 2.0
+            surface[r0:r1 + 1, c0:c1 + 1] |= d <= half + grid.step
             band[r0:r1 + 1, c0:c1 + 1] |= d <= reach
     return _limit_slope(h, band & ~surface, grade * grid.step, iterations)
 
@@ -690,7 +773,7 @@ def _flatten(grid: Grid, road, profile, x, z, mode: str, locked: np.ndarray | No
         # The first and the last segment also change the cells at the ends of the road.
         beside = (raw_t >= (-np.inf if i == 0 else -0.02)) & (raw_t <= (np.inf if i == len(x) - 2 else 1.02))
         if mode == "mix":
-            core = (d <= half + grid.step / 2.0) & beside
+            core = (d <= half + grid.step) & beside
             weight = 1.0 / (d + 0.5) ** 2
             mix[0][r0:r1 + 1, c0:c1 + 1][core] += (target * weight)[core]
             mix[1][r0:r1 + 1, c0:c1 + 1][core] += weight[core]
@@ -698,13 +781,15 @@ def _flatten(grid: Grid, road, profile, x, z, mode: str, locked: np.ndarray | No
                 # The outside of a bend is beside neither segment. A disc at the
                 # start point has the height of that point, with a very small
                 # weight, so it counts only where no segment is beside a cell.
-                join = (raw_t < 0.0) & (d <= half + grid.step / 2.0)
+                join = (raw_t < 0.0) & (d <= half + grid.step)
                 mix[0][r0:r1 + 1, c0:c1 + 1][join] += (target * weight * JOIN_WEIGHT)[join]
                 mix[1][r0:r1 + 1, c0:c1 + 1][join] += (weight * JOIN_WEIGHT)[join]
             touched.append((r0, r1, c0, c1))
         elif mode == "surface":
-            # The road surface and a band of half a grid step, so that the edge sample is flat too.
-            core = (d <= half + grid.step / 2.0) & beside
+            # The road surface and a band of one grid step: the ground under the road
+            # is flat to its edge, also between two samples (report 0026, D-0026-11:
+            # with half a step, the edge of a road was 0.15 m lower than its middle).
+            core = (d <= half + grid.step) & beside
             if locked is not None:
                 core &= ~locked[r0:r1 + 1, c0:c1 + 1]
                 new_lock.append((r0, r1, c0, c1, core))

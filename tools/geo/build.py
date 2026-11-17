@@ -332,9 +332,17 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     # Plan 0008, R2 and D7: the ground under each known place is level, at the
     # lowest point of its outline; the base of the place is 0.1 m over it.
     level_places(grid, config.landmarks, found_by_id)
+    # Report 0026, D-0026-11: the ground under and beside the sidewalks and the
+    # walk on the sea wall of the showcase is at their tops.
+    showcase_path = ROOT / "data" / "showcase" / "bai_truoc.json"
+    walk_cells = None
+    if showcase_path.exists():
+        walks = showcase_module.level_walks(grid, load_json(showcase_path), roads)
+        walk_cells = walks["walks"]
+        log(f"showcase walks: {walks['cells']} cells of ground at the tops of the walk parts")
     # Plan 0026, D3 (and plan 0009, R8): the ground under each model of World
     # of data/world/places/ is level, at the height of the ground at its front.
-    level_world_places(grid, ROOT / "data" / "world" / "places", roads)
+    level_world_places(grid, ROOT / "data" / "world" / "places", roads, walk_cells)
     cut_stairs(grid, config.landmarks, found_by_id, roads)
     # The roads take the heights of the ground again: the bases and the stairs changed it.
     for road in roads:
@@ -660,10 +668,12 @@ def world_place_footprint(place: dict) -> list[tuple[float, float]]:
     x0, x1, z0, _z1 = place["box"]
     ox = place["front"][0] - place.get("front_middle_x", 0.0) * ax
     oz = place["front"][1] - place.get("front_middle_x", 0.0) * az
-    return [(ox + x * ax + z * fx, oz + x * az + z * fz) for x, z in ((x0, z0), (x1, z0), (x1, 0.0), (x0, 0.0))]
+    # The level ground in front of the model to its street (report 0026, D-0026-13).
+    front = float(place.get("forecourt_m", 0.0))
+    return [(ox + x * ax + z * fx, oz + x * az + z * fz) for x, z in ((x0, z0), (x1, z0), (x1, front), (x0, front))]
 
 
-def level_world_places(grid, folder, roads=()) -> None:
+def level_world_places(grid, folder, roads=(), walk_cells=None) -> None:
     """Makes the ground level under each model of World of the places files
     (plan 0026, D3), at the height of the ground at the middle of its front,
     and LEVEL_MARGIN_M round its box. Where the margins of two models meet,
@@ -686,7 +696,11 @@ def level_world_places(grid, folder, roads=()) -> None:
     if not places:
         return
     cores = [Polygon([(x, -z) for x, z in world_place_footprint(p)]) for p in places]
-    levels = [float(grid.sample(np.array([p["front"][0]]), np.array([p["front"][1]]))[0]) for p in places]
+    # The level is the ground at the front, or at "level_at" (a point of the
+    # sidewalk of its street, report 0026, D-0026-13: Hải Âu stood 9.8 m over Hạ
+    # Long, and a bank of earth hid its ground storey).
+    levels = [float(grid.sample(np.array([p.get("level_at", p["front"])[0]]),
+                                np.array([p.get("level_at", p["front"])[1]]))[0]) for p in places]
     core_masks = [terrain.rasterize(grid, [c]) for c in cores]
     # The margin (the ground between two cells of the grid, 2 m, mixes their heights).
     margins = [terrain.rasterize(grid, [c.buffer(LEVEL_MARGIN_M)]) for c in cores]
@@ -709,9 +723,18 @@ def level_world_places(grid, folder, roads=()) -> None:
             # model into it); outside it, the level only fills the lower ground.
             keep = terrain.rasterize(grid, [r.buffer(ROAD_KEEP_M) for r in road_lines]) if road_lines else np.zeros_like(core_masks[i])
             level_masks[i] = (core_masks[i] & ~keep) | (level_masks[i] & (grid.heights <= levels[i]))
+    # A model with a forecourt does not change the sidewalk of its street:
+    # its forecourt goes to the edge of the sidewalk (report 0026, D-0026-13).
+    if walk_cells is not None:
+        for i, place in enumerate(places):
+            if float(place.get("forecourt_m", 0.0)) > 0.0:
+                level_masks[i] &= ~walk_cells
     all_level = np.logical_or.reduce(level_masks)
+    before = grid.heights.copy()
     for i, place in enumerate(places):
         grid.heights[level_masks[i]] = levels[i]
+    for i, place in enumerate(places):
+        forecourt_ramp(grid, place, level_masks[i], levels[i], before)
     for i, place in enumerate(places):
         shape = cores[i].buffer(LEVEL_MARGIN_M)
         side = terrain.rasterize(grid, [shape.buffer(BASE_SIDE_M)]) & ~all_level
@@ -724,6 +747,44 @@ def level_world_places(grid, folder, roads=()) -> None:
             change = np.clip(grid.heights[rows, cols] - levels[i], -BASE_SIDE_GRADE * d, high)
             grid.heights[rows, cols] = levels[i] + change
         log(f"{place['id']}: the ground under it is level at {levels[i]:.2f} m ({int(level_masks[i].sum())} cells)")
+
+
+def forecourt_ramp(grid, place: dict, mask, level: float, before) -> None:
+    """The forecourt of a model ("forecourt_m" in front of its front) goes
+    from the level of the model at its front to the ground where the level
+    ground ends in front of it (the sidewalk of its street, before the
+    level), in a straight ramp: a street that climbs along a wide model
+    has no step to the forecourt (report 0026, D-0026-13: Hạ Long climbs 2 m
+    along Hải Âu, and it curves)."""
+    depth = float(place.get("forecourt_m", 0.0))
+    if depth <= 0.0:
+        return
+    fx, fz = place["facing"]
+    norm = math.hypot(fx, fz)
+    fx, fz = fx / norm, fz / norm
+    rows, cols = np.nonzero(mask)
+    x = grid.x0 + cols * grid.step
+    z = grid.z0 + rows * grid.step
+    ahead = (x - place["front"][0]) * fx + (z - place["front"][1]) * fz
+    front = ahead > 0.0
+    if not front.any():
+        return
+    rows, cols, x, z, ahead = rows[front], cols[front], x[front], z[front], ahead[front]
+    # March forward to the first point out of the level ground.
+    step = grid.step / 2.0
+    rest = np.full(len(x), np.nan)
+    edge = np.zeros(len(x))
+    for k in range(1, int((depth + 2.0 * grid.step) / step) + 1):
+        px = x + k * step * fx
+        pz = z + k * step * fz
+        col = np.clip(np.round((px - grid.x0) / grid.step).astype(int), 0, grid.shape[1] - 1)
+        row = np.clip(np.round((pz - grid.z0) / grid.step).astype(int), 0, grid.shape[0] - 1)
+        out = np.isnan(rest) & ~mask[row, col]
+        rest[out] = k * step
+        edge[out] = before[row[out], col[out]]
+    done = ~np.isnan(rest)
+    t = np.clip(ahead[done] / (ahead[done] + rest[done]), 0.0, 1.0)
+    grid.heights[rows[done], cols[done]] = level + t * (edge[done] - level)
 
 
 def cut_stairs(grid, landmarks_config, found_by_id, roads) -> None:

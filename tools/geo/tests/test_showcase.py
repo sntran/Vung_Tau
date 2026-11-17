@@ -95,3 +95,33 @@ def test_two_models_side_by_side_stand_on_their_own_level(tmp_path):
         # The front, and its two corners 2 m inside the sides.
         for dx in (-3.0, 0.0, 3.0):
             assert grid.sample(np.array([x + dx]), np.array([30.0]))[0] == pytest.approx(level, abs=0.05)
+
+
+def test_the_ground_beside_a_sidewalk_is_at_its_top():
+    """Report 0026, D-0026-11: the ground under a sidewalk of the showcase and
+    past its outer edge is at its top less UNDER_TOP_M; lower ground past it
+    rises to it; the road does not change."""
+    from geodata import roads as roads_module
+    from geodata import terrain
+
+    cols, rows = 41, 41
+    heights = np.full((rows, cols), 5.0, dtype=np.float32)
+    heights[:, 26:] = 4.0  # the park, 1 m lower, from x 52
+    grid = terrain.Grid(x0=0.0, z0=-80.0, step=2.0, heights=heights)
+    pts = np.array([(40.0, 0.0), (40.0, 80.0)])  # map y 0 to 80: game z 0 to -80, forward -z
+    road = roads_module.Road(id=7, type="primary", name="", width=10.0, width_source="table", surface="", hem=False,
+                             sidewalk="", oneway=False, lanes=0, bridge=False, tunnel=False, refs=[1, 2],
+                             node_points=pts, points=pts)
+    config = {"outline": [[0.0, -100.0], [100.0, -100.0], [100.0, 100.0], [0.0, 100.0]],
+              # Forward -z: the right side (-forward.z, forward.x) is +x.
+              "sidewalks": [{"way": 7, "side": "right", "width": 3.0, "height": 0.15}]}
+    result = showcase.level_walks(grid, config, [road])
+    top = 5.0 + showcase.ROAD_LIFT_M + 0.15
+    assert result["cells"] > 0
+    assert grid.sample([40.0], [-40.0])[0] == pytest.approx(5.0), "the road does not change"
+    edge = grid.sample([48.3], [-40.0])[0]
+    assert edge == pytest.approx(top - showcase.UNDER_TOP_M, abs=0.02), "the ground at the outer edge"
+    past = grid.sample([56.0], [-40.0])[0]
+    assert 4.0 < past < top, "the park rises to the sidewalk"
+    # The cells of the sidewalk itself (x 48), not the road (x 40) and not the park (x 52).
+    assert result["walks"][20, 24] and not result["walks"][20, 20] and not result["walks"][20, 26]

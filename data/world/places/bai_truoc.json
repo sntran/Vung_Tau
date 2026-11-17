@@ -220,6 +220,12 @@
 				-0.2672
 			],
 			"front_middle_x": -11.65,
+			"forecourt_m": 21.0,
+			"level_at": [
+				-227.18,
+				500.93
+			],
+			"level_note": "Report 0026, D-0026-13: the front of the outline is 32 m from the middle of Hạ Long, on ground 9.8 m over the road, and a bank of earth hid the ground storey. The photos of 2014 show the ground storey with its shops and its porch at the level of the sidewalk of Hạ Long. So the level is the ground at level_at (a point of the sidewalk band of Hạ Long in front of the model, 12 m from the middle of the road: the top of the sidewalk less 3 cm), and the ground is level from the back of the box to forecourt_m in front of it (to the outer edge of the sidewalk, 11 m from the middle of the road). The hill stays at the sides of the forecourt and inside the model.",
 			"box": [
 				-48.1,
 				24.8,

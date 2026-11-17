@@ -685,3 +685,53 @@ def test_the_ground_under_steps_keeps_its_ends():
     out = terrain.limit_grade_exact(h, np.diff(s), 0.5, 8.0, keep_ends=True)
     assert abs(out[0] - h[0]) < 1e-9 and abs(out[-1] - h[-1]) < 1e-9
     assert np.max(np.abs(np.diff(out))) <= 0.5 * 0.5 + 1e-9
+
+
+def test_a_road_comes_to_the_height_of_a_junction_with_a_ramp():
+    """Report 0026, Q14: a road that takes the height of a more important road
+    at a junction comes to it over JUNCTION_BLEND_M, not with a step."""
+    spacing = np.full(20, 2.0)
+    profile = np.full(21, 13.0)
+    raw = profile.copy()
+    raw[-1] = 12.0
+    fixed = np.zeros(21, dtype=bool)
+    fixed[-1] = True
+    out = terrain.blend_to_fixed(profile, raw, fixed, spacing, terrain.JUNCTION_BLEND_M)
+    assert out[-1] == pytest.approx(12.0)
+    steps = np.abs(np.diff(out))
+    assert steps.max() <= 1.0 / (terrain.JUNCTION_BLEND_M / 2.0) + 1e-6, "the drop of 1 m spreads over 20 m"
+    assert out[0] == pytest.approx(13.0), "20 m from the junction the road keeps its own height"
+
+
+def test_the_two_ways_of_a_street_with_a_median_have_one_height():
+    """Report 0026, D-0026-11: the two ways of Quang Trung were 2.8 m apart in
+    height across a median of 4 m. The two ways of a street take the mean."""
+    cols, rows = 61, 61
+    gx = np.arange(cols) * 2.0
+    # The ground climbs 0.5 m for each meter to the east: way B (x 70) is 6 m higher than way A (x 58).
+    heights = np.tile((0.5 * gx).astype(np.float32), (rows, 1))
+    grid = terrain.Grid(x0=0.0, z0=-120.0, step=2.0, heights=heights)
+    a = _road(1, "primary", [(58.0, 10.0), (58.0, 110.0)], width=8.0)
+    b = _road(2, "primary", [(70.0, 110.0), (70.0, 10.0)], width=8.0)
+    for road in (a, b):
+        road.name = "Quang Trung"
+        road.oneway = True
+    assert terrain.find_twins([a, b]) == 1
+    terrain.flatten_roads(grid, [a, b], 2.0)
+    ya = grid.sample([58.0], [-60.0])[0]
+    yb = grid.sample([70.0], [-60.0])[0]
+    assert abs(ya - yb) < 0.2, f"the two ways are at one height: {ya:.2f} and {yb:.2f}"
+
+
+def test_a_road_is_flat_to_its_edge():
+    """Report 0026, D-0026-11: the ground under a road is flat to its edge, also
+    between two samples of the grid (it was 0.15 m lower at the edge)."""
+    cols, rows = 41, 41
+    gx = np.arange(cols) * 2.0
+    heights = np.tile((0.3 * gx).astype(np.float32), (rows, 1))
+    grid = terrain.Grid(x0=0.0, z0=-80.0, step=2.0, heights=heights)
+    road = _road(1, "primary", [(41.0, 0.0), (41.0, 80.0)], width=10.0)
+    terrain.flatten_roads(grid, [road], 2.0)
+    middle = grid.sample([41.0], [-40.0])[0]
+    for x in (36.3, 36.9, 45.1, 45.7):
+        assert grid.sample([x], [-40.0])[0] == pytest.approx(middle, abs=0.02), f"at x {x}"
