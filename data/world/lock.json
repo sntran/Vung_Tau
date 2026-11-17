@@ -146,6 +146,16 @@
 				"khach_san_grand_canh_nam.receipt.json": "6c17dfa033c9370c328a03863564419ff27983b9651bbeb7aa6ec79c300c3d3c"
 			}
 		},
+		"khach_san_hai_au": {
+			"hash": "c344ff9a1e86cf93adcc7daaf829a15d",
+			"files": {
+				"khach_san_hai_au.far.glb": "2dd81016c5a5ade55f5ccf465d8d75664a44917709c63692d41ce6e2cc08e8a0",
+				"khach_san_hai_au.glb": "c39c0d4e4529c96d1950c510c4f380010642579de037a4234afd8b671042c71d",
+				"khach_san_hai_au.mid.glb": "30dc1d05c742009f202c4cfce3bf81105635238b90800f35eea4cb597bf7f34c",
+				"khach_san_hai_au.parts.json": "f59519447e9efe0d7071bd40660ff4d42b4493d6f758f95133164e38426fbe45",
+				"khach_san_hai_au.receipt.json": "3bea8bacd8a2c3bc8c78cca41be852c683eeee3a951c64930785cc90bffc2887"
+			}
+		},
 		"lan_can_ha_long": {
 			"hash": "95056aed2bdcf62d2ffb69122e59e056",
 			"files": {
