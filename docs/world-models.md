@@ -1,6 +1,6 @@
 # How Vũng Tàu makes its models in World
 
-World works as the game Dreams of Media Molecule: World is the engine and the tools, and the person who plays makes the things. For this game, **Vũng Tàu makes its models**. It sculpts them with the tools of World, puts parts together, and uses the things of World again, as a player of Dreams uses the shapes, the sculpt tools, and the elements of other players. World does not make a model of this game, and does not choose its sizes, its shapes, or its colors.
+World works as the game Dreams of Media Molecule: World is the engine and the tools, and the person who plays makes the things. For this game, **Vũng Tàu makes its models**. It sculpts them with the tools of World, puts parts together, and uses the things of World again, as a player of Dreams uses the shapes, the sculpt tools, and the elements of other players. World does not make a model of this game, and does not choose its sizes, its shapes, or its colors. **The construction is in the game** (plan 0027): World gives the tools, the parts, and the labour, and streams each part of a model; this game glues the parts together. An edit builds only the parts that change.
 
 The tools are in World: `docs/requests.md` (how a project asks), `docs/format.md` ("A sculpture", "A drawing", "A blueprint in data", "A person"), and `docs/skills.md`.
 
@@ -37,7 +37,7 @@ As a player of Dreams sculpts, looks, and sculpts again:
 1. **Check** the order (`check_order`, `check_drawing`, or `check_blueprint` of World: milliseconds). Correct each error.
 2. **Look at the far or the mid level first** (seconds to 2 minutes), next to the photos, from the same views (front, side, three quarters, far).
 3. **Edit** with small changes (`edit_order`, or a new version of the drawing), and look again, until the model matches the photos.
-4. **Build the near level** one time, when the mid level is right. A large building from edits takes minutes: do it before a review, not while a person waits.
+4. **Build the near level** one time, when the mid level is right. A large building from edits takes minutes: do it before a review, not while a person waits. When World gives the parts of an order (plan 0027), an edit builds only the parts that change, and the game glues them.
 5. **Keep** the last order and its lock in this repository. Make the review sheet (`tools/world/sheets.py`): the model next to its photos, with its sizes.
 
 ## 5. When a tool is missing
