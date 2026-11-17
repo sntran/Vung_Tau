@@ -690,17 +690,18 @@ def test_the_ground_under_steps_keeps_its_ends():
 def test_a_road_comes_to_the_height_of_a_junction_with_a_ramp():
     """Report 0026, Q14: a road that takes the height of a more important road
     at a junction comes to it over JUNCTION_BLEND_M, not with a step."""
-    spacing = np.full(20, 2.0)
-    profile = np.full(21, 13.0)
+    spacing = np.full(30, 2.0)
+    profile = np.full(31, 13.0)
     raw = profile.copy()
     raw[-1] = 12.0
-    fixed = np.zeros(21, dtype=bool)
+    fixed = np.zeros(31, dtype=bool)
     fixed[-1] = True
     out = terrain.blend_to_fixed(profile, raw, fixed, spacing, terrain.JUNCTION_BLEND_M)
     assert out[-1] == pytest.approx(12.0)
-    steps = np.abs(np.diff(out))
-    assert steps.max() <= 1.0 / (terrain.JUNCTION_BLEND_M / 2.0) + 1e-6, "the drop of 1 m spreads over 20 m"
-    assert out[0] == pytest.approx(13.0), "20 m from the junction the road keeps its own height"
+    grades = np.abs(np.diff(out)) / 2.0
+    assert grades.max() <= 1.5 / terrain.JUNCTION_BLEND_M + 1e-6, "the drop of 1 m spreads over the blend"
+    assert np.abs(np.diff(grades)).max() < 0.01, "no kink in the ramp"
+    assert out[0] == pytest.approx(13.0), "60 m from the junction the road keeps its own height"
 
 
 def test_the_two_ways_of_a_street_with_a_median_have_one_height():
@@ -735,3 +736,16 @@ def test_a_road_is_flat_to_its_edge():
     middle = grid.sample([41.0], [-40.0])[0]
     for x in (36.3, 36.9, 45.1, 45.7):
         assert grid.sample([x], [-40.0])[0] == pytest.approx(middle, abs=0.02), f"at x {x}"
+
+
+def test_a_twin_road_takes_the_height_of_a_junction():
+    """The mean height of the two ways of a street does not change the height
+    at a junction with a more important road (it made a step of 1.27 m)."""
+    profile = np.full(31, 13.0)
+    raw = np.full(31, 13.0)
+    raw[-1] = 11.0
+    fixed = np.zeros(31, dtype=bool)
+    fixed[-1] = True
+    out = terrain.blend_to_fixed(profile, raw, fixed, np.full(30, 2.0), terrain.JUNCTION_BLEND_M)
+    assert out[-1] == pytest.approx(11.0)
+    assert np.abs(np.diff(out)).max() < 0.2

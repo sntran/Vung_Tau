@@ -47,18 +47,25 @@ LAND_MIN_HEIGHT = 1.2
 # D-0026-11), so the shoulder is wider than that step.
 ROAD_SHOULDER_M = 3.5
 # Where a road takes the height of a more important road at a junction, the
-# difference spreads along it over this length (report 0026, Q14: Hạ Long fell
-# 0.8 m in 4 m at a junction).
-JUNCTION_BLEND_M = 20.0
+# difference spreads along it over this length, with a smooth weight (report
+# 0026, Q14: Hạ Long fell 0.8 m in 4 m at a junction; with 20 m and a straight
+# weight, the walk on its sea wall was steeper than 0.12 there).
+JUNCTION_BLEND_M = 40.0
 # The two ways of a street with a median (the same name, one way each, side by
 # side) take the mean of their heights across, at points this near (report 0026,
 # D-0026-11: the two roads of Quang Trung were 2.8 m apart in height across a
 # median of 4 m, from the surface model).
 TWIN_M = 25.0
+TWIN_FADE_M = 10.0
 # The length of the moving average of the road height along a road.
 ROAD_SMOOTH_M = 16.0
 # The steepest road: 25 % (14 degrees). Steep streets in Vũng Tàu are near this value.
 MAX_ROAD_GRADE = 0.25
+# The main roads of the town (Hạ Long and Trần Phú along the coast) are not
+# steeper than 10 %; the surface model made parts of Hạ Long 12 % steep, and the
+# walk on its sea wall had a grade of 0.12 (report 0026, D-0026-11).
+MAX_MAIN_ROAD_GRADE = 0.10
+MAIN_ROADS = {"trunk", "primary", "secondary"}
 # The steepest grade of the ground under steps (plan 0008, R6): steps of 16.5 cm
 # with treads of 28 cm climb 0.59, so the steps of the game can follow it.
 MAX_STEPS_GRADE = 0.5
@@ -567,7 +574,8 @@ def blend_to_fixed(profile: np.ndarray, raw: np.ndarray, fixed: np.ndarray, spac
     delta = (raw - profile)[fixed]
     nearest = np.abs(s[:, None] - fixed_s[None, :]).argmin(axis=1)
     distance = np.abs(s - fixed_s[nearest])
-    weight = np.clip(1.0 - distance / length, 0.0, 1.0)
+    u = np.clip(distance / length, 0.0, 1.0)
+    weight = 1.0 - u * u * (3.0 - 2.0 * u)
     return np.where(fixed, raw, profile + weight * delta[nearest])
 
 
@@ -577,9 +585,10 @@ def _profile(grid: Grid, road, step: float, locked: np.ndarray | None = None):
     x = road.points[:, 0]
     z = -road.points[:, 1]
     raw = grid.sample(x, z)
-    if getattr(road, "twin_raw", None) is not None:
-        raw = road.twin_raw
-    profile = smooth_profile(raw, step, ROAD_SMOOTH_M if not road.hem else ROAD_SMOOTH_M / 2)
+    # The two ways of a street take the mean of their heights; a point at a
+    # junction still takes the height that the more important road set there.
+    own = road.twin_raw if getattr(road, "twin_raw", None) is not None else raw
+    profile = smooth_profile(own, step, ROAD_SMOOTH_M if not road.hem else ROAD_SMOOTH_M / 2)
     spacing = np.hypot(np.diff(x), np.diff(z))
     fixed = None
     if locked is not None:
@@ -593,7 +602,8 @@ def _profile(grid: Grid, road, step: float, locked: np.ndarray | None = None):
         if fixed is not None:
             profile = np.where(fixed, raw, profile)
     else:
-        profile = limit_grade(profile, spacing, MAX_ROAD_GRADE, fixed=fixed)
+        grade = MAX_MAIN_ROAD_GRADE if road.type in MAIN_ROADS else MAX_ROAD_GRADE
+        profile = limit_grade(profile, spacing, grade, fixed=fixed)
     return profile, x, z
 
 
@@ -658,9 +668,10 @@ def flatten_roads(grid: Grid, roads, step: float) -> None:
             total, count = raw.copy(), np.ones(len(x))
             for twin in road.twins:
                 tx, tz, near = _nearest_points(x, z, twin.points[:, 0], -twin.points[:, 1])
-                close = near <= TWIN_M
-                total[close] += grid.sample(tx, tz)[close]
-                count[close] += 1.0
+                # The mean fades out where the two ways go apart (a step made a grade of 13 %).
+                weight = np.clip((TWIN_M - near) / TWIN_FADE_M, 0.0, 1.0)
+                total += weight * grid.sample(tx, tz)
+                count += weight
             road.twin_raw = total / count
     for road in reversed(flat):
         profile, x, z = _profile(grid, road, step)

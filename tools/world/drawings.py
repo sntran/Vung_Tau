@@ -5,6 +5,8 @@
     python tools/world/drawings.py check --factory ID    # also the check of World (check_order)
     python tools/world/drawings.py place ID              # keep the order on the factory: its hash
     python tools/world/drawings.py look ID --level mid   # the level next to the photos: build/look/ID_mid.png
+    python tools/world/drawings.py look ID --lock        # the same with the files of the lock (assets/world/):
+                                                         # a model that the job "Models of World" built
     python tools/world/drawings.py sync [ID ...]         # put the order of each drawing (or of these) in data/world/orders.json
 
 A file data/world/drawings/ID.json has:
@@ -256,15 +258,37 @@ def command_place(args) -> int:
     return 0
 
 
+def lock_level(model_id: str, level: str, out: Path) -> tuple[str, Path]:
+    """The hash of the order of the model in data/world/lock.json and a copy of
+    the file of the level in assets/world/ (the files that the game uses)."""
+    lock = json.loads((ROOT / "data" / "world" / "lock.json").read_text(encoding="utf-8"))
+    entry = lock["models"].get(model_id)
+    if entry is None:
+        raise SystemExit(f"{model_id}: not in data/world/lock.json")
+    suffix = {"near": ".glb", "mid": ".mid.glb", "far": ".far.glb"}[level]
+    source = ROOT / "assets" / "world" / f"{model_id}{suffix}"
+    if not source.exists():
+        raise SystemExit(f"{model_id}: no file {source.relative_to(ROOT)} (run tools/world/fetch.py)")
+    out.mkdir(parents=True, exist_ok=True)
+    path = out / f"{entry['hash']}{suffix}"
+    path.write_bytes(source.read_bytes())
+    return entry["hash"], path
+
+
 def command_look(args) -> int:
     drawing = load(args.id)
-    order_hash = args.hash or drawing.get("hash")
-    if not order_hash:
-        order_hash = place(drawing)["hash"]
-        drawing["hash"] = order_hash
-        save(drawing)
     work = LOOK / args.id
-    glb = fetch_level(order_hash, args.level, work)
+    if args.lock:
+        order_hash, glb = lock_level(args.id, args.level, work)
+        if drawing.get("hash") and drawing["hash"] != order_hash:
+            print(f"{args.id}: the lock has the order {order_hash}, the drawing {drawing['hash']}")
+    else:
+        order_hash = args.hash or drawing.get("hash")
+        if not order_hash:
+            order_hash = place(drawing)["hash"]
+            drawing["hash"] = order_hash
+            save(drawing)
+        glb = fetch_level(order_hash, args.level, work)
     render([glb], work)
     stem = glb.name.replace(".glb", "").replace(".", "_")
     views = {v: work / f"{stem}_{v}.png" for v in ("front", "side", "three_quarters", "above")}
@@ -315,6 +339,7 @@ def main() -> int:
     p.add_argument("--level", default="mid", choices=("near", "mid", "far"))
     p.add_argument("--hash")
     p.add_argument("--other", help="a folder with the photos that are not open (tools/photos/photos.py --other)")
+    p.add_argument("--lock", action="store_true", help="the files of the lock (assets/world/), not of the factory")
     p.set_defaults(run=command_look)
     p = sub.add_parser("sync")
     p.add_argument("ids", nargs="*")

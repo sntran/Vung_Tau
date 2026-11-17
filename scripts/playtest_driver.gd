@@ -1108,13 +1108,15 @@ func wait_ground(timeout_s := 30.0) -> bool:
 
 # --- Fixed views (plan 0004) --------------------------------------------------
 
-## Waits until the showcase of Bãi Trước has all its parts (report 0026,
-## D-0026-12: the world builds them in the first frames near the area). The
-## player is at the start point near the area. Returns false after the timeout.
+## Makes the area where the player stands ready, with all the parts of the
+## showcase of Bãi Trước (report 0026, D-0026-12: the world builds them in
+## steps near the area). A setup step, as start_at(): the player is at the
+## start point near the area. Returns false when the parts are not there.
 func wait_showcase(timeout_s := 120.0) -> bool:
 	var w := world()
 	if w == null or w.showcase == null:
 		return false
+	w.prepare_at(main().player.global_position)
 	var ok: bool = await wait_until(func() -> bool: return w.showcase.is_built(), timeout_s,
 			"the showcase has all its parts")
 	if ok:

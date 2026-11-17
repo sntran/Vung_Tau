@@ -400,8 +400,6 @@ func detail_at(point: Vector3) -> int:
 func is_settled() -> bool:
 	if _tasks > 0:
 		return false
-	if _showcase_wanted(_focus):
-		return false
 	for key: Vector2i in _chunks:
 		var state: Dictionary = _chunks[key]
 		if state.wanted != state.detail:
