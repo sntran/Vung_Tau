@@ -103,35 +103,50 @@ Most photos are from 2014 and 2015. A difference from 2019 that I know is a "Che
 5. The people and the scooters (R10, R11).
 6. The new buildings of World as they come (section 7), and night (R14).
 
-## 7. Photos and requests to World
+## 7. Photos and specs for World
 
 **Photos.** I have no photos of these places. The builder searches for photos at each step and in each place that it can reach: Wikimedia Commons (and its Panoramio photos), Flickr photos with an open license, OpenStreetMap notes and Mapillary, news articles, travel and hotel pages, and videos of walks in Vũng Tàu from 2018 to 2020. The rules:
 
-- A photo with an open license (CC0, CC BY, CC BY-SA, public domain) can go to World as a source of a request, with its credit.
-- Any other photo is a reference only: its link and what it shows go into `docs/content/reference/landmarks.md` or the request, never the photo itself.
+- A photo with an open license (CC0, CC BY, CC BY-SA, public domain) can go to World as a source of a spec, with its credit, and its copy goes into `docs/reference/photos/` (R17).
+- Any other photo is a reference only: its link and what it shows go into `docs/content/reference/landmarks.md` or the spec, never the photo itself.
 - Do not take pictures out of Google Street View or other map services whose terms forbid it.
 - Each photo has its date. A photo from 2017 to 2021 is the best source for 2019. A size or a look that only an older or newer photo shows is "Check".
 
 
-These are requests of this repository (D5). World builds them from its rules.
+Vũng Tàu gives World a spec for each model (D5, `docs/world-specs.md`): `data/world/specs/ID.json`, with each value, its status, how it was measured, and the photos that it comes from (report 0026, D-0026-09). They replace the requests of 2026-11-16. The year of each model is 2019 (the answer to World plan 0018, section 6). `python tools/world/specs.py --list` lists the values with the status "Check": a model with a Check value can be built, but it is not in the game before I decide the value. Nhà thiếu nhi and its low block wait for World plan 0018, step 4; the sculptures wait for Q2.
 
-| # | What | From |
-|---|---|---|
-| Q-W1 | **The year.** World plan 0018 asks which year: 2019 for each model of this game. | World plan 0018, section 6 |
-| Q-W2 | **Hải Âu** (OSM way 790529523, about 70 m long, on Hạ Long in front of Cầu Đá): a `building`, from about ten photos. Its storeys and its look in 2019 are "Check". | I remember it in front of Cầu Đá in the 1990s. |
-| Q-W3 | **Nhà khách Hạ Long** (102 Hạ Long, OSM way 235149416, 8 storeys): a `building`. | OSM |
-| Q-W4 | **Nhà thiếu nhi** and the low block and the office (rows T14 to T16 of the survey): World plan 0018, step 4. | World plan 0018 |
-| Q-W5 | **The park**: the pavilion with the orange tile roof, a bench of the park, a low lamp, the blue lamp pole, the lamp of globes, a kiosk, and the sculptures (when I know their subjects). | Photos of section 3 |
-| Q-W6 | **People of 2019**: the clothes of a town in 2019 (a T-shirt, a shirt, shorts, long pants, a dress, áo bà ba, a sun jacket, sandals, a helmet, a nón lá, swim clothes), and a swim ring (phao). | R10 |
-| Q-W7 | **The sea wall**: a piece of 2 m of the wall of stone blocks and of the low wall of the walk, with the granite border of a lawn, as the street kit (W21). | Photos of section 3, S5 |
-| Q-W8 | **The Araucaria** tree, a hedge, and the plants of a flower bed, with the plant blueprint. | Survey of World plan 0018, section 3.1 |
+| Spec | What | Photos | Check values |
+|---|---|---|---|
+| `ao_chong_nang` | áo khoác chống nắng, the light jacket with a hood and long sleeves that women wear against the sun | 2 | 7 |
+| `bac_xuong_cat` | bậc xuống bãi tắm, a flight of steps of granite from the walk of the sea down to the sand of Bãi Trước | 3 | 5 |
+| `cay_hoa_tim_bon_hoa` | cây hoa tím bồn hoa, the low plant with purple flowers of the flower beds of the park | 2 | 6 |
+| `cay_thong_noel` | cây thông Noel (bách tán, Araucaria heterophylla), the Norfolk pine | 5 | 3 |
+| `cay_vien_bon_hoa_do` | cây viền bồn hoa lá đỏ, the low plant with red leaves at the edge of a flower bed | 2 | 2 |
+| `den_cot_den_cau` | đèn cột đen cầu trắng, the dark post of the park with five white globes | 3 | 4 |
+| `den_cot_xanh_hai_tay` | đèn cột xanh hai tay, the blue lamp pole of the park with a frame of two arms at the top | 4 | 11 |
+| `den_vuon_thap` | đèn sân vườn thấp, the low square lamp at the side of a path of the park | 3 | 5 |
+| `ghe_da_cong_vien` | ghế đá công viên, the bench of dark granite of the park (a slab on two slab legs) | 2 | 4 |
+| `hang_rao_cong_vien` | hàng rào cây cắt xén, a piece of 2 m of the clipped hedge along the paths of the park | 3 | 0 |
+| `ke_da_bai_truoc` | kè đá Bãi Trước, a piece of 2 m of the sloped sea wall of granite blocks from the low wall of the walk down to the sand | 3 | 5 |
+| `ke_ha_long` | kè đường Hạ Long, a piece of 2 m of the sloped sea wall of concrete of Hạ Long, from the walk down to the rocks at the water | 4 | 5 |
+| `khach_san_hai_au` | khách sạn Hải Âu, the hotel Hải Âu at 124 Hạ Long, in front of the jetty of Cầu Đá | 3 | 17 |
+| `ki_ot_cong_vien` | ki-ốt công viên, the light blue kiosk on the sidewalk of the park | 1 | 15 |
+| `lan_can_ha_long` | lan can đường đi bộ Hạ Long, a piece of 2 m of the parapet clad in grey granite on the sea side of the walk of Hạ Long | 4 | 0 |
+| `nha_khach_ha_long` | nhà khách Hạ Long (khách sạn Hạ Long), the guest house at 102 Hạ Long on the side of the hill | 2 | 10 |
+| `nha_mai_ngoi_cam` | nhà mái ngói cam bên đường Hạ Long, the square hall with a pyramid roof of orange tiles by Hạ Long, next to the tower of Khách sạn Hoa Tiêu | 3 | 6 |
+| `non_rong_vanh` | nón rộng vành, the wide hat of straw or cloth that women wear against the sun | 2 | 4 |
+| `phao_boi` | phao bơi, the inflatable swim ring of the people who swim at Bãi Trước | 3 | 0 |
+| `quan_dui_boi_nam` | quần đùi bơi nam, the swim shorts of a man (to the middle of the thigh or to the knee) | 2 | 5 |
+| `tru_lan_can_ha_long` | trụ lan can đường đi bộ Hạ Long, the panel of red brown granite in the parapet of the walk of Hạ Long | 2 | 2 |
+| `tuong_bai_tam` | tường lan can bãi tắm, a span of the low wall of rough granite blocks between the walk of the sea and the beach of Bãi Trước | 4 | 1 |
+| `vien_bon_co` | viền bồn cỏ đá granite, a piece of 2 m of the border of light granite of a raised lawn of the walk of the sea | 1 | 0 |
 
 ## 8. Play-test scenarios
 
 - **PT-71 `showcase_places`.** Each model of `places/bai_truoc.json` stands on the ground (its base within 0.1 m of the ground), on its lot, with its front to its street. No two models overlap.
 - **PT-72 `showcase_shots`.** The five shots of R15, with their sheets. The architect and I look at them next to the photos.
 - **PT-73 `showcase_budget`.** The budget of R16 at each shot.
-- **PT-74 `showcase_walk`.** With the joystick, walk from the north end of the park along the walk of the sea to Hải Âu and onto the jetty, at 17:00. The player does not fall, does not walk through a wall or a person, and stays on the ground. Screenshots every 50 m.
+- **PT-74 `showcase_walk`.** With the joystick, walk from the north end of the park along the walk of the sea to Hải Âu and onto the jetty, at 17:00. The player does not fall, does not walk through a wall or a person, and stays on the ground. Screenshots every 50 m. The way along the sea wall never turns back, and each of the eight runs takes less than 180 s, also with `PLAYTEST_MAX_FPS=3` (report 0026, D-0026-01).
 - **PT-75 `showcase_people`.** At 17:00 the area has 30 to 50 people, the swimmers are in the water near the beach, and nobody stands inside a wall, a tree, or another person. At 12:00 there are fewer.
 - **PT-76 `showcase_night`.** The shots S3 and S5 at 20:00: the lamps, the fronts of the bars, and the windows.
 
@@ -175,3 +190,4 @@ These are requests of this repository (D5). World builds them from its rules.
 - **PT-74, the walk (section 8).** `playtests/showcase_walk.gd` walks with the joystick at 17:00 from the north end of the walk of the sea (x −131, z −356), along the walk between the low wall and the raised lawns, the walks of the park (ways 458829436 and 458829438), through the south end of the park to the junction of Quang Trung, along the walk on the sea wall of Hạ Long (`Showcase.sea_walk`: on the road, 2 m from the curb, where the walk has a gap at a junction), on the path of the port of Cầu Đá (way 235006085, in front of Hải Âu), and 60 m onto the deck of the jetty, along its line: about 1 300 m in six runs. At each physics step it checks that the player is not under the ground or the deck, not on a part (more than 0.4 m over the ground, the walk, or the deck), not inside a wall, a part, or a person, and not nearer to a person than the two bodies. A screenshot every 50 m, and one of Hải Âu. The walkers of R10 now have a body that stops the player, keep to the right of their way (0.6 m to 1.1 m, less on a narrow way), stop and step aside when the player is in front of them in their lane, and never move nearer than 0.6 m to the player. The game runs six times faster in the walk, and the route walk of the play-test driver (`stick_along()`) can hold the joystick longer (`max_hold`), so that a run of 220 m takes about 90 s.
 - **Four defects that PT-74 found.** (1) The walk on the sea wall of Hạ Long had a gap of 90 m from x −41 to x −115, with no parapet, where the ground falls 2 m to 9 m to the beach just past the curb: a player fell there. Each road near the walk cut it, also the OSM path of the sea (a footway that runs along the road there, on the sand at the water line) and the roads on the side of the hill. Now only a road (not a footway) that goes to the sea side cuts the walk (`Showcase._reaches_side()`): the walk goes on for 376 m from the junction of Quang Trung, and has gaps only at the three service roads of the port of Cầu Đá. (2) The top of the walk followed the height of the middle of the road. Where the road slopes across, the ground at the curb is lower, and the step onto the walk was up to 0.47 m (the player steps up 0.25 m): at the junction of Quang Trung the player could not go onto the walk. Now the walk is 0.19 m over the ground at the curb. (3) The jetty of Cầu Đá (plan 0008) had walls on both sides of its deck up to its shore end: a player could not step onto it from the land (PT-62 starts on the deck). Now the deck has no walls on its first 3 m on the land (`KnownPlaces.JETTY_LAND_OPEN`). (4) OSM puts the old hydrofoil terminal (Bến Tàu Cánh ngầm cũ, way 200554626) around the land end of the old pier, so its stand-in covered 15 m of the deck. Now a stand-in leaves a passage of the width of the deck and 0.6 m on each side (`Showcase._jetty_passage()`).
 - **Two failures of CI on this branch.** (1) PT-35 `geo_beach` walks from Quang Trung to the water of Bãi Trước: the low wall of the walk of the sea (phase 2) had no opening, so nobody could go down to the sand. Now the wall has an opening of one span (2.4 m) in the middle of each 40 m (`opening_every_m` and `opening_m` in `data/showcase/bai_truoc.json`: builder values, status check, as I found no photo of the places of the steps), `Showcase.wall_openings` gives their places, and PT-35 goes through the opening nearest to its start. (2) PT-56 `world_models` had room for 10 models; the World buildings of phase 2, the thúng chai, and the nine people of phase 5 make 25. It now has 13 runs of two models for each preset.
+- **Report 0026, D-0026-01 (PT-74 run 5 stops near Hải Âu).** Three causes. (1) The walk on the sea wall of Hạ Long was built from each OSM way alone: where the ways 200554629 and 1423071603 meet, the walk of the second way starts 4.4 m back, so the route turned back there, and at a low frame rate the player turned round and walked to the steep side. Now the ways that meet are one line (`_sea_wall_lines`), the width changes smoothly over 10 m, and a point is dropped where the middle of the walk does not go 0.5 m forward (the inside of a sharp corner). (2) A piece of the walk shorter than 8 m is dropped, and each end of a piece has a cap, so the player cannot step from a short piece to the slope of 37°. (3) At 3 frames per second, one frame is 2 s of game time (the time scale is 6) and 2.8 m of walk: a hold of the joystick ended up to a frame late, the player was more than 1 m off the route, and the driver aimed 4 m ahead with a turn of the view of 5 s each time. `stick_along` now takes the walk of a frame into account (the near aim point, the room off the route, and the hold); at a normal frame rate nothing changes. The play-test steps that find it: PT-74 fails when the way along the sea wall turns back, and a hold that does not take the player 0.3 m on along the route counts as a stop (`need_progress`). The walk is in eight runs, so that each run takes less than 180 s also with `PLAYTEST_MAX_FPS=3` (run 2, in the park, took more than 180 s before the change of `stick_along`, and 75 s after). The time limit of a turn of the view in `stick_along` is 40 s (was 15 s: PT-34 failed on it in CI).

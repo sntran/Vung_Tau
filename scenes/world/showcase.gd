@@ -24,6 +24,12 @@ const STEP := 2.0
 const JUNCTION_MARGIN := 1.0
 ## A stand-in leaves this much room (m) on each side of the deck of the jetty.
 const PASSAGE_MARGIN := 0.6
+## The shortest piece of the walk on the sea wall (m).
+const SEA_WALK_MIN_RUN := 8.0
+## Where two ways of the sea wall meet, their widths change over this length (m).
+const WIDTH_BLEND := 10.0
+## The middle of the walk goes on at least this much (m) from one point to the next.
+const WALK_ADVANCE := 0.5
 ## The types of the ways that do not cut the walk on the sea wall.
 const SEA_WALL_NOT_CUT_BY := ["footway", "path", "steps", "pedestrian", "cycleway", "track"]
 ## The source of the trees of the showcase in the tree field.
@@ -498,6 +504,8 @@ func _sea_wall(cfg: Dictionary) -> void:
 	var width := float(cfg.get("width", 7.0))
 	var parapet := float(cfg.get("parapet", 0.6))
 	var until_z := float(cfg.get("until_z", INF))
+	var color := str(cfg.get("color", "#77746c"))
+	var walk_color := str(cfg.get("walk_color", "#b9a68d"))
 	var ids: Array[int] = []
 	for way: Variant in cfg.get("ways", []):
 		ids.append(int(way))
@@ -506,39 +514,196 @@ func _sea_wall(cfg: Dictionary) -> void:
 	# OSM path of the sea along Hạ Long), and a road on the side of the hill
 	# does not reach the walk (PT-74: the walk had gaps of 90 m over the bank).
 	var others := _other_roads(ids, SEA_WALL_NOT_CUT_BY)
+	# The ways of the sea wall are one line: where two ways meet, the walks of
+	# the two ways overlapped and the way of the people went 4 m back (report
+	# 0026, D-0026-01). The width of the road changes over WIDTH_BLEND m.
+	for piece: Array in _sea_wall_lines(ids):
+		var all_points: PackedVector3Array = piece[0]
+		var all_halves: PackedFloat32Array = piece[1]
+		var all_sides := _sides(all_points)
+		# On the inner side of a sharp corner of the road, the middles of the walk
+		# bunch together and go back: the points where the middle does not go on
+		# by WALK_ADVANCE m are left out (report 0026, D-0026-01).
+		var dense := PackedVector3Array()
+		var halves := PackedFloat32Array()
+		var sides := PackedVector3Array()
+		var last_middle := Vector3.INF
+		for i in all_points.size():
+			var middle := all_points[i] + all_sides[i] * sign * (all_halves[i] + walk / 2.0)
+			# _sides() gives the side (−forward.z, 0, forward.x): the forward from the side.
+			var forward := Vector3(all_sides[i].z, 0.0, -all_sides[i].x)
+			if last_middle != Vector3.INF and (middle - last_middle).dot(forward) < WALK_ADVANCE and i < all_points.size() - 1:
+				continue
+			last_middle = middle
+			dense.append(all_points[i])
+			halves.append(all_halves[i])
+			sides.append(all_sides[i])
+		var flags: Array[bool] = []
+		for i in dense.size():
+			var at := dense[i] + sides[i] * sign * (halves[i] + walk / 2.0)
+			flags.append(contains(at.x, at.z) and at.z <= until_z
+					and not _reaches_side(dense[i], sides[i] * sign, halves[i], at, others, walk / 2.0))
+		var on := _long_runs(dense, flags, SEA_WALK_MIN_RUN)
+		var tops := _walk_tops(dense, sides, halves, sign, walk)
+		# The way of the people (PT-74).
+		for i in dense.size():
+			var road := _on_ground(dense[i] + sides[i] * sign * (halves[i] - 2.0))
+			sea_road.append(road)
+			if on[i]:
+				var middle := dense[i] + sides[i] * sign * (halves[i] + walk / 2.0)
+				middle.y = tops[i]
+				sea_walk.append(middle)
+			else:
+				sea_walk.append(road)
+			sea_walk_on.append(1 if on[i] else 0)
+		# The parts of each run of the walk.
+		var i := 0
+		while i < dense.size():
+			if not on[i]:
+				i += 1
+				continue
+			var first := i
+			while i < dense.size() and on[i]:
+				i += 1
+			var last := i - 1
+			for k in range(first, last):
+				var side0 := sides[k] * sign
+				var side1 := sides[k + 1] * sign
+				var e0 := dense[k] + side0 * halves[k]
+				var e1 := dense[k + 1] + side1 * halves[k + 1]
+				e0.y = tops[k]
+				e1.y = tops[k + 1]
+				var o0 := e0 + side0 * walk
+				var o1 := e1 + side1 * walk
+				# The face at the curb, from below the ground up to the walk.
+				var face := maxf(tops[k] - world.ground_height(e0.x, e0.z), tops[k + 1] - world.ground_height(e1.x, e1.z)) + 0.1
+				_wall(walk_color, e0 - Vector3(0, face, 0), e1 - Vector3(0, face, 0), face, -side0)
+				_top(walk_color, e0, e1, o0, o1)
+				# The parapet at the outer edge of the walk.
+				_box_along(color, o0 - side0 * 0.15, o1 - side1 * 0.15, 0.15, 0.0, parapet)
+				# The face of stone from the walk down to the ground, then over the ground to the sea.
+				var g0 := o0 + side0 * width
+				var g1 := o1 + side1 * width
+				g0.y = minf(world.ground_height(g0.x, g0.z), o0.y) + 0.05
+				g1.y = minf(world.ground_height(g1.x, g1.z), o1.y) + 0.05
+				_slope(color, o0, o1, g0, g1, side0)
+				_add_length("sea_wall", e0.distance_to(e1))
+			# A closed end where the walk stops at a junction: past the end of the
+			# walk the ground falls to the beach (D-0026-01), so a player leaves the
+			# walk only to the road. At the end of the line, the walk stays open.
+			for end in [first, last]:
+				if end == 0 or end == dense.size() - 1:
+					continue
+				var side := sides[end] * sign
+				var e := dense[end] + side * halves[end]
+				e.y = tops[end]
+				var o := e + side * walk
+				var inward := (dense[mini(end + 1, last)] - dense[end]).normalized() if end == first \
+						else (dense[maxi(end - 1, first)] - dense[end]).normalized()
+				_box_along(color, e + inward * 0.15, o + inward * 0.15, 0.15, -0.15, parapet)
+
+
+## The ways of the sea wall as lines every STEP m, with the half width of the
+## road at each point: [[PackedVector3Array, PackedFloat32Array], ...]. Ways that
+## meet (an end within 1 m of the next start) are one line, and the width
+## changes over WIDTH_BLEND m around the point where they meet.
+func _sea_wall_lines(ids: Array[int]) -> Array:
+	var pieces: Array = []
+	var line := PackedVector3Array()
+	var halves := PackedFloat32Array()
 	for id in ids:
 		var road: Dictionary = _roads.get(id, {})
 		if road.is_empty():
 			continue
+		var points := _line(road)
 		var half := float(road.width) / 2.0
-		var keep := func(p: Vector3, side: Vector3) -> bool:
-			var at := p + side * sign * (half + walk / 2.0)
-			return contains(at.x, at.z) and at.z <= until_z \
-					and not _reaches_side(p, side * sign, half, at, others, walk / 2.0)
-		_keep_sea_walk(_line(road), keep, half + walk / 2.0, sign, half)
-		for run: PackedVector3Array in _runs(_line(road), keep):
-			var sides := _sides(run)
-			for i in run.size() - 1:
-				# The walk is a step over the ground at the curb (PT-74: where the road
-				# slopes across, the ground at the curb is lower than the middle of the
-				# road, and a walk at the height of the middle was a step of 0.47 m).
-				var e0 := _on_ground(run[i] + sides[i] * sign * half) + Vector3(0, LIFT, 0)
-				var e1 := _on_ground(run[i + 1] + sides[i + 1] * sign * half) + Vector3(0, LIFT, 0)
-				var o0 := e0 + sides[i] * sign * walk
-				var o1 := e1 + sides[i + 1] * sign * walk
-				var up := Vector3(0, 0.15, 0)
-				_wall(str(cfg.get("walk_color", "#b9a68d")), e0, e1, 0.15, -sides[i] * sign)
-				_top(str(cfg.get("walk_color", "#b9a68d")), e0 + up, e1 + up, o0 + up, o1 + up)
-				# The parapet at the outer edge of the walk.
-				_box_along(str(cfg.get("color", "#77746c")), o0 - sides[i] * sign * 0.15 + up,
-						o1 - sides[i + 1] * sign * 0.15 + up, 0.15, 0.0, parapet)
-				# The face of stone from the walk down to the ground, then over the ground to the sea.
-				var g0 := o0 + sides[i] * sign * width
-				var g1 := o1 + sides[i + 1] * sign * width
-				g0.y = minf(world.ground_height(g0.x, g0.z), o0.y) + 0.05
-				g1.y = minf(world.ground_height(g1.x, g1.z), o1.y) + 0.05
-				_slope(str(cfg.get("color", "#77746c")), o0 + up, o1 + up, g0, g1, sides[i] * sign)
-				_add_length("sea_wall", e0.distance_to(e1))
+		if line.size() > 0 and line[line.size() - 1].distance_to(points[0]) > 1.0:
+			pieces.append([line, halves])
+			line = PackedVector3Array()
+			halves = PackedFloat32Array()
+		for k in points.size():
+			if k == 0 and line.size() > 0:
+				continue
+			line.append(points[k])
+			halves.append(half)
+	if line.size() >= 2:
+		pieces.append([line, halves])
+	var result: Array = []
+	for piece: Array in pieces:
+		var points: PackedVector3Array = piece[0]
+		var widths: PackedFloat32Array = piece[1]
+		var dense := PackedVector3Array()
+		var dense_halves := PackedFloat32Array()
+		for i in points.size() - 1:
+			var count := maxi(1, ceili(points[i].distance_to(points[i + 1]) / STEP))
+			for k in count:
+				var t := float(k) / count
+				dense.append(points[i].lerp(points[i + 1], t))
+				dense_halves.append(lerpf(widths[i], widths[i + 1], t))
+		dense.append(points[points.size() - 1])
+		dense_halves.append(widths[widths.size() - 1])
+		# The change of width over WIDTH_BLEND m (a mean over the points around).
+		var reach := maxi(1, roundi(WIDTH_BLEND / 2.0 / STEP))
+		var smooth := PackedFloat32Array()
+		for i in dense.size():
+			var total := 0.0
+			var n := 0
+			for k in range(maxi(0, i - reach), mini(dense.size(), i + reach + 1)):
+				total += dense_halves[k]
+				n += 1
+			smooth.append(total / n)
+		result.append([dense, smooth])
+	return result
+
+
+## For each flag, true when it is in a run of two flags or more that is not
+## shorter than "min_length" m.
+static func _long_runs(dense: PackedVector3Array, flags: Array[bool], min_length: float) -> Array[bool]:
+	var result: Array[bool] = []
+	result.resize(dense.size())
+	var first := -1
+	for i in dense.size() + 1:
+		if i < dense.size() and flags[i]:
+			if first < 0:
+				first = i
+			continue
+		if first >= 0:
+			var length := 0.0
+			for k in range(first, i - 1):
+				length += dense[k].distance_to(dense[k + 1])
+			if i - first >= 2 and length >= min_length:
+				for k in range(first, i):
+					result[k] = true
+			first = -1
+	return result
+
+
+## The height of the top of the walk at each point: 0.15 m over the ground at
+## the curb, and over the ground under the walk, so that the ground does not
+## come through it (report 0026, D-0026-04), then smoothed along the walk.
+func _walk_tops(dense: PackedVector3Array, sides: PackedVector3Array, halves: PackedFloat32Array, sign: float, walk: float) -> PackedFloat32Array:
+	var raw := PackedFloat32Array()
+	for i in dense.size():
+		var e := dense[i] + sides[i] * sign * halves[i]
+		var high := world.ground_height(e.x, e.z)
+		# Across the walk, and halfway to the next point (the ground between the points).
+		var next := dense[mini(i + 1, dense.size() - 1)] + sides[mini(i + 1, dense.size() - 1)] * sign * halves[mini(i + 1, dense.size() - 1)]
+		for t: float in [0.0, 0.5]:
+			var base := e.lerp(next, t)
+			for k: float in [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]:
+				var q := base + sides[i] * sign * minf(k, walk)
+				high = maxf(high, world.ground_height(q.x, q.z))
+		raw.append(high + LIFT + 0.15)
+	# Smooth: the mean of the points around, but never lower than the point.
+	var result := PackedFloat32Array()
+	for i in raw.size():
+		var total := 0.0
+		var n := 0
+		for k in range(maxi(0, i - 2), mini(raw.size(), i + 3)):
+			total += raw[k]
+			n += 1
+		result.append(maxf(total / n, raw[i]))
+	return result
 
 
 ## R7: a stand-in for each building of OSM in the area: its outline and its storeys.
@@ -1050,28 +1215,6 @@ func _lamp(kind: String, at: Vector3, along: Vector3) -> void:
 		light.visible = false
 		add_child(light)
 		lamp_lights.append(light)
-
-
-## The way of the people along the sea wall (PT-74): for each point of the
-## road every STEP m, the middle of the walk at its top where the walk is (a run
-## of two points or more, as _runs()), else the road 2 m in from its curb.
-func _keep_sea_walk(line: PackedVector3Array, keep: Callable, offset: float, sign: float, half: float) -> void:
-	var dense := _dense(line, STEP)
-	var sides := _sides(dense)
-	var flags: Array[bool] = []
-	for i in dense.size():
-		flags.append(keep.call(dense[i], sides[i]))
-	for i in dense.size():
-		var on := flags[i] and ((i > 0 and flags[i - 1]) or (i < dense.size() - 1 and flags[i + 1]))
-		var road := _on_ground(dense[i] + sides[i] * sign * (half - 2.0))
-		sea_road.append(road)
-		if on:
-			var walk := dense[i] + sides[i] * sign * offset
-			walk.y = _on_ground(dense[i] + sides[i] * sign * half).y + LIFT + 0.15
-			sea_walk.append(walk)
-		else:
-			sea_walk.append(road)
-		sea_walk_on.append(1 if on else 0)
 
 
 ## The point on the ground.

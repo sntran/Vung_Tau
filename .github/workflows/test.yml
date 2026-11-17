@@ -117,13 +117,15 @@ jobs:
         run: tools/test.sh
 
   playtest:
-    name: Play tests (part ${{ matrix.shard }} of 8)
+    name: Play tests (part ${{ matrix.shard }} of 12)
     runs-on: ubuntu-latest
     timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+        # 12 parts: with the showcase of plan 0026, a part of 8 took more than
+        # the 120 minutes of the job (report 0026).
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     steps:
       - uses: actions/checkout@v4
 
@@ -144,7 +146,7 @@ jobs:
         run: tools/setup.sh
 
       - name: Play tests
-        run: tools/playtest.sh --all --shard=${{ matrix.shard }}/8
+        run: tools/playtest.sh --all --shard=${{ matrix.shard }}/12
 
       - name: Upload the play-test output
         if: always()

@@ -5,10 +5,13 @@ extends RefCounted
 # of Hải Âu, and 60 m onto the jetty. The player does not fall, does not walk
 # through a wall or a person, and stays on the ground (or on the deck of the
 # jetty). A screenshot every 50 m, and one of Hải Âu from the path. The walk of
-# about 1.2 km is in six runs. The game runs six times faster and does up to 48
-# physics steps in one frame (a setup of the run, as the time scale of PT-34):
-# the player walks at the same speed in game time, and the checks run at each
-# physics step.
+# about 1.3 km is in eight runs, so that a run takes less than 180 s also at 3
+# frames per second (PLAYTEST_MAX_FPS=3; report 0026, D-0026-01). The game
+# runs six times faster and does up to 48 physics steps in one frame (a setup
+# of the run, as the time scale of PT-34): the player walks at the same speed
+# in game time, and the checks run at each physics step. The way along the sea
+# wall never turns back, and a hold of the joystick that does not take the
+# player on along the route counts as a stop (D-0026-01).
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=17:00 --quality=low
 # phase: --world=vung_tau --start-time=17:00 --quality=low
@@ -16,8 +19,10 @@ extends RefCounted
 # phase: --world=vung_tau --start-time=17:00 --quality=low
 # phase: --world=vung_tau --start-time=17:00 --quality=low
 # phase: --world=vung_tau --start-time=17:00 --quality=low
+# phase: --world=vung_tau --start-time=17:00 --quality=low
+# phase: --world=vung_tau --start-time=17:00 --quality=low
 
-const RUNS := 6
+const RUNS := 8
 const TIME_SCALE := 6.0
 const PHYSICS_STEPS := 48
 const SHOT_EVERY := 50.0
@@ -44,10 +49,15 @@ const MAX_UNDER := 0.3
 const WALK_CELL := 1.0
 ## The first points of the way along Hạ Long on the road (every 2 m).
 const ROAD_FIRST := 12
+## The points (every 2 m) at each end of a piece of the walk on the sea wall
+## where the route stays on the road.
+const WALK_MARGIN := 2
 
 ## The top of the walk on the sea wall in each cell (Vector2i), the floor of the
 ## player there (not the ground under it).
 var _walk_tops: Dictionary = {}
+## The points where the way along the sea wall turns back.
+var _backs: Array[Vector2] = []
 
 
 func run(d: PlaytestDriver) -> void:
@@ -59,6 +69,7 @@ func run(d: PlaytestDriver) -> void:
 	var length := PlaytestDriver._length(route)
 	if not d.expect(length > 900.0, "the route is %.0f m long" % length):
 		return
+	d.expect(_backs.is_empty(), "the way along the sea wall of Hạ Long never turns back: %s" % str(_backs))
 	var jetty_start := length - ON_JETTY
 	var hai_au := _hai_au(w)
 	var hai_au_at := PlaytestDriver.route_distance(route, hai_au) if hai_au != Vector3.INF else -1.0
@@ -88,9 +99,12 @@ func run(d: PlaytestDriver) -> void:
 		for side: Vector2 in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]:
 			var q := Vector2(p.x, p.z) + side * Player.RADIUS
 			top = maxf(top, w.ground_height(q.x, q.y))
+		# The walk on the sea wall in the cells around the player (the body
+		# reaches into the next cell at the edge of the walk).
 		var cell := Vector2i(floori(p.x / WALK_CELL), floori(p.z / WALK_CELL))
-		if _walk_tops.has(cell):
-			top = maxf(top, float(_walk_tops[cell]))
+		for dx in range(-1, 2):
+			for dz in range(-1, 2):
+				top = maxf(top, float(_walk_tops.get(cell + Vector2i(dx, dz), -INF)))
 		if player.is_on_floor():
 			if p.y - top > stats.over:
 				stats.over = p.y - top
@@ -132,7 +146,7 @@ func run(d: PlaytestDriver) -> void:
 		goals.sort()
 	var walked_all := true
 	for goal in goals:
-		if not await d.stick_along(route, goal, Callable(), 30.0, false, 25.0):
+		if not await d.stick_along(route, goal, Callable(), 30.0, false, 25.0, true):
 			walked_all = false
 			break
 		d.set_time_scale(1.0)
@@ -243,6 +257,18 @@ func _sea_wall_walk(w: VungTau, until: Vector3) -> PackedVector3Array:
 	var road: PackedVector3Array = w.showcase.sea_road
 	for i in mini(ROAD_FIRST, points.size()):
 		points[i] = road[i]
+	# The player goes onto the walk and off it from the road, over its side, 4 m
+	# inside each piece: at an end of a piece the ground falls to the beach
+	# (report 0026, D-0026-01).
+	var flags: PackedByteArray = w.showcase.sea_walk_on
+	for i in points.size():
+		var inside := true
+		for k in range(-WALK_MARGIN, WALK_MARGIN + 1):
+			if i + k < 0 or i + k >= flags.size() or flags[i + k] == 0:
+				inside = false
+				break
+		if not inside:
+			points[i] = road[i]
 	var on: PackedByteArray = w.showcase.sea_walk_on
 	var walk := float(w.showcase.data.sea_walls[0].get("walk", 3.0))
 	var walk_points: PackedVector3Array = w.showcase.sea_walk
@@ -258,7 +284,22 @@ func _sea_wall_walk(w: VungTau, until: Vector3) -> PackedVector3Array:
 				var q := at + across * (walk / 2.0 * k / 4.0)
 				var cell := Vector2i(floori(q.x / WALK_CELL), floori(q.z / WALK_CELL))
 				_walk_tops[cell] = maxf(float(_walk_tops.get(cell, -INF)), at.y)
-	return points.slice(0, _nearest(points, until) + 1)
+	# The way of the people never turns back (report 0026, D-0026-01: where two
+	# ways of Hạ Long met, it went 4 m back, and a slow computer turned round there).
+	# The way ends at the point of the road nearest to "until" (the path of the
+	# port of Cầu Đá), and the player leaves the walk over its side to the road
+	# before it: from the walk, the line to the path goes over the parapet or
+	# the closed end of the walk (PT-74 run 8 stopped there).
+	var end := _nearest(road, until)
+	for i in range(maxi(0, end - WALK_MARGIN), end + 1):
+		points[i] = road[i]
+	var way := points.slice(0, end + 1)
+	for i in range(1, way.size() - 1):
+		var a := Vector2(way[i].x - way[i - 1].x, way[i].z - way[i - 1].z)
+		var b := Vector2(way[i + 1].x - way[i].x, way[i + 1].z - way[i].z)
+		if a.length() > 0.01 and b.length() > 0.01 and a.dot(b) < 0.0:
+			_backs.append(Vector2(way[i].x, way[i].z))
+	return way
 
 
 ## The points of an OSM way of the roads (x, y, z), or none.

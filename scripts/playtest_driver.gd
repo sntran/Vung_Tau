@@ -1409,8 +1409,10 @@ static func route_distance(route: PackedVector3Array, point: Vector3) -> float:
 ## joystick forward. "check" runs each frame of the walk. With "may_stop", a
 ## stop on the way (for example at deep water) is not a failure. "max_hold" is
 ## the longest hold of the joystick before the view turns again (game seconds).
+## With "need_progress", a hold that does not take the player 0.3 m on along
+## the route counts as a stop too (a player that slides to and fro).
 func stick_along(route: PackedVector3Array, to: float, check := Callable(), ahead := 12.0,
-		may_stop := false, max_hold := 8.0) -> bool:
+		may_stop := false, max_hold := 8.0, need_progress := false) -> bool:
 	var hook := func() -> void:
 		if check.is_valid():
 			check.call()
@@ -1429,7 +1431,18 @@ func stick_along(route: PackedVector3Array, to: float, check := Callable(), ahea
 		# aim at a near point of the route.
 		var now := route_point(route, here)
 		var off := Vector2(pos.x - now.x, pos.z - now.z).length()
-		var step := ahead if stuck == 0 and off < 1.0 else 4.0
+		# The game time of a frame and the walk in it: at a low frame rate (for
+		# example PLAYTEST_MAX_FPS=3 at a time scale of 6), a frame is about 2 s
+		# of game time, so a hold ends up to a frame late. The near aim point and
+		# the room off the middle of the route grow with the walk of a frame
+		# (report 0026, D-0026-01). After a stop, and at a sharp turn, the aim
+		# point stays 4 m ahead, so that the walk does not cut a narrow corner
+		# (the passage to the jetty of Cầu Đá). At a normal frame rate nothing
+		# changes.
+		var frame_time := Engine.time_scale / maxf(Engine.get_frames_per_second(), 1.0)
+		var frame_walk := minf(Player.WALK_SPEED * frame_time, 3.0)
+		var near := maxf(4.0, 3.0 * frame_walk)
+		var step := ahead if stuck == 0 and off < maxf(1.0, frame_walk) else (near if stuck == 0 else 4.0)
 		var soon := route_point(route, minf(here + 3.0, to))
 		while step > 4.0:
 			var far := route_point(route, minf(here + step, to))
@@ -1439,11 +1452,15 @@ func stick_along(route: PackedVector3Array, to: float, check := Callable(), ahea
 				break
 			step *= 0.5
 		var target := route_point(route, minf(here + step, to))
-		await look_at_point(Vector3(target.x, pos.y + Player.EYE_HEIGHT, target.z), 4.0 if stuck == 0 else 2.0, 15.0)
+		await look_at_point(Vector3(target.x, pos.y + Player.EYE_HEIGHT, target.z), 4.0 if stuck == 0 else 2.0, 40.0)
 		var length := Vector2(target.x - pos.x, target.z - pos.z).length()
-		await hold_stick(Vector2(0, -1), clampf(length / Player.WALK_SPEED, 0.5, max_hold))
-		var moved: float = Vector2(state().player.x - pos.x, state().player.z - pos.z).length()
-		stuck = stuck + 1 if moved < 0.5 else 0
+		var hold := clampf(length / Player.WALK_SPEED - minf(frame_time, 2.0), 0.5, max_hold)
+		await hold_stick(Vector2(0, -1), hold)
+		var after: Vector3 = state().player
+		var moved: float = Vector2(after.x - pos.x, after.z - pos.z).length()
+		# A player that slides to and fro moves, but does not go on along the route.
+		var progress := route_distance(route, after) - here
+		stuck = stuck + 1 if moved < 0.5 or (need_progress and progress < 0.3) else 0
 		if stuck >= 4:
 			if not may_stop:
 				var at: Vector3 = state().player
