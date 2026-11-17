@@ -1,0 +1,182 @@
+{
+	"id": "non_rong_vanh",
+	"what": "nón rộng vành, the wide hat of straw or cloth that women wear against the sun",
+	"uses": "Plan 0026, R10: women on the walk of the sea and on the sand, in place of the nón lá for some. A person of the person blueprint of World, 1.6 m tall: the sizes are for that body, and they scale with it.",
+	"year": 2019,
+	"photos": [
+		{
+			"url": "https://tuoitre.vn/vung-tau-sau-30-nam-thanh-lap-thu-ngan-sach-gap-gan-300-lan-20211230155102555.htm",
+			"date": "2019-04-30 (in the file name of the photo)",
+			"license": "all rights reserved",
+			"author": "Tuổi Trẻ",
+			"open": false,
+			"shows": "The beach of Bãi Trước full of people at the end of the afternoon, to the south: people on the sand and in the water, swim rings, a light blue lamp pole, Khách sạn Bưu điện, the tower of Khách sạn Hoa Tiêu, the stepped block, the orange tile roof, the hill Núi Nhỏ."
+		},
+		{
+			"url": "https://vnexpress.net/pho-bien-yen-vang-4079788.html",
+			"date": "2020-04-02",
+			"license": "all rights reserved",
+			"author": "VnExpress",
+			"open": false,
+			"shows": "Two women who sell food by the low wall of the beach: rough grey granite blocks, square posts, a top rail and an opening between two posts; a woman in a nón lá stands beside the wall; a bicycle."
+		}
+	],
+	"envelope": {
+		"width": 0.46,
+		"depth": 0.46,
+		"height": 0.14,
+		"tolerance": 0.05
+	},
+	"parts": [
+		{
+			"name": "crown",
+			"shape": "cylinder",
+			"sizes": {
+				"diameter": 0.2,
+				"height": 0.12
+			},
+			"at": [
+				0,
+				0,
+				0.02
+			],
+			"role": "cloth",
+			"color": "#3fa6d8"
+		},
+		{
+			"name": "brim",
+			"shape": "cone",
+			"sizes": {
+				"diameter": 0.46,
+				"drop": 0.06
+			},
+			"at": [
+				0,
+				0,
+				0.02
+			],
+			"role": "cloth",
+			"color": "#3fa6d8"
+		},
+		{
+			"name": "band",
+			"shape": "cylinder",
+			"sizes": {
+				"diameter": 0.205,
+				"height": 0.02
+			},
+			"at": [
+				0,
+				0,
+				0.03
+			],
+			"role": "cloth",
+			"color": "#2c7fb0"
+		}
+	],
+	"levels": {
+		"near": 600,
+		"mid": 120,
+		"far": 24
+	},
+	"checks": [
+		"Views: front, side, top, on a woman of 1.6 m.",
+		"A brim of about 2.3 times the width of the head, a little down at its edge."
+	],
+	"status": {
+		"envelope.width": {
+			"status": "Source",
+			"how": "Photo 0: the light blue hat is about 2.3 times as wide as the head under it (0.2 m): 0.46 m.",
+			"photos": [
+				0
+			]
+		},
+		"envelope.depth": {
+			"status": "Source",
+			"how": "A round hat (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"envelope.height": {
+			"status": "Source",
+			"how": "Photo 0: the crown is about 0.6 of the width of the head high.",
+			"photos": [
+				0
+			]
+		},
+		"parts.crown.sizes.diameter": {
+			"status": "Source",
+			"how": "The width of the head (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.crown.sizes.height": {
+			"status": "Source",
+			"how": "See envelope.height.",
+			"photos": [
+				0
+			]
+		},
+		"parts.crown.at": {
+			"status": "Source",
+			"how": "On the head (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.crown.color": {
+			"status": "Source",
+			"how": "Photo 0: light blue straw; photo 1: a green cloth hat. The color is one of light blue, green, beige, and white for each woman.",
+			"photos": [
+				0,
+				1
+			]
+		},
+		"parts.brim.sizes.diameter": {
+			"status": "Source",
+			"how": "See envelope.width.",
+			"photos": [
+				0
+			]
+		},
+		"parts.brim.sizes.drop": {
+			"status": "Source",
+			"how": "Photo 0: the edge of the brim is a little lower than its foot.",
+			"photos": [
+				0
+			]
+		},
+		"parts.brim.at": {
+			"status": "Source",
+			"how": "Photo 0.",
+			"photos": [
+				0
+			]
+		},
+		"parts.brim.color": {
+			"status": "Source",
+			"how": "As the crown (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.band.sizes.diameter": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.band.sizes.height": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.band.at": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.band.color": {
+			"status": "Check",
+			"how": "A guess."
+		}
+	}
+}

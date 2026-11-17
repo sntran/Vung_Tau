@@ -1,0 +1,140 @@
+{
+	"id": "cay_hoa_tim_bon_hoa",
+	"what": "cây hoa tím bồn hoa, the low plant with purple flowers of the flower beds of the park",
+	"uses": "Plan 0026: the inside of the flower beds of the park.",
+	"year": 2019,
+	"photos": [
+		{
+			"url": "https://www.flickr.com/photos/10598985@N07/26942383027/",
+			"date": "2018-03-08",
+			"license": "all rights reserved",
+			"author": "Flickr user 10598985@N07",
+			"open": false,
+			"shows": "The park: a flower bed of low plants with purple flowers in front, lawns, frangipani trees, rock sculptures, granite sculptures, a clipped hedge, palms at the back."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(1).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_flower_bed_2014.jpg",
+			"shows": "The park in the morning: a round flower bed with a ring of red leaves and low yellow green plants in it, a low square white lamp, clipped hedges and round clipped bushes, painted cat sculptures, frangipani trees, coconut palms, a black post with white globes, a blue lamp pole far away."
+		}
+	],
+	"envelope": {
+		"width": 0.4,
+		"depth": 0.4,
+		"height": 0.3,
+		"tolerance": 0.1
+	},
+	"parts": [
+		{
+			"name": "clump",
+			"shape": "world",
+			"sizes": {
+				"width": 0.4,
+				"depth": 0.4,
+				"height": 0.3
+			},
+			"at": [
+				0,
+				0,
+				0
+			],
+			"role": "plant",
+			"color": "#4f7a32"
+		},
+		{
+			"name": "flowers",
+			"shape": "world",
+			"sizes": {
+				"diameter": 0.03,
+				"per_clump": 30
+			},
+			"at": [
+				0,
+				0,
+				0.25
+			],
+			"role": "plant",
+			"color": "#8a5aa8"
+		}
+	],
+	"levels": {
+		"near": 600,
+		"mid": 100,
+		"far": 12
+	},
+	"checks": [
+		"Views: side, top.",
+		"A low clump of green leaves with many small purple flowers on its top, 0.3 m ± 0.1 m high."
+	],
+	"status": {
+		"envelope.width": {
+			"status": "Check",
+			"how": "A guess: one clump of a bed of many."
+		},
+		"envelope.depth": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"envelope.height": {
+			"status": "Source",
+			"how": "Photo 0 (2018): the flowers are about as high as the curb of the bed is long in two tiles; photo 1 (2014): the plants in the round bed are a little higher than the red ring (0.25 m).",
+			"photos": [
+				0,
+				1
+			]
+		},
+		"parts.clump.sizes.width": {
+			"status": "Check",
+			"how": "See envelope.width."
+		},
+		"parts.clump.sizes.depth": {
+			"status": "Check",
+			"how": "See envelope.depth."
+		},
+		"parts.clump.sizes.height": {
+			"status": "Source",
+			"how": "See envelope.height.",
+			"photos": [
+				0,
+				1
+			]
+		},
+		"parts.clump.at": {
+			"status": "Confirmed",
+			"how": "The base point of the model."
+		},
+		"parts.clump.color": {
+			"status": "Source",
+			"how": "Photo 0: green leaves in the sun.",
+			"photos": [
+				0
+			]
+		},
+		"parts.flowers.sizes.diameter": {
+			"status": "Check",
+			"how": "A guess: small flowers of five petals."
+		},
+		"parts.flowers.sizes.per_clump": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.flowers.at": {
+			"status": "Source",
+			"how": "On the top of the clump (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.flowers.color": {
+			"status": "Source",
+			"how": "Photo 0: purple and violet flowers. The species is not known (Check).",
+			"photos": [
+				0
+			]
+		}
+	}
+}

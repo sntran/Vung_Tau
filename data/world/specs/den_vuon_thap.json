@@ -1,0 +1,271 @@
+{
+	"id": "den_vuon_thap",
+	"what": "đèn sân vườn thấp, the low square lamp at the side of a path of the park",
+	"uses": "Plan 0026, R9: the low lamps along the paths of the park (data/showcase/bai_truoc.json, path_lamps, the kind path_lamp), about 14 m apart at alternate sides.",
+	"year": 2019,
+	"photos": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(2).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_paths_2014.jpg",
+			"shows": "The park in the morning: a path of tiles with a granite curb, a low square white lamp at its side, two women on the path, a granite bench, clipped hedges along the paths, round clipped bushes, granite balls on the lawn, frangipani trees, a black post with white globes, raised lawns and coconut palms."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(1).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_flower_bed_2014.jpg",
+			"shows": "The park in the morning: a round flower bed with a ring of red leaves and low yellow green plants in it, a low square white lamp, clipped hedges and round clipped bushes, painted cat sculptures, frangipani trees, coconut palms, a black post with white globes, a blue lamp pole far away."
+		},
+		{
+			"url": "https://www.flickr.com/photos/10598985@N07/27942036338/",
+			"date": "2018-03-08",
+			"license": "all rights reserved",
+			"author": "Flickr user 10598985@N07",
+			"open": false,
+			"shows": "The park under frangipani trees: a dark grey post with five white globes, paths of red tiles, granite benches (a slab on two legs), low square white lamps, lawns, stone sculptures."
+		}
+	],
+	"envelope": {
+		"width": 0.4,
+		"depth": 0.4,
+		"height": 0.7,
+		"tolerance": 0.06
+	},
+	"parts": [
+		{
+			"name": "body",
+			"shape": "box",
+			"sizes": {
+				"width": 0.32,
+				"depth": 0.32,
+				"height": 0.56
+			},
+			"at": [
+				0,
+				0,
+				0.06
+			],
+			"role": "emissive",
+			"color": "#ece8da"
+		},
+		{
+			"name": "frame",
+			"shape": "box",
+			"sizes": {
+				"bar": 0.025,
+				"columns": 2,
+				"rows": 4
+			},
+			"at": [
+				0,
+				0,
+				0.06
+			],
+			"role": "paint",
+			"color": "#3c3c38"
+		},
+		{
+			"name": "foot",
+			"shape": "box",
+			"sizes": {
+				"width": 0.34,
+				"depth": 0.34,
+				"height": 0.06
+			},
+			"at": [
+				0,
+				0,
+				0
+			],
+			"role": "paint",
+			"color": "#3c3c38"
+		},
+		{
+			"name": "cap",
+			"shape": "box",
+			"sizes": {
+				"width": 0.4,
+				"depth": 0.4,
+				"height": 0.08
+			},
+			"at": [
+				0,
+				0,
+				0.62
+			],
+			"role": "paint",
+			"color": "#d8d6ce"
+		}
+	],
+	"collision": [
+		{
+			"shape": "box",
+			"width": 0.4,
+			"depth": 0.4,
+			"height": 0.7
+		}
+	],
+	"levels": {
+		"near": 300,
+		"mid": 60,
+		"far": 12
+	},
+	"checks": [
+		"Views: front, three quarters, far (20 m).",
+		"The height is 0.70 m ± 0.06 m.",
+		"A white body of frosted panes in a dark frame (two columns and four rows on each side), under a light grey cap."
+	],
+	"status": {
+		"envelope.width": {
+			"status": "Source",
+			"how": "Photo 0: the cap is 13 to 14 px across at the scale of the woman beside it (131 px for 1.58 m, photo 0): 0.40 m.",
+			"photos": [
+				0
+			]
+		},
+		"envelope.depth": {
+			"status": "Source",
+			"how": "A square lamp: as the width (photos 0, 1).",
+			"photos": [
+				0,
+				1
+			]
+		},
+		"envelope.height": {
+			"status": "Source",
+			"how": "Photo 0: the lamp is 58 px from its foot to the top of its cap, and the woman in green who walks by it is 131 px (1.58 m, a mean height of a woman); her feet and the foot of the lamp are at the same height in the photo, so they are at the same distance: 0.70 m.",
+			"photos": [
+				0
+			]
+		},
+		"parts.body.sizes.width": {
+			"status": "Source",
+			"how": "Photo 0: the body is 28 px at the scale of the woman beside it (131 px for 1.58 m, photo 0): 0.34 m with its frame; 0.32 m.",
+			"photos": [
+				0
+			]
+		},
+		"parts.body.sizes.depth": {
+			"status": "Source",
+			"how": "As the width (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.body.sizes.height": {
+			"status": "Source",
+			"how": "Photo 0: 46 px of the 58 px of the lamp.",
+			"photos": [
+				0
+			]
+		},
+		"parts.body.at": {
+			"status": "Source",
+			"how": "On the foot (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.body.color": {
+			"status": "Source",
+			"how": "Photo 0: frosted white panes; photo 2 (2018): the same white lamps.",
+			"photos": [
+				0,
+				2
+			]
+		},
+		"parts.frame.sizes.bar": {
+			"status": "Check",
+			"how": "A guess: thin dark bars (photo 0)."
+		},
+		"parts.frame.sizes.columns": {
+			"status": "Source",
+			"how": "Photo 0: two columns of panes on each side.",
+			"photos": [
+				0
+			]
+		},
+		"parts.frame.sizes.rows": {
+			"status": "Source",
+			"how": "Photo 0: four rows of panes.",
+			"photos": [
+				0
+			]
+		},
+		"parts.frame.at": {
+			"status": "Source",
+			"how": "Around the panes of the body (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.frame.color": {
+			"status": "Source",
+			"how": "Photo 0: dark grey.",
+			"photos": [
+				0
+			]
+		},
+		"parts.foot.sizes.width": {
+			"status": "Check",
+			"how": "A guess: the foot is under the hedge in photo 0."
+		},
+		"parts.foot.sizes.depth": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.foot.sizes.height": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.foot.at": {
+			"status": "Confirmed",
+			"how": "The base point of the model."
+		},
+		"parts.foot.color": {
+			"status": "Check",
+			"how": "A guess: as the frame."
+		},
+		"parts.cap.sizes.width": {
+			"status": "Source",
+			"how": "See envelope.width.",
+			"photos": [
+				0
+			]
+		},
+		"parts.cap.sizes.depth": {
+			"status": "Source",
+			"how": "As the width.",
+			"photos": [
+				0
+			]
+		},
+		"parts.cap.sizes.height": {
+			"status": "Source",
+			"how": "Photo 0: 6 to 7 px at the scale of the woman beside it (131 px for 1.58 m, photo 0): 0.08 m.",
+			"photos": [
+				0
+			]
+		},
+		"parts.cap.at": {
+			"status": "Source",
+			"how": "On the body (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.cap.color": {
+			"status": "Source",
+			"how": "Photo 0: light grey in the morning light.",
+			"photos": [
+				0
+			]
+		}
+	}
+}

@@ -1,0 +1,165 @@
+{
+	"id": "ao_chong_nang",
+	"what": "áo khoác chống nắng, the light jacket with a hood and long sleeves that women wear against the sun",
+	"uses": "Plan 0026, R10: women on the walk of the sea and on the sand at 17:00, over a T-shirt. A person of the person blueprint of World, 1.6 m tall: the sizes are for that body, and they scale with it.",
+	"year": 2019,
+	"photos": [
+		{
+			"url": "https://tuoitre.vn/vung-tau-sau-30-nam-thanh-lap-thu-ngan-sach-gap-gan-300-lan-20211230155102555.htm",
+			"date": "2019-04-30 (in the file name of the photo)",
+			"license": "all rights reserved",
+			"author": "Tuổi Trẻ",
+			"open": false,
+			"shows": "The beach of Bãi Trước full of people at the end of the afternoon, to the south: people on the sand and in the water, swim rings, a light blue lamp pole, Khách sạn Bưu điện, the tower of Khách sạn Hoa Tiêu, the stepped block, the orange tile roof, the hill Núi Nhỏ."
+		},
+		{
+			"url": "https://vnexpress.net/pho-bien-yen-vang-4079788.html",
+			"date": "2020-04-02",
+			"license": "all rights reserved",
+			"author": "VnExpress",
+			"open": false,
+			"shows": "Two women who sell food by the low wall of the beach: rough grey granite blocks, square posts, a top rail and an opening between two posts; a woman in a nón lá stands beside the wall; a bicycle."
+		}
+	],
+	"envelope": {
+		"width": 0.5,
+		"depth": 0.3,
+		"height": 0.62,
+		"tolerance": 0.06
+	},
+	"parts": [
+		{
+			"name": "jacket",
+			"shape": "world",
+			"sizes": {
+				"length": 0.62,
+				"sleeve": 0.6,
+				"fit": 1.15
+			},
+			"at": [
+				0,
+				0,
+				0.82
+			],
+			"role": "cloth",
+			"color": "#7fb7de"
+		},
+		{
+			"name": "hood",
+			"shape": "world",
+			"sizes": {
+				"depth": 0.28
+			},
+			"at": [
+				0,
+				0.08,
+				1.44
+			],
+			"role": "cloth",
+			"color": "#7fb7de"
+		},
+		{
+			"name": "zip",
+			"shape": "world",
+			"sizes": {
+				"width": 0.02
+			},
+			"at": [
+				0,
+				-0.15,
+				0.82
+			],
+			"role": "plastic",
+			"color": "#d8d8d8"
+		}
+	],
+	"levels": {
+		"near": 2000,
+		"mid": 400,
+		"far": 60
+	},
+	"checks": [
+		"Views: front, side, back, on a woman of 1.6 m.",
+		"Long sleeves to the wrist, a hood, a zip at the front, the hem at the hips; a light, thin cloth."
+	],
+	"status": {
+		"envelope.width": {
+			"status": "Check",
+			"how": "The width of the body with a loose fit."
+		},
+		"envelope.depth": {
+			"status": "Check",
+			"how": "As the width."
+		},
+		"envelope.height": {
+			"status": "Source",
+			"how": "Photo 0: the light blue jacket of a woman on the walk reaches her hips: 0.62 m on a woman of 1.6 m.",
+			"photos": [
+				0
+			]
+		},
+		"parts.jacket.sizes.length": {
+			"status": "Source",
+			"how": "See envelope.height.",
+			"photos": [
+				0
+			]
+		},
+		"parts.jacket.sizes.sleeve": {
+			"status": "Source",
+			"how": "Photo 0: to the wrist.",
+			"photos": [
+				0
+			]
+		},
+		"parts.jacket.sizes.fit": {
+			"status": "Check",
+			"how": "A loose fit; a guess."
+		},
+		"parts.jacket.at": {
+			"status": "Source",
+			"how": "Photo 0.",
+			"photos": [
+				0
+			]
+		},
+		"parts.jacket.color": {
+			"status": "Source",
+			"how": "Photo 0: light blue; photo 1: a check of red and blue (a shirt of the same use). The color is one of light blue, pink, white, and a check for each woman.",
+			"photos": [
+				0,
+				1
+			]
+		},
+		"parts.hood.sizes.depth": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.hood.at": {
+			"status": "Source",
+			"how": "On the head or down on the back (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.hood.color": {
+			"status": "Source",
+			"how": "As the jacket (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.zip.sizes.width": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.zip.at": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.zip.color": {
+			"status": "Check",
+			"how": "A guess."
+		}
+	}
+}

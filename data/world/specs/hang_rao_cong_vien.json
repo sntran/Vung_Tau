@@ -1,0 +1,143 @@
+{
+	"id": "hang_rao_cong_vien",
+	"what": "hàng rào cây cắt xén, a piece of 2 m of the clipped hedge along the paths of the park",
+	"uses": "Plan 0026: the hedges along the paths of the park, in pieces of 2 m in a row along a line (as the sidewalk pieces of World).",
+	"year": 2019,
+	"photos": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(2).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_paths_2014.jpg",
+			"shows": "The park in the morning: a path of tiles with a granite curb, a low square white lamp at its side, two women on the path, a granite bench, clipped hedges along the paths, round clipped bushes, granite balls on the lawn, frangipani trees, a black post with white globes, raised lawns and coconut palms."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(1).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_flower_bed_2014.jpg",
+			"shows": "The park in the morning: a round flower bed with a ring of red leaves and low yellow green plants in it, a low square white lamp, clipped hedges and round clipped bushes, painted cat sculptures, frangipani trees, coconut palms, a black post with white globes, a blue lamp pole far away."
+		},
+		{
+			"url": "https://www.flickr.com/photos/10598985@N07/27942036338/",
+			"date": "2018-03-08",
+			"license": "all rights reserved",
+			"author": "Flickr user 10598985@N07",
+			"open": false,
+			"shows": "Benches of the park: a bench of dark polished granite (a slab on two slab legs) and benches of rough light granite, by a path of red tiles and a clipped hedge; a dark post with white globes."
+		}
+	],
+	"envelope": {
+		"width": 2.0,
+		"depth": 0.5,
+		"height": 0.45,
+		"tolerance": 0.08
+	},
+	"parts": [
+		{
+			"name": "hedge",
+			"shape": "box",
+			"sizes": {
+				"length": 2.0,
+				"width": 0.5,
+				"height": 0.45,
+				"round": 0.08
+			},
+			"at": [
+				0,
+				0,
+				0
+			],
+			"role": "plant",
+			"color": "#3f5a1e"
+		}
+	],
+	"ports": [
+		{
+			"name": "start",
+			"at": [
+				-1.0,
+				0,
+				0
+			]
+		},
+		{
+			"name": "end",
+			"at": [
+				1.0,
+				0,
+				0
+			]
+		}
+	],
+	"levels": {
+		"near": 800,
+		"mid": 120,
+		"far": 12
+	},
+	"checks": [
+		"Views: front, end, far.",
+		"A block of small leaves 0.45 m ± 0.08 m high and 0.5 m wide, with rounded edges; two pieces in a row make one hedge with no gap."
+	],
+	"status": {
+		"envelope.width": {
+			"status": "Confirmed",
+			"how": "A piece of 2 m (the length of the pieces of World)."
+		},
+		"envelope.depth": {
+			"status": "Source",
+			"how": "Photo 0: the hedge by the near path is about 0.7 times the height of the low lamp beside it (0.70 m) wide.",
+			"photos": [
+				0
+			]
+		},
+		"envelope.height": {
+			"status": "Source",
+			"how": "Photo 0: the top of the hedge is a little under two thirds of the height of the low lamp (0.70 m) beside it.",
+			"photos": [
+				0
+			]
+		},
+		"parts.hedge.sizes.length": {
+			"status": "Confirmed",
+			"how": "See envelope.width."
+		},
+		"parts.hedge.sizes.width": {
+			"status": "Source",
+			"how": "See envelope.depth.",
+			"photos": [
+				0
+			]
+		},
+		"parts.hedge.sizes.height": {
+			"status": "Source",
+			"how": "See envelope.height.",
+			"photos": [
+				0
+			]
+		},
+		"parts.hedge.sizes.round": {
+			"status": "Source",
+			"how": "Photos 0 and 2: the edges of the top are round.",
+			"photos": [
+				0,
+				2
+			]
+		},
+		"parts.hedge.at": {
+			"status": "Confirmed",
+			"how": "The base point of the model."
+		},
+		"parts.hedge.color": {
+			"status": "Source",
+			"how": "Photo 0: the median of the hedge in the light of the morning is #27340c in the shade and #4c6a22 in the light; #3f5a1e between them.",
+			"photos": [
+				0
+			]
+		}
+	}
+}

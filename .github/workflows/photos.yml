@@ -1,0 +1,63 @@
+name: Reference photos
+
+# Plan 0026, R17. Copies the open photos (CC0, CC BY, CC BY-SA, public domain)
+# of the specs of World (data/world/specs/) and of the shots of the showcase
+# into docs/reference/photos/, with CREDITS.md, and commits them to the branch
+# that it runs on with the message "Update the reference photos". The
+# workspace cannot reach upload.wikimedia.org; CI can. The photos that are not
+# open go into the artifact "other-photos", which GitHub deletes after one
+# day: the builder looks at them there, and they never go into the
+# repository. A push with the workflow token does not start the test workflow.
+on:
+  workflow_dispatch:
+  push:
+    paths: ["data/world/specs/**", "data/showcase/shots.json", "tools/photos/**"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: photos-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  LANG: C.UTF-8
+
+jobs:
+  photos:
+    name: Copy the open photos
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Get the open photos and write the credits
+        run: python tools/photos/photos.py
+
+      - name: Check the photos
+        run: python tools/photos/photos.py --check
+
+      - name: Get the photos that are not open (an artifact of one day)
+        run: python tools/photos/photos.py --other other-photos || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: other-photos
+          path: other-photos/
+          retention-days: 1
+          if-no-files-found: ignore
+
+      - name: Commit the photos
+        run: |
+          git add docs/reference/photos
+          if git diff --cached --quiet; then
+            echo "The photos are up to date."
+            exit 0
+          fi
+          git -c user.name="Sơn Trần-Nguyễn" -c user.email=github@sntran.com -c commit.gpgsign=false \
+            commit -m "Update the reference photos"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

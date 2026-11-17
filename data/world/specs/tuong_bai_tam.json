@@ -1,0 +1,308 @@
+{
+	"id": "tuong_bai_tam",
+	"what": "tường lan can bãi tắm, a span of the low wall of rough granite blocks between the walk of the sea and the beach of Bãi Trước",
+	"uses": "Plan 0026, R4: the low wall along the walk of the park and the walk of the sea (data/showcase/bai_truoc.json, walls and beach_wall), one span between two posts.",
+	"year": 2019,
+	"photos": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:V%C5%A9ng_T%C3%A0u,_Ba_Ria_-_Vung_Tau,_Vietnam_-_panoramio_(6).jpg",
+			"date": "2014-03-09",
+			"license": "CC BY-SA 3.0",
+			"author": "Lam Tr Th",
+			"open": true,
+			"file": "beach_wall_2014.jpg",
+			"shows": "The low wall of the beach along the walk of the park, to the south: rough granite blocks, square posts, a flat top rail, low openings between the posts, the walk of tiles, leaning palms, the beach and Núi Nhỏ."
+		},
+		{
+			"url": "https://vnexpress.net/pho-bien-yen-vang-4079788.html",
+			"date": "2020-04-02",
+			"license": "all rights reserved",
+			"author": "VnExpress",
+			"open": false,
+			"shows": "Two women who sell food by the low wall of the beach: rough grey granite blocks, square posts, a top rail and an opening between two posts; a woman in a nón lá stands beside the wall; a bicycle."
+		},
+		{
+			"url": "https://www.flickr.com/photos/110569822@N04/48108232968/",
+			"date": "2019-06-22",
+			"license": "all rights reserved",
+			"author": "Flickr user 110569822@N04",
+			"open": false,
+			"shows": "The north part of Bãi Trước from the beach, to the north (Núi Lớn with the cable car): the low wall of granite blocks with square posts and openings on the right, a flight of three or four steps down to the sand at the end of a section, a wider stair farther along, swim rings, people on the sand."
+		},
+		{
+			"url": "https://vnexpress.net/bai-bien-vung-tau-dong-nghit-nguoi-4090193.html",
+			"date": "2020-04-25",
+			"license": "all rights reserved",
+			"author": "VnExpress",
+			"open": false,
+			"shows": "The south part of the beach full of swimmers at the end of the afternoon: the low wall with balusters in sections on the sloped stone sea wall, a stair down to the sand in a gap between two sections, swim rings, light blue lamp poles behind the palms."
+		}
+	],
+	"envelope": {
+		"width": 2.4,
+		"depth": 0.45,
+		"height": 1.0,
+		"tolerance": 0.12
+	},
+	"parts": [
+		{
+			"name": "base",
+			"shape": "box",
+			"sizes": {
+				"length": 2.4,
+				"width": 0.4,
+				"height": 0.6
+			},
+			"at": [
+				0,
+				0,
+				0
+			],
+			"role": "granite",
+			"color": "#9a958b"
+		},
+		{
+			"name": "post",
+			"shape": "box",
+			"sizes": {
+				"width": 0.45,
+				"depth": 0.45,
+				"height": 0.86
+			},
+			"at": [
+				-0.98,
+				0,
+				0
+			],
+			"role": "granite",
+			"color": "#9a958b"
+		},
+		{
+			"name": "opening",
+			"shape": "box",
+			"sizes": {
+				"length": 1.5,
+				"height": 0.26
+			},
+			"at": [
+				0.22,
+				0,
+				0.6
+			],
+			"role": "granite",
+			"color": "#9a958b"
+		},
+		{
+			"name": "rail",
+			"shape": "box",
+			"sizes": {
+				"length": 2.4,
+				"width": 0.45,
+				"height": 0.14
+			},
+			"at": [
+				0,
+				0,
+				0.86
+			],
+			"role": "granite",
+			"color": "#b0aba0"
+		}
+	],
+	"collision": [
+		{
+			"shape": "box",
+			"width": 2.4,
+			"depth": 0.45,
+			"height": 1.0
+		}
+	],
+	"ports": [
+		{
+			"name": "start",
+			"at": [
+				-1.2,
+				0,
+				0
+			]
+		},
+		{
+			"name": "end",
+			"at": [
+				1.2,
+				0,
+				0
+			]
+		}
+	],
+	"levels": {
+		"near": 400,
+		"mid": 80,
+		"far": 12
+	},
+	"checks": [
+		"Views: front (from the walk), back (from the sand), end, far (30 m).",
+		"From the walk the top of the rail is 1.0 m ± 0.12 m high.",
+		"One square post at one end; between the posts a low opening under the rail; rough blocks in courses.",
+		"On the side of the sand the wall stands on the sea wall of blocks (tuong_bai_tam does not include it)."
+	],
+	"status": {
+		"envelope.width": {
+			"status": "Source",
+			"how": "Photo 0: the posts are about five times their width apart; with the posts of 0.45 m, a span of about 2.4 m. Photo 1 shows the same.",
+			"photos": [
+				0,
+				1
+			]
+		},
+		"envelope.depth": {
+			"status": "Source",
+			"how": "As the posts (photo 1).",
+			"photos": [
+				1
+			]
+		},
+		"envelope.height": {
+			"status": "Source",
+			"how": "Photo 1: the woman in a nón lá stands by the wall, her feet 15 px nearer than its foot: she is 182 px (1.55 m) and the wall 130 px from the walk to the top of its rail: 1.1 m; the woman may be a little nearer: 1.0 m.",
+			"photos": [
+				1
+			]
+		},
+		"parts.base.sizes.length": {
+			"status": "Source",
+			"how": "See envelope.width.",
+			"photos": [
+				0,
+				1
+			]
+		},
+		"parts.base.sizes.width": {
+			"status": "Source",
+			"how": "Photo 0: the base is a little narrower than the rail.",
+			"photos": [
+				0
+			]
+		},
+		"parts.base.sizes.height": {
+			"status": "Source",
+			"how": "Photo 1: the woman in a nón lá stands by the wall, her feet 15 px nearer than its foot: she is 182 px (1.55 m) and the wall 130 px from the walk to the top of its rail: the base under the opening is 80 px: 0.6 m.",
+			"photos": [
+				1
+			]
+		},
+		"parts.base.at": {
+			"status": "Confirmed",
+			"how": "The base point of the model."
+		},
+		"parts.base.color": {
+			"status": "Source",
+			"how": "Photos 0 and 1: rough grey granite blocks; the median of a sunlit block in photo 0 is about #9a958b.",
+			"photos": [
+				0,
+				1
+			]
+		},
+		"parts.post.sizes.width": {
+			"status": "Source",
+			"how": "Photo 1: the woman in a nón lá stands by the wall, her feet 15 px nearer than its foot: she is 182 px (1.55 m) and the wall 130 px from the walk to the top of its rail: a post is 55 px wide: 0.45 m.",
+			"photos": [
+				1
+			]
+		},
+		"parts.post.sizes.depth": {
+			"status": "Source",
+			"how": "A square post (photos 0, 1).",
+			"photos": [
+				0,
+				1
+			]
+		},
+		"parts.post.sizes.height": {
+			"status": "Source",
+			"how": "Up to the rail (photos 0, 1).",
+			"photos": [
+				0,
+				1
+			]
+		},
+		"parts.post.at": {
+			"status": "Source",
+			"how": "At one end of the span (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.post.color": {
+			"status": "Source",
+			"how": "As the base.",
+			"photos": [
+				0,
+				1
+			]
+		},
+		"parts.opening.sizes.length": {
+			"status": "Check",
+			"how": "Photo 1: an opening of 0.85 m between a post and a pillar; photo 0: openings of about four blocks. Not the same: Check."
+		},
+		"parts.opening.sizes.height": {
+			"status": "Source",
+			"how": "Photo 1: the woman in a nón lá stands by the wall, her feet 15 px nearer than its foot: she is 182 px (1.55 m) and the wall 130 px from the walk to the top of its rail: the opening is 35 px high: 0.3 m; 0.26 m under a rail of 0.14 m.",
+			"photos": [
+				1
+			]
+		},
+		"parts.opening.at": {
+			"status": "Source",
+			"how": "Under the rail, between the posts (photos 0, 1).",
+			"photos": [
+				0,
+				1
+			]
+		},
+		"parts.opening.color": {
+			"status": "Source",
+			"how": "An opening: the color of its sides (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.rail.sizes.length": {
+			"status": "Source",
+			"how": "See envelope.width.",
+			"photos": [
+				0,
+				1
+			]
+		},
+		"parts.rail.sizes.width": {
+			"status": "Source",
+			"how": "Photo 0: the rail is as wide as the posts.",
+			"photos": [
+				0
+			]
+		},
+		"parts.rail.sizes.height": {
+			"status": "Source",
+			"how": "Photo 1: the woman in a nón lá stands by the wall, her feet 15 px nearer than its foot: she is 182 px (1.55 m) and the wall 130 px from the walk to the top of its rail: the rail is 15 px: 0.13 m to 0.14 m.",
+			"photos": [
+				1
+			]
+		},
+		"parts.rail.at": {
+			"status": "Source",
+			"how": "On the posts (photos 0, 1).",
+			"photos": [
+				0,
+				1
+			]
+		},
+		"parts.rail.color": {
+			"status": "Source",
+			"how": "Photo 0: the top of the rail is lighter, worn by people who sit on it.",
+			"photos": [
+				0
+			]
+		}
+	}
+}

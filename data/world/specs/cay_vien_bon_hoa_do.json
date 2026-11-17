@@ -1,0 +1,107 @@
+{
+	"id": "cay_vien_bon_hoa_do",
+	"what": "cây viền bồn hoa lá đỏ, the low plant with red leaves at the edge of a flower bed",
+	"uses": "Plan 0026: the ring at the edge of the round flower beds of the park.",
+	"year": 2019,
+	"photos": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(1).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_flower_bed_2014.jpg",
+			"shows": "The park in the morning: a round flower bed with a ring of red leaves and low yellow green plants in it, a low square white lamp, clipped hedges and round clipped bushes, painted cat sculptures, frangipani trees, coconut palms, a black post with white globes, a blue lamp pole far away."
+		},
+		{
+			"url": "https://www.flickr.com/photos/10598985@N07/26942383027/",
+			"date": "2018-03-08",
+			"license": "all rights reserved",
+			"author": "Flickr user 10598985@N07",
+			"open": false,
+			"shows": "The park: a flower bed of low plants with purple flowers in front, lawns, frangipani trees, rock sculptures, granite sculptures, a clipped hedge, palms at the back."
+		}
+	],
+	"envelope": {
+		"width": 0.5,
+		"depth": 0.3,
+		"height": 0.25,
+		"tolerance": 0.08
+	},
+	"parts": [
+		{
+			"name": "clump",
+			"shape": "world",
+			"sizes": {
+				"width": 0.5,
+				"depth": 0.3,
+				"height": 0.25
+			},
+			"at": [
+				0,
+				0,
+				0
+			],
+			"role": "plant",
+			"color": "#7a2e22"
+		}
+	],
+	"levels": {
+		"near": 400,
+		"mid": 80,
+		"far": 12
+	},
+	"checks": [
+		"Views: side, top.",
+		"A clump of small red leaves 0.25 m ± 0.08 m high; many clumps make a ring 0.3 m wide."
+	],
+	"status": {
+		"envelope.width": {
+			"status": "Check",
+			"how": "A piece of a ring; no measure."
+		},
+		"envelope.depth": {
+			"status": "Source",
+			"how": "Photo 0: the red ring is about half as wide as the low lamp beside the bed is high (0.70 m): 0.3 m.",
+			"photos": [
+				0
+			]
+		},
+		"envelope.height": {
+			"status": "Source",
+			"how": "Photo 0: the ring is about a third of the height of the low lamp: 0.25 m.",
+			"photos": [
+				0
+			]
+		},
+		"parts.clump.sizes.width": {
+			"status": "Check",
+			"how": "See envelope.width."
+		},
+		"parts.clump.sizes.depth": {
+			"status": "Source",
+			"how": "See envelope.depth.",
+			"photos": [
+				0
+			]
+		},
+		"parts.clump.sizes.height": {
+			"status": "Source",
+			"how": "See envelope.height.",
+			"photos": [
+				0
+			]
+		},
+		"parts.clump.at": {
+			"status": "Confirmed",
+			"how": "The base point of the model."
+		},
+		"parts.clump.color": {
+			"status": "Source",
+			"how": "Photo 0: dark red leaves in the morning light. The species is not known (Check).",
+			"photos": [
+				0
+			]
+		}
+	}
+}

@@ -1,0 +1,505 @@
+{
+	"id": "khach_san_hai_au",
+	"what": "khách sạn Hải Âu, the hotel Hải Âu at 124 Hạ Long, in front of the jetty of Cầu Đá",
+	"uses": "Plan 0026, R7, Q7, Q8: on its OSM outline (way 790529523) by Hạ Long; PT-74 takes a screenshot of it. In place of its stand-in.",
+	"year": 2019,
+	"photos": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Ks_Hai_au,_duong_Ha_Long,_tp_Vung_tau,_Baria_Vungtau,_Vietnam_-_panoramio.jpg",
+			"date": "2014-04-05 16:02",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "hai_au_2014.jpg",
+			"shows": "Khách sạn Hải Âu (124 Hạ Long) from the road: sky blue walls with white bands, a middle block of six storeys under a curved canopy with the red letters HAI AU, a stair tower of glass, a left wing of five storeys with round balconies and the green sign HOTEL HẢI ÂU, a right wing of five storeys with long bands of windows and its top floor set back, shops and a porch on the ground floor, pots of plants, a Norfolk pine."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Hai_Au_Hotel,_Vung_Tau.JPG",
+			"date": "2010-11-20",
+			"license": "CC BY-SA 4.0",
+			"author": "HappyMidnight",
+			"open": true,
+			"file": "hai_au_2010.jpg",
+			"shows": "Khách sạn Hải Âu in 2010: the same blocks, white with light green panels, white letters HAI AU on the canopy."
+		},
+		{
+			"url": "https://www.vietfuntravel.com.vn/blog/chia-se-thong-tin-ve-khach-san-hai-au-o-vung-tau.html",
+			"date": "on or before 2019-01 (the date of the image file on the server)",
+			"license": "all rights reserved",
+			"author": "Viet Fun Travel",
+			"open": false,
+			"shows": "Khách sạn Hải Âu light blue with white trim, about five stepped storeys with curved balcony fronts, big red letters HAI AU on the roof."
+		}
+	],
+	"envelope": {
+		"width": 70.9,
+		"depth": 21.3,
+		"height": 22.0,
+		"tolerance": 2.0
+	},
+	"parts": [
+		{
+			"name": "middle_block",
+			"shape": "box",
+			"sizes": {
+				"width": 16.0,
+				"depth": 21.3,
+				"storeys": 6,
+				"storey": 3.3
+			},
+			"at": [
+				3.0,
+				0,
+				0
+			],
+			"role": "plaster",
+			"color": "#73a2d0"
+		},
+		{
+			"name": "left_wing",
+			"shape": "box",
+			"sizes": {
+				"width": 25.0,
+				"depth": 18.0,
+				"storeys": 5,
+				"storey": 3.3
+			},
+			"at": [
+				-17.5,
+				0,
+				0
+			],
+			"role": "plaster",
+			"color": "#73a2d0"
+		},
+		{
+			"name": "right_wing",
+			"shape": "box",
+			"sizes": {
+				"width": 30.0,
+				"depth": 18.0,
+				"storeys": 5,
+				"storey": 3.3,
+				"setback": 2.0
+			},
+			"at": [
+				20.5,
+				0,
+				0
+			],
+			"role": "plaster",
+			"color": "#83b6e7"
+		},
+		{
+			"name": "stair_tower",
+			"shape": "box",
+			"sizes": {
+				"width": 3.0,
+				"depth": 3.0,
+				"height": 22.0
+			},
+			"at": [
+				11.5,
+				-1.0,
+				0
+			],
+			"role": "glass",
+			"color": "#3c4a55"
+		},
+		{
+			"name": "bands",
+			"shape": "box",
+			"sizes": {
+				"height": 0.45,
+				"every": 3.3
+			},
+			"at": [
+				0,
+				-0.2,
+				3.3
+			],
+			"role": "paint",
+			"color": "#e9ece9"
+		},
+		{
+			"name": "canopy",
+			"shape": "arc",
+			"sizes": {
+				"width": 12.0,
+				"depth": 3.0,
+				"rise": 0.8
+			},
+			"at": [
+				3.0,
+				-0.5,
+				19.799999999999997
+			],
+			"role": "paint",
+			"color": "#73a2d0"
+		},
+		{
+			"name": "letters",
+			"shape": "box",
+			"sizes": {
+				"height": 2.1,
+				"length": 5.8,
+				"depth": 0.15
+			},
+			"at": [
+				1.5,
+				-1.6,
+				20.4
+			],
+			"role": "paint",
+			"color": "#c7262c"
+		},
+		{
+			"name": "windows",
+			"shape": "plane",
+			"sizes": {
+				"width": 1.6,
+				"height": 1.5,
+				"spacing": 3.4
+			},
+			"at": [
+				0,
+				-0.1,
+				0.9
+			],
+			"role": "glass",
+			"color": "#5a6a73"
+		},
+		{
+			"name": "ground_floor",
+			"shape": "box",
+			"sizes": {
+				"height": 4.0
+			},
+			"at": [
+				0,
+				0,
+				0
+			],
+			"role": "glass",
+			"color": "#4d5a62"
+		}
+	],
+	"ports": [
+		{
+			"name": "entrance",
+			"at": [
+				3.0,
+				-10.65,
+				0
+			]
+		}
+	],
+	"collision": [
+		{
+			"shape": "box",
+			"width": 70.9,
+			"depth": 21.3,
+			"height": 22.0
+		}
+	],
+	"levels": {
+		"near": 60000,
+		"mid": 9000,
+		"far": 300
+	},
+	"checks": [
+		"Views: front (from Hạ Long), three quarters, far (from the walk of the sea 150 m away).",
+		"The middle block has six storeys and the wings five; the right wing has its top floor set back.",
+		"The walls are sky blue with white bands at the floors (the look of the photo of 2014, Q7).",
+		"The red letters HAI AU on the curved canopy over the middle block (Q8: Hải Âu stood in 2019, and its name is used).",
+		"No sign of a bank or of another brand."
+	],
+	"status": {
+		"envelope.width": {
+			"status": "Source",
+			"how": "The outline of OpenStreetMap: 70.9 m along Hạ Long.",
+			"page": "https://www.openstreetmap.org/way/790529523"
+		},
+		"envelope.depth": {
+			"status": "Source",
+			"how": "The outline of OpenStreetMap: 21.3 m deep.",
+			"page": "https://www.openstreetmap.org/way/790529523"
+		},
+		"envelope.height": {
+			"status": "Source",
+			"how": "Photo 0: six storeys of about 3.3 m and the canopy with its letters: 22 m.",
+			"photos": [
+				0
+			]
+		},
+		"parts.middle_block.sizes.width": {
+			"status": "Source",
+			"how": "Photo 0: the middle block is 0.22 of the front: 16 m of 70.9 m.",
+			"photos": [
+				0
+			]
+		},
+		"parts.middle_block.sizes.depth": {
+			"status": "Source",
+			"how": "The outline of OpenStreetMap.",
+			"page": "https://www.openstreetmap.org/way/790529523"
+		},
+		"parts.middle_block.sizes.storeys": {
+			"status": "Source",
+			"how": "Photo 0: the ground floor and five storeys over it (counted); a page of the hotel gives 6 storeys.",
+			"photos": [
+				0
+			]
+		},
+		"parts.middle_block.sizes.storey": {
+			"status": "Check",
+			"how": "3.3 m, the storey of the stand-ins (data/showcase/bai_truoc.json); not measured."
+		},
+		"parts.middle_block.at": {
+			"status": "Source",
+			"how": "Photo 0: the middle block is a little right of the middle of the front.",
+			"photos": [
+				0
+			]
+		},
+		"parts.middle_block.color": {
+			"status": "Source",
+			"how": "Photo 0 (2014): the median of the sunlit wall of the middle block is #73a2d0 (Q7: the look of the photo of 2014). Photo 2 (on or before 2019-01): light blue with white trim.",
+			"photos": [
+				0,
+				2
+			]
+		},
+		"parts.left_wing.sizes.width": {
+			"status": "Source",
+			"how": "Photo 0: 0.35 of the front.",
+			"photos": [
+				0
+			]
+		},
+		"parts.left_wing.sizes.depth": {
+			"status": "Check",
+			"how": "A guess: a little less deep than the outline."
+		},
+		"parts.left_wing.sizes.storeys": {
+			"status": "Source",
+			"how": "Photo 0: the ground floor and four storeys over it (counted).",
+			"photos": [
+				0
+			]
+		},
+		"parts.left_wing.sizes.storey": {
+			"status": "Check",
+			"how": "As the middle block."
+		},
+		"parts.left_wing.at": {
+			"status": "Source",
+			"how": "Photo 0: the left part of the front.",
+			"photos": [
+				0
+			]
+		},
+		"parts.left_wing.color": {
+			"status": "Source",
+			"how": "Photo 0: #7a97b5 in the shade; the same blue as the middle block.",
+			"photos": [
+				0
+			]
+		},
+		"parts.right_wing.sizes.width": {
+			"status": "Source",
+			"how": "Photo 0: 0.43 of the front.",
+			"photos": [
+				0
+			]
+		},
+		"parts.right_wing.sizes.depth": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.right_wing.sizes.storeys": {
+			"status": "Source",
+			"how": "Photo 0: the ground floor and four storeys over it, the top one set back (counted).",
+			"photos": [
+				0
+			]
+		},
+		"parts.right_wing.sizes.storey": {
+			"status": "Check",
+			"how": "As the middle block."
+		},
+		"parts.right_wing.sizes.setback": {
+			"status": "Check",
+			"how": "Photo 0 shows the top floor set back; not measured."
+		},
+		"parts.right_wing.at": {
+			"status": "Source",
+			"how": "Photo 0: the right part of the front.",
+			"photos": [
+				0
+			]
+		},
+		"parts.right_wing.color": {
+			"status": "Source",
+			"how": "Photo 0: #83b6e7 in the sun.",
+			"photos": [
+				0
+			]
+		},
+		"parts.stair_tower.sizes.width": {
+			"status": "Check",
+			"how": "Photo 0: a narrow tower of glass right of the middle block; about 3 m."
+		},
+		"parts.stair_tower.sizes.depth": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.stair_tower.sizes.height": {
+			"status": "Source",
+			"how": "Photo 0: as high as the canopy.",
+			"photos": [
+				0
+			]
+		},
+		"parts.stair_tower.at": {
+			"status": "Source",
+			"how": "Photo 0: between the middle block and the right wing.",
+			"photos": [
+				0
+			]
+		},
+		"parts.stair_tower.color": {
+			"status": "Source",
+			"how": "Photo 0: dark glass in a light blue frame.",
+			"photos": [
+				0
+			]
+		},
+		"parts.bands.sizes.height": {
+			"status": "Check",
+			"how": "Photo 0: white bands at the floors and the balcony fronts; their height is a guess."
+		},
+		"parts.bands.sizes.every": {
+			"status": "Source",
+			"how": "At each floor (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.bands.at": {
+			"status": "Source",
+			"how": "Photo 0.",
+			"photos": [
+				0
+			]
+		},
+		"parts.bands.color": {
+			"status": "Source",
+			"how": "Photo 0: white (Q7).",
+			"photos": [
+				0
+			]
+		},
+		"parts.canopy.sizes.width": {
+			"status": "Source",
+			"how": "Photo 0: the canopy is a little wider than the letters, about 0.75 of the middle block.",
+			"photos": [
+				0
+			]
+		},
+		"parts.canopy.sizes.depth": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.canopy.sizes.rise": {
+			"status": "Check",
+			"how": "Photo 0: a curved canopy; its rise is a guess."
+		},
+		"parts.canopy.at": {
+			"status": "Source",
+			"how": "On the middle block (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.canopy.color": {
+			"status": "Source",
+			"how": "As the walls (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.letters.sizes.height": {
+			"status": "Source",
+			"how": "Photo 0: the letters are 0.63 of the height of a storey of the middle block: 2.1 m.",
+			"photos": [
+				0
+			]
+		},
+		"parts.letters.sizes.length": {
+			"status": "Source",
+			"how": "Photo 0: the six letters HAI AU are 1.75 storeys long: 5.8 m.",
+			"photos": [
+				0
+			]
+		},
+		"parts.letters.sizes.depth": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.letters.at": {
+			"status": "Source",
+			"how": "On the canopy, a little left of its middle (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.letters.color": {
+			"status": "Source",
+			"how": "Photo 0 (2014): red letters; photo 2: red letters. In 2010 (photo 1) they were white.",
+			"photos": [
+				0,
+				1,
+				2
+			]
+		},
+		"parts.windows.sizes.width": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.windows.sizes.height": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.windows.sizes.spacing": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.windows.at": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.windows.color": {
+			"status": "Source",
+			"how": "Photo 0: dark glass.",
+			"photos": [
+				0
+			]
+		},
+		"parts.ground_floor.sizes.height": {
+			"status": "Check",
+			"how": "Photo 0: a high ground floor with shops and a porch; 4 m is a guess."
+		},
+		"parts.ground_floor.at": {
+			"status": "Confirmed",
+			"how": "The base point of the model."
+		},
+		"parts.ground_floor.color": {
+			"status": "Source",
+			"how": "Photo 0: glass and dark shop fronts under the first band.",
+			"photos": [
+				0
+			]
+		}
+	}
+}

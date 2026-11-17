@@ -1,0 +1,247 @@
+{
+	"id": "nha_khach_ha_long",
+	"what": "nhà khách Hạ Long (khách sạn Hạ Long), the guest house at 102 Hạ Long on the side of the hill",
+	"uses": "Plan 0026, R7, Q7: on its OSM outline (way 235149416), about 300 m south of Hải Âu (out of the area of D1; seen from the jetty and the walk).",
+	"year": 2019,
+	"photos": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Ha_Long_ph%C6%B0%E1%BB%9Dng_2,_V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"date": "2014-04-06",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "nha_khach_ha_long_2014.jpg",
+			"shows": "Hạ Long to the north near Cầu Đá: a cream block of many storeys on the right (Nhà khách Hạ Long), shops, blue lamp poles with a curved frame, the silver domes of the terminal of the jetty, a round white building on the sea side, green lamp posts with four white globes on the walk."
+		},
+		{
+			"url": "https://www.flickr.com/photos/venanzio_kh/51180048443/",
+			"date": "2021-05-10",
+			"license": "all rights reserved",
+			"author": "Venanzio_KH (Flickr)",
+			"open": false,
+			"shows": "Behind the sea wall and the road: a white block with the blue letters HA LONG HOTEL on its roof, seven rows of windows over the trees, a machine room on the roof."
+		}
+	],
+	"envelope": {
+		"width": 21.4,
+		"depth": 17.1,
+		"height": 28.0,
+		"tolerance": 2.5
+	},
+	"parts": [
+		{
+			"name": "block",
+			"shape": "box",
+			"sizes": {
+				"width": 21.4,
+				"depth": 17.1,
+				"storeys": 8,
+				"storey": 3.3
+			},
+			"at": [
+				0,
+				0,
+				0
+			],
+			"role": "plaster",
+			"color": "#ecebe4"
+		},
+		{
+			"name": "machine_room",
+			"shape": "box",
+			"sizes": {
+				"width": 6.0,
+				"depth": 5.0,
+				"height": 2.8
+			},
+			"at": [
+				4.0,
+				2.0,
+				26.4
+			],
+			"role": "plaster",
+			"color": "#ecebe4"
+		},
+		{
+			"name": "letters",
+			"shape": "box",
+			"sizes": {
+				"height": 1.0,
+				"length": 9.0,
+				"depth": 0.12
+			},
+			"at": [
+				0,
+				-8.6,
+				26.599999999999998
+			],
+			"role": "paint",
+			"color": "#2a4f9a"
+		},
+		{
+			"name": "windows",
+			"shape": "plane",
+			"sizes": {
+				"width": 1.4,
+				"height": 1.4,
+				"spacing": 3.4
+			},
+			"at": [
+				0,
+				-8.55,
+				1.0
+			],
+			"role": "glass",
+			"color": "#4e5a62"
+		}
+	],
+	"collision": [
+		{
+			"shape": "box",
+			"width": 21.4,
+			"depth": 17.1,
+			"height": 26.4
+		}
+	],
+	"levels": {
+		"near": 30000,
+		"mid": 5000,
+		"far": 300
+	},
+	"checks": [
+		"Views: front, three quarters, far (from the jetty).",
+		"A white block of eight storeys with a machine room on its roof and the blue letters HA LONG HOTEL on the roof edge."
+	],
+	"status": {
+		"envelope.width": {
+			"status": "Source",
+			"how": "The outline of OpenStreetMap: 21.4 m.",
+			"page": "https://www.openstreetmap.org/way/235149416"
+		},
+		"envelope.depth": {
+			"status": "Source",
+			"how": "The outline of OpenStreetMap: 17.1 m.",
+			"page": "https://www.openstreetmap.org/way/235149416"
+		},
+		"envelope.height": {
+			"status": "Source",
+			"how": "Eight storeys of about 3.3 m (OpenStreetMap: building:levels 8) and the machine room.",
+			"photos": [
+				1
+			],
+			"page": "https://www.openstreetmap.org/way/235149416"
+		},
+		"parts.block.sizes.width": {
+			"status": "Source",
+			"how": "See envelope.width.",
+			"page": "https://www.openstreetmap.org/way/235149416"
+		},
+		"parts.block.sizes.depth": {
+			"status": "Source",
+			"how": "See envelope.depth.",
+			"page": "https://www.openstreetmap.org/way/235149416"
+		},
+		"parts.block.sizes.storeys": {
+			"status": "Source",
+			"how": "OpenStreetMap: building:levels 8; photo 1 (2021): seven rows of windows over the trees.",
+			"photos": [
+				1
+			],
+			"page": "https://www.openstreetmap.org/way/235149416"
+		},
+		"parts.block.sizes.storey": {
+			"status": "Check",
+			"how": "3.3 m, as the stand-ins; not measured."
+		},
+		"parts.block.at": {
+			"status": "Confirmed",
+			"how": "The base point of the model."
+		},
+		"parts.block.color": {
+			"status": "Source",
+			"how": "Photo 1 (2021, the photo nearest to 2019): white. Photo 0 (2014): cream. As Q7 for Hải Âu, the photo nearest to 2019 gives the color.",
+			"photos": [
+				0,
+				1
+			]
+		},
+		"parts.machine_room.sizes.width": {
+			"status": "Check",
+			"how": "Photo 1: a small block on the roof; not measured."
+		},
+		"parts.machine_room.sizes.depth": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.machine_room.sizes.height": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.machine_room.at": {
+			"status": "Source",
+			"how": "On the roof, right of the middle (photo 1).",
+			"photos": [
+				1
+			]
+		},
+		"parts.machine_room.color": {
+			"status": "Source",
+			"how": "White (photo 1).",
+			"photos": [
+				1
+			]
+		},
+		"parts.letters.sizes.height": {
+			"status": "Check",
+			"how": "Photo 1: about a third of a storey; not measured."
+		},
+		"parts.letters.sizes.length": {
+			"status": "Source",
+			"how": "Photo 1: the letters go along about 0.45 of the front.",
+			"photos": [
+				1
+			]
+		},
+		"parts.letters.sizes.depth": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.letters.at": {
+			"status": "Source",
+			"how": "On the edge of the roof of the front (photo 1).",
+			"photos": [
+				1
+			]
+		},
+		"parts.letters.color": {
+			"status": "Source",
+			"how": "Photo 1: blue letters HA LONG HOTEL.",
+			"photos": [
+				1
+			]
+		},
+		"parts.windows.sizes.width": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.windows.sizes.height": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.windows.sizes.spacing": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.windows.at": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.windows.color": {
+			"status": "Source",
+			"how": "Photo 1: dark glass.",
+			"photos": [
+				1
+			]
+		}
+	}
+}

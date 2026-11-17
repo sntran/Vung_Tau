@@ -1,0 +1,196 @@
+{
+	"id": "ghe_da_cong_vien",
+	"what": "ghế đá công viên, the bench of dark granite of the park (a slab on two slab legs)",
+	"uses": "Plan 0026: the benches by the paths of the park and along the walk of the sea; the sitters of R10 sit on them.",
+	"year": 2019,
+	"photos": [
+		{
+			"url": "https://www.flickr.com/photos/10598985@N07/27942036338/",
+			"date": "2018-03-08",
+			"license": "all rights reserved",
+			"author": "Flickr user 10598985@N07",
+			"open": false,
+			"shows": "Benches of the park: a bench of dark polished granite (a slab on two slab legs) and benches of rough light granite, by a path of red tiles and a clipped hedge; a dark post with white globes."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(2).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_paths_2014.jpg",
+			"shows": "The park in the morning: a path of tiles with a granite curb, a low square white lamp at its side, two women on the path, a granite bench, clipped hedges along the paths, round clipped bushes, granite balls on the lawn, frangipani trees, a black post with white globes, raised lawns and coconut palms."
+		}
+	],
+	"envelope": {
+		"width": 1.2,
+		"depth": 0.4,
+		"height": 0.45,
+		"tolerance": 0.05
+	},
+	"parts": [
+		{
+			"name": "seat",
+			"shape": "box",
+			"sizes": {
+				"width": 1.2,
+				"depth": 0.4,
+				"height": 0.08
+			},
+			"at": [
+				0,
+				0,
+				0.37
+			],
+			"role": "granite",
+			"color": "#4a4a48"
+		},
+		{
+			"name": "legs",
+			"shape": "box",
+			"sizes": {
+				"width": 0.08,
+				"depth": 0.36,
+				"height": 0.37
+			},
+			"count": 2,
+			"spacing": 0.9,
+			"at": [
+				0,
+				0,
+				0
+			],
+			"role": "granite",
+			"color": "#4a4a48"
+		}
+	],
+	"collision": [
+		{
+			"shape": "box",
+			"width": 1.2,
+			"depth": 0.4,
+			"height": 0.45
+		}
+	],
+	"ports": [
+		{
+			"name": "seat_left",
+			"at": [
+				-0.3,
+				0,
+				0.45
+			]
+		},
+		{
+			"name": "seat_right",
+			"at": [
+				0.3,
+				0,
+				0.45
+			]
+		}
+	],
+	"levels": {
+		"near": 200,
+		"mid": 40,
+		"far": 12
+	},
+	"checks": [
+		"Views: front, side, three quarters.",
+		"The top of the seat is 0.45 m ± 0.05 m over the ground.",
+		"The seat is 1.2 m ± 0.1 m long."
+	],
+	"status": {
+		"envelope.width": {
+			"status": "Source",
+			"how": "Photo 0: the dark bench seen from the front is 2.6 times as long as it is high.",
+			"photos": [
+				0
+			]
+		},
+		"envelope.depth": {
+			"status": "Check",
+			"how": "A guess: no photo shows a bench from its end."
+		},
+		"envelope.height": {
+			"status": "Source",
+			"how": "Photo 1: the seat of the bench behind the two women is 28 px over the ground at the scale of 98 px for 1.58 m at its distance (the women's feet are 1.34 times as far under the line of the sea): 0.45 m.",
+			"photos": [
+				1
+			]
+		},
+		"parts.seat.sizes.width": {
+			"status": "Source",
+			"how": "See envelope.width.",
+			"photos": [
+				0
+			]
+		},
+		"parts.seat.sizes.depth": {
+			"status": "Check",
+			"how": "See envelope.depth."
+		},
+		"parts.seat.sizes.height": {
+			"status": "Source",
+			"how": "Photo 0: the slab is 0.18 times the height of the bench.",
+			"photos": [
+				0
+			]
+		},
+		"parts.seat.at": {
+			"status": "Source",
+			"how": "On the legs (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.seat.color": {
+			"status": "Source",
+			"how": "Photo 0: the median of the dark bench is #4a4a48 (polished dark granite); photo 1 (2014): a dark bench.",
+			"photos": [
+				0,
+				1
+			]
+		},
+		"parts.legs.sizes.width": {
+			"status": "Check",
+			"how": "A guess: slab legs (photo 0)."
+		},
+		"parts.legs.sizes.depth": {
+			"status": "Check",
+			"how": "A guess: a little less deep than the seat."
+		},
+		"parts.legs.sizes.height": {
+			"status": "Source",
+			"how": "The height of the bench less the seat (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.legs.count": {
+			"status": "Source",
+			"how": "Photo 0: two slab legs.",
+			"photos": [
+				0
+			]
+		},
+		"parts.legs.spacing": {
+			"status": "Source",
+			"how": "Photo 0: the legs are at 0.75 of the length of the seat.",
+			"photos": [
+				0
+			]
+		},
+		"parts.legs.at": {
+			"status": "Confirmed",
+			"how": "The base point of the model."
+		},
+		"parts.legs.color": {
+			"status": "Source",
+			"how": "As the seat (photo 0).",
+			"photos": [
+				0
+			]
+		}
+	}
+}

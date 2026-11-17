@@ -1,0 +1,213 @@
+{
+	"id": "ki_ot_cong_vien",
+	"what": "ki-ốt công viên, the light blue kiosk on the sidewalk of the park",
+	"uses": "Plan 0026: the kiosks on the sidewalk of the park on Quang Trung (the place in 2019 is Q2: Check).",
+	"year": 2019,
+	"photos": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Quang_trung_street-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"date": "2014-04-06",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "street_kiosk_2014.jpg",
+			"shows": "The road of the side of the sea to the south, by the park: Norfolk pines and red hibiscus on the median, big Terminalia trees, a light blue kiosk with a red sign on the sidewalk of the park, stone benches, sculptures, scooters, blue lamp poles."
+		}
+	],
+	"envelope": {
+		"width": 1.8,
+		"depth": 1.5,
+		"height": 2.5,
+		"tolerance": 0.4
+	},
+	"parts": [
+		{
+			"name": "body",
+			"shape": "box",
+			"sizes": {
+				"width": 1.6,
+				"depth": 1.3,
+				"height": 2.2
+			},
+			"at": [
+				0,
+				0,
+				0
+			],
+			"role": "paint",
+			"color": "#8fc4c0"
+		},
+		{
+			"name": "roof",
+			"shape": "box",
+			"sizes": {
+				"width": 1.8,
+				"depth": 1.5,
+				"height": 0.12
+			},
+			"at": [
+				0,
+				0,
+				2.2
+			],
+			"role": "paint",
+			"color": "#8fc4c0"
+		},
+		{
+			"name": "sign",
+			"shape": "box",
+			"sizes": {
+				"width": 1.6,
+				"depth": 0.04,
+				"height": 0.25
+			},
+			"at": [
+				0,
+				-0.66,
+				2.32
+			],
+			"role": "paint",
+			"color": "#c0302a"
+		},
+		{
+			"name": "window",
+			"shape": "plane",
+			"sizes": {
+				"width": 1.0,
+				"height": 0.9
+			},
+			"at": [
+				0,
+				-0.66,
+				1.0
+			],
+			"role": "glass",
+			"color": "#9fb8bc"
+		}
+	],
+	"collision": [
+		{
+			"shape": "box",
+			"width": 1.8,
+			"depth": 1.5,
+			"height": 2.5
+		}
+	],
+	"levels": {
+		"near": 600,
+		"mid": 120,
+		"far": 24
+	},
+	"checks": [
+		"Views: front, side, three quarters.",
+		"A light blue box with a red sign under its roof, a window on its front."
+	],
+	"status": {
+		"envelope.width": {
+			"status": "Check",
+			"how": "Photo 0 shows the kiosk at about 60 m; the benches and the scooters near it give 1.5 m to 2 m."
+		},
+		"envelope.depth": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"envelope.height": {
+			"status": "Check",
+			"how": "Photo 0: 2.2 m to 2.8 m from the scooters near it."
+		},
+		"parts.body.sizes.width": {
+			"status": "Check",
+			"how": "See envelope.width."
+		},
+		"parts.body.sizes.depth": {
+			"status": "Check",
+			"how": "See envelope.depth."
+		},
+		"parts.body.sizes.height": {
+			"status": "Check",
+			"how": "See envelope.height."
+		},
+		"parts.body.at": {
+			"status": "Confirmed",
+			"how": "The base point of the model."
+		},
+		"parts.body.color": {
+			"status": "Source",
+			"how": "Photo 0: light blue green panels.",
+			"photos": [
+				0
+			]
+		},
+		"parts.roof.sizes.width": {
+			"status": "Check",
+			"how": "A guess: a little wider than the body (photo 0)."
+		},
+		"parts.roof.sizes.depth": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.roof.sizes.height": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.roof.at": {
+			"status": "Source",
+			"how": "On the body (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.roof.color": {
+			"status": "Source",
+			"how": "As the body (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.sign.sizes.width": {
+			"status": "Source",
+			"how": "Photo 0: the red sign is as wide as the front.",
+			"photos": [
+				0
+			]
+		},
+		"parts.sign.sizes.depth": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.sign.sizes.height": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.sign.at": {
+			"status": "Source",
+			"how": "Under the roof, on the front (photo 0).",
+			"photos": [
+				0
+			]
+		},
+		"parts.sign.color": {
+			"status": "Source",
+			"how": "Photo 0: red with white letters (the letters cannot be read).",
+			"photos": [
+				0
+			]
+		},
+		"parts.window.sizes.width": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.window.sizes.height": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.window.at": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.window.color": {
+			"status": "Check",
+			"how": "A guess."
+		}
+	}
+}

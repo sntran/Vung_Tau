@@ -1,0 +1,257 @@
+{
+	"id": "den_cot_den_cau",
+	"what": "đèn cột đen cầu trắng, the dark post of the park with five white globes",
+	"uses": "Plan 0026, R9: the lamps of the paths of the park (data/showcase/bai_truoc.json, the kind globe_post).",
+	"year": 2019,
+	"photos": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(1).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_flower_bed_2014.jpg",
+			"shows": "The park in the morning: a round flower bed with a ring of red leaves and low yellow green plants in it, a low square white lamp, clipped hedges and round clipped bushes, painted cat sculptures, frangipani trees, coconut palms, a black post with white globes, a blue lamp pole far away."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(2).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_paths_2014.jpg",
+			"shows": "The park in the morning: a path of tiles with a granite curb, a low square white lamp at its side, two women on the path, a granite bench, clipped hedges along the paths, round clipped bushes, granite balls on the lawn, frangipani trees, a black post with white globes, raised lawns and coconut palms."
+		},
+		{
+			"url": "https://www.flickr.com/photos/10598985@N07/27942036338/",
+			"date": "2018-03-08",
+			"license": "all rights reserved",
+			"author": "Flickr user 10598985@N07",
+			"open": false,
+			"shows": "The park under frangipani trees: a dark grey post with five white globes, paths of red tiles, granite benches (a slab on two legs), low square white lamps, lawns, stone sculptures."
+		}
+	],
+	"envelope": {
+		"width": 1.1,
+		"depth": 1.1,
+		"height": 4.3,
+		"tolerance": 0.3
+	},
+	"parts": [
+		{
+			"name": "post",
+			"shape": "cylinder",
+			"sizes": {
+				"height": 3.6,
+				"diameter": 0.12
+			},
+			"at": [
+				0,
+				0,
+				0
+			],
+			"role": "paint",
+			"color": "#3a3d3c"
+		},
+		{
+			"name": "base",
+			"shape": "cylinder",
+			"sizes": {
+				"height": 0.6,
+				"diameter": 0.22
+			},
+			"at": [
+				0,
+				0,
+				0
+			],
+			"role": "paint",
+			"color": "#3a3d3c"
+		},
+		{
+			"name": "arms",
+			"shape": "arc",
+			"sizes": {
+				"reach": 0.35,
+				"rise": 0.15,
+				"bar": 0.03
+			},
+			"count": 4,
+			"at": [
+				0,
+				0,
+				3.55
+			],
+			"role": "paint",
+			"color": "#3a3d3c"
+		},
+		{
+			"name": "globes",
+			"shape": "sphere",
+			"sizes": {
+				"diameter": 0.4
+			},
+			"count": 5,
+			"at": [
+				0,
+				0,
+				3.75
+			],
+			"role": "emissive",
+			"color": "#efeee8"
+		}
+	],
+	"collision": [
+		{
+			"shape": "cylinder",
+			"height": 3.0,
+			"diameter": 0.22
+		}
+	],
+	"levels": {
+		"near": 1500,
+		"mid": 400,
+		"far": 80
+	},
+	"checks": [
+		"Views: front, side, three quarters, far (40 m).",
+		"The height to the top of the top globe is 4.3 m ± 0.3 m.",
+		"Four globes on arms around the post at the same height and one globe on the top."
+	],
+	"status": {
+		"envelope.width": {
+			"status": "Source",
+			"how": "Photo 2: the four arms reach about 2.8 times the diameter of a globe across: 1.1 m.",
+			"photos": [
+				2
+			]
+		},
+		"envelope.depth": {
+			"status": "Source",
+			"how": "As the width: the arms go round the post (photo 2).",
+			"photos": [
+				2
+			]
+		},
+		"envelope.height": {
+			"status": "Source",
+			"how": "Photo 1: the post is 143 px from its foot to the top of its top globe. The woman in green on the near path is 131 px (1.58 m) with her feet 171 px under the line of the sea; the foot of the post is 68 px under it, so at the distance of the post she is 52 px: 4.3 m. The woman on the phone gives 4.4 m.",
+			"photos": [
+				1
+			]
+		},
+		"parts.post.sizes.height": {
+			"status": "Source",
+			"how": "The envelope less the globes (photo 1).",
+			"photos": [
+				1
+			]
+		},
+		"parts.post.sizes.diameter": {
+			"status": "Check",
+			"how": "A guess: a thin post."
+		},
+		"parts.post.at": {
+			"status": "Confirmed",
+			"how": "The base point of the model."
+		},
+		"parts.post.color": {
+			"status": "Source",
+			"how": "Photo 2: the median of the pixels of the post is #4e4f4e; photos 0 and 1 show it near black in the shade.",
+			"photos": [
+				0,
+				1,
+				2
+			]
+		},
+		"parts.base.sizes.height": {
+			"status": "Source",
+			"how": "Photo 1: the wider foot is 20 px of the 143 px of the post: 0.6 m.",
+			"photos": [
+				1
+			]
+		},
+		"parts.base.sizes.diameter": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.base.at": {
+			"status": "Confirmed",
+			"how": "The base point of the model."
+		},
+		"parts.base.color": {
+			"status": "Source",
+			"how": "As the post (photo 2).",
+			"photos": [
+				2
+			]
+		},
+		"parts.arms.sizes.reach": {
+			"status": "Source",
+			"how": "Photos 1 and 2: from the post to the middle of a side globe, 0.9 times the diameter of a globe: 0.35 m.",
+			"photos": [
+				1,
+				2
+			]
+		},
+		"parts.arms.sizes.rise": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.arms.sizes.bar": {
+			"status": "Check",
+			"how": "A guess."
+		},
+		"parts.arms.count": {
+			"status": "Source",
+			"how": "Photo 2: four side globes (two seen from the side, one in front, one behind).",
+			"photos": [
+				2
+			]
+		},
+		"parts.arms.at": {
+			"status": "Source",
+			"how": "Photo 2: under the side globes.",
+			"photos": [
+				2
+			]
+		},
+		"parts.arms.color": {
+			"status": "Source",
+			"how": "As the post (photo 2).",
+			"photos": [
+				2
+			]
+		},
+		"parts.globes.sizes.diameter": {
+			"status": "Source",
+			"how": "Photo 1: a globe is 13 px across at the scale of the post (52 px for 1.58 m): 0.40 m.",
+			"photos": [
+				1
+			]
+		},
+		"parts.globes.count": {
+			"status": "Source",
+			"how": "Photo 2: four side globes and one on the top. Photo 1 shows three or four from its side.",
+			"photos": [
+				1,
+				2
+			]
+		},
+		"parts.globes.at": {
+			"status": "Source",
+			"how": "Photos 1 and 2: the side globes are about one globe under the top globe.",
+			"photos": [
+				1,
+				2
+			]
+		},
+		"parts.globes.color": {
+			"status": "Source",
+			"how": "Photo 2: white glass (the median of a globe in the sun is #e6c7b9 with the light of the evening).",
+			"photos": [
+				2
+			]
+		}
+	}
+}
