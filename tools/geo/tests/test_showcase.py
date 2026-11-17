@@ -125,3 +125,21 @@ def test_the_ground_beside_a_sidewalk_is_at_its_top():
     assert 4.0 < past < top, "the park rises to the sidewalk"
     # The cells of the sidewalk itself (x 48), not the road (x 40) and not the park (x 52).
     assert result["walks"][20, 24] and not result["walks"][20, 20] and not result["walks"][20, 26]
+
+
+def test_the_footways_of_a_park_are_paved():
+    """Report 0026, D-0026-17: a footway in a park for half of its length or
+    more has tiles; a footway out of the parks and a road do not."""
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import build
+
+    park = box(0, 0, 40, 40)
+    inside = SimpleNamespace(id=1, type="footway", points=np.array([[5.0, 5.0], [35.0, 5.0]]))
+    half_out = SimpleNamespace(id=2, type="footway", points=np.array([[30.0, 20.0], [70.0, 20.0]]))
+    outside = SimpleNamespace(id=3, type="footway", points=np.array([[50.0, 50.0], [80.0, 50.0]]))
+    road = SimpleNamespace(id=4, type="residential", points=np.array([[5.0, 10.0], [35.0, 10.0]]))
+    assert build.paved_paths([inside, half_out, outside, road], [park]) == {1}
+    assert build.paved_paths([inside], []) == set()

@@ -1,0 +1,1192 @@
+{
+	"id": "khach_san_buu_dien",
+	"what": "Khách sạn Bưu điện (the Vung Tau P&T Hotel, 158 Hạ Long), at the south end of Bãi Trước: a white tower of 12 storeys with bands of windows between thick white slabs, a round corner of dark glass and a pier of red brown granite at the west end of its front, the top storey of blue glass under a high white band, a white room and a mast on its roof, and on its east side a wing of 3 storeys with the pool on its roof",
+	"way": "order",
+	"order": {
+		"blueprint": "building",
+		"options": {
+			"name": "khach_san_buu_dien",
+			"sources": [
+				"Khách sạn Bưu điện (Vung Tau P&T Hotel, 158 Hạ Long), Vũng Tàu, as in 2019 (plan 0026, R7, D-0026-14). Plan: OpenStreetMap way 259750558 (© OpenStreetMap contributors, ODbL). Look: photos of 2014 (trungydang, Wikimedia Commons, CC BY 3.0), 2021 (Tuong Lam Photos, Wikimedia Commons, CC BY-SA 4.0) and 2024 (Xuanphuocle, Wikimedia Commons, CC0)."
+			],
+			"plan": [
+				[
+					-18.451,
+					-6.14
+				],
+				[
+					-17.237,
+					-33.194
+				],
+				[
+					0.866,
+					-34.297
+				],
+				[
+					1.053,
+					-6.955
+				],
+				[
+					-3.958,
+					-0.003
+				],
+				[
+					-13.799,
+					-1.288
+				]
+			],
+			"storeys": 12,
+			"ground": 3.2,
+			"band": 0.4,
+			"storey": 3.6,
+			"colors": {
+				"wall": "#ebe7dc",
+				"trim": "#f4f2ec",
+				"band": "#f4f2ec",
+				"cornice": "#f4f2ec",
+				"glass": "#3a4655",
+				"frame": "#d3d8da",
+				"rail": "#e9ece9",
+				"deck": "#c49a7c",
+				"ground": "#a49d92"
+			},
+			"cornice": {
+				"high": 2.2,
+				"out": 0.35
+			},
+			"roof": {
+				"kind": "flat",
+				"parapet": 1.0
+			},
+			"fronts": [
+				{
+					"side": 1,
+					"style": "windows",
+					"bays": 7,
+					"inset": 0.6,
+					"window": [
+						1.6,
+						1.6
+					],
+					"sill": 0.9,
+					"bars": 1,
+					"ground": "blank"
+				},
+				{
+					"side": 2,
+					"style": "windows",
+					"bays": 6,
+					"inset": 1.0,
+					"window": [
+						0.6,
+						0.6
+					],
+					"sill": 1.5,
+					"bars": 0,
+					"ground": "blank"
+				},
+				{
+					"side": 3,
+					"style": "windows",
+					"bays": 5,
+					"inset": 0.8,
+					"window": [
+						2.2,
+						1.7
+					],
+					"sill": 0.9,
+					"bars": 2,
+					"ledges": true
+				},
+				{
+					"side": 4,
+					"style": "windows",
+					"bays": 3,
+					"inset": 0.1,
+					"window": [
+						2.75,
+						2.1
+					],
+					"sill": 0.9,
+					"bars": 2,
+					"ground": "blank"
+				},
+				{
+					"side": 5,
+					"style": "windows",
+					"from": 0.0,
+					"to": 8.42,
+					"bays": 4,
+					"inset": 0.1,
+					"window": [
+						1.95,
+						2.1
+					],
+					"sill": 0.9,
+					"bars": 1,
+					"ground": "blank"
+				},
+				{
+					"side": 6,
+					"style": "plain"
+				}
+			],
+			"letters": [],
+			"apron": 0.6,
+			"age": 0.45,
+			"more": {
+				"than": [
+					{
+						"shape": "extrude",
+						"size": {
+							"outline": [
+								[
+									0.549,
+									-30.427
+								],
+								[
+									18.155,
+									-31.537
+								],
+								[
+									18.458,
+									-7.952
+								],
+								[
+									1.053,
+									-6.955
+								]
+							],
+							"depth": 11.8
+						},
+						"at": [
+							0,
+							0,
+							5.9
+						],
+						"color": "#ebe7dc",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						}
+					},
+					{
+						"shape": "extrude",
+						"size": {
+							"outline": [
+								[
+									0.957,
+									-30.052
+								],
+								[
+									17.76,
+									-31.111
+								],
+								[
+									18.053,
+									-8.329
+								],
+								[
+									1.444,
+									-7.378
+								]
+							],
+							"depth": 2.0
+						},
+						"at": [
+							0,
+							0,
+							11.8
+						],
+						"color": "#c49a7c",
+						"mode": "subtract",
+						"roughness": 0.95,
+						"surface": {
+							"kind": "concrete",
+							"scale": 0.05
+						}
+					},
+					{
+						"shape": "box",
+						"size": [
+							5.6,
+							3.4,
+							0.7
+						],
+						"at": [
+							9.013,
+							-13.421,
+							10.8
+						],
+						"axis": [
+							0,
+							0,
+							1
+						],
+						"up": [
+							0.057189,
+							0.998363,
+							0
+						],
+						"color": "#2f6fa8",
+						"mode": "subtract",
+						"roughness": 0.05
+					},
+					{
+						"shape": "box",
+						"size": [
+							8.317,
+							1.35,
+							0.25
+						],
+						"at": [
+							9.755,
+							-7.454,
+							1.75
+						],
+						"color": "#2e3a48",
+						"axis": [
+							0.057189,
+							0.998363,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.12,
+						"metal": 0.25
+					},
+					{
+						"shape": "box",
+						"size": [
+							8.317,
+							1.3,
+							0.25
+						],
+						"at": [
+							9.755,
+							-7.454,
+							5.35
+						],
+						"color": "#2d4a6e",
+						"axis": [
+							0.057189,
+							0.998363,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.12,
+						"metal": 0.25
+					},
+					{
+						"shape": "box",
+						"size": [
+							11.393,
+							1.35,
+							0.25
+						],
+						"at": [
+							18.306,
+							-19.744,
+							1.75
+						],
+						"color": "#2e3a48",
+						"axis": [
+							0.999917,
+							-0.012846,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.12,
+						"metal": 0.25
+					},
+					{
+						"shape": "box",
+						"size": [
+							11.393,
+							1.3,
+							0.25
+						],
+						"at": [
+							18.306,
+							-19.744,
+							5.35
+						],
+						"color": "#2d4a6e",
+						"axis": [
+							0.999917,
+							-0.012846,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.12,
+						"metal": 0.25
+					},
+					{
+						"shape": "box",
+						"size": [
+							8.42,
+							1.35,
+							0.25
+						],
+						"at": [
+							9.352,
+							-30.982,
+							1.75
+						],
+						"color": "#2e3a48",
+						"axis": [
+							-0.062922,
+							-0.998018,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.12,
+						"metal": 0.25
+					},
+					{
+						"shape": "box",
+						"size": [
+							8.42,
+							1.3,
+							0.25
+						],
+						"at": [
+							9.352,
+							-30.982,
+							5.35
+						],
+						"color": "#2d4a6e",
+						"axis": [
+							-0.062922,
+							-0.998018,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.12,
+						"metal": 0.25
+					},
+					{
+						"shape": "box",
+						"size": [
+							4.135,
+							1.35,
+							0.25
+						],
+						"at": [
+							-1.453,
+							-3.479,
+							1.75
+						],
+						"color": "#2e3a48",
+						"axis": [
+							0.811227,
+							0.584732,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.12,
+						"metal": 0.25
+					},
+					{
+						"shape": "box",
+						"size": [
+							4.135,
+							1.35,
+							0.25
+						],
+						"at": [
+							-1.453,
+							-3.479,
+							5.35
+						],
+						"color": "#2d4a6e",
+						"axis": [
+							0.811227,
+							0.584732,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.12,
+						"metal": 0.25
+					},
+					{
+						"shape": "box",
+						"size": [
+							4.235,
+							1.5,
+							0.25
+						],
+						"at": [
+							-1.453,
+							-3.479,
+							9.0
+						],
+						"color": "#ebe7dc",
+						"axis": [
+							0.811227,
+							0.584732,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.85
+					},
+					{
+						"shape": "box",
+						"size": [
+							4.812,
+							1.35,
+							0.25
+						],
+						"at": [
+							-8.878,
+							-0.646,
+							1.75
+						],
+						"color": "#2e3a48",
+						"axis": [
+							-0.129477,
+							0.991582,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.12,
+						"metal": 0.25
+					},
+					{
+						"shape": "box",
+						"size": [
+							4.812,
+							1.35,
+							0.25
+						],
+						"at": [
+							-8.878,
+							-0.646,
+							5.35
+						],
+						"color": "#2d4a6e",
+						"axis": [
+							-0.129477,
+							0.991582,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.12,
+						"metal": 0.25
+					},
+					{
+						"shape": "box",
+						"size": [
+							4.912,
+							1.5,
+							0.25
+						],
+						"at": [
+							-8.878,
+							-0.646,
+							9.0
+						],
+						"color": "#ebe7dc",
+						"axis": [
+							-0.129477,
+							0.991582,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.85
+					},
+					{
+						"shape": "box",
+						"size": [
+							4.585,
+							0.45,
+							0.5
+						],
+						"at": [
+							-1.25,
+							-3.333,
+							11.2
+						],
+						"color": "#f4f2ec",
+						"axis": [
+							0.811227,
+							0.584732,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"repeat": {
+							"count": 9,
+							"move": [
+								0,
+								0,
+								3.6
+							]
+						}
+					},
+					{
+						"shape": "box",
+						"size": [
+							4.362,
+							0.45,
+							0.5
+						],
+						"at": [
+							-8.018,
+							-0.281,
+							11.2
+						],
+						"color": "#f4f2ec",
+						"axis": [
+							-0.129477,
+							0.991582,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"repeat": {
+							"count": 9,
+							"move": [
+								0,
+								0,
+								3.6
+							]
+						}
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.75,
+							16.05,
+							0.4
+						],
+						"at": [
+							-13.055,
+							-1.191,
+							26.85
+						],
+						"color": "#8a5a4c",
+						"axis": [
+							-0.129477,
+							0.991582,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"roughness": 0.6,
+						"surface": {
+							"kind": "stone",
+							"scale": 0.05
+						}
+					},
+					{
+						"shape": "box",
+						"size": [
+							4.085,
+							1.1,
+							0.25
+						],
+						"at": [
+							-1.453,
+							-3.479,
+							41.55
+						],
+						"color": "#3f5f8f",
+						"axis": [
+							0.811227,
+							0.584732,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.12,
+						"metal": 0.25
+					},
+					{
+						"shape": "box",
+						"size": [
+							4.762,
+							1.1,
+							0.25
+						],
+						"at": [
+							-8.878,
+							-0.646,
+							41.55
+						],
+						"color": "#3f5f8f",
+						"axis": [
+							-0.129477,
+							0.991582,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.12,
+						"metal": 0.25
+					},
+					{
+						"shape": "box",
+						"size": [
+							13.471,
+							1.1,
+							0.25
+						],
+						"at": [
+							0.96,
+							-20.626,
+							41.55
+						],
+						"color": "#3f5f8f",
+						"axis": [
+							0.999977,
+							-0.006839,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.12,
+						"metal": 0.25
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							3.511,
+							21.45
+						],
+						"at": [
+							-15.764,
+							-4.06,
+							21.45
+						],
+						"color": "#55504b",
+						"roughness": 0.12,
+						"metal": 0.25
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							3.551,
+							0.06
+						],
+						"at": [
+							-15.764,
+							-4.06,
+							3.6
+						],
+						"color": "#d3d8da",
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.6,
+						"repeat": {
+							"count": 11,
+							"move": [
+								0,
+								0,
+								3.6
+							]
+						}
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							3.861,
+							1.1
+						],
+						"at": [
+							-15.764,
+							-4.06,
+							44.0
+						],
+						"color": "#f4f2ec",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						}
+					},
+					{
+						"shape": "extrude",
+						"size": {
+							"outline": [
+								[
+									-17.993,
+									-6.312
+								],
+								[
+									-16.806,
+									-32.769
+								],
+								[
+									0.419,
+									-33.819
+								],
+								[
+									0.602,
+									-7.099
+								],
+								[
+									-4.166,
+									-0.484
+								],
+								[
+									-13.584,
+									-1.714
+								]
+							],
+							"depth": 2.0
+						},
+						"at": [
+							0,
+							0,
+							45.3
+						],
+						"color": "#c49a7c",
+						"mode": "subtract",
+						"roughness": 0.95,
+						"surface": {
+							"kind": "concrete",
+							"scale": 0.05
+						}
+					},
+					{
+						"shape": "box",
+						"size": [
+							4.5,
+							3.0,
+							1.6
+						],
+						"at": [
+							-5.771,
+							-5.282,
+							45.9
+						],
+						"axis": [
+							0,
+							0,
+							1
+						],
+						"up": [
+							-0.044828,
+							0.998995,
+							0
+						],
+						"color": "#ebe7dc",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						}
+					},
+					{
+						"shape": "box",
+						"size": [
+							1.8,
+							1.8,
+							1.4
+						],
+						"at": [
+							-13.47,
+							-31.019,
+							45.7
+						],
+						"axis": [
+							0,
+							0,
+							1
+						],
+						"up": [
+							-0.044828,
+							0.998995,
+							0
+						],
+						"color": "#ebe7dc",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						}
+					},
+					{
+						"shape": "box",
+						"size": [
+							1.8,
+							1.8,
+							1.4
+						],
+						"at": [
+							-2.609,
+							-31.681,
+							45.7
+						],
+						"axis": [
+							0,
+							0,
+							1
+						],
+						"up": [
+							-0.044828,
+							0.998995,
+							0
+						],
+						"color": "#ebe7dc",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						}
+					},
+					{
+						"shape": "box",
+						"size": [
+							1.3,
+							0.9,
+							1.0
+						],
+						"at": [
+							-3.531,
+							-19.228,
+							45.3
+						],
+						"axis": [
+							0,
+							0,
+							1
+						],
+						"up": [
+							-0.044828,
+							0.998995,
+							0
+						],
+						"color": "#c9ced1",
+						"roughness": 0.5
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.18,
+							3.5
+						],
+						"at": [
+							-2.975,
+							-11.029,
+							47.8
+						],
+						"color": "#b7bcc0",
+						"roughness": 0.4,
+						"metal": 0.6
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.16,
+							0.08,
+							0.7
+						],
+						"at": [
+							-2.525,
+							-11.029,
+							50.4
+						],
+						"color": "#e4e6e6",
+						"roughness": 0.5,
+						"repeat": {
+							"count": 3,
+							"center": [
+								-2.975,
+								-11.029,
+								0
+							]
+						}
+					}
+				]
+			}
+		}
+	},
+	"sources": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:V%C5%A9ng_T%C3%A0u,_Ba_Ria_-_Vung_Tau,_Vietnam_-_panoramio_(2).jpg",
+			"date": "2014-04-05 17:53",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "shot_s1_2014.jpg",
+			"shows": "Photo 0 (the shot S1). The beach to the south, from about 400 m: the north front of the tower, 9 rows of dark windows between white bands with slabs, the bands bend at the corners of the front; the left part is the east face; at the right end a strip of red brown stone and brown glass; over the top row a white band (with the letters VUNG TAU P&T HOTEL); on the roof a white room at each end, a box and a mast with panels and a dish. The podium is behind the low buildings in front."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Vung_Tau,_Viet_Nam.jpg",
+			"date": "2021-01-30 14:44",
+			"license": "CC BY-SA 4.0",
+			"author": "Tuong Lam Photos",
+			"open": true,
+			"file": "drone_2021_ha_long.jpg",
+			"shows": "Photo 1. From a drone over Hạ Long, from the south-east: the south face (white, small windows, ledges at each floor, a stair core) and the east face (pairs of windows in bays at an angle, an air conditioner on a ledge at each window); the roof of terracotta tiles with a white room and a mast at the front end and two stair heads at the back; the pool on the roof of a wing of 3 storeys on the east side of the tower."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Vung_Tau,_Viet_Nam_2021.jpg",
+			"date": "2021-01-30 14:43",
+			"license": "CC BY-SA 4.0",
+			"author": "Tuong Lam Photos",
+			"open": true,
+			"file": "drone_2021_park.jpg",
+			"shows": "Photo 2. From a drone over the south end of the park, from the east: the east face with its top row of blue glass and 8 rows of windows with air conditioners over the roof of the wing, the pool and its deck of tiles, a white parapet with dark glass under it on the east side of the wing, the white room and the masts on the roof."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Ks_Buu_Dien_Vung_tau,_tp_Vungtau,_duong_Ha_long,_Vietnam_-_panoramio.jpg",
+			"image": "https://commons.wikimedia.org/wiki/Special:FilePath/Ks_Buu_Dien_Vung_tau%2C_tp_Vungtau%2C_duong_Ha_long%2C_Vietnam_-_panoramio.jpg?width=1280",
+			"date": "2014-04-11 or before (the upload to Panoramio)",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "buu_dien_2014.jpg",
+			"shows": "Photo 3 (black and white). From the sea side of Hạ Long, to the south-east: the front with its bands of windows and white slabs, the full high round wall of glass with the stair in it at the west end, the west face with rows of windows; a podium of 3 storeys with the sign of the hotel. An open photo: its copy is not in docs/reference/photos/ yet."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Building_on_Ha_Long_street_in_Vung_Tau_030324_1.jpg",
+			"image": "https://commons.wikimedia.org/wiki/Special:FilePath/Building_on_Ha_Long_street_in_Vung_Tau_030324_1.jpg?width=1280",
+			"date": "2024-03-06",
+			"license": "CC0",
+			"author": "Xuanphuocle",
+			"open": true,
+			"file": "buu_dien_2024.jpg",
+			"shows": "Photo 4. From the corner of Quang Trung and Hạ Long, to the south-west: the east face and the front; the ground storey with columns, a storey of dark blue glass and a white storey with a logo (the podium); 8 rows of windows and the top row of blue glass; the white band with the letters P&T HOTEL and three masts on the roof; the terrace with a rail of glass over the wing on the left. An open photo: its copy is not in docs/reference/photos/ yet."
+		},
+		{
+			"url": "https://pthotel.vn",
+			"image": "https://pthotel.vn/wp-content/uploads/2023/06/1A3A2692-scaled.jpg",
+			"date": "2023-06 or before (the folder of the upload on the site); the second photo of the site, wp-content/uploads/2023/04/gt.jpg, 2023-04 or before",
+			"license": "all rights reserved",
+			"author": "Vung Tau P&T Hotel (the site of the hotel)",
+			"open": false,
+			"file": "pthotel_2023_1a3a2692.jpg",
+			"shows": "Photo 5. From across Hạ Long: the front with 8 rows of windows, the top row of blue glass and the white band with letters; thick white slabs with round ends; a pier of red brown granite; the round wall of dark glass in a grid of panes at the west end, under a round white top; the podium: a white storey with a logo, a storey of dark blue glass, the shops; the wing of 3 storeys on the left with a rail of glass on its roof."
+		},
+		{
+			"url": "https://www.flickr.com/photos/beos_album/50955595227/",
+			"image": "https://live.staticflickr.com/65535/50955595227_b86c7c86b7_b.jpg",
+			"date": "2019-02-02 (Flickr: date taken)",
+			"license": "all rights reserved",
+			"author": "Nguyễn Huỳnh Hữu Nghĩa (Flickr beos_album)",
+			"open": false,
+			"file": "flickr_50955595227_b.jpg",
+			"shows": "Photo 6. The beach to the south at sunset, from far: the tower with its white bands, a strip of glass that shines gold at its west end, the masts on the roof; the tower of Cao ốc Sen Biển and its terraces."
+		},
+		{
+			"url": "https://tuoitre.vn/vung-tau-sau-30-nam-thanh-lap-thu-ngan-sach-gap-gan-300-lan-20211230155102555.htm",
+			"image": "https://cdn.tuoitre.vn/2021/12/30/logo-du-khach-30-4-2019-20-1640854141848374700459.jpg",
+			"date": "2019-04-30 (the name of the file; the article is of 2021-12-30)",
+			"license": "all rights reserved",
+			"author": "Đông Hà, Tuổi Trẻ",
+			"open": false,
+			"file": "tuoitre_2019_04_30.jpg",
+			"shows": "Photo 7. The beach to the south, from far: the tower with its white bands and dark windows, the brown strip of glass at its west end, the white band and the masts on the roof."
+		},
+		{
+			"url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
+			"image": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/19/247001/418082",
+			"date": "unknown (Esri does not give the date of this image)",
+			"license": "Esri World Imagery terms of use (not open)",
+			"author": "Esri and its providers",
+			"open": false,
+			"file": "buu_dien_esri_z19.jpg",
+			"shows": "Photo 8. From above (tiles of zoom 19): the pool on a low wing at the east side of the tower, inside the outline of way 259750558; the long white roof of way 580493843 east of it; the tower leans to the south-west in the image (a tall building), with its roof of tiles, a round end at the north-west and the white room."
+		}
+	],
+	"sizes": {
+		"plan_tower": {
+			"value": "19.6 m along Hạ Long (from the round corner to the corner of the wing), 27.1 m and 27.3 m deep; a front of two faces of 9.9 m and 8.6 m",
+			"unit": "",
+			"source": "The west part of the outline of OpenStreetMap (way 259750558; © OpenStreetMap contributors, ODbL): its corners A, B, C, G, H, I (C to G is a new side along the east face). The tower is not the whole outline: in photo 0 the tower is 270 px wide, and the whole outline is 320 px wide from the place of the camera; photos 1, 2 and 8 show the pool east of the tower, inside the outline."
+		},
+		"plan_wing": {
+			"value": "17.4 m along Hạ Long by 23.6 m",
+			"unit": "",
+			"source": "The east part of the same outline (its corners C, D, E, F), 7 m behind the front of the tower: photos 1, 2, 4 and 5."
+		},
+		"storeys": {
+			"value": 12,
+			"unit": "",
+			"source": "Photos 4 (2024) and 5 (2023): the ground storey, a storey of dark blue glass and a white storey (the podium), 8 rows of windows and the top row of blue glass. Photo 0 (2014): 9 rows of windows over the podium, under the white band. Photo 2 (2021): the top row and 8 rows on the east face over the roof of the wing."
+		},
+		"storey": {
+			"value": 3.6,
+			"unit": "m",
+			"source": "Photo 0: 34.4 px from a row of windows to the next (275 px over 8 rows). The scale: the hall with the orange roof (way 225803473) is 25 m wide in this view (26.6 m with its eaves) and 235 px wide in photo 0: 0.113 m a px at the hall. The place of the camera that fits the hall and the tower (about x -35, z -120 of the game) puts the tower at 0.92 times the distance of the hall: 0.104 m a px. 34.4 px × 0.104 m = 3.6 m (the scale can be wrong by 5 %)."
+		},
+		"ground_storey": {
+			"value": "3.2 m to the lintel, 3.6 m to the next floor",
+			"unit": "",
+			"source": "Photo 4: the ground storey is as high as the other storeys. The lintel is an estimate (no source)."
+		},
+		"height": {
+			"value": "42.9 m to the eaves, 45.1 m to the top of the white band, 51.3 m to the top of the mast",
+			"unit": "",
+			"source": "From the storeys and the storey. Photo 0: the white band over the top row is 20 px high (2.1 m: 2.2 m in the model); the mast is 60 px over the band (6.2 m: 7 m from the deck of the roof in the model)."
+		},
+		"bands_of_windows": {
+			"value": "windows 2.1 m high from 0.9 m over each floor; white slabs 0.9 m high, 0.75 m out, under each row",
+			"unit": "",
+			"source": "Photo 0: the dark row of glass is 20 px of the 34.4 px of a storey (2.1 m), the white band 14 px (1.5 m) with a slab out at its foot; photo 5 (2023): thick white slabs with round ends. The depth of the slabs is an estimate (no source)."
+		},
+		"round_corner": {
+			"value": "a cylinder of dark glass of 3.5 m radius from the ground to the eaves, white floor lines, under a round white top in the band",
+			"unit": "",
+			"source": "Photo 0 (2014): 30 px of brown glass at the west end (3.1 m in this view); photos 3 (2014) and 5 (2023): a round wall of glass from the podium to the roof, at the west end of the front; photos 6 and 7 (2019): a dark strip of glass that shines at the west end. The radius is an estimate from photo 5 (about the width of two bays of the front)."
+		},
+		"granite_pier": {
+			"value": "1.5 m wide, red brown",
+			"unit": "",
+			"source": "Photo 0 (2014): a red brown strip between the bands and the glass; photo 5 (2023): a pier of red brown granite. The width is an estimate (no source)."
+		},
+		"podium": {
+			"value": "the ground storey of dark glass, the second storey a band of dark blue glass, the third storey white",
+			"unit": "",
+			"source": "Photos 4 (2024) and 5 (2023); photo 3 (2014): a band with the sign of the hotel at the third storey."
+		},
+		"top_storey": {
+			"value": "a row of blue glass",
+			"unit": "",
+			"source": "Photo 2 (2021, the east face), photos 4 (2024) and 5 (2023), the front and the east face. Photo 0 (2014) shows dark glass there: the glass changed between 2014 and 2021."
+		},
+		"wing": {
+			"value": "3 storeys, the deck at 10.8 m, a parapet of 1.0 m; the pool 11.2 m by 6.8 m, 0.7 m into the deck",
+			"unit": "",
+			"source": "Photos 1 and 2 (2021): the pool on the roof of the wing on the east side of the tower, the deck at the floor of the fourth storey of the tower; photo 5 (2023): the front of the wing, 3 storeys with a rail of glass on its roof. The size of the pool is an estimate from photo 8."
+		},
+		"roof": {
+			"value": "a deck of terracotta tiles 0.8 m under the top of the white band; a white room of 9 m by 6 m by 3.2 m on the front part; two stair heads of 3.6 m at the back; a box; a mast of 7 m with three panels",
+			"unit": "",
+			"source": "Photos 1 and 2 (2021) and photo 0 (2014) show these things; their sizes are estimates (no source)."
+		},
+		"faces": {
+			"value": "the east face: 5 bays of a pair of windows (2.2 m by 1.7 m) with an air conditioner on a ledge at each storey; the south face: 6 small windows a storey; the west face: 7 windows a storey",
+			"unit": "",
+			"source": "Photos 1 and 2 (2021) and 4 (2024): the east face and the south face. The bays of the east face stand out at an angle (a saw tooth) in photos 1 and 2: the model has a flat face with the same windows. Photo 3 (2014) shows rows of windows on the west face; no photo of 2017 or later shows the west face, so its windows are an estimate, as the back of Hải Âu. The counts are estimates."
+		},
+		"colors": {
+			"value": "walls #ebe7dc, bands and slabs #f4f2ec, windows #3a4655, top row #3f5f8f, podium #2e3a48 and #2d4a6e, round corner #55504b, pier #8a5a4c, deck #c49a7c, pool #2f6fa8",
+			"unit": "",
+			"source": "Photo 0 (2014): cream white walls, dark windows, brown glass at the west end; photos 1 and 2 (2021): white walls, a deck of terracotta tiles, a blue pool; photos 4 and 5 (2023, 2024): the blue top row, the dark blue glass of the podium, the dark glass of the round corner, the red brown granite."
+		},
+		"letters": {
+			"value": "none",
+			"unit": "",
+			"source": "Photos 0, 4 and 5 show the letters of the hotel (VUNG TAU P&T HOTEL, P&T HOTEL) on the white band. The model has no letters: they are the name of a business, and I did not approve them (the design rules of the game: no real businesses)."
+		}
+	},
+	"looks": [],
+	"status": "Source",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"uses": "Plan 0026, R7, D-0026-14: on its OSM outline (way/259750558) by Hạ Long, in place of its stand-in; the shot S1 shows it.",
+	"impostor": false
+}

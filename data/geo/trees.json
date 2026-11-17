@@ -89,7 +89,85 @@
 				30.0
 			],
 			"comment": "Plan 0026, R9: many coconut palms of the park of Bãi Trước lean by 10 to 35 degrees, in all directions (the photos of S2 of 2014, Wikimedia Commons, trungydang, CC BY 3.0). The share and the angles are builder values from the photos."
-		}
+		},
+		"groves": [
+			{
+				"name": "S2",
+				"outline": [
+					[
+						-8.3,
+						-202.8
+					],
+					[
+						-14.7,
+						-203.6
+					],
+					[
+						-46.1,
+						-174.3
+					],
+					[
+						-17.3,
+						-155.4
+					],
+					[
+						15.1,
+						-166.7
+					]
+				],
+				"spacing_m": 6.5,
+				"gap": 0.55,
+				"jitter_m": 1.6,
+				"mix": {
+					"coconut": 1.0
+				},
+				"seed": 202,
+				"lean": {
+					"types": [
+						"coconut"
+					],
+					"share": 0.85,
+					"deg": [
+						8.0,
+						32.0
+					],
+					"toward_part": 0.7,
+					"toward_deg": 270.0,
+					"spread_deg": 50.0
+				},
+				"comment": "Report 0026, D-0026-17: the grove of leaning coconut palms of the photo of S2 (Commons, trungydang, 2014-04-05, CC BY 3.0, docs/reference/photos/shot_s2_2014.jpg), in the frame of S2 (the eye of data/showcase/shots.json, from 5 m to 50 m, 40 degrees to each side of its heading): about 20 palms 5 m to 8 m apart on the lawn (6.5 m: with 5 m, the 39 palms of the grove made S2 370 000 triangles on Low, PT-73), most of them leaning by 10 to 35 degrees, more to the sea (to -x) than to other sides. The Norfolk pines of the photo stand at its side to the sea (the grove S2 pines). The trees of the other rules in the outline give their place to the grove. The spacing, the parts, and the angles are builder values from the photo."
+			},
+			{
+				"name": "S2 pines",
+				"outline": [
+					[
+						-28.0,
+						-190.0
+					],
+					[
+						-36.0,
+						-193.0
+					],
+					[
+						-50.0,
+						-166.0
+					],
+					[
+						-40.0,
+						-160.0
+					]
+				],
+				"spacing_m": 8.0,
+				"gap": 0.6,
+				"jitter_m": 1.5,
+				"mix": {
+					"araucaria": 1.0
+				},
+				"seed": 203,
+				"lean": {},
+				"comment": "Report 0026, D-0026-17: the Norfolk pines at the right of the photo of S2, between the grove and the walk of the sea (to -x). The trees of the grove S2 in this outline give their place to them."
+			}
+		]
 	},
 	"osm_trees": {
 		"comment": "OSM natural=tree nodes and natural=tree_row ways. A tag genus or species can select the type.",

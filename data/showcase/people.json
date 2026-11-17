@@ -1,5 +1,5 @@
 {
-	"note": "Plan 0026, R10, D8: the people of the showcase of Bãi Trước (scenes/world/showcase_people.gd). The walkers go back and forth along the footways of the park and the ways of the walk of the sea, keep_right_m to the right of the middle of the way (less on a narrow way), and stop when the player stands in front of them; the sitters sit on the borders of the raised lawns, with their backs to the lawn. hours gives the part of the people that is there at each hour: [hour, part]. At 17:00 all of them are there (about 40, R10); at noon fewer. The culture notes (Confirmed): in the evening many families come to Bãi Trước, swim, and sit on the paved edge of the park. The swimmers wait for the swim clothes and the swim rings of World (request Q-W6). The counts and the parts are builder values. spots: some of the walkers walk on a short way in the frame of a shot (report 0026, D-0026-07: at 17:00 people walk on the walk of the sea and in the park, near the places of the shots and of the player); the others go on the ways of the park.",
+	"note": "Plan 0026, R10, D8: the people of the showcase of Bãi Trước (scenes/world/showcase_people.gd). The walkers go back and forth along the footways of the park and the ways of the walk of the sea, keep_right_m to the right of the middle of the way (less on a narrow way), and stop when the player stands in front of them; the sitters sit on the borders of the raised lawns, with their backs to the lawn. hours gives the part of the people that is there at each hour: [hour, part]. At 17:00 all of them are there (about 40, R10); at noon fewer. The culture notes (Confirmed): in the evening many families come to Bãi Trước, swim, and sit on the paved edge of the park. The counts and the parts are builder values. spots: some of the walkers walk on a short way in the frame of a shot (report 0026, D-0026-07: at 17:00 people walk on the walk of the sea and in the park, near the places of the shots and of the player); the others go on the ways of the park.",
 	"seed": 26,
 	"hours": [
 		[
@@ -57,6 +57,7 @@
 			"walker_1",
 			"walker_2",
 			"walker_3",
+			"non_rong_vanh",
 			"walker_4",
 			"walker_5",
 			"walker_6"
@@ -153,7 +154,8 @@
 					]
 				]
 			}
-		]
+		],
+		"models_note": "non_rong_vanh: the woman in the wide sun hat of report 0026, Q19 (data/world/drawings/non_rong_vanh.json)."
 	},
 	"sitters": {
 		"count": 12,
@@ -164,5 +166,125 @@
 		],
 		"every_m": 1.8,
 		"out_m": 0.3
+	},
+	"swimmers": {
+		"note": "Report 0026, D-0026-20 and Q20: the swimmers of Bãi Trước in T-shirts and shorts (the person blueprint of World: swimmer_1 to swimmer_4, and walker_5, a boy in a T-shirt and quần đùi), some with a swim ring phao_boi at the water line: a child stands in its ring, an adult holds the ring at its side. Each swimmer has a point on the line, which is on the sand at the top of the beach in front of the shot S1 (the ground of the game is 1.5 m there), and goes out along to_sea (at right angles to the water's edge from z -200 to z -60) to the point where the water at its feet is its depth (depth_m, child_depth_m for a person younger than child_age), at each sea level of the tide. hours: the part of the swimmers in the sea at each hour (the culture notes: people swim at Bãi Trước early in the morning and in the evening; no photo gives the counts). The count, the depths, the part with a ring, and the hours are builder values.",
+		"count": 14,
+		"models": [
+			"swimmer_1",
+			"swimmer_2",
+			"swimmer_3",
+			"walker_5",
+			"swimmer_4",
+			"swimmer_2",
+			"swimmer_1"
+		],
+		"line": [
+			[
+				-56.0,
+				-200.0
+			],
+			[
+				-52.0,
+				-180.0
+			],
+			[
+				-44.0,
+				-160.0
+			],
+			[
+				-37.0,
+				-140.0
+			],
+			[
+				-31.0,
+				-120.0
+			],
+			[
+				-25.0,
+				-100.0
+			],
+			[
+				-20.0,
+				-80.0
+			],
+			[
+				-15.0,
+				-62.0
+			]
+		],
+		"to_sea": [
+			-0.93,
+			0.36
+		],
+		"depth_m": [
+			0.6,
+			1.0
+		],
+		"child_depth_m": [
+			0.5,
+			0.7
+		],
+		"child_age": 14,
+		"ring_model": "phao_boi",
+		"ring_part": 0.4,
+		"hours": [
+			[
+				0.0,
+				0.0
+			],
+			[
+				4.5,
+				0.0
+			],
+			[
+				5.5,
+				0.6
+			],
+			[
+				7.0,
+				0.4
+			],
+			[
+				9.0,
+				0.1
+			],
+			[
+				11.0,
+				0.05
+			],
+			[
+				14.0,
+				0.05
+			],
+			[
+				15.5,
+				0.3
+			],
+			[
+				16.5,
+				0.8
+			],
+			[
+				17.0,
+				1.0
+			],
+			[
+				18.5,
+				0.6
+			],
+			[
+				19.5,
+				0.1
+			],
+			[
+				20.0,
+				0.0
+			],
+			[
+				24.0,
+				0.0
+			]
+		]
 	}
 }

@@ -76,6 +76,17 @@ const MARKER_HEIGHT := 30.0
 const MARKER_SPACING := 120.0
 const MARKER_STACK := 16.0
 const TEXTURE_ROOT := "res://assets/textures/ground/"
+## The tint of the asphalt texture: the roads of the photos of Bãi Trước (S3, S4,
+## 2014) are dark grey, about #3c3d3f in the sun (report 0026, D-0026-18).
+const ASPHALT_TINT := Color(0.68, 0.68, 0.71)
+## The tiles of the footways (report 0026, D-0026-17): the side of the texture
+## (m), the tiles on a side, and the colors of the tiles and of the joints.
+const PAVING_TEXTURE_M := 1.6
+const PAVING_TILES := 4
+const PAVING_COLOR := Color("#9a7562")
+const PAVING_JOINT := Color("#6f5a4e")
+## The light of the haze of the far land at night, of its light in the day (D-0026-15).
+const FAR_HAZE_NIGHT := 0.08
 const TEXTURE_COLORS := {"sand": Color("#D9C79E"), "grass": Color("#6E8A47"), "rock": Color("#7D766C"),
 		"town": Color("#B3ADA3"), "wood": Color("#3F5A2C"), "asphalt": Color("#4A4A4C"),
 		"concrete": Color("#A9A59C")}
@@ -469,6 +480,13 @@ func update_time(minutes: int, day: int) -> void:
 	environment.tonemap_exposure = lerpf(1.5, 1.0, high)
 	environment.fog_light_color = ambient.darkened(0.15)
 	environment.fog_light_energy = lerpf(0.25, 1.0, twilight)
+	# The light of the haze of the far land (report 0026, D-0026-15).
+	var haze_light := lerpf(FAR_HAZE_NIGHT, 1.0, twilight)
+	_ground_material.set_shader_parameter("far_haze_light", haze_light)
+	if canopy:
+		for each: ShaderMaterial in [canopy.material, canopy.dense_material]:
+			if each:
+				each.set_shader_parameter("far_haze_light", haze_light)
 	var colors := sky_colors(elevation)
 	# The beauty pass (plan 0026, R13): the grading of the hour.
 	var grade := Grading.at(minutes, Quality.current_renderer())
@@ -830,7 +848,7 @@ func _show_far(key: Vector2i) -> void:
 
 
 func _add_roads(node: Node3D, body: StaticBody3D, roads: Dictionary) -> void:
-	for kind: String in ["asphalt", "concrete", "dirt", "sidewalk", "lines"]:
+	for kind: String in ["asphalt", "concrete", "dirt", "paving", "sidewalk", "lines"]:
 		if roads[kind] == null:
 			continue
 		var mesh := ArrayMesh.new()
@@ -1318,18 +1336,29 @@ func _make_materials() -> void:
 	if not bay.is_empty():
 		_sea_material.set_shader_parameter("calm_center", Vector2(bay.position[0], bay.position[1]))
 		_sea_material.set_shader_parameter("calm_radius", CALM_BAY_RADIUS)
-	for kind: String in ["asphalt", "concrete", "dirt", "sidewalk", "lines"]:
+	for kind: String in ["asphalt", "concrete", "dirt", "paving", "sidewalk", "lines"]:
 		var material := StandardMaterial3D.new()
 		material.cull_mode = BaseMaterial3D.CULL_DISABLED
 		material.roughness = 0.9
 		match kind:
 			"asphalt":
 				material.albedo_texture = _texture_or_color("asphalt", "asphalt")
-				material.uv1_scale = Vector3(1.0, 1.0, 1.0)
+				# Dark smooth asphalt, as in the photos of Quang Trung and Hạ Long
+				# (report 0026, D-0026-18): the texture (mean #5a5a55) is darker.
+				material.albedo_color = ASPHALT_TINT
+				material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 			"concrete":
 				material.albedo_texture = _texture_or_color("concrete", "concrete")
 			"dirt":
 				material.albedo_color = Color("#9C8462")
+			"paving":
+				# The square tiles of the paths of the park (report 0026,
+				# D-0026-17; park_paths_2014.jpg: tiles of about 40 cm, brown red
+				# against the grey granite of the borders).
+				material.albedo_texture = _tile_texture()
+				var repeat := RoadBuilder.TEXTURE_M / PAVING_TEXTURE_M
+				material.uv1_scale = Vector3(repeat, repeat, 1.0)
+				material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 			"sidewalk":
 				material.albedo_texture = _texture_or_color("concrete", "concrete")
 				material.albedo_color = Color("#C9B9A6")
@@ -1358,6 +1387,27 @@ static func roof_colors() -> Array[Color]:
 	while result.size() < 8:
 		result.append(Color("#B28469"))
 	return result
+
+
+## A texture of square tiles with joints (PAVING_TILES on a side), each tile a
+## little lighter or darker.
+static func _tile_texture() -> Texture2D:
+	const SIZE := 256
+	var image := Image.create(SIZE, SIZE, false, Image.FORMAT_RGB8)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 17
+	var cell := SIZE / PAVING_TILES
+	for ty in PAVING_TILES:
+		for tx in PAVING_TILES:
+			var tile := PAVING_COLOR * rng.randf_range(0.9, 1.08)
+			for y in cell:
+				for x in cell:
+					var joint := x < 2 or y < 2
+					var grain := rng.randf_range(0.96, 1.04)
+					var c := PAVING_JOINT if joint else tile * grain
+					image.set_pixel(tx * cell + x, ty * cell + y, Color(c.r, c.g, c.b))
+	image.generate_mipmaps()
+	return ImageTexture.create_from_image(image)
 
 
 func _texture_or_color(texture_kind: String, color_kind: String) -> Texture2D:

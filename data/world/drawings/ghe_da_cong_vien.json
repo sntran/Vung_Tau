@@ -2,7 +2,7 @@
 	"id": "ghe_da_cong_vien",
 	"what": "ghế đá công viên: the bench of dark polished granite of the park of Bãi Trước, a slab on two slab legs",
 	"way": "drawing",
-	"status": "Check",
+	"status": "Source",
 	"levels": [
 		"near",
 		"mid",
@@ -221,5 +221,6 @@
 			"changed": "Nothing."
 		}
 	],
-	"hash": "169bd97aae3919c33603c44ecf44e456"
+	"hash": "169bd97aae3919c33603c44ecf44e456",
+	"status_note": "Source (report 0026, Q17, rule 2): photo 0 (2018-03-08) shows the dark polished granite bench in the park, and its sizes come from photo 1 (2014-04-06, the height at the scale of a woman) and photo 0 (the length, the seat, the legs). The depth is an estimate (no source): no photo shows a bench from its end."
 }

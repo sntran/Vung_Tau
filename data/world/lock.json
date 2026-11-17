@@ -67,6 +67,16 @@
 				"aerobics_leader.receipt.json": "dbb55668643a76ce073a73d35fafb4ce37320d7d214bae8705346415a01843bb"
 			}
 		},
+		"bac_xuong_cat": {
+			"hash": "504121c2118205fe22ac1abf586737c5",
+			"files": {
+				"bac_xuong_cat.far.glb": "d6c0f94db9be25d355e2f7517182d549281d5bd32d7c2903f8ee9b8ea4217a38",
+				"bac_xuong_cat.glb": "ebe9592fbf97ef95c3dd69191e4a1649f54af3175249a19567bf2ac6f240fe3a",
+				"bac_xuong_cat.mid.glb": "2460e9f70011e9dde534a714501a5f561e7385208ad7116f39cf459e28ab23f6",
+				"bac_xuong_cat.parts.json": "0aadf5dec80029bb2a57840a67f6d0634c124dbf32730222bd35e8d9e8b86588",
+				"bac_xuong_cat.receipt.json": "375c9b3d2999012f1cfd5c0670f468bc1e26b6f33e8c995b31ff045497e8d260"
+			}
+		},
 		"cang_vu_vung_tau": {
 			"hash": "c1983dfb7a7ab8ec578e19a7ba6469fe",
 			"files": {
@@ -117,6 +127,16 @@
 				"den_vuon_thap.receipt.json": "01ed447edc0d44b1697a2b8dfd9a480aba668f9c2c41aa8630dc561f42ca5a37"
 			}
 		},
+		"ghe_da_cong_vien": {
+			"hash": "169bd97aae3919c33603c44ecf44e456",
+			"files": {
+				"ghe_da_cong_vien.far.glb": "596852dcf04b568a5173e3c310d4c529fc875d2104294cdf2e319389267c4201",
+				"ghe_da_cong_vien.glb": "caf1488b9f0a3245568f11f3b4f7fe016d6a53f11fceb0ad1071c72ce3ec950f",
+				"ghe_da_cong_vien.mid.glb": "4a6830a5619c85daeb584d7f8b49e57bf100bf2007b99e6b811cf2fa9613c28c",
+				"ghe_da_cong_vien.parts.json": "2c4a16b212768566a7fe06e714af7ea52af34f125685e62edfc52f2771ef3ac7",
+				"ghe_da_cong_vien.receipt.json": "8fb60acb45d151add0fc2747378cdebecd10cd776073031117c0c7174e7ea8ce"
+			}
+		},
 		"ghe_danh_ca": {
 			"hash": "f57ba2160fab51a90c9b982eaf40ca7b",
 			"files": {
@@ -124,6 +144,16 @@
 				"ghe_danh_ca.mid.glb": "4ab7ab79cc3d9070b4605a1d47c7cfb2395bdd0b2132ec950e9c5af8e6fb3679",
 				"ghe_danh_ca.parts.json": "ba78333de6ee93e9681b867bacb8ba9174ea2a54c30ecb2f3be4e96f8f65c10c",
 				"ghe_danh_ca.receipt.json": "8506f447c76a2f3b9ba94b534ebbd00811633b5cb6d817738039b887648ba042"
+			}
+		},
+		"hang_rao_cong_vien": {
+			"hash": "f5b1de0205a135cfa13ad9d7d2b28b55",
+			"files": {
+				"hang_rao_cong_vien.far.glb": "63e4a31b244c8b4a836bb096d280a6639e146332596d03a20fae2e080acd8d7d",
+				"hang_rao_cong_vien.glb": "594ea3972a3741e6176d95c2e0d8a9726cbc335dbbe6e93b88b1e4221b5033e2",
+				"hang_rao_cong_vien.mid.glb": "03ec3fc2633fcdcbf2b4de78375bd36c02170ca5d5af4f8f65d955fb1b537e2e",
+				"hang_rao_cong_vien.parts.json": "434b927a7b286815abe38bc8933b109c9e8be5b5ec982b3977ee1ec5653de502",
+				"hang_rao_cong_vien.receipt.json": "d2ea319b256ef660972a9017bedf3fa82819407e462def07706832d17754560b"
 			}
 		},
 		"khach_san_grand": {
@@ -164,6 +194,16 @@
 				"lan_can_ha_long.mid.glb": "d488a0641faa150df1d33b4ad7645baef0566a65735f69d83bcbb8b053780dd9",
 				"lan_can_ha_long.parts.json": "a50fa240a8580c61518eabf4b249b1d58441d55a19f7be428cb0f13521e295f4",
 				"lan_can_ha_long.receipt.json": "404a4b8199729b74ab3016a6bd01256b045294478cb08ed9cf75d077a5e1560a"
+			}
+		},
+		"phao_boi": {
+			"hash": "744b553c0b81b6fdae01bae186dab48a",
+			"files": {
+				"phao_boi.far.glb": "cd43e7de7795e09e4b3d62fbf8d811b353f64d1dfa467c4e5957f8ee8b955760",
+				"phao_boi.glb": "06cc752d2f241fefd5cfe8e0e97538ac43ab48ae9f07cad5d0f3e3d536f8f8b4",
+				"phao_boi.mid.glb": "af0637558c07f0d9c0f4154ad424aab5065a37e9c272885689d2fbb58c043f97",
+				"phao_boi.parts.json": "7aeee9ff294b23c9028aa3438960e2bcec66cb2812c3c4b8144d890d2266a060",
+				"phao_boi.receipt.json": "2a8d1de0960358152dbe76b6929e2892ef70dd93cadd2d08ca1e83322529ffca"
 			}
 		},
 		"quang_trung_12_18": {
@@ -231,6 +271,42 @@
 				"sitter_3.mid.glb": "99387cfd838b34146e06b063ed5aaf89290d60419383f0abe1da36de3696ca58",
 				"sitter_3.parts.json": "7f7d7091c3a10f50bdba94cb79f06149f06ccb0256fcae326c87e0f3cf11fb45",
 				"sitter_3.receipt.json": "564d7289bcfe1b46d98a0d20455a764eb89468a6c1f17967b2055766eee6069a"
+			}
+		},
+		"swimmer_1": {
+			"hash": "2f67a588aebf9685085a5334edf5b043",
+			"files": {
+				"swimmer_1.far.glb": "7da62a5e6cdafe21482d379040313b915031cfa1c3e38a7d1989d2957f08b43f",
+				"swimmer_1.mid.glb": "672b9f8909d001933ed77bc52175af67c636e4c5d7f7063d439ac3d9b787a688",
+				"swimmer_1.parts.json": "2ffecef7d09959edf99529cb49548d17fcb0160260f6cb22163b67b736354ded",
+				"swimmer_1.receipt.json": "67d167ffb9fdbca312d37037265f68a4ae6a9a674a86f701409370b2f39268af"
+			}
+		},
+		"swimmer_2": {
+			"hash": "72fe33261af95b7516aa53deea4cc5fe",
+			"files": {
+				"swimmer_2.far.glb": "d53e3d9c22a2fe0b3aa160f9f0af12c08cfb40350d9b01f0cd272fbc81f9ccf5",
+				"swimmer_2.mid.glb": "3cde6afa4d10996b56f123340eb082bef1cc34cd591bdfe321ff137b2bfe1eeb",
+				"swimmer_2.parts.json": "6aea2d461469679f3d8a258229635ff913ade24e87726ac5cfd987856d57e374",
+				"swimmer_2.receipt.json": "20af19902ea2c3a912b2e0a26ae996dc884a8b705521d983e3ef36a3414cdcd7"
+			}
+		},
+		"swimmer_3": {
+			"hash": "c59ff7595ef5c14ef15c1ffe42a417f1",
+			"files": {
+				"swimmer_3.far.glb": "36d3963ef29f77226306d7c06d4670c5ed8201855676cb4dbe49e2cf56e09674",
+				"swimmer_3.mid.glb": "7fe358d4bf0ffcccab8ba38e5bf5afc22540ee45211050a3c7387e0d0c229e36",
+				"swimmer_3.parts.json": "a3fc93cd0156feda329c60f5b8ca15edb1dae53e077330bf427e950a11c3b65d",
+				"swimmer_3.receipt.json": "2b7ad70dd55c223b1fe8a44c660f81fb733d77dbe3e958ae59648db9ae2a8bf7"
+			}
+		},
+		"swimmer_4": {
+			"hash": "9d25c7d075aa1066c8f8f8292bcdbf72",
+			"files": {
+				"swimmer_4.far.glb": "5c1e19ff04d38296c36961c5ab99688d58ddfa4f634a9ff0c4349a0d332c34b6",
+				"swimmer_4.mid.glb": "05b5674a83a20408112445421f7a018b9a1c998b277f0cd1988c689f7c49e456",
+				"swimmer_4.parts.json": "5e7529237bde8772d76cf19795e853931467e9559dc25009fecff91023044c4d",
+				"swimmer_4.receipt.json": "37a78f58ba97a4258ccf02cbcd9ae0cee2515eb3d574d6d4970cb488099e1fb1"
 			}
 		},
 		"thung_chai": {

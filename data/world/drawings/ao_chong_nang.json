@@ -113,5 +113,6 @@
 			"changed": "No change (status Check, a tool request for a jacket with a hood that shows at the mid and far levels)."
 		}
 	],
-	"hash": "9c0e86c76adfbd22cc0deaf646429827"
+	"hash": "9c0e86c76adfbd22cc0deaf646429827",
+	"status_note": "Check. The photos meet the rules (report 0026, Q17, rule 2): photo 0 (2019-04-30) and photo 1 (2020-04-02) show the sun jackets, and the length, the sleeves, the hood and the zip come from them. But the model does not show the look of the photos: at the mid and far levels the jacket world_rain_shell is tight, its collar goes up to the chin, and no hood hangs on the back. The person blueprint of World has no jacket with a hood that shows at these levels: that is a tool to ask World for. The game does not use the model until it has that look, or until I decide."
 }

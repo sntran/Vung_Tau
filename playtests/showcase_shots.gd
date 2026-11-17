@@ -15,9 +15,17 @@ extends RefCounted
 # Report 0026 (D-0026-02): a shot is the view of its photo. PT-72 checks that
 # the eye is at the place of the photo, that each subject of the photo is in
 # the frame and that no stand-in hides it, and that each stand-in in the frame
-# has its storeys from a source (Q6). D-0026-05: in the box "hill" of a shot,
+# has its storeys from a source (Q6). D-0026-14: no stand-in is a main subject
+# of a shot: a stand-in covers at most MAX_STAND_IN of the frame (the part of
+# the frame of the box of its corners, times the part of the points of its
+# faces to the eye that a ray from the eye reaches). D-0026-05: in the box "hill" of a shot,
 # the patches of the far trees (the variation of the brightness of blocks of
-# BLOCK px) are at most HILL_MAX times those of the photo in its box. D-0026-06:
+# BLOCK px) are at most HILL_MAX times those of the photo in its box;
+# D-0026-15: also the colors: at 12:00 and at 17:10 the mean hue, saturation,
+# and value of the box are near those of the photo (HILL_MAX_HUE,
+# HILL_MAX_SATURATION, HILL_MAX_VALUE), and the spread of the chroma of the
+# blocks (pink and teal roofs on the hill) is at most HILL_MAX times that of the
+# photo. D-0026-06:
 # at 12:00, the water in the box "water" is green grey, not cyan or the pale
 # sky: its saturation is at most WATER_MAX_SATURATION and its value at most
 # WATER_MAX_VALUE (the water of the photos of 2014 to 2021: #5d91ab to
@@ -57,9 +65,16 @@ const VIEW_RANGE := 800.0
 ## The blocks of the measure of the patches (px of a frame of 1280 px).
 const BLOCK := 16
 const HILL_MAX := 1.5
+## D-0026-15: the mean color of the box "hill" and of the photo in its box.
+const HILL_MAX_HUE := 25.0
+const HILL_MAX_SATURATION := 0.15
+const HILL_MAX_VALUE := 0.12
 const WATER_MAX_SATURATION := 0.35
 ## The water of the photos is 0.45 to 0.7 bright (the value of its mean color).
 const WATER_MAX_VALUE := 0.72
+## A stand-in covers at most this part of a frame (D-0026-14: the grey boxes of
+## Khách sạn Bưu điện and Cao ốc Sen Biển in S1).
+const MAX_STAND_IN := 0.02
 
 
 func run(d: PlaytestDriver) -> void:
@@ -153,6 +168,79 @@ func _check_view(d: PlaytestDriver, w: VungTau, camera: Camera3D, shot: Dictiona
 				break
 	d.step("%s: %d stand-ins with a guessed number of storeys in the frame" % [shot.id, guessed.size()])
 	d.expect(guessed.is_empty(), "%s: each stand-in in the frame has its storeys from a source (Q6): %s" % [shot.id, ", ".join(guessed)])
+	var main: Array[String] = []
+	var largest := 0.0
+	for entry: Dictionary in w.showcase.stand_ins:
+		var part := _frame_part(d, w, camera, eye, entry)
+		largest = maxf(largest, part)
+		if part > MAX_STAND_IN:
+			main.append("%s %s (%.1f %% of the frame)" % [entry.osm, entry.name, part * 100.0])
+	d.step("%s: the largest stand-in covers %.1f %% of the frame" % [shot.id, largest * 100.0])
+	d.expect(main.is_empty(), "%s: no stand-in is a main subject of the shot (at most %.0f %% of the frame): %s" % [
+			shot.id, MAX_STAND_IN * 100.0, ", ".join(main)])
+
+
+## The part of the frame that a stand-in covers (D-0026-14): the box of the
+## corners of its prism on the screen (in the frame), times the part of the
+## points of its faces to the eye that a ray from the eye reaches.
+static func _frame_part(d: PlaytestDriver, w: VungTau, camera: Camera3D, eye: Vector3, entry: Dictionary) -> float:
+	var outline: PackedVector2Array = entry.outline
+	var top := float(entry.top)
+	if outline.size() < 3 or eye.distance_to(Vector3(outline[0].x, top, outline[0].y)) > VIEW_RANGE:
+		return 0.0
+	var base := INF
+	for q in outline:
+		base = minf(base, w.ground_height(q.x, q.y))
+	var size := Vector2(d.viewport().get_visible_rect().size)
+	var rect := Rect2()
+	var first := true
+	for q in outline:
+		for y: float in [base, top]:
+			var p := Vector3(q.x, y, q.y)
+			if camera.is_position_behind(p):
+				continue
+			var at := camera.unproject_position(p)
+			rect = Rect2(at, Vector2.ZERO) if first else rect.expand(at)
+			first = false
+	if first:
+		return 0.0
+	rect = rect.intersection(Rect2(Vector2.ZERO, size))
+	if rect.size.x <= 0.0 or rect.size.y <= 0.0:
+		return 0.0
+	# The points of the faces to the eye: a ray from the eye reaches each one.
+	var area := 0.0
+	for i in outline.size():
+		area += outline[i].cross(outline[(i + 1) % outline.size()])
+	var space := camera.get_world_3d().direct_space_state
+	var seen := 0
+	var total := 0
+	for i in outline.size():
+		var a := outline[i]
+		var b := outline[(i + 1) % outline.size()]
+		var edge := b - a
+		# (edge.y, -edge.x) is out of a polygon whose area (the sum of the cross products) is positive.
+		var out := Vector2(edge.y, -edge.x).normalized() * (1.0 if area > 0.0 else -1.0)
+		var middle := (a + b) / 2.0
+		if out.dot(Vector2(eye.x, eye.z) - middle) <= 0.0:
+			continue
+		for t: float in [0.2, 0.5, 0.8]:
+			var q := a.lerp(b, t) + out * 0.05
+			for h: float in [0.25, 0.6, 0.9]:
+				var p := Vector3(q.x, lerpf(base, top, h), q.y)
+				if camera.is_position_behind(p) or not camera.is_position_in_frustum(p):
+					continue
+				total += 1
+				var query := PhysicsRayQueryParameters3D.create(eye, p, Layers.FLOOR)
+				var hit := space.intersect_ray(query)
+				if hit.is_empty() or (hit.position as Vector3).distance_to(p) < 0.6:
+					seen += 1
+	if total == 0:
+		return 0.0
+	var part := rect.get_area() / (size.x * size.y) * float(seen) / total
+	if part > 0.001:
+		d.step("  the stand-in %s %s: the box of its corners %.1f %% of the frame, %d of %d points seen" % [
+				entry.osm, entry.name, rect.get_area() / (size.x * size.y) * 100.0, seen, total])
+	return part
 
 
 ## D-0026-05 and D-0026-06: the patches of the far hill and the color of the water.
@@ -166,6 +254,20 @@ func _check_look(d: PlaytestDriver, shot: Dictionary, preset: String, time: Stri
 		d.step("%s, %s: the patches of the hill: %.3f (the photo %.3f)" % [shot.id, preset, game.patches, photo.patches])
 		d.expect(float(game.patches) <= float(photo.patches) * HILL_MAX, "%s, %s: the far trees of the hill are not patches: %.3f, at most %.1f times the photo (%.3f)" % [
 				shot.id, preset, game.patches, HILL_MAX, photo.patches])
+		# D-0026-15: the colors, not only the brightness.
+		var g: Color = game.mean
+		var f: Color = photo.mean
+		var hue := absf(g.h - f.h) * 360.0
+		hue = minf(hue, 360.0 - hue)
+		d.step("%s, %s, %s: the hill is #%s (hue %.0f, saturation %.2f, value %.2f); the photo #%s (hue %.0f, saturation %.2f, value %.2f); the color patches %.3f (the photo %.3f)" % [
+				shot.id, preset, time, g.to_html(false), g.h * 360.0, g.s, g.v, f.to_html(false), f.h * 360.0, f.s, f.v,
+				game.color_patches, photo.color_patches])
+		d.expect(hue <= HILL_MAX_HUE and absf(g.s - f.s) <= HILL_MAX_SATURATION and absf(g.v - f.v) <= HILL_MAX_VALUE,
+				"%s, %s, %s: the hill has the color of the photo: the hue %.0f degrees from it (at most %.0f), the saturation %.2f from it (at most %.2f), the value %.2f from it (at most %.2f)" % [
+					shot.id, preset, time, hue, HILL_MAX_HUE, absf(g.s - f.s), HILL_MAX_SATURATION, absf(g.v - f.v), HILL_MAX_VALUE])
+		d.expect(float(game.color_patches) <= float(photo.color_patches) * HILL_MAX,
+				"%s, %s, %s: the hill has no patches of color (pink, teal roofs): %.3f, at most %.1f times the photo (%.3f)" % [
+					shot.id, preset, time, game.color_patches, HILL_MAX, photo.color_patches])
 	if shot.has("water") and time == "1200":
 		var water := box_stats(frame, shot.water)
 		var color: Color = water.mean
@@ -187,18 +289,22 @@ static func box_stats(image: Image, box: Array) -> Dictionary:
 	var total := Color(0, 0, 0)
 	var count := 0
 	var blocks: Array[float] = []
+	var block_colors: Array[Color] = []
 	for by in range(y0, y1 - BLOCK + 1, BLOCK):
 		for bx in range(x0, x1 - BLOCK + 1, BLOCK):
 			var light := 0.0
 			var n := 0
+			var block_total := Color(0, 0, 0)
 			for y in range(by, by + BLOCK, 2):
 				for x in range(bx, bx + BLOCK, 2):
 					var c := image.get_pixel(x, y)
 					total += c
+					block_total += c
 					count += 1
 					light += c.get_luminance()
 					n += 1
 			blocks.append(light / maxf(n, 1.0))
+			block_colors.append(Color(block_total.r / maxf(n, 1.0), block_total.g / maxf(n, 1.0), block_total.b / maxf(n, 1.0)))
 	var mean_light := 0.0
 	for v in blocks:
 		mean_light += v / maxf(blocks.size(), 1.0)
@@ -206,7 +312,19 @@ static func box_stats(image: Image, box: Array) -> Dictionary:
 	for v in blocks:
 		spread += (v - mean_light) * (v - mean_light) / maxf(blocks.size(), 1.0)
 	var mean := Color(total.r / maxf(count, 1.0), total.g / maxf(count, 1.0), total.b / maxf(count, 1.0))
-	return {"mean": mean, "patches": sqrt(spread)}
+	# The spread of the color (the chroma) of the blocks: the distance of the
+	# chroma of each block (red - green, yellow - blue) from the mean chroma.
+	var mean_a := 0.0
+	var mean_b := 0.0
+	for c: Color in block_colors:
+		mean_a += (c.r - c.g) / maxf(block_colors.size(), 1.0)
+		mean_b += ((c.r + c.g) / 2.0 - c.b) / maxf(block_colors.size(), 1.0)
+	var chroma_spread := 0.0
+	for c: Color in block_colors:
+		var da := c.r - c.g - mean_a
+		var db := (c.r + c.g) / 2.0 - c.b - mean_b
+		chroma_spread += (da * da + db * db) / maxf(block_colors.size(), 1.0)
+	return {"mean": mean, "patches": sqrt(spread), "color_patches": sqrt(chroma_spread)}
 
 
 ## The stand-in or the model of World that the line from the eye to the point

@@ -1,0 +1,3833 @@
+{
+	"id": "khach_san_grand_canh_sau",
+	"what": "The back wings of the Grand Hotel (2 Nguyễn Du) round its forecourt: a curved wing of one storey round the fountain, with shop fronts between piers, a roof terrace with an iron rail and a pergola, a hall on the terrace, the lobby with the letters GRAND HOTEL, and low blocks with roofs of brown tiles behind the main block",
+	"way": "order",
+	"order": {
+		"blueprint": "building",
+		"options": {
+			"name": "khach_san_grand_canh_sau",
+			"sources": [
+				"The back wings of the Grand Hotel of Vũng Tàu (2 Nguyễn Du) round its forecourt and behind its main block, as in 2019. Plan: OpenStreetMap way 791795131 (© OpenStreetMap contributors, ODbL). Look: photos of 2014 (trungydang, Wikimedia Commons, CC BY 3.0), images from above of 2018 and 2020 (Esri World Imagery Wayback), photos of the hotel (mytour.vn, tripi.vn)."
+			],
+			"plan": [
+				[
+					29.2046,
+					-0.1081
+				],
+				[
+					0.0,
+					0.0
+				],
+				[
+					0.3552,
+					-6.9453
+				],
+				[
+					19.7105,
+					-7.0271
+				],
+				[
+					20.5754,
+					-20.6233
+				],
+				[
+					26.43,
+					-20.7828
+				],
+				[
+					33.164,
+					-23.2042
+				],
+				[
+					35.1779,
+					-28.2118
+				],
+				[
+					35.4034,
+					-30.0384
+				],
+				[
+					26.1264,
+					-29.8679
+				],
+				[
+					26.49,
+					-38.2666
+				],
+				[
+					25.7259,
+					-40.517
+				],
+				[
+					23.9662,
+					-42.5458
+				],
+				[
+					20.8115,
+					-43.7775
+				],
+				[
+					17.077,
+					-44.1295
+				],
+				[
+					16.7784,
+					-51.7947
+				],
+				[
+					55.5223,
+					-52.2823
+				],
+				[
+					54.856,
+					-68.3239
+				],
+				[
+					61.5566,
+					-68.5914
+				],
+				[
+					62.1249,
+					-55.0337
+				],
+				[
+					66.2124,
+					-55.186
+				],
+				[
+					66.7974,
+					-41.2126
+				],
+				[
+					55.5859,
+					-40.7643
+				],
+				[
+					55.3525,
+					-46.2453
+				],
+				[
+					49.8085,
+					-46.019
+				],
+				[
+					49.9494,
+					-42.5628
+				],
+				[
+					53.9721,
+					-42.732
+				],
+				[
+					54.3012,
+					-34.9711
+				],
+				[
+					46.0988,
+					-34.6505
+				],
+				[
+					46.3177,
+					-29.5752
+				],
+				[
+					49.7934,
+					-29.7203
+				],
+				[
+					49.8449,
+					-21.3892
+				],
+				[
+					47.7196,
+					-14.3543
+				],
+				[
+					45.2952,
+					-10.558
+				],
+				[
+					39.955,
+					-5.7132
+				]
+			],
+			"storeys": 1,
+			"ground": 3.5,
+			"band": 0.6,
+			"colors": {
+				"wall": "#f1dc86",
+				"trim": "#e3aa6c",
+				"band": "#d99a5c",
+				"cornice": "#f0e6c2",
+				"glass": "#55707c",
+				"frame": "#f4f1e4",
+				"rail": "#2f4a3c",
+				"roof": "#d8a544",
+				"deck": "#d9d6cc",
+				"ground": "#8d8a80",
+				"letters": "#a8864e"
+			},
+			"roof": {
+				"kind": "flat",
+				"parapet": 0.4
+			},
+			"cornice": {
+				"high": 0.0
+			},
+			"fronts": [
+				{
+					"side": 31,
+					"style": "windows",
+					"ground": "windows",
+					"bays": 3,
+					"inset": 0.2,
+					"window": [
+						1.64,
+						2.45
+					],
+					"sill": 0.35,
+					"bars": 1,
+					"pilasters": true,
+					"pilaster": 0.7
+				},
+				{
+					"side": 32,
+					"style": "windows",
+					"ground": "windows",
+					"bays": 3,
+					"inset": 0.2,
+					"window": [
+						1.32,
+						2.45
+					],
+					"sill": 0.35,
+					"bars": 1,
+					"pilasters": true,
+					"pilaster": 0.7
+				},
+				{
+					"side": 33,
+					"style": "windows",
+					"ground": "windows",
+					"bays": 2,
+					"inset": 0.2,
+					"window": [
+						1.05,
+						2.45
+					],
+					"sill": 0.35,
+					"bars": 1,
+					"pilasters": true,
+					"pilaster": 0.7
+				},
+				{
+					"side": 34,
+					"style": "windows",
+					"ground": "windows",
+					"bays": 2,
+					"inset": 0.2,
+					"window": [
+						2.4,
+						2.45
+					],
+					"sill": 0.35,
+					"bars": 1,
+					"pilasters": true,
+					"pilaster": 0.7
+				},
+				{
+					"side": 35,
+					"style": "windows",
+					"ground": "windows",
+					"bays": 4,
+					"inset": 0.2,
+					"window": [
+						1.93,
+						2.45
+					],
+					"sill": 0.35,
+					"bars": 1,
+					"pilasters": true,
+					"pilaster": 0.7
+				}
+			],
+			"letters": [
+				{
+					"side": 34,
+					"at": 3.6052,
+					"z": 3.05,
+					"high": 0.5,
+					"text": "GRAND HOTEL",
+					"out": 0.1
+				}
+			],
+			"apron": 0.3,
+			"age": 0.5,
+			"more": {
+				"than": [
+					{
+						"shape": "box",
+						"size": [
+							0.05,
+							0.05,
+							4.1338
+						],
+						"at": [
+							49.6217,
+							-25.5573,
+							5.25
+						],
+						"axis": [
+							0.0063,
+							1.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.04,
+							0.04,
+							4.1338
+						],
+						"at": [
+							49.6217,
+							-25.5573,
+							4.62
+						],
+						"axis": [
+							0.0063,
+							1.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.05,
+							0.05,
+							3.6465
+						],
+						"at": [
+							48.5939,
+							-17.9328,
+							5.25
+						],
+						"axis": [
+							-0.2891,
+							0.9573,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.04,
+							0.04,
+							3.6465
+						],
+						"at": [
+							48.5939,
+							-17.9328,
+							4.62
+						],
+						"axis": [
+							-0.2891,
+							0.9573,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.05,
+							0.05,
+							2.2351
+						],
+						"at": [
+							46.3364,
+							-12.5585,
+							5.25
+						],
+						"axis": [
+							-0.5384,
+							0.8427,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.04,
+							0.04,
+							2.2351
+						],
+						"at": [
+							46.3364,
+							-12.5585,
+							4.62
+						],
+						"axis": [
+							-0.5384,
+							0.8427,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.05,
+							0.05,
+							3.5776
+						],
+						"at": [
+							42.4821,
+							-8.2726,
+							5.25
+						],
+						"axis": [
+							-0.741,
+							0.6715,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.04,
+							0.04,
+							3.5776
+						],
+						"at": [
+							42.4821,
+							-8.2726,
+							4.62
+						],
+						"axis": [
+							-0.741,
+							0.6715,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.05,
+							0.05,
+							6.0154
+						],
+						"at": [
+							34.4982,
+							-3.0872,
+							5.25
+						],
+						"axis": [
+							-0.8865,
+							0.4626,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.04,
+							0.04,
+							6.0154
+						],
+						"at": [
+							34.4982,
+							-3.0872,
+							4.62
+						],
+						"axis": [
+							-0.8865,
+							0.4626,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							49.5956,
+							-29.691,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							49.606,
+							-28.0375,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							49.6165,
+							-26.384,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							49.627,
+							-24.7306,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							49.6374,
+							-23.0771,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							49.6479,
+							-21.4236,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							49.1209,
+							-19.6782,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							48.5939,
+							-17.9328,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							48.0668,
+							-16.1873,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							47.5398,
+							-14.4419,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							46.3364,
+							-12.5585,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							45.133,
+							-10.675,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							43.8075,
+							-9.4738,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							42.4821,
+							-8.2726,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							41.1566,
+							-7.0714,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							39.8311,
+							-5.8702,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							38.3074,
+							-5.0751,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							36.7837,
+							-4.2799,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							35.26,
+							-3.4848,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							33.7363,
+							-2.6896,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							32.2126,
+							-1.8945,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							30.6889,
+							-1.0993,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.045,
+							0.375
+						],
+						"at": [
+							29.1653,
+							-0.3042,
+							4.875
+						],
+						"color": "#2f4a3c",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							43.8808,
+							-28.3336,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							44.0233,
+							-25.4075,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							43.7368,
+							-22.492,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							43.0274,
+							-19.6496,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							41.9105,
+							-16.9414,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							40.4099,
+							-14.4253,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							38.5578,
+							-12.1555,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							36.3941,
+							-10.1805,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							33.965,
+							-8.5429,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							31.3228,
+							-7.2777,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							28.524,
+							-6.412,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.4648
+						],
+						"at": [
+							43.952,
+							-26.8706,
+							6.5
+						],
+						"axis": [
+							0.0486,
+							0.9988,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.4648
+						],
+						"at": [
+							43.88,
+							-23.9498,
+							6.5
+						],
+						"axis": [
+							-0.0978,
+							0.9952,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.4648
+						],
+						"at": [
+							43.3821,
+							-21.0708,
+							6.5
+						],
+						"axis": [
+							-0.2422,
+							0.9702,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.4647
+						],
+						"at": [
+							42.4689,
+							-18.2955,
+							6.5
+						],
+						"axis": [
+							-0.3813,
+							0.9245,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.4648
+						],
+						"at": [
+							41.1602,
+							-15.6834,
+							6.5
+						],
+						"axis": [
+							-0.5122,
+							0.8589,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.4648
+						],
+						"at": [
+							39.4839,
+							-13.2904,
+							6.5
+						],
+						"axis": [
+							-0.6322,
+							0.7748,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.4648
+						],
+						"at": [
+							37.4759,
+							-11.168,
+							6.5
+						],
+						"axis": [
+							-0.7386,
+							0.6742,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.4648
+						],
+						"at": [
+							35.1796,
+							-9.3617,
+							6.5
+						],
+						"axis": [
+							-0.8292,
+							0.559,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.4647
+						],
+						"at": [
+							32.6439,
+							-7.9103,
+							6.5
+						],
+						"axis": [
+							-0.9019,
+							0.4319,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.4648
+						],
+						"at": [
+							29.9234,
+							-6.8449,
+							6.5
+						],
+						"axis": [
+							-0.9553,
+							0.2955,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							47.8511,
+							-28.8202,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							48.0221,
+							-25.3089,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							47.6783,
+							-21.8103,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							46.8271,
+							-18.3994,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							45.4867,
+							-15.1495,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							43.686,
+							-12.1303,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							41.4635,
+							-9.4065,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							38.867,
+							-7.0366,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							35.9521,
+							-5.0714,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							32.7815,
+							-3.5531,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.17,
+							1.25
+						],
+						"at": [
+							29.423,
+							-2.5143,
+							5.35
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.7577
+						],
+						"at": [
+							47.9366,
+							-27.0646,
+							6.5
+						],
+						"axis": [
+							0.0486,
+							0.9988,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.7577
+						],
+						"at": [
+							47.8502,
+							-23.5596,
+							6.5
+						],
+						"axis": [
+							-0.0978,
+							0.9952,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.7578
+						],
+						"at": [
+							47.2527,
+							-20.1048,
+							6.5
+						],
+						"axis": [
+							-0.2421,
+							0.9702,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.7577
+						],
+						"at": [
+							46.1569,
+							-16.7745,
+							6.5
+						],
+						"axis": [
+							-0.3813,
+							0.9245,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.7577
+						],
+						"at": [
+							44.5863,
+							-13.6399,
+							6.5
+						],
+						"axis": [
+							-0.5122,
+							0.8588,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.7577
+						],
+						"at": [
+							42.5748,
+							-10.7684,
+							6.5
+						],
+						"axis": [
+							-0.6322,
+							0.7748,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.7577
+						],
+						"at": [
+							40.1653,
+							-8.2216,
+							6.5
+						],
+						"axis": [
+							-0.7386,
+							0.6741,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.7577
+						],
+						"at": [
+							37.4095,
+							-6.054,
+							6.5
+						],
+						"axis": [
+							-0.8292,
+							0.559,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.7577
+						],
+						"at": [
+							34.3668,
+							-4.3122,
+							6.5
+						],
+						"axis": [
+							-0.9019,
+							0.4319,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.1,
+							0.1,
+							1.7577
+						],
+						"at": [
+							31.1022,
+							-3.0337,
+							6.5
+						],
+						"axis": [
+							-0.9553,
+							0.2955,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1
+						],
+						"at": [
+							46.263,
+							-28.6256,
+							6.71
+						],
+						"axis": [
+							0.9926,
+							-0.1217,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1
+						],
+						"at": [
+							46.4029,
+							-26.9898,
+							6.71
+						],
+						"axis": [
+							0.9988,
+							-0.0487,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1
+						],
+						"at": [
+							46.4226,
+							-25.3483,
+							6.71
+						],
+						"axis": [
+							0.9997,
+							0.0247,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1001
+						],
+						"at": [
+							46.322,
+							-23.7097,
+							6.71
+						],
+						"axis": [
+							0.9952,
+							0.0978,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1001
+						],
+						"at": [
+							46.1017,
+							-22.083,
+							6.71
+						],
+						"axis": [
+							0.9854,
+							0.1704,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1
+						],
+						"at": [
+							45.7628,
+							-20.4767,
+							6.71
+						],
+						"axis": [
+							0.9703,
+							0.2421,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1001
+						],
+						"at": [
+							45.3072,
+							-18.8995,
+							6.71
+						],
+						"axis": [
+							0.9499,
+							0.3126,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1
+						],
+						"at": [
+							44.7373,
+							-17.3599,
+							6.71
+						],
+						"axis": [
+							0.9245,
+							0.3812,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1
+						],
+						"at": [
+							44.0562,
+							-15.8663,
+							6.71
+						],
+						"axis": [
+							0.894,
+							0.4479,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1
+						],
+						"at": [
+							43.2675,
+							-14.4264,
+							6.71
+						],
+						"axis": [
+							0.8588,
+							0.5123,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1
+						],
+						"at": [
+							42.3756,
+							-13.0482,
+							6.71
+						],
+						"axis": [
+							0.819,
+							0.5738,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1
+						],
+						"at": [
+							41.385,
+							-11.7391,
+							6.71
+						],
+						"axis": [
+							0.7749,
+							0.6322,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1
+						],
+						"at": [
+							40.3012,
+							-10.5061,
+							6.71
+						],
+						"axis": [
+							0.7265,
+							0.6873,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1001
+						],
+						"at": [
+							39.1301,
+							-9.3557,
+							6.71
+						],
+						"axis": [
+							0.6741,
+							0.7386,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1
+						],
+						"at": [
+							37.8779,
+							-8.2942,
+							6.71
+						],
+						"axis": [
+							0.6183,
+							0.786,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1
+						],
+						"at": [
+							36.5511,
+							-7.3272,
+							6.71
+						],
+						"axis": [
+							0.559,
+							0.8291,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1
+						],
+						"at": [
+							35.1572,
+							-6.46,
+							6.71
+						],
+						"axis": [
+							0.4968,
+							0.8679,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1
+						],
+						"at": [
+							33.7036,
+							-5.6972,
+							6.71
+						],
+						"axis": [
+							0.4319,
+							0.902,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1
+						],
+						"at": [
+							32.198,
+							-5.043,
+							6.71
+						],
+						"axis": [
+							0.3647,
+							0.9312,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1
+						],
+						"at": [
+							30.6484,
+							-4.5007,
+							6.71
+						],
+						"axis": [
+							0.2955,
+							0.9554,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.08,
+							0.11,
+							3.1001
+						],
+						"at": [
+							29.0634,
+							-4.0733,
+							6.71
+						],
+						"axis": [
+							0.2248,
+							0.9744,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#9a6644",
+						"roughness": 0.8,
+						"surface": {
+							"kind": "wood",
+							"scale": 0.05
+						},
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "extrude",
+						"size": {
+							"outline": [
+								[
+									41.8821,
+									-19.3982
+								],
+								[
+									41.3031,
+									-17.9873
+								],
+								[
+									40.6128,
+									-16.6275
+								],
+								[
+									39.8157,
+									-15.3274
+								],
+								[
+									38.9169,
+									-14.0954
+								],
+								[
+									37.9222,
+									-12.9394
+								],
+								[
+									36.838,
+									-11.867
+								],
+								[
+									35.6713,
+									-10.8849
+								],
+								[
+									34.4295,
+									-9.9996
+								],
+								[
+									33.1208,
+									-9.2167
+								],
+								[
+									31.7535,
+									-8.5413
+								],
+								[
+									28.7044,
+									-15.3936
+								],
+								[
+									29.532,
+									-15.8024
+								],
+								[
+									30.3241,
+									-16.2763
+								],
+								[
+									31.0757,
+									-16.8121
+								],
+								[
+									31.7819,
+									-17.4065
+								],
+								[
+									32.4381,
+									-18.0556
+								],
+								[
+									33.0402,
+									-18.7553
+								],
+								[
+									33.5842,
+									-19.501
+								],
+								[
+									34.0667,
+									-20.2879
+								],
+								[
+									34.4845,
+									-21.111
+								],
+								[
+									34.8349,
+									-21.9649
+								]
+							],
+							"depth": 3.7
+						},
+						"at": [
+							0,
+							0,
+							5.95
+						],
+						"color": "#ecd6bc",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						}
+					},
+					{
+						"shape": "extrude",
+						"size": {
+							"outline": [
+								[
+									42.07,
+									-19.3297
+								],
+								[
+									41.4849,
+									-17.904
+								],
+								[
+									40.7874,
+									-16.5299
+								],
+								[
+									39.9819,
+									-15.2161
+								],
+								[
+									39.0736,
+									-13.9711
+								],
+								[
+									38.0685,
+									-12.803
+								],
+								[
+									36.9728,
+									-11.7192
+								],
+								[
+									35.7938,
+									-10.7268
+								],
+								[
+									34.539,
+									-9.8322
+								],
+								[
+									33.2165,
+									-9.0411
+								],
+								[
+									31.8348,
+									-8.3586
+								],
+								[
+									28.6231,
+									-15.5764
+								],
+								[
+									29.4363,
+									-15.978
+								],
+								[
+									30.2147,
+									-16.4436
+								],
+								[
+									30.9532,
+									-16.9702
+								],
+								[
+									31.6471,
+									-17.5542
+								],
+								[
+									32.2919,
+									-18.1921
+								],
+								[
+									32.8835,
+									-18.8795
+								],
+								[
+									33.418,
+									-19.6123
+								],
+								[
+									33.8921,
+									-20.3855
+								],
+								[
+									34.3026,
+									-21.1942
+								],
+								[
+									34.647,
+									-22.0333
+								]
+							],
+							"depth": 0.4
+						},
+						"at": [
+							0,
+							0,
+							7.6
+						],
+						"color": "#e3aa6c",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						}
+					},
+					{
+						"shape": "extrude",
+						"size": {
+							"outline": [
+								[
+									41.8821,
+									-19.3982
+								],
+								[
+									41.3031,
+									-17.9873
+								],
+								[
+									40.6128,
+									-16.6275
+								],
+								[
+									39.8157,
+									-15.3274
+								],
+								[
+									38.9169,
+									-14.0954
+								],
+								[
+									37.9222,
+									-12.9394
+								],
+								[
+									36.838,
+									-11.867
+								],
+								[
+									35.6713,
+									-10.8849
+								],
+								[
+									34.4295,
+									-9.9996
+								],
+								[
+									33.1208,
+									-9.2167
+								],
+								[
+									31.7535,
+									-8.5413
+								],
+								[
+									28.7044,
+									-15.3936
+								],
+								[
+									29.532,
+									-15.8024
+								],
+								[
+									30.3241,
+									-16.2763
+								],
+								[
+									31.0757,
+									-16.8121
+								],
+								[
+									31.7819,
+									-17.4065
+								],
+								[
+									32.4381,
+									-18.0556
+								],
+								[
+									33.0402,
+									-18.7553
+								],
+								[
+									33.5842,
+									-19.501
+								],
+								[
+									34.0667,
+									-20.2879
+								],
+								[
+									34.4845,
+									-21.111
+								],
+								[
+									34.8349,
+									-21.9649
+								]
+							],
+							"depth": 0.1
+						},
+						"mode": "paint",
+						"at": [
+							0,
+							0,
+							7.8
+						],
+						"color": "#a9a49a",
+						"blend": 0.05,
+						"roughness": 0.9
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.85,
+							1.0,
+							0.3
+						],
+						"at": [
+							41.385,
+							-18.1687,
+							5.6
+						],
+						"axis": [
+							0.9134,
+							0.4069,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"color": "#f4f1e4",
+						"blend": 0.04,
+						"raise": 0.015,
+						"roughness": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.7,
+							0.85,
+							0.35
+						],
+						"at": [
+							41.385,
+							-18.1687,
+							5.6
+						],
+						"axis": [
+							0.9134,
+							0.4069,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"color": "#55707c",
+						"blend": 0.04,
+						"raise": -0.04,
+						"roughness": 0.3,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.85,
+							1.0,
+							0.3
+						],
+						"at": [
+							39.8709,
+							-15.4102,
+							5.6
+						],
+						"axis": [
+							0.8338,
+							0.5522,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"color": "#f4f1e4",
+						"blend": 0.04,
+						"raise": 0.015,
+						"roughness": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.7,
+							0.85,
+							0.35
+						],
+						"at": [
+							39.8709,
+							-15.4102,
+							5.6
+						],
+						"axis": [
+							0.8338,
+							0.5522,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"color": "#55707c",
+						"blend": 0.04,
+						"raise": -0.04,
+						"roughness": 0.3,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.85,
+							1.0,
+							0.3
+						],
+						"at": [
+							37.9222,
+							-12.9394,
+							5.6
+						],
+						"axis": [
+							0.7312,
+							0.6822,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"color": "#f4f1e4",
+						"blend": 0.04,
+						"raise": 0.015,
+						"roughness": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.7,
+							0.85,
+							0.35
+						],
+						"at": [
+							37.9222,
+							-12.9394,
+							5.6
+						],
+						"axis": [
+							0.7312,
+							0.6822,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"color": "#55707c",
+						"blend": 0.04,
+						"raise": -0.04,
+						"roughness": 0.3,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.85,
+							1.0,
+							0.3
+						],
+						"at": [
+							35.5925,
+							-10.8242,
+							5.6
+						],
+						"axis": [
+							0.6085,
+							0.7935,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"color": "#f4f1e4",
+						"blend": 0.04,
+						"raise": 0.015,
+						"roughness": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.7,
+							0.85,
+							0.35
+						],
+						"at": [
+							35.5925,
+							-10.8242,
+							5.6
+						],
+						"axis": [
+							0.6085,
+							0.7935,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"color": "#55707c",
+						"blend": 0.04,
+						"raise": -0.04,
+						"roughness": 0.3,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.85,
+							1.0,
+							0.3
+						],
+						"at": [
+							32.9456,
+							-9.1224,
+							5.6
+						],
+						"axis": [
+							0.4693,
+							0.883,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"color": "#f4f1e4",
+						"blend": 0.04,
+						"raise": 0.015,
+						"roughness": 0.6,
+						"levels": [
+							"near",
+							"mid"
+						]
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.7,
+							0.85,
+							0.35
+						],
+						"at": [
+							32.9456,
+							-9.1224,
+							5.6
+						],
+						"axis": [
+							0.4693,
+							0.883,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"color": "#55707c",
+						"blend": 0.04,
+						"raise": -0.04,
+						"roughness": 0.3,
+						"levels": [
+							"near",
+							"mid"
+						]
+					}
+				],
+				"mai": [
+					{
+						"shape": "wedge",
+						"size": [
+							13.05,
+							1.375,
+							1.0
+						],
+						"at": [
+							59.925,
+							-54.85,
+							5.1
+						],
+						"axis": [
+							0,
+							0,
+							1
+						],
+						"up": [
+							1,
+							0,
+							0
+						],
+						"color": "#a8684a",
+						"roughness": 0.7,
+						"surface": {
+							"kind": "stone",
+							"scale": 0.2
+						}
+					},
+					{
+						"shape": "wedge",
+						"size": [
+							13.05,
+							1.375,
+							1.0
+						],
+						"at": [
+							57.175,
+							-54.85,
+							5.1
+						],
+						"axis": [
+							0,
+							0,
+							1
+						],
+						"up": [
+							-1,
+							0,
+							0
+						],
+						"color": "#a8684a",
+						"roughness": 0.7,
+						"surface": {
+							"kind": "stone",
+							"scale": 0.2
+						}
+					},
+					{
+						"shape": "wedge",
+						"size": [
+							10.4,
+							2.95,
+							1.1
+						],
+						"at": [
+							42.65,
+							-41.0,
+							5.2
+						],
+						"axis": [
+							0,
+							0,
+							1
+						],
+						"up": [
+							1,
+							0,
+							0
+						],
+						"color": "#a8684a",
+						"roughness": 0.7,
+						"surface": {
+							"kind": "stone",
+							"scale": 0.2
+						}
+					},
+					{
+						"shape": "wedge",
+						"size": [
+							10.4,
+							2.95,
+							1.1
+						],
+						"at": [
+							36.75,
+							-41.0,
+							5.2
+						],
+						"axis": [
+							0,
+							0,
+							1
+						],
+						"up": [
+							-1,
+							0,
+							0
+						],
+						"color": "#a8684a",
+						"roughness": 0.7,
+						"surface": {
+							"kind": "stone",
+							"scale": 0.2
+						}
+					},
+					{
+						"shape": "pyramid",
+						"size": [
+							3.75,
+							3.55,
+							0.8
+						],
+						"at": [
+							50.15,
+							-38.75,
+							4.9
+						],
+						"color": "#876356",
+						"roughness": 0.7,
+						"surface": {
+							"kind": "stone",
+							"scale": 0.2
+						}
+					},
+					{
+						"shape": "wedge",
+						"size": [
+							9.4,
+							3.1,
+							0.5
+						],
+						"at": [
+							10.0,
+							-3.5,
+							4.6
+						],
+						"axis": [
+							0,
+							0,
+							1
+						],
+						"up": [
+							0,
+							-1,
+							0
+						],
+						"color": "#c27a64",
+						"roughness": 0.7,
+						"surface": {
+							"kind": "stone",
+							"scale": 0.2
+						}
+					}
+				]
+			}
+		}
+	},
+	"sources": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Grand_hotel,_quang_trung_street-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"date": "2014-04-06 06:54",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "shot_s4_2014.jpg",
+			"shows": "The photo of the shot S4, from Quang Trung to the east: the main block of 3 storeys. At the right edge, behind the big trees, a cream wall with an orange cornice and pale pilasters, about 11 m to 12.5 m high with the horizon of the shot (the north end of the south wing, or the hall of the curved wing: the two are near the same bearing from here). The trees and the fence hide the ground storey and the terrace of the curved wing."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Khach_san_Grand_-_duong_quang_trung-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"date": "2014-04-06 (Commons: taken on)",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "grand_nguyen_du_2014.jpg",
+			"shows": "From the same place as the shot S4, with a wider view (a field of view of 84 degrees, from the main block and the south wing): the main block at the left, the south wing of 3 storeys at the right, and between them, behind the trees and the fence, the top of the curved wing: a cream wall with an orange cornice and a row of white frames of doors (the hall on the terrace), between the bearings of 31 and 41 degrees right of east, about 75 m from the camera."
+		},
+		{
+			"url": "https://mytour.vn/en/khach-san/609-grand-hotel-vung-tau.html",
+			"image": "https://gcs.tripi.vn/hms_prod/photo/img/494307Lws/mat-tien-ks-.jpg",
+			"date": "on or before 2026-05-23 (the date of the file on the server; the cars in front are models that came out in 2019 or later)",
+			"license": "all rights reserved",
+			"author": "the Grand Hotel Vũng Tàu, on tripi.vn and mytour.vn",
+			"open": false,
+			"file": "grand_forecourt_tripi.jpg",
+			"shows": "From the fountain of the forecourt to the east: the curved wing of one storey round the forecourt. Shop fronts of glass between piers, a cream fascia, a low curb with an iron rail of dark green on its roof terrace, a pergola of wood on round orange columns over the terrace, the hall on the terrace with the sign Grand Hall and doors in white frames, and at the right the lobby with the letters GRAND HOTEL (gold) on its curved fascia. The terrace is level with the terrace over the porch of the main block (left). The Palace Hotel and the old water tower behind."
+		},
+		{
+			"url": "https://mytour.vn/en/khach-san/609-grand-hotel-vung-tau.html",
+			"image": "http://p0.meituan.net/tdcoverseahoteldark/178b8f56ef3d153620aca0f596a7b004833650.jpg",
+			"date": "unknown (no date on the page or in the file)",
+			"license": "all rights reserved",
+			"author": "the Grand Hotel Vũng Tàu, on mytour.vn",
+			"open": false,
+			"file": "grand_forecourt_mytour_02.jpg",
+			"shows": "From the north part of the forecourt at dusk: the main block, and the curved wing of one storey from its south end round the fountain to the lobby with the letters GRAND HOTEL. One rail goes from the terrace of the porch of the main block along the terrace of the curved wing. The pergola on columns and the hall on the terrace. The same look as in the photo of 2026."
+		},
+		{
+			"url": "https://mytour.vn/en/khach-san/609-grand-hotel-vung-tau.html",
+			"image": "http://p1.meituan.net/tdcoverseahoteldark/3d39efc5a9c5d3f0476bb7d86c8e7cd8136014.jpg",
+			"date": "unknown (no date on the page or in the file)",
+			"license": "all rights reserved",
+			"author": "the Grand Hotel Vũng Tàu, on mytour.vn",
+			"open": false,
+			"file": "grand_terrace_mytour_25.jpg",
+			"shows": "From the terrace of the curved wing to the north: the curved edge of the terrace with its iron rail (a pattern of crosses), the pergola of wood beams on round columns of pale green, and the main block with GRAND HOTEL on its cornice. The terrace and the terrace over the porch of the main block are one level."
+		},
+		{
+			"url": "https://livingatlas.arcgis.com/wayback/",
+			"image": "https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/11351/17/61749/104521",
+			"date": "2018-07-04 (the metadata of the release World Imagery Wayback 2019-10-09: DigitalGlobe, 0.5 m)",
+			"license": "Esri World Imagery terms of use (not open)",
+			"author": "Esri and its providers (DigitalGlobe)",
+			"open": false,
+			"file": "grand_esri_2018.jpg",
+			"shows": "From above (zoom 17, enlarged): the curved wing as a quarter of a disc between the main block and the south wing, its roof terrace white with radial lines (the pergola), a light roof on the terrace, brown roofs of tiles east of it, the tennis court and the pool of the Palace Hotel out of the outline."
+		},
+		{
+			"url": "https://livingatlas.arcgis.com/wayback/",
+			"image": "https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/16749/17/61749/104521",
+			"date": "2020-11-18 (the metadata of the release World Imagery Wayback 2021-10-13: Maxar, 0.31 m)",
+			"license": "Esri World Imagery terms of use (not open)",
+			"author": "Esri and its providers (Maxar)",
+			"open": false,
+			"file": "grand_esri_2020.jpg",
+			"shows": "From above (zoom 17, enlarged): the same as in 2018: the white terrace of the curved wing with its pergola, the brown roofs of tiles of the blocks east of it (a long roof with a ridge along the arm east of the main block), the red roof of the strip along the back of the south wing."
+		},
+		{
+			"url": "https://livingatlas.arcgis.com/wayback/",
+			"image": "https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/63116/19/246997/418084",
+			"date": "2026-03-11 (the metadata of the release World Imagery Wayback 2026-09-24: Vantor, 0.34 m)",
+			"license": "Esri World Imagery terms of use (not open)",
+			"author": "Esri and its providers (Vantor)",
+			"open": false,
+			"file": "grand_esri_2026.jpg",
+			"shows": "From above (zoom 19): the curved edge of the terrace on the curve of the OSM outline (the image is 4 m to 7 m south of OSM), the radial beams of the pergola, the roof of the hall, the gable roof of brown tiles of the east arm with its ridge along the arm, a roof of four slopes of brown tiles south-east of the main block, and the red roof of the strip along the back of the south wing. The same parts as in 2018 and 2020."
+		},
+		{
+			"url": "https://livingatlas.arcgis.com/wayback/",
+			"image": "https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/10/17/61749/104521",
+			"date": "2009-01-16 (the metadata of the release World Imagery Wayback 2014-02-20: GeoEye)",
+			"license": "Esri World Imagery terms of use (not open)",
+			"author": "Esri and its providers (GeoEye)",
+			"open": false,
+			"file": "grand_esri_2009.jpg",
+			"shows": "From above (zoom 17, enlarged): the curve of the wing already there in 2009, but an orange curved roof round an open round court with a round feature, not the white terrace with the pergola of 2018. So the terrace and the hall came after 2009."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Ph%C6%B0%E1%BB%9Dng_1,_V%C5%A9ng_T%C3%A0u,_Ba_Ria_-_Vung_Tau,_Vietnam_-_panoramio_(9).jpg",
+			"date": "2015-11-08 (Commons: taken on)",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "grand_canh_nam_2015.jpg",
+			"shows": "The south wing of the Grand Hotel at the corner of Quang Trung and Nguyễn Trãi, not the back wings: a low ground storey between piers, a brown band, two storeys of loggias between orange pilasters with dark green rails, pale yellow walls, a cornice. The stand-in took its 3 storeys from this photo. I take from it only the colors and the rails of the hotel."
+		}
+	],
+	"sizes": {
+		"plan": {
+			"value": "35 corners, 67 m by 69 m in its own axes (the axes of the main block)",
+			"unit": "",
+			"source": "The outline of OpenStreetMap (way 791795131; © OpenStreetMap contributors, ODbL), not simplified. Its curve (OSM points 0 to 5) is a quarter of a circle of 26.1 m radius round (174.6, 44.7) of the game: a fit of the six points, each 0.43 m from the circle or less. Photos 5, 6 and 7 (2018, 2020, 2026) show the curved edge of the terrace on this curve."
+		},
+		"storeys": {
+			"value": 1,
+			"unit": "",
+			"source": "Photos 2 (2026 or before) and 3 and 4 (no date): the curved wing has one storey of shop fronts under a roof terrace. Photos 5 and 6 (2018, 2020) show the roof terrace from above. Not 3 storeys as the stand-in: the 3 storeys came from photo 9, the south wing."
+		},
+		"terrace": {
+			"value": 4.1,
+			"unit": "m",
+			"source": "Photos 2, 3 and 4: one rail goes from the terrace over the porch of the main block along the terrace of the curved wing, so the two terraces are one level: 4.1 m, the porch of the order khach_san_grand (from the photos of 2014). Photo 2: the white sedan in front of the shop fronts (1.475 m, 66 px) gives 3.9 m to 4.4 m from the ground to the top of the slab (175 px), with the sedan 0 m to 3 m in front of the wall. In the order: a ground storey of 3.5 m and a band of 0.6 m."
+		},
+		"rail": {
+			"value": "a curb of 0.4 m and an iron rail to 1.15 m over the terrace",
+			"unit": "",
+			"source": "Photo 2: the curb under the rail is about a third of the rail, and the top of the rail is 4.55 m to 5.1 m over the ground (205 px over the white sedan). The rail of crosses (photo 4) is two rails and posts every 1.8 m in the order: estimate (no source) for the spacing."
+		},
+		"pergola": {
+			"value": "columns 2.5 m high in two rings, 2.1 m and 6.1 m in from the edge; rafters every 4.2 degrees from 6.8 m in to 0.6 m in from the edge",
+			"unit": "",
+			"source": "Photo 2: the top of the beams is 6.0 m to 6.7 m over the ground (270 px over the white sedan), so the columns are about 2.5 m high over the terrace. Photo 7 (2026): radial beams across the terrace; photos 5 and 6 (2018, 2020) show the same white terrace with radial lines. The spacing of the columns and of the rafters: estimate (no source). Its place is Source (photos 5 and 6); its height comes only from photo 2 (2026 or before): Check."
+		},
+		"hall": {
+			"value": "3.7 m over the terrace (the top of its cornice 7.8 m over the ground), 11.5 m to 19 m from the center of the curve, between 122 and 168 degrees",
+			"unit": "",
+			"source": "Photo 1 (2014): from the calibration of the photo with the main block (the letters GRAND HOTEL at 12.35 m and the terrace of the porch at 4.1 m give the horizon and 15 px per m at 59.6 m in the copy of 1 280 px), the orange cornice of the hall is 7.9 m over the ground and its white frames are 4.8 m to 6.4 m, at about 71 m to 78 m. Its bearings (31 to 41 degrees right of east) put it in the west and middle part of the curve. Photo 2 (2026) shows the same hall with doors in white frames behind the pergola. Its depth and its inner edge: estimate (no source)."
+		},
+		"shop_fronts": {
+			"value": "windows 2.45 m high from 0.35 m, between piers of 0.7 m, bays of 2.1 m to 3.6 m",
+			"unit": "",
+			"source": "Photo 2: the glass goes from near the ground to 2.9 m to 3.2 m (130 px over the base of the white sedan), under a cream fascia. The count of bays on each side of the curve: estimate (no source), about 2.9 m as in photo 2. Only photos 2 (2026 or before), 3 and 4 (no date) show the ground storey: the trees and the fence hide it in photos 0 and 1 (2014). Check."
+		},
+		"letters": {
+			"value": "GRAND HOTEL, 0.5 m high, gold (#a8864e), on the fascia of the lobby",
+			"unit": "",
+			"source": "Photos 2 and 3: the letters GRAND HOTEL on the curved fascia of the lobby at the south end of the curve, about a third of the fascia high. The side: the side of OSM points 2 to 1, which looks to the forecourt (photo 2 is from its fountain). No photo of 2014 or of 2017 to 2021 shows them: Check."
+		},
+		"roofs_east": {
+			"value": "roofs of brown tiles, 2.0 m and 2.2 m high, on the one storey; a roof of four slopes of 1.6 m; a roof of one slope of 1.0 m (red) over the strip along the south wing",
+			"unit": "",
+			"source": "Photos 6 and 7 (2020, 2026): the gable roof of brown tiles of the east arm with its ridge along the arm, the brown roof east of the curve, the dark brown roof south-east of the main block, the red roof of the strip. The colors: medians of photo 7 (#b67b5e, #876356, #cf8977), a little darker for the tiles. The heights of the roofs and the storeys under them: estimate (no source): no photo shows their walls, and photos 2 and 3 show nothing over the hall behind the terrace, so these blocks are low. The roofs: Source (photos 5 to 7). The walls and the storeys under them: Check."
+		},
+		"colors": {
+			"value": "the colors of the main block: walls #f1dc86, piers and columns #e3aa6c, rails #2f4a3c, glass #55707c, frames #f4f1e4; terrace #d9d6cc; hall #ecd6bc",
+			"unit": "",
+			"source": "The wings belong to the same hotel: the colors of the order khach_san_grand, from the photos of 2014, as in photo 9 (2015, the south wing). The terrace: the white terrace of photos 5 to 7 (median #e9ede3 in photo 7), a little darker. The hall: photo 2 (median #e9d3bb of its wall). Photo 2 (2026) shows a paler cream fascia than the walls of the main block: Check."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "",
+			"seen": "No look. The factory answered HTTP 503 (the builder stopped: the order needs more memory than the edge has) at POST /orders for my first order (the whole outline, the rails and the beams as tubes; check_order of World: 213c9f737c37070e979ff7eccb134ae9), 4 tries. The factory also answered HTTP 503 after 34 s for the mid level of each building that I sent: a box of 12 m by 10 m of one storey, 20 m by 10 m, 30 m by 30 m, and the curved wing with no edits. The mid level of the blueprint building has a map of 1 024, and on 2026-11-17 the factory refused each level with a map of 1 024 (the notes of the factory in section 5 of the guide of this repository). At POST /orders, a box of 45 m by 30 m failed and a box of 30 m by 30 m passed in 33 s.",
+			"changed": "The rails and the beams of the pergola are bars (boxes), not tubes: 4 tubes alone made the curved wing fail. The thin parts (the rail, its posts, the columns, the rafters, the doors of the hall) go only to the near and mid levels: they are thinner than two cells of the far level (0.25 m). The order (check_order of World: d947d4783c6a3a671e38975ac66f4ec1) still fails at POST /orders, and so does the curved wing alone with its edits (5 tries)."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "far",
+			"hash": "7e76673aaa4213696ccf4780cc0ef5b2",
+			"seen": "The far level of a smaller order that the factory can build, not of this order: the curved wing only (OSM points 0 to 6 and 28 to 32), its walls, its terrace and the hall, with no shop fronts, no letters and none of the thin parts (build/look/khach_san_grand_canh_sau_far.png). Next to photos 5 to 7 (from above): the quarter of a disc, the white terrace and the hall in the middle of it agree. Next to photos 0 and 1 (2014, from the corner of Nguyễn Du): one storey, and the hall over it as high as the cream wall with the orange cornice behind the trees (7.8 m). Next to photo 2: the hall is paler and more grey than its pink cream wall in the photo, in the light of the look; the shop fronts, the rail, the pergola and the letters are not in this build.",
+			"changed": "Nothing. This order has the shop fronts, the letters, the thin parts, and the roofs of tiles east of the curve."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "7e76673aaa4213696ccf4780cc0ef5b2",
+			"seen": "No look. The factory answered HTTP 503 after 34 s for the near level of the same smaller order (a map of 2 048).",
+			"changed": "Nothing. The job Models of World (mix world.order in CI) can build this order; then a look with --lock at the mid and near levels, next to the photos."
+		}
+	],
+	"status": "Check",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"uses": "Plan 0026, R7, D-0026-14: on its OSM outline (way/791795131) behind the Grand Hotel, in place of its stand-in; the shot S4 shows it.",
+	"impostor": false
+}

@@ -59,6 +59,19 @@ uniform vec3 bush_dry : source_color = vec3(0.36, 0.33, 0.17);
 uniform vec3 roof_colors[8] : source_color;
 uniform float roof_near = 120.0;
 uniform float roof_far = 220.0;
+// Far away, the roofs take their mean color (report 0026, D-0026-15: lots of pink
+// and teal roofs made patches on the slope of Núi Nhỏ from the beach).
+uniform vec2 roof_even_range = vec2(250.0, 600.0);
+uniform float roof_far_even = 0.8;
+// The air between the eye and the far land (report 0026, D-0026-15): from
+// far_haze_range.x to .y m, far_haze of the color of the land goes to
+// far_haze_color (the far forest of the photo of S1 is a pale blue green). The
+// far clumps of the hill trees (shaders/canopy.gdshader) take the same values.
+uniform vec3 far_haze_color : source_color = vec3(0.23, 0.38, 0.38);
+uniform vec2 far_haze_range = vec2(150.0, 650.0);
+uniform float far_haze = 0.58;
+// The light of the haze: 1 in the day, less in the twilight (VungTau sets it).
+uniform float far_haze_light = 1.0;
 // The highest sea level of the last 12 hours: the sand below it is wet.
 uniform float last_high = -100.0;
 uniform vec3 shell_color : source_color = vec3(0.85, 0.82, 0.76);
@@ -187,6 +200,11 @@ void fragment() {
 		town_tree += step(tree_min, texture(canopy_heights, canopy_uv + offset * spread).r * canopy_unit) * 0.2;
 	}
 	vec3 town_crowns = mix(canopy_dark, canopy_light, value_noise(world_position.xz * 0.4));
+	vec3 roof_mean = vec3(0.0);
+	for (int k = 0; k < 8; k++) {
+		roof_mean += roof_colors[k] * 0.53 / 8.0;
+	}
+	lot_color = mix(lot_color, roof_mean, roof_far_even * smoothstep(roof_even_range.x, roof_even_range.y, camera_distance));
 	lot_color = mix(lot_color, town_crowns, town_tree);
 	float town = town_ground * (1.0 - hill_ground);
 	color = mix(color, lot_color, town * smoothstep(roof_near, roof_far, camera_distance));
@@ -294,6 +312,11 @@ void fragment() {
 	// The ground under the water is darker and wet.
 	float under = smoothstep(sea_level + 0.2, sea_level - 0.6, world_position.y);
 	color = mix(color, color * vec3(0.55, 0.65, 0.7), under);
-	ALBEDO = color;
+	// The haze is light that the air scatters, not a lit surface: an emission
+	// with the light of the hour, so that the warm sun of the golden hour does
+	// not make it olive.
+	float haze_part = far_haze * smoothstep(far_haze_range.x, far_haze_range.y, camera_distance) * (1.0 - under);
+	ALBEDO = color * (1.0 - haze_part);
+	EMISSION = far_haze_color * haze_part * far_haze_light;
 	ROUGHNESS = mix(roughness, 0.6, under);
 }

@@ -38,6 +38,11 @@ const CURB_FRONT := 0.02
 const OVER_SIDEWALK_LIFT := 0.02
 ## The way of the people goes on the road this far from the curb of the walk (m).
 const ROAD_INSIDE := 1.5
+## The base of a low wall along the beach: the highest ground this far across
+## (m), and its steepest grade (D-0026-16).
+const WALL_ACROSS := 0.6
+const WALL_GRADE := 0.1
+const WALL_SMOOTH_PASSES := 3
 ## The smoothing raises the walk on the sea wall by this much at most (m): the
 ## step from the road to the walk stays under the step of the player (report
 ## 0026, D-0026-11: the smoothing raised it 0.12 m where the road climbs).
@@ -97,6 +102,9 @@ var sea_walk := PackedVector3Array()
 var sea_walk_on := PackedByteArray()
 ## The road beside each point of sea_walk, 2 m in from the curb.
 var sea_road := PackedVector3Array()
+## The base lines of the low walls along the beach (D-0026-16; PT-71 checks
+## that they are smooth).
+var wall_lines: Array[PackedVector3Array] = []
 ## The edges of the parts that a player walks on (report 0026, D-0026-11):
 ## [{kind, a, b (the ends of the edge on the top of the part), out (the
 ## direction out of the part)}]. PT-71 scans the step at each edge.
@@ -109,6 +117,16 @@ var ground_step := 0.5
 ## The pieces of the walls that are models of this game (report 0026,
 ## D-0026-09): one row of MultiMeshes, the near, mid and far levels.
 var wall_row: WorldRow
+## Report 0026, D-0026-17: the hedges, the round bushes, the flowers of the
+## flower beds, and the benches of the park (park_plants), in one row.
+var park_row: WorldRow
+## The low lamps of the paths of the park: the hedges leave a gap at each.
+var path_lamp_points: Array[Vector3] = []
+## The places of the plants of the park, for PT-71: {"kind", "at", "radius"}.
+var park_plants: Array[Dictionary] = []
+## The long boats on the sand (report 0026, D-0026-20): {"at", "along" (unit, to
+## the bow), "half" (half the length)}. The swimmers keep away from them.
+var beached_boats: Array[Dictionary] = []
 
 ## The world builds the parts when the player comes near (report 0026, D-0026-12).
 signal built
@@ -173,10 +191,13 @@ func setup(w: VungTau, path := CONFIG) -> bool:
 		_steps.append(_lamp_row.bind(row))
 	if data.has("path_lamps"):
 		_steps.append(_path_lamps.bind(data.path_lamps))
+	if data.has("park_plants"):
+		_steps.append(_park_plants.bind(data.park_plants))
 	if data.has("stand_ins"):
 		_steps.append(_stand_ins.bind(data.stand_ins))
-	if data.has("beached"):
-		_steps.append(_beached.bind(data.beached))
+	var beached: Variant = data.get("beached", [])
+	for cfg: Dictionary in (beached if beached is Array else [beached]):
+		_steps.append(_beached.bind(cfg))
 	_steps.append(_commit)
 	# R10: the people, after the parts (they sit on the raised lawns).
 	_steps.append(_add_people)
@@ -307,7 +328,62 @@ func _ground(path: String) -> void:
 		var line := PackedVector3Array()
 		for point: Array in wall.points:
 			line.append(Vector3(float(point[0]), world.ground_height(float(point[0]), float(point[1])), float(point[1])))
-		_balustrade(_dense(line, STEP), cfg.get("beach_wall", {}))
+		var base := _wall_base(_dense(line, STEP))
+		wall_lines.append(base)
+		_balustrade(base, cfg.get("beach_wall", {}))
+		_wall_poles(base, cfg.get("beach_wall", {}).get("poles", {}))
+
+
+## Report 0026, D-0026-19: the blue poles of the walk of the sea, in_m to the
+## land side of the low wall of the beach (the side with the higher ground), with
+## the long arm over the walk.
+func _wall_poles(line: PackedVector3Array, cfg: Dictionary) -> void:
+	if cfg.is_empty() or line.size() < 2:
+		return
+	var sides := _sides(line)
+	for at: Array in _every(line, float(cfg.get("every_m", 30.0)), float(cfg.get("from_end_m", 10.0))):
+		var p: Vector3 = at[0]
+		var along: Vector3 = at[1]
+		var right := Vector3(-along.z, 0.0, along.x).normalized()
+		var land := right if world.ground_height(p.x + right.x * 2.0, p.z + right.z * 2.0) \
+				> world.ground_height(p.x - right.x * 2.0, p.z - right.z * 2.0) else -right
+		var foot := _on_ground(p + land * float(cfg.get("in_m", 1.0)))
+		if not contains(foot.x, foot.z) or _in_model(foot):
+			continue
+		# A model with a long arm turns it to the right side of "along": to the land.
+		_lamp(str(cfg.get("kind", "")), foot, along if right.dot(land) > 0.0 else -along)
+
+
+## The base of a low wall along the edge of the walk (report 0026, D-0026-16):
+## the wall stands at the edge between the walk and the sand (a drop of up to
+## 2 m), so the ground on its line jumps between the two, and the top of its
+## pieces was a saw-tooth. The base is the highest ground within WALL_ACROSS
+## m across (the walk), then WALL_SMOOTH_PASSES times a mean of 5 points and
+## a grade of at most WALL_GRADE.
+func _wall_base(line: PackedVector3Array) -> PackedVector3Array:
+	var sides := _sides(line)
+	var raw := PackedFloat32Array()
+	for i in line.size():
+		var high := -INF
+		for k: float in [-WALL_ACROSS, 0.0, WALL_ACROSS]:
+			var q := line[i] + sides[i] * k
+			high = maxf(high, world.ground_height(q.x, q.z))
+		raw.append(high)
+	var mean := raw
+	for pass_index in WALL_SMOOTH_PASSES:
+		var next := PackedFloat32Array()
+		for i in mean.size():
+			var total := 0.0
+			var n := 0
+			for k in range(maxi(0, i - 2), mini(mean.size(), i + 3)):
+				total += mean[k]
+				n += 1
+			next.append(total / n)
+		mean = _limit_grade(line, next, WALL_GRADE)
+	var result := PackedVector3Array()
+	for i in line.size():
+		result.append(Vector3(line[i].x, mean[i], line[i].z))
+	return result
 
 
 ## The lawn (R) and the paving (G) of the fine mask at a point, from 0 to 1.
@@ -423,10 +499,8 @@ func _balustrade(line: PackedVector3Array, cfg: Dictionary) -> void:
 	var along := 0.0
 	var next_post := 0.0
 	for i in line.size() - 1:
-		var a := line[i]
-		var b := line[i + 1]
-		a.y = world.ground_height(a.x, a.z) + LIFT
-		b.y = world.ground_height(b.x, b.z) + LIFT
+		var a := line[i] + Vector3(0, LIFT, 0)
+		var b := line[i + 1] + Vector3(0, LIFT, 0)
 		var length := a.distance_to(b)
 		var dir := (b - a).normalized()
 		for part: Vector2 in _less_gaps(along, along + length, gaps):
@@ -463,10 +537,9 @@ func _wall_spans(model_id: String, line: PackedVector3Array, span: float, gaps: 
 		var mid := (s0 + s1) / 2.0
 		if _in_gaps(mid, gaps, 0.0):
 			continue
-		var a := _along_line(line, s0)
-		var b := _along_line(line, s1)
-		a.y = world.ground_height(a.x, a.z) + LIFT
-		b.y = world.ground_height(b.x, b.z) + LIFT
+		# On the base of the wall (the line), not on the ground (D-0026-16).
+		var a := _along_line(line, s0) + Vector3(0, LIFT, 0)
+		var b := _along_line(line, s1) + Vector3(0, LIFT, 0)
 		var middle := (a + b) / 2.0
 		var side := Vector3(-(b - a).z, 0.0, (b - a).x).normalized()
 		var sea := side if world.ground_height(middle.x + side.x * 1.5, middle.z + side.z * 1.5) \
@@ -685,7 +758,9 @@ func _walls(cfg: Dictionary) -> void:
 				var line := PackedVector3Array()
 				for i in run.size():
 					line.append(run[i] + sides[i] * offset)
-				_balustrade(line, cfg)
+				var base := _wall_base(line)
+				wall_lines.append(base)
+				_balustrade(base, cfg)
 			else:
 				_ridge(str(cfg.get("color", "#8a867e")), run, offset, width, float(cfg.get("height", 0.55)))
 			_add_length("wall", _length(run))
@@ -1123,7 +1198,8 @@ func _place_steps(path: String) -> void:
 	for place: Dictionary in parsed.get("places", []):
 		# A model with the status Check (data/world/drawings/) has its place, but
 		# no order in data/world/orders.json: it waits, and its stand-in stays.
-		if not WorldModel.order(str(place.id)).is_empty():
+		# So does an order whose files wait for the job "Models of World".
+		if _has_model(str(place.id)):
 			_place_ids.append(str(place.id))
 			_steps.append(_place.bind(place, ranges))
 
@@ -1169,6 +1245,9 @@ func _place(place: Dictionary, ranges: Dictionary) -> void:
 
 ## R5: the basket boats on the sand above the water line.
 func _beached(cfg: Dictionary) -> void:
+	# A long boat (length_m) lies along the slope of the sand: the line from its
+	# stern to its bow follows the ground, and it sinks sink_m into the sand.
+	var length := float(cfg.get("length_m", 0.0))
 	for point: Array in cfg.get("points", []):
 		var p := Vector3(float(point[0]), 0.0, float(point[1]))
 		p.y = world.ground_height(p.x, p.z)
@@ -1178,8 +1257,22 @@ func _beached(cfg: Dictionary) -> void:
 		var boat := WorldModel.make(str(cfg.model), WorldMaterials.DEFAULT_PAINT, str(cfg.get("material_set", "")))
 		if boat == null:
 			return
-		boat.transform = Transform3D(Basis(Vector3.UP, deg_to_rad(float(point[2]))), p)
+		var basis := Basis(Vector3.UP, deg_to_rad(float(point[2])))
+		if length > 0.0:
+			# The bow of the boat of World is to +z (its eyes, PT-75 screenshots).
+			var ahead := basis * Vector3(0.0, 0.0, length * 0.5)
+			var bow := world.ground_height(p.x + ahead.x, p.z + ahead.z)
+			var stern := world.ground_height(p.x - ahead.x, p.z - ahead.z)
+			basis = basis * Basis(Vector3.RIGHT, atan2(bow - stern, length))
+			p.y = minf(p.y, (bow + stern) * 0.5) - float(cfg.get("sink_m", 0.0))
+			beached_boats.append({"at": p, "along": Vector3(ahead.x, 0.0, ahead.z).normalized(), "half": length * 0.5})
+		boat.transform = Transform3D(basis, p)
 		add_child(boat)
+		# The far level casts no shadow (report 0026, PT-73: the shadow pass doubles its triangles).
+		var far := boat.level("far")
+		if far != null:
+			for node in far.find_children("*", "GeometryInstance3D", true, false):
+				(node as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		_add_length("beached", 1.0)
 
 
@@ -1567,8 +1660,229 @@ func _path_lamps(cfg: Dictionary) -> void:
 			if park.size() < 3 or not Geometry2D.is_point_in_polygon(Vector2(p.x, p.z), park) or _in_model(p):
 				continue
 			_lamp(str(cfg.get("kind", "path_lamp")), p, dir)
+			path_lamp_points.append(p)
 			count += 1
 	_add_length("path_lamps", count)
+
+
+## Report 0026, D-0026-17 (Q19): the park of the photos of 2014 to 2021. Low
+## clipped hedges at the edge of the lawns along the paths, with a gap at each
+## low lamp, at each bench, and at each junction; a group of round clipped
+## bushes behind the hedge at some corners where paths meet; round flower beds
+## on the lawn behind long hedges; and granite benches in gaps of the hedges,
+## to the path. Each plant is on the lawn of the ground mask, in the park, and
+## away from the trunks of the trees.
+func _park_plants(cfg: Dictionary) -> void:
+	if park.size() < 3:
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = int(cfg.get("seed", 26))
+	var hedge: Dictionary = cfg.get("hedges", {})
+	var border := float(data.get("path_borders", {}).get("width", 0.16))
+	var types: Array = hedge.get("types", ["footway"])
+	var park_box := Rect2(park[0], Vector2.ZERO)
+	for q in park:
+		park_box = park_box.expand(q)
+	var lines: Array[PackedVector3Array] = []
+	for id: int in _roads:
+		var road: Dictionary = _roads[id]
+		if not str(road.type) in types:
+			continue
+		var line := _line(road)
+		var in_box := false
+		for q in line:
+			in_box = in_box or park_box.has_point(Vector2(q.x, q.z))
+		if not in_box:
+			continue
+		var offset := float(road.width) / 2.0 + border + float(hedge.get("offset_m", 0.3))
+		var others := _other_roads([id])
+		var gap := float(hedge.get("junction_gap_m", 1.5))
+		for sign: float in [-1.0, 1.0]:
+			for run: PackedVector3Array in _runs(line, func(q: Vector3, side: Vector3) -> bool:
+					var at := q + side * sign * offset
+					return Geometry2D.is_point_in_polygon(Vector2(at.x, at.z), park) and _lawn(at) \
+							and not _near_other(at, others, gap) and not _in_model(at)):
+				var sides := _sides(run)
+				var shifted := PackedVector3Array()
+				for i in run.size():
+					shifted.append(_on_ground(run[i] + sides[i] * sign * offset))
+				# The lawn side of the hedge.
+				var lawn := sides[shifted.size() / 2] * sign
+				if _length(shifted) >= float(hedge.get("min_run_m", 4.0)):
+					lines.append(shifted)
+					_hedge_line(cfg, shifted, lawn, rng)
+
+
+## True when the ground mask of the park has lawn at the point.
+func _lawn(p: Vector3) -> bool:
+	return ground_at(p.x, p.z).r > 0.5
+
+
+## True when the trunk of a tree is nearer than "radius" m to the point.
+func _in_tree(p: Vector3, radius: float) -> bool:
+	return world.trees != null and not world.trees.all_trees_near(p, radius).is_empty()
+
+
+## The pieces of one hedge, the benches in its gaps, the group of bushes at its
+## two ends, and a flower bed behind its middle.
+func _hedge_line(cfg: Dictionary, line: PackedVector3Array, lawn: Vector3, rng: RandomNumberGenerator) -> void:
+	var hedge: Dictionary = cfg.get("hedges", {})
+	var bench: Dictionary = cfg.get("benches", {})
+	var model := str(hedge.get("model", ""))
+	var piece := float(_option(model, "length", 2.0))
+	var total := _length(line)
+	# The gaps: [from, to] along the line.
+	var gaps: Array[Vector2] = []
+	var lamp_gap := float(hedge.get("lamp_gap_m", 0.35))
+	for lamp in path_lamp_points:
+		var q := _nearest(line, lamp)
+		if Vector2(q.x - lamp.x, q.z - lamp.z).length() < 1.0:
+			var s := _distance_along(line, q)
+			gaps.append(Vector2(s - lamp_gap, s + lamp_gap))
+	var benches: Array[float] = []
+	var bench_model := str(bench.get("model", ""))
+	if _has_model(bench_model):
+		var length := float(_option(bench_model, "length", 1.2))
+		var every := float(bench.get("every_m", 24.0))
+		var s := every * 0.5
+		while s < total - every * 0.25:
+			var free := true
+			for g in gaps:
+				free = free and (s + length < g.x - 0.2 or s - length > g.y + 0.2)
+			if free:
+				benches.append(s)
+				gaps.append(Vector2(s - length * 0.5 - 0.2, s + length * 0.5 + 0.2))
+			s += every
+	gaps.sort_custom(func(a: Vector2, b: Vector2) -> bool: return a.x < b.x)
+	if _has_model(model):
+		for span: Vector2 in _less_gaps(0.0, total, gaps):
+			var count := maxi(roundi((span.y - span.x) / piece), 1)
+			if span.y - span.x < piece * 0.4:
+				continue
+			var step := (span.y - span.x) / count
+			for k in count:
+				var a := _along_line(line, span.x + step * k)
+				var b := _along_line(line, span.x + step * (k + 1))
+				_row_piece(model, a, b, lawn)
+				_add_length("hedge", a.distance_to(b))
+	for s in benches:
+		var at := _along_line(line, s)
+		var along := (_along_line(line, s + 0.5) - _along_line(line, s - 0.5)).normalized()
+		# The bench looks to the path: its front (+z of the GLB) away from the lawn.
+		var basis := Basis(Vector3.UP, atan2(-lawn.x, -lawn.z))
+		_row_add(bench_model, Transform3D(basis, at))
+		park_plants.append({"kind": "bench", "at": at, "radius": 0.6, "along": along})
+	# The round bushes at the corners.
+	var bushes: Dictionary = cfg.get("bushes", {})
+	if _has_model(str(bushes.get("model", ""))):
+		for end: float in [1.0, total - 1.0]:
+			if rng.randf() < float(bushes.get("part", 0.5)):
+				var corner := _along_line(line, clampf(end + (2.0 if end < total * 0.5 else -2.0), 0.0, total))
+				_bush_group(bushes, corner + lawn * float(bushes.get("behind_m", 1.8)), lawn, rng)
+	# A flower bed behind the middle of a long hedge.
+	var beds: Dictionary = cfg.get("flower_beds", {})
+	if _has_model(str(beds.get("model", ""))) and total >= float(beds.get("min_run_m", 30.0)) \
+			and rng.randf() < float(beds.get("part", 0.5)):
+		var radius := rng.randf_range(float(beds.radius_m[0]), float(beds.radius_m[1]))
+		_flower_bed(beds, _along_line(line, total * 0.5) + lawn * (float(beds.get("behind_m", 2.0)) + radius), radius)
+
+
+## A group of 3 to 5 round bushes, the tallest at the back.
+func _bush_group(cfg: Dictionary, center: Vector3, lawn: Vector3, rng: RandomNumberGenerator) -> void:
+	var model := str(cfg.model)
+	var count := rng.randi_range(int(cfg.get("count", [3, 5])[0]), int(cfg.get("count", [3, 5])[1]))
+	var width := float(_option(model, "width", 1.4))
+	var placed := 0
+	for k in count:
+		var a := TAU * k / count + rng.randf_range(-0.3, 0.3)
+		var r := 0.0 if k == 0 else width * 0.55
+		var p := _on_ground(center + Vector3(cos(a), 0.0, sin(a)) * r)
+		if not _lawn(p) or _in_tree(p, width * 0.6 + 0.3) or _in_model(p) \
+				or not Geometry2D.is_point_in_polygon(Vector2(p.x, p.z), park):
+			continue
+		# The bush at the back (on the lawn side) is the tall one.
+		var back := Vector2(p.x - center.x, p.z - center.z).dot(Vector2(lawn.x, lawn.z)) > 0.2
+		var scale := rng.randf_range(1.25, 1.5) if back and placed == 0 else rng.randf_range(0.85, 1.05)
+		_row_add(model, Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * scale), p - Vector3(0, 0.03, 0)))
+		park_plants.append({"kind": "bush", "at": p, "radius": width * 0.5 * scale})
+		placed += 1
+	if placed > 0:
+		_add_length("bush_groups", 1.0)
+
+
+## A round flower bed: a granite border and the flowers inside it.
+func _flower_bed(cfg: Dictionary, center: Vector3, radius: float) -> void:
+	var model := str(cfg.model)
+	for k in 12:
+		var a := TAU * k / 12.0
+		var p := center + Vector3(cos(a), 0.0, sin(a)) * radius
+		if not _lawn(p) or _in_model(p) or not Geometry2D.is_point_in_polygon(Vector2(p.x, p.z), park):
+			return
+	if not _lawn(center) or _in_tree(center, radius + 0.4):
+		return
+	var ring := PackedVector3Array()
+	for k in 33:
+		var a := TAU * k / 32.0
+		ring.append(_on_ground(center + Vector3(cos(a), 0.0, sin(a)) * radius))
+	var border: Dictionary = data.get("path_borders", {})
+	_ridge(str(border.get("color", "#8f8c86")), ring, 0.0, float(cfg.get("border_m", 0.16)), float(cfg.get("border_height_m", 0.12)))
+	# Larger clumps, fewer of them: each clump is 400 triangles at the mid level.
+	var grow := float(cfg.get("clump_scale", 1.0))
+	var clump := float(_option(model, "width", 0.4)) * grow * float(cfg.get("spacing", 0.9))
+	var row := 0
+	var z := -radius
+	while z <= radius:
+		var x := -radius + (clump * 0.5 if row % 2 == 1 else 0.0)
+		while x <= radius:
+			if Vector2(x, z).length() <= radius - clump * 0.5:
+				var p := _on_ground(center + Vector3(x, 0.0, z))
+				_row_add(model, Transform3D(Basis(Vector3.UP, fposmod(x * 7.3 + z * 3.1, TAU)).scaled(Vector3.ONE * grow), p))
+			x += clump
+		z += clump * 0.866
+		row += 1
+	park_plants.append({"kind": "flower_bed", "at": center, "radius": radius})
+	_add_length("flower_beds", 1.0)
+
+
+## The distance along the line to its point nearest to p.
+func _distance_along(line: PackedVector3Array, p: Vector3) -> float:
+	var best := 0.0
+	var best_d := INF
+	var along := 0.0
+	for i in line.size() - 1:
+		var q := Geometry3D.get_closest_point_to_segment(p, line[i], line[i + 1])
+		var d := q.distance_to(p)
+		if d < best_d:
+			best_d = d
+			best = along + line[i].distance_to(q)
+		along += line[i].distance_to(line[i + 1])
+	return best
+
+
+## A model in the row of the park.
+func _row_add(model_id: String, at: Transform3D) -> void:
+	if park_row == null:
+		park_row = WorldRow.new()
+		park_row.name = "ParkPlants"
+		var cfg: Dictionary = data.get("park_plants", {})
+		park_row.cell_size = float(cfg.get("cell_m", WorldRow.CELL))
+		for preset: String in cfg.get("ranges", {}):
+			var r: Array = cfg.ranges[preset]
+			park_row.custom_ranges[preset] = Vector3(float(r[0]), float(r[1]), float(r[2]))
+		add_child(park_row)
+	park_row.add(model_id, at)
+
+
+## A piece along a line (a hedge) in the row of the park: as _wall_piece.
+func _row_piece(model_id: String, a: Vector3, b: Vector3, side: Vector3) -> void:
+	var length := float(_option(model_id, "length", 2.0))
+	if a.distance_to(b) < 0.05:
+		return
+	var flat := Vector3(side.x, 0.0, side.z).normalized()
+	var basis := Basis(-(b - a) / length, Vector3.UP, flat)
+	if basis.determinant() < 0.0:
+		basis.x = -basis.x
+	_row_add(model_id, Transform3D(basis, (a + b) / 2.0))
 
 
 ## R9: a stand-in lamp of the kind of "lamp_kinds" at the point (its base),
@@ -1781,6 +2095,9 @@ static func _area(ring: PackedVector2Array) -> float:
 
 
 func _commit() -> void:
+	if park_row != null:
+		park_row.build()
+		_add_length("park_plants", float(park_row.count()))
 	if wall_row != null:
 		wall_row.build()
 		_add_length("wall_pieces", float(wall_row.count()))

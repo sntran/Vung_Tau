@@ -433,7 +433,8 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     write_json(out / "beaches.json", {"beaches": [
         {"osm": b["osm"], "name": b["name"], "polygons": [blocks_module.polygon_to_game(p) for p in b["polygons"]]}
         for b in beach_records]}, None)
-    write_json(out / "roads.json", {"roads": [road_record(r) for r in roads]}, None)
+    paved = paved_paths(roads, parks)
+    write_json(out / "roads.json", {"roads": [road_record(r, r.id in paved) for r in roads]}, None)
     write_json(out / "blocks.json", {"blocks": [
         dict(id=i, buildings=b["buildings"], has_buildings=b["buildings"] > 0, landuse=b["landuse"],
              area_m2=round(b["polygon"].area, 1), **blocks_module.polygon_to_game(b["polygon"]))
@@ -501,12 +502,34 @@ def shore_end(line, islet: dict, projection) -> tuple[float, float]:
     return (end.x, end.y)
 
 
-def road_record(road) -> dict:
+PAVED_PATH_TYPES = ("footway", "pedestrian")
+
+
+def paved_paths(roads, parks) -> set:
+    """Report 0026, D-0026-17: the ids of the footways and the pedestrian ways
+    that are in a park for at least half of their length. The game gives them
+    tiles (the paths of the park of Bãi Trước), not the concrete of a hẻm."""
+    if not parks:
+        return set()
+    union = shapely.ops.unary_union(parks)
+    result = set()
+    for road in roads:
+        if road.type not in PAVED_PATH_TYPES or road.points is None or len(road.points) < 2:
+            continue
+        line = shapely.LineString(road.points)
+        if line.length > 0 and line.intersection(union).length >= 0.5 * line.length:
+            result.add(road.id)
+    return result
+
+
+def road_record(road, paved: bool = False) -> dict:
     record = {"id": road.id, "type": road.type, "name": road.name, "width": road.width,
               "width_source": road.width_source, "surface": road.surface, "hem": road.hem,
               "sidewalk": road.sidewalk, "oneway": road.oneway, "lanes": road.lanes,
               "points": [[round(float(x), 2), round(float(h), 2), round(-float(y), 2)]
                          for (x, y), h in zip(road.points, road.heights)]}
+    if paved:
+        record["paved"] = True
     if road.bridge:
         record["bridge"] = True
     if road.tunnel:

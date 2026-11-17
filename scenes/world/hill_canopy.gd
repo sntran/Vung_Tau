@@ -21,9 +21,11 @@ const SECOND := 0.5
 ## (the shader changes it between the two distances of "scale_m"), and the
 ## distance to which the dense clumps show (0: never). Far away, the sparse
 ## clumps are larger, so that they cover about as much of the hills as all
-## the clumps.
+## the clumps. "height_max" (Low): a clump grows wider, but not higher than this
+## scale (report 0026, D-0026-15: on Low the crowns of 11 m every 32 m stood on
+## the bare hill of S1 as small houses; the photo shows one canopy).
 const DETAIL := {
-	"low": {"crown": true, "scale": [2.0, 4.5], "scale_m": [400.0, 1600.0], "dense_m": 0.0},
+	"low": {"crown": true, "scale": [3.4, 5.0], "scale_m": [400.0, 1600.0], "dense_m": 0.0, "height_max": 1.8},
 	"medium": {"crown": false, "scale": [1.0, 2.4], "scale_m": [900.0, 1500.0], "dense_m": 1000.0},
 	"high": {"crown": false, "scale": [1.0, 2.4], "scale_m": [1300.0, 2000.0], "dense_m": 1500.0},
 	"ultra": {"crown": false, "scale": [1.0, 2.4], "scale_m": [1800.0, 2600.0], "dense_m": 2000.0},
@@ -96,6 +98,7 @@ func set_preset(preset: String) -> void:
 	material.set_shader_parameter("clump_scale", detail.scale[0])
 	material.set_shader_parameter("clump_scale_far", detail.scale[1])
 	material.set_shader_parameter("scale_range", Vector2(detail.scale_m[0], detail.scale_m[1]))
+	material.set_shader_parameter("height_scale_max", float(detail.get("height_max", 100.0)))
 	for instance: MultiMeshInstance3D in _sparse:
 		instance.multimesh.mesh = _crown_mesh if detail.crown else _mesh
 	for instance: MultiMeshInstance3D in _dense:
@@ -151,7 +154,7 @@ static func crown_mesh() -> Mesh:
 	var tool := SurfaceTool.new()
 	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
 	# Darker than a crown of a clump: one crown has no shade of the other crowns on it.
-	_crown(tool, Vector3(0.0, 2.2, 0.0), Vector3(2.6, 2.0, 2.6), 0.4, 0.75)
+	_crown(tool, Vector3(0.0, 2.2, 0.0), Vector3(2.6, 2.0, 2.6), 0.55, 0.8)
 	tool.index()
 	return tool.commit()
 
@@ -163,8 +166,9 @@ static func _crown(tool: SurfaceTool, center: Vector3, radius: Vector3, low_shad
 	var rings: Array[PackedVector3Array] = []
 	var normals: Array[PackedVector3Array] = []
 	for r in RINGS + 1:
-		# From 30 degrees below the middle to the top.
-		var angle := lerpf(-PI / 6.0, PI / 2.0, float(r) / RINGS)
+		# From 30 degrees below the middle to the top, with the middle ring at 45
+		# degrees: a round top, not the roof of a house (report 0026, D-0026-15).
+		var angle: float = [-PI / 6.0, PI / 4.0, PI / 2.0][r]
 		var ring := PackedVector3Array()
 		var ring_normals := PackedVector3Array()
 		for s in SIDES:

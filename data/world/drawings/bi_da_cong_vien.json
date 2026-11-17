@@ -1,0 +1,324 @@
+{
+	"id": "bi_da_cong_vien",
+	"what": "bi đá công viên: the brown stone ball (granite) set into the lawn of the park of Bãi Trước, in a group of small balls and one large ball",
+	"way": "drawing",
+	"status": "Check",
+	"status_note": "Check: the photos of 2014 show the balls, but I found no photo of 2017 to 2021 or after 2021 that shows them (the photo of 2021 from a drone shows only the south end of the park, and the balls are not clear in it).",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": true,
+	"uses": "Plan 0026, D-0026-17: the stone balls on the lawns of the park of Bãi Trước, in a group by a path (data/showcase/bai_truoc.json)",
+	"order": {
+		"blueprint": "drawing",
+		"options": {
+			"drawing": {
+				"name": "bi_da_cong_vien",
+				"kind": "prop",
+				"sources": [
+					"The brown stone ball on the lawn of the park of Bãi Trước: 0.55 m across, set into the lawn 0.14 m, rough and with dark patches; photos of 2014-04-06 (Commons, trungydang, CC BY 3.0); the sizes at the scale of the low lamp of the park (0.70 m) (Vũng Tàu, data/world/drawings/bi_da_cong_vien.json)."
+				],
+				"materials": {
+					"part_01": {
+						"color": "#ffffff",
+						"roughness": 0.85,
+						"metalness": 0.0
+					}
+				},
+				"nodes": [
+					{
+						"name": "ball",
+						"skill": {
+							"sculpt": {
+								"edits": [
+									{
+										"shape": "ball",
+										"size": [
+											0.275
+										],
+										"at": [
+											0,
+											0,
+											0.135
+										],
+										"material": "part_01",
+										"color": "#6c4826",
+										"roughness": 0.85,
+										"surface": {
+											"kind": "stone",
+											"scale": 0.03
+										}
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.5,
+											0.5,
+											0.5
+										],
+										"at": [
+											0,
+											0,
+											-0.5
+										],
+										"mode": "subtract",
+										"material": "part_01",
+										"color": "#4a3a22"
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.12
+										],
+										"at": [
+											0.2,
+											0.12,
+											0.3
+										],
+										"mode": "paint",
+										"blend": 0.05,
+										"opacity": 0.3,
+										"material": "part_01",
+										"color": "#48301a"
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.1
+										],
+										"at": [
+											-0.16,
+											0.2,
+											0.22
+										],
+										"mode": "paint",
+										"blend": 0.05,
+										"opacity": 0.28,
+										"material": "part_01",
+										"color": "#48301a"
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.13
+										],
+										"at": [
+											-0.1,
+											-0.22,
+											0.3
+										],
+										"mode": "paint",
+										"blend": 0.05,
+										"opacity": 0.25,
+										"material": "part_01",
+										"color": "#48301a"
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.09
+										],
+										"at": [
+											0.05,
+											-0.05,
+											0.42
+										],
+										"mode": "paint",
+										"blend": 0.05,
+										"opacity": 0.22,
+										"material": "part_01",
+										"color": "#48301a"
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.1
+										],
+										"at": [
+											0.24,
+											-0.12,
+											0.12
+										],
+										"mode": "paint",
+										"blend": 0.05,
+										"opacity": 0.3,
+										"material": "part_01",
+										"color": "#8c6a42"
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.09
+										],
+										"at": [
+											-0.24,
+											-0.04,
+											0.12
+										],
+										"mode": "paint",
+										"blend": 0.05,
+										"opacity": 0.25,
+										"material": "part_01",
+										"color": "#8c6a42"
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.08
+										],
+										"at": [
+											0.0,
+											0.26,
+											0.1
+										],
+										"mode": "paint",
+										"blend": 0.05,
+										"opacity": 0.25,
+										"material": "part_01",
+										"color": "#8c6a42"
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.4,
+											0.4,
+											0.03
+										],
+										"at": [
+											0,
+											0,
+											0.0
+										],
+										"mode": "paint",
+										"blend": 0.05,
+										"opacity": 0.7,
+										"material": "part_01",
+										"color": "#4a3a22"
+									}
+								],
+								"cells": {
+									"near": 0.01,
+									"mid": 0.03,
+									"far": 0.07
+								},
+								"budget": {
+									"near": 4000,
+									"mid": 500,
+									"far": 60
+								},
+								"bake": {
+									"near": 512,
+									"mid": 128,
+									"far": 64
+								},
+								"dirt": 0.3,
+								"wear": 0.15
+							}
+						}
+					}
+				]
+			}
+		}
+	},
+	"sources": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"date": "2014-04-06 06:46",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_balls_2014.jpg",
+			"shows": "The park in front of a raised lawn with coconut palms and a stair: a group of brown granite balls (one large, four small) and low round clipped shrubs on the lawn, a carved stone with stars, granite benches, low square lamps, and a group of round clipped bushes on the right."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(2).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_paths_2014.jpg",
+			"shows": "The park in the morning: a path of tiles with a granite curb, a low square white lamp at its side, two women on the path, a granite bench, clipped hedges along the paths, round clipped bushes, granite balls on the lawn, frangipani trees, a black post with white globes, raised lawns and coconut palms."
+		}
+	],
+	"sizes": {
+		"diameter": {
+			"value": 0.55,
+			"unit": "m",
+			"source": "Photo 0 (2014, 1920 px): two low lamps (0.70 m) on the lawn are 71 px (the foot at 900 px) and 60 px (the foot at 835 px) high; between them the scale goes with the height of the foot in the photo. The two small balls in front (their feet at 845 px and 844 px, 88 px for 1 m) are 50 px and 48.5 px across: 0.57 m and 0.55 m. Photo 1 (2014, 1920 px): a small ball is 39 px across at its foot at 931 px, where the scale of the women (1.58 m) and of the low lamp is 79 px for 1 m: 0.49 m. 0.55 m."
+		},
+		"shown": {
+			"value": 0.41,
+			"unit": "m",
+			"source": "Photo 0: the two small balls are 36.5 px and 35.5 px high over the lawn and 50 px and 48.5 px across: 0.73 of their width; the large ball 0.82. The lawn round them is short, so the balls are set into the lawn: 0.41 m of 0.55 m shows."
+		},
+		"large": {
+			"value": 1.0,
+			"unit": "m",
+			"source": "Photo 0: one large ball with the small ones, 102.5 px across at its foot at 870 px (94 px for 1 m): 1.09 m. Photo 1: the large ball is 70 px at 78 px for 1 m: 0.90 m. The game uses this model with a scale of 1.8 for it."
+		},
+		"colors": {
+			"value": "stone #6c4826, dark patches #48301a, light patches #8c6a42",
+			"unit": "",
+			"source": "Photo 0 (an overcast morning): the median of the small balls is #5c3a12 to #603812, of the large ball #4e3b16; the light granite curb of the path in the same photo is #8a7d56, and its color is #c9c6bd (data/showcase/bai_truoc.json). With the same correction: #865c28 and #725d30. The look of the mid level next to photo 0 was too light and too yellow, so the stone is a darker red brown: #6c4826. The patches: photos 0 and 1 (crops at full size), dark patches and light grains on a rough surface."
+		},
+		"surface": {
+			"value": "rough dressed stone, bumps of 3 cm",
+			"unit": "",
+			"source": "Photos 0 and 1, crops at full size: a dull rough surface with small pits and spots, no shine."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "5100c90182f24607ae601939a08ded4d",
+			"seen": "Next to crops of photo 0: a ball set into the lawn, 0.55 m across and 0.41 m high, with patches and a rough surface, as the balls of the photo. But it is light beige, as bread or sand: the small balls of the photo are a darker orange brown and the large one a grey brown. With 300 triangles the outline has some flat facets.",
+			"changed": "A darker red brown stone (#6c4826, patches #48301a and #8c6a42), and 500 triangles at the mid level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "8f8f994b58f5c54423ef1787f2e0ecb1",
+			"seen": "An orange brown ball set into the lawn with a smooth outline (500 triangles): the color and the shape of the small balls of photos 0 and 1. But the dark patches are large soft smudges, as dirt; the balls of the photos have an even color with fine dark pits, and their dark sides are shade.",
+			"changed": "Weaker patches (an opacity of 0.22 to 0.3) and a finer stone surface (3 cm)."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "f833156daab483e20c1ed597fb15f4c9",
+			"seen": "Next to crops of photos 0 and 1: an even orange brown ball, 0.55 m across, 0.41 m over the lawn, with weak patches: the shape, the size and the color of the small balls of the photos. The fine pits of the stone show only a little at this level; at 15 m to 40 m a ball is 10 px to 30 px.",
+			"changed": "Nothing at the mid level. Next: the far level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "far",
+			"hash": "f833156daab483e20c1ed597fb15f4c9",
+			"seen": "40 triangles: a brown stone of seven or eight sides with the mean color of the mid level (#835d38 against #875f39 in the front view). It reads as a stone ball from far, but its outline is a polygon, and the image shows thin light lines at some edges.",
+			"changed": "60 triangles at the far level, for a rounder outline."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "far",
+			"hash": "6629fafa3f678ac75730cc8a7ce52592",
+			"seen": "60 triangles: a rounder brown ball of ten or eleven sides, the color of the mid level, a dark line at the lawn. From far (40 m to 150 m it is 2 px to 8 px) it reads as a round brown stone. Faint light lines stay at some edges of the image.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "6629fafa3f678ac75730cc8a7ce52592",
+			"seen": "The same views as the mid level before (only the far level changed): 500 triangles.",
+			"changed": "Nothing. Next: the near level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "6629fafa3f678ac75730cc8a7ce52592",
+			"seen": "4000 triangles: a ball of rough stone, set into the lawn, with small bumps and pits, weak dark patches and a dark line at the lawn. Next to a crop of photo 0 the color and the shape agree; the relief of the stone is a little stronger than the fine pits of the balls of the photo.",
+			"changed": "Nothing: I build the near level one time."
+		}
+	],
+	"hash": "6629fafa3f678ac75730cc8a7ce52592"
+}

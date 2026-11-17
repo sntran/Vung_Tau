@@ -30,14 +30,14 @@
 				}
 			],
 			"eye": [
-				-45.5,
+				-48.7,
 				-214.0
 			],
-			"eye_height": 1.6,
+			"eye_height": 2.4,
 			"heading": 3.4,
 			"pitch": -0.8,
 			"fov": 29.9,
-			"how": "Eye: the photo is taken from over the low wall at the top of the beach; the place on Panoramio is 15 m inland, in the park, where a tree hides the view, so the eye is on the walk at the top of the beach, 15 m from it (on the sand, the wall hides the beach). The low wall of the game is at the right of the eye, not at the left as in the photo. Heading: from the place of the photo, Khách sạn Bưu điện (OSM way 259750558, x 22, z 286) is 4.3 degrees left of the middle of the photo and the blue and white block of Cao ốc Sen Biển (way 225803467, x -17, z 352) 0.6 degrees right of it (both give 1.8 to 2.0 degrees from the place of the photo, and 3.4 and 3.5 degrees from the eye): 3.4 degrees. Pitch: the foot of the sea wall of Hạ Long (about 400 m away) is 1.4 degrees under the middle.",
+			"how": "Eye (report 0026, D-0026-20): in the photo, the low wall at the top of the beach is at the left, and the camera looks down on its top: the photographer stands on the walk and holds the camera over the wall, over the sand. So the eye is 0.25 m out of the sea face of the wall (the wall of the game is at x -48.25 there), 1.6 m over the walk, which is 0.8 m over the sand at the foot of the wall: eye_height 2.4 m over the sand. From the walk 2.7 m inland (the eye before), the wall hid the beach, the boats on the sand, and the swimmers: the ground of the beach falls 1.8 m in 6 m from the wall. The place on Panoramio is 19 m from the eye, in the park. Heading: from the place of the photo, Khách sạn Bưu điện (OSM way 259750558, x 22, z 286) is 4.3 degrees left of the middle of the photo and the blue and white block of Cao ốc Sen Biển (way 225803467, x -17, z 352) 0.6 degrees right of it (both give 1.8 to 2.0 degrees from the place of the photo, and 3.4 and 3.5 degrees from the eye): 3.4 degrees. Pitch: the foot of the sea wall of Hạ Long (about 400 m away) is 1.4 degrees under the middle.",
 			"subjects": [
 				{
 					"name": "Khách sạn Bưu điện (P&T)",
@@ -48,8 +48,8 @@
 					]
 				}
 			],
-			"people": 4,
-			"people_how": "The photo shows about 45 people on the beach at 17:53 (2014) and the photo of 2019-04-30 (Tuổi Trẻ) a full beach; the swimmers wait for the swim clothes (Q-W6), so the walkers on the walk count: six walk on the 55 m of the walk in front of the eye, and at least 4 are in the frame.",
+			"people": 6,
+			"people_how": "The photo shows about 45 people on the beach at 17:53 (2014) and the photo of 2019-04-30 (Tuổi Trẻ) a full beach. In the frame of the game: the swimmers in the sea in front of the boats (report 0026, D-0026-20; 55 m to 150 m from the eye, so people_range_m is 150 m) and the walkers on the walk at the left of the wall: at least 6.",
 			"hill": {
 				"shot": [
 					0.6,
@@ -70,7 +70,8 @@
 				0.5,
 				0.95,
 				0.6
-			]
+			],
+			"people_range_m": 150.0
 		},
 		{
 			"id": "S2",

@@ -235,6 +235,53 @@
 			"street": "Hạ Long",
 			"source": "The outline of OpenStreetMap way 790529523 (© OpenStreetMap contributors, ODbL): the middle of its front on Hạ Long, and the direction to the road; the model has its front at z = 0 and its canopy 2.2 m in front of it (data/world/drawings/khach_san_hai_au.json). It replaces the stand-in of the same outline. Hẻm 2 Hải Đăng runs along its east wall, inside the box: the cells near another road keep their height (tools/geo/build.py, ROAD_KEEP_M). The front of the model is out of the OSM outline at its two ends (5.9 m and 7.4 m), so the level ground is its box. It stands against the hill (\"keep_higher\"): the ground that is higher than its level stays, and the walls of the model hide the hill inside it.",
 			"keep_higher": true
+		},
+		{
+			"id": "khach_san_buu_dien",
+			"front": [
+				17.32,
+				271.38
+			],
+			"facing": [
+				-0.4516,
+				-0.8922
+			],
+			"front_middle_x": 0.0,
+			"level_at": [
+				15.06,
+				266.92
+			],
+			"level_note": "The front point is on the foot of the hill (the ground of the game: 7.5 m there), but photos of 2023 and 2024 show the ground storey at the level of the forecourt and of Hạ Long (5.6 m to 5.8 m in the ground of the game from 5 m in front of the front to the road). So the level is the ground at level_at, 5 m in front of the middle of the front (5.8 m).",
+			"box": [
+				-19.06,
+				20.23,
+				-34.9,
+				1.38
+			],
+			"street": "Hạ Long",
+			"keep_higher": true,
+			"source": "The outline of OpenStreetMap way 259750558 (© OpenStreetMap contributors, ODbL): the model has its front at z = 0 through the most forward corner of the outline (the corner B of data/world/drawings/khach_san_buu_dien.json), and its x = 0 at the middle of the outline across the front. The facing is square to Hạ Long (way 200554629) between x -10 and x 47. The model covers the tower and the wing with the pool, as the outline. The ground rises to 12 m at the back of the outline: the hill stays (keep_higher). The low building of way 580493843 east of the wing keeps its stand-in."
+		},
+		{
+			"id": "cao_oc_sen_bien",
+			"front": [
+				-27.87,
+				335.91
+			],
+			"facing": [
+				-0.4014,
+				-0.9159
+			],
+			"front_middle_x": 0.0,
+			"box": [
+				-19.4,
+				19.17,
+				-47.65,
+				5.4
+			],
+			"street": "Hạ Long",
+			"keep_higher": true,
+			"source": "The outline of OpenStreetMap way 225803467 (© OpenStreetMap contributors, ODbL), a rectangle: the front is the middle of its north-west face, and the facing is square to that face, to Hạ Long (50 m away, behind the hall with the orange roof). The box goes 5.4 m in front of the face for the disc of the tower (at 34 m). In the ground of the game the hill rises from 18.1 m at the front to 35.3 m at the back: the hill stays (keep_higher), and the walls of the model hide it. The photo from a drone of 2021 shows more storeys on the south-east side than this ground leaves: the ground of the game there is a question for me."
 		}
 	]
 }

@@ -371,7 +371,14 @@
 			"opening_every_m": 40.0,
 			"opening_m": 2.4,
 			"color": "#b3ada1",
-			"model": "tuong_bai_tam"
+			"model": "tuong_bai_tam",
+			"poles": {
+				"kind": "blue_double",
+				"every_m": 30.0,
+				"from_end_m": 10.0,
+				"in_m": 1.0,
+				"note": "Report 0026, D-0026-19: the blue poles of the walk of the sea along the low wall of the beach, 1 m in from the wall, with the long arm over the walk. The photo of 2014-03-09 (Commons, CC BY-SA 3.0, beach_wall_2014.jpg) shows a pole by the wall; the photo of S1 (2014-04-05) shows the poles along the walk at the left of the beach, and the photo from a drone of 2021-01-30 (drone_2021_park.jpg) the poles at the beach edge of the walk. The spacing of 30 m is by eye from the photo of S1 (an estimate)."
+			}
 		},
 		"paving_texture": {
 			"texture": "walk_slabs",
@@ -541,8 +548,8 @@
 			},
 			"way/580493843": {
 				"storeys": 2,
-				"name": "The wing of Khách sạn Bưu điện with the pool on its roof",
-				"source": "The photos from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0, Vung_Tau,_Viet_Nam_2021.jpg and Vung_Tau,_Viet_Nam.jpg): east of the tower of Khách sạn Bưu điện, the pool is on the roof of a wing of two storeys.",
+				"name": "The low building east of Khách sạn Bưu điện",
+				"source": "The photos from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0, Vung_Tau,_Viet_Nam_2021.jpg and Vung_Tau,_Viet_Nam.jpg): east of the wing of Khách sạn Bưu điện with the pool (the pool is in the outline of way/259750558, data/world/drawings/khach_san_buu_dien.json), a low building of two storeys.",
 				"status": "Source"
 			},
 			"way/580493842": {
@@ -569,18 +576,12 @@
 				"source": "The photo of Hải Âu (Commons, trungydang, 2014-04-05, CC BY 3.0): the middle block has a ground floor and five storeys (the wings have five storeys). The model khach_san_hai_au of data/world/drawings/.",
 				"status": "Source"
 			},
-			"way/200554626": {
-				"storeys": 2,
-				"height": 11.0,
-				"name": "Bến tàu cánh ngầm cũ, the old hydrofoil terminal",
-				"source": "The photo of the terminal at night (Commons, trungydang, 2014-04-05, CC BY 3.0, Ben_tau_Canh_Ngam...jpg): two storeys under seven curved vaults, about ten times the height of a person at its door. OSM: the hydrofoils left from near the cable car from January 2017; the building stood.",
-				"status": "Source"
-			},
 			"way/791795131": {
-				"storeys": 3,
+				"storeys": 1,
 				"name": "The back wings of the Grand Hotel around its courtyard",
-				"source": "The photo of the south wing of the Grand Hotel (Commons, 2015, CC BY 3.0, Phường_1,_Vũng_Tàu..._panoramio_(9).jpg): the wings of the Grand Hotel have a ground floor and two storeys. The outline of OSM goes round the courtyard behind the main block and the south wing.",
-				"status": "Source"
+				"source": "Report 0026, D-0026-14: one storey with a roof terrace at 4.1 m, not three. The images from above of 2018-07-04 and 2020-11-18 (Esri World Imagery Wayback, not open) show the plan, the roof terrace, the pergola, and the tile roofs of the low blocks behind the main block; the photo of S4 and the photo from Nguyễn Du (Commons, trungydang, 2014-04-06, CC BY 3.0) show the hall on the terrace. The terrace is level with the terrace over the porch of the main block (4.1 m in the photo of S4). The three storeys before came from the photo of the south wing (2015), which is another wing. The model khach_san_grand_canh_sau of data/world/drawings/ (Check: the ground storey, the pergola, and the letters show only in photos with no date or after 2021).",
+				"status": "Source",
+				"height": 4.1
 			},
 			"way/791795151": {
 				"storeys": 4,
@@ -599,6 +600,9 @@
 			"way/225803467"
 		],
 		"extra_note": "Buildings of OSM out of the outline that the shots show (S1, S2): Cao ốc Sen Biển (the Lotus Tower) by Hạ Long.",
+		"left_out": {
+			"way/200554626": "Bến tàu cánh ngầm cũ, the old hydrofoil terminal: the OSM outline is the area of the port, not the building, and its box of 11 m stood over the shore end of the jetty of Cầu Đá and over the way to it (report 0026, D-0026-14). The building waits for its real outline."
+		},
 		"jetty_access": 235006085,
 		"jetty_access_note": "The way from the land to the shore end of the jetty of Cầu Đá: the path of the port (OSM way). The shore end of the deck is in the outline of the old hydrofoil terminal, so a stand-in leaves a passage along the deck and a passage from the shore end to the nearest point of this path (report 0026, D-0026-02: with the terminal at its height of the photo, the passage along the deck had no way in from the land; PT-74 run 8).",
 		"footprints": {
@@ -643,39 +647,86 @@
 			"reason": "The photo from a drone of 2021-01-30 shows houses, villas, and hotels of one to six storeys on this side of the hill, but these footprints could not be matched one by one to the buildings of the photo: their storeys are Check."
 		}
 	},
-	"beached": {
-		"model": "thung_chai",
-		"material_set": "boat",
-		"min_ground": 1.0,
-		"points": [
-			[
-				-2.0,
-				104.0,
-				20.0
+	"beached": [
+		{
+			"model": "thung_chai",
+			"material_set": "boat",
+			"min_ground": 1.0,
+			"points": [
+				[
+					-2.0,
+					104.0,
+					20.0
+				],
+				[
+					1.0,
+					112.0,
+					75.0
+				],
+				[
+					-3.0,
+					118.0,
+					140.0
+				],
+				[
+					2.0,
+					126.0,
+					200.0
+				],
+				[
+					3.0,
+					140.0,
+					300.0
+				]
 			],
-			[
-				1.0,
-				112.0,
-				75.0
+			"note": "R5: basket boats (thúng chai) on the sand at the south end of the beach, above the water line: x, z, and the turn in degrees. The landing of the boats of Bãi Trước (Tuổi Trẻ, 2017-08-02) and two thúng chai on the beach on 2019-01-24 (Flickr, Ted McGrath). Their places are a guess (plan 0026, Q3). A point with ground lower than min_ground (m) has no boat."
+		},
+		{
+			"model": "ghe_danh_ca",
+			"material_set": "boat",
+			"min_ground": 0.5,
+			"length_m": 11.15,
+			"sink_m": 0.15,
+			"points": [
+				[
+					-52.0,
+					-160.0,
+					114.0
+				],
+				[
+					-46.0,
+					-146.0,
+					108.0
+				],
+				[
+					-41.0,
+					-134.0,
+					116.0
+				],
+				[
+					-38.5,
+					-121.0,
+					110.0
+				],
+				[
+					-35.0,
+					-108.0,
+					118.0
+				],
+				[
+					-31.0,
+					-96.0,
+					106.0
+				],
+				[
+					-29.0,
+					-84.0,
+					112.0
+				]
 			],
-			[
-				-3.0,
-				118.0,
-				140.0
-			],
-			[
-				2.0,
-				126.0,
-				200.0
-			],
-			[
-				3.0,
-				140.0,
-				300.0
-			]
-		],
-		"note": "R5: basket boats (thúng chai) on the sand at the south end of the beach, above the water line: x, z, and the turn in degrees. The landing of the boats of Bãi Trước (Tuổi Trẻ, 2017-08-02) and two thúng chai on the beach on 2019-01-24 (Flickr, Ted McGrath). Their places are a guess (plan 0026, Q3). A point with ground lower than min_ground (m) has no boat."
-	},
+			"note": "Report 0026, D-0026-20: the fishing boats (the ghe of World, Q10) pulled up on the sand in front of the shot S1, with the bow to the land: x, z, and the turn in degrees (111 puts the bow, with its eyes, at right angles to the water's edge there, to the land). The photo of S1 (2014-04-05, docs/reference/photos/shot_s1_2014.jpg) shows a row of ghe pulled up at the water's edge in front of the hotels of Hạ Long, with the sea round their sterns, and the landing of the boats of Bãi Trước is on this beach (Tuổi Trẻ, 2017-08-02: Source). The middle of each boat is where the ground of the game is 0.9 m: at a high tide the sea is round its stern, at a low tide it is on the sand. The swimmers keep away from them. The places along the beach are builder values. length_m: the length of the model, which lies along the slope of the sand; sink_m: the keel in the sand."
+		}
+	],
 	"lamp_kinds": {
 		"note": "R9: the lamps of the park and of Quang Trung. Each kind names its model (\"model\": data/world/drawings/ID.json, a lamp of the blueprint den_cong_vien that I make with the tools of World, report 0026, D-0026-09). The game shows the model when its order is in data/world/orders.json; until then, it shows a stand-in from the other values of the kind. R14: at night (DayLight.lamps_on()), the surfaces of the role glow_role of a model glow (the head of a stand-in), and each kind with \"light\" lights the ground. The warm color is the color of the lamps of the photo of S5 at dusk (2015).",
 		"blue_double": {
@@ -757,6 +808,26 @@
 			"note": "R9: the lamp poles on the sidewalk of the park (the photo from a drone of 2021-01-30).",
 			"long_arm_over_way": true,
 			"long_arm_note": "The long arm of the pole reaches over the road. The photos of 2014 and 2019 show the poles of the walk of the sea with the long arm over the walk and the beach; for the poles of Quang Trung, this side is a builder value."
+		},
+		{
+			"way": 458829436,
+			"side": "left",
+			"offset_m": -0.8,
+			"kind": "blue_double",
+			"every_m": 40.0,
+			"from_end_m": 10.0,
+			"long_arm_over_way": true,
+			"note": "Report 0026, D-0026-19: the blue poles of the walk of the sea, 0.8 m in from the low wall of the beach. The photo of 2014-03-09 (Commons, CC BY-SA 3.0, beach_wall_2014.jpg) shows a pole by the wall with its long arm over the walk, and the photo from a drone of 2021-01-30 (Tuong Lam Photos, CC BY-SA 4.0, drone_2021_park.jpg) shows the poles at the beach edge of the walk. The spacing of 40 m is an estimate (no source): about four poles along the part of the walk in the photo from the drone."
+		},
+		{
+			"way": 458829438,
+			"side": "left",
+			"offset_m": -0.8,
+			"kind": "blue_double",
+			"every_m": 40.0,
+			"from_end_m": 10.0,
+			"long_arm_over_way": true,
+			"note": "Report 0026, D-0026-19: the blue poles of the walk of the sea, 0.8 m in from the low wall of the beach. The photo of 2014-03-09 (Commons, CC BY-SA 3.0, beach_wall_2014.jpg) shows a pole by the wall with its long arm over the walk, and the photo from a drone of 2021-01-30 (Tuong Lam Photos, CC BY-SA 4.0, drone_2021_park.jpg) shows the poles at the beach edge of the walk. The spacing of 40 m is an estimate (no source): about four poles along the part of the walk in the photo from the drone."
 		}
 	],
 	"path_lamps": {
@@ -768,6 +839,56 @@
 		"offset_m": 0.45,
 		"from_end_m": 3.0,
 		"note": "R9: the low lamps along the paths of the park, at alternate sides (the photo of S2 of 2014). The spacing is a builder value."
+	},
+	"park_plants": {
+		"note": "Report 0026, D-0026-17 and Q19: the park of the photos (park_paths_2014.jpg, park_flower_bed_2014.jpg, park_bushes_2014.jpg; the photo of 2018-03-08 on Flickr and the photo from a drone of 2021-01-30 show the bushes and the hedges, so they are Source by Q17, rule 2). Low clipped hedges (hang_rao_cong_vien) stand at the edge of the lawns along the paths of the park, offset_m behind the granite border, with a gap at each low lamp and at each bench, and junction_gap_m from the other paths; benches (ghe_da_cong_vien) stand in gaps of the hedges, to the path, about every every_m; groups of 3 to 5 round bushes (bui_cay_tron, the tall one at the back: 1.25 to 1.5 times the model, as the photos) stand behind the hedge at some corners where paths meet (part: the part of the ends of the hedges with a group); round flower beds of purple flowers (cay_hoa_tim_bon_hoa) in a granite border stand on the lawn behind the middle of some long hedges (the photos show round beds of 3 m to 5 m). The plants are on the lawn of the ground mask and away from the trunks of the trees. The parts, the offsets, and the spacing are builder values; the places of the beds and of the groups are not from a photo (the photos do not show all of them).",
+		"seed": 17,
+		"cell_m": 24.0,
+		"ranges": {
+			"low": [
+				0.0,
+				10.0,
+				80.0
+			]
+		},
+		"hedges": {
+			"model": "hang_rao_cong_vien",
+			"types": [
+				"footway"
+			],
+			"offset_m": 0.3,
+			"junction_gap_m": 1.5,
+			"lamp_gap_m": 0.35,
+			"min_run_m": 4.0
+		},
+		"benches": {
+			"model": "ghe_da_cong_vien",
+			"every_m": 26.0
+		},
+		"bushes": {
+			"model": "bui_cay_tron",
+			"part": 0.45,
+			"count": [
+				3,
+				5
+			],
+			"behind_m": 1.9
+		},
+		"flower_beds": {
+			"model": "cay_hoa_tim_bon_hoa",
+			"part": 0.5,
+			"min_run_m": 30.0,
+			"radius_m": [
+				1.4,
+				2.0
+			],
+			"behind_m": 2.0,
+			"border_m": 0.16,
+			"border_height_m": 0.12,
+			"spacing": 0.9,
+			"clump_scale": 1.5
+		},
+		"ranges_note": "On Low: no near level, the mid level to 10 m, the far level to 80 m (a hedge piece: 300 and 40 triangles; a bush: 600 and 80; a clump of flowers: 400 and 60). PT-73: S2 and S5 stay under 300 000 triangles."
 	},
 	"materials": {
 		"note": "R12: the colors of the parts that take a texture set of data/look/textures.json (shaders/showcase_surface.gdshader). tint multiplies the texture; tones makes the dark and the light of the texture two colors; mean is the color from far. The other colors stay flat. Builder values from the photos of section 3 and the photo from a drone of 2021: I approve them with the shots of PT-72.",

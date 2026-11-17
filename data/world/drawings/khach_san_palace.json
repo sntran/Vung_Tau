@@ -8717,7 +8717,7 @@
 		"storeys_east_block": {
 			"value": 6,
 			"unit": "",
-			"source": "Photo 1 (2014): the block at the east end is 2 storeys lower than the tower. Only the photos of 2014 and 2022 show it: Check."
+			"source": "Photo 1 (2014) and photo 2 (2022): the block at the east end is 2 storeys lower than the tower in both, so it was so in 2019 (report 0026, Q17, rule 1)."
 		},
 		"storey": {
 			"value": 3.2,
@@ -8737,17 +8737,17 @@
 		"porch": {
 			"value": "18 m wide, 10 m deep, 8.2 m high, 6 columns, a fascia of 1.3 m",
 			"unit": "",
-			"source": "Photos 1 (2014) and 2 (2022): the fascia is at the top of the first storey (the 3 storeys of brick panels start over it); the columns: 2 pairs and 2 single columns. No photo of 2017 to 2021 shows the porch: Check."
+			"source": "Photos 1 (2014) and 2 (2022) show the same porch: a curved fascia with the gold letters PALACE HOTEL over 2 pairs of columns and 2 single columns, at the top of the first storey (the 3 storeys of brick panels start over it), and a canopy on steel rods. So the porch was so in 2019 (Q17, rule 1). The canopy is blue with a blue banner in 2014 and clear glass in 2022: its look in 2019 is Check (the model has no canopy). The model has a straight fascia, not curved. Its width, depth and height are estimates from the outline and the photos."
 		},
 		"brick_panels": {
 			"value": "2 bays of 8.0 m with 3 storeys of brick each, a column of the stair of 1.8 m between them, two small windows in the top row of each bay",
 			"unit": "",
-			"source": "Photos 1 (2014) and 2 (2022): the west face of the front block; photo 0 (2018) shows the same brick at its north-west corner. The widths: estimates from the photos (the face is 21.3 m on the outline)."
+			"source": "Photos 1 (2014) and 2 (2022): the west face of the front block, two bays of 3 storeys with the column of the stair between them (the same in both: rule 1). The color is not the same: a light tan in photo 1 and orange red brick in photo 2; photo 0 (2018) shows the brick at the north-west corner (#a3796f), so the color comes from photo 0 (rule 2). The widths: estimates from the photos (the face is 21.3 m on the outline)."
 		},
 		"letters": {
 			"value": "PALACE 1.5 m high (navy #1f2f6e), HOTEL 0.9 m high (red #b3261e), on the west edge of the roof of the tower",
 			"unit": "",
-			"source": "Photo 0 (2018): PALA in navy and HO in red on the roof; photos 1 (2014) and 2 (2022) the whole name. The heights: in photo 1 the letters of PALACE are 0.45 of a storey of the tower and those of HOTEL 0.28. The letters of the building blueprint are wider than the real ones (see the report)."
+			"source": "Photo 0 (2018): PALA in navy and HO in red on the roof; photos 1 (2014) and 2 (2022) the whole name. The two photos do not agree on the color of HOTEL (blue in photo 1, red in photo 2); photo 0 (2018) shows red, so the colors come from photo 0 (rule 2). The heights: in photo 1 the letters of PALACE are 0.45 of a storey of the tower and those of HOTEL 0.28. The letters of the building blueprint are wider than the real ones. The sign in the shape of a diamond (blue in photos 0 and 1) is not on the model."
 		},
 		"colors": {
 			"value": "walls #cfa2a2, trim #e3c4c1, brick #a5745e, rails #393e3f, glass #4f5f68",
@@ -8796,5 +8796,6 @@
 	],
 	"uses": "Plan 0026, D-0026-10: the Palace Hotel across from the park, on its OSM outline (way 791795130, on Nguyễn Trãi); its place is in data/world/places/bai_truoc.json.",
 	"impostor": false,
-	"hash": "ae16d41fc33c1f04abecf3d17877700c"
+	"hash": "ae16d41fc33c1f04abecf3d17877700c",
+	"status_note": "Check. The photos of 2014 (photo 1) and of 2022 (photo 2) show the same porch, the same faces of the front block (brick bays, the column of the stair, the loggia and the pergola at the top), the same balconies of the tower and the east block 2 storeys lower: that was the look in 2019 (report 0026, Q17, rule 1). Photo 0 (2018) shows the tower, the front block, the letters and the pink walls (rule 2). They do not agree on: the color of HOTEL on the roof and of the brick panels (photo 0 of 2018 gives both), and the canopy of the porch (blue in 2014, clear glass in 2022; the model has none). Still Check: the height of a storey (3.2 m) and of the ground storey (4.2 m) are estimates (no source): the car in front of the porch in photo 1 is nearer than the porch, and no photo has a person or a car at the face. The model also differs from both photos: the fascia of the porch is straight (curved in the photos), and the porch has no canopy. No look of the model of the factory: the factory stops at this order (HTTP 503); the looks below are of a preview in my workspace. I grow the area to the lot (Q15)."
 }

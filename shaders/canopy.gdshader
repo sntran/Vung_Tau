@@ -12,6 +12,7 @@ uniform float near_hide = 280.0;
 uniform float clump_scale = 1.0;
 uniform float clump_scale_far = 1.0;
 uniform vec2 scale_range = vec2(400.0, 1600.0);
+uniform float height_scale_max = 100.0;
 uniform float fade_m = 60.0;
 // 0 is green, 1 is the driest.
 uniform float dryness = 0.0;
@@ -30,8 +31,15 @@ uniform vec3 bare_color : source_color = vec3(0.38, 0.35, 0.3);
 // far_range.x to far_range.y m, far_even of the difference to the mean goes.
 uniform vec2 far_range = vec2(250.0, 900.0);
 uniform float far_even = 0.75;
+// The air between the eye and the far hill (report 0026, D-0026-15): the same
+// values as the far ground (shaders/terrain.gdshader).
+uniform vec3 far_haze_color : source_color = vec3(0.23, 0.38, 0.38);
+uniform vec2 far_haze_range = vec2(150.0, 650.0);
+uniform float far_haze = 0.58;
+uniform float far_haze_light = 1.0;
 
 varying vec3 clump_color;
+varying float haze_part;
 
 float hash(vec2 p) {
 	return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -42,7 +50,11 @@ void vertex() {
 	vec3 origin = (MODEL_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
 	float distance_xz = distance(origin.xz, CAMERA_POSITION_WORLD.xz);
 	float near = smoothstep(near_hide, near_hide + fade_m, distance_xz);
-	VERTEX *= near * mix(clump_scale, clump_scale_far, smoothstep(scale_range.x, scale_range.y, distance_xz));
+	// Report 0026, D-0026-15: a far clump grows wider than it grows high, so that
+	// the clumps cover the hill as one canopy and do not stand on it as houses.
+	float grow = mix(clump_scale, clump_scale_far, smoothstep(scale_range.x, scale_range.y, distance_xz));
+	VERTEX.xz *= near * grow;
+	VERTEX.y *= near * min(grow, height_scale_max);
 	float a = hash(origin.xz);
 	float b = hash(origin.xz + vec2(17.0, 5.0));
 	vec3 color = mix(leaf_dark, leaf_light, a);
@@ -60,11 +72,14 @@ void vertex() {
 	// The vertex color is the shade low on the crowns; far away, less of it (toward a
 	// mean shade of 0.8).
 	float shade = mix(COLOR.r, 0.8, 0.5 * far_even * smoothstep(far_range.x, far_range.y, distance_xz));
-	clump_color = color * shade;
+	haze_part = far_haze * smoothstep(far_haze_range.x, far_haze_range.y, distance_xz);
+	clump_color = color * shade * (1.0 - haze_part);
 }
 
 void fragment() {
 	ALBEDO = clump_color;
+	// The haze of the far land (shaders/terrain.gdshader): an emission.
+	EMISSION = far_haze_color * haze_part * far_haze_light;
 	ROUGHNESS = 0.9;
 	// Leaves have almost no shine: with the default specular, a low sun made
 	// the clumps pale tan on the Mobile renderer.

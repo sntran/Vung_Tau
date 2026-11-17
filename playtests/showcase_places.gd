@@ -19,7 +19,11 @@ extends RefCounted
 # round it in 2.5 m or less; the ledge of D-0026-11 was about 300 m long). A
 # wall is not a step (the outside is more than 1 m higher: the face of a
 # building), and nor is a thing on the part (more than 0.3 m over the edge:
-# the closed end of the walk, the foot of a lamp).
+# the closed end of the walk, the foot of a lamp). D-0026-16: the base line of
+# each low wall along the beach is smooth (the top of its pieces is one line):
+# its grade is at most MAX_WALL_GRADE, and the grade changes by at most
+# MAX_WALL_BEND from one segment to the next. D-0026-19: at least
+# MIN_WALK_POLES blue poles stand within 3 m of the low wall.
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=10:00 --quality=low
 
@@ -47,6 +51,10 @@ const MAX_STEP := 0.25
 const WALL_OVER := 1.0
 const ON_PART := 0.3
 const MAX_LEDGE_RUN := 5.0
+const MAX_WALL_GRADE := 0.12
+const MAX_WALL_BEND := 0.06
+## D-0026-19: the blue poles by the low wall of the beach (about every 40 m of 500 m).
+const MIN_WALK_POLES := 8
 
 
 func run(d: PlaytestDriver) -> void:
@@ -73,6 +81,7 @@ func run(d: PlaytestDriver) -> void:
 	_check_models(d, w)
 	_check_hill_side(d, w)
 	_scan_edges(d, w)
+	_check_wall_lines(d, w)
 	for kind: String in ["median", "sidewalk", "path_border", "wall", "sea_wall", "stand_ins", "lawn_m2", "paving_m2",
 			"planter", "beach_wall", "median_trees", "lamps", "path_lamps"]:
 		d.expect(float(w.showcase.lengths.get(kind, 0.0)) > 0.0, "the showcase has the part %s" % kind)
@@ -187,6 +196,47 @@ static func _area(ring: PackedVector2Array) -> float:
 ## the road has a stand-in with its storeys from a photo, or is listed in
 ## stand_ins.footprints_check of data/showcase/bai_truoc.json with its reason;
 ## each stand-in has its storeys from a source.
+## D-0026-16: the base lines of the low walls are smooth (no saw-tooth).
+func _check_wall_lines(d: PlaytestDriver, w: VungTau) -> void:
+	var steepest := 0.0
+	var bend := 0.0
+	var at := Vector3.ZERO
+	for line: PackedVector3Array in w.showcase.wall_lines:
+		var last := INF
+		for i in line.size() - 1:
+			var run := Vector2(line[i + 1].x - line[i].x, line[i + 1].z - line[i].z).length()
+			if run < 0.1:
+				continue
+			var grade := (line[i + 1].y - line[i].y) / run
+			steepest = maxf(steepest, absf(grade))
+			if last != INF and absf(grade - last) > bend:
+				bend = absf(grade - last)
+				at = line[i]
+			last = grade
+	d.step("the low walls: %d lines, the steepest grade %.3f, the largest change of grade %.3f at (%.0f, %.0f)" % [
+			w.showcase.wall_lines.size(), steepest, bend, at.x, at.z])
+	d.expect(not w.showcase.wall_lines.is_empty(), "the showcase has the low walls along the beach")
+	# D-0026-19: the blue poles of the walk of the sea stand by the low wall.
+	var poles := 0
+	for lamp: Dictionary in w.showcase.lamps:
+		if str(lamp.kind) != "blue_double":
+			continue
+		var foot: Vector3 = lamp.at
+		var near := false
+		for line: PackedVector3Array in w.showcase.wall_lines:
+			for q in line:
+				if Vector2(q.x - foot.x, q.z - foot.z).length() < 3.0:
+					near = true
+					break
+			if near:
+				break
+		if near:
+			poles += 1
+	d.expect(poles >= MIN_WALK_POLES, "the walk of the sea has its blue poles by the low wall: %d (at least %d)" % [poles, MIN_WALK_POLES])
+	d.expect(steepest <= MAX_WALL_GRADE and bend <= MAX_WALL_BEND, "the top of each low wall is one smooth line: the grade %.3f (at most %.2f), the change of grade %.3f (at most %.2f)" % [
+			steepest, MAX_WALL_GRADE, bend, MAX_WALL_BEND])
+
+
 ## D-0026-11: the steps at the edges of the parts that a player walks on.
 func _scan_edges(d: PlaytestDriver, w: VungTau) -> void:
 	var space: PhysicsDirectSpaceState3D = d.main().get_world_3d().direct_space_state

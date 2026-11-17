@@ -1,15 +1,15 @@
 {
 	"id": "ke_da_bai_truoc",
-	"what": "kè đá Bãi Trước: a piece of 2 m of the sloped sea wall of granite blocks in courses, from the foot of the low wall of the walk down to the sand",
+	"what": "kè đá Bãi Trước: a piece of 2 m of the sea wall of granite blocks in courses that leans back, from the foot of the low wall of the walk down to the sand",
 	"way": "blueprint",
-	"status": "Check",
+	"status": "Source",
 	"levels": [
 		"near",
 		"mid",
 		"far"
 	],
 	"impostor": false,
-	"uses": "Plan 0026, R4: under the low wall of the beach (tuong_bai_tam) where the sea wall slopes (photo 0: the south corner): the game puts the pieces one after another along the line, the port end of a piece on the port start of the next, the top edge (the origin) at the foot of the low wall on the side of the sand, the slope down to +y.",
+	"uses": "Plan 0026, R4: under the low wall of the beach (tuong_bai_tam) where the sea wall is not a flight of steps: the game puts the pieces one after another along the line, the port end of a piece on the port start of the next, the top edge (the origin) at the foot of the low wall on the side of the sand, the face down to +y. The game scales each piece in height to the drop at its place (the height of the walk less the height of the sand: 0 m to 2.0 m along the line); the run stays 0.3 m.",
 	"order": {
 		"blueprint": {
 			"file": "data/world/blueprints/ke_bien.json"
@@ -17,12 +17,12 @@
 		"options": {
 			"kind": "ke_da_bai_truoc",
 			"length": 2.0,
-			"height": 1.4,
-			"run": 2.0,
+			"height": 1.2,
+			"run": 0.3,
 			"course": 0.25,
 			"block": 0.4,
 			"blocks": 5,
-			"courses": 5
+			"courses": 4
 		}
 	},
 	"sources": [
@@ -65,6 +65,16 @@
 			"open": false,
 			"file": "flickr_48108232968_2019_steps.jpg",
 			"shows": "The north part of Bãi Trước from the sand (a crop of the original): wide flights of granite steps from the walk down to the sand and the water between the sections of the low wall, seen from the side; on the right a section of the low wall on a footing of concrete, with a short flight of three steps at its end; swim rings, people on the sand."
+		},
+		{
+			"url": "https://www.youtube.com/watch?v=haFi_72WxO4",
+			"image": "https://i.ytimg.com/vi/haFi_72WxO4/maxres3.jpg",
+			"date": "2020-06-22",
+			"license": "all rights reserved",
+			"author": "Huy Đi Lang Thang (YouTube)",
+			"open": false,
+			"file": "youtube_haFi_72WxO4_2020_1058.jpg",
+			"shows": "A walk on the sand of Bãi Trước on a calm morning (the third automatic picture of YouTube, at about 11:00 of 14:37): the end of a section of the sea wall under the low wall, a wall of granite blocks in courses that leans back steeply from the low wall down to the sand, a footing of rough concrete at its end, and a flight of eight courses of steps beside it."
 		}
 	],
 	"sizes": {
@@ -74,19 +84,19 @@
 			"source": "A piece of the row: I choose 2 m."
 		},
 		"height": {
-			"value": 1.4,
+			"value": 1.2,
 			"unit": "m",
-			"source": "Photo 1 (2019-01-24): from the walk to the sand 172 px of the crop, at the scale of the man in blue on the steps (192 px for 1.6 m): 1.43 m. The game takes the heights from the ground of plan 0005."
+			"source": "The drop: the height of the walk less the height of the sand in the ground of the game (report 0026, Q17). I measured it along the low wall of the beach: 0 m to 2.0 m, median 1.2 m. The model has the median; the game scales each piece in height to the drop at its place. Photo 1 (2019-01-24) gives 1.43 m at the place of its steps."
 		},
 		"run": {
-			"value": 2.0,
+			"value": 0.3,
 			"unit": "m",
-			"source": "estimate (no source): a slope of about 35 degrees (photo 0 shows the slope at about 35 degrees; not measured)."
+			"source": "Photo 4 (2020-06-22, 1280 px): the lines of the wall meet at 270 px on the horizon (245 px), and the end of the section shows the face from the top edge to the sand. From the top edge at the end (520, 170) to the foot at the end (460, 545), the face leans back at 80 degrees; from the top edge to the foot at the far end of the visible face (430, 195 to 365, 375), at 69 degrees (a lens of 800 px to 1 100 px). The mean is 75 degrees: the run is 0.27 times the drop. 0.27 × 1.2 m: 0.32 m; 0.3 m."
 		},
 		"course": {
 			"value": 0.25,
 			"unit": "m",
-			"source": "estimate (no source): photo 0 shows courses of blocks along the top edge, as the courses of the low wall (0.2 m to 0.24 m, tuong_bai_tam)."
+			"source": "estimate (no source): photo 4 shows courses of blocks a little higher than the steps beside them (0.18 m, bac_xuong_cat); with a drop of 1.2 m, four joints under the top edge."
 		},
 		"block": {
 			"value": 0.4,
@@ -127,7 +137,22 @@
 			"hash": "2169503e65af074813fc6a2ea180dea9",
 			"seen": "Next to photo 0: courses of grey blocks along the top edge with joints a half block apart, darker near the sand. In photo 0 the blocks are rougher and each course stands out a little; here the slope is flat.",
 			"changed": "Nothing: the last level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "e96e7363da7282ae20caaae7de81749c",
+			"seen": "Next to photo 4 (2020) and photos 0 to 2 (2019): a wall of 1.2 m that leans back at 75 degrees from the top edge to the sand, one grey, with a darker band at the foot, as the end of the section in photo 4. The old order had a slope of 35 degrees (2.0 m of run): photo 4 shows a much steeper face. In photo 4 the lower half of the face is dark and wet; here the dark band is low and weak.",
+			"changed": "Nothing at the mid level (the drop of 1.2 m and the run of 0.3 m come from the ground of the game and photo 4). Next: the near level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "e96e7363da7282ae20caaae7de81749c",
+			"seen": "Next to photo 4: four courses of grey blocks with joints a half block apart on a face that leans back, as the wall of blocks in photo 4. In photo 4 the blocks are rougher, and the lower half is dark and wet.",
+			"changed": "Nothing: the last level."
 		}
 	],
-	"hash": "2169503e65af074813fc6a2ea180dea9"
+	"hash": "e96e7363da7282ae20caaae7de81749c",
+	"status_note": "Source (report 0026, Q17). Rule 2: photos 0 and 1 (2019) and photo 4 (2020) show the wall of granite blocks in courses under the low wall; the drop comes from the ground of the game, and the run from photo 4. The course and the block are estimates (no source); they show at the near level only. On 2026-11-17 the image of photo 2 (VnExpress) did not open, so I did not use it."
 }

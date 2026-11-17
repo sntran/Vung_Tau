@@ -100,14 +100,15 @@ None.
 
 ## Trees (R12a)
 
-- bang: 1909
+- araucaria: 2
+- bang: 1907
 - casuarina: 3490
-- coconut: 883
+- coconut: 897
 - flame: 1627
 - frangipani: 772
 - shade: 3571
 - tall_shade: 181
-- From: bai_truoc_road 81, bai_truoc_road_snapped 8, coast_roads 3959, coast_roads_snapped 314, named_roads 497, named_roads_snapped 107, osm 385, park_bai_truoc 303, park_bai_truoc_snapped 68, parks 1384, parks_snapped 1384, street 5824, street_snapped 5824.
+- From: bai_truoc_road 81, bai_truoc_road_snapped 8, coast_roads 3959, coast_roads_snapped 314, grove 22, named_roads 497, named_roads_snapped 107, osm 385, park_bai_truoc 295, park_bai_truoc_snapped 68, parks 1384, parks_snapped 1384, street 5824, street_snapped 5824.
 
 ## Land cover and trees (report 0005, D-0005-09; plan 0020, D8)
 
@@ -138,9 +139,10 @@ The street and park trees and the canopy map (report 0020, D-0020-03): on the ro
 |---|---|---|---|
 | Quang Trung (Bãi Trước) | 81 | 10 % | 88 % |
 | Thùy Vân, Hạ Long, Trần Phú | 3959 | 8 % | 71 % |
+| grove | 22 | 0 % | 0 % |
 | Trần Hưng Đạo, Ba Cu | 497 | 22 % | 35 % |
 | The trees of OSM | 385 | 0 % | 36 % |
-| The park of Bãi Trước | 303 | 22 % | 21 % |
+| The park of Bãi Trước | 295 | 23 % | 22 % |
 | The other parks | 1384 | 100 % | 0 % |
 | The other main roads | 5824 | 100 % | 0 % |
 

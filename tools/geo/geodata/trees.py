@@ -9,7 +9,7 @@ import math
 import numpy as np
 import shapely
 from shapely import STRtree
-from shapely.geometry import LineString, Point
+from shapely.geometry import LineString, Point, Polygon
 from shapely.prepared import prep
 from scipy.spatial import cKDTree
 
@@ -258,6 +258,9 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
                     kind = _pick(mix, rng)
                     add(kind, point, source, lean_of(kind) if near else None)
 
+    for grove in park_spec.get("groves", []):
+        _grove(grove, place, found, leans, counts, groups)
+
     result = {"note": "Made by tools/geo/build.py from data/geo/trees.json and OSM. Do not change by hand. "
                       "Each point is [X, height, Z] in game coordinates. A tree that leans has two more "
                       "values: its tilt and the direction of the tilt (degrees, from +Z to +X).", "types": {}}
@@ -272,3 +275,58 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
             rows.append(row)
         result["types"][kind] = rows
     return result, counts, groups
+
+
+def _grove(grove: dict, place, found: dict, leans: dict, counts: dict, groups: dict) -> None:
+    """Report 0026, D-0026-17: a grove of the photo of a shot (S2: the leaning
+    coconut palms). The trees of the other rules in its outline give their place
+    to the trees of the grove: its own mix, spacing, and leans, with its own
+    random numbers, so the trees out of the outline do not change.
+    The outline is in game x, z (map y = -z)."""
+    outline = Polygon([(float(x), -float(z)) for x, z in grove["outline"]])
+    inside = prep(outline)
+    # The trees in the outline go, and the leans of the others keep their trees.
+    for kind in list(found):
+        old_leans = {i: v for (k, i), v in leans.items() if k == kind}
+        for key in [key for key in leans if key[0] == kind]:
+            del leans[key]
+        kept = []
+        for index, point in enumerate(found[kind]):
+            if inside.contains(Point(point)):
+                continue
+            if index in old_leans:
+                leans[(kind, len(kept))] = old_leans[index]
+            kept.append(point)
+        found[kind] = kept
+    for source in list(groups):
+        before = len(groups[source])
+        groups[source] = [q for q in groups[source] if not inside.contains(Point(q))]
+        counts[source] = counts.get(source, 0) - (before - len(groups[source]))
+    others = [q for points in found.values() for q in points]
+    rng = np.random.default_rng(int(grove.get("seed", 1)))
+    spacing = float(grove["spacing_m"])
+    gap = spacing * float(grove.get("gap", 0.6))
+    lean = grove.get("lean", {})
+    placed: list[tuple[float, float]] = []
+    min_x, min_y, max_x, max_y = outline.bounds
+    for x in np.arange(min_x + spacing / 2, max_x, spacing):
+        for y in np.arange(min_y + spacing / 2, max_y, spacing):
+            jitter = float(grove.get("jitter_m", 1.5))
+            point = np.array([x + rng.uniform(-jitter, jitter), y + rng.uniform(-jitter, jitter)])
+            kind = _pick(grove["mix"], rng)
+            tilt = rng.uniform(*lean.get("deg", [8.0, 30.0]))
+            toward = rng.uniform(0.0, 1.0) < float(lean.get("toward_part", 0.0))
+            direction = rng.normal(float(lean.get("toward_deg", 0.0)), float(lean.get("spread_deg", 45.0))) \
+                if toward else rng.uniform(0.0, 360.0)
+            leans_now = rng.uniform(0.0, 1.0) < float(lean.get("share", 0.0)) and kind in lean.get("types", [])
+            if not inside.contains(Point(point)):
+                continue
+            near = [q for q in others + placed if math.hypot(q[0] - point[0], q[1] - point[1]) < gap]
+            if near or not place.free(point, 0.0):
+                continue
+            found.setdefault(kind, []).append((float(point[0]), float(point[1])))
+            if leans_now:
+                leans[(kind, len(found[kind]) - 1)] = (round(float(tilt), 1), round(float(direction) % 360.0, 1))
+            placed.append((float(point[0]), float(point[1])))
+            groups.setdefault("grove", []).append((float(point[0]), float(point[1])))
+            counts["grove"] = counts.get("grove", 0) + 1

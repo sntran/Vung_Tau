@@ -8,6 +8,8 @@ extends RefCounted
 
 ## The road surface is this much above the ground, so that it does not flicker.
 const LIFT := 0.04
+## The size of one copy of a texture of the road surfaces (m).
+const TEXTURE_M := 4.0
 const CURB := 0.15
 const SIDEWALK_WIDTH := 2.0
 ## A road with a sidewalk must be at least this wide.
@@ -18,13 +20,16 @@ const ASPHALT_TYPES := ["motorway", "trunk", "primary", "secondary", "tertiary",
 		"living_street", "service"]
 const LINE_TYPES := ["motorway", "trunk", "primary", "secondary", "tertiary"]
 const DIRT_TYPES := ["path", "track"]
+## A way with "paved" (the footways and the pedestrian ways in a park,
+## tools/geo/build.py) has tiles, not concrete (report 0026, D-0026-17: the paths
+## of the park of Bãi Trước looked like gravel).
 
 
-## Returns {"asphalt", "concrete", "dirt", "sidewalk", "lines"}: each one is
+## Returns {"asphalt", "concrete", "dirt", "paving", "sidewalk", "lines"}: each one is
 ## mesh arrays or null. "collision" is a PackedVector3Array of triangles for
 ## the sidewalks and the curbs. The positions are from "origin".
 static func build(data: GeoData, key: Vector2i, origin: Vector3) -> Dictionary:
-	var parts := {"asphalt": _Strip.new(), "concrete": _Strip.new(), "dirt": _Strip.new(),
+	var parts := {"asphalt": _Strip.new(), "concrete": _Strip.new(), "dirt": _Strip.new(), "paving": _Strip.new(),
 			"sidewalk": _Strip.new(), "lines": _Strip.new()}
 	var collision := PackedVector3Array()
 	for part: Array in data.road_parts.get(key, []):
@@ -38,8 +43,8 @@ static func build(data: GeoData, key: Vector2i, origin: Vector3) -> Dictionary:
 			continue
 		var kind: String = road.type
 		var width: float = road.width
-		var surface := "concrete" if road.hem else ("dirt" if kind in DIRT_TYPES else
-				("asphalt" if kind in ASPHALT_TYPES else "concrete"))
+		var surface := "paving" if road.get("paved", false) else ("concrete" if road.hem else ("dirt" if kind in DIRT_TYPES else
+				("asphalt" if kind in ASPHALT_TYPES else "concrete")))
 		var half := width / 2.0
 		var sidewalk := str(road.get("sidewalk", ""))
 		if sidewalk != "" and width >= MIN_SIDEWALK_ROAD:
@@ -104,9 +109,14 @@ class _Strip:
 			var a1 := line[i] + sides[i] * right + Vector3(0, lift_right, 0)
 			var b0 := line[i + 1] + sides[i + 1] * left + Vector3(0, lift_left, 0)
 			var b1 := line[i + 1] + sides[i + 1] * right + Vector3(0, lift_right, 0)
-			var v0 := distance / 4.0
-			var v1 := (distance + length) / 4.0
-			_quad(a0, a1, b0, b1, Vector2(0, v0), Vector2(1, v0), Vector2(0, v1), Vector2(1, v1))
+			# The texture in meters, both ways (report 0026, D-0026-18: from 0 to 1
+			# across the whole road, the grain of the asphalt was ten times too
+			# large, and the roads looked like gravel).
+			var v0 := distance / TEXTURE_M
+			var v1 := (distance + length) / TEXTURE_M
+			var u0 := left / TEXTURE_M
+			var u1 := right / TEXTURE_M
+			_quad(a0, a1, b0, b1, Vector2(u0, v0), Vector2(u1, v0), Vector2(u0, v1), Vector2(u1, v1))
 			distance += length
 
 	## A vertical face along the line at the offset, from "low" to "high".

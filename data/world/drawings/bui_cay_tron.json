@@ -1,0 +1,465 @@
+{
+	"id": "bui_cay_tron",
+	"what": "bụi cây cắt tròn: the clipped round bush of the park of Bãi Trước, in groups of three to five on the lawns by the paths",
+	"way": "drawing",
+	"status": "Source",
+	"status_note": "Source (report 0026, Q17, rule 2): photo 4 (2018) and photo 5 (2021, from a drone) show the round clipped bushes in groups by the paths of the park; the sizes come from photos 0 to 2 (2014) and agree with photo 5.",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": true,
+	"uses": "Plan 0026, D-0026-17: the round bushes of the park of Bãi Trước, in groups by the paths (data/showcase/bai_truoc.json)",
+	"order": {
+		"blueprint": "drawing",
+		"options": {
+			"drawing": {
+				"name": "bui_cay_tron",
+				"kind": "plant",
+				"sources": [
+					"The clipped round bush of the park of Bãi Trước: an upright dome of small clipped leaves, 1.7 m high and 1.4 m wide, widest at 0.70 m; photos of 2014-04-06 (Commons, trungydang, CC BY 3.0), 2018-03-08 (Flickr) and 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0); the sizes at the scale of the low lamp of the park (0.70 m) (Vũng Tàu, data/world/drawings/bui_cay_tron.json)."
+				],
+				"materials": {
+					"part_01": {
+						"color": "#ffffff",
+						"roughness": 0.85,
+						"metalness": 0.0
+					}
+				},
+				"nodes": [
+					{
+						"name": "bush",
+						"skill": {
+							"sculpt": {
+								"edits": [
+									{
+										"shape": "revolve",
+										"size": {
+											"profile": [
+												[
+													0.0,
+													0.01
+												],
+												[
+													0.0,
+													0.0
+												],
+												[
+													0.55,
+													0.0
+												],
+												[
+													0.61,
+													0.06
+												],
+												[
+													0.655,
+													0.18
+												],
+												[
+													0.69,
+													0.4
+												],
+												[
+													0.7,
+													0.7
+												],
+												[
+													0.685,
+													0.95
+												],
+												[
+													0.645,
+													1.15
+												],
+												[
+													0.575,
+													1.32
+												],
+												[
+													0.48,
+													1.46
+												],
+												[
+													0.37,
+													1.565
+												],
+												[
+													0.25,
+													1.64
+												],
+												[
+													0.13,
+													1.685
+												],
+												[
+													0.0,
+													1.7
+												],
+												[
+													0.0,
+													1.69
+												]
+											],
+											"smooth": 2
+										},
+										"at": [
+											0,
+											0,
+											0
+										],
+										"material": "part_01",
+										"color": "#2b4619",
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.03
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.5
+										],
+										"at": [
+											0.182,
+											0.066,
+											0.8
+										],
+										"blend": 0.24,
+										"material": "part_01",
+										"color": "#2b4619",
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.03
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.32
+										],
+										"at": [
+											-0.222,
+											0.264,
+											1.05
+										],
+										"blend": 0.16,
+										"material": "part_01",
+										"color": "#2b4619",
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.03
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.3
+										],
+										"at": [
+											-0.132,
+											-0.362,
+											0.95
+										],
+										"blend": 0.16,
+										"material": "part_01",
+										"color": "#2b4619",
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.03
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.3
+										],
+										"at": [
+											0.3,
+											-0.252,
+											0.45
+										],
+										"blend": 0.16,
+										"material": "part_01",
+										"color": "#2b4619",
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.03
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.28
+										],
+										"at": [
+											0.106,
+											0.396,
+											0.4
+										],
+										"blend": 0.16,
+										"material": "part_01",
+										"color": "#2b4619",
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.03
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.28
+										],
+										"at": [
+											-0.396,
+											-0.07,
+											0.35
+										],
+										"blend": 0.16,
+										"material": "part_01",
+										"color": "#2b4619",
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.03
+										}
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.9,
+											0.9,
+											0.95
+										],
+										"at": [
+											0,
+											0,
+											0.85
+										],
+										"mode": "paint",
+										"material": "part_01",
+										"color": "#2b4619",
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.08
+										},
+										"levels": [
+											"mid"
+										]
+									},
+									{
+										"shape": "box",
+										"size": [
+											1.2,
+											1.2,
+											0.18
+										],
+										"at": [
+											0,
+											0,
+											0.0
+										],
+										"mode": "paint",
+										"blend": 0.22,
+										"opacity": 0.85,
+										"material": "part_01",
+										"color": "#1a2a0e"
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.75,
+											0.75,
+											0.45
+										],
+										"at": [
+											0,
+											0,
+											1.7
+										],
+										"mode": "paint",
+										"blend": 0.3,
+										"opacity": 0.65,
+										"material": "part_01",
+										"color": "#47662a"
+									}
+								],
+								"cells": {
+									"near": 0.02,
+									"mid": 0.06,
+									"far": 0.14
+								},
+								"budget": {
+									"near": 6000,
+									"mid": 600,
+									"far": 80
+								},
+								"bake": {
+									"near": 512,
+									"mid": 256,
+									"far": 64
+								},
+								"dirt": 0.25
+							}
+						}
+					}
+				]
+			}
+		}
+	},
+	"sources": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(2).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_paths_2014.jpg",
+			"shows": "The park in the morning: a path of tiles with a granite curb, a low square white lamp at its side, two women on the path, a granite bench, clipped hedges along the paths, round clipped bushes, granite balls on the lawn, frangipani trees, a black post with white globes, raised lawns and coconut palms."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(3).jpg",
+			"date": "2014-04-06 06:49",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_bushes_2014.jpg",
+			"shows": "The park under a large shade tree, to the walk of the sea: two round clipped bushes and a taller one behind them by a path, low square lamps, painted cat sculptures, clipped hedges along the paths, frangipani trees, raised lawns, coconut palms and the boats of the bay."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"date": "2014-04-06 06:46",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_balls_2014.jpg",
+			"shows": "The park in front of a raised lawn with coconut palms and a stair: a group of brown granite balls (one large, four small) and low round clipped shrubs on the lawn, a carved stone with stars, granite benches, low square lamps, and a group of round clipped bushes on the right."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(1).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_flower_bed_2014.jpg",
+			"shows": "The park in the morning: a round flower bed with a ring of red leaves and low yellow green plants in it, a low square white lamp (0.70 m) beside it."
+		},
+		{
+			"url": "https://www.flickr.com/photos/10598985@N07/27942041498/",
+			"image": "https://live.staticflickr.com/974/27942041498_9571d66a9a_b.jpg",
+			"date": "2018-03-08 07:48",
+			"license": "all rights reserved",
+			"author": "Ricoucou (Flickr user 10598985@N07)",
+			"open": false,
+			"file": "flickr_27942041498_b.jpg",
+			"shows": "The garden of sculptures of the park in the morning sun: behind the clipped hedges and the stone sculptures, round clipped bushes of dark green small leaves with lighter tops, a low square lamp near them."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Vung_Tau,_Viet_Nam_2021.jpg",
+			"date": "2021-01-30",
+			"license": "CC BY-SA 4.0",
+			"author": "Tuong Lam Photos",
+			"open": true,
+			"file": "drone_2021_park.jpg",
+			"shows": "From a drone over the south end of Bãi Trước, to the north: the square of the south end of the park with five Norfolk pines in a row (narrow dark cones with tiers), Norfolk pines on the median and the sidewalks of Quang Trung beside the blue lamp poles, palms, the walk of the sea, the boats, Núi Lớn."
+		}
+	],
+	"sizes": {
+		"height": {
+			"value": 1.7,
+			"unit": "m",
+			"source": "Photo 1 (2014, 1920 px): the front bush is 99 px high and 85 px wide, and the low lamp (0.70 m) that stands on the same line of the lawn is 39 px: 1.74 m. Photo 0 (2014, 1920 px): the front bush of the group of four is 180 px high; two women (1.58 m) and the low lamp (0.70 m) give the scale by the height of the foot in the photo (127 px for 1 m at a foot at 1027 px, 97 px at 967 px): 100 px for 1 m at the foot of the bush (973 px): 1.80 m. Photo 2: a bush behind a low lamp and a bench, 1.53 m. Photo 5 (2021, from a drone, the copy of 3840 px of Commons): the bushes are 11 to 15 px across, at 0.13 m for 1 px (a car of 4.5 m on Quang Trung at the same distance is 35 px): 1.4 m to 2.0 m across. 1.70 m."
+		},
+		"width": {
+			"value": 1.4,
+			"unit": "m",
+			"source": "Photo 1 (2014): 85 px at 57 px for 1 m: 1.49 m. Photo 0 (2014): 134 px at 100 px for 1 m: 1.34 m. Photo 2: 1.10 m. 1.40 m."
+		},
+		"widest": {
+			"value": 0.7,
+			"unit": "m",
+			"source": "Photos 0, 1 and 3 (2014): the bushes are widest a little under the half of their height (0.4 to 0.45 of it), and their foot is about 0.6 of their width on the lawn."
+		},
+		"group": {
+			"value": "1.5 m to 2.6 m high in one group",
+			"unit": "",
+			"source": "Photos 0 and 1 (2014): in each group, one or two bushes behind the others are taller (about 2.1 m to 2.6 m high, 1.8 m wide). The game uses this model with a scale for them."
+		},
+		"colors": {
+			"value": "leaves #2e4a1c, the clipped top #4c6b28, the foot #1a2a0e",
+			"unit": "",
+			"source": "Photo 4 (2018, in the sun): the median of the bushes is #2b4218 and their lit tops #659644. Photos 0 to 3 (2014, an overcast morning): the round bushes are darker and bluer than the clipped hedges and the lawn round them (photo 1: #1f290e, the top #475412). So the leaves are a little darker than the hedges of the park (#3a541b)."
+		},
+		"leaves": {
+			"value": 0.03,
+			"unit": "m",
+			"source": "Photos 1 and 4: small leaves in a dense clipped surface, a little larger than the leaves of the hedges (0.025 m)."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "82fc018990e8d9f7692139b6e3b99424",
+			"seen": "An egg of green leaves, 1.7 m high and 1.4 m wide, next to crops of photos 0, 1 and 4. The outline is lumpy, as a potato or a rock, and it narrows too much at the foot. The bushes of the photos are smooth clipped domes on sides that go almost straight down to a broad foot on the lawn. The green of the render is a little light next to the bushes of the photos, which are darker than the lawn and the hedges.",
+			"changed": "The mass is now a revolve of the side of the bushes of the photos (a dome on near vertical sides, a broad foot), with six soft bulges of a few cm only; the leaves are a little darker (#2b4619), and the light top is less strong."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "8a6de21b3525fbde564108b4d8f9f063",
+			"seen": "A clipped dome on near vertical sides with a broad foot: the shape of the bushes of photos 0 and 1. The top comes to a small point, the soft bulge at the top makes a small bump in the view from above, and the side shows bands where the corners of the side outline are.",
+			"changed": "A rounder top (more points at the top of the side outline), a smoother side (smooth 2), a broader foot (1.1 m), and no bulge at the top."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "702f35a62bfa19dc265b771d843ffb44",
+			"seen": "A smooth clipped dome on near vertical sides and a broad foot, as the bushes of photos 0 and 1, with no point at the top. But the view from above shows a small dark pit at the middle of the top: the smoothing of the side outline cuts its corner on the axis into a thin cone.",
+			"changed": "Two points on the axis at the top and at the foot of the side outline, so that the smoothing keeps the top and the foot flat on the axis."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "25182bd4af84ad53a97a8e660a723a5d",
+			"seen": "No pit at the top now. The shape agrees with the bushes of photos 0, 1 and 4: a smooth clipped dome on near vertical sides, 1.7 m high, 1.4 m wide, a broad dark foot, a lighter top. But the surface is smooth as plastic: the leaves of 3 cm are less than two texels of the image of the mid level, and the bushes of the photos show a dense pattern of leaf clumps with light spots.",
+			"changed": "A paint of the whole bush at the mid level only, with the surface leaves at a scale of 8 cm (5 texels); the light top paint has no surface of its own, so it keeps the surface under it."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "df73c6a6bae018450da3a5e013507d40",
+			"seen": "Next to crops of photos 1, 3 and 4: a clipped dome of dense leaf clumps, darker on the shaded side, a lighter top, a dark foot; the shape, the size and the green of the bushes of the photos. The bushes of the photos are a little more yellow on the side in the sun; the light of the game gives that.",
+			"changed": "Nothing at the mid level. Next: the far level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "far",
+			"hash": "df73c6a6bae018450da3a5e013507d40",
+			"seen": "80 triangles: a dome of dark green with a lighter top; from far it reads as a round clipped bush, as the bushes of photo 5 (2021, from a drone). But the far level has the colors at its points only, and its mean color is about a third darker than the mid level (#273a20 against #3c5c2b in the front view): the bush would go dark when the far level comes in.",
+			"changed": "A small image at the far level (64 texels), so that the far level has the same colors as the mid level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "far",
+			"hash": "92dbbc2521dea90872eae60f31cb8df7",
+			"seen": "80 triangles with a small image: the same mean color as the mid level (#3c5c2b in the front view), a lighter top and a dark foot. From far it reads as a round green bush, as the clipped balls by the paths in photo 5 (2021, from a drone).",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "92dbbc2521dea90872eae60f31cb8df7",
+			"seen": "The same views as the mid level before (only the far image changed): 600 triangles.",
+			"changed": "Nothing. Next: the near level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "92dbbc2521dea90872eae60f31cb8df7",
+			"seen": "6000 triangles: the same clipped dome, with a fine pattern of leaves over it, a lighter top and a dark foot. Next to a crop of photo 1 the leaves look as fine felt: the bushes of the photo show leaves of 3 cm to 5 cm with light edges, and a little bumpy outline. The first build of the near level stopped (HTTP 503: more memory than the edge has); the second built it.",
+			"changed": "Nothing: I build the near level one time."
+		}
+	],
+	"hash": "92dbbc2521dea90872eae60f31cb8df7"
+}

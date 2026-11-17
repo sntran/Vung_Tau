@@ -68,9 +68,9 @@
 				]
 			],
 			"storeys": 5,
-			"ground": 3.6,
+			"ground": 4.1,
 			"band": 0.6,
-			"storey": 3.3,
+			"storey": 3.0,
 			"colors": {
 				"wall": "#78a8d8",
 				"trim": "#eef0ee",
@@ -206,7 +206,7 @@
 						"at": [
 							26.3213,
 							-0.87,
-							4.6
+							5.0636
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -235,7 +235,7 @@
 						"at": [
 							26.3213,
 							-0.87,
-							7.9
+							8.0636
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -264,7 +264,7 @@
 						"at": [
 							26.3213,
 							-0.87,
-							11.2
+							11.0636
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -293,7 +293,7 @@
 						"at": [
 							26.3213,
 							-0.87,
-							14.5
+							14.0636
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -322,7 +322,7 @@
 						"at": [
 							6.9253,
 							0.4495,
-							4.6
+							5.0636
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -351,7 +351,7 @@
 						"at": [
 							6.9253,
 							0.4495,
-							7.9
+							8.0636
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -380,7 +380,7 @@
 						"at": [
 							6.9253,
 							0.4495,
-							11.2
+							11.0636
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -409,7 +409,7 @@
 						"at": [
 							6.9253,
 							0.4495,
-							14.5
+							14.0636
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -437,7 +437,7 @@
 						"at": [
 							37.8,
 							-7.4,
-							7.95
+							8.1091
 						],
 						"color": "#eef0ee",
 						"roughness": 0.85
@@ -451,7 +451,7 @@
 						"at": [
 							37.8,
 							-7.4,
-							11.25
+							11.1091
 						],
 						"color": "#eef0ee",
 						"roughness": 0.85
@@ -465,7 +465,7 @@
 						"at": [
 							37.8,
 							-7.4,
-							14.55
+							14.1091
 						],
 						"color": "#eef0ee",
 						"roughness": 0.85
@@ -491,12 +491,12 @@
 									-15.0
 								]
 							],
-							"depth": 4.8
+							"depth": 4.3636
 						},
 						"at": [
 							0.0,
 							0.0,
-							19.0
+							18.1545
 						],
 						"color": "#78a8d8",
 						"roughness": 0.85,
@@ -526,12 +526,12 @@
 									-14.6
 								]
 							],
-							"depth": 2.0
+							"depth": 1.8182
 						},
 						"at": [
 							0.0,
 							0.0,
-							21.4
+							20.3364
 						],
 						"color": "#9a9d98",
 						"mode": "subtract",
@@ -547,7 +547,7 @@
 						"at": [
 							11.3,
 							-1.6167,
-							19.15
+							18.2909
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -575,7 +575,7 @@
 						"at": [
 							11.3,
 							-1.6167,
-							19.15
+							18.2909
 						],
 						"color": "#4d5a62",
 						"axis": [
@@ -604,7 +604,7 @@
 						"at": [
 							11.6664,
 							-1.6305,
-							19.15
+							18.2909
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -631,7 +631,7 @@
 						"at": [
 							10.9336,
 							-1.6028,
-							19.15
+							18.2909
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -658,7 +658,7 @@
 						"at": [
 							6.9,
 							-1.45,
-							19.15
+							18.2909
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -686,7 +686,7 @@
 						"at": [
 							6.9,
 							-1.45,
-							19.15
+							18.2909
 						],
 						"color": "#4d5a62",
 						"axis": [
@@ -715,7 +715,7 @@
 						"at": [
 							7.2664,
 							-1.4639,
-							19.15
+							18.2909
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -742,7 +742,7 @@
 						"at": [
 							6.5336,
 							-1.4361,
-							19.15
+							18.2909
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -769,7 +769,7 @@
 						"at": [
 							2.5,
 							-1.2833,
-							19.15
+							18.2909
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -797,7 +797,7 @@
 						"at": [
 							2.5,
 							-1.2833,
-							19.15
+							18.2909
 						],
 						"color": "#4d5a62",
 						"axis": [
@@ -826,7 +826,7 @@
 						"at": [
 							2.8664,
 							-1.2972,
-							19.15
+							18.2909
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -853,7 +853,7 @@
 						"at": [
 							2.1336,
 							-1.2695,
-							19.15
+							18.2909
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -880,7 +880,7 @@
 						"at": [
 							6.9,
 							-0.6,
-							21.9
+							20.7909
 						],
 						"color": "#78a8d8",
 						"axis": [
@@ -905,7 +905,7 @@
 						"at": [
 							6.9,
 							1.95,
-							22.35
+							21.2
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -945,12 +945,12 @@
 									-9.8
 								]
 							],
-							"depth": 23.4
+							"depth": 22.1545
 						},
 						"at": [
 							0.0,
 							0.0,
-							11.7
+							11.0773
 						],
 						"color": "#78a8d8",
 						"roughness": 0.85,
@@ -969,7 +969,7 @@
 						"at": [
 							-1.9,
 							-6.2,
-							5.8
+							6.1545
 						],
 						"color": "#a7b6c2",
 						"axis": [
@@ -998,7 +998,7 @@
 						"at": [
 							-1.9,
 							-6.2,
-							5.8
+							6.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1024,7 +1024,7 @@
 						"at": [
 							-1.9,
 							-6.2,
-							5.8
+							6.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1050,7 +1050,7 @@
 						"at": [
 							-1.9,
 							-6.2,
-							9.1
+							9.1545
 						],
 						"color": "#a7b6c2",
 						"axis": [
@@ -1079,7 +1079,7 @@
 						"at": [
 							-1.9,
 							-6.2,
-							9.1
+							9.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1105,7 +1105,7 @@
 						"at": [
 							-1.9,
 							-6.2,
-							9.1
+							9.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1131,7 +1131,7 @@
 						"at": [
 							-1.9,
 							-6.2,
-							12.4
+							12.1545
 						],
 						"color": "#a7b6c2",
 						"axis": [
@@ -1160,7 +1160,7 @@
 						"at": [
 							-1.9,
 							-6.2,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1186,7 +1186,7 @@
 						"at": [
 							-1.9,
 							-6.2,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1212,7 +1212,7 @@
 						"at": [
 							-1.9,
 							-6.2,
-							15.7
+							15.1545
 						],
 						"color": "#a7b6c2",
 						"axis": [
@@ -1241,7 +1241,7 @@
 						"at": [
 							-1.9,
 							-6.2,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1267,7 +1267,7 @@
 						"at": [
 							-1.9,
 							-6.2,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1293,7 +1293,7 @@
 						"at": [
 							-1.9,
 							-6.2,
-							19.0
+							18.1545
 						],
 						"color": "#a7b6c2",
 						"axis": [
@@ -1322,7 +1322,7 @@
 						"at": [
 							-1.9,
 							-6.2,
-							19.0
+							18.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1348,7 +1348,7 @@
 						"at": [
 							-1.9,
 							-6.2,
-							19.0
+							18.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1374,7 +1374,7 @@
 						"at": [
 							-3.6,
 							-8.0,
-							5.8
+							6.1545
 						],
 						"color": "#a7b6c2",
 						"axis": [
@@ -1403,7 +1403,7 @@
 						"at": [
 							-3.6,
 							-8.0,
-							5.8
+							6.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1429,7 +1429,7 @@
 						"at": [
 							-3.6,
 							-8.0,
-							5.8
+							6.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1455,7 +1455,7 @@
 						"at": [
 							-3.6,
 							-8.0,
-							9.1
+							9.1545
 						],
 						"color": "#a7b6c2",
 						"axis": [
@@ -1484,7 +1484,7 @@
 						"at": [
 							-3.6,
 							-8.0,
-							9.1
+							9.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1510,7 +1510,7 @@
 						"at": [
 							-3.6,
 							-8.0,
-							9.1
+							9.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1536,7 +1536,7 @@
 						"at": [
 							-3.6,
 							-8.0,
-							12.4
+							12.1545
 						],
 						"color": "#a7b6c2",
 						"axis": [
@@ -1565,7 +1565,7 @@
 						"at": [
 							-3.6,
 							-8.0,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1591,7 +1591,7 @@
 						"at": [
 							-3.6,
 							-8.0,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1617,7 +1617,7 @@
 						"at": [
 							-3.6,
 							-8.0,
-							15.7
+							15.1545
 						],
 						"color": "#a7b6c2",
 						"axis": [
@@ -1646,7 +1646,7 @@
 						"at": [
 							-3.6,
 							-8.0,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1672,7 +1672,7 @@
 						"at": [
 							-3.6,
 							-8.0,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1698,7 +1698,7 @@
 						"at": [
 							-3.6,
 							-8.0,
-							19.0
+							18.1545
 						],
 						"color": "#a7b6c2",
 						"axis": [
@@ -1727,7 +1727,7 @@
 						"at": [
 							-3.6,
 							-8.0,
-							19.0
+							18.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1753,7 +1753,7 @@
 						"at": [
 							-3.6,
 							-8.0,
-							19.0
+							18.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1779,7 +1779,7 @@
 						"at": [
 							-13.967,
 							-5.7536,
-							7.3
+							7.5182
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1808,7 +1808,7 @@
 						"at": [
 							-13.9744,
 							-6.0535,
-							9.05
+							9.1091
 						],
 						"color": "#2f3b44",
 						"axis": [
@@ -1837,7 +1837,7 @@
 						"at": [
 							-5.027,
 							-6.2754,
-							9.05
+							9.1091
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1863,7 +1863,7 @@
 						"at": [
 							-6.3052,
 							-6.2437,
-							9.05
+							9.1091
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1889,7 +1889,7 @@
 						"at": [
 							-7.5834,
 							-6.212,
-							9.05
+							9.1091
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1915,7 +1915,7 @@
 						"at": [
 							-8.8616,
 							-6.1803,
-							9.05
+							9.1091
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1941,7 +1941,7 @@
 						"at": [
 							-10.1398,
 							-6.1486,
-							9.05
+							9.1091
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1967,7 +1967,7 @@
 						"at": [
 							-11.418,
 							-6.1169,
-							9.05
+							9.1091
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -1993,7 +1993,7 @@
 						"at": [
 							-12.6962,
 							-6.0852,
-							9.05
+							9.1091
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2019,7 +2019,7 @@
 						"at": [
 							-13.9744,
 							-6.0535,
-							9.05
+							9.1091
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2045,7 +2045,7 @@
 						"at": [
 							-15.2526,
 							-6.0218,
-							9.05
+							9.1091
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2071,7 +2071,7 @@
 						"at": [
 							-16.5308,
 							-5.9901,
-							9.05
+							9.1091
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2097,7 +2097,7 @@
 						"at": [
 							-17.809,
 							-5.9585,
-							9.05
+							9.1091
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2123,7 +2123,7 @@
 						"at": [
 							-19.0872,
 							-5.9268,
-							9.05
+							9.1091
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2149,7 +2149,7 @@
 						"at": [
 							-20.3654,
 							-5.8951,
-							9.05
+							9.1091
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2175,7 +2175,7 @@
 						"at": [
 							-21.6436,
 							-5.8634,
-							9.05
+							9.1091
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2201,7 +2201,7 @@
 						"at": [
 							-22.9218,
 							-5.8317,
-							9.05
+							9.1091
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2227,7 +2227,7 @@
 						"at": [
 							-13.9744,
 							-6.0535,
-							9.05
+							9.1091
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2248,12 +2248,12 @@
 						"size": [
 							10.3287,
 							6.0,
-							2.4
+							2.1818
 						],
 						"at": [
 							-13.9744,
 							-6.0535,
-							16.8
+							16.1545
 						],
 						"color": "#78a8d8",
 						"axis": [
@@ -2278,12 +2278,12 @@
 						"size": [
 							10.3287,
 							6.0,
-							4.6
+							4.1818
 						],
 						"at": [
 							-13.9744,
 							-6.0535,
-							20.1
+							19.1545
 						],
 						"color": "#78a8d8",
 						"axis": [
@@ -2313,7 +2313,7 @@
 						"at": [
 							-13.9759,
 							-6.1135,
-							11.3
+							11.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2342,7 +2342,7 @@
 						"at": [
 							-14.0339,
 							-8.4528,
-							12.4
+							12.1545
 						],
 						"color": "#2f3b44",
 						"axis": [
@@ -2370,7 +2370,7 @@
 						"at": [
 							-5.0865,
 							-8.6746,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2396,7 +2396,7 @@
 						"at": [
 							-6.3647,
 							-8.6429,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2422,7 +2422,7 @@
 						"at": [
 							-7.6429,
 							-8.6112,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2448,7 +2448,7 @@
 						"at": [
 							-8.9211,
 							-8.5796,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2474,7 +2474,7 @@
 						"at": [
 							-10.1993,
 							-8.5479,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2500,7 +2500,7 @@
 						"at": [
 							-11.4775,
 							-8.5162,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2526,7 +2526,7 @@
 						"at": [
 							-12.7557,
 							-8.4845,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2552,7 +2552,7 @@
 						"at": [
 							-14.0339,
 							-8.4528,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2578,7 +2578,7 @@
 						"at": [
 							-15.3121,
 							-8.4211,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2604,7 +2604,7 @@
 						"at": [
 							-16.5903,
 							-8.3894,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2630,7 +2630,7 @@
 						"at": [
 							-17.8685,
 							-8.3577,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2656,7 +2656,7 @@
 						"at": [
 							-19.1467,
 							-8.326,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2682,7 +2682,7 @@
 						"at": [
 							-20.4249,
 							-8.2943,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2708,7 +2708,7 @@
 						"at": [
 							-21.7031,
 							-8.2626,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2734,7 +2734,7 @@
 						"at": [
 							-22.9813,
 							-8.231,
-							12.4
+							12.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2760,7 +2760,7 @@
 						"at": [
 							-14.0304,
 							-8.3128,
-							14.6
+							14.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2789,7 +2789,7 @@
 						"at": [
 							-14.0884,
 							-10.6521,
-							15.7
+							15.1545
 						],
 						"color": "#2f3b44",
 						"axis": [
@@ -2817,7 +2817,7 @@
 						"at": [
 							-5.1411,
 							-10.8739,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2843,7 +2843,7 @@
 						"at": [
 							-6.4193,
 							-10.8423,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2869,7 +2869,7 @@
 						"at": [
 							-7.6975,
 							-10.8106,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2895,7 +2895,7 @@
 						"at": [
 							-8.9757,
 							-10.7789,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2921,7 +2921,7 @@
 						"at": [
 							-10.2538,
 							-10.7472,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2947,7 +2947,7 @@
 						"at": [
 							-11.532,
 							-10.7155,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2973,7 +2973,7 @@
 						"at": [
 							-12.8102,
 							-10.6838,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -2999,7 +2999,7 @@
 						"at": [
 							-14.0884,
 							-10.6521,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -3025,7 +3025,7 @@
 						"at": [
 							-15.3666,
 							-10.6204,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -3051,7 +3051,7 @@
 						"at": [
 							-16.6448,
 							-10.5887,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -3077,7 +3077,7 @@
 						"at": [
 							-17.923,
 							-10.557,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -3103,7 +3103,7 @@
 						"at": [
 							-19.2012,
 							-10.5254,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -3129,7 +3129,7 @@
 						"at": [
 							-20.4794,
 							-10.4937,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -3155,7 +3155,7 @@
 						"at": [
 							-21.7576,
 							-10.462,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -3181,7 +3181,7 @@
 						"at": [
 							-23.0358,
 							-10.4303,
-							15.7
+							15.1545
 						],
 						"color": "#eef0ee",
 						"axis": [
@@ -3207,7 +3207,7 @@
 						"at": [
 							-14.0934,
 							-10.8521,
-							17.6
+							16.8818
 						],
 						"color": "#78a8d8",
 						"axis": [
@@ -3235,12 +3235,12 @@
 								[
 									10.9,
 									1.4,
-									22.5
+									21.3364
 								],
 								[
 									10.9,
 									1.4,
-									24.6
+									23.4364
 								]
 							],
 							"radii": [
@@ -3258,12 +3258,12 @@
 								[
 									10.2895,
 									1.4,
-									22.5
+									21.3364
 								],
 								[
 									10.2895,
 									1.4,
-									24.6
+									23.4364
 								]
 							],
 							"radii": [
@@ -3281,12 +3281,12 @@
 								[
 									10.9,
 									1.4,
-									23.564
+									22.3036
 								],
 								[
 									10.2895,
 									1.4,
-									23.564
+									22.3036
 								]
 							],
 							"radii": [
@@ -3304,17 +3304,17 @@
 								[
 									9.8621,
 									1.4,
-									22.5
+									21.3364
 								],
 								[
 									9.5568,
 									1.4,
-									24.6
+									23.4364
 								],
 								[
 									9.2516,
 									1.4,
-									22.5
+									21.3364
 								]
 							],
 							"radii": [
@@ -3333,12 +3333,12 @@
 								[
 									9.74,
 									1.4,
-									23.284
+									22.0491
 								],
 								[
 									9.3737,
 									1.4,
-									23.284
+									22.0491
 								]
 							],
 							"radii": [
@@ -3356,12 +3356,12 @@
 								[
 									8.5189,
 									1.4,
-									22.5
+									21.3364
 								],
 								[
 									8.5189,
 									1.4,
-									24.6
+									23.4364
 								]
 							],
 							"radii": [
@@ -3379,17 +3379,17 @@
 								[
 									6.7484,
 									1.4,
-									22.5
+									21.3364
 								],
 								[
 									6.4432,
 									1.4,
-									24.6
+									23.4364
 								],
 								[
 									6.1379,
 									1.4,
-									22.5
+									21.3364
 								]
 							],
 							"radii": [
@@ -3408,12 +3408,12 @@
 								[
 									6.6263,
 									1.4,
-									23.284
+									22.0491
 								],
 								[
 									6.26,
 									1.4,
-									23.284
+									22.0491
 								]
 							],
 							"radii": [
@@ -3431,32 +3431,32 @@
 								[
 									5.7105,
 									1.4,
-									24.6
+									23.4313
 								],
 								[
 									5.7105,
 									1.4,
-									23.06
+									21.8913
 								],
 								[
 									5.564,
 									1.4,
-									22.556
+									21.3873
 								],
 								[
 									5.2465,
 									1.4,
-									22.556
+									21.3873
 								],
 								[
 									5.1,
 									1.4,
-									23.06
+									21.8913
 								],
 								[
 									5.1,
 									1.4,
-									24.6
+									23.4313
 								]
 							],
 							"radii": [
@@ -3527,19 +3527,19 @@
 			"source": "Photo 0 (2014): the north wing and the south wing have the ground storey and four storeys over it (counted)."
 		},
 		"storey": {
-			"value": 3.3,
+			"value": 3.0,
 			"unit": "m",
-			"source": "estimate (no source): no person or car is at the face of the building in a photo; 3.3 m is the storey of the stand-ins."
+			"source": "Photo 0 (2014): the man at the curb in front (1.7 m) is 100 px high, so the camera sees 1.7 cm in a pixel at his distance; the white car at the porch (a sedan of 1.45 m) is 48 px high, so it is 1.76 times as far. The front of the OSM outline is 24 m behind the curb, 2.4 times as far as the man. The floors over the porch are 65 to 72 px apart at that distance: 2.8 m to 3.1 m. Report 0026, D-0026-13."
 		},
 		"ground_storey": {
-			"value": 3.6,
+			"value": 4.1,
 			"unit": "m",
-			"source": "estimate (no source): the shops and the porch of the ground storey are high in photo 0; a band of 0.6 m over it."
+			"source": "Photo 0 (2014): the porch from the forecourt to its soffit is 130 px high, 2 m behind the white car (1.45 m, 48 px): 4.1 m to the soffit, then the band of 0.6 m. Report 0026, D-0026-13."
 		},
 		"height": {
-			"value": "18.1 m (wings), 21.4 m (middle block), 22.5 m (canopy), 24.6 m (top of the letters)",
+			"value": "16.7 m (wings), 19.7 m (middle block), about 21 m (canopy), about 23 m (top of the letters)",
 			"unit": "",
-			"source": "From the storeys, the storey and the parapet of 1.0 m (estimate (no source)); the spec gave 22 m for the middle block with its canopy."
+			"source": "From the storeys, the ground storey and the band (4.7 m to the first floor), the storey of 3.0 m, and the parapet of 1.0 m; photo 0 (2014): the canopy is 530 px over the porch at 40 m (the scale of the man and the car): about 22 m."
 		},
 		"canopy": {
 			"value": "14.8 m wide, 5.2 m deep, rises 10 degrees to the front, a white edge 1.9 m in front of the middle block",
@@ -3598,6 +3598,13 @@
 			"hash": "c344ff9a1e86cf93adcc7daaf829a15d",
 			"seen": "A preview in my workspace, not a build of the factory: the factory answers HTTP 503 (memory) when it places this order, so I made the edits of the rule (World.Town.Building, ported to Python) into voxels of 0.12 m and rendered them with tools/world/look.gd (build/look/khach_san_hai_au_preview_near.png). As at the mid level.",
 			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "none",
+			"hash": "",
+			"seen": "Report 0026, D-0026-13: the three looks before are of a preview from a copy of the building rule of World that I made in Python, not of the model of World. I deleted that copy. The next look is of the files of the lock, after the job \"Models of World\" builds this order.",
+			"changed": "The ground storey 4.1 m and the storey 3.0 m (measured from the man and the car of photo 0); each edit of \"more\" moves with the floors (4.7 m + 3.0 m for each floor, from 4.2 m + 3.3 m)."
 		}
 	],
 	"status": "Source",
@@ -3607,6 +3614,5 @@
 		"far"
 	],
 	"uses": "Plan 0026, R7, Q7, Q8: on its OSM outline (way 790529523) by Hạ Long, in place of its stand-in (6 storeys, stand_ins.storeys of data/showcase/bai_truoc.json); PT-74 takes a screenshot of it; its place is in data/world/places/bai_truoc.json.",
-	"impostor": false,
-	"hash": "c344ff9a1e86cf93adcc7daaf829a15d"
+	"impostor": false
 }
