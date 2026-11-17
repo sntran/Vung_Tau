@@ -56,9 +56,9 @@ At 17:00 the 40 people are on about 1.3 km of paths: the shots show 0 to 3 peopl
 
 The low lamps of the park are white posts, and the raised lawns are boxes with a flat green top. They wait for their specs (section 3).
 
-### D-0026-09: The requests to World are not specs (high)
+### D-0026-09: The requests ask World to make the models (high)
 
-`data/world/requests/bai_truoc.json` asks World to design the things of the park, the sea wall, the plants, and the clothes (Q-W5 to Q-W8 give "needs" and no sizes), and two sources say "not looked at". World builds from specs that this repository gives (`docs/world-specs.md`). Write one spec for each model, with values measured from the photos (R17 of the plan gives copies of the open photos). Also, write the data as from me (first person), not "the owner".
+`data/world/requests/bai_truoc.json` asks World to design the things of the park, the sea wall, the plants, and the clothes (Q-W5 to Q-W8 give "needs" and no sizes), and two sources say "not looked at". World is an engine with tools, as Dreams: this game makes its models with them (`docs/world-models.md`). Make each model as a drawing, a blueprint in data, or an order with edits, with sizes measured from photos that you looked at. Ask World only for a tool that is missing (section 5 of that file). Also, write the data as from me (first person), not "the owner".
 
 ## 3. World
 
@@ -69,8 +69,8 @@ The low lamps of the park are white posts, and the raised lawns are boxes with a
 
 The builder writes these in the plan file on the branch (the plan on `main` is older than the branch):
 
-- **D5 (new text).** Vũng Tàu gives World a spec for each model (`docs/world-specs.md`, `data/world/specs/ID.json`). World builds to the spec, adds a general rule when it has none, and asks when a value is missing. World does not choose a size, a shape, or a color of a model of this game.
-- **R17 (new).** A workflow copies the open photos (CC0, CC BY, CC BY-SA, public domain) of the specs and of section 3 into `docs/reference/photos/`, with a file of credits (the author, the license, the link, the date), so that the builder and the architect can look at them in the workspace. The workspace cannot reach `upload.wikimedia.org` (checked on 2026-11-16), but CI can. A photo that is not open stays a link.
+- **D5 (new text).** Vũng Tàu makes its models with the tools of World, as a player of Dreams makes things (`docs/world-models.md`): an order of a blueprint with the numbers of this game, an order with edits, or a drawing of edits, in `data/world/drawings/`. World gives the tools, corrects its faults, and adds a tool when this game shows the need. World does not make a model of this game.
+- **R17 (new).** A workflow copies the open photos (CC0, CC BY, CC BY-SA, public domain) of the drawings and of section 3 into `docs/reference/photos/`, with a file of credits (the author, the license, the link, the date), so that the builder and the architect can look at them in the workspace. The workspace cannot reach `upload.wikimedia.org` (checked on 2026-11-16), but CI can. A photo that is not open stays a link.
 - **R15 (change).** Each shot has the eye, the direction, and the field of view of its photo (D-0026-02).
 - **Q5.** The whole park and the walk of the sea to z −365 are in the area: yes.
 - **Q6.** Do not wait for plan 0009: count the storeys from the photos (R17), with the status "Source". A stand-in of 1 storey is not correct in a shot.
@@ -82,12 +82,12 @@ The builder writes these in the plan file on the branch (the plan on `main` is o
 
 ## 5. Photos
 
-I have no photos of these places. The builder finds as many photos as it can, in each place that it can reach, and uses each one to make the specs more correct:
+I have no photos of these places. The builder finds as many photos as it can, in each place that it can reach, and uses each one to make the models more correct:
 
 - image searches (in Vietnamese and in English: "bãi trước vũng tàu", "công viên bãi trước", "đường hạ long vũng tàu", "kè bãi trước", "bậc xuống bãi tắm", "cầu đá vũng tàu", "khách sạn hải âu vũng tàu", with the years 2017 to 2020),
 - Wikimedia Commons, Flickr, Mapillary, news articles, travel blogs, hotel and review pages, and videos of walks in Vũng Tàu.
 
-For each photo it writes the link, the date, the license, and what it shows, in the spec that uses it. An open photo goes into `docs/reference/photos/` (R17). A photo that is not open stays a link: the builder can look at it in a run of CI (an artifact that is not kept), but it does not go into the repository. For Q11 and Q12 (the steps down to the sand and a walk on the sand along Hạ Long), the builder looks for at least three photos from 2017 to 2021 before it decides; with fewer, the value stays "Check".
+For each photo it writes the link, the date, the license, and what it shows, in the drawing that uses it. An open photo goes into `docs/reference/photos/` (R17). A photo that is not open stays a link: the builder can look at it in a run of CI (an artifact that is not kept), but it does not go into the repository. For Q11 and Q12 (the steps down to the sand and a walk on the sand along Hạ Long), the builder looks for at least three photos from 2017 to 2021 before it decides; with fewer, the value stays "Check".
 
 ## 6. Status
 
