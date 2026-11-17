@@ -65,4 +65,6 @@ Why now (report 0026, section 3): the edge of World answers 503 for each buildin
 ## 8. Open questions
 
 - **Q1.** In Dreams, a soft blend joins the sculptures of one group. Here, a blend stays inside one part: World makes the parts so that no blend crosses two parts. Is that enough for the buildings and the statues? (World answers.)
+  - **Answer (World, branch `feat/parts-at-the-factory`, 2026-11-17):** a blend can cross two parts. World makes each part from the field of all the edits near it, so the two sides of a border are the same surface, with no gap and no step. Only the maps can differ a little at a border, because each part has its own maps. The glue uses one material for the parts of one role (D3), and that hides it.
 - **Q2.** For the far level, is one small part for the whole model better than many parts? (World answers, with the triangles and the draw calls of Hải Âu.)
+  - **Answer (World, 2026-11-17):** one part. For Hải Âu at far, one part has 2 draw calls and 1 300 triangles; 15 tiles had 16 draw calls, 2 025 triangles, and a bad shape.
