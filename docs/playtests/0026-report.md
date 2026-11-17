@@ -95,4 +95,87 @@ For each photo it writes the link, the date, the license, and what it shows, in 
 
 ## 6. Status
 
-The plan stays "In progress". Q9: do not put plan 0023 on `main` with a red test; World corrects its catalog first.
+The plan stays "In progress". Q9: World corrected its catalog at `1984a6f` (its CI builds the files of the catalog from its code). Plan 0023 goes to `main` with this plan, when CI is green.
+
+## 7. Audit 2: branch at `2375a18` (2026-11-17)
+
+The pictures of this audit are in [`0026/audit-2026-11-17/`](0026/audit-2026-11-17/).
+
+### 7.1 Runs
+
+| Run | Result |
+|---|---|
+| PT-74 `showcase_walk`, all runs (workspace) | **Fail in run 5.** At 702 m the player stops at (73.7, 3.3, 195.1) against a wall (D-0026-11). The scenario stops at the first failed run, so I ran runs 6, 7, and 8 alone: pass. |
+| PT-72 `showcase_shots`, phases 1 and 2 (Low, 17:10 and 12:00) | Pass. I put the shots of 12:00 next to their photos: `shots_noon.jpg`. |
+| PT-71 `showcase_places` | Pass (116 s here). |
+| PT-75 `showcase_people`, phase 1 (17:00) | Pass, with 0 swimmers (D-0026-20). |
+| CI of `2375a18` | **Fail.** Five play tests take more than 300 s in their first run: `geo_hill`, `landmark_views`, `geo_chunks`, `landmark_sheet`, and `showcase_places` (D-0026-12). |
+
+### 7.2 What is correct
+
+- The models of this game are made in the correct way (D5, `docs/world-models.md`). The lamps, the walls, the plants, and the steps are sculptures from edits in this repository. Each size has its photo and how it was measured. The ten tool requests ask World for tools, not for models.
+- The open photos are in `docs/reference/photos/` with their credits (R17). Five photos of 2017 to 2020 show the steps down to the sand (Q11).
+- The people on the walk of the sea, the bars of Quang Trung, Cảng vụ, and the fishing boats look correct. The sea is green grey (D-0026-06).
+- The walk on the sea wall of Hạ Long and the way onto the jetty pass (runs 6 to 8).
+
+### 7.3 Defects
+
+#### D-0026-11: A ledge between the park and the sidewalk of Quang Trung (high)
+
+At the south end of the park, the sidewalk of the park side of Quang Trung is a ledge of about 0.3 m to 0.5 m over the path (`ledge_run5.jpg`). The player steps up 0.25 m, so a player who walks from the park to the street stops there. It passes on your computer and fails here: it is the same kind of defect as D-0026-01. Add a scan of each edge between a part that a player walks on and the ground of the area (rays every 0.5 m along the edge): a step higher than 0.25 m with no way round it fails. Then correct the edges: in the photos, the curbs of Quang Trung are low, and the paths of the park meet the sidewalk at its level.
+
+#### D-0026-12: The play tests of the world are slower, and five fail in CI (high)
+
+On `main` (CI of `eada09b`), `landmark_sheet` takes 91 s and `landmark_views` 142 s. On `2375a18`, the first run of each takes more than 300 s, and so do `geo_hill`, `geo_chunks`, and `showcase_places`. Most of these play tests are not about the showcase: the showcase makes each start of the Vũng Tàu world slower. Measure the time from the start to the first frame on `main` and on the branch. Then build the showcase only when the player comes near it (or in parts, over some frames), so that each play test of `main` takes its time of `main` again. Add the time of the start to a play test, with a limit.
+
+#### D-0026-13: Hải Âu (high)
+
+- **Its ground storey is under the ground.** From the walk (PT-74 run 8) and from near (PT-71), a bank of earth hides the ground storey: the shops and the porch of the photo are not there (`hai_au.jpg`). The level ground under the model must be the level of the sidewalk of Hạ Long in front of it.
+- **No look of the true model.** The three looks in `khach_san_hai_au.json` are of a preview from a copy of the rule of World that you made in Python. Nobody looked at the model that World built (the job "Models of World", 28 minutes). A look is of the files of the lock, next to the photos. Do not keep a copy of the code of World, in this repository or in a workspace: two copies drift apart (Q9).
+- **Sizes.** The height of a storey is "estimate (no source)", but photo 0 has a car and people at the front of the building. Measure it from them.
+
+#### D-0026-14: Stand-ins in the shots (high)
+
+- In S1, Khách sạn Bưu điện and Cao ốc Sen Biển are two grey boxes (`s1_hill_and_stand_ins.jpg`). They are the main subject of the photo of S1. The photo of S1 (2014) and the photo from a drone of 2021 show them: make them as orders of `building`, as Hải Âu.
+- In S4, a box of grey stone stands at the right of the Grand Hotel.
+- The old hydrofoil terminal is a box of 11 m over the land end of the jetty, and the way to the jetty is a corridor cut through it (`terminal_and_slope.jpg`). The outline of OpenStreetMap is the area of the port, not the building. Until a model from photos is there, no box stands over the jetty and its way.
+- PT-72 passes when a stand-in in the frame has its storeys. Make it fail when a stand-in is a main subject of the photo of the shot.
+
+#### D-0026-15: The far hill trees are dark shapes, and the hill is a patchwork (high)
+
+In S1 at 12:00 and at 17:10 on Low, the far trees of Núi Nhỏ are dark shapes like small houses on the hill, and the ground of the hill has pink and teal patches (the far roofs of the town) where the photo shows trees and a few white villas (`s1_hill_and_stand_ins.jpg`). The check of D-0026-05 measures the spread of the brightness only. Also compare the colors (the hue and the value) of the box `hill` with the photo, at 12:00 and at 17:10.
+
+#### D-0026-16: The top of the low wall of the beach is a saw-tooth (medium)
+
+Where the low wall follows a curve or a slope, the top of each piece slopes on its own, and the top of the wall is a saw-tooth (`s1_wall_top.jpg`). The rail of the wall is one smooth line: the pieces meet at the same height.
+
+#### D-0026-17: The park is a bare lawn (medium)
+
+The photos of the park (`park.jpg`) show clipped hedges along the paths, round clipped bushes, flower beds, granite balls, benches, frangipani trees, and paths of tiles. In the game, the park is a flat lawn with trees, and the paths look like gravel. S2 shows a frangipani in the middle of the frame, where its photo shows the grove of leaning coconut palms. Put the hedges and the flower beds in the park (Q19), make the paths tiles, and put the leaning palms of S2 in the frame of S2.
+
+#### D-0026-18: The roads look like gravel (medium)
+
+In S3, S4, and at the south end of the park (`ledge_run5.jpg`), the asphalt is a light grey surface of coarse stones. In the photos, it is dark smooth asphalt with white lines. A brown block stands on the road at the south end of the median (`ledge_run5.jpg`, right).
+
+#### D-0026-19: The blue lamp poles of the walk of the sea are not there (medium)
+
+`lamp_rows` puts the blue poles only on the sidewalk of Quang Trung. The photo of 2014 (`park_blue_lamp_2014.jpg`) and the photos of 2019 show them along the walk of the sea, by the low wall. Put a row there.
+
+#### D-0026-20: No swimmers and no boats on the sand (medium)
+
+Section 8 says that at 17:00 the swimmers are in the water near the beach. PT-75 writes "0 swimmers" and passes. Make PT-75 fail with no swimmers. The photo of S1 also shows the boats pulled up on the sand, and people in the water (Q20).
+
+#### D-0026-21: The slope of Hạ Long is still bare (low)
+
+The side of the hill along Hạ Long is bare earth with palms (`terminal_and_slope.jpg`, PT-74 run 6). See Q13.
+
+### 7.4 Answers to the questions of the plan
+
+- **Q13.** Do not wait for an Earth Engine account. Count the storeys of the houses of the slope from the photos of 2017 to 2021 (the photo from a drone of 2021 shows many of them), as for the other stand-ins. A footprint that no photo shows stays off. The account is a question for plan 0009.
+- **Q14.** Correct the build now: at a junction, both roads come to one smooth height. Build the geodata again, and run the geodata tests and PT-33 to PT-39.
+- **Q15.** Yes. Grow the outline of the area to the lot of the Palace Hotel (way 791795130) and to Nguyễn Trãi in front of it. Where the photos of 2014 and of 2022 show the same porch and the same faces, that was the look in 2019 too: Source (Q17, rule 1). Where they do not agree, the value stays Check. The video of 1992 (`docs/content/reference/video-1992.md`, 2:15) shows that the hotel is in the view from Quang Trung.
+- **Q16.** Yes: use the name. The letters HA LONG HOTEL of the photo of 2021 go on the model (AGENTS.md section 4; the culture notes list the exception).
+- **Q17.** Two rules, for this and for the next models. (1) A look that a photo before 2017 and a photo after 2021 both show was the look in 2019: Source. (2) A thing that a photo of 2017 to 2021 shows (also from far, for example the photo from a drone of 2021), with its sizes from a photo of 2014 or 2015: Source. A thing that no photo of 2017 or later shows stays Check. For the two sloped sea walls, the drop is the height of the walk less the height of the sand in the ground of the game, and the run comes from the photos: Source.
+- **Q18.** Over the road. The photo from a drone of 2021 (`drone_2021_park.jpg`) shows the arms of the poles of both sidewalks of Quang Trung over the road. The status is Source.
+- **Q19.** In this plan: the swimmers with the swim rings (section 8), the hedges, the round bushes, and the flower beds of the park (D-0026-17), the steps at the openings of the low wall, and the woman with the wide hat as a walker. For the Norfolk pine, keep one model only: the tree of plan 0020 or the drawing, the one that is nearer to the photos at the mid and the far levels.
+- **Q20 (new).** Did the people of Bãi Trước swim in shorts and T-shirts, or in swim clothes? **Answer:** in shorts and T-shirts. They are local, and this is not a swimming pool (culture notes, Confirmed). So the swimmers wear the shorts and T-shirts of the person blueprint of World, with the swim rings (`phao_boi`), and do not wait for `swim_trunks`. The garment `swim_trunks` (`quan_dui_boi_nam`) is not needed for this plan.
