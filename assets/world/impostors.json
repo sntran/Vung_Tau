@@ -1,5 +1,18 @@
 {
 	"models": {
+		"bui_cay_tron": {
+			"glb": "9c3e05033aa6103c3beb6af78be6033e51082eca9f3648bd60bb5d3a63a8a1bf",
+			"materials": "4e33c8ddb7893598165769f9db16ecd13f83d70585e8653e5215ea4941e32e25",
+			"script": "6a2254bef1a9ff6f0c20d1482891315022c8d4c5adf6f47d580de9ec573d730f",
+			"version": 1,
+			"size": 1.7422,
+			"views": 8,
+			"cell_px": 128,
+			"files": {
+				"bui_cay_tron_impostor.png": "21201d953f64d140bfca9592fb98fda0f36ffa6ddbf64dbf3b502b04ce455f29",
+				"bui_cay_tron_impostor_normal.png": "c9c76cc0c357cc3e94eff9530b1c5a963d2db64d012e35f5c27fac682737f023"
+			}
+		},
 		"scooter_tay_ga_1": {
 			"glb": "c7aaded4ef4a664bdd297404a2fc0e1f708223ef82073ae43fe982693e9fc0ff",
 			"materials": "4e33c8ddb7893598165769f9db16ecd13f83d70585e8653e5215ea4941e32e25",
