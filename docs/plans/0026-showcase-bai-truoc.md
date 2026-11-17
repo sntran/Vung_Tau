@@ -136,7 +136,7 @@ Most photos are from 2014 and 2015. A difference from 2019 that I know is a "Che
 | `lan_can_ha_long` | lan can đường đi bộ Hạ Long | blueprint | Source | 4 (3) | yes |
 | `nha_khach_ha_long` | Nhà khách Hạ Long (khách sạn Hạ Long), the guest house at 102 Hạ Long at the foot of Núi Nhỏ | order | Check | 2 (1) | no |
 | `nha_mai_ngoi_cam` | nhà mái ngói cam bên đường Hạ Long | drawing | Check | 5 (2) | no |
-| `non_rong_vanh` | nón rộng vành | remix | Check | 3 (3) | no |
+| `non_rong_vanh` | nón rộng vành | remix | Source | 3 (3) | no |
 | `phao_boi` | phao bơi | drawing | Source | 2 (2) | no |
 | `quan_dui_boi_nam` | quần đùi bơi nam | order | Check | 3 (3) | no |
 | `tru_lan_can_ha_long` | trụ lan can đường đi bộ Hạ Long | blueprint | Source | 2 (2) | yes |
@@ -150,6 +150,10 @@ Most photos are from 2014 and 2015. A difference from 2019 that I know is a "Che
 - `6e7bcc4e2af49515f6a5ba9e03578cac`: A porch with a curved front (a quarter of a circle at a corner, with its fascia) and balconies with round ends, in the blueprint building.
 - `42762ad79c2b7a1a3f1da63ded11d3ed`: The levels of an edit inside a group of a sculpture count, as the levels of an edit at the top: or an edit of the shape group takes levels. Then details in a group (the joints of a course of blocks) stay out of the mid and far levels.
 - `41f9313324ef1bff194c60c2d3da1f1b`: The factory builds the near level, and a mid level with maps of 256 or more, of a building from edits of about 20 m: a builder with more memory, or a bake that uses less memory.
+- `4179c9b39e0fdc7737110e03f5f3afbd`: A garment swim_trunks for the person blueprint, as the other garments: thin synthetic cloth, an elastic waist with a cord, and loose legs to the middle of the thigh, with options for the length and a print of checks or stripes.
+- `9a6eb611a807b780c1c4528493f97942`: The mid and far levels of a person keep the form of a loose garment and of a hood, not only its color, and a jacket has an option for its hood (down on the back, or up on the head).
+- `5edea855bf5ef0aab057b116d30ba0a3`: A species araucaria (a tiered conifer: whorls of level branches on a straight trunk) for the plant blueprint, with its numbers (height, tiers, branches in a tier, crown).
+- `423335d27881ab1f03a073ee04a765e7`: The factory builds a person with four garments (a fault of World: the order checks, but the builder stops).
 
 ## 8. Play-test scenarios
 
@@ -189,6 +193,7 @@ Most photos are from 2014 and 2015. A difference from 2019 that I know is a "Che
 - **Q16.** (Builder, 2026-11-17.) The guest house of Hạ Long (`nha_khach_ha_long`, OSM way 235149416) is outside the area, and its model has the letters HA LONG HOTEL of the photo of 2021, the name of a business (AGENTS.md, section 4). Do you approve the name, and do I put it in the game when the area grows?
 - **Q17.** (Builder, 2026-11-17.) These models are Check because only photos of 2014 or 2015 show their sizes or looks: the raised lawns (`bon_co_234797329`, `bon_co_234797330`: the photo of S5 of 2015), the granite bench of the park, the kiosk of the park, and the hall with the orange roof (its front windows and its plinth: photos of 2014). The two sloped sea walls (`ke_ha_long`, `ke_da_bai_truoc`) are Check because no photo gives their drop and their run. Do I use the look of the photos of 2014 and 2015 for them (as Q7 for Hải Âu), or do they wait for photos of 2017 to 2021?
 - **Q18.** (Builder, 2026-11-17.) The blue poles of the park have a long arm and a short arm. The photos of 2014 and 2019 show the poles of the walk of the sea with the long arm over the walk and the beach. On the sidewalk of the park on Quang Trung, I put the long arm over the road (a builder value). Is that correct, or does the long arm go over the sidewalk?
+- **Q19.** (Builder, 2026-11-17.) These models have the status Source, but the game does not use them yet, because each needs a part of the game that the plan does not have: the swim ring (`phao_boi`, for the swimmers of R10), the woman with the wide hat (`non_rong_vanh`, a walker), the Norfolk pine (`cay_thong_noel`: the pines of the median are trees of plan 0020 now), the purple plant of the flower beds (`cay_hoa_tim_bon_hoa`), the clipped hedge (`hang_rao_cong_vien`, a piece of 2 m), and the steps down to the sand (`bac_xuong_cat`: its places are builder values, R10). Do I put them in the game in this plan (the swimmers with rings, a walker with the hat, the flower beds and the hedges of the park, the steps at the openings of the low wall), or in a later plan?
 
 ## 11. Builder notes
 

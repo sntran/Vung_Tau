@@ -110,7 +110,11 @@
 										"blend": 0.04,
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -144,7 +148,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -178,7 +186,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "tube",
@@ -212,7 +224,11 @@
 										"blend": 0.04,
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -246,7 +262,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -280,7 +300,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "tube",
@@ -314,7 +338,11 @@
 										"blend": 0.04,
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -348,7 +376,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -382,7 +414,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "tube",
@@ -416,7 +452,11 @@
 										"blend": 0.04,
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -450,7 +490,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -484,7 +528,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "tube",
@@ -518,7 +566,11 @@
 										"blend": 0.04,
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -552,7 +604,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -586,7 +642,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "tube",
@@ -620,7 +680,11 @@
 										"blend": 0.04,
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -654,7 +718,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -688,7 +756,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "tube",
@@ -722,7 +794,11 @@
 										"blend": 0.04,
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -756,7 +832,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -790,7 +870,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "tube",
@@ -824,7 +908,11 @@
 										"blend": 0.04,
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -858,7 +946,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -892,7 +984,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "tube",
@@ -926,7 +1022,11 @@
 										"blend": 0.04,
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -960,7 +1060,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -994,7 +1098,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "tube",
@@ -1028,7 +1136,11 @@
 										"blend": 0.04,
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -1062,7 +1174,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -1096,7 +1212,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "tube",
@@ -1130,7 +1250,11 @@
 										"blend": 0.04,
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -1164,7 +1288,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -1198,7 +1326,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "tube",
@@ -1232,7 +1364,11 @@
 										"blend": 0.04,
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -1266,7 +1402,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -1300,7 +1440,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "tube",
@@ -1334,7 +1478,11 @@
 										"blend": 0.04,
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -1368,7 +1516,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -1402,7 +1554,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "tube",
@@ -1436,7 +1592,11 @@
 										"blend": 0.04,
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -1470,7 +1630,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -1504,7 +1668,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "tube",
@@ -1538,7 +1706,11 @@
 										"blend": 0.04,
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -1572,7 +1744,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -1606,7 +1782,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "tube",
@@ -1640,7 +1820,11 @@
 										"blend": 0.04,
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -1674,7 +1858,11 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -1708,7 +1896,106 @@
 										},
 										"repeat": {
 											"count": 5
-										}
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "cone",
+										"size": [
+											1.9,
+											0.665,
+											1.1
+										],
+										"at": [
+											0,
+											0,
+											3.5
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"levels": [
+											"far"
+										]
+									},
+									{
+										"shape": "cone",
+										"size": [
+											1.63,
+											0.571,
+											1.1
+										],
+										"at": [
+											0,
+											0,
+											5.7
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"levels": [
+											"far"
+										]
+									},
+									{
+										"shape": "cone",
+										"size": [
+											1.347,
+											0.471,
+											1.1
+										],
+										"at": [
+											0,
+											0,
+											7.9
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"levels": [
+											"far"
+										]
+									},
+									{
+										"shape": "cone",
+										"size": [
+											1.064,
+											0.372,
+											1.1
+										],
+										"at": [
+											0,
+											0,
+											10.1
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"levels": [
+											"far"
+										]
+									},
+									{
+										"shape": "cone",
+										"size": [
+											0.781,
+											0.273,
+											1.1
+										],
+										"at": [
+											0,
+											0,
+											12.3
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"levels": [
+											"far"
+										]
 									},
 									{
 										"shape": "ellipsoid",
@@ -1855,7 +2142,28 @@
 			"hash": "390d63d74538b06e0705b7befcb24be3",
 			"seen": "Before this look, the near level of order 96c0097e46def6c3bfece31fa1fb8163 (cells of 4 cm, 12000 triangles) stopped the builder three times (HTTP 503), and order fc7a22394a3a86027e31441c289df52b (near cells of 6 cm, 8000 triangles) stopped it at the mid level eight times. This order has no maps at the mid and far levels (the colors of the edits only): the mid level is the same narrow full cone of 16 tiers as before, with the same dark greens; at the mid distance the map of leaves did not show.",
 			"changed": "No change. Next: the near level (cells of 6 cm, 8000 triangles, a map of 1024)."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "far",
+			"hash": "390d63d74538b06e0705b7befcb24be3",
+			"seen": "The far level (cells of 20 cm, 400 triangles) loses most of the sprays: the tree is a trunk with some flat spikes, and the top half is near bare. In photos 0, 1 and 2 a pine far away is a narrow dark cone of tiers. The near level of this order stopped the builder six times (HTTP 503).",
+			"changed": "The tiers are now only at the near and mid levels; the far level has its own crown: 5 stacked cones of foliage, each 2.2 m high, as wide as the tiers at their foot."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "far",
+			"hash": "c6a8912dc9763dbed5a9a1ba1636ef1d",
+			"seen": "The far level is now a narrow dark cone of 5 tiers on a bare trunk, 3.8 m wide at its foot and 14 m high: the form of a pine far away in photos 0 and 3. Its green is darker than the mid level (one dark green, #263f23).",
+			"changed": "No change. Next: the mid level of this order (the tiers at near and mid did not change), then the near level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "c6a8912dc9763dbed5a9a1ba1636ef1d",
+			"seen": "After 7 tries (HTTP 503), the mid level of this order: the same narrow full cone of 16 soft tiers as order 390d63d74538b06e0705b7befcb24be3 (the views are the same), as the pines of photos 0, 2 and 3. The near level of this order stopped the builder four times (HTTP 503), so it is not built: the factory did not build the near level of any of the four orders of this pine (19 tries).",
+			"changed": "No change. The near level waits for the factory."
 		}
 	],
-	"hash": "390d63d74538b06e0705b7befcb24be3"
+	"hash": "c6a8912dc9763dbed5a9a1ba1636ef1d"
 }
