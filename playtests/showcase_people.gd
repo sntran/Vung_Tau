@@ -6,11 +6,17 @@ extends RefCounted
 # scooters in front of the bars of Quang Trung is there. The swimmers of R10
 # wait for the swim clothes and the swim rings of World (request Q-W6): the
 # test says that there are none yet. Screenshots of the people of the park and
-# of the walk.
+# of the walk. Report 0026, D-0026-07: at 17:00, PT-75 counts the people in the
+# frame of each shot of data/showcase/shots.json (nearer than PEOPLE_RANGE, not
+# behind a building) and expects at least the "people" of the shot.
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=17:00 --quality=low
 # phase: --world=vung_tau --start-time=12:00 --quality=low
 
+## The eye and the aim of a shot, as PT-72 takes it.
+const Shots := preload("res://playtests/showcase_shots.gd")
+## A person farther than this from the eye of a shot does not count in it (m).
+const PEOPLE_RANGE := 90.0
 ## Two people closer than this (m, from foot to foot) stand in each other.
 const MIN_GAP := 0.5
 ## A person nearer than this (m) to the trunk of a tree stands in it.
@@ -80,6 +86,8 @@ func run(d: PlaytestDriver) -> void:
 	d.expect(moved == shown, "each walker walks: %d of %d moved in 2 s" % [moved, shown])
 	var parked: Dictionary = w.parked.rows.get("quang_trung_bars", {}) if w.parked else {}
 	d.expect(not parked.is_empty() and (parked.points as Array).size() > 0, "the scooters stand in front of the bars of Quang Trung")
+	if not noon:
+		await _count_in_shots(d, w, people)
 	for view: Array in VIEWS:
 		var eye: Vector3 = view[1]
 		var target: Vector3 = view[2]
@@ -89,4 +97,37 @@ func run(d: PlaytestDriver) -> void:
 		await d.wait_ground(60.0)
 		await d.wait_frames(6)
 		await d.screenshot("%s_%s" % [view[0], "1200" if noon else "1700"])
+	d.fly_end()
+
+
+## Report 0026, D-0026-07: the people in the frame of each shot at 17:00.
+func _count_in_shots(d: PlaytestDriver, w: VungTau, people: ShowcasePeople) -> void:
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(Shots.SHOTS))
+	if not d.expect(data is Dictionary, "the shots can be read"):
+		return
+	var camera := d.viewport().get_camera_3d()
+	var fov := camera.fov
+	for shot: Dictionary in data.shots:
+		var eye := Shots.eye_of(w, shot)
+		await d.fly_to(eye, Shots.aim(shot, eye))
+		camera = d.viewport().get_camera_3d()
+		camera.fov = float(shot.get("fov", fov))
+		await d.wait_ground(60.0)
+		await d.wait_frames(3)
+		var count := 0
+		for entry: Dictionary in people.walkers + people.sitters:
+			var model: WorldModel = entry.model
+			if not model.visible:
+				continue
+			var head := model.global_position + Vector3(0, 1.5, 0)
+			if eye.distance_to(head) > PEOPLE_RANGE or camera.is_position_behind(head) or not camera.is_position_in_frustum(head):
+				continue
+			if Shots._hidden_by(w, eye, head) != "":
+				continue
+			count += 1
+		var least := int(shot.get("people", 0))
+		d.step("%s: %d people in the frame (at least %d)" % [shot.id, count, least])
+		d.expect(count >= least, "%s: at 17:00 the frame has at least %d people: %d" % [shot.id, least, count])
+		await d.screenshot("people_%s" % shot.id)
+	camera.fov = fov
 	d.fly_end()

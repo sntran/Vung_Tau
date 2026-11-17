@@ -193,21 +193,47 @@ func _add_walkers(world: VungTau, showcase: Showcase, cfg: Dictionary, rng: Rand
 	var models: Array = cfg.get("models", [])
 	var speed: Array = cfg.get("speed_m_s", [0.9, 1.3])
 	var keep_right: Array = cfg.get("keep_right_m", [0.0, 0.0])
-	for i in int(cfg.get("count", 0)):
+	# The spots: walkers on a short way in the frame of a shot (report 0026,
+	# D-0026-07), in the order of the walkers, so the first of the day are there.
+	# Each entry: [the line, the place of the walker on it, the walkers on it].
+	var spot_lines: Array = []
+	for spot: Dictionary in cfg.get("spots", []):
+		var spot_line := PackedVector3Array()
+		for p: Array in spot.line:
+			spot_line.append(Vector3(float(p[0]), world.ground_height(float(p[0]), float(p[1])), float(p[1])))
+		var n := int(spot.get("count", 0))
+		for k in n:
+			spot_lines.append([spot_line, k, n])
+	# Every other walker is on a spot, so the spots have people at each hour (the
+	# order of the list is the order in which the people come: _show()).
+	var count := int(cfg.get("count", 0))
+	var plan: Array = []
+	for i in count:
+		var on_spot := not spot_lines.is_empty() and (i % 2 == 0 or count - i <= spot_lines.size())
+		plan.append(spot_lines.pop_front() if on_spot else null)
+	for i in count:
 		var model := WorldModel.make(str(models[i % models.size()]))
 		if model == null:
 			continue
 		var which := rng.randi() % lines.size()
 		var line: PackedVector3Array = lines[which]
-		var length := Showcase._line_length(line)
 		# Not on the borders of the way: the half of the width less a body and a border.
 		var room := maxf(widths[which] / 2.0 - 0.5, 0.0)
+		var spot: Array = plan[i] if plan[i] != null else []
+		if not spot.is_empty():
+			line = spot[0]
+			room = 1.0
+		var length := Showcase._line_length(line)
+		# The walkers of a spot start apart, one in each part of its line.
+		var start := rng.randf() * length
+		if not spot.is_empty():
+			start = (float(spot[1]) + rng.randf_range(0.25, 0.75)) / float(spot[2]) * length
 		var side := minf(rng.randf_range(float(keep_right[0]), float(keep_right[1])), room)
 		add_child(model)
 		model.apply_ranges()
 		model.play("walk", rng.randf())
 		var w := {"model": model, "body": _walker_body(model), "line": line, "length": length,
-				"at": rng.randf() * length, "speed": rng.randf_range(float(speed[0]), float(speed[1])),
+				"at": start, "speed": rng.randf_range(float(speed[0]), float(speed[1])),
 				"sign": 1.0 if rng.randf() < 0.5 else -1.0, "side": side, "now": side, "room": maxf(room, 0.7), "stopped": false}
 		_place_walker(w)
 		walkers.append(w)
