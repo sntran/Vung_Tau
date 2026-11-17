@@ -60,6 +60,10 @@ The low lamps of the park are white posts, and the raised lawns are boxes with a
 
 `data/world/requests/bai_truoc.json` asks World to design the things of the park, the sea wall, the plants, and the clothes (Q-W5 to Q-W8 give "needs" and no sizes), and two sources say "not looked at". World is an engine with tools, as Dreams: this game makes its models with them (`docs/world-models.md`). Make each model as a drawing, a blueprint in data, or an order with edits, with sizes measured from photos that you looked at. Ask World only for a tool that is missing (section 5 of that file). Also, write the data as from me (first person), not "the owner".
 
+### D-0026-10: The Palace Hotel is not there (medium)
+
+The Palace Hotel (1 Nguyễn Trãi, OpenStreetMap node 7402231824, near (212, 53)) is across from the park, near the Grand Hotel. It is a block of about 8 or 9 storeys with its name in large letters on the roof (`docs/content/reference/video-1992.md`, 2:15), and it stood in 2019. Find its outline (one of the ways 791795129, 791795130, 791795131) and its 2019 look from photos, and make its model (D5).
+
 ## 3. World
 
 - **The catalog of World is behind its code (Q9).** At World `8fbf36c`, the code of `honda_vision_110` has the joint `side_stand` (World `a87e283`), but `priv/models/honda_vision_110.*` is from 2026-11-08, with no joints. So the factory and a clone give different bytes, and the R4 test of plan 0023 fails correctly. World must build its catalog files again from its code at each commit, and its CI must fail when they differ.
@@ -87,7 +91,7 @@ I have no photos of these places. The builder finds as many photos as it can, in
 - image searches (in Vietnamese and in English: "bãi trước vũng tàu", "công viên bãi trước", "đường hạ long vũng tàu", "kè bãi trước", "bậc xuống bãi tắm", "cầu đá vũng tàu", "khách sạn hải âu vũng tàu", with the years 2017 to 2020),
 - Wikimedia Commons, Flickr, Mapillary, news articles, travel blogs, hotel and review pages, and videos of walks in Vũng Tàu.
 
-For each photo it writes the link, the date, the license, and what it shows, in the drawing that uses it. An open photo goes into `docs/reference/photos/` (R17). A photo that is not open stays a link: the builder can look at it in a run of CI (an artifact that is not kept), but it does not go into the repository. For Q11 and Q12 (the steps down to the sand and a walk on the sand along Hạ Long), the builder looks for at least three photos from 2017 to 2021 before it decides; with fewer, the value stays "Check".
+For each photo it writes the link, the date, the license, and what it shows, in the drawing that uses it. An open photo goes into `docs/reference/photos/` (R17). A photo that is not open stays a link: the builder can look at it in a run of CI (an artifact that is not kept), but it does not go into the repository. A video of 1992 shows the route from the park to Hạ Long (`docs/content/reference/video-1992.md`). It is not a source for a 2019 value, but it shows what to look for. For Q11 and Q12 (the steps down to the sand and a walk on the sand along Hạ Long), the builder looks for at least three photos from 2017 to 2021 before it decides; with fewer, the value stays "Check".
 
 ## 6. Status
 
