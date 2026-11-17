@@ -14,7 +14,6 @@ from affine import Affine
 from rasterio import features
 from rasterio.warp import Resampling, reproject
 from scipy import ndimage
-from scipy.spatial import cKDTree
 
 from . import pngio
 
@@ -107,8 +106,9 @@ class Grid:
         """The rasterio transform from map (x east, y north) to cells. The cell centers are the samples."""
         return Affine(self.step, 0, self.x0 - self.step / 2, 0, -self.step, -self.z0 + self.step / 2)
 
-    def sample(self, x, z) -> np.ndarray:
-        """Bilinear height at game (X, Z) points."""
+    def sample(self, x, z, mask: np.ndarray | None = None) -> np.ndarray:
+        """Bilinear height at game (X, Z) points. With "mask", only the cells
+        of the mask count (a point with no such cell takes all four cells)."""
         col = (np.asarray(x, dtype=np.float64) - self.x0) / self.step
         row = (np.asarray(z, dtype=np.float64) - self.z0) / self.step
         rows, cols = self.heights.shape
@@ -117,9 +117,19 @@ class Grid:
         fc = np.clip(col - c0, 0.0, 1.0)
         fr = np.clip(row - r0, 0.0, 1.0)
         h = self.heights
-        top = h[r0, c0] * (1 - fc) + h[r0, c0 + 1] * fc
-        bottom = h[r0 + 1, c0] * (1 - fc) + h[r0 + 1, c0 + 1] * fc
-        return top * (1 - fr) + bottom * fr
+        if mask is None:
+            top = h[r0, c0] * (1 - fc) + h[r0, c0 + 1] * fc
+            bottom = h[r0 + 1, c0] * (1 - fc) + h[r0 + 1, c0 + 1] * fc
+            return top * (1 - fr) + bottom * fr
+        corners = [(r0, c0, (1 - fr) * (1 - fc)), (r0, c0 + 1, (1 - fr) * fc),
+                   (r0 + 1, c0, fr * (1 - fc)), (r0 + 1, c0 + 1, fr * fc)]
+        total = np.zeros(np.shape(col))
+        weights = np.zeros(np.shape(col))
+        for r, c, w in corners:
+            w = np.where(mask[r, c], np.maximum(w, 1e-6), 0.0)
+            total += h[r, c] * w
+            weights += w
+        return np.where(weights > 0.0, total / np.maximum(weights, 1e-12), self.sample(x, z))
 
 
 def chunk_range(bounds, chunk: float) -> tuple[int, int, int, int]:
@@ -609,6 +619,11 @@ def _profile(grid: Grid, road, step: float, locked: np.ndarray | None = None):
         cols = np.clip(np.round((x - grid.x0) / grid.step).astype(int), 0, grid.shape[1] - 1)
         rows = np.clip(np.round((z - grid.z0) / grid.step).astype(int), 0, grid.shape[0] - 1)
         fixed = locked[rows, cols]
+        # A fixed point takes the height of the set surface only. At the edge of
+        # the round end of the other road, the bilinear sample also took the
+        # lower ground: the Hải Đăng road fell 1.9 m in 2.5 m between two fixed
+        # points (PT-36, run 3).
+        raw = np.where(fixed, grid.sample(x, z, mask=locked), raw)
         profile = blend_to_fixed(profile, raw, fixed, spacing, JUNCTION_BLEND_M)
     profile = np.maximum(profile, LAND_MIN_HEIGHT + 0.05)
     if road.type == "steps":
@@ -634,30 +649,6 @@ def _nearest_points(x: np.ndarray, z: np.ndarray, lx: np.ndarray, lz: np.ndarray
     best = d.argmin(axis=1)
     rows = np.arange(len(x))
     return px[rows, best], pz[rows, best], d[rows, best]
-
-
-def mark_joined_ends(roads, reach: float = 1.5) -> None:
-    """Sets "open_ends" of each road: (start, end), False where the end touches
-    another road (a point of another road within "reach" m)."""
-    points, owner = [], []
-    for k, road in enumerate(roads):
-        if road.points is None or len(road.points) < 2:
-            continue
-        points.append(road.points)
-        owner.append(np.full(len(road.points), k))
-    if not points:
-        return
-    tree = cKDTree(np.vstack(points))
-    owners = np.concatenate(owner)
-    for k, road in enumerate(roads):
-        if road.points is None or len(road.points) < 2:
-            road.open_ends = (True, True)
-            continue
-        ends = []
-        for end in (road.points[0], road.points[-1]):
-            near = tree.query_ball_point(end, reach)
-            ends.append(not any(owners[j] != k for j in near))
-        road.open_ends = tuple(ends)
 
 
 def find_twins(roads) -> int:
@@ -696,7 +687,6 @@ def flatten_roads(grid: Grid, roads, step: float) -> None:
     flat = [r for r in sorted(roads, key=lambda r: r.importance)
             if r.type not in NATURAL_ROADS and not r.bridge and not r.tunnel]
     find_twins(flat)
-    mark_joined_ends(flat)
     # The heights of the two ways of a street, from the ground before any road changes it.
     for road in flat:
         road.twin_raw = None
@@ -821,12 +811,7 @@ def _flatten(grid: Grid, road, profile, x, z, mode: str, locked: np.ndarray | No
         # A segment changes only the cells that are beside it. Else the round end of
         # each segment puts the height of one point on the slope of the next segment.
         # The first and the last segment also change the cells at the ends of the road.
-        # An end that joins another road has no round end: the round end of the
-        # surface of a road covered the first metres of the next road with the
-        # height of its end (PT-36, the Hải Đăng road: a bank of 1.5 m).
-        start_open, end_open = getattr(road, "open_ends", (True, True))
-        beside = (raw_t >= (-np.inf if i == 0 and start_open else -0.02)) \
-            & (raw_t <= (np.inf if i == len(x) - 2 and end_open else 1.02))
+        beside = (raw_t >= (-np.inf if i == 0 else -0.02)) & (raw_t <= (np.inf if i == len(x) - 2 else 1.02))
         if mode == "mix":
             core = (d <= half + grid.step) & beside
             weight = 1.0 / (d + 0.5) ** 2

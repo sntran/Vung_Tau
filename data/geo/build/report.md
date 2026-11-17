@@ -55,7 +55,7 @@ Total road length: 692.3 km. Roads with a width tag: 9 of 4124. Hẻm: 2366.
 | Tượng Chúa Kitô Vua | yes | way/235008112 | 1159.87, 1893.39 | 138.33 | 1 candidates, 83.3 m from the hint |
 | Hải đăng Vũng Tàu | yes | way/229301316 | 402.21, 1056.5 | 173.11 | 1 candidates, 21.8 m from the hint |
 | Bạch Dinh | yes | way/220753354 | -596.69, -776.93 | 28.11 | 1 candidates, 259.6 m from the hint |
-| Tượng Đức Mẹ Bãi Dâu | yes | way/790529433 | -1290.64, -3064.05 | 57.18 | 2 candidates, 7.3 m from the hint |
+| Tượng Đức Mẹ Bãi Dâu | yes | way/790529433 | -1290.64, -3064.05 | 57.09 | 2 candidates, 7.3 m from the hint |
 | Miếu Hòn Bà | yes | way/221906193 | 1677.76, 2174.06 | 11.35 | 8 candidates, 8.4 m from the hint |
 | Chùa Tam Bảo | yes | way/792193852 | -749.18, -1275.61 | 104.03 | 1 candidates, 5.1 m from the hint |
 | Vi Ba | yes | way/35923559 | -722.46, -1106.78 | 75.47 | 5 candidates, 299.0 m from the hint |
@@ -78,7 +78,7 @@ The first curve of the lighthouse road turns -172° between 116 m and 138 m from
 
 ## The sea floor, the rocks, and the Hòn Bà ridge (R8g, R8h)
 
-- The sea floor comes from the intertidal zone of the Sentinel-2 images and from GEBCO 2025: see `intertidal_report.md`. Where both have no value near the coast, it slopes from +1.2 m at the coastline to -4.0 m over 80 m.
+- The sea floor slopes from +1.2 m at the coastline to -4.0 m over 80 m, then stays at -4.0 m.
 - Rocks in the sea: 58 grid cells at +0.5 m.
 - The rocky coast Mũi Nghinh Phong (overrides.json): 31059 m² of bare rock, on the land and in the sea in front of it.
 - The flat rocks Đá ven kè Bãi Trước (overrides.json): 17903 m² at -1.00 m, dry when the tide is lower.
@@ -86,7 +86,7 @@ The first curve of the lighthouse road turns -172° between 116 m and 138 m from
 - The ridge Đường ra Hòn Bà (way/221906223): 206 m long, 4 m wide, top at -1.70 m.
 - The band of rocks Bãi đá ra Hòn Bà: about 34 m wide, 1495 grid cells in the sea, from -2.96 m (tide pools) to +1.07 m (outcrops).
 - The sand flat in front of the path: 110 m around the beach end, at -1.85 m (1538 grid cells).
-- The tide: see `tide_report.md`.
+- The tide: `tide.json` is not there. Run tools/geo/tide.py before build.py.
 
 ## Roadworks (R11a)
 
@@ -120,7 +120,7 @@ None.
 
 | Hill | Area (km²) | Tree cover | Bushes | Grass | Bare | Trees | WorldCover classes |
 |---|---|---|---|---|---|---|---|
-| Núi Lớn | 2.31 | 73 % | 7 % | 8 % | 0 % | 15771 | tree cover 88 %, built-up 11 %, grassland 1 %, bare or sparse 0 %, water 0 % |
+| Núi Lớn | 2.31 | 73 % | 7 % | 8 % | 0 % | 15772 | tree cover 88 %, built-up 11 %, grassland 1 %, bare or sparse 0 %, water 0 % |
 | Núi Nhỏ | 0.92 | 76 % | 8 % | 6 % | 0 % | 6892 | tree cover 92 %, built-up 7 %, grassland 1 %, bare or sparse 0 % |
 
 The hills: the land within 1.1 km of the top of Núi Lớn and 0.7 km of the top of Núi Nhỏ, higher than 20 m.
@@ -214,6 +214,7 @@ The street and park trees and the canopy map (report 0020, D-0020-03): on the ro
 - area 18343238 is not a correct polygon: invalid area (area_id=36686477)
 - Núi Lớn is not in the OSM data of the box
 - Núi Nhỏ is not in the OSM data of the box
+- tide.json is not there
 
 ## Source files
 

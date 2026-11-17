@@ -761,3 +761,17 @@ def test_a_road_from_a_fixed_junction_is_not_steeper_than_the_grade():
     result = terrain.limit_grade(profile, spacing, 0.25, fixed=fixed)
     assert result[0] == pytest.approx(41.13)
     assert np.max(np.abs(np.diff(result)) / spacing) <= 0.25 + 1e-6
+
+
+def test_a_sample_with_a_mask_takes_only_the_set_cells():
+    """PT-36, run 3: a fixed point at the edge of the round end of a road takes
+    the height of the set surface, not a mean with the lower ground."""
+    heights = np.full((4, 4), 35.5, dtype=np.float32)
+    heights[:, :2] = 41.13
+    mask = np.zeros((4, 4), dtype=bool)
+    mask[:, :2] = True
+    grid = terrain.Grid(x0=0.0, z0=0.0, step=2.0, heights=heights)
+    assert grid.sample(np.array([2.8]), np.array([1.0]))[0] < 39.5
+    assert grid.sample(np.array([2.8]), np.array([1.0]), mask=mask)[0] == pytest.approx(41.13)
+    # A point with no set cell takes the bilinear height.
+    assert grid.sample(np.array([5.0]), np.array([1.0]), mask=mask)[0] == pytest.approx(35.5)
