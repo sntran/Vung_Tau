@@ -100,3 +100,9 @@ def test_a_photo_that_nobody_looked_at_is_a_problem():
 def test_commons_pages_become_thumbnails():
     url = photos.image_url({"url": "https://commons.wikimedia.org/wiki/File:A_b.jpg"})
     assert url.startswith("https://commons.wikimedia.org/wiki/Special:FilePath/A_b.jpg?width=")
+
+
+def test_a_tiny_number_in_an_order_is_a_problem():
+    drawing = copy.deepcopy(GOOD)
+    drawing["order"]["options"]["tilt"] = -0.000484
+    assert any("-0.000484" in p for p in drawings.problems(drawing, "test_lamp"))

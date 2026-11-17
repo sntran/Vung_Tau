@@ -72,6 +72,17 @@ def all_ids() -> list[str]:
     return sorted(p.stem for p in DRAWINGS.glob("*.json"))
 
 
+def _tiny_numbers(value, path: list) -> list:
+    """The numbers of a value that are not 0 and less than 0.001 (with their paths)."""
+    if isinstance(value, dict):
+        return [found for key, item in value.items() for found in _tiny_numbers(item, path + [key])]
+    if isinstance(value, list):
+        return [found for i, item in enumerate(value) for found in _tiny_numbers(item, path + [i])]
+    if isinstance(value, float) and value != 0.0 and abs(value) < 0.001:
+        return [("/".join(str(p) for p in path), value)]
+    return []
+
+
 def problems(drawing: dict, model_id: str) -> list[str]:
     """The problems of the file of a drawing, with no network."""
     found = []
@@ -84,6 +95,11 @@ def problems(drawing: dict, model_id: str) -> list[str]:
         found.append(f"{model_id}: the way is not one of {', '.join(WAYS)}")
     if drawing.get("status") not in STATUS:
         found.append(f"{model_id}: the status is not one of {', '.join(STATUS)}")
+    for path, number in _tiny_numbers(drawing.get("order", {}), []):
+        # World writes such a number with an exponent ("-4.84e-4") when it
+        # takes the hash of the order, and this game without one: the hash of
+        # the receipt was not the hash of its order (cao_oc_sen_bien, 2026-11-17).
+        found.append(f"{model_id}: the order has {number} at {path}: use 0 or a number of 0.001 or more")
     order = drawing.get("order", {})
     if not isinstance(order, dict) or "blueprint" not in order:
         found.append(f"{model_id}: the order has no blueprint")
