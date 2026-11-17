@@ -1,6 +1,6 @@
 {
-	"note": "The five shots of the showcase of Bãi Trước (plan 0026, R15, section 3). Each shot has the photo that it must match (a link only), the eye (x and z of the game: the eye is eye_height m over the ground, or over the floor of a known place), the point that the camera looks at (x, y, z of the game), and the vertical field of view of the camera in degrees (fov: 40 is about the view of a phone camera at 16:9). PT-72 takes each shot at each time of \"times\", on Low (the Mobile renderer) and on High (Forward+). The positions are from the roads of OpenStreetMap (data/geo/build/roads.json) and from the survey of World plan 0018.",
-	"status": "check",
+	"note": "The five shots of the showcase of Bãi Trước (plan 0026, R15, section 3). Each shot is the view of its photo (report 0026, D-0026-02): the eye is at the place of the photo (\"place\": the GPS of the camera in the photo file, or the place that the author gave on Panoramio, with the distance that the eye can be from it), the view has the direction of the photo (\"heading\": degrees from the south (+z) to the east (+x); \"pitch\": degrees up), and \"fov\" is the horizontal field of view of the lens of the photo: the camera of the game keeps the width of the frame (Camera3D.KEEP_WIDTH), so its fov is horizontal. \"subjects\" are the points that the photo shows: PT-72 checks that each is in the frame and that no stand-in hides it. The open photos are in docs/reference/photos/ (R17). PT-72 takes each shot at each time of \"times\", on Low (the Mobile renderer) and on High (Forward+).",
+	"status": "Source",
 	"times": [
 		"17:10",
 		"12:00"
@@ -8,84 +8,248 @@
 	"shots": [
 		{
 			"id": "S1",
-			"name": "The park edge, to the south: the bay, the boats, Hạ Long, the slope of Núi Nhỏ",
-			"photo": "https://commons.wikimedia.org/wiki/File%3AV%C5%A9ng_T%C3%A0u%2C_Ba_Ria_-_Vung_Tau%2C_Vietnam_-_panoramio_%282%29.jpg",
+			"name": "The beach to the south: the boats, the hotels of Hạ Long, the slope of Núi Nhỏ",
+			"photos": [
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:V%C5%A9ng_T%C3%A0u,_Ba_Ria_-_Vung_Tau,_Vietnam_-_panoramio_(2).jpg",
+					"date": "2014-04-05 17:53",
+					"license": "CC BY 3.0",
+					"author": "trungydang",
+					"open": true,
+					"file": "shot_s1_2014.jpg",
+					"shows": "The beach of Bãi Trước to the south from the walk at its north end: people and basket boats on the sand, fishing boats in the bay, the sea wall of Hạ Long, Khách sạn Bưu điện (P&T, the tall white block left of the middle) and the hotels on the slope of Núi Nhỏ.",
+					"place": {
+						"at": [
+							-31.0,
+							-221.6
+						],
+						"from": "the place that the author gave on Panoramio (10.345688 N, 107.073777 E; the camera has no GPS)",
+						"within": 30.0
+					},
+					"lens": "Canon PowerShot G12 (in the file): 13.8 mm on a sensor of 7.44 mm, a horizontal field of view of 29.9 degrees"
+				}
+			],
 			"eye": [
-				28.0,
-				105.0
+				-45.5,
+				-214.0
 			],
 			"eye_height": 1.6,
-			"target": [
-				-190.0,
-				14.0,
-				500.0
+			"heading": 3.4,
+			"pitch": -0.8,
+			"fov": 29.9,
+			"how": "Eye: the photo is taken from over the low wall at the top of the beach; the place on Panoramio is 15 m inland, in the park, where a tree hides the view, so the eye is on the walk at the top of the beach, 15 m from it (on the sand, the wall hides the beach). The low wall of the game is at the right of the eye, not at the left as in the photo. Heading: from the place of the photo, Khách sạn Bưu điện (OSM way 259750558, x 22, z 286) is 4.3 degrees left of the middle of the photo and the blue and white block of Cao ốc Sen Biển (way 225803467, x -17, z 352) 0.6 degrees right of it (both give 1.8 to 2.0 degrees from the place of the photo, and 3.4 and 3.5 degrees from the eye): 3.4 degrees. Pitch: the foot of the sea wall of Hạ Long (about 400 m away) is 1.4 degrees under the middle.",
+			"subjects": [
+				{
+					"name": "Khách sạn Bưu điện (P&T)",
+					"at": [
+						22.0,
+						27.0,
+						286.0
+					]
+				}
 			],
-			"fov": 45.0
+			"people": 6,
+			"people_how": "The photo shows about 45 people on the beach at 17:53 (2014) and the photo of 2019-04-30 (Tuổi Trẻ) a full beach; the swimmers wait for the swim clothes (Q-W6), so the walkers on the walk count: at least 6.",
+			"hill": {
+				"shot": [
+					0.02,
+					0.0,
+					0.3,
+					0.12
+				],
+				"photo": [
+					0.5,
+					0.0,
+					0.9,
+					0.2
+				]
+			},
+			"water": [
+				0.65,
+				0.45,
+				0.95,
+				0.6
+			]
 		},
 		{
 			"id": "S2",
-			"name": "The park, its palms and paths",
-			"photo": "https://commons.wikimedia.org/wiki/File%3AC%C3%B4ng_Vi%C3%AAn_B%C3%A3i_Tr%C6%B0%E1%BB%9Bc%2C_Quang_Trung%2C_Ph%C6%B0%E1%BB%9Dng_1%2C_tp._V%C5%A9ng_T%C3%A0u%2C_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u%2C_Vi%E1%BB%87t_Nam_-_panoramio_%281%29.jpg",
+			"name": "The park: the leaning palms on the lawn, the sculptures, the bay",
+			"photos": [
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:C%C3%B4ng_Vi%C3%AAn_B%C3%A3i_Tr%C6%B0%E1%BB%9Bc,_Quang_Trung,_Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(1).jpg",
+					"date": "2014-04-06 08:01",
+					"license": "CC BY 3.0",
+					"author": "trungydang",
+					"open": true,
+					"file": "shot_s2_2014.jpg",
+					"shows": "The north part of the park to the south: leaning coconut palms on a lawn, stone sculptures, a sign, Norfolk pines, the low wall of the beach with the boats of the bay on the right, and Khách sạn Bưu điện far in the middle.",
+					"place": {
+						"at": [
+							-15.6,
+							-207.2
+						],
+						"from": "the GPS of the camera in the photo file (10.345557 N, 107.073917 E)",
+						"within": 10.0
+					},
+					"lens": "Nokia Lumia 1020 (in the file): 26 mm (35 mm equivalent) in 16:9, a horizontal field of view of 71.9 degrees"
+				}
+			],
 			"eye": [
-				46.0,
-				84.0
+				-11.0,
+				-207.0
 			],
 			"eye_height": 1.6,
-			"target": [
-				38.0,
-				5.0,
-				-60.0
+			"heading": -7.0,
+			"pitch": 7.0,
+			"fov": 71.9,
+			"how": "Eye: 4.6 m east of the GPS of the photo, so that the camera is not in the crown of a tree of the park or in a walker. Heading: Khách sạn Bưu điện (x 22, z 286) is 11.4 degrees left of the middle. Pitch: the line of the sea is 110 px under the middle of 720 px.",
+			"subjects": [
+				{
+					"name": "Khách sạn Bưu điện (P&T)",
+					"at": [
+						22.0,
+						27.0,
+						286.0
+					]
+				}
 			],
-			"fov": 45.0
+			"people": 3,
+			"people_how": "The photo (08:01) shows two or three people on the lawn and the walk; at 17:00 more: at least 3."
 		},
 		{
 			"id": "S3",
-			"name": "Quang Trung to the south, Cảng vụ at the end",
-			"photo": "https://commons.wikimedia.org/wiki/File%3ABai_truoc-duong_Ha_long-Ph%C6%B0%E1%BB%9Dng_2%2C_tp._V%C5%A9ng_T%C3%A0u%2C_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u%2C_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"name": "Cảng vụ from the junction of Hạ Long, Quang Trung to the north",
+			"photos": [
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:Bai_truoc-duong_Ha_long-Ph%C6%B0%E1%BB%9Dng_2,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+					"date": "2014-04-06 09:10",
+					"license": "CC BY 3.0",
+					"author": "trungydang",
+					"open": true,
+					"file": "shot_s3_2014.jpg",
+					"shows": "Cảng vụ Hàng hải Vũng Tàu (2 Quang Trung) from the junction of Hạ Long: the corner with its glass bays, the sign, the flag, two Norfolk pines, scooters, Quang Trung to the north on the left with the median and the Grand Hotel far away.",
+					"place": {
+						"at": [
+							79.7,
+							237.0
+						],
+						"from": "the GPS of the camera in the photo file (10.341536 N, 107.074760 E)",
+						"within": 10.0
+					},
+					"lens": "Nokia Lumia 1020 (in the file): 26 mm (35 mm equivalent) in 16:9, a horizontal field of view of 71.9 degrees"
+				}
+			],
 			"eye": [
-				62.0,
-				-72.0
+				79.7,
+				237.0
 			],
 			"eye_height": 1.6,
-			"target": [
-				121.7,
-				12.0,
-				194.0
+			"heading": 145.0,
+			"pitch": 13.0,
+			"fov": 71.9,
+			"how": "Heading: the round corner of Cảng vụ (x 112, z 204) is 8.4 degrees right of the middle, the north end of its front (x 113, z 177) 7.1 degrees left, and its east end (x 135, z 204) 27.6 degrees right: 144 to 149 degrees. Pitch: the far end of Quang Trung is 205 px under the middle of 720 px.",
+			"subjects": [
+				{
+					"name": "the corner of Cảng vụ",
+					"at": [
+						112.0,
+						13.0,
+						204.0
+					]
+				}
 			],
-			"fov": 40.0
+			"people": 0,
+			"people_how": "The photo shows about ten people on scooters; the moving scooters wait for plan 0018, and no walker of the park is there."
 		},
 		{
 			"id": "S4",
-			"name": "The Grand Hotel and the median",
-			"photo": "https://commons.wikimedia.org/wiki/File:Grand_hotel,_quang_trung_street-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"name": "The Grand Hotel from Quang Trung",
+			"photos": [
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:Grand_hotel,_quang_trung_street-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+					"date": "2014-04-06 06:54",
+					"license": "CC BY 3.0",
+					"author": "trungydang",
+					"open": true,
+					"file": "shot_s4_2014.jpg",
+					"shows": "The Grand Hotel (2 Nguyễn Du) across Quang Trung: the main block of 3 storeys with its tile roof, the north end with a pediment, the letters GRAND HOTEL, the fence with lantern posts, frangipani and big trees.",
+					"place": {
+						"at": [
+							95.2,
+							-10.9
+						],
+						"from": "the GPS of the camera in the photo file (10.343776 N, 107.074917 E)",
+						"within": 10.0
+					},
+					"lens": "Nokia Lumia 1020 (in the file) with its zoom: a horizontal field of view of 55 degrees, from the photo"
+				}
+			],
 			"eye": [
-				100.8,
-				21.0
+				95.2,
+				-10.9
 			],
 			"eye_height": 1.6,
-			"target": [
-				150.0,
-				9.0,
-				18.0
+			"heading": 77.3,
+			"pitch": 8.8,
+			"fov": 55.0,
+			"how": "Lens and heading: from the GPS of the photo, the north end of the front of the main block (x 152, z -21) is at the bearing 100 degrees and its south end (x 158, z 15) at 68 degrees; the north end is at 125 px of 1280 and the south end is hidden by the trees past 870 px, so the field of view is about 55 degrees, and the heading 77.3 degrees. Pitch: the tops of the lantern posts of the fence (about 1.5 m) are 190 px under the middle. The place on Panoramio of the survey (c11) is 13 m from the GPS of the file.",
+			"subjects": [
+				{
+					"name": "the front of the Grand Hotel",
+					"at": [
+						155.0,
+						13.0,
+						-3.0
+					]
+				}
 			],
-			"fov": 45.0
+			"people": 0,
+			"people_how": "The photo shows nobody on the street at 06:54."
 		},
 		{
 			"id": "S5",
 			"name": "The walk of the sea at dusk",
-			"photo": "https://commons.wikimedia.org/wiki/File%3AVoyage_au_Vi%C3%AAt_Nam_-_panoramio_%2812%29.jpg",
+			"photos": [
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:Voyage_au_Vi%C3%AAt_Nam_-_panoramio_(12).jpg",
+					"date": "2015-03 (uploaded 2015-03-20)",
+					"license": "CC BY 3.0",
+					"author": "Jean Van Jean",
+					"open": true,
+					"file": "shot_s5_2015.jpg",
+					"shows": "The walk of the sea at dusk: a raised lawn in a granite border on the left, the tiles of the walk on the right, lamp poles with warm lights, Quang Trung and a hotel of about 9 storeys behind.",
+					"place": {
+						"at": [
+							-17.6,
+							-266.0
+						],
+						"from": "the place that the author gave on Panoramio (10.346088 N, 107.073902 E; no GPS in the file, and no geotag in the survey of World plan 0018); the raised lawn that the photo shows at the feet of the camera ends 56 m from it",
+						"within": 60.0
+					},
+					"lens": "not in the file: a phone of 4:3, about 62 degrees horizontal"
+				}
+			],
 			"eye": [
-				-97.0,
-				-311.0
+				-73.0,
+				-281.0
 			],
 			"eye_height": 1.6,
-			"target": [
-				-50.0,
-				3.0,
-				-255.0
+			"heading": 44.6,
+			"pitch": 3.0,
+			"fov": 62.0,
+			"how": "Eye: on the walk at the north-west end of the raised lawn of OSM way 234797330 (the lawn is at the left of the camera in the photo, its border at its feet). Heading: the edge of the lawn goes to the south-east at the bearing 41 degrees, and its line goes away 3.6 degrees right of the middle of the photo: 44.6 degrees.",
+			"subjects": [
+				{
+					"name": "the raised lawn",
+					"at": [
+						-60.0,
+						6.2,
+						-268.0
+					]
+				}
 			],
-			"fov": 50.0,
-			"note": "The photo of the walk (2015) looks to the south-east along the walk, with the raised lawns of OSM (ways 234797329 and 234797330) on its left. Its geotag (x -18, z -266) is about 50 m from that place, so the eye is on the walk at the north-west end of the raised lawns."
+			"people": 5,
+			"people_how": "The photo at dusk shows about six people on the walk and the road: at least 5."
 		}
 	]
 }

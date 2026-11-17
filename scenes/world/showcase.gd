@@ -24,6 +24,8 @@ const STEP := 2.0
 const JUNCTION_MARGIN := 1.0
 ## A stand-in leaves this much room (m) on each side of the deck of the jetty.
 const PASSAGE_MARGIN := 0.6
+## The passage from the land goes to this point behind the shore end of the jetty (m).
+const JETTY_BEHIND := 5.0
 ## The shortest piece of the walk on the sea wall (m).
 const SEA_WALK_MIN_RUN := 8.0
 ## Where two ways of the sea wall meet, their widths change over this length (m).
@@ -43,6 +45,8 @@ var park := PackedVector2Array()
 var lengths: Dictionary = {}
 ## The stand-ins: [{osm, name, center (Vector3), top, outline (PackedVector2Array)}].
 var stand_ins: Array[Dictionary] = []
+## The OSM buildings of the area with no storeys from a source: not built.
+var stand_ins_left_out: Array[String] = []
 ## The models of World at their places (D3): [{id, model, footprint (PackedVector2Array), base}].
 var models: Array[Dictionary] = []
 ## The people of R10, or null.
@@ -725,38 +729,64 @@ func _stand_ins(cfg: Dictionary) -> void:
 		for p in ring:
 			center += p
 		center /= ring.size()
-		if not contains(center.x, center.y) or str(building.get("osm", "")) in skip or _in_model(Vector3(center.x, 0, center.y)):
+		var extra: bool = str(building.get("osm", "")) in (cfg.get("extra", []) as Array)
+		if not (contains(center.x, center.y) or extra) or str(building.get("osm", "")) in skip \
+				or _in_model(Vector3(center.x, 0, center.y)) or _covers_model(ring):
 			continue
 		var known: Dictionary = cfg.get("storeys", {}).get(str(building.get("osm", "")), {})
-		var storeys := float(known.get("storeys", building.get("levels", cfg.get("default_storeys", 1))))
+		# A building with no storeys from a source is left out: a guess is not in
+		# the game (report 0026, Q6: a stand-in of 1 storey is not correct).
+		if known.is_empty() and not building.has("levels") and not building.has("height"):
+			stand_ins_left_out.append(str(building.get("osm", "")))
+			continue
+		var storeys := float(known.get("storeys", building.get("levels", 1)))
 		var low := INF
 		for p in ring:
 			low = minf(low, world.ground_height(p.x, p.y))
-		var height := float(building.get("height", storeys * storey))
+		var height := float(known.get("height", building.get("height", storeys * storey)))
 		var top := low + height
-		for part in _jetty_passage(ring):
+		for part in _jetty_passage(ring, int(cfg.get("jetty_access", 0))):
 			_prism(color, roof, part, low - 0.5, top)
+		# A pyramid roof over the walls (the hall with the roof of orange tiles).
+		var roof_height := float(known.get("pyramid_roof", 0.0))
+		if roof_height > 0.0:
+			_pyramid(str(known.get("roof_color", roof)), ring, top, roof_height)
 		stand_ins.append({"osm": str(building.get("osm", "")), "name": str(building.get("name", "")),
-				"center": Vector3(center.x, low, center.y), "top": top, "outline": ring,
-				"storeys": storeys, "known": not known.is_empty() or building.has("levels") or building.has("height")})
+				"center": Vector3(center.x, low, center.y), "top": top + roof_height, "outline": ring,
+				"storeys": storeys, "known": true})
 	_add_length("stand_ins", stand_ins.size())
 
 
 ## The outline of a stand-in less a passage along the deck of the jetty of
-## Cầu Đá: OSM puts the old hydrofoil terminal around the land end of the old
-## pier, and a solid stand-in there closed the jetty (PT-74). Holes are dropped.
-func _jetty_passage(ring: PackedVector2Array) -> Array[PackedVector2Array]:
+## Cầu Đá, and a passage from the shore end of the deck to the nearest point of
+## the way "access" (the path of the port): OSM puts the old hydrofoil terminal
+## around the land end of the old pier, and a solid stand-in there closed the
+## jetty (PT-74). With the terminal at its height of the photo, the passage
+## along the deck had no way in from the land (report 0026, D-0026-02). Holes
+## are dropped.
+func _jetty_passage(ring: PackedVector2Array, access := 0) -> Array[PackedVector2Array]:
 	var parts: Array[PackedVector2Array] = [ring]
 	if world.places == null or world.places.jetty.is_empty():
 		return parts
 	var line: PackedVector3Array = world.places.jetty.line
 	var half := float(world.places.jetty.width) / 2.0 + PASSAGE_MARGIN
+	var bands: Array[PackedVector2Array] = []
 	for i in line.size() - 1:
-		var a := Vector2(line[i].x, line[i].z)
-		var b := Vector2(line[i + 1].x, line[i + 1].z)
-		var dir := (b - a).normalized()
-		var n := Vector2(-dir.y, dir.x) * half
-		var band := PackedVector2Array([a - dir + n, b + dir + n, b + dir - n, a - dir - n])
+		bands.append(_band(Vector2(line[i].x, line[i].z), Vector2(line[i + 1].x, line[i + 1].z), half))
+	var way: Dictionary = _roads.get(access, {})
+	if not way.is_empty() and line.size() > 1:
+		# From a point behind the shore end (on the land) to the nearest point of the way.
+		var shore := Vector2(line[0].x, line[0].z)
+		var behind := shore + (shore - Vector2(line[1].x, line[1].z)).normalized() * JETTY_BEHIND
+		var nearest := Vector2.INF
+		for p: Array in way.get("points", []):
+			var q := Vector2(float(p[0]), float(p[2]))
+			if q.distance_to(behind) < nearest.distance_to(behind):
+				nearest = q
+		bands.append(_band(shore, behind, half))
+		if nearest != Vector2.INF and nearest.distance_to(behind) > 0.5:
+			bands.append(_band(behind, nearest, half))
+	for band in bands:
 		var next: Array[PackedVector2Array] = []
 		for part in parts:
 			if Geometry2D.intersect_polygons(part, band).is_empty():
@@ -767,6 +797,13 @@ func _jetty_passage(ring: PackedVector2Array) -> Array[PackedVector2Array]:
 					next.append(piece)
 		parts = next
 	return parts
+
+
+## A band of the half width "half" from a to b, 1 m longer at each end.
+func _band(a: Vector2, b: Vector2, half: float) -> PackedVector2Array:
+	var dir := (b - a).normalized()
+	var n := Vector2(-dir.y, dir.x) * half
+	return PackedVector2Array([a - dir + n, b + dir + n, b + dir - n, a - dir - n])
 
 
 ## R7, D3: the models of World at their places, with the ranges of D6.
@@ -843,6 +880,21 @@ static func _model_box(model: WorldModel) -> AABB:
 func _in_model(p: Vector3) -> bool:
 	for entry: Dictionary in models:
 		if Geometry2D.is_point_in_polygon(Vector2(p.x, p.z), entry.footprint):
+			return true
+	return false
+
+
+## True when an outline of OSM goes around the middle of a model of World: the
+## outline is the same building as the model, or a group of buildings with it
+## (report 0026, D-0026-02: an outline of OSM around the whole Grand Hotel made a
+## box in front of the model).
+func _covers_model(ring: PackedVector2Array) -> bool:
+	for entry: Dictionary in models:
+		var footprint: PackedVector2Array = entry.footprint
+		var middle := Vector2.ZERO
+		for p in footprint:
+			middle += p
+		if Geometry2D.is_point_in_polygon(middle / maxf(footprint.size(), 1.0), ring):
 			return true
 	return false
 
@@ -1023,6 +1075,24 @@ func _mesh(color: String) -> _Mesh:
 	if not _meshes.has(color):
 		_meshes[color] = _Mesh.new()
 	return _meshes[color]
+
+
+## A pyramid roof on a ring at the height "base", with its top "height" m over
+## the middle of the ring.
+func _pyramid(color: String, ring: PackedVector2Array, base: float, height: float) -> void:
+	var middle := Vector2.ZERO
+	for p in ring:
+		middle += p
+	middle /= maxf(ring.size(), 1.0)
+	var apex := Vector3(middle.x, base + height, middle.y)
+	for i in ring.size():
+		var a := Vector3(ring[i].x, base, ring[i].y)
+		var b := Vector3(ring[(i + 1) % ring.size()].x, base, ring[(i + 1) % ring.size()].y)
+		var normal := (b - a).cross(apex - a).normalized()
+		if normal.y < 0.0:
+			normal = -normal
+		_mesh(color).triangle(a, b, apex, normal)
+		_collision.append_array([a, b, apex])
 
 
 ## A face that looks up: the corners a0, a1 along one edge, b0, b1 along the other.

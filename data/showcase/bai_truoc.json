@@ -506,18 +506,87 @@
 	],
 	"stand_ins": {
 		"storey_m": 3.3,
-		"default_storeys": 1,
 		"color": "#c9c4b8",
 		"roof_color": "#a89f90",
-		"note": "A building of OSM in the area that World does not have yet (R7): its outline, and its storeys from OSM (building:levels). A building with no storeys in OSM has default_storeys (1, a guess until the heights of plan 0009, R1: plan 0026, Q6). A building under a model of World has no stand-in. \"storeys\" gives the storeys of a building from another source, by its OSM id.",
+		"note": "A building of OSM in the area that World does not have yet (R7): its outline, and its storeys from OSM (building:levels) or from a photo (\"storeys\", by its OSM id, with its source and its status). A building with no storeys from a source is left out (report 0026, Q6: count the storeys from the photos; a stand-in of 1 storey is not correct in a shot). A building under a model of World, or around one, has no stand-in. \"height\" replaces the storeys for a building with a high roof; \"pyramid_roof\" puts a roof of four sides of that height on the walls.",
 		"storeys": {
 			"way/259750558": {
 				"storeys": 12,
 				"name": "Khách sạn Bưu điện (158 Hạ Long)",
 				"source": "About 12 storeys counted from a photo from a drone of 2021-01-30 (Wikimedia Commons, Tuong Lam Photos, CC BY-SA 4.0, File:Vung_Tau,_Viet_Nam_2021.jpg); a hotel list gives it an outdoor pool, as the photo shows.",
 				"status": "Source"
+			},
+			"way/225803473": {
+				"storeys": 1,
+				"height": 3.9,
+				"pyramid_roof": 6.2,
+				"roof_color": "#c8704a",
+				"name": "The hall with the roof of orange tiles by Hạ Long",
+				"source": "The shot S1 (Commons, trungydang, 2014-04-05, CC BY 3.0): the front of 19 m is 710 px, the walls 145 px (3.9 m), the pyramid roof 230 px (6.2 m); the drone photo of 2021-01-30 (Tuong Lam Photos, CC BY-SA 4.0) and the photo of 2019-04-30 (Tuổi Trẻ) show the same roof. The spec nha_mai_ngoi_cam.",
+				"status": "Source"
+			},
+			"way/580493843": {
+				"storeys": 2,
+				"name": "The wing of Khách sạn Bưu điện with the pool on its roof",
+				"source": "The photos from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0, Vung_Tau,_Viet_Nam_2021.jpg and Vung_Tau,_Viet_Nam.jpg): east of the tower of Khách sạn Bưu điện, the pool is on the roof of a wing of two storeys.",
+				"status": "Source"
+			},
+			"way/580493842": {
+				"storeys": 3,
+				"name": "The building south of Cảng vụ",
+				"source": "The shot S3 (Commons, trungydang, 2014-04-06, CC BY 3.0): at its right edge, the building south of Cảng vụ has a ground floor and two storeys with balconies.",
+				"status": "Source"
+			},
+			"way/790529521": {
+				"storeys": 2,
+				"name": "The shops north of Hải Âu",
+				"source": "The photo of Hải Âu (Commons, trungydang, 2014-04-05, CC BY 3.0, Ks_Hai_au...jpg): north of Hải Âu, the shops have a ground floor and one storey over it.",
+				"status": "Source"
+			},
+			"way/790529522": {
+				"storeys": 2,
+				"name": "The shops north of Hải Âu",
+				"source": "As way/790529521.",
+				"status": "Source"
+			},
+			"way/790529523": {
+				"storeys": 6,
+				"name": "Khách sạn Hải Âu (until World builds the spec khach_san_hai_au)",
+				"source": "The photo of Hải Âu (Commons, trungydang, 2014-04-05, CC BY 3.0): the middle block has a ground floor and five storeys (the wings have five storeys). The spec khach_san_hai_au.",
+				"status": "Source"
+			},
+			"way/200554626": {
+				"storeys": 2,
+				"height": 11.0,
+				"name": "Bến tàu cánh ngầm cũ, the old hydrofoil terminal",
+				"source": "The photo of the terminal at night (Commons, trungydang, 2014-04-05, CC BY 3.0, Ben_tau_Canh_Ngam...jpg): two storeys under seven curved vaults, about ten times the height of a person at its door. OSM: the hydrofoils left from near the cable car from January 2017; the building stood.",
+				"status": "Source"
+			},
+			"way/791795131": {
+				"storeys": 3,
+				"name": "The back wings of the Grand Hotel around its courtyard",
+				"source": "The photo of the south wing of the Grand Hotel (Commons, 2015, CC BY 3.0, Phường_1,_Vũng_Tàu..._panoramio_(9).jpg): the wings of the Grand Hotel have a ground floor and two storeys. The outline of OSM goes round the courtyard behind the main block and the south wing.",
+				"status": "Source"
+			},
+			"way/791795151": {
+				"storeys": 4,
+				"name": "Nhà thiếu nhi tỉnh Bà Rịa - Vũng Tàu (until World plan 0018, step 4)",
+				"source": "The photo of the survey of World plan 0018, c13 (Commons, trungydang, 2014-04-06, CC BY 3.0, Nha_thieu_nhi_tin_ba_ria_vung_tau...jpg): the middle and the left blocks have a ground floor and three storeys, with a spire; the right hall is as high.",
+				"status": "Source"
+			},
+			"way/225803467": {
+				"storeys": 7,
+				"name": "Cao ốc Sen Biển (the Lotus Tower), its stepped block",
+				"source": "The shot S1 (Commons, trungydang, 2014-04-05, CC BY 3.0): the stepped block of blue and white bands is 135 px high at 574 m, and Khách sạn Bưu điện (12 storeys, about 40 m) 255 px at 511 m: about 24 m, 7 storeys. The photo of 2019-04-30 (Tuổi Trẻ) shows the same block. Its tower of glass (about 46 m) is not in the stand-in: it waits for a spec.",
+				"status": "Source"
 			}
-		}
+		},
+		"extra": [
+			"way/225803467"
+		],
+		"extra_note": "Buildings of OSM out of the outline that the shots show (S1, S2): Cao ốc Sen Biển (the Lotus Tower) by Hạ Long.",
+		"jetty_access": 235006085,
+		"jetty_access_note": "The way from the land to the shore end of the jetty of Cầu Đá: the path of the port (OSM way). The shore end of the deck is in the outline of the old hydrofoil terminal, so a stand-in leaves a passage along the deck and a passage from the shore end to the nearest point of this path (report 0026, D-0026-02: with the terminal at its height of the photo, the passage along the deck had no way in from the land; PT-74 run 8)."
 	},
 	"beached": {
 		"model": "thung_chai",

@@ -4,9 +4,11 @@
     tools/playtest.sh showcase_shots
     python tools/showcase/sheets.py
 
-Each sheet has the shot on Low (the Mobile renderer, left) and on High
-(Forward+, right), at 17:10 (top) and at 12:00 (bottom). The page links the
-photo of each shot (plan 0026, section 3): a link only, not the photo.
+Each sheet has the photo of the shot (its copy in docs/reference/photos/,
+R17), then the shot on Low (the Mobile renderer) and on High (Forward+), at
+17:10 (top) and at 12:00 (bottom). The page gives the link, the author, the
+license, and the date of each photo, and where the eye of the shot is from
+(report 0026, D-0026-02).
 """
 
 from __future__ import annotations
@@ -33,10 +35,15 @@ def main() -> int:
             print(f"ERROR: {sheet} is not there. Run tools/playtest.sh showcase_shots.")
             return 1
         shutil.copyfile(sheet, OUT / sheet.name)
+        photo = shot["photos"][0]
         rows.append(
             f"<section><h2>{html.escape(shot['id'])}: {html.escape(shot['name'])}</h2>"
-            f'<p>The photo to match: <a href="{html.escape(shot["photo"])}">{html.escape(shot["photo"])}</a></p>'
-            f"<p>Columns: Low (the Mobile renderer), High (Forward+). Rows: 17:10, 12:00.</p>"
+            f'<p>The photo: <a href="{html.escape(photo["url"])}">{html.escape(photo["url"])}</a>, '
+            f"{html.escape(photo['author'])}, {html.escape(photo['license'])}, {html.escape(photo['date'])}. "
+            f"{html.escape(photo['shows'])}</p>"
+            f"<p>The eye: {html.escape(photo['place']['from'])}. The lens: {html.escape(photo['lens'])}. "
+            f"{html.escape(shot.get('how', ''))}</p>"
+            f"<p>Columns: the photo, Low (the Mobile renderer), High (Forward+). Rows: 17:10, 12:00.</p>"
             f'<img src="{html.escape(sheet.name)}" alt="The sheet of {html.escape(shot["id"])}"></section>'
         )
     page = f"""<!doctype html>
@@ -45,7 +52,7 @@ def main() -> int:
 <style>body{{font-family:sans-serif;margin:16px;max-width:1300px;background:#fafafa;color:#222}}
 img{{max-width:100%;height:auto;border:1px solid #ccc}}a{{word-break:break-all}}</style></head>
 <body><h1>The showcase of Bãi Trước</h1>
-<p>Plan 0026, PT-72. The five shots of section 3, next to the links of their photos.</p>
+<p>Plan 0026, PT-72. The five shots of section 3, next to their photos.</p>
 {''.join(rows)}
 </body></html>
 """

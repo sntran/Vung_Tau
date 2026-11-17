@@ -9,7 +9,12 @@ extends RefCounted
 # taken. A shot fails when its ground is not ready.
 # High takes the shots in two runs for each time: one run of five shots on
 # Forward+ takes more than 300 s under lavapipe. The last run makes the sheet
-# of each shot (sheet_ID.jpg): a column for Low and High, a row for each time.
+# of each shot (sheet_ID.jpg): the photo (its copy in docs/reference/photos/,
+# R17), then a column for Low and High, a row for each time.
+# Report 0026 (D-0026-02): a shot is the view of its photo. PT-72 checks that
+# the eye is at the place of the photo, that each subject of the photo is in
+# the frame and that no stand-in hides it, and that each stand-in in the frame
+# has its storeys from a source (Q6).
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=17:10 --quality=low
 # phase: --world=vung_tau --start-time=12:00 --quality=low
@@ -34,6 +39,10 @@ const RUNS := [
 
 ## A cell of a sheet.
 const SHEET_CELL := Vector2i(640, 360)
+## The copies of the open photos (plan 0026, R17).
+const PHOTOS := "res://docs/reference/photos/"
+## A stand-in farther than this from the eye does not count as in the frame.
+const VIEW_RANGE := 800.0
 
 
 func run(d: PlaytestDriver) -> void:
@@ -54,14 +63,12 @@ func run(d: PlaytestDriver) -> void:
 	var ui: Control = d.main().ui_root
 	for i in range(int(run_values[2]), mini(int(run_values[3]), shots.size() - 1) + 1):
 		var shot: Dictionary = shots[i]
-		var eye := Vector3(float(shot.eye[0]), 0.0, float(shot.eye[1]))
-		w.prepare_at(eye, 400.0)
-		var floor_y := w.places.floor_at(eye.x, eye.z) if w.places != null else -INF
-		eye.y = maxf(w.ground_height(eye.x, eye.z), floor_y) + float(shot.get("eye_height", 1.6))
-		var target := Vector3(float(shot.target[0]), float(shot.target[1]), float(shot.target[2]))
-		await d.fly_to(eye, target)
+		var eye := eye_of(w, shot)
+		await d.fly_to(eye, aim(shot, eye))
 		d.expect(await d.wait_ground(120.0), "%s: the ground is ready" % shot.id)
 		camera.fov = float(shot.get("fov", fov))
+		if run_values[0] == "low" and run_values[1] == "1710":
+			_check_view(d, w, camera, shot, eye)
 		ui.visible = false
 		await d.wait_frames(8)
 		await d.screenshot("%s_%s_%s" % [shot.id, run_values[0], run_values[1]])
@@ -69,6 +76,89 @@ func run(d: PlaytestDriver) -> void:
 		d.step("%s (%s): eye (%.1f, %.1f, %.1f), fov %.0f" % [shot.id, shot.name, eye.x, eye.y, eye.z, camera.fov])
 		camera.fov = fov
 	d.fly_end()
+
+
+## The eye of a shot: eye_height over the ground, or over the floor of a known place.
+static func eye_of(w: VungTau, shot: Dictionary) -> Vector3:
+	var eye := Vector3(float(shot.eye[0]), 0.0, float(shot.eye[1]))
+	w.prepare_at(eye, 400.0)
+	var floor_y := w.places.floor_at(eye.x, eye.z) if w.places != null else -INF
+	eye.y = maxf(w.ground_height(eye.x, eye.z), floor_y) + float(shot.get("eye_height", 1.6))
+	return eye
+
+
+## The point that the camera of a shot looks at: "heading" is in degrees from
+## the south (+z) to the east (+x), "pitch" in degrees up (from the photo).
+static func aim(shot: Dictionary, eye: Vector3) -> Vector3:
+	var heading := deg_to_rad(float(shot.heading))
+	var pitch := deg_to_rad(float(shot.get("pitch", 0.0)))
+	return eye + Vector3(sin(heading) * cos(pitch), sin(pitch), cos(heading) * cos(pitch)) * 100.0
+
+
+## Report 0026, D-0026-02: the eye is at the place of the photo, each subject of
+## the photo is in the frame and no stand-in hides it, and each stand-in in the
+## frame has its storeys from a source (Q6: a stand-in of 1 storey, a guess, is
+## not correct in a shot).
+func _check_view(d: PlaytestDriver, w: VungTau, camera: Camera3D, shot: Dictionary, eye: Vector3) -> void:
+	var photos: Array = shot.get("photos", [])
+	if not d.expect(not photos.is_empty() and (photos[0] as Dictionary).has("place"), "%s has its photo and the place of the photo" % shot.id):
+		return
+	var place: Dictionary = photos[0].place
+	var gap := Vector2(float(place.at[0]), float(place.at[1])).distance_to(Vector2(eye.x, eye.z))
+	d.expect(gap <= float(place.within), "%s: the eye is %.1f m from the place of its photo (at most %.0f m: %s)" % [
+			shot.id, gap, float(place.within), place.from])
+	var subjects: Array = shot.get("subjects", [])
+	d.expect(not subjects.is_empty(), "%s names what its photo shows (subjects)" % shot.id)
+	for subject: Dictionary in subjects:
+		var p := Vector3(float(subject.at[0]), float(subject.at[1]), float(subject.at[2]))
+		d.expect(not camera.is_position_behind(p) and camera.is_position_in_frustum(p), "%s: %s is in the frame" % [shot.id, subject.name])
+		var hidden := _hidden_by(w, eye, p)
+		d.expect(hidden == "", "%s: no stand-in hides %s%s" % [shot.id, subject.name, (" (" + hidden + ")") if hidden != "" else ""])
+	var guessed: Array[String] = []
+	for entry: Dictionary in w.showcase.stand_ins:
+		if entry.known:
+			continue
+		var outline: PackedVector2Array = entry.outline
+		var points: Array[Vector2] = [Vector2.ZERO]
+		for q in outline:
+			points[0] += q / outline.size()
+			points.append(q)
+		for q: Vector2 in points:
+			var top := Vector3(q.x, float(entry.top), q.y)
+			if eye.distance_to(top) < VIEW_RANGE and not camera.is_position_behind(top) and camera.is_position_in_frustum(top) \
+					and _hidden_by(w, eye, top, str(entry.osm)) != "":
+				continue
+			if eye.distance_to(top) < VIEW_RANGE and not camera.is_position_behind(top) and camera.is_position_in_frustum(top):
+				guessed.append("%s %s" % [entry.osm, entry.name])
+				break
+	d.step("%s: %d stand-ins with a guessed number of storeys in the frame" % [shot.id, guessed.size()])
+	d.expect(guessed.is_empty(), "%s: each stand-in in the frame has its storeys from a source (Q6): %s" % [shot.id, ", ".join(guessed)])
+
+
+## The stand-in or the model of World that the line from the eye to the point
+## goes through under its top, or "" ("skip" is the stand-in of the point). The
+## models of World have no collision, so the test uses their footprints and
+## the tops of their boxes.
+static func _hidden_by(w: VungTau, eye: Vector3, p: Vector3, skip := "") -> String:
+	var line := PackedVector2Array([Vector2(eye.x, eye.z), Vector2(p.x, p.z)])
+	var flat := line[0].distance_to(line[1])
+	var blockers: Array = []
+	for entry: Dictionary in w.showcase.stand_ins:
+		if str(entry.osm) != skip:
+			blockers.append(["%s %s" % [entry.osm, entry.name], entry.outline, float(entry.top)])
+	for entry: Dictionary in w.showcase.models:
+		var box: AABB = entry.box
+		blockers.append([str(entry.id), entry.footprint, float(entry.base) + box.end.y])
+	for blocker: Array in blockers:
+		# A building that the point is in or on does not hide it.
+		if Geometry2D.is_point_in_polygon(line[1], blocker[1]):
+			continue
+		for piece: PackedVector2Array in Geometry2D.intersect_polyline_with_polygon(line, blocker[1]):
+			for q in piece:
+				var t := line[0].distance_to(q) / maxf(flat, 0.01)
+				if t < 0.98 and lerpf(eye.y, p.y, t) < float(blocker[2]):
+					return str(blocker[0])
+	return ""
 
 
 ## The last run: one sheet for each shot from the screenshots of the other runs.
@@ -80,8 +170,20 @@ static func _make_sheets(d: PlaytestDriver) -> void:
 	var times: Array = ["1710", "1200"]
 	var presets: Array = ["low", "high"]
 	for shot: Dictionary in data.shots:
-		var sheet := Image.create(SHEET_CELL.x * presets.size(), SHEET_CELL.y * times.size(), false, Image.FORMAT_RGB8)
+		var sheet := Image.create(SHEET_CELL.x * (presets.size() + 1), SHEET_CELL.y * times.size(), false, Image.FORMAT_RGB8)
 		sheet.fill(Color("#202020"))
+		# The photo of the shot, at the top left (R17: the open photos are copied).
+		for photo: Dictionary in shot.get("photos", []):
+			var path := ProjectSettings.globalize_path(PHOTOS + str(photo.get("file", "")))
+			if photo.get("open", false) and FileAccess.file_exists(path):
+				var image := Image.load_from_file(path)
+				image.convert(Image.FORMAT_RGB8)
+				var size := Vector2(image.get_size())
+				var fit := minf(SHEET_CELL.x / size.x, SHEET_CELL.y / size.y)
+				image.resize(int(size.x * fit), int(size.y * fit), Image.INTERPOLATE_BILINEAR)
+				sheet.blit_rect(image, Rect2i(Vector2i.ZERO, image.get_size()), (SHEET_CELL - image.get_size()) / 2)
+			d.step("sheet_%s.jpg: the photo %s %s" % [shot.id, photo.get("file", ""), "is there" if FileAccess.file_exists(path) else "is not in docs/reference/photos/ (run tools/photos/photos.py)"])
+			break
 		var found := 0
 		for r in times.size():
 			for c in presets.size():
@@ -91,7 +193,7 @@ static func _make_sheets(d: PlaytestDriver) -> void:
 						var image := Image.load_from_file(d.out_dir.path_join(file))
 						image.convert(Image.FORMAT_RGB8)
 						image.resize(SHEET_CELL.x, SHEET_CELL.y, Image.INTERPOLATE_BILINEAR)
-						sheet.blit_rect(image, Rect2i(Vector2i.ZERO, SHEET_CELL), Vector2i(c * SHEET_CELL.x, r * SHEET_CELL.y))
+						sheet.blit_rect(image, Rect2i(Vector2i.ZERO, SHEET_CELL), Vector2i((c + 1) * SHEET_CELL.x, r * SHEET_CELL.y))
 						found += 1
 						break
 		sheet.save_jpg(d.out_dir.path_join("sheet_%s.jpg" % shot.id), 0.85)

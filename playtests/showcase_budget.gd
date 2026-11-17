@@ -12,6 +12,8 @@ extends RefCounted
 # phase: --world=vung_tau --renderer=forward_plus --quality=high --start-time=17:10
 
 const SHOTS := "res://data/showcase/shots.json"
+## The eye and the aim of a shot, as PT-72 takes it.
+const Shots := preload("res://playtests/showcase_shots.gd")
 const LIMITS := {"low": [600, 300000], "high": [2000, 2000000]}
 ## For each run: the preset, and the first and the last shot (from 0).
 const RUNS := [["low", 0, 4], ["high", 0, 2], ["high", 3, 4]]
@@ -33,11 +35,8 @@ func run(d: PlaytestDriver) -> void:
 	var limit: Array = LIMITS[preset]
 	for i in range(int(run_values[1]), int(run_values[2]) + 1):
 		var shot: Dictionary = shots[i]
-		var eye := Vector3(float(shot.eye[0]), 0.0, float(shot.eye[1]))
-		w.prepare_at(eye, 400.0)
-		eye.y = w.ground_height(eye.x, eye.z) + float(shot.get("eye_height", 1.6))
-		var target := Vector3(float(shot.target[0]), float(shot.target[1]), float(shot.target[2]))
-		await d.fly_to(eye, target)
+		var eye := Shots.eye_of(w, shot)
+		await d.fly_to(eye, Shots.aim(shot, eye))
 		await d.wait_ground(120.0)
 		camera.fov = float(shot.get("fov", fov))
 		await d.wait_frames(8)

@@ -14,6 +14,8 @@ extends RefCounted
 # phase: --world=vung_tau --start-time=20:00 --quality=high --renderer=forward_plus
 
 const SHOTS := "res://data/showcase/shots.json"
+## The eye and the aim of a shot, as PT-72 takes it.
+const Shots := preload("res://playtests/showcase_shots.gd")
 ## For each run: the preset, the shots, and if the run measures the light of a lamp.
 ## High takes S3, S5, and the measure in three runs: a run on Forward+ under
 ## lavapipe is slow (one run of S3 and the measure took more than 300 s in CI).
@@ -45,11 +47,8 @@ func run(d: PlaytestDriver) -> void:
 	for shot: Dictionary in data.shots:
 		if not str(shot.id) in (run_values[1] as Array):
 			continue
-		var eye := Vector3(float(shot.eye[0]), 0.0, float(shot.eye[1]))
-		w.prepare_at(eye, 400.0)
-		eye.y = w.ground_height(eye.x, eye.z) + float(shot.get("eye_height", 1.6))
-		var target := Vector3(float(shot.target[0]), float(shot.target[1]), float(shot.target[2]))
-		await d.fly_to(eye, target)
+		var eye := Shots.eye_of(w, shot)
+		await d.fly_to(eye, Shots.aim(shot, eye))
 		d.expect(await d.wait_ground(120.0), "%s: the ground is ready" % shot.id)
 		camera.fov = float(shot.get("fov", fov))
 		ui.visible = false

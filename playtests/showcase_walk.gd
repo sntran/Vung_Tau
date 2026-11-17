@@ -212,7 +212,7 @@ func _route(w: VungTau) -> PackedVector3Array:
 	# The deck has walls on its sides: the route goes onto it along its line,
 	# from a point on the land behind its shore end.
 	var out := Vector3(jetty[0].x - jetty[1].x, 0.0, jetty[0].z - jetty[1].z).normalized()
-	var behind := jetty[0] + out * 5.0
+	var behind := jetty[0] + out * Showcase.JETTY_BEHIND
 	var port_end := _nearest(port, behind)
 	var part := PackedVector3Array()
 	var step := 1 if port_end >= port_start else -1
