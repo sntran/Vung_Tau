@@ -863,18 +863,28 @@ func _sea_wall(cfg: Dictionary) -> void:
 					and not _reaches_side(dense[i], sides[i] * sign, halves[i], at, others, walk / 2.0))
 		var on := _long_runs(dense, flags, SEA_WALK_MIN_RUN)
 		var tops := _walk_tops(dense, sides, halves, sign, walk, over)
+		# The first and the last point of a run of the walk with a closed end
+		# (below): the way of the people stays on the road there, and goes onto
+		# the walk at the next point. A player that went onto the walk at the end
+		# point climbed the curb beside the box of the closed end, and the step
+		# up stopped on the box (PT-74, run 7: at the junction near Khách sạn Hải
+		# Âu, 2 of 5 runs).
+		var closed_ends := {}
+		for i in dense.size():
+			if on[i] and i > 0 and i < dense.size() - 1 and (not on[i - 1] or not on[i + 1]):
+				closed_ends[i] = true
 		# The way of the people (PT-74).
 		for i in dense.size():
 			# On the road, clear of the curb of the walk (the walk covers the sidewalk).
 			var road := _on_ground(dense[i] + sides[i] * sign * (halves[i] - maxf(2.0, over + ROAD_INSIDE)))
 			sea_road.append(road)
-			if on[i]:
+			if on[i] and not closed_ends.has(i):
 				var middle := dense[i] + sides[i] * sign * (halves[i] + walk / 2.0)
 				middle.y = tops[i]
 				sea_walk.append(middle)
 			else:
 				sea_walk.append(road)
-			sea_walk_on.append(1 if on[i] else 0)
+			sea_walk_on.append(1 if on[i] and not closed_ends.has(i) else 0)
 		# The parts of each run of the walk.
 		var i := 0
 		while i < dense.size():
