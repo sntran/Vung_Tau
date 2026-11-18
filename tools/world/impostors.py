@@ -69,7 +69,7 @@ def role_colors(materials: dict) -> dict:
             return None
         hex_ = values.get("color", "#FFFFFF").lstrip("#")
         rgb = tuple(int(hex_[i : i + 2], 16) / 255.0 for i in (0, 2, 4))
-        return rgb, bool(values.get("paint", False))
+        return rgb, bool(values.get("paint", False)), bool(values.get("keep", False))
 
     return color
 
@@ -154,6 +154,46 @@ def emission(name: str, rgb=None, mode: str = "color"):
     return m
 
 
+def source_emission(name: str, source):
+    """An emission material with the base color of the material of the GLB (its
+    texture, or its color): for a role whose material of the game keeps the
+    material of the GLB ("keep": the parts part_*, plan 0026, D4). With the flat
+    color of the table, the impostors of the round bush and of the flowers were
+    white (report 0026, the sheet of S2 on Low)."""
+    m = emission(name, (1.0, 1.0, 1.0))
+    if source is None or source.node_tree is None:
+        return m
+    bsdf = next((n for n in source.node_tree.nodes if n.type == "BSDF_PRINCIPLED"), None)
+    if bsdf is None:
+        return m
+    nt = m.node_tree
+    em = next(n for n in nt.nodes if n.type == "EMISSION")
+    base = bsdf.inputs["Base Color"]
+    if not base.is_linked:
+        # A color socket holds linear values; the view transform is Raw, so the
+        # picture needs the sRGB values.
+        em.inputs["Color"].default_value = (*(_to_srgb(c) for c in base.default_value[:3]), 1.0)
+        return m
+    node = base.links[0].from_node
+    if node.type != "TEX_IMAGE" or node.image is None:
+        return m
+    tex = nt.nodes.new("ShaderNodeTexImage")
+    tex.image = node.image
+    # The sRGB values of the texture go to the picture as they are (Raw view).
+    tex.image.colorspace_settings.name = "Non-Color"
+    vector = node.inputs["Vector"]
+    if vector.is_linked and vector.links[0].from_node.type == "UVMAP":
+        uv = nt.nodes.new("ShaderNodeUVMap")
+        uv.uv_map = vector.links[0].from_node.uv_map
+        nt.links.new(uv.outputs[0], tex.inputs["Vector"])
+    nt.links.new(tex.outputs["Color"], em.inputs["Color"])
+    return m
+
+
+def _to_srgb(c: float) -> float:
+    return 12.92 * c if c <= 0.0031308 else 1.055 * c ** (1.0 / 2.4) - 0.055
+
+
 def import_model(glb: Path):
     """The model as one mesh object, with the transforms of its nodes applied."""
     bpy = _bpy()
@@ -217,8 +257,11 @@ def make_impostor(model_id: str, color_of, out_dir: Path) -> dict:
             colors.append(None)
             masks.append(None)
             continue
-        rgb, paint = found
-        colors.append(emission(f"c_{role}", (1.0, 1.0, 1.0) if paint else rgb))
+        rgb, paint, keep = found
+        if keep and not paint:
+            colors.append(source_emission(f"c_{role}", slot.material))
+        else:
+            colors.append(emission(f"c_{role}", (1.0, 1.0, 1.0) if paint else rgb))
         masks.append(emission(f"m_{role}", (1.0, 1.0, 1.0) if paint else (0.0, 0.0, 0.0)))
     normal = emission("normal", mode="normal")
     hidden = [i for i, c in enumerate(colors) if c is None]
@@ -316,6 +359,34 @@ def write_import(path: Path) -> None:
     import_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def white_problem(model_id: str) -> str:
+    """A problem when the impostor is white where it has no paint: its colors
+    were lost (report 0026: the impostors of the round bush and of the flowers
+    were white on Low, so the bush and the bed were white in the shot S2)."""
+    from PIL import Image  # noqa: PLC0415
+
+    color_path = wf.ASSETS / f"{model_id}_impostor.png"
+    normal_path = wf.ASSETS / f"{model_id}_impostor_normal.png"
+    if not color_path.exists() or not normal_path.exists():
+        return ""
+    color = Image.open(color_path).convert("RGBA")
+    paint = Image.open(normal_path).convert("RGBA").split()[3]
+    seen = white = 0
+    rgba = color.tobytes()
+    for i, p in enumerate(paint.tobytes()):
+        r, g, b, a = rgba[4 * i : 4 * i + 4]
+        if a > 128 and p < 128:
+            seen += 1
+            white += 1 if min(r, g, b) > 245 else 0
+    if seen and white > WHITE_PART * seen:
+        return f"{model_id}: the impostor is white where it has no paint ({100 * white // seen} %)"
+    return ""
+
+
+## The part of the impostor with no paint that can be white (a white part of a model).
+WHITE_PART = 0.5
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--force", action="store_true")
@@ -366,6 +437,10 @@ def main(argv=None) -> int:
         changed = True
         print(f"{mid}: the impostor ({values['size']} m)")
     if args.check:
+        for model in models:
+            problem = white_problem(model["id"])
+            if problem:
+                problems.append(problem)
         for problem in problems:
             print(f"ERROR: {problem}")
         if problems:
