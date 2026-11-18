@@ -33,7 +33,7 @@ Why now (report 0026, section 3): the edge of World answers 503 for each buildin
 
 ## 4. Requirements
 
-- **R1.** `tools/world/fetch.py` gets the parts list and the part files of each order from the factory (W24, W25), and from a clone of World for the catalog.
+- **R1.** `tools/world/fetch.py` gets the parts list and the part files of each order from the factory (W24, W25), and from a clone of World for the catalog. A request of Vũng Tàu has its project token (`authorization: Bearer TOKEN`; the secret `WORLD_PROJECT_TOKEN` of this repository): with it, a part that the edge cannot build waits for a construction shift of World (World `docs/factory.md`, "Construction shifts"); with no token, the factory answers 422 for such a part.
 - **R2.** The lock of D4. A new lock lists each part, and `fetch.py --check` checks each file.
 - **R3.** The glue of D3 (`tools/world/glue.py`, or an import plugin of Godot). The same parts always give the same scene. Unit tests: the bounds of the glued model are the bounds of its parts; its triangles are the sum of the triangles of its parts; a repeated part is a MultiMesh.
 - **R4.** `WorldModel` loads a glued model as before: the levels and their ranges, the joints, `set_pose()`, `parts()`, and the receipt.
