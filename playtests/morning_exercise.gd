@@ -14,6 +14,10 @@ const GROUP := "aerobics"
 ## The player and a person do not overlap: the distance of their middles is
 ## at least this (the radius of the player and of the body of a person, less 5 cm).
 const MIN_GAP := 0.45
+## The time in which each person must move, and the move of the right hand
+## that counts (the routine holds a pose for about 1 s).
+const MOTION_TIME := 2.0
+const MOVE := 0.05
 
 
 func run(d: PlaytestDriver) -> void:
@@ -83,16 +87,30 @@ func run(d: PlaytestDriver) -> void:
 ## Each person moves, and no two people are at the same time of the routine.
 static func _check_motion(d: PlaytestDriver, people: Array) -> void:
 	var times: Array[float] = []
-	var moved := 0
 	for m: WorldModel in people:
 		times.append(m.animation_time())
-	var before := _hands(people)
-	await d.wait_seconds(0.5)
-	var after := _hands(people)
+	# The routine holds a pose for about 1 s (6.1 s to 7.1 s of the loop of
+	# 8 s: the right hand does not move). A person is in the hold when a wait
+	# of 0.5 s starts there, and a slow frame (CI) makes the wait longer. So
+	# the hand is measured at each frame for 2 s, and the person moves when
+	# the hand goes more than MOVE m from where it was at the start.
+	var start := _hands(people)
+	var most: Array[float] = []
+	most.resize(people.size())
+	most.fill(0.0)
+	var tree := (people[0] as Node).get_tree()
+	var timer := tree.create_timer(MOTION_TIME)
+	while timer.time_left > 0.0:
+		await tree.process_frame
+		var now := _hands(people)
+		for i in people.size():
+			most[i] = maxf(most[i], start[i].distance_to(now[i]))
+	var still := []
 	for i in people.size():
-		if before[i].distance_to(after[i]) > 0.01:
-			moved += 1
-	d.expect(moved == people.size(), "each person moves in 0.5 s: %d of %d" % [moved, people.size()])
+		if most[i] <= MOVE:
+			still.append("%s (%.3f m)" % [(people[i] as WorldModel).id, most[i]])
+	d.expect(still.is_empty(), "each person moves in %.0f s: %d of %d (no move: %s)" % [
+			MOTION_TIME, people.size() - still.size(), people.size(), still])
 	d.step("the times of the routine: %s" % [times.map(func(t: float) -> String: return "%.2f" % t)])
 	var same := 0
 	for i in times.size():
