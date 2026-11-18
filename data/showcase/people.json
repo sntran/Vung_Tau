@@ -168,7 +168,7 @@
 		"out_m": 0.3
 	},
 	"swimmers": {
-		"note": "Report 0026, D-0026-20 and Q20: the swimmers of Bãi Trước in T-shirts and shorts (the person blueprint of World: swimmer_1 to swimmer_4, and walker_5, a boy in a T-shirt and quần đùi), some with a swim ring phao_boi at the water line: a child stands in its ring, an adult holds the ring at its side. Each swimmer has a point on the line, which is on the sand at the top of the beach in front of the shot S1 (the ground of the game is 1.5 m there), and goes out along to_sea (at right angles to the water's edge from z -200 to z -60) to the point where the water at its feet is its depth (depth_m, child_depth_m for a person younger than child_age), at each sea level of the tide. hours: the part of the swimmers in the sea at each hour (the culture notes: people swim at Bãi Trước early in the morning and in the evening; no photo gives the counts). The count, the depths, the part with a ring, and the hours are builder values.",
+		"note": "Report 0026, D-0026-20 and Q20: the swimmers of Bãi Trước in T-shirts and shorts (the person blueprint of World: swimmer_1 to swimmer_4, and walker_5, a boy in a T-shirt and quần đùi), some with a swim ring phao_boi at the water line: a child stands in its ring, an adult holds the ring at its side. Each swimmer has a point on the line, which is on the sand at the top of the beach in front of the shot S1 (the ground of the game is 1.5 m there), between the eye of S1 and the row of boats on the sand: in the photo of S1 the people in the water are nearer than the boats, and goes out along to_sea (at right angles to the water's edge from z -182 to z -126) to the point where the water at its feet is its depth (depth_m, child_depth_m for a person younger than child_age), at each sea level of the tide. hours: the part of the swimmers in the sea at each hour (the culture notes: people swim at Bãi Trước early in the morning and in the evening; no photo gives the counts). The count, the depths, the part with a ring, and the hours are builder values.",
 		"count": 14,
 		"models": [
 			"swimmer_1",
@@ -181,36 +181,28 @@
 		],
 		"line": [
 			[
-				-56.0,
-				-200.0
+				-52.5,
+				-182.0
 			],
 			[
-				-52.0,
-				-180.0
+				-47.0,
+				-170.0
 			],
 			[
-				-44.0,
-				-160.0
+				-42.0,
+				-158.0
 			],
 			[
-				-37.0,
-				-140.0
+				-37.5,
+				-146.0
 			],
 			[
-				-31.0,
-				-120.0
+				-35.0,
+				-134.0
 			],
 			[
-				-25.0,
-				-100.0
-			],
-			[
-				-20.0,
-				-80.0
-			],
-			[
-				-15.0,
-				-62.0
+				-33.0,
+				-126.0
 			]
 		],
 		"to_sea": [

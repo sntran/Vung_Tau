@@ -23134,7 +23134,7 @@
 				"mid",
 				"far"
 			],
-			"impostor": false,
+			"impostor": true,
 			"uses": "Plan 0026: the inside of the flower beds of the park (many clumps side by side).",
 			"drawing": "data/world/drawings/cay_hoa_tim_bon_hoa.json",
 			"catalog": null

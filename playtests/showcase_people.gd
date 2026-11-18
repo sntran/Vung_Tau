@@ -11,7 +11,8 @@ extends RefCounted
 # Screenshots of the people of the park, of the walk, and of the swimmers. Report 0026, D-0026-07: at 17:00, PT-75 counts the people in the
 # frame of each shot of data/showcase/shots.json (nearer than PEOPLE_RANGE or the
 # "people_range_m" of the shot, not behind a building; the swimmers also count)
-# and expects at least the "people" of the shot.
+# and expects at least the "people" of the shot, and at least the "swimmers" of
+# the shot with no boat on the sand in front of them (D-0026-20).
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=17:00 --quality=low
 # phase: --world=vung_tau --start-time=12:00 --quality=low
@@ -31,6 +32,9 @@ const MAX_DEPTH := 1.2
 ## The middle of the tube of a swim ring is this near to the water line (m).
 const RING_LINE := 0.15
 const MIN_BOATS := 5
+## The box of a boat on the sand on the screen: its height and half its width (m).
+const BOAT_HEIGHT := 2.2
+const BOAT_HALF_WIDTH := 1.4
 const VIEWS := [
 	["park", Vector3(46.0, 0.0, 84.0), Vector3(30.0, 0.0, 20.0)],
 	["walk", Vector3(-97.0, 0.0, -311.0), Vector3(-50.0, 0.0, -255.0)],
@@ -141,9 +145,47 @@ func _count_in_shots(d: PlaytestDriver, w: VungTau, people: ShowcasePeople) -> v
 		var least := int(shot.get("people", 0))
 		d.step("%s: %d people in the frame (at least %d)" % [shot.id, count, least])
 		d.expect(count >= least, "%s: at 17:00 the frame has at least %d people: %d" % [shot.id, least, count])
+		if shot.has("swimmers"):
+			var seen := _swimmers_seen(w, camera, eye, people)
+			var swim_least := int(shot.swimmers)
+			d.step("%s: %d swimmers show in the frame with no boat in front of them (at least %d)" % [shot.id, seen, swim_least])
+			d.expect(seen >= swim_least, "%s: at 17:00 at least %d swimmers show in the frame, with no boat on the sand in front of them (D-0026-20): %d" % [shot.id, swim_least, seen])
 		await d.screenshot("people_%s" % shot.id)
 	camera.fov = fov
 	d.fly_end()
+
+
+## Report 0026, D-0026-20: the swimmers in the frame whose head no boat on the
+## sand nearer to the eye covers (the box of the boat on the screen, 2.2 m high
+## and 2.8 m wide). From the eye of S1 the row of boats hid the swimmers behind it.
+static func _swimmers_seen(w: VungTau, camera: Camera3D, eye: Vector3, people: ShowcasePeople) -> int:
+	var boxes: Array[Rect2] = []
+	var near: Array[float] = []
+	for boat: Dictionary in w.showcase.beached_boats:
+		var at: Vector3 = boat.at
+		var along: Vector3 = boat.along
+		var side := Vector3(-along.z, 0.0, along.x).normalized()
+		var box := Rect2(camera.unproject_position(at), Vector2.ZERO)
+		for a: float in [-1.0, 1.0]:
+			for b: float in [-1.0, 1.0]:
+				for h: float in [0.0, BOAT_HEIGHT]:
+					box = box.expand(camera.unproject_position(at + along * float(boat.half) * a + side * BOAT_HALF_WIDTH * b + Vector3(0.0, h, 0.0)))
+		boxes.append(box)
+		near.append(eye.distance_to(at))
+	var seen := 0
+	for s: Dictionary in people.swimmers:
+		var model: WorldModel = s.model
+		if not model.visible:
+			continue
+		var head := model.global_position + Vector3(0, 1.5, 0)
+		if camera.is_position_behind(head) or not camera.is_position_in_frustum(head):
+			continue
+		var at := camera.unproject_position(head)
+		var covered := false
+		for k in boxes.size():
+			covered = covered or (near[k] < eye.distance_to(head) and boxes[k].grow(2.0).has_point(at))
+		seen += 0 if covered else 1
+	return seen
 
 
 ## Report 0026, D-0026-20: the swimmers stand in the sea, and their rings float.

@@ -27,6 +27,12 @@ const BOAT_MODEL := "ghe_danh_ca"
 const BOAT_MODEL_LENGTH := 11.15
 const BOAT_DRAFT := 0.75
 const BOAT_FAR_END := 400.0
+## The end of the far level of the ghe for a preset, if not BOAT_FAR_END. On Low
+## the far level of a ghe is 3 000 triangles, and the boats of the bay had
+## 31 920 triangles in the shot S2 (report 0026, PT-73): past 250 m the plain
+## boat is there. The value of the preset at the start; a change of the preset
+## later does not change it.
+const BOAT_FAR_ENDS := {"low": 250.0}
 
 var ships: Array = []
 var boats: Array = []
@@ -124,13 +130,14 @@ func _add_world_boat(boat: Dictionary, holder: Node3D) -> void:
 	var basis := Basis(Vector3.UP, deg_to_rad(-float(boat.heading_deg))).scaled(Vector3.ONE * size)
 	var p: Array = boat.position
 	model.transform = Transform3D(basis, Vector3(float(p[0]), -BOAT_DRAFT * size, float(p[1])))
-	model.far_end = BOAT_FAR_END
+	var far_end := float(BOAT_FAR_ENDS.get(WorldModel.preset, BOAT_FAR_END))
+	model.far_end = far_end
 	holder.add_child(model)
 	model.apply_ranges()
 	# The plain boat shows only beyond the ghe.
 	for geometry in holder.find_children("*", "GeometryInstance3D", false, false):
 		var g := geometry as GeometryInstance3D
-		g.visibility_range_begin = BOAT_FAR_END
+		g.visibility_range_begin = far_end
 		g.visibility_range_begin_margin = WorldModel.FADE
 		g.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
 	world_boats += 1

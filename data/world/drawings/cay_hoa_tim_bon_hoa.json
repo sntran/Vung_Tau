@@ -8,7 +8,7 @@
 		"mid",
 		"far"
 	],
-	"impostor": false,
+	"impostor": true,
 	"uses": "Plan 0026: the inside of the flower beds of the park (many clumps side by side).",
 	"order": {
 		"blueprint": "drawing",
@@ -579,5 +579,6 @@
 			"changed": "Nothing."
 		}
 	],
-	"hash": "9498e6dc41a98b9d860d4ab6bc7a3018"
+	"hash": "9498e6dc41a98b9d860d4ab6bc7a3018",
+	"impostor_note": "Report 0026, PT-73 (CI of c1fd259): with no impostor, each clump of a bed showed its far level (60 triangles) to 80 m on Low, and a bed has 30 to 50 clumps: the shot S2 had 303 568 triangles (the limit is 300 000). With the impostor, a clump past the mid level is 2 triangles, as a bush."
 }

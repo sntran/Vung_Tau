@@ -38,6 +38,7 @@ static var preset := "low"
 static var _orders: Dictionary = {}
 static var _scenes: Dictionary = {}
 static var _requested: Dictionary = {}  # the paths in the load of request()
+static var _dropped: Dictionary = {}  # the paths whose load of request() is not used
 static var _lowest: Dictionary = {}  # id/level -> the lowest point of the level at rest
 
 ## The id of the order in data/world/orders.json.
@@ -94,15 +95,35 @@ static func levels_of(model_id: String) -> Array[String]:
 
 ## The scene of a level of a model, loaded one time.
 static func scene(model_id: String, level: String) -> PackedScene:
+	release_dropped()
 	var key := model_id + "/" + level
 	if not _scenes.has(key):
 		var path: String = ROOT + model_id + SUFFIX[level]
-		if _requested.has(path):
+		if _requested.has(path) and ResourceLoader.load_threaded_get_status(path) == ResourceLoader.THREAD_LOAD_LOADED:
 			_requested.erase(path)
 			_scenes[key] = ResourceLoader.load_threaded_get(path) as PackedScene
+		elif _requested.has(path):
+			# The main thread does not wait for the load in the other thread: in CI
+			# (the CI of c1fd259, report 0026) such a wait in build_all() stopped the
+			# game for more than 4 minutes. The main thread loads its own copy, and
+			# release_dropped() frees the other copy when its load ends.
+			_requested.erase(path)
+			_dropped[path] = true
+			_scenes[key] = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE_DEEP) as PackedScene
 		else:
 			_scenes[key] = load(path) as PackedScene
 	return _scenes[key]
+
+
+## Frees each load of request() that scene() did not use, when it ends.
+static func release_dropped() -> void:
+	for path: String in _dropped.keys():
+		var status := ResourceLoader.load_threaded_get_status(path)
+		if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			continue
+		if status == ResourceLoader.THREAD_LOAD_LOADED or status == ResourceLoader.THREAD_LOAD_FAILED:
+			ResourceLoader.load_threaded_get(path)
+		_dropped.erase(path)
 
 
 ## Starts the load of the files of the levels of a model in other threads, so

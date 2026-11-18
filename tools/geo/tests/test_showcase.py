@@ -97,6 +97,39 @@ def test_two_models_side_by_side_stand_on_their_own_level(tmp_path):
             assert grid.sample(np.array([x + dx]), np.array([30.0]))[0] == pytest.approx(level, abs=0.05)
 
 
+def test_the_level_sides_of_a_place_on_a_hill(tmp_path):
+    """Report 0026, PT-71: a model against a hill ("keep_higher") keeps the
+    higher ground next to its sides, and the grid of 2 m mixed it into the
+    corners of its front. With "level_sides_m" the ground is level past the
+    sides too."""
+    import json
+    import sys
+    from pathlib import Path
+
+    from geodata import terrain
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import build
+
+    # The ground climbs 0.3 m per meter to the east (game x), a grid of 2 m.
+    xs = np.arange(0, 40) * 2.0
+    heights = np.tile(xs * 0.3, (30, 1)).astype(np.float32)
+    place = {"id": "a", "front": [40.0, 40.0], "facing": [0, 1], "front_middle_x": 0.0, "box": [-9, 9, -20, 0],
+             "forecourt_m": 3.0, "keep_higher": True}
+    for sides, ok in ((0.0, False), (2.5, True)):
+        grid = terrain.Grid(0.0, 0.0, 2.0, heights.copy())
+        folder = tmp_path / str(sides)
+        folder.mkdir()
+        (folder / "test.json").write_text(json.dumps({"places": [dict(place, level_sides_m=sides)]}))
+        build.level_world_places(grid, folder)
+        level = 12.0
+        # The ground 1 m past the uphill side, at the front: higher than the
+        # level unless the sides are level.
+        past = grid.sample(np.array([49.0]), np.array([39.0]))[0]
+        assert (abs(past - level) <= 0.1) == ok
+        assert grid.sample(np.array([40.0]), np.array([40.0]))[0] == pytest.approx(level, abs=0.05)
+
+
 def test_the_ground_beside_a_sidewalk_is_at_its_top():
     """Report 0026, D-0026-11: the ground under a sidewalk of the showcase and
     past its outer edge is at its top less UNDER_TOP_M; lower ground past it

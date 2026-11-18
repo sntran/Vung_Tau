@@ -219,6 +219,7 @@ func is_built() -> bool:
 ## Does the next steps of the build, for "budget_ms" ms at most and at least
 ## one step (report 0026, D-0026-12).
 func build_some(budget_ms: float) -> void:
+	WorldModel.release_dropped()
 	if not _requested:
 		_requested = true
 		for id: String in _place_ids:

@@ -49,7 +49,8 @@
 				}
 			],
 			"people": 6,
-			"people_how": "The photo shows about 45 people on the beach at 17:53 (2014) and the photo of 2019-04-30 (Tuổi Trẻ) a full beach. In the frame of the game: the swimmers in the sea in front of the boats (report 0026, D-0026-20; 55 m to 150 m from the eye, so people_range_m is 150 m) and the walkers on the walk at the left of the wall: at least 6.",
+			"swimmers": 6,
+			"people_how": "The photo shows about 45 people on the beach at 17:53 (2014) and the photo of 2019-04-30 (Tuổi Trẻ) a full beach. In the frame of the game: the swimmers in the sea in front of the row of boats on the sand (report 0026, D-0026-20; 45 m to 150 m from the eye, so people_range_m is 150 m) and the walkers on the walk at the left of the wall: at least 6. swimmers: at least 6 swimmers show with no boat in front of them, as in the photo the people in the water are nearer than the boats (8 at 17:10 on Low).",
 			"hill": {
 				"shot": [
 					0.6,

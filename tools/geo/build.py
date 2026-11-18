@@ -689,6 +689,11 @@ def world_place_footprint(place: dict) -> list[tuple[float, float]]:
     yaw = math.atan2(fx, fz)
     ax, az = math.cos(yaw), -math.sin(yaw)  # the x axis of the model in the game
     x0, x1, z0, _z1 = place["box"]
+    # The level ground past each side of the box ("level_sides_m"): on a slope
+    # the grid of 2 m mixes the higher ground next to a side into the corners
+    # of the front (report 0026, PT-71: Cao ốc Sen Biển, 0.14 m).
+    side = float(place.get("level_sides_m", 0.0))
+    x0, x1 = x0 - side, x1 + side
     ox = place["front"][0] - place.get("front_middle_x", 0.0) * ax
     oz = place["front"][1] - place.get("front_middle_x", 0.0) * az
     # The level ground in front of the model to its street (report 0026, D-0026-13).

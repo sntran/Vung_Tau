@@ -694,42 +694,42 @@
 			"sink_m": 0.15,
 			"points": [
 				[
-					-52.0,
-					-160.0,
-					114.0
-				],
-				[
-					-46.0,
-					-146.0,
+					-40.25,
+					-128.0,
 					108.0
 				],
 				[
-					-41.0,
-					-134.0,
-					116.0
+					-37.25,
+					-116.0,
+					102.0
 				],
 				[
-					-38.5,
-					-121.0,
+					-33.25,
+					-104.0,
 					110.0
 				],
 				[
-					-35.0,
-					-108.0,
-					118.0
+					-31.25,
+					-92.0,
+					104.0
 				],
 				[
-					-31.0,
-					-96.0,
-					106.0
-				],
-				[
-					-29.0,
-					-84.0,
+					-27.25,
+					-80.0,
 					112.0
+				],
+				[
+					-24.25,
+					-68.0,
+					100.0
+				],
+				[
+					-21.25,
+					-56.0,
+					106.0
 				]
 			],
-			"note": "Report 0026, D-0026-20: the fishing boats (the ghe of World, Q10) pulled up on the sand in front of the shot S1, with the bow to the land: x, z, and the turn in degrees (111 puts the bow, with its eyes, at right angles to the water's edge there, to the land). The photo of S1 (2014-04-05, docs/reference/photos/shot_s1_2014.jpg) shows a row of ghe pulled up at the water's edge in front of the hotels of Hạ Long, with the sea round their sterns, and the landing of the boats of Bãi Trước is on this beach (Tuổi Trẻ, 2017-08-02: Source). The middle of each boat is where the ground of the game is 0.9 m: at a high tide the sea is round its stern, at a low tide it is on the sand. The swimmers keep away from them. The places along the beach are builder values. length_m: the length of the model, which lies along the slope of the sand; sink_m: the keel in the sand."
+			"note": "Report 0026, D-0026-20: the fishing boats (the ghe of World, Q10) pulled up on the sand in front of the shot S1, with the bow to the land: x, z, and the turn in degrees (105 puts the bow, with its eyes, at right angles to the water's edge there, to the land). The photo of S1 (2014-04-05, docs/reference/photos/shot_s1_2014.jpg) shows a row of ghe pulled up at the water's edge in front of the hotels of Hạ Long, with the sea round their sterns, and the landing of the boats of Bãi Trước is on this beach (Tuổi Trẻ, 2017-08-02: Source). The middle of each boat is where the ground of the game is 0.9 m: at a high tide the sea is round its stern, at a low tide it is on the sand. The swimmers keep away from them. The places along the beach are builder values: in the photo the row of boats is behind the people in the water, at 430 px to 470 px of 1045 under the top, and the edge of the water at that height of the frame of the shot is from z -130 to z -100; so the row is from z -128 to z -56, and the water in front of it (z -180 to z -130) is free for the swimmers (from z -160 to z -84, the boats hid the swimmers from the eye of S1). length_m: the length of the model, which lies along the slope of the sand; sink_m: the keel in the sand."
 		}
 	],
 	"lamp_kinds": {
