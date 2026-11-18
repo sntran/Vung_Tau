@@ -88,9 +88,13 @@ func run(d: PlaytestDriver) -> void:
 ## The mean red of the frame when the camera looks at a point: the warm light
 ## of the lamps (the light of the moon and of the sky at night is blue).
 func _brightness(d: PlaytestDriver, eye: Vector3, target: Vector3) -> float:
-	d.world().prepare_at(eye, 200.0)
+	# Each chunk to the mid distance of the preset at once, as for a shot
+	# (Shots.eye_of()). With 200 m, the world built the other chunks of the mid
+	# ring one in each frame, and on High in CI (about 1.2 s for each frame) the
+	# ground was not ready in 60 s (the CI of 112ed1c, run 4).
+	d.world().prepare_at(eye, maxf(400.0, float(VungTau.ground_detail.mid)))
 	await d.fly_to(eye, target)
-	await d.wait_ground(60.0)
+	await d.wait_ground(120.0)
 	await d.wait_frames(10)
 	var image := d.viewport().get_texture().get_image()
 	var size := image.get_size()

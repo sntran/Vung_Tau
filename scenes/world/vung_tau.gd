@@ -293,6 +293,28 @@ func prepare_at(point: Vector3, radius := 64.0, with_showcase := true) -> void:
 		_tasks += 1
 		var detail := int(state.wanted)
 		_build_chunk(key, detail, _patch_strides(key) if detail == Detail.NEAR else {})
+	_apply_all_done()
+	# The patches of a chunk that was near before have the grids of the point
+	# before. The world built them again one in each frame: 71 patches took 73
+	# frames, more than 60 s on High in CI (PT-76, the CI of 112ed1c).
+	for key: Vector2i in _chunks:
+		var state: Dictionary = _chunks[key]
+		if _distance_to_chunk(key) > radius or state.busy or not state.has("heights"):
+			continue
+		var patches: Dictionary = state.get("patches", {})
+		for at: Vector2i in patches:
+			var patch: Dictionary = patches[at]
+			var stride := _patch_stride(key, at, patch.stride)
+			if patch.busy or stride == patch.stride:
+				continue
+			patch.busy = true
+			_tasks += 1
+			_build_patch(key, at, stride, state.heights)
+	_apply_all_done()
+
+
+## Shows each finished build now, not some in each frame.
+func _apply_all_done() -> void:
 	while true:
 		_mutex.lock()
 		var left := _done.size()
