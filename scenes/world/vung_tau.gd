@@ -311,6 +311,14 @@ func prepare_at(point: Vector3, radius := 64.0, with_showcase := true) -> void:
 			_tasks += 1
 			_build_patch(key, at, stride, state.heights)
 	_apply_all_done()
+	# The far tiles with the grids of the point. The world makes one again in
+	# each frame, so a measure soon after a fly saw the finer grids of the
+	# point before (S2 of PT-73: 323 000 triangles, not 288 000).
+	for tile: Vector2i in _far_tiles:
+		var stride := _far_stride(tile)
+		if stride != _far_strides[tile]:
+			_far_strides[tile] = stride
+			_rebuild_far_tile(tile)
 
 
 ## Shows each finished build now, not some in each frame.
@@ -436,7 +444,8 @@ func detail_at(point: Vector3) -> int:
 	return state.get("detail", -1)
 
 
-## True when each chunk has the detail that it needs, and no worker is busy.
+## True when each chunk, each patch of a near chunk, and each far tile has the
+## detail that it needs, and no worker is busy.
 func is_settled() -> bool:
 	if _tasks > 0:
 		return false
@@ -448,6 +457,9 @@ func is_settled() -> bool:
 		for at: Vector2i in patches:
 			if patches[at].stride != _patch_stride(key, at, patches[at].stride):
 				return false
+	for tile: Vector2i in _far_tiles:
+		if _far_strides[tile] != _far_stride(tile):
+			return false
 	return true
 
 
