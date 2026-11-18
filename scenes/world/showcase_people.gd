@@ -23,13 +23,15 @@ const KEEP_GAP := 0.6
 ## Each walker: {"model", "body", "line" (PackedVector3Array), "length", "at" (m along the line),
 ## "speed", "sign", "side" (m to the right of the middle of the way), "now" (the side now),
 ## "room" (the most side on the way), "stopped"}. The body stops the player.
-## The ranges of the levels of a person on Low: the mid level (7 000 triangles)
-## to 12 m, the far level (1 500) beyond. The people in the frames of the shots
-## (report 0026, D-0026-07) made S5 330 000 triangles on Low, more than the
-## limit of 300 000 (PT-73); with the mid level to 20 m and the hedges, the
-## grove, and the poles of audit 2, S2 had 304 000 and S5 312 000. The other
-## presets keep WorldModel.RANGES.
-const PEOPLE_RANGES := {"low": Vector3(10.0, 12.0, 150.0)}
+## The ranges of the levels of a person on Low: the mid level (6 500 to 9 600
+## triangles) to 6 m, the far level (1 500) beyond. The people in the frames of
+## the shots (report 0026, D-0026-07) made S5 330 000 triangles on Low, more
+## than the limit of 300 000 (PT-73); with the mid level to 20 m and the hedges,
+## the grove, and the poles of audit 2, S2 had 304 000 and S5 312 000. With the
+## mid level to 12 m, one walker 7 m from the eye of S2 made 303 438 (the CI of
+## 0732db6): S2 must have room for a person near the eye. The other presets
+## keep WorldModel.RANGES.
+const PEOPLE_RANGES := {"low": Vector3(5.0, 6.0, 150.0)}
 ## A swimmer goes out at most this many steps of 0.5 m from the water's edge.
 const SWIM_STEPS := 160
 ## The tube of the swim ring phao_boi (m, its drawing), and the distance of the
