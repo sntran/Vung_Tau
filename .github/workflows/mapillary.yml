@@ -1,0 +1,88 @@
+name: Street photos
+
+# Plan 0009, R5e; report 0026, section 8.4. Gets the index of the street photos
+# of Mapillary in the play area (tools/geo/photos.py, with the secret
+# MAPILLARY_TOKEN), writes the report and the map of the images by year, makes
+# the contact sheets of data/showcase/photo_points.json, and commits them to the
+# branch that it runs on with the message "Update the street photos". The
+# workspace cannot reach graph.mapillary.com or the artifacts of CI; CI can
+# reach Mapillary. A second run asks the API only for the new images. The
+# images are CC BY-SA 4.0: docs/reference/mapillary/CREDITS.md has the credit
+# of each one. A push with the workflow token does not start the test workflow.
+on:
+  workflow_dispatch:
+    inputs:
+      detail:
+        description: "The ids of images to get at 1 024 px (2 048 px for a 360), with spaces between them"
+        required: false
+        default: ""
+  push:
+    paths: ["data/showcase/photo_points.json", "tools/geo/photos.py", ".github/workflows/mapillary.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mapillary-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  LANG: C.UTF-8
+
+jobs:
+  photos:
+    name: Get the street photos
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install the Python packages
+        run: pip install numpy==2.5.4 pyproj==3.8.0 pillow==13.0.0 pytest==9.1.1
+
+      - name: Test the tool
+        run: python -m pytest -q tools/geo/tests/test_photos.py
+
+      - name: Get the index of the images
+        env:
+          MAPILLARY_TOKEN: ${{ secrets.MAPILLARY_TOKEN }}
+        run: python tools/geo/photos.py index
+
+      - name: Write the report and the map
+        run: python tools/geo/photos.py report
+
+      - name: Make the contact sheets
+        env:
+          MAPILLARY_TOKEN: ${{ secrets.MAPILLARY_TOKEN }}
+        run: python tools/geo/photos.py sheets
+
+      - name: Get the pictures of single images
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.detail != '' }}
+        env:
+          MAPILLARY_TOKEN: ${{ secrets.MAPILLARY_TOKEN }}
+          DETAIL: ${{ inputs.detail }}
+        run: python tools/geo/photos.py detail $DETAIL
+
+      - name: Check the files
+        run: python tools/geo/photos.py --check
+
+      - name: Commit the files
+        run: |
+          git add data/geo/raw/mapillary.json data/geo/build/photos_report.md data/geo/build/photos_map.png docs/reference/mapillary
+          if git diff --cached --quiet; then
+            echo "The street photos are up to date."
+            exit 0
+          fi
+          git -c user.name="Sơn Trần-Nguyễn" -c user.email=github@sntran.com -c commit.gpgsign=false \
+            commit -m "Update the street photos"
+          for attempt in 1 2 3 4; do
+            git -c user.name="Sơn Trần-Nguyễn" -c user.email=github@sntran.com -c commit.gpgsign=false \
+              pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            git rebase --abort || true
+            sleep $((attempt * 5))
+          done
+          exit 1
