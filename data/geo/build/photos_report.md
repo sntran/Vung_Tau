@@ -79,22 +79,52 @@ The images are CC BY-SA 4.0 (the author, Mapillary). The map: `photos_map.png` (
 
 ## The points of the contact sheets (`data/showcase/photo_points.json`)
 
-| Point | For | Images that match | On the sheets |
-|---|---|---|---|
-| `q21_grand_back` | Q21 | 0 | 0 |
-| `q22_ha_long_fronts` | Q22, D-0026-21 | 0 | 0 |
-| `q23_buu_dien_roof` | Q23 | 2 | 2 |
-| `d22_grand_front` | D-0026-22 | 0 | 0 |
-| `d24_ha_long_trees` | D-0026-24 | 13 | 2 |
-| `d25_wall_north` | D-0026-25, D-0026-26 | 0 | 0 |
-| `d25_wall_middle_north` | D-0026-25, D-0026-26 | 0 | 0 |
-| `d25_wall_middle` | D-0026-25, D-0026-26 | 0 | 0 |
-| `d25_wall_south` | D-0026-25, D-0026-26 | 0 | 0 |
-| `d25_wall_ha_long` | D-0026-25, D-0026-26 | 0 | 0 |
-| `r18_quang_trung_north` | R18, R20 | 0 | 0 |
-| `r18_quang_trung_grand` | R18, R20 | 5 | 2 |
-| `r18_quang_trung_south` | R18, R20 | 3 | 2 |
-| `r18_ha_long` | R18, R20 | 0 | 0 |
-| `r18_near_streets` | R18, R20 | 0 | 0 |
-| `r19_tet_quang_trung` | R19 | 0 | 0 |
-| `r19_tet_ha_long` | R19 | 0 | 0 |
+| Point | For | Years | Images that match | On the sheets |
+|---|---|---|---|---|
+| `q21_grand_back` | Q21 | 2017 to 2021 | 0 | 0 |
+| `q21_grand_back` | Q21 | 2013 to 2016 | 0 | 0 |
+| `q21_grand_back` | Q21 | 2022 to 2026 | 22 | 12 |
+| `q22_ha_long_fronts` | Q22, D-0026-21 | 2017 to 2021 | 0 | 0 |
+| `q22_ha_long_fronts` | Q22, D-0026-21 | 2013 to 2016 | 0 | 0 |
+| `q22_ha_long_fronts` | Q22, D-0026-21 | 2022 to 2026 | 150 | 12 |
+| `q23_buu_dien_roof` | Q23 | 2017 to 2021 | 2 | 2 |
+| `q23_buu_dien_roof` | Q23 | 2013 to 2016 | 0 | 0 |
+| `q23_buu_dien_roof` | Q23 | 2022 to 2026 | 241 | 12 |
+| `d22_grand_front` | D-0026-22 | 2017 to 2021 | 0 | 0 |
+| `d22_grand_front` | D-0026-22 | 2013 to 2016 | 0 | 0 |
+| `d22_grand_front` | D-0026-22 | 2022 to 2026 | 28 | 12 |
+| `d24_ha_long_trees` | D-0026-24 | 2017 to 2021 | 13 | 1 |
+| `d24_ha_long_trees` | D-0026-24 | 2013 to 2016 | 0 | 0 |
+| `d24_ha_long_trees` | D-0026-24 | 2022 to 2026 | 88 | 12 |
+| `d25_wall_north` | D-0026-25, D-0026-26 | 2017 to 2021 | 0 | 0 |
+| `d25_wall_north` | D-0026-25, D-0026-26 | 2013 to 2016 | 0 | 0 |
+| `d25_wall_north` | D-0026-25, D-0026-26 | 2022 to 2026 | 0 | 0 |
+| `d25_wall_middle_north` | D-0026-25, D-0026-26 | 2017 to 2021 | 0 | 0 |
+| `d25_wall_middle_north` | D-0026-25, D-0026-26 | 2013 to 2016 | 0 | 0 |
+| `d25_wall_middle_north` | D-0026-25, D-0026-26 | 2022 to 2026 | 0 | 0 |
+| `d25_wall_middle` | D-0026-25, D-0026-26 | 2017 to 2021 | 0 | 0 |
+| `d25_wall_middle` | D-0026-25, D-0026-26 | 2013 to 2016 | 0 | 0 |
+| `d25_wall_middle` | D-0026-25, D-0026-26 | 2022 to 2026 | 0 | 0 |
+| `d25_wall_south` | D-0026-25, D-0026-26 | 2017 to 2021 | 0 | 0 |
+| `d25_wall_south` | D-0026-25, D-0026-26 | 2013 to 2016 | 0 | 0 |
+| `d25_wall_south` | D-0026-25, D-0026-26 | 2022 to 2026 | 0 | 0 |
+| `d25_wall_ha_long` | D-0026-25, D-0026-26 | 2017 to 2021 | 0 | 0 |
+| `d25_wall_ha_long` | D-0026-25, D-0026-26 | 2013 to 2016 | 0 | 0 |
+| `d25_wall_ha_long` | D-0026-25, D-0026-26 | 2022 to 2026 | 2 | 1 |
+| `r18_quang_trung_north` | R18, R20 | 2017 to 2021 | 0 | 0 |
+| `r18_quang_trung_north` | R18, R20 | 2013 to 2016 | 0 | 0 |
+| `r18_quang_trung_north` | R18, R20 | 2022 to 2026 | 117 | 12 |
+| `r18_quang_trung_grand` | R18, R20 | 2017 to 2021 | 5 | 5 |
+| `r18_quang_trung_grand` | R18, R20 | 2013 to 2016 | 0 | 0 |
+| `r18_quang_trung_grand` | R18, R20 | 2022 to 2026 | 70 | 12 |
+| `r18_quang_trung_south` | R18, R20 | 2017 to 2021 | 3 | 3 |
+| `r18_quang_trung_south` | R18, R20 | 2013 to 2016 | 0 | 0 |
+| `r18_quang_trung_south` | R18, R20 | 2022 to 2026 | 94 | 12 |
+| `r18_ha_long` | R18, R20 | 2017 to 2021 | 0 | 0 |
+| `r18_ha_long` | R18, R20 | 2013 to 2016 | 0 | 0 |
+| `r18_ha_long` | R18, R20 | 2022 to 2026 | 68 | 12 |
+| `r18_near_streets` | R18, R20 | 2017 to 2021 | 0 | 0 |
+| `r18_near_streets` | R18, R20 | 2013 to 2016 | 0 | 0 |
+| `r18_near_streets` | R18, R20 | 2022 to 2026 | 38 | 12 |
+| `r19_tet_quang_trung` | R19 | the weeks before Tết | 0 | 0 |
+| `r19_tet_ha_long` | R19 | the weeks before Tết | 0 | 0 |
