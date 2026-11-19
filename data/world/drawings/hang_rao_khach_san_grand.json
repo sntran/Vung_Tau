@@ -27,8 +27,8 @@
 					},
 					"part_02": {
 						"color": "#ffffff",
-						"roughness": 0.45,
-						"metalness": 0.6
+						"roughness": 0.6,
+						"metalness": 0.0
 					}
 				},
 				"nodes": [
@@ -56,7 +56,7 @@
 										"shape": "box",
 										"size": [
 											1.15,
-											0.02,
+											0.03,
 											0.02
 										],
 										"at": [
@@ -71,7 +71,7 @@
 										"shape": "box",
 										"size": [
 											1.15,
-											0.02,
+											0.03,
 											0.015
 										],
 										"at": [
@@ -85,21 +85,21 @@
 									{
 										"shape": "box",
 										"size": [
-											0.01,
-											0.01,
+											0.02,
+											0.02,
 											0.24
 										],
 										"at": [
-											-1.0899999999999999,
+											-1.0999999999999999,
 											0,
 											0.5
 										],
 										"material": "part_02",
 										"color": "#2f3d33",
 										"repeat": {
-											"count": 20,
+											"count": 12,
 											"move": [
-												0.1155,
+												0.2,
 												0,
 												0
 											]
@@ -210,7 +210,7 @@
 								},
 								"cells": {
 									"near": 0.01,
-									"mid": 0.025,
+									"mid": 0.02,
 									"far": 0.06
 								},
 								"budget": {
@@ -285,8 +285,21 @@
 			"value": "posts #e6dbb3, cap #ddd0a4, small roof #d3c28c, window #3b3a33, base #77736a, bars #2f3d33",
 			"unit": "",
 			"source": "The photo of S4 (2014) and the Mapillary image of 2024 (the posts are white to cream in the light of 2024)."
+		},
+		"bars_note": {
+			"value": "bars of 4 cm, 0.2 m apart",
+			"unit": "m",
+			"source": "The photo of S4 (2014): about 12 bars in a span of 2.8 m, as thin as the joints of the posts (a few px). 4 cm is thicker than the bars: thinner bars do not show at the mid level (cells of 2 cm)."
 		}
 	},
-	"looks": [],
+	"looks": [
+		{
+			"date": "2026-11-19",
+			"level": "mid",
+			"hash": "(the files of the lock of fe1c185)",
+			"seen": "In the shot S4 of PT-72 (Low): the posts with their caps stand on the edge of the sidewalk, as in the photo of S4. The bars of 2 cm showed as tan V shapes: too thin for the cells of the mid level, and the metal gloss took the low sun.",
+			"changed": "Bars of 4 cm, 0.2 m apart, and no metal gloss; the mid level has cells of 2 cm."
+		}
+	],
 	"status_note": "Source (report 0026, Q17, rule 1): the photos of 2014 (S4 and Nguyễn Du) and the street photo of Mapillary of 2024-11-09 show the same fence with the cream lantern posts and the iron bars on the edge of the sidewalk. No photo of 2017 to 2021 shows it (Mapillary has none there). The looks wait for the files of the lock (the job \"Models of World\")."
 }

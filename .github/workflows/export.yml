@@ -1,8 +1,11 @@
 name: Export
 
+# Plan 0026, R21: a push to a plan branch (feat/...) makes only the macOS look
+# build (the job "macos_look"): the macOS build with the play tests, for a run
+# of PT-72 on High on a computer with a graphics card (tools/look_on_mac.sh).
 on:
   push:
-    branches: [main]
+    branches: [main, "feat/**"]
   workflow_dispatch:
 
 concurrency:
@@ -12,6 +15,7 @@ concurrency:
 jobs:
   web:
     name: Web
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -65,6 +69,7 @@ jobs:
 
   desktop:
     name: Desktop builds
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -117,6 +122,7 @@ jobs:
 
   android:
     name: Android debug APK
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -183,6 +189,7 @@ jobs:
 
   ios-project:
     name: iOS Xcode project
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -244,3 +251,39 @@ jobs:
         with:
           name: ios-build-log
           path: build/ios-build.log
+
+  macos_look:
+    name: macOS look build (R21)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot and the export templates
+        uses: actions/cache@v4
+        with:
+          path: |
+            .tools
+            ~/.local/share/godot/export_templates
+          key: godot-templates-${{ runner.os }}-${{ hashFiles('tools/setup.sh') }}
+
+      - name: Set up the tools
+        run: tools/setup.sh --templates
+
+      # Plan 0026, R21: the macOS build with the play tests (the preset
+      # "macOS look"). tools/look_on_mac.sh gets this artifact and runs PT-72 on
+      # High with it. Not signed (an ad-hoc signature), as the other builds.
+      - name: Export the macOS look build
+        run: |
+          mkdir -p build/macos-look
+          .tools/godot/godot --headless --path . --import
+          .tools/godot/godot --headless --path . --export-release "macOS look" build/macos-look/VungTau-look.zip
+          test -f build/macos-look/VungTau-look.zip
+          ls -l build/macos-look
+
+      - name: Upload the macOS look build
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-look-build
+          path: build/macos-look/
+          retention-days: 14

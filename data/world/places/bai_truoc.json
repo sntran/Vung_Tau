@@ -179,7 +179,8 @@
 				6.45
 			],
 			"forecourt_m": 39.5,
-			"level_note": "Report 0026, D-0026-22: the front of the outline is 51 m from the middle of the east road of Quang Trung, on ground 2.2 m over the sidewalk, and a bank of earth went up from the sidewalk to the front. The photo of S4 (2014) shows the fence with the lantern posts on the sidewalk and the garden at the level of the sidewalk. So the level is the ground at level_at (a point of the sidewalk band of Quang Trung in front of the model, 8 m from the middle of the road: at 11 m the bank starts), and the ground is level from the back of the box to forecourt_m in front of it (to the outer edge of the sidewalk, 11.5 m from the middle of the road)."
+			"level_note": "Report 0026, D-0026-22: the front of the outline is 51 m from the middle of the east road of Quang Trung, on ground 2.2 m over the sidewalk, and a bank of earth went up from the sidewalk to the front. The photo of S4 (2014) shows the fence with the lantern posts on the sidewalk and the garden at the level of the sidewalk. So the level is the ground at level_at (a point of the sidewalk band of Quang Trung in front of the model, 8 m from the middle of the road: at 11 m the bank starts), and the ground is level from the back of the box to forecourt_m in front of it (to the outer edge of the sidewalk, 11.5 m from the middle of the road). level_sides_m: the garden is level 8 m past each side of the box, to the corner of Nguyễn Du (the bank stood there in the shot S4).",
+			"level_sides_m": 8.0
 		},
 		{
 			"id": "bon_co_234797329",

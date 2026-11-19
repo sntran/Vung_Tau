@@ -58,6 +58,13 @@ def hill_sheet(shot: dict) -> str | None:
 
 
 def main() -> int:
+    global OUT
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out", type=Path, help="the folder of the sheets (R21: docs/showcase/mac/ for the run on a Mac)")
+    args = parser.parse_args()
+    if args.out:
+        OUT = args.out if args.out.is_absolute() else ROOT / args.out
     data = json.loads(SHOTS.read_text(encoding="utf-8"))
     OUT.mkdir(parents=True, exist_ok=True)
     rows = []

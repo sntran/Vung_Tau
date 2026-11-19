@@ -118,7 +118,7 @@ func run(d: PlaytestDriver) -> void:
 		_check_look(d, shot, str(run_values[0]), str(run_values[1]))
 		await d.screenshot("%s_%s_%s" % [shot.id, run_values[0], run_values[1]])
 		ui.visible = true
-		d.step("%s (%s): eye (%.1f, %.1f, %.1f), fov %.0f" % [shot.id, shot.name, eye.x, eye.y, eye.z, camera.fov])
+		d.step("%s (%s): eye (%.1f, %.1f, %.1f), fov %.0f; %s" % [shot.id, shot.name, eye.x, eye.y, eye.z, camera.fov, memory_text()])
 		camera.fov = fov
 	d.fly_end()
 
@@ -269,7 +269,7 @@ func _check_look(d: PlaytestDriver, shot: Dictionary, preset: String, time: Stri
 				shot.id, preset, time, green * 100.0, float(shot.lawn.min_green) * 100.0])
 	if shot.has("hill"):
 		var game := box_stats(frame, shot.hill.shot)
-		var photo_image := Image.load_from_file(ProjectSettings.globalize_path(PHOTOS + str(shot.photos[0].file)))
+		var photo_image := Image.load_from_file(photo_path(str(shot.photos[0].file)))
 		photo_image.resize(frame.get_width(), int(photo_image.get_height() * float(frame.get_width()) / photo_image.get_width()))
 		var photo := box_stats(photo_image, shot.hill.photo)
 		d.step("%s, %s: the patches of the hill: %.3f (the photo %.3f)" % [shot.id, preset, game.patches, photo.patches])
@@ -357,6 +357,24 @@ static func shape_stats(image: Image, box: Array) -> Dictionary:
 					stack.append(n)
 		largest = maxi(largest, count)
 	return {"edges": float(edges) / maxf(total, 1.0), "smooth": float(largest) / maxf(total, 1.0)}
+
+
+## The file of a photo of docs/reference/photos/. Godot does not export docs/
+## (docs/.gdignore), so a run of an exported game (R21: the macOS build on a
+## computer with a graphics card) gives the folder of a checkout: --photos=DIR.
+static func photo_path(file: String) -> String:
+	var folder := GameState.arg_value("photos")
+	return (folder if folder != "" else ProjectSettings.globalize_path(PHOTOS)).path_join(file)
+
+
+## R21: the memory of the game at a shot: the memory of the engine, the video
+## memory, and the memory of the textures and the buffers (MB).
+static func memory_text() -> String:
+	return "the memory: %.0f MB static, %.0f MB video (%.0f MB textures, %.0f MB buffers)" % [
+			OS.get_static_memory_usage() / 1048576.0,
+			Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0,
+			Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED) / 1048576.0,
+			Performance.get_monitor(Performance.RENDER_BUFFER_MEM_USED) / 1048576.0]
 
 
 ## The part of the pixels of a box (parts of the frame) whose green is more than
@@ -490,7 +508,7 @@ static func _make_sheets(d: PlaytestDriver) -> void:
 		sheet.fill(Color("#202020"))
 		# The photo of the shot, at the top left (R17: the open photos are copied).
 		for photo: Dictionary in shot.get("photos", []):
-			var path := ProjectSettings.globalize_path(PHOTOS + str(photo.get("file", "")))
+			var path := photo_path(str(photo.get("file", "")))
 			if photo.get("open", false) and FileAccess.file_exists(path):
 				var image := Image.load_from_file(path)
 				image.convert(Image.FORMAT_RGB8)
