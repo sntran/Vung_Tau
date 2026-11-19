@@ -39,9 +39,9 @@ SEA_ROCK_TAGS = {"rock", "reef", "bare_rock"}
 # scree areas, and cliff lines with CLIFF_ROCK_M on each side.
 LAND_ROCK_TAGS = {"scree"}
 CLIFF_ROCK_M = 6.0
-# tide.py and footprints.py write these files before build.py runs. build.py
-# keeps them.
-TIDE_FILES = ("tide.json", "tide_report.md", "footprints.json")
+# tide.py, footprints.py, and photos.py (the street photos, plan 0009, R5e)
+# write these files before build.py runs. build.py keeps them.
+TIDE_FILES = ("tide.json", "tide_report.md", "footprints.json", "photos_report.md", "photos_map.png")
 BUILT_LANDUSE = {"residential", "commercial", "retail", "industrial", "construction", "military", "religious"}
 # A place where the roads cover more than this part of the ground (in a
 # Gaussian of TOWN_ROAD_SIGMA_M) is town.
@@ -343,6 +343,11 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     # Plan 0026, D3 (and plan 0009, R8): the ground under each model of World
     # of data/world/places/ is level, at the height of the ground at its front.
     level_world_places(grid, ROOT / "data" / "world" / "places", roads, walk_cells)
+    # Report 0026, D-0026-25: the walk is level to the low wall of the beach.
+    if showcase_path.exists():
+        lines = beach_wall_lines(data.areas, roads, buildings, projection, showcase_path)
+        cells = showcase_module.level_to_beach_walls(grid, lines, beaches)
+        log(f"showcase: the walk is level to {len(lines)} low walls of the beach ({cells} cells)")
     cut_stairs(grid, config.landmarks, found_by_id, roads)
     # The roads take the heights of the ground again: the bases and the stairs changed it.
     for road in roads:
@@ -644,6 +649,25 @@ def level_places(grid, landmarks_config, found_by_id) -> None:
         record["base_height"] = round(lowest + 0.1, 2)
         log(f"{landmark['id']}: the ground under it is level at {lowest:.2f} m ({int(mask.sum())} cells)")
 
+
+
+def beach_wall_lines(areas, roads, buildings, projection, config_path: Path) -> list[list[list[float]]]:
+    """The lines ([x, z] of the game) of the low walls of the beach of the
+    showcase: the edges of the walk that face the beach (showcase_module.make)
+    and the ways of the part "walls" of data/showcase/bai_truoc.json."""
+    config = load_json(config_path)
+    lines = []
+    if config.get("ground") and len(config.get("outline", [])) >= 3:
+        outline = Polygon([(x, -z) for x, z in config["outline"]])
+        found = [(f"{a.kind}/{a.id}", a.tags, to_map_geometry(a.geometry, projection)) for a in areas]
+        lines += [w["points"] for w in showcase_module.make(config["ground"], found, roads, buildings, outline)["walls"]]
+    by_id = {road.id: road for road in roads}
+    for wall in config.get("walls", []):
+        for way in wall.get("ways", []):
+            road = by_id.get(int(way))
+            if road is not None and road.points is not None and len(road.points) >= 2:
+                lines.append([[float(x), float(-y)] for x, y in road.points])
+    return lines
 
 
 def write_showcase(areas, roads, buildings, projection, out: Path, config_path: Path) -> dict:

@@ -166,6 +166,79 @@
 				"seed": 203,
 				"lean": {},
 				"comment": "Report 0026, D-0026-17: the Norfolk pines at the right of the photo of S2, between the grove and the walk of the sea (to -x). The trees of the grove S2 in this outline give their place to them."
+			},
+			{
+				"name": "Hạ Long",
+				"outline": [
+					[
+						92.0,
+						227.0
+					],
+					[
+						72.0,
+						193.0
+					],
+					[
+						-116.0,
+						311.0
+					],
+					[
+						-96.0,
+						345.0
+					]
+				],
+				"trees": [
+					{
+						"kind": "araucaria",
+						"at": [
+							40.0,
+							233.8
+						]
+					},
+					{
+						"kind": "araucaria",
+						"at": [
+							10.0,
+							250.7
+						]
+					},
+					{
+						"kind": "araucaria",
+						"at": [
+							-20.0,
+							268.2
+						]
+					},
+					{
+						"kind": "araucaria",
+						"at": [
+							-50.0,
+							285.7
+						]
+					},
+					{
+						"kind": "coconut",
+						"at": [
+							30.0,
+							256.5
+						]
+					},
+					{
+						"kind": "coconut",
+						"at": [
+							19.0,
+							262.0
+						]
+					},
+					{
+						"kind": "coconut",
+						"at": [
+							8.0,
+							267.5
+						]
+					}
+				],
+				"comment": "Report 0026, D-0026-24: the band of Hạ Long from the junction with Quang Trung to Cao ốc Sen Biển (20 m to each side of the middle of its two roads). The rule coast_roads put an even row of casuarinas every 7 m there, and it hid the hall with the orange roof in S1. The photos show no row: the photo of Mapillary of 2018-07-29 (image 1927330624091805, hoangvietanh, CC BY-SA 4.0, docs/reference/mapillary/) shows the walk of the sea of Hạ Long with its parapet and its lamps of five globes, and no tree; the photo from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0, docs/reference/photos/drone_2021_ha_long.jpg) shows the median with flower beds and a few small Norfolk pines, and no tree on the sea side; the photo of S1 (Commons, trungydang, 2014-04-05, CC BY 3.0) shows a few coconut palms in front of Khách sạn Bưu điện. So the grove has these trees only: four Norfolk pines in the median (araucaria, about 30 m apart) and three coconut palms on the sidewalk of the side of the hill in front of Khách sạn Bưu điện. Their places are by eye from the two photos (about 5 m)."
 			}
 		]
 	},

@@ -539,9 +539,7 @@ func _steps_down(cfg: Dictionary, openings: Array, half: float) -> void:
 	for opening: Dictionary in openings:
 		var at: Vector3 = opening.at
 		var along: Vector3 = opening.along
-		var side := Vector3(-along.z, 0.0, along.x).normalized()
-		var sand := side if world.ground_height(at.x + side.x * 2.0, at.z + side.z * 2.0) \
-				< world.ground_height(at.x - side.x * 2.0, at.z - side.z * 2.0) else -side
+		var sand := _sand_side(at, Vector3(-along.z, 0.0, along.x).normalized())
 		var top := at + sand * half
 		var foot := top + sand * run
 		var fall := top.y - world.ground_height(foot.x, foot.z)
@@ -554,6 +552,22 @@ func _steps_down(cfg: Dictionary, openings: Array, half: float) -> void:
 			basis.x = -basis.x
 		_row_of_walls().add(model_id, Transform3D(basis, top))
 		_add_length("steps_down", 1.0)
+
+
+## The side of a low wall of the beach that is the sand (side or -side):
+## the side with less lawn and paving in the mask of the ground 2 m out (the
+## walk is paving), else the lower side. Report 0026, D-0026-26: at the flat
+## north end of the line, the two sides have the same height, and the steps
+## of the openings went up on the side of the walk.
+func _sand_side(at: Vector3, side: Vector3) -> Vector3:
+	var a := ground_at(at.x + side.x * 2.0, at.z + side.z * 2.0)
+	var b := ground_at(at.x - side.x * 2.0, at.z - side.z * 2.0)
+	var walk_a := a.r + a.g
+	var walk_b := b.r + b.g
+	if absf(walk_a - walk_b) > 0.5:
+		return side if walk_a < walk_b else -side
+	return side if world.ground_height(at.x + side.x * 2.0, at.z + side.z * 2.0) \
+			< world.ground_height(at.x - side.x * 2.0, at.z - side.z * 2.0) else -side
 
 
 ## The spans of the model of a low wall along the line, end to end by their
@@ -573,9 +587,7 @@ func _wall_spans(model_id: String, line: PackedVector3Array, span: float, gaps: 
 		var a := _along_line(line, s0) + Vector3(0, LIFT, 0)
 		var b := _along_line(line, s1) + Vector3(0, LIFT, 0)
 		var middle := (a + b) / 2.0
-		var side := Vector3(-(b - a).z, 0.0, (b - a).x).normalized()
-		var sea := side if world.ground_height(middle.x + side.x * 1.5, middle.z + side.z * 1.5) \
-				< world.ground_height(middle.x - side.x * 1.5, middle.z - side.z * 1.5) else -side
+		var sea := _sand_side(middle, Vector3(-(b - a).z, 0.0, (b - a).x).normalized())
 		_wall_piece(model_id, a, b, sea)
 
 

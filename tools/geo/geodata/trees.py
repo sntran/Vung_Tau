@@ -302,6 +302,15 @@ def _grove(grove: dict, place, found: dict, leans: dict, counts: dict, groups: d
         before = len(groups[source])
         groups[source] = [q for q in groups[source] if not inside.contains(Point(q))]
         counts[source] = counts.get(source, 0) - (before - len(groups[source]))
+    # Report 0026, D-0026-24: a grove can give each tree of its photos (kind and
+    # place) in place of a spacing and a mix.
+    for tree in grove.get("trees", []):
+        x, z = float(tree["at"][0]), float(tree["at"][1])
+        found.setdefault(str(tree["kind"]), []).append((x, -z))
+        groups.setdefault("grove", []).append((x, -z))
+        counts["grove"] = counts.get("grove", 0) + 1
+    if "spacing_m" not in grove:
+        return
     others = [q for points in found.values() for q in points]
     rng = np.random.default_rng(int(grove.get("seed", 1)))
     spacing = float(grove["spacing_m"])

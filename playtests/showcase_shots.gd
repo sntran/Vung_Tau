@@ -41,6 +41,9 @@ extends RefCounted
 # phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
 # phase: --start-time=12:00
 
+## D-0026-24: the radius of the crown of a palm or a pine, and the step of the search for trees along the line.
+const CROWN_RADIUS := {"coconut": 3.0, "casuarina": 2.5, "araucaria": 2.5, "frangipani": 2.0, "fan_palm": 1.5}
+const TREE_LOOK_M := 8.0
 const SHOTS := "res://data/showcase/shots.json"
 const SHEETS_FROM := SHOTS
 ## For each phase: the preset, the time, and the first and the last shot (from 0).
@@ -149,6 +152,11 @@ func _check_view(d: PlaytestDriver, w: VungTau, camera: Camera3D, shot: Dictiona
 		d.expect(not camera.is_position_behind(p) and camera.is_position_in_frustum(p), "%s: %s is in the frame" % [shot.id, subject.name])
 		var hidden := _hidden_by(w, eye, p)
 		d.expect(hidden == "", "%s: no stand-in hides %s%s" % [shot.id, subject.name, (" (" + hidden + ")") if hidden != "" else ""])
+		# Report 0026, D-0026-24: a subject that the trees must not hide (the hall
+		# with the orange roof of S1, behind the trees of Hạ Long).
+		if bool(subject.get("trees", false)):
+			var tree := _hidden_by_tree(w, eye, p)
+			d.expect(tree == "", "%s: no tree hides %s%s" % [shot.id, subject.name, (" (" + tree + ")") if tree != "" else ""])
 	var guessed: Array[String] = []
 	for entry: Dictionary in w.showcase.stand_ins:
 		if entry.known:
@@ -350,6 +358,36 @@ static func _hidden_by(w: VungTau, eye: Vector3, p: Vector3, skip := "") -> Stri
 				var t := line[0].distance_to(q) / maxf(flat, 0.01)
 				if t < 0.98 and lerpf(eye.y, p.y, t) < float(blocker[2]):
 					return str(blocker[0])
+	return ""
+
+
+## The tree whose crown is on the line from the eye to the point (D-0026-24), or "".
+## The crown of a tree is a ball at 0.8 of the mean height of its type, of half
+## its crown width (or CROWN_RADIUS for a palm or a pine), from data/trees/types.json.
+static func _hidden_by_tree(w: VungTau, eye: Vector3, p: Vector3) -> String:
+	if w.trees == null:
+		return ""
+	var types: Dictionary = (JSON.parse_string(FileAccess.get_file_as_string("res://data/trees/types.json")) as Dictionary).get("types", {})
+	var length := eye.distance_to(p)
+	var seen := {}
+	var s := 0.0
+	while s < length - 3.0:
+		var at := eye.lerp(p, s / length)
+		for entry: Array in w.trees.all_trees_near(at, TREE_LOOK_M):
+			var base: Vector3 = entry[0]
+			var key := "%.1f,%.1f" % [base.x, base.z]
+			if seen.has(key):
+				continue
+			seen[key] = true
+			var info: Dictionary = types.get(str(entry[1]), {})
+			var heights: Array = info.get("height", [10.0, 10.0])
+			var h := (float(heights[0]) + float(heights[1])) / 2.0
+			var radius := float(info.get("crown_width", CROWN_RADIUS.get(str(entry[1]), 6.0) * 2.0)) / 2.0 * 0.8
+			var crown := base + Vector3(0.0, h * 0.8, 0.0)
+			var q := Geometry3D.get_closest_point_to_segment(crown, eye, p)
+			if q.distance_to(crown) < radius and q.distance_to(p) > 2.0:
+				return "%s at (%.1f, %.1f), %.0f m from the eye" % [entry[1], base.x, base.z, eye.distance_to(q)]
+		s += TREE_LOOK_M
 	return ""
 
 

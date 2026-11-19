@@ -333,3 +333,68 @@ def _inside(grid, outline: Polygon) -> np.ndarray:
     gx, gz = np.meshgrid(grid.x0 + np.arange(c0, c1 + 1) * grid.step, grid.z0 + np.arange(r0, r1 + 1) * grid.step)
     mask[r0:r1 + 1, c0:c1 + 1] = shapely.contains_xy(outline, gx, gz)
     return mask
+
+
+# Report 0026, D-0026-25: the walk is level to the low wall of the beach. The
+# ground of the walk side within WALL_LEVEL_M of the line comes up to the
+# ground WALL_LEVEL_M from it (near the eye of S1 the walk fell 0.6 m in its
+# last 2 m to the wall: 4.63 m at 3 m from the line, 4.02 m at 1 m), by at most
+# WALL_FILL_M. The walk side is the side whose point WALL_SIDE_M out is not on
+# the beach; where both or neither are, the ground stays.
+WALL_LEVEL_M = 3.0
+WALL_SIDE_M = 1.5
+WALL_FILL_M = 0.8
+
+
+def level_to_beach_walls(grid, lines: list[list[list[float]]], beaches: list, reach: float = WALL_LEVEL_M) -> int:
+    """Fills the ground of the walk side of each line ([x, z] of the game) to
+    the level of the walk at "reach" from the line. beaches: the beach shapes
+    (map x, y). Returns the number of cells that changed."""
+    from shapely.geometry import Point
+    from shapely.ops import unary_union
+    from shapely.prepared import prep
+    beach = prep(unary_union(beaches)) if beaches else None
+    changed = np.zeros(grid.heights.shape, dtype=bool)
+    if beach is None:
+        return 0
+    for line in lines:
+        points = np.asarray(line, dtype=float)
+        for a, b in zip(points[:-1], points[1:]):
+            d = b - a
+            length = float(np.hypot(*d))
+            if length < 0.01:
+                continue
+            u = d / length
+            n = np.array([-u[1], u[0]])
+            mid = (a + b) / 2.0
+            plus = beach.contains(Point(mid[0] + n[0] * WALL_SIDE_M, -(mid[1] + n[1] * WALL_SIDE_M)))
+            minus = beach.contains(Point(mid[0] - n[0] * WALL_SIDE_M, -(mid[1] - n[1] * WALL_SIDE_M)))
+            if plus == minus:
+                continue
+            side = -n if plus else n
+            lo = np.minimum(a, b) - reach - grid.step
+            hi = np.maximum(a, b) + reach + grid.step
+            c0, c1 = int(np.floor((lo[0] - grid.x0) / grid.step)), int(np.ceil((hi[0] - grid.x0) / grid.step))
+            r0, r1 = int(np.floor((lo[1] - grid.z0) / grid.step)), int(np.ceil((hi[1] - grid.z0) / grid.step))
+            c0, r0 = max(c0, 0), max(r0, 0)
+            c1, r1 = min(c1, grid.heights.shape[1] - 1), min(r1, grid.heights.shape[0] - 1)
+            if c1 < c0 or r1 < r0:
+                continue
+            cols, rows = np.meshgrid(np.arange(c0, c1 + 1), np.arange(r0, r1 + 1))
+            x = grid.x0 + cols * grid.step
+            z = grid.z0 + rows * grid.step
+            along = (x - a[0]) * u[0] + (z - a[1]) * u[1]
+            out = (x - a[0]) * side[0] + (z - a[1]) * side[1]
+            band = (along >= 0.0) & (along <= length) & (out >= -grid.step * 0.5) & (out <= reach)
+            if not band.any():
+                continue
+            # The level of the walk: the ground at "reach" out from the point of the line.
+            px = a[0] + u[0] * along[band] + side[0] * reach
+            pz = a[1] + u[1] * along[band] + side[1] * reach
+            level = grid.sample(px, pz)
+            rr, cc = rows[band], cols[band]
+            fill = np.minimum(level, grid.heights[rr, cc] + WALL_FILL_M)
+            low = grid.heights[rr, cc] < fill
+            grid.heights[rr[low], cc[low]] = fill[low]
+            changed[rr[low], cc[low]] = True
+    return int(changed.sum())

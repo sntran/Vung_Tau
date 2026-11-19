@@ -46,6 +46,26 @@
 						27.0,
 						286.0
 					]
+				},
+				{
+					"name": "the roof of the hall with the orange roof (way 225803473)",
+					"at": [
+						-39.6,
+						19.5,
+						321.8
+					],
+					"trees": true,
+					"how": "Report 0026, D-0026-24: the top of the pyramid roof (the ground 10.2 m at the lowest corner of the outline, the walls 3.9 m, the roof 6.2 m: data/showcase/bai_truoc.json). The photo of S1 shows all of the roof over the trees of Hạ Long."
+				},
+				{
+					"name": "the north face of the roof of the hall",
+					"at": [
+						-41.5,
+						17.0,
+						317.5
+					],
+					"trees": true,
+					"how": "Report 0026, D-0026-24: the middle of the face of the roof to the eye."
 				}
 			],
 			"people": 6,
