@@ -187,13 +187,13 @@
 			}
 		},
 		"hang_rao_khach_san_grand": {
-			"hash": "26c813b111f8b6205ded3f0f5b8993ba",
+			"hash": "02db657d63c7b12cb51a87b985d64a60",
 			"files": {
-				"hang_rao_khach_san_grand.far.glb": "31a570369ca9c1d255c1da0d990abdcc22a7bc22528179ff0ec3890c176a86e6",
-				"hang_rao_khach_san_grand.glb": "d542cd13d1455e72ac912437894ce24af5c67439d0f796549aa1b7613c7d0144",
-				"hang_rao_khach_san_grand.mid.glb": "329d5e95306862b6408f2d027ab6cbfa77ba5061fb4ba2e7f5a5c590fbf854ef",
+				"hang_rao_khach_san_grand.far.glb": "87abce239738a5c8b3838c63c4a3f037e2beb1d317be932dc672b89ae1f67d9e",
+				"hang_rao_khach_san_grand.glb": "85ec823e50074d2cd2df5c060036e08b736a6c208598ba278ac8c1ebb3f8914d",
+				"hang_rao_khach_san_grand.mid.glb": "89bd1c432ea3d85d54f36223036ea9ff69a02b794a7e68d831845a81d618a2d2",
 				"hang_rao_khach_san_grand.parts.json": "d43a1a0b5322870ec00da3a65000d99d497628f7a06ecd832901d237675d814d",
-				"hang_rao_khach_san_grand.receipt.json": "f896755c46c144965d81463f8db7b12cf74f92f7cb271b16332dbedaac240596"
+				"hang_rao_khach_san_grand.receipt.json": "ffaf7502f6e315cb86bd94d48b7b463bc824aea9dbea6c4c503766654865adf7"
 			}
 		},
 		"ke_da_bai_truoc": {
