@@ -380,14 +380,15 @@ On Low, PT-72 logs 1 448 MB of video memory, of which 1 307 MB are textures (for
 
 ### 9.5 The questions of the builder
 
-1. **Q23, the letters on Khách sạn Bưu điện.** I answer.
+1. **Q23, the letters on Khách sạn Bưu điện.** Answered (2026-11-19): use the photos nearest to 2019, before and after it, from Mapillary or the web, and read the letters on them. The letters can be the same on both sides. If a photo before 2017 and a photo after 2021 show the same letters, the letters are Source (rule 1). If they are not the same, use the letters of the photo nearest to 2019, with the status Check. I approve the name of the hotel on its roof as an exception of AGENTS.md, section 4: add it to `docs/content/culture-notes.md`.
 2. **R18 and R19, the images of 2024 and 2025 for the counts.** Use them for the kinds of things, with rule 1 (a photo before 2017 of the same kind). The counts from them have the status Check, and the game uses them only after I look at the sheets.
-3. **The low wall at the eye of S1.** I answer.
+3. **The low wall at the eye of S1.** Answered (2026-11-19): I do not know. Find more photos. Mapillary has no image on the walk of the sea (`photos_report.md`: 0 images at each point `d25_wall_*`), so also look for images from the road Quang Trung that look to the wall (a larger distance, with the compass of the image to the wall), and for photos on the web (Wikimedia Commons and Flickr with a free license; other photos are only for the eyes, plan 0009, D11). Rule 1 applies: the photo of S1 (2014) and a photo after 2021 that show the same granite wall at the same place make it Source. Until then, that part of the wall stays Check.
 4. **The ATL03 file** and 5. **the values of plan 0009**: report 0009, D-0009-04 to D-0009-06.
 
 ### 9.6 New questions
 
 - **Q24.** Is there a limit of the video memory on Low (for example 1 GB)? Then PT-72 and PT-73 check it, and the textures of the look (R12) get a smaller size on Low.
+  - **Decided (2026-11-19):** yes. Low uses at most 1 024 MB of video memory (`RENDERING_INFO_VIDEO_MEM_USED`) at each shot, also in the worst case of PT-73. Add it to R16: PT-73 fails over the limit, and PT-72 logs the memory of each shot and the part of the textures. Low is the preset of the phones, the web build, and a computer with no graphics card (AGENTS.md, section 5b), and these share the memory with the processor. High has no limit of memory in this plan.
 
 ### 9.7 Status
 
