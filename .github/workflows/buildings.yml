@@ -50,8 +50,12 @@ jobs:
 
       - name: Commit the files
         run: |
-          git add data/geo/raw/buildings data/geo/raw/lidar data/geo/build/buildings_2019.json \
-            data/geo/build/buildings_report.md data/geo/build/lidar_report.md data/geo/build/lidar_seafloor.png || true
+          # Only the files that are there: one missing path stops "git add" for all
+          # (the first run had no lidar_seafloor.png and committed nothing).
+          for path in data/geo/raw/buildings data/geo/raw/lidar data/geo/build/buildings_2019.json \
+              data/geo/build/buildings_report.md data/geo/build/lidar_report.md data/geo/build/lidar_seafloor.png; do
+            if [ -e "$path" ]; then git add "$path"; fi
+          done
           if git diff --cached --quiet; then
             echo "Nothing changed."
             exit 0

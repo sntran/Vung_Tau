@@ -38,12 +38,19 @@ MAP = ROOT / "data" / "geo" / "build" / "lidar_seafloor.png"
 T0 = "2018-10-14T00:00:00Z"  # the first data of ICESat-2
 T1 = dt.date.today().isoformat() + "T00:00:00Z"
 # Each product: the names of the calls of the sliderule package to try, in turn.
+# The first run in CI (2026-11-19): atl08p and gedi02ap gave their rows for all
+# the years in one request; each "x" call (run) for all the years stopped at the
+# server after 600 s ("timed-out ... waiting for endpoint proxy") and gave
+# nothing. So a "run" call asks for one year at a time (BY_YEAR).
 PRODUCTS = {
-    "atl08": [("run", "atl08x"), ("icesat2", "atl08p")],
+    "atl08": [("icesat2", "atl08p"), ("run", "atl08x")],
     "atl03_ground": [("run", "atl03x")],
     "atl24": [("run", "atl24x")],
-    "gedi02a": [("run", "gedi02ax"), ("gedi", "gedi02ap")],
+    "gedi02a": [("gedi", "gedi02ap"), ("run", "gedi02ax")],
 }
+BY_YEAR = {"run"}
+# The fetch stops to ask for more years after this many seconds (the job has 120 minutes).
+BUDGET_S = 75 * 60
 
 
 def polygon() -> list[dict]:
@@ -65,6 +72,17 @@ def parms_for(product: str) -> dict:
     return parms
 
 
+def year_spans(t0: str, t1: str) -> list[tuple[str, str]]:
+    """The spans of one calendar year from t0 to t1 (ISO times), in order."""
+    start, end = dt.date.fromisoformat(t0[:10]), dt.date.fromisoformat(t1[:10])
+    spans = []
+    while start < end:
+        stop = min(dt.date(start.year + 1, 1, 1), end)
+        spans.append((start.isoformat() + "T00:00:00Z", stop.isoformat() + "T00:00:00Z"))
+        start = stop
+    return spans
+
+
 def egm2008(lon, lat, h):
     """Heights over the WGS 84 ellipsoid to heights over EGM2008 (PROJ gets the grid from its CDN)."""
     import pyproj
@@ -84,12 +102,31 @@ def fetch(lines: list[str]) -> None:
     sliderule.init(verbose=False)
     lines.append(f"- sliderule {getattr(sliderule, '__version__', '?')}, {T0} to {T1}")
     RAW.mkdir(parents=True, exist_ok=True)
+    import time
+    import pandas as pd
+    started = time.time()
     for product, calls in PRODUCTS.items():
         frame = None
         for module_name, call in calls:
             try:
-                if module_name == "run":
-                    frame = sliderule.run(call, parms_for(product))
+                if module_name in BY_YEAR:
+                    parts = []
+                    for t0, t1 in year_spans(T0, T1):
+                        if time.time() - started > BUDGET_S:
+                            lines.append(f"- {product}: {call}: no time for {t0[:4]} and later")
+                            break
+                        parms = {**parms_for(product), "t0": t0, "t1": t1}
+                        try:
+                            part = sliderule.run(call, parms)
+                        except Exception as error:  # noqa: BLE001 - the next year
+                            lines.append(f"- {product}: {call} {t0[:4]}: {type(error).__name__}: {str(error)[:200]}")
+                            continue
+                        lines.append(f"- {product}: {call} {t0[:4]}: {0 if part is None else len(part)} rows")
+                        if part is not None and len(part) > 0:
+                            parts.append(part)
+                    if not parts:
+                        continue
+                    frame = pd.concat(parts)
                 else:
                     module = getattr(sliderule, module_name)
                     frame = getattr(module, call)(parms_for(product))
@@ -117,8 +154,9 @@ def write_points(product: str, frame, lines: list[str]) -> None:
             if name in columns:
                 return np.asarray(frame[name])
         return None
-    ground = column("h_te_median", "h_mean", "height", "elev_lowestmode", "ortho_h", "surface_h", "h_ph")
-    top = column("h_max_canopy", "h_canopy", "elev_highestreturn", "bathy_h")
+    # GEDI L2A of gedi02ap: elevation_lm (the lowest mode, the ground) and elevation_hr (the highest return).
+    ground = column("h_te_median", "h_mean", "height", "elev_lowestmode", "elevation_lm", "ortho_h", "surface_h", "h_ph")
+    top = column("h_max_canopy", "h_canopy", "elev_highestreturn", "elevation_hr", "bathy_h")
     klass = column("atl08_class", "class_ph", "class")
     quality = column("quality_flag", "l2_quality_flag", "confidence", "quality_ph")
     when = frame.index if "time" not in columns else frame["time"]

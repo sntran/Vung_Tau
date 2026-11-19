@@ -89,6 +89,7 @@ Verified in the development workspace (Linux, 2 CPUs, no GPU, no Vulkan):
 - Godot changes a 16-bit PNG file to 8 bits when it loads it. The game reads the 16-bit height files with `Png16` (`scripts/geo/png16.gd`). An import file with `importer="keep"` makes the export keep a file as it is, and Godot does not change that import file.
 - Earth Search (`earth-search.aws.element84.com`, the Sentinel-2 L2A images on `sentinel-cogs.s3.us-west-2.amazonaws.com`) and the GEBCO 2025 files on `dap.ceda.ac.uk` are reachable. rasterio reads a window of these files over HTTP (`/vsicurl/`), so `tools/geo/intertidal.py` downloads only the play area.
 - ESA WorldCover 2021 (`esa-worldcover.s3.eu-central-1.amazonaws.com`) and the Meta and WRI canopy height maps (`dataforgood-fb-data.s3.amazonaws.com`, `forests/v1/alsgedi_global_v6_float/`) are reachable. rasterio reads a window of them, so `tools/geo/landcover.py` downloads only the play area (about 2 MB). The canopy file of Vũng Tàu is the quadkey `132231002` (EPSG:3857, about 1.2 m, heights in whole meters), and `CHM_acquisition_date.tif` gives the image dates as years after 2000 (2019 for the play area). WorldCover has almost no shrubland here, so the bushes come from the canopy heights.
+- On 2026-11-19 the workspace reached Overture Maps (`overturemaps-us-west-2.s3.us-west-2.amazonaws.com`, with DuckDB), the public bucket of Open Buildings 2.5D Temporal (`storage.googleapis.com/open-buildings-temporal-data`; rasterio reads a window over `/vsicurl/`), and the ohsome API. The ohsome API answers HTTP 403 at `elements/geometry` and works at `elementsFullHistory/geometry`. curl reaches SlideRule (`sliderule.slideruleearth.io`), but its Python package does not connect from the workspace, so `tools/geo/lidar.py fetch` runs in CI (plan 0009).
 - `PackedByteArray.decompress_dynamic(-1, FileAccess.COMPRESSION_DEFLATE)` reads a zlib stream (the data of a PNG file).
 - A `Vector2` has 32-bit floats. UTM values and degrees need 64 bits, so `GeoProjection` gives them in a `PackedFloat64Array`.
 - GitHub archive downloads (`github.com/OWNER/REPO/archive/...`) return 403 in the workspace. `git clone` works. So `tools/setup.sh` gets GUT with `git clone`. GitHub release downloads (Godot, the export templates) work.
@@ -147,6 +148,9 @@ python tools/geo/fetch.py          # CI only: the "Geodata" workflow runs it by 
 python tools/geo/tide.py --times-only   # the dry times of the game year again, from tide.json
 python tools/geo/intertidal.py     # the sea floor sources (Sentinel-2 and GEBCO), about 25 minutes
 python tools/geo/landcover.py      # the land cover (ESA WorldCover) and the canopy heights (Meta and WRI), less than 1 minute
+python tools/geo/buildings.py all       # plan 0009: outlines, temporal, osm2019, build (pip install duckdb); the workflow "Buildings and lidar" commits them
+python tools/geo/lidar.py fetch && python tools/geo/lidar.py report   # plan 0009: CI only
+python -m pytest -q tools/geo/tests/test_buildings_tool.py
 tools/playtest.sh geo_views        # PT-33: the screenshots of the real places
 
 # The Vũng Tàu world (plan 0005): add -- --world=vung_tau to the Godot command. F3 shows the debug screen.
