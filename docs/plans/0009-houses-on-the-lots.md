@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Approved (2026-11-16), for the area of plan 0026 first. Changed (2026-11-18): all the sources of the data (section 3, "The sources"; D9 to D11, R1, R5 to R5e, Q1, Q5 to Q7). |
+| Status | In progress (phase 1a, 2026-11-19). Approved (2026-11-16), for the area of plan 0026 first. Changed (2026-11-18): all the sources of the data (section 3, "The sources"; D9 to D11, R1, R5 to R5e, Q1, Q5 to Q7). |
 | Branch | `feat/0009-houses-on-the-lots` |
 | Depends on | 0004 (the house kit and the palette), 0005 (the roads and the ground), 0008 (the known places stay as they are), 0023 (the houses come from World, D8). |
 | Used by | 0010 (the bus ride), 0011 to 0015 (the shops and the streets), 0021 (Tết), 0022 (the garden). |
@@ -196,3 +196,7 @@ Each source of the data of this plan, also the ones that the plan does not use, 
   - **Answered (2026-11-18), later:** the photos are good. I made the account, and the secret `MAPILLARY_TOKEN` of this repository has the client token (R5e).
 - **Q7.** When I am in Vũng Tàu, which things do I scan with a phone? Only things that did not change since 2019 are useful: for example a gate, a shrine, a stair, or a part of the sea wall.
   - **Partly answered (2026-11-18):** I asked some people to take photos later. It is not sure, so no step of this plan waits for them.
+
+## Builder notes
+
+- **Phase 1a (2026-11-19).** `tools/geo/buildings.py` (R1, R5d) and `tools/geo/lidar.py` (R5a, R5c) run in CI only, with the workflow "Buildings and lidar" (`.github/workflows/buildings.yml`, by hand or on a push that changes the tools). The workspace cannot reach their sources (D2, D9). `buildings.py outlines` gets the buildings theme of Overture Maps in the box of `data/geo/area.json` (it joins OpenStreetMap, Microsoft, and Google Open Buildings v3, so an outline of Google is there where OpenStreetMap has none); `temporal` finds and reads the windows of the rasters of Open Buildings 2.5D Temporal of 2016 to 2023 (the public bucket `open-buildings-temporal-data`, `v1`, the cell 31); `osm2019` gets the buildings of OpenStreetMap on 2019-01-22 from the ohsome API; `build` (no network) writes `data/geo/build/buildings_2019.json` (the median height of the pixels where `building_presence` is more than 0.5, a builder value, and the first year) and `buildings_report.md`. `lidar.py fetch` asks SlideRule for ATL08, ATL03 with the classes of ATL08, ATL24, and GEDI L2A, with the heights over the ellipsoid and over EGM2008; `report` compares ATL24 with the intertidal heights and GEBCO (R5c). Each part writes what it found and each error in the report, and a part that fails does not stop the others: the first runs show the formats of the sources, and I correct the tools from the reports. 3D-GloBFP and GHS-BUILT-H (the checks of R1) come after the first runs. R5: `data/geo/LICENSE` has the notes of the new sources; the credits page gets them when the game uses them (phase 1b and later).

@@ -18,3 +18,23 @@ ESA; all rights reserved.
 
 The organisations in charge of the Copernicus programme by law or by delegation
 do not incur any liability for any use of the Copernicus WorldDEM-30.
+
+Plan 0009 (R5): the sources of the buildings and of the lidar points.
+
+- The buildings theme of Overture Maps (raw/buildings/overture.json, and
+  build/buildings_2019.json): © OpenStreetMap contributors, Overture Maps
+  Foundation, Microsoft, Google, and the other sources of the theme; the
+  Open Database License 1.0 (ODbL).
+- Google Open Buildings 2.5D Temporal (raw/buildings/temporal_*.tif, and the
+  heights and the first years of build/buildings_2019.json): Google, under
+  the Creative Commons Attribution 4.0 license (CC BY 4.0). Open Buildings
+  has two licenses (CC BY 4.0 and ODbL); the game uses CC BY 4.0 for the
+  2.5D rasters, and the outlines of Google Open Buildings v3 come in the
+  theme of Overture Maps under the ODbL.
+- OpenStreetMap on 2019-01-22 from the ohsome API of HeiGIT
+  (raw/buildings/osm2019.json): © OpenStreetMap contributors, ODbL.
+- The lidar points of ICESat-2 (ATL03, ATL08, ATL24) and GEDI (L2A) from the
+  public service of SlideRule (raw/lidar/): the data of NASA, free to use
+  with no restriction; the credit is NASA, the National Snow and Ice Data
+  Center, and the Land Processes DAAC, and SlideRule (University of
+  Washington and NASA).

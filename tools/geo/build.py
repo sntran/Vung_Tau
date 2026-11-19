@@ -37,8 +37,10 @@ SEA_ROCK_TAGS = {"rock", "reef", "bare_rock"}
 # scree areas, and cliff lines with CLIFF_ROCK_M on each side.
 LAND_ROCK_TAGS = {"scree"}
 CLIFF_ROCK_M = 6.0
-# tide.py writes these files before build.py runs. build.py keeps them.
-TIDE_FILES = ("tide.json", "tide_report.md")
+# tide.py, buildings.py, and lidar.py (plan 0009, R1, R5a, R5c) write these files before
+# build.py runs. build.py keeps them.
+TIDE_FILES = ("tide.json", "tide_report.md", "buildings_2019.json", "buildings_report.md", "lidar_report.md",
+              "lidar_seafloor.png")
 BUILT_LANDUSE = {"residential", "commercial", "retail", "industrial", "construction", "military", "religious"}
 # A place where the roads cover more than this part of the ground (in a
 # Gaussian of TOWN_ROAD_SIGMA_M) is town.

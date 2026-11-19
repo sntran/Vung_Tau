@@ -1,0 +1,67 @@
+name: Buildings and lidar
+
+# Plan 0009, phase 1a (R1, R5a, R5c, R5d): the outlines of the buildings of
+# the play area (Overture Maps), the rasters of Open Buildings 2.5D Temporal
+# of 2016 to 2023, OpenStreetMap on 2019-01-22 (ohsome), and the lidar points
+# of ICESat-2 and GEDI (SlideRule). The workspace cannot reach these sources
+# (plan 0009, D2 and D9). The tools write the data in data/geo/raw/buildings/
+# and data/geo/raw/lidar/, and the reports in data/geo/build/; this workflow
+# commits them to the branch that it runs on with the message "Update the
+# buildings and the lidar". By hand, or on a push that changes the tools. A
+# part that fails does not stop the others: the reports say what each part
+# found. They change nothing in the game.
+on:
+  workflow_dispatch:
+  push:
+    paths: ["tools/geo/buildings.py", "tools/geo/lidar.py", ".github/workflows/buildings.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: buildings-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  buildings:
+    name: Get the buildings and the lidar
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: tools/geo/requirements.txt
+
+      - name: Install the Python packages
+        run: pip install -r tools/geo/requirements.txt duckdb sliderule geopandas
+
+      - name: The outlines, the 2.5D rasters, and OpenStreetMap of 2019
+        run: python tools/geo/buildings.py all
+
+      - name: The lidar points (SlideRule)
+        run: python tools/geo/lidar.py fetch
+
+      - name: The report of the sea floor
+        run: python tools/geo/lidar.py report
+
+      - name: Commit the files
+        run: |
+          git add data/geo/raw/buildings data/geo/raw/lidar data/geo/build/buildings_2019.json \
+            data/geo/build/buildings_report.md data/geo/build/lidar_report.md data/geo/build/lidar_seafloor.png || true
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          git -c user.name="Sơn Trần-Nguyễn" -c user.email=github@sntran.com -c commit.gpgsign=false \
+            commit -m "Update the buildings and the lidar"
+          for attempt in 1 2 3 4; do
+            git -c user.name="Sơn Trần-Nguyễn" -c user.email=github@sntran.com -c commit.gpgsign=false \
+              pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            git rebase --abort || true
+            sleep $((attempt * 5))
+          done
+          exit 1
