@@ -23,7 +23,11 @@ extends RefCounted
 # each low wall along the beach is smooth (the top of its pieces is one line):
 # its grade is at most MAX_WALL_GRADE, and the grade changes by at most
 # MAX_WALL_BEND from one segment to the next. D-0026-19: at least
-# MIN_WALK_POLES blue poles stand within 3 m of the low wall.
+# MIN_WALK_POLES blue poles stand within 3 m of the low wall. D-0026-22: for
+# each model of World with a street, the ground from the curb of its street to
+# its front (at the middle and at the two corners of the front) goes up or
+# down by at most MAX_FORECOURT_RISE (the Grand Hotel stood on a bank 2.2 m over
+# the sidewalk, and the scan of the edges passed it: its foot was a short run).
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=10:00 --quality=low
 
@@ -55,6 +59,13 @@ const MAX_WALL_GRADE := 0.12
 const MAX_WALL_BEND := 0.06
 ## D-0026-19: the blue poles by the low wall of the beach (about every 40 m of 500 m).
 const MIN_WALK_POLES := 8
+## D-0026-22: the ground from the curb to the front of a model, and the spacing of the samples.
+const MAX_FORECOURT_RISE := 0.5
+const FORECOURT_EVERY := 0.5
+## The ray from the front stops at the curb: within the half width of the street and this.
+const FORECOURT_CURB_M := 0.5
+const FORECOURT_MAX_M := 80.0
+const FORECOURT_INSET := 3.0
 
 
 func run(d: PlaytestDriver) -> void:
@@ -127,6 +138,10 @@ func run(d: PlaytestDriver) -> void:
 		var to_road := (road - Vector2(middle.x, middle.z)).normalized()
 		d.expect(facing.dot(to_road) >= MIN_FACING, "%s looks to its street: cos %.2f (at least %.2f)" % [
 				entry.id, facing.dot(to_road), MIN_FACING])
+		# Three meters inside the sides: the grid of 2 m mixes a hill beside a
+		# forecourt into the cells next to it (Hải Âu, D-0026-13).
+		var inner := [t * Vector3(box.position.x + FORECOURT_INSET, 0, 0), t * Vector3(box.end.x - FORECOURT_INSET, 0, 0)]
+		_check_forecourt(d, w, entry.id, place, facing, [middle] + inner)
 	for i in models.size():
 		for j in range(i + 1, models.size()):
 			var common := 0.0
@@ -146,6 +161,88 @@ func run(d: PlaytestDriver) -> void:
 		await d.wait_frames(6)
 		await d.screenshot(str(entry.id))
 	d.fly_end()
+
+
+## D-0026-22: from each point of the front, out along the facing of the model
+## to the curb of its street (the first point within the half width of the
+## street and FORECOURT_CURB_M), the ground goes up or down from its height at
+## the curb by at most MAX_FORECOURT_RISE. At a corner of the front, the street
+## can fall along a wide model (Quang Trung falls 1.45 m along the front of
+## Cảng vụ): the fall of the curb from the middle to the corner is not a bank.
+## A model on a slope behind another lot gives its height over the street from
+## a photo ("front_above_street_m", with "front_above_street_source").
+func _check_forecourt(d: PlaytestDriver, w: VungTau, id: String, place: Dictionary, facing: Vector2, fronts: Array) -> void:
+	var above := float(place.get("front_above_street_m", 0.0))
+	if above != 0.0:
+		d.step("%s stands %.1f m over %s: %s" % [id, above, place.street, place.get("front_above_street_source", "?")])
+	var curb_middle := NAN
+	for k in fronts.size():
+		var p: Vector3 = fronts[k]
+		var samples: Array[float] = []
+		var curb := NAN
+		var s := 0.0
+		while s <= FORECOURT_MAX_M:
+			var q := Vector2(p.x, p.z) + facing * s
+			var road := _nearest_road_point(w, Vector3(q.x, 0, q.y), str(place.street))
+			if not road.is_empty() and (road.point as Vector2).distance_to(q) <= float(road.width) / 2.0 + FORECOURT_CURB_M:
+				curb = w.ground_height(q.x, q.y)
+				samples.append(curb)
+				break
+			# A point on another road is not ground of the forecourt (Hẻm 2 Hải
+			# Đăng climbs along the east wall of Hải Âu, inside its box).
+			if not _on_road(w, q, str(place.street)):
+				samples.append(w.ground_height(q.x, q.y))
+			s += FORECOURT_EVERY
+		if is_nan(curb):
+			d.expect(false, "%s: the street %s is in front of the front, within %.0f m" % [id, place.street, FORECOURT_MAX_M])
+			return
+		if k == 0:
+			curb_middle = curb
+		var allowed := MAX_FORECOURT_RISE + (absf(curb - curb_middle) if k > 0 else 0.0)
+		# Out of the band from the curb to the height of the front over the street.
+		var worst := 0.0
+		for h in samples:
+			var change := h - curb
+			var out := change - clampf(change, minf(0.0, above), maxf(0.0, above))
+			if absf(out) > absf(worst):
+				worst = out
+		d.expect(absf(worst) <= allowed, "%s: from the curb of %s to its front (%s, %.1f m), the ground changes by %+.2f m%s (at most %.2f): %.2f m at the curb, %.2f m at the front" % [
+				id, place.street, ["the middle", "a corner", "a corner"][mini(k, 2)], s, worst,
+				" over %.1f m" % above if above != 0.0 else "", allowed, curb, samples[0] if not samples.is_empty() else NAN])
+
+
+## The point is on a road (in its half width) that is not the street.
+static func _on_road(w: VungTau, q: Vector2, street: String) -> bool:
+	for road: Dictionary in w.data.roads:
+		if str(road.name) == street or str(road.type) in ["footway", "pedestrian", "path", "steps", "track"]:
+			continue
+		var points: Array = road.points
+		for i in points.size() - 1:
+			var a := Vector3(points[i][0], 0, points[i][2])
+			var b := Vector3(points[i + 1][0], 0, points[i + 1][2])
+			var c := Geometry3D.get_closest_point_to_segment(Vector3(q.x, 0, q.y), a, b)
+			if Vector2(c.x - q.x, c.z - q.y).length() <= float(road.get("width", 4.0)) / 2.0:
+				return true
+	return false
+
+
+## The nearest point of a car road of the street to a point: {"point": (x, z), "width"}, or {}.
+static func _nearest_road_point(w: VungTau, p: Vector3, street: String) -> Dictionary:
+	var best := {}
+	var best_d := INF
+	for road: Dictionary in w.data.roads:
+		if str(road.type) in ["footway", "pedestrian", "path", "steps", "service", "track"] or str(road.name) != street:
+			continue
+		var points: Array = road.points
+		for i in points.size() - 1:
+			var a := Vector3(points[i][0], 0, points[i][2])
+			var b := Vector3(points[i + 1][0], 0, points[i + 1][2])
+			var q := Geometry3D.get_closest_point_to_segment(Vector3(p.x, 0, p.z), a, b)
+			var dist := Vector2(q.x - p.x, q.z - p.z).length()
+			if dist < best_d:
+				best_d = dist
+				best = {"point": Vector2(q.x, q.z), "width": float(road.get("width", 6.0))}
+	return best
 
 
 ## The point of the nearest car road (not a footway) to the point, as (x, z):

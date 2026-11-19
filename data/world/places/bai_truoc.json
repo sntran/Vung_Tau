@@ -144,7 +144,13 @@
 				-20.9,
 				4.2
 			],
-			"street": "Quang Trung"
+			"street": "Quang Trung",
+			"level_at": [
+				123.77,
+				57.92
+			],
+			"forecourt_m": 2.2,
+			"level_note": "Report 0026, D-0026-22: the level is the sidewalk of Quang Trung in front of the wing (level_at, 8 m from the middle of the road), as for the main block, and the ground is level to the outer edge of the sidewalk (forecourt_m)."
 		},
 		{
 			"id": "khach_san_grand",
@@ -167,7 +173,13 @@
 				-24.6,
 				5.05
 			],
-			"street": "Quang Trung"
+			"street": "Quang Trung",
+			"level_at": [
+				112.36,
+				6.45
+			],
+			"forecourt_m": 39.5,
+			"level_note": "Report 0026, D-0026-22: the front of the outline is 51 m from the middle of the east road of Quang Trung, on ground 2.2 m over the sidewalk, and a bank of earth went up from the sidewalk to the front. The photo of S4 (2014) shows the fence with the lantern posts on the sidewalk and the garden at the level of the sidewalk. So the level is the ground at level_at (a point of the sidewalk band of Quang Trung in front of the model, 8 m from the middle of the road: at 11 m the bank starts), and the ground is level from the back of the box to forecourt_m in front of it (to the outer edge of the sidewalk, 11.5 m from the middle of the road)."
 		},
 		{
 			"id": "bon_co_234797329",
@@ -289,7 +301,9 @@
 				-29.48,
 				332.25
 			],
-			"forecourt_m": 3.0
+			"forecourt_m": 3.0,
+			"front_above_street_m": 9.4,
+			"front_above_street_source": "The block stands on the slope of the hill, 50 m from Hạ Long, behind the hall with the orange roof and its lane: in the photo of S1 (Commons, trungydang, 2014-04-05, CC BY 3.0) and the photo from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0), its lowest terrace is over the roof of the hall. The ground of the game: 7.5 m at the curb of Hạ Long in front of the middle of its front, 16.88 m at its level (report 0026, D-0026-22)."
 		}
 	]
 }
