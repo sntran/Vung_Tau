@@ -447,12 +447,12 @@
 			}
 		},
 		"walker_3": {
-			"hash": "10beec615d8336daa33bfc521a2d6055",
+			"hash": "7e6ecf331eeaf8e2fa9827ffda8bb6ff",
 			"files": {
-				"walker_3.far.glb": "373355ede315bd7937b36cdc23b3d0b1daf96de5b79100a76c8ff7789f273de9",
-				"walker_3.mid.glb": "6a3364bd40464cc0dffe7f65c210267e278bad34b95bc4c6f44c5baddd6ca8cf",
-				"walker_3.parts.json": "54153dd3e4195f9ba9fcf37c1d738d25e466b05a9c6c374e8ae80a78813a72b6",
-				"walker_3.receipt.json": "203a64c77363503a505b857e40d00130a82e3a32c2789e62b9ada3f6a8999e75"
+				"walker_3.far.glb": "99a1b987b9a2912ccbff673dd0bdbb9020be03ace3462b5e5b6b6f2c836f91bf",
+				"walker_3.mid.glb": "1af22c4b0e316554058923027e164fa8d5de51c4e6740dc4556b3af3a9c87665",
+				"walker_3.parts.json": "2dae6a3ab7fddc8bebffbe5cb2df7c086397951129968d4f0a6841472e8960a8",
+				"walker_3.receipt.json": "133bfda18998cf428ccb75ecd5d7e9becd549643354f52a1c7a372509be0bd18"
 			}
 		},
 		"walker_4": {
@@ -474,12 +474,12 @@
 			}
 		},
 		"walker_6": {
-			"hash": "95f3493c12bb69f2127aa5eb392db4e2",
+			"hash": "defbf6e9edd5aae257685e39596af1b8",
 			"files": {
-				"walker_6.far.glb": "3d8fc8d0ddbcb4d3cf3e0b085d87421120d40fea8bcf5d4f08ac49c638a9219e",
-				"walker_6.mid.glb": "760d6c75a94de5748369b11febe311800ce391f4c78b0d2b09f8bd5a6e64adcb",
-				"walker_6.parts.json": "b444f657ecd3fb0bf51a3a8cc803ab53ff3a3c0d9c53ab07a788058687fc1c67",
-				"walker_6.receipt.json": "8b30880e9031eaa9436b0b82f73c5c7fc70e8043307ee80c503388f898e5104c"
+				"walker_6.far.glb": "eeb301adee363c357c8ffa0db3c0c18a863837d7b423eac653ff8b816497a062",
+				"walker_6.mid.glb": "9bf34f6337503298e3df910e6060eb64855054689162eeed65740e23dece3ad5",
+				"walker_6.parts.json": "ac4678bb89b1ce3f6f354252f88d541e726f2125fc07ccce658f2bdaa6bb35ef",
+				"walker_6.receipt.json": "97d0144a8030409ebd0ba1f1282e8e17ff3becfd35ef80701ce3138302023e59"
 			}
 		}
 	}
