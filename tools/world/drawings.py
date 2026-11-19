@@ -125,12 +125,23 @@ def problems(drawing: dict, model_id: str) -> list[str]:
     return found
 
 
+# The words of a "status_note" that say why a drawing with the status Source is
+# not in the game (report 0026, D-0026-27: cay_thong_noel).
+NOT_IN_THE_GAME = "Not in the game"
+
+
 def order_problems(ids: list[str]) -> list[str]:
-    """The drawings with the status Source whose order is not in data/world/orders.json as it is."""
+    """The drawings with the status Source whose order is not in data/world/orders.json as it is,
+    and the drawings with the status Source with no order there, unless the "status_note" starts
+    with NOT_IN_THE_GAME and says why (report 0026, D-0026-27)."""
     orders = {m["id"]: m for m in json.loads(ORDERS.read_text(encoding="utf-8"))["models"]}
     found = []
     for model_id in ids:
         drawing = load(model_id)
+        if drawing.get("status") == "Source" and model_id not in orders \
+                and not str(drawing.get("status_note", "")).startswith(NOT_IN_THE_GAME):
+            found.append(f"{model_id}: the status is Source, but the order is not in data/world/orders.json "
+                         f"(run sync), and the status_note does not start with \"{NOT_IN_THE_GAME}\" and say why")
         if drawing.get("status") == "Source" and model_id in orders and orders[model_id].get("order") != full_order(drawing):
             found.append(f"{model_id}: the order in data/world/orders.json is not the order of the drawing (run sync)")
         if drawing.get("status") == "Check" and model_id in orders:
