@@ -479,7 +479,10 @@
 		"height": 0.14,
 		"width": 0.16,
 		"color": "#8f8c86",
-		"note": "The lawns of the park have granite borders along the paths (photos of section 3, S5)."
+		"chunk_m": 60.0,
+		"far_m": 120.0,
+		"note": "The lawns of the park have granite borders along the paths (photos of section 3, S5).",
+		"far_note": "The borders are in squares of chunk_m, each to far_m (a border of 14 cm is less than a pixel there): PT-73, as one mesh for the whole park of 480 m, they were 10 700 triangles of S2 and 12 700 of S5 on Low (audit 3 of the corrections)."
 	},
 	"walls": [
 		{
@@ -944,12 +947,16 @@
 		"ranges": {
 			"low": [
 				0.0,
-				20.0,
+				12.0,
 				120.0
 			]
 		},
-		"note": "The pieces of the walls that are models of this game (the parapet of Hạ Long, the low wall of the beach): one row of MultiMeshes in cells of cell_m (fewer draw calls than cells of 6 m), and on Low no near level (as the buildings of plan 0026, D6): the mid level (470 triangles for a span of the low wall) to 20 m, the far level (60) to 120 m. PT-73: with the near level on Low and cells of 6 m, S5 had 575 draw calls and 322 686 triangles; with the mid level to 40 m and the far level to 150 m, 304 656.",
+		"note": "The pieces of the walls that are models of this game (the parapet of Hạ Long, the low wall of the beach): one row of MultiMeshes in cells of cell_m (fewer draw calls than cells of 6 m), and on Low no near level (as the buildings of plan 0026, D6): the mid level (470 triangles for a span of the low wall) to 20 m, the far level (60) to 120 m. PT-73: with the near level on Low and cells of 6 m, S5 had 575 draw calls and 322 686 triangles; with the mid level to 40 m and the far level to 150 m, 304 656. Audit 3 of the corrections: with the pieces under the wall, the steps, and the fence of the Grand Hotel, S5 had 297 768 with the mid level to 20 m (a range is for a whole cell); with 12 m, less, so that the CI has room for the walkers.",
 		"under_model": "ke_da_bai_truoc",
+		"under_ranges": {
+			"low": [0.0, 0.0, 40.0]
+		},
+		"under_ranges_note": "The pieces under the low wall (a row of their own, with no shadow): on Low only the far level (80 triangles) to 40 m: from the walk the wall hides them, and a range is for a whole cell of cell_m (with the mid level to 6 m, all the pieces of the cell of the eye had the mid level). PT-73: with the ranges of the walls (20 m and 120 m) and the shadow, S5 had 312 688 triangles; with the mid level to 8 m, the far level to 80 m, and no shadow, 306 528; with 6 m and 40 m, 305 568.",
 		"under_note": "Report 0026, D-0026-27: the sloped sea wall of granite blocks under each span of the low wall of the beach, on the side of the sand (data/world/drawings/ke_da_bai_truoc.json)."
 	},
 	"fences": [

@@ -13,6 +13,8 @@ extends Node3D
 
 ## Half the thickness of the low wall of the beach at its foot (tuong_bai_tam: width 0.42 m).
 ## The two sides of a low wall that differ by more than this (m, 2 m out) give the sand side by their heights.
+## The point of the walk next to an opening of the low wall, out of the wall (m).
+const STEP_WALK_M := 0.3
 const SAND_SIDE_STEP := 0.15
 const WALL_HALF_WIDTH := 0.21
 const CONFIG := "res://data/showcase/bai_truoc.json"
@@ -121,6 +123,13 @@ var ground_step := 0.5
 ## The pieces of the walls that are models of this game (report 0026,
 ## D-0026-09): one row of MultiMeshes, the near, mid and far levels.
 var wall_row: WorldRow
+## The sloped granite pieces under the low wall of the beach (ke_da_bai_truoc):
+## a row of their own, with the ranges of "under_ranges" of "wall_pieces" and
+## no shadow (they lie on the sand). PT-73: in the row of the walls, S5 on Low
+## had 312 688 triangles (the limit is 300 000).
+var under_row: WorldRow
+## The end of the range of the squares of a part in chunks (the color -> m).
+var _far_ends: Dictionary = {}
 ## Report 0026, D-0026-17: the hedges, the round bushes, the flowers of the
 ## flower beds, and the benches of the park (park_plants), in one row.
 var park_row: WorldRow
@@ -578,7 +587,11 @@ func _balustrade(line: PackedVector3Array, cfg: Dictionary) -> void:
 ## Report 0026, Q19: the granite steps down to the sand in each opening of the
 ## low wall (bac_xuong_cat): the top edge of the piece at the sand face of the
 ## wall, at the height of the walk, the steps down to the sand side. The piece
-## is scaled up and down to the drop to the sand at its foot.
+## is scaled up and down to the drop to the sand at its foot. The height of the
+## walk is the ground on the side of the walk next to the wall (STEP_WALK_M),
+## not the base of the wall: the base is the highest ground near the line, and
+## at an opening near a raised lawn the top of the steps was about 1 m over the
+## walk (PT-77 checks the top, "top_y", and the foot of the model, "foot").
 func _steps_down(cfg: Dictionary, openings: Array, half: float) -> void:
 	var model_id := str(cfg.get("model", ""))
 	# Each opening records its side of the sand (PT-77 walks through it).
@@ -595,17 +608,29 @@ func _steps_down(cfg: Dictionary, openings: Array, half: float) -> void:
 		var along: Vector3 = opening.along
 		var sand: Vector3 = opening.sand
 		var top := at + sand * half
+		var walk := at - sand * (half + STEP_WALK_M)
+		top.y = world.ground_height(walk.x, walk.z)
 		var foot := top + sand * run
 		var fall := top.y - world.ground_height(foot.x, foot.z)
 		if fall < float(cfg.get("min_drop_m", 0.25)):
 			continue
 		var scale := clampf(fall / drop, 0.25, 2.0)
-		# The x of World is along the wall, and its +y (the steps down) is -z of the GLB.
-		var basis := Basis(along, Vector3.UP * scale, -sand)
+		# The steps go down along +z of the GLB (its top at z = 0, its foot at
+		# z = run): +z goes to the sand. Report 0026, D-0026-26: with +z to the
+		# walk, the steps went down under the walk, and from the sand the
+		# opening showed the end of the steps over the sand.
+		var basis := Basis(along, Vector3.UP * scale, sand)
 		if basis.determinant() < 0.0:
 			basis.x = -basis.x
-		_row_of_walls().add(model_id, Transform3D(basis, top))
+		var lift := _lift_of(model_id)
+		var placed := Transform3D(basis, top - basis.y * lift)
+		_row_of_walls().add(model_id, placed)
 		opening.steps = true
+		# The top and the foot of the steps as the row draws them (the mesh of
+		# the row is lifted by "lift"): the top at y = 0 of the GLB, the foot of
+		# the last step at z = run, y = -drop.
+		opening.top_y = (placed * Vector3(0.0, lift, 0.0)).y
+		opening.foot = placed * Vector3(0.0, lift - drop, run)
 		_add_length("steps_down", 1.0)
 
 
@@ -628,7 +653,7 @@ func _sea_wall_under(a: Vector3, b: Vector3, sea: Vector3) -> void:
 	var drop := (a.y + b.y) / 2.0 - sand
 	if drop < 0.1 or half <= 0.0:
 		return
-	_wall_piece(model_id, a2, b2, sea, drop / height)
+	_wall_piece(model_id, a2, b2, sea, drop / height, 1.0, _row_under_walls())
 	_add_length("beach_sea_wall_pieces", 1.0)
 
 
@@ -862,8 +887,9 @@ func _path_borders(cfg: Dictionary) -> void:
 					var at := p + side * sign * half
 					return park.size() >= 3 and Geometry2D.is_point_in_polygon(Vector2(at.x, at.z), park) \
 							and not _near_other(at, others, width)):
-				_ridge(color, run, sign * half, width, height)
+				_ridge(color, run, sign * half, width, height, float(cfg.get("chunk_m", 0.0)))
 				_add_length("path_border", _length(run))
+	_far_ends[color] = float(cfg.get("far_m", 0.0))
 
 
 ## R4: a low wall at one side of a way (the wall between the walk of the sea and the beach).
@@ -1045,7 +1071,10 @@ func _sea_wall(cfg: Dictionary) -> void:
 				if slope_pieces:
 					var drop := ((o0.y - g0.y) + (o1.y - g1.y)) / 2.0
 					if drop > 0.1:
-						_wall_piece(slope_id, o0, o1, side0, drop / slope_height)
+						# A small drop has a short run: the piece keeps its angle (with
+						# the run of 8 m at a drop of 0.3 m the slope lay almost flat
+						# over the beach).
+						_wall_piece(slope_id, o0, o1, side0, drop / slope_height, minf(1.0, drop / slope_height))
 						_add_length("sea_wall_pieces", 1.0)
 				_add_length("sea_wall", e0.distance_to(e1))
 			# A closed end where the walk stops at a junction: past the end of the
@@ -1721,12 +1750,18 @@ func _box_along(color: String, p0: Vector3, p1: Vector3, half: float, low: float
 
 
 ## A low ridge (a border or a wall) along a line, at the offset to the right side.
-func _ridge(color: String, line: PackedVector3Array, offset: float, width: float, height: float) -> void:
+## With "chunk_m", each segment goes to the mesh of its square of chunk_m
+## (the color, "|", and the square), which shows to the end of "far_m" of its part.
+func _ridge(color: String, line: PackedVector3Array, offset: float, width: float, height: float, chunk_m := 0.0) -> void:
 	var sides := _sides(line)
 	for i in line.size() - 1:
 		var a := line[i] + sides[i] * offset + Vector3(0, LIFT, 0)
 		var b := line[i + 1] + sides[i + 1] * offset + Vector3(0, LIFT, 0)
-		_box_along(color, a, b, width / 2.0, 0.0, height)
+		var key := color
+		if chunk_m > 0.0:
+			var mid := (a + b) / 2.0
+			key = "%s|%d_%d" % [color, floori(mid.x / chunk_m), floori(mid.z / chunk_m)]
+		_box_along(key, a, b, width / 2.0, 0.0, height)
 
 
 ## A tube from a to b with "sides" faces, radius r0 at a and r1 at b (a pole,
@@ -2178,11 +2213,12 @@ static func _option(model_id: String, name: String, default: Variant) -> Variant
 ## x = -length/2 to its port "end" at x = length/2, the sea to +y, z up) from
 ## the point a to the point b: it follows the slope of a to b (a shear), and
 ## "up" and "out" scale its height and its depth.
-func _wall_piece(model_id: String, a: Vector3, b: Vector3, sea: Vector3, up := 1.0, out := 1.0) -> void:
+func _wall_piece(model_id: String, a: Vector3, b: Vector3, sea: Vector3, up := 1.0, out := 1.0, row: WorldRow = null) -> void:
 	var length := float(_option(model_id, "length", 2.0))
 	if a.distance_to(b) < 0.05 or length <= 0.0:
 		return
-	_row_of_walls()
+	if row == null:
+		row = _row_of_walls()
 	# The x of World is -x of the GLB: the local -x goes from a to b. A
 	# MultiMesh does not turn the faces of a mirrored instance over, so the
 	# basis stays right-handed: when the sea is to the other side, the piece
@@ -2191,7 +2227,24 @@ func _wall_piece(model_id: String, a: Vector3, b: Vector3, sea: Vector3, up := 1
 	var basis := Basis(-(b - a) / length, Vector3(0.0, up, 0.0), flat_sea * out)
 	if basis.determinant() < 0.0:
 		basis.x = -basis.x
-	wall_row.add(model_id, Transform3D(basis, (a + b) / 2.0))
+	row.add(model_id, Transform3D(basis, (a + b) / 2.0 - basis.y * _lift_of(model_id)))
+
+
+## The lift of the levels of a model in a WorldRow (WorldModel, R7: the model
+## stands on y = 0). A piece of a sea wall or of the steps hangs under its
+## port (its top at y = 0 of World, its foot under it), so the row lifted it by
+## its depth: the steps stood over the walk, and the slope of Hạ Long, turned
+## over to go down, lay as a flat deck over the beach (audit 3 of the
+## corrections, D-0026-26 and D-0026-27). The pieces take the lift away.
+func _lift_of(model_id: String) -> float:
+	var template := WorldRow._template(model_id)
+	if template == null:
+		return 0.0
+	for level: String in ["mid", "near", "far"]:
+		var node := template.level(level)
+		if node != null:
+			return node.position.y
+	return 0.0
 
 
 ## Report 0026, D-0026-22: a fence of a model of this game (the fence of the
@@ -2239,15 +2292,27 @@ func _fence(cfg: Dictionary) -> void:
 ## The row of the pieces of the walls (and the steps down to the sand).
 func _row_of_walls() -> WorldRow:
 	if wall_row == null:
-		wall_row = WorldRow.new()
-		wall_row.name = "WallPieces"
-		var cfg: Dictionary = data.get("wall_pieces", {})
-		wall_row.cell_size = float(cfg.get("cell_m", WorldRow.CELL))
-		for preset: String in cfg.get("ranges", {}):
-			var r: Array = cfg.ranges[preset]
-			wall_row.custom_ranges[preset] = Vector3(float(r[0]), float(r[1]), float(r[2]))
-		add_child(wall_row)
+		wall_row = _new_row("WallPieces", "ranges")
 	return wall_row
+
+
+## The row of the pieces under the low wall of the beach.
+func _row_under_walls() -> WorldRow:
+	if under_row == null:
+		under_row = _new_row("WallUnderPieces", "under_ranges")
+	return under_row
+
+
+func _new_row(row_name: String, ranges_key: String) -> WorldRow:
+	var row := WorldRow.new()
+	row.name = row_name
+	var cfg: Dictionary = data.get("wall_pieces", {})
+	row.cell_size = float(cfg.get("cell_m", WorldRow.CELL))
+	for preset: String in cfg.get(ranges_key, {}):
+		var r: Array = cfg[ranges_key][preset]
+		row.custom_ranges[preset] = Vector3(float(r[0]), float(r[1]), float(r[2]))
+	add_child(row)
+	return row
 
 
 ## The point on the ground.
@@ -2297,18 +2362,28 @@ func _commit() -> void:
 	if wall_row != null:
 		wall_row.build()
 		_add_length("wall_pieces", float(wall_row.count()))
-	for color: String in _meshes:
-		if color == HIDDEN:
+	if under_row != null:
+		under_row.build()
+		for node: Node in under_row.find_children("*", "GeometryInstance3D", true, false):
+			(node as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_add_length("wall_under_pieces", float(under_row.count()))
+	for key: String in _meshes:
+		if key == HIDDEN:
 			continue
-		var arrays: Variant = (_meshes[color] as _Mesh).arrays()
+		var arrays: Variant = (_meshes[key] as _Mesh).arrays()
 		if arrays == null:
 			continue
+		# A key "COLOR|SQUARE" is a square of a part in chunks (_ridge()).
+		var color := key.get_slice("|", 0)
 		var mesh := ArrayMesh.new()
 		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 		mesh.surface_set_material(0, _material(color))
 		var instance := MeshInstance3D.new()
-		instance.name = "Part_" + color.trim_prefix("#")
+		instance.name = "Part_" + key.trim_prefix("#").replace("|", "_")
 		instance.mesh = mesh
+		if key != color and float(_far_ends.get(color, 0.0)) > 0.0:
+			instance.visibility_range_end = float(_far_ends[color])
+			instance.visibility_range_end_margin = 2.0
 		add_child(instance)
 	if not _collision.is_empty():
 		var body := StaticBody3D.new()

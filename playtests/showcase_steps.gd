@@ -8,7 +8,8 @@ extends RefCounted
 # with steps (in audit 3 the steps went up from the walk to the top of the wall
 # at the flat north end of the line). The player reaches the sand (on the
 # ground, at least MIN_DROP m under the walk where the opening has steps) and
-# the walk again (within 0.3 m of its height). The openings are in four runs
+# the walk again (within 0.3 m of its height). The model of the steps has its
+# top at the walk and its foot on the sand (TOP_ON_WALK, FOOT_ON_SAND). The openings are in four runs
 # (five openings took 151 s in the workspace, and CI is about two times slower).
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=17:00 --quality=low
@@ -23,6 +24,9 @@ const SAND_OUT := 4.5
 ## At an opening with steps, the sand is at least this much under the walk (the steps are scaled to the drop from 0.25 m).
 const MIN_DROP := 0.2
 const BACK_ON_WALK := 0.3
+## The top of the model of the steps and the walk 1 m from the wall, and its foot and the sand (m).
+const TOP_ON_WALK := 0.25
+const FOOT_ON_SAND := 0.3
 ## An opening where the sand is this much under the walk has steps.
 const NEEDS_STEPS := 0.4
 
@@ -62,6 +66,26 @@ func _walk_through(d: PlaytestDriver, w: VungTau, k: int, opening: Dictionary) -
 	d.step("opening %d at (%.1f, %.1f): the walk %.2f m, the sand %.2f m, %s" % [
 			k, at.x, at.z, walk_y, sand_y, "with steps" if has_steps else "no steps (the sand is near the height of the walk)"])
 	if has_steps:
+		# The model of the steps: its top at the walk next to the wall, and its
+		# foot on the side of the sand, on the sand (audit 3 of the corrections:
+		# the steps went down under the walk, and at an opening near a raised
+		# lawn their top was about 1 m over the walk).
+		var near_walk := at - sand * 1.0
+		var top_y := float(opening.get("top_y", INF))
+		var near_y := w.ground_height(near_walk.x, near_walk.z)
+		d.expect(absf(top_y - near_y) <= TOP_ON_WALK, "opening %d: the top of the steps is at the walk: %.2f m, the walk 1 m from the wall %.2f m" % [
+				k, top_y, near_y])
+		var profile := PackedStringArray()
+		for m: float in [3.0, 2.0, 1.0, 0.5, 0.0, -0.5, -1.0, -2.0, -3.0]:
+			var q := at - sand * m
+			profile.append("%.2f" % w.ground_height(q.x, q.z))
+		d.step("opening %d: the top of the steps %.2f m; the ground from 3 m on the walk to 3 m on the sand: %s" % [
+				k, top_y, ", ".join(profile)])
+		var foot: Vector3 = opening.get("foot", at)
+		var foot_ground := w.ground_height(foot.x, foot.z)
+		d.expect((foot - at).dot(sand) > 1.0 and absf(foot.y - foot_ground) <= FOOT_ON_SAND,
+				"opening %d: the foot of the steps is on the sand: %.1f m to the sand side of the wall, %.2f m over the ground" % [
+				k, (foot - at).dot(sand), foot.y - foot_ground])
 		d.expect(walk_y - sand_y >= MIN_DROP, "opening %d: the steps go down to the sand: the sand is %.2f m under the walk (at least %.2f)" % [
 				k, walk_y - sand_y, MIN_DROP])
 	else:
