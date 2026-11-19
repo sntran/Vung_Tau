@@ -96,7 +96,7 @@ Each source of the data of this plan, also the ones that the plan does not use, 
 
 | Source | Use |
 |---|---|
-| Google Earth and its photorealistic 3D meshes | I look at the town in 3D. |
+| Google Earth and its photorealistic 3D meshes | I look at the town in 3D. In Vũng Tàu, the meshes have little detail (I looked on 2026-11-18): at the church, the roof is a photo on a rough shape, and the bell tower does not stand up. |
 | Google Earth, the photos of earlier years | I check the year of a building (Q3). |
 | Google Street View | I look at a street. |
 | Esri Wayback (World Imagery by date) | I check the year of a building (Q3). |
@@ -187,4 +187,6 @@ Each source of the data of this plan, also the ones that the plan does not use, 
 - **Q3.** The 2019 state of some places: which streets near chợ Xóm Lưới had shops, and which hotels stood near Bãi Trước. These facts have the status "Check".
 - **Q4.** The first release does not need all the town. Which part has houses of the near level first: the hẻm, the market streets, and the road to Bãi Trước?
 - **Q6.** The API of Mapillary needs a free account and a token (a secret `MAPILLARY_TOKEN`). Do I make them? Without them, the builder checks only KartaView.
+  - **Answered (2026-11-18):** I make them if Mapillary has good photos of the play area. The first look is on the public map of Mapillary, which needs no account.
 - **Q7.** When I am in Vũng Tàu, which things do I scan with a phone? Only things that did not change since 2019 are useful: for example a gate, a shrine, a stair, or a part of the sea wall.
+  - **Partly answered (2026-11-18):** I asked some people to take photos later. It is not sure, so no step of this plan waits for them.
