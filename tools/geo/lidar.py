@@ -49,6 +49,8 @@ PRODUCTS = {
     "gedi02a": [("gedi", "gedi02ap"), ("run", "gedi02ax")],
 }
 BY_YEAR = {"run"}
+# The columns of the heights that are over EGM2008 already (not over the WGS 84 ellipsoid).
+ORTHOMETRIC = {"ortho_h"}
 # The fetch stops to ask for more years after this many seconds (the job has 120 minutes).
 BUDGET_S = 75 * 60
 
@@ -149,9 +151,11 @@ def write_points(product: str, frame, lines: list[str]) -> None:
     lon = np.asarray(geometry.x if geometry is not None else frame["longitude"], dtype=float)
     lat = np.asarray(geometry.y if geometry is not None else frame["latitude"], dtype=float)
     columns = list(frame.columns)
+    used = {}
     def column(*names):
         for name in names:
             if name in columns:
+                used[names[0]] = name
                 return np.asarray(frame[name])
         return None
     # GEDI L2A of gedi02ap: elevation_lm (the lowest mode, the ground) and elevation_hr (the highest return).
@@ -164,14 +168,19 @@ def write_points(product: str, frame, lines: list[str]) -> None:
     if ground is None:
         lines.append(f"- {product}: no column of the height in {columns}")
         return
-    ground_egm = egm2008(lon, lat, ground.astype(float))
+    # ortho_h of ATL24 is already a height over EGM2008 (the first run turned it
+    # over the geoid a second time: -0.45 m became +2.11 m).
+    if used.get("h_te_median") in ORTHOMETRIC:
+        ground_egm = ground.astype(float)
+    else:
+        ground_egm = egm2008(lon, lat, ground.astype(float))
     rows = []
     for i in range(len(lon)):
         rows.append([round(float(lon[i]), 6), round(float(lat[i]), 6), dates[i], round(float(ground[i]), 2),
                      round(float(ground_egm[i]), 2), None if top is None else round(float(top[i]), 2),
                      None if klass is None else str(klass[i]), None if quality is None else str(quality[i])])
     head = {"note": f"Made by tools/geo/lidar.py fetch (plan 0009, R5a): the points of {product} from SlideRule (public). height: over the WGS 84 ellipsoid; height_egm2008: over EGM2008. top: the top of the canopy, or the height of the sea floor (ATL24). The data of NASA (ICESat-2, GEDI) is free to use.",
-            "product": product, "columns": ["lon", "lat", "date", "height", "height_egm2008", "top", "class", "quality"]}
+            "product": product, "height_column": used.get("h_te_median"), "columns": ["lon", "lat", "date", "height", "height_egm2008", "top", "class", "quality"]}
     text = json.dumps(head, ensure_ascii=False, indent="\t")[:-2] + ',\n\t"points": [\n' + \
         ",\n".join(json.dumps(r) for r in rows) + "\n\t]\n}\n"
     (RAW / f"{product}.json").write_text(text, encoding="utf-8")
