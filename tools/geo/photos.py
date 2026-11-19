@@ -69,6 +69,8 @@ SHEET_COLUMNS = 3
 SHEET_ROWS = 4
 TILE_W = 512
 PANO_VIEW_DEG = 100.0
+# The time of the API in one run of the index (the job stops at 100 minutes).
+INDEX_BUDGET_S = 45 * 60.0
 
 
 # ----- the vector tiles (Mapbox Vector Tile 2.1, a protobuf) -----
@@ -272,8 +274,8 @@ def write_index(index: dict) -> None:
     INDEX.write_text(text, encoding="utf-8")
 
 
-def tile_ids(bbox: dict) -> dict[str, dict]:
-    """The id of each image of the coverage tiles in the box, with the values of the tile."""
+def tile_ids(bbox: dict) -> dict[str, tuple[dict, tuple[float, float]]]:
+    """The id of each image of the coverage tiles in the box, with the values and the position of the tile."""
     found: dict[str, dict] = {}
     secret = token()
     tiles = tile_range(bbox)
@@ -290,7 +292,7 @@ def tile_ids(bbox: dict) -> dict[str, dict]:
         for p in points:
             lon, lat = tile_lonlat(tx, ty, p["x"], p["y"], p["extent"])
             if in_box(lon, lat, bbox) and p["properties"].get("id") is not None:
-                found[str(p["properties"]["id"])] = p["properties"]
+                found[str(p["properties"]["id"])] = (p["properties"], (lon, lat))
                 kept += 1
         print(f"tile {k + 1}/{len(tiles)} {ZOOM}/{tx}/{ty}: {len(points)} images, {kept} in the box")
         time.sleep(0.2)
@@ -319,30 +321,62 @@ def fetch_images(ids: list[str]) -> list[dict]:
     return out
 
 
-def command_index() -> int:
+def tile_row(image_id: str, props: dict, lonlat: tuple[float, float]) -> list:
+    """A row of the index from the values of a coverage tile only (computed null:
+    no computed position or direction, and the id of the author, not the name)."""
+    when = dt.datetime.fromtimestamp(int(props.get("captured_at", 0)) / 1000.0, tz=dt.timezone.utc).astimezone(VIETNAM)
+    compass = props.get("compass_angle")
+    return [image_id, when.strftime("%Y-%m-%dT%H:%M"), round(lonlat[0], 7), round(lonlat[1], 7), None,
+            None if compass is None else round(float(compass) % 360.0, 1), None,
+            "spherical" if props.get("is_pano") else "", str(props.get("sequence_id") or ""),
+            str(props.get("creator_id") or "")]
+
+
+def command_index(budget_s: float = INDEX_BUDGET_S) -> int:
+    """The index: each image of the tiles in the box. An image that is new
+    gets a row from its tile; then the API gives the fields of the rows that
+    have no answer yet (computed None), first the images of 2017 to 2021, in
+    a time budget: the index is written after each part, and the next run goes
+    on from there."""
     area = json.loads(AREA.read_text(encoding="utf-8"))["bbox"]
     index = load_index()
     known = {r[0]: r for r in index["images"]}
     in_tiles = tile_ids(area)
-    new = sorted(set(in_tiles) - set(known))
-    print(f"{len(in_tiles)} images in the tiles, {len(known)} in the index, {len(new)} new")
     rows = {i: known[i] for i in in_tiles if i in known}
-    for image in fetch_images(new):
-        r = row(image)
-        if r[2] is not None and in_box(r[2], r[3], area):
-            rows[r[0]] = r
+    for image_id, (props, lonlat) in in_tiles.items():
+        if image_id not in rows:
+            rows[image_id] = tile_row(image_id, props, lonlat)
     gone = len(set(known) - set(in_tiles))
-    index = {
-        "note": "Made by tools/geo/photos.py index (plan 0009, R5e). Do not change by hand. One row for each image of Mapillary in the play area (data/geo/area.json). date: the time of Vietnam (UTC+7). lon, lat: computed_geometry (computed 1), or the position of the camera (computed 0). compass: compass_angle; computed_compass: computed_compass_angle (degrees from the north to the east). camera: camera_type (spherical and equirectangular are 360). author: the username of the creator. The link of an image: https://www.mapillary.com/app/?pKey=ID. The images are CC BY-SA 4.0: the credit is the author, Mapillary, and the license.",
-        "license": LICENSE,
-        "updated": dt.date.today().isoformat(),
-        "bbox": area,
-        "tiles": f"mly1_public, zoom {ZOOM}",
-        "columns": COLUMNS,
-        "images": list(rows.values()),
-    }
-    write_index(index)
-    print(f"{len(rows)} images in {INDEX.name} ({gone} are not in the tiles now)")
+    def save() -> None:
+        write_index({
+            "note": "Made by tools/geo/photos.py index (plan 0009, R5e). Do not change by hand. One row for each image of Mapillary in the play area (data/geo/raw/mapillary.json, the box of data/geo/area.json). date: the time of Vietnam (UTC+7). lon, lat: computed_geometry (computed 1), the position of the camera (computed 0), or the position in the coverage tile (computed null: the API did not answer for the image yet). compass: compass_angle; computed_compass: computed_compass_angle (degrees from the north to the east). camera: camera_type (spherical and equirectangular are 360). author: the username of the creator (or the id of the creator, from the tile). The link of an image: https://www.mapillary.com/app/?pKey=ID. The images are CC BY-SA 4.0: the credit is the author, Mapillary, and the license.",
+            "license": LICENSE,
+            "updated": dt.date.today().isoformat(),
+            "bbox": area,
+            "tiles": f"mly1_public, zoom {ZOOM}",
+            "columns": COLUMNS,
+            "images": list(rows.values()),
+        })
+    save()
+    waiting = sorted((r for r in rows.values() if r[4] is None),
+                     key=lambda r: (0 if 2017 <= int(r[1][:4]) <= 2021 else 1, r[1]))
+    print(f"{len(in_tiles)} images in the tiles, {len(known)} in the index before, {gone} not in the tiles now, "
+          f"{len(waiting)} wait for the API")
+    start = time.monotonic()
+    ids = [r[0] for r in waiting]
+    done = 0
+    for k in range(0, len(ids), BATCH * 20):
+        if time.monotonic() - start > budget_s:
+            print(f"the time budget ({budget_s:.0f} s) is over: {len(ids) - done} images wait for the next run")
+            break
+        part = ids[k:k + BATCH * 20]
+        for image in fetch_images(part):
+            r = row(image)
+            if r[2] is not None:
+                rows[r[0]] = r
+        done += len(part)
+        save()
+    print(f"{len(rows)} images in {INDEX.name}")
     return 0
 
 
@@ -657,6 +691,26 @@ def command_sheets() -> int:
     index = load_index()
     images = with_positions(index, Places())
     points = json.loads(POINTS.read_text(encoding="utf-8"))
+    # The images near the points that have only the values of their tile get
+    # their fields from the API first (the position after processing, the
+    # direction, and the name of the author for the credit).
+    near = set()
+    for point in points["points"]:
+        ax, az = point["at"]
+        for r in images:
+            if r["computed"] is None and math.hypot(r["x"] - ax, r["z"] - az) <= point["radius_m"] + 30.0 \
+                    and in_dates(r, point, points["years"]):
+                near.add(r["id"])
+    if near:
+        print(f"{len(near)} images near the points get their fields from the API")
+        by_id = {r[0]: r for r in index["images"]}
+        for image in fetch_images(sorted(near)):
+            r = row(image)
+            if r[2] is not None:
+                by_id[r[0]] = r
+        index["images"] = list(by_id.values())
+        write_index(index)
+        images = with_positions(index, Places())
     OUT.mkdir(parents=True, exist_ok=True)
     for old in OUT.glob("sheet_*.jpg"):
         old.unlink()
