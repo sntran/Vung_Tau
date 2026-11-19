@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Approved (2026-11-16), for the area of plan 0026 first. |
+| Status | Approved (2026-11-16), for the area of plan 0026 first. Changed (2026-11-18): all the sources of the data (section 3, "The sources"; D9 to D11, R1, R5 to R5d, Q1, Q5 to Q7). |
 | Branch | `feat/0009-houses-on-the-lots` |
 | Depends on | 0004 (the house kit and the palette), 0005 (the roads and the ground), 0008 (the known places stay as they are), 0023 (the houses come from World, D8). |
 | Used by | 0010 (the bus ride), 0011 to 0015 (the shops and the streets), 0021 (Tết), 0022 (the garden). |
@@ -30,22 +30,109 @@ At the end of this plan, the town is full of houses. The hẻm of the homestay i
 | D6 | The real hẻm (Hẻm 2 Hải Đăng) replaces the test street of plans 0001 to 0004. The shops and the people of the test street move to the streets near chợ Xóm Lưới. Bà Tư and cô Nga stay at the homestay. | AGENTS.md, section 1. |
 | D7 | The street is lived in. The rules for scooters, stools, laundry, plants, and cages are in the data, and they depend on the time of day (plan 0023, sections 9.3 and 9.4). | A clean street is not Vũng Tàu. |
 | D8 | The colors follow the rules of plan 0004 (R10a): most walls come from the muted palette, a few are bold, and two neighbors never have the same color. | The measured palette of the aerial photos. |
-| D9 | NASA lidar checks the heights: ICESat-2 (ATL08, the ground and the tops of the trees along its tracks) and GEDI (L2A, the ground and the height of the top in circles of 25 m). It does not give the shapes of the houses: its tracks are lines kilometers apart. The fetch runs in CI with my NASA Earthdata token in the GitHub secret `EARTHDATA_TOKEN`. | The ground heights of plan 0005 come from radar, which sees the tops of the trees and the roofs. On the forest of Núi Lớn and Núi Nhỏ the hills can be too high, and the game puts its trees on top of that. The lidar measures the ground under the trees. The workspace cannot reach the NASA data sites (`cmr.earthdata.nasa.gov` and `data.nsidc.earthdatacloud.nasa.gov`, checked on 2026-11-11). |
+| D9 | The ground is bare earth. The build makes it from three models of the ground, and lidar points from space check them (R5a, R5b). Copernicus GLO-30 (plan 0005) is a model of the surface: it has the tops of the trees and the roofs. GEDTM30 and DeltaDTM are models of the ground under them: they start from Copernicus and correct it with the lidar of ICESat-2 and GEDI. DeltaDTM has only the land below 10 m (the town, the beaches, the market). GEDTM30 has all the land, also the hills. The lidar points come from SlideRule, a public service that needs no account. They do not give the shapes of the houses: their tracks are lines hundreds of meters to some kilometers apart. Changed (2026-11-18): SlideRule replaces the NASA Earthdata token, and the two models of the ground are new. | The ground heights of plan 0005 come from radar, which sees the tops of the trees and the roofs. On the forest of Núi Lớn and Núi Nhỏ the hills can be too high, and the game puts its trees on top of that. In the town, the roofs make the ground under the houses of this plan too high. The workspace cannot reach the NASA data sites (`cmr.earthdata.nasa.gov` and `data.nsidc.earthdatacloud.nasa.gov`, checked on 2026-11-11), or the sites of the new sources (`storage.googleapis.com`, `zenodo.org`, `data.4tu.nl`, `slideruleearth.io`, `api.ohsome.org`, checked on 2026-11-18). So the fetch runs in CI (D2). |
+| D10 | The heights of the buildings, and the first year when each building shows, come from Google Open Buildings 2.5D Temporal: a raster for each year from 2016 to 2023, with a real resolution of about 4 m. The outlines come from Overture Maps and OpenStreetMap (plan 0005). 3D-GloBFP (the heights of 2020) and GHS-BUILT-H (the mean height in cells of 100 m) are checks. The lidar photons on the roofs (ICESat-2 ATL03) also check the heights. | The 2.5D data has the state of each year, so the build can remove the buildings that are newer than 2019 (D1). Its heights are not exact. Google measured a mean error of 1.5 m only in North America, Europe, and Japan, and small houses that touch can show as one shape. So each outline takes the median height of the pixels in it, and only the pixels where the data is sure of a building. |
+| D11 | Google Earth, its photorealistic 3D meshes, Street View, and Esri Wayback are for my eyes only. I can look at them to remember the town or to check a year, as I look at a photo. The game takes no shape, size, or color from them, and the repository keeps no copy of them. | Their terms do not let a project copy, keep, or trace their content. |
+
+### The sources
+
+Each source of the data of this plan, also the ones that the plan does not use, and why. "In use" is a source of plan 0005, 0008, or 0020. A "check" source does not change the game: the report compares it with the sources in use, and I decide.
+
+**The ground**
+
+| Source | What it gives | License | Use |
+|---|---|---|---|
+| Copernicus DEM GLO-30 | Heights of the surface (the tops of the trees and the roofs), 30 m | Free, with the credit of plan 0005 | In use. It stays where no better model of the ground agrees with the lidar (R5b). |
+| [GEDTM30](https://codeberg.org/openlandmap/GEDTM30) v1.2 (OpenGeoHub, 2025) | Heights of the ground, 30 m, all the land, and a map of the uncertainty | CC BY 4.0 | New. The ground of the hills and of the town, where the lidar agrees (R5b). |
+| [DeltaDTM](https://data.4tu.nl/datasets/1da2e70f-6c4d-4b03-86bd-b53e789cc629) v1.0 (Pronk and others, 2024) | Heights of the ground, 30 m, only the land below 10 m. The error against airborne lidar is 0.74 m (RMSE), and 0.91 m in towns. | CC BY 4.0 | New. The ground of the low town and of the beaches, where the lidar agrees (R5b). |
+| FABDEM, FathomDEM | Heights of the ground, 30 m | CC BY-NC-SA 4.0 (non-commercial) | Not used: the license is non-commercial. |
+| SRTM, NASADEM, ALOS AW3D30, TanDEM-X 90 m | Older models of the surface | Free (TanDEM-X 90 m: only for science) | Not needed. GEDTM30 uses AW3D30 already. |
+| CoastalDEM, TanDEM-X 12 m, the national lidar of Vietnam | Heights of the ground or of the surface | Not open: paid, or only by a request to the survey office | Not usable. |
+
+**The lidar points** (all from [SlideRule](https://slideruleearth.io), with no account; NASA data has no limits of use)
+
+| Source | What it gives | Use |
+|---|---|---|
+| ICESat-2 ATL08 | The ground and the tops of the trees along the tracks, in segments of 20 m and 100 m, from October 2018 | New. The check of the three models of the ground (R5b). |
+| ICESat-2 ATL03, with the classes of ATL08 | Each photon, with its class (ground, tree, top of a tree). A photon on a roof gives the height of the roof. | New. A check of the heights of the buildings (D10, R2). |
+| ICESat-2 ATL24 | The depth of the sea floor along the tracks, where the water is clear | New, a check. The heights of the intertidal zone and of the bay of plan 0005 (R5c). |
+| GEDI L2A | The ground and the height of the top in circles of 25 m, from April 2019 | New. The check of the ground (R5b), and of tall buildings. |
+
+**The buildings**
+
+| Source | What it gives | License | Use |
+|---|---|---|---|
+| Overture Maps | Outlines from OpenStreetMap, Microsoft, and other sources | ODbL | In use. The outlines (R1). |
+| OpenStreetMap | Outlines, tags (hotel, church, temple, market), and some levels (`building:levels`) | ODbL | In use. The kind (R3), and the floors where the tag is (R2). |
+| OpenStreetMap history ([ohsome API](https://wiki.openstreetmap.org/wiki/Ohsome_API)) | OpenStreetMap as it was on a date, for example 22 January 2019 | ODbL | New, a check of D1 (R5d). |
+| [Google Open Buildings 2.5D Temporal](https://sites.research.google/gr/open-buildings/temporal) | For each year from 2016 to 2023: the presence of a building and its height, about 4 m. Vietnam is in its list. | CC BY 4.0 or ODbL | New. The heights and the first year (D10). |
+| Google Open Buildings v3 | Outlines of 2023 | CC BY 4.0 or ODbL | New. The outlines where Overture has none. |
+| [3D-GloBFP](https://essd.copernicus.org/articles/16/5357/2024/) | Outlines of Microsoft with heights of 2020. The error in Asia can be 13 m (RMSE). | CC BY 4.0 | New, a check of the heights. |
+| GHS-BUILT-H (European Commission, 2018) | The mean height of the buildings in cells of 100 m | CC BY 4.0 | New, a check of the mean height of each block. |
+| Microsoft Global ML Building Footprints | Outlines, and heights in some countries | ODbL | Not needed: Overture has them. |
+
+**The trees, the land cover, and the sea**
+
+| Source | Use |
+|---|---|
+| Meta and WRI canopy heights (1 m), ESA WorldCover 2021 | In use (plans 0005 and 0020). They give the classes of R5b. |
+| ETH global canopy height 2020 (10 m) | Not needed: the map of Meta and WRI is finer. |
+| GEBCO 2025, Sentinel-2 L2A | In use (plan 0005, R8g). |
+| The nautical charts of Vietnam | Not usable: not open. |
+
+**The photos** (for the look of the models, `docs/world-models.md`, section 3)
+
+| Source | What it gives | License | Use |
+|---|---|---|---|
+| Wikimedia Commons, Flickr | Photos with dates | CC0, CC BY, CC BY-SA, or public domain | In use. |
+| The video of 1992 (`docs/content/reference/video-1992.md`) | The things that did not change | Kept for reference (my decision) | In use. |
+| [Mapillary](https://www.mapillary.com) | Street photos with dates and positions | CC BY-SA 4.0. The API needs a free token (Q6). | New, a check. The builder counts the photos of 2017 to 2021 on the streets of this plan. |
+| KartaView | Street photos with dates and positions | CC BY-SA 4.0 | New, a check, as Mapillary. |
+| OpenAerialMap | Aerial photos | CC BY 4.0 | Not available: it has no photos of Vũng Tàu. |
+| My scans with a phone (the lidar of an iPhone Pro, or many photos) | A mesh of a small thing: a gate, a shrine, a stair, the front of a house | Mine | An option, only for things that did not change since 2019 (Q7). |
+| My photos from a drone | A mesh of a street | Mine | An option. A flight in Vietnam can need a permit (Check). |
+
+**For my eyes only** (D11)
+
+| Source | Use |
+|---|---|
+| Google Earth and its photorealistic 3D meshes | I look at the town in 3D. |
+| Google Earth, the photos of earlier years | I check the year of a building (Q3). |
+| Google Street View | I look at a street. |
+| Esri Wayback (World Imagery by date) | I check the year of a building (Q3). |
 
 ## 4. Requirements
 
 ### The data
 
-- **R1.** `tools/geo/buildings.py` (CI) fetches the footprints and the heights of buildings in the play area, and the height by year. It writes `data/geo/build/buildings_2019.json`: the outline, the height, the source, and the first year when the building shows. A building that first shows after 2019 is not in the file. The report `buildings_report.md` gives the counts and the maps: all buildings, the ones in 2019, and the ones that are removed.
-- **R2.** The floors come from the height with a rule in `data/geo/houses.json` (a base height and a height for each floor). The builder calibrates the rule with 20 buildings that I know (the homestay hẻm and some places on Trần Phú), and writes the result in the report. Where a lidar point of D9 falls on a building, its height also calibrates the rule, so I give the floors of fewer buildings.
+- **R1.** `tools/geo/buildings.py` (CI) fetches the buildings of the play area (D10):
+  - The outlines of Overture Maps and OpenStreetMap (plan 0005), and the outlines of Google Open Buildings v3 where they have none.
+  - The rasters of Open Buildings 2.5D Temporal of 2016 to 2023. They are in the public bucket `open-buildings-temporal-data`, version `v1`. The manifests of the S2 cell `31` (level 2) give the GeoTIFF of each tile and year (the download notebook of Google does the same).
+  - The heights of 3D-GloBFP (the part of Asia, DOI 10.5281/zenodo.11397014) and of GHS-BUILT-H.
+
+  For each outline, the build takes the median `building_height` of the pixels in it, where `building_presence` is more than a limit. The builder proposes the limit in the report. The first year is the first year in which the outline has a building. The build writes `data/geo/build/buildings_2019.json`: the outline, the height, the source of the outline, the source of the height, and the first year. A building that first shows after 2019 is not in the file. The report `buildings_report.md` gives the counts and the maps: all buildings, the ones in 2019, the ones that are removed, and the places where the raster of 2019 has a building and no outline has it (a building that is gone now). It also compares the heights of the 2.5D data with 3D-GloBFP, GHS-BUILT-H, the levels of OpenStreetMap, and the lidar of R5a.
+- **R2.** The floors come from the height with a rule in `data/geo/houses.json` (a base height and a height for each floor). The builder calibrates the rule with 20 buildings that I know (the homestay hẻm and some places on Trần Phú), and writes the result in the report. Where a lidar photon of R5a falls on a roof, or OpenStreetMap has `building:levels`, the height also calibrates the rule, so I give the floors of fewer buildings.
 - **R3.** The kind of each building:
   - When OpenStreetMap has a tag (hotel, church, temple, market), the tag decides.
   - Otherwise, a narrow deep footprint (width up to 6 m, depth at least twice the width) is a tube house. A tall narrow building near the beach is a mini-hotel. A large footprint is a block with a flat roof (`big`).
   - The known places of plan 0008 are not houses. Their outlines clear the houses.
 - **R4.** The front of each house points to the nearest road. The width and the depth come from the smallest rectangle around the outline. A row of houses with shared walls keeps the walls shared (W17).
-- **R5.** The data has a license note and a credit in the credits page (R15).
-- **R5a.** `tools/geo/lidar.py` (CI) gets the points of ICESat-2 ATL08 and GEDI L2A in the play area, of the years 2018 to 2023, to `data/geo/raw/lidar/`. It keeps only the points of good quality (the quality flags of each product), and writes for each point: the position, the date, the height of the ground, the height of the top, and the product.
-- **R5b.** The ground under the trees. `tools/geo/build.py` compares the height of the DEM with the height of the lidar ground at each point, and the report gives the difference by land cover (tree cover, bushes, town, bare ground) and on each hill. If the mean difference under the tree cover is more than 2 m, the build lowers the DEM under the tree cover by the difference, smoothly to zero at the edge of the cover, and the report shows the maps before and after. If it is 2 m or less, the build does not change the DEM. Then PT-33 runs again, and I look at the views of the hills.
+- **R5.** Each source in use has a license note in `data/geo/LICENSE` and a credit in the credits page (R15). For a source with two licenses (Open Buildings), the note says which one the game uses.
+- **R5a.** `tools/geo/lidar.py` (CI) asks SlideRule (the Python package `sliderule`, the public service) for the points in the play area, of all the years, to `data/geo/raw/lidar/`:
+  - ICESat-2 ATL08, and ATL03 with the classes of ATL08.
+  - ICESat-2 ATL24.
+  - GEDI L2A.
+
+  It keeps only the points of good quality (the quality flags of each product). For each point, it writes the position, the date, the height of the ground, the height of the top (or the height of the photon and its class), and the product. The lidar heights are above the WGS 84 ellipsoid. The build changes them to the vertical datum of the models of the ground (EGM2008 for Copernicus and DeltaDTM). The builder checks the datum of each model, and the report gives it. If SlideRule is not available, the fallback is the NASA Earthdata access with a free account (Q5).
+- **R5b.** The ground under the trees and the roofs. `tools/geo/fetch.py` also gets windows of GEDTM30 (version 1.2, a COG: the heights are in decimeters, Int32) and DeltaDTM (the tile of 10° N to 11° N and 107° E to 108° E, from the file of Asia of 4TU.ResearchData, DOI 10.4121/21997565). Then `tools/geo/build.py` does these steps:
+  1. It compares Copernicus, GEDTM30, and DeltaDTM with the lidar ground at each point. The report gives, for each model, the mean difference and the RMSE by land cover (tree cover, bushes, town, bare ground) and on each hill.
+  2. For each class and each hill, it takes the model with the smallest RMSE. A class or a hill with fewer than 30 lidar ground points keeps Copernicus, and the report says so.
+  3. Where that model differs from Copernicus by more than 2 m on average, the build uses it, with a smooth change to Copernicus over 60 m at the edge. Elsewhere, the build keeps Copernicus.
+  4. Below the line of the high water, the heights of plan 0005 (R8g) stay.
+
+  The report shows the maps before and after, and pictures of Bãi Trước and of Núi Nhỏ with each model side by side. The roads and the known places (plans 0005 and 0008) are built again on the new ground. Then PT-33 and PT-60 to PT-62 run again, and I look at the views of the hills.
+- **R5c.** The sea floor. The build compares the depths of ATL24 with the heights of the intertidal zone and of GEBCO (plan 0005, R8g), and the report gives the differences on a map. The build does not change the sea floor. I decide after the report.
+- **R5d.** The check of 2019 by OpenStreetMap. `tools/geo/buildings.py` gets the buildings of OpenStreetMap on 22 January 2019 from the ohsome API. The report lists the buildings that OpenStreetMap had then and the 2.5D data does not have in 2019, and the other way. It also lists the buildings with a `start_date` after 2019, or with `building=construction` in 2019. OpenStreetMap of 2019 did not have all the buildings, so a building that it does not have is not removed for that reason.
 
 ### The game
 
@@ -66,7 +153,7 @@ At the end of this plan, the town is full of houses. The hẻm of the homestay i
 
 ## 5. Phases
 
-1. The data pipeline and its report (R1 to R5b). I look at the maps in the report, and at the hills before and after R5b.
+1. The data pipeline and its report (R1 to R5d). I look at the maps in the report, and at the hills before and after R5b.
 2. The far level of the whole town (R6, R10), with boxes of the right size and roofs. I look from Núi Nhỏ and Núi Lớn.
 3. The houses of World, near and mid (R7, R8, R9), one kind at a time: the tube house first.
 4. The real hẻm and the homestay (R11).
@@ -74,7 +161,7 @@ At the end of this plan, the town is full of houses. The hẻm of the homestay i
 
 ## 6. Play-test scenarios
 
-- **PT-65 `buildings_data`.** The unit test of R1 to R4: no building is outside the area, no two overlap, the floors are from 1 to 12, and no building first shows after 2019. The test of R5b: with a DEM that is 5 m too high under the tree cover of a test area, the build finds the 5 m (within 0.5 m) and lowers the ground; with a correct DEM, it changes nothing.
+- **PT-65 `buildings_data`.** The unit test of R1 to R4: no building is outside the area, no two overlap, the floors are from 1 to 12, and no building first shows after 2019. The test of R5b: with a DEM that is 5 m too high under the tree cover of a test area, the build finds the 5 m (within 0.5 m) and lowers the ground; with a correct DEM, it changes nothing. With two models, one correct and one 5 m too high, the build takes the correct one, and no step at the edge is more than 0.3 m from cell to cell. A lidar point at a known height above the ellipsoid gets the height of the datum of the models. The test of R1: an outline with the raster of a building from 2021 only is not in the file, and its median height ignores the pixels of low presence.
 - **PT-66 `hem_homestay_walk`.** Walk the full hẻm with the joystick at 06:00, 12:00, and 20:30. The free path is 0.9 m or more at all times (the check of plan 0004, `hem_walk`). Enter the front room of the homestay.
 - **PT-67 `xom_luoi_walk`.** Walk from the homestay hẻm to chợ Xóm Lưới and along the streets around it. Each shop of R12 is at its place.
 - **PT-68 `town_views`.** Screenshots from the top of Núi Nhỏ, the top of Núi Lớn, the Hải Đăng road, and the bus view of plan 0010, at 12:00 and 18:00. The architect looks at them.
@@ -93,7 +180,11 @@ At the end of this plan, the town is full of houses. The hẻm of the homestay i
 ## 8. Open questions
 
 - **Q1.** The sources of the footprints and of the heights. The first choice: Google Open Buildings 2.5D Temporal for the height by year (4 m grid, CC BY 4.0 or ODbL), and a footprint set that covers the area (OpenStreetMap, Overture Maps, or Open Buildings). The builder checks in CI which one covers Vũng Tàu, and the architect confirms.
+  - **Partly answered (2026-11-18):** the sources table (section 3) and D10. Vietnam (VNM) is in the list of countries of the 2.5D data. The builder still checks in CI that its tiles cover the play area, and the architect confirms the report.
 - **Q2.** The rule for floors (R2). I give the floors of the buildings that I know: 20 without lidar, fewer where the lidar points fall on buildings.
 - **Q5.** I make a free NASA Earthdata account and put its token in the secret `EARTHDATA_TOKEN` before phase 1.
+  - **Changed (2026-11-18):** no account is necessary. SlideRule is a public service, and the files of the other sources are open downloads. Only if SlideRule is not available (R5a), I make the account and the secret.
 - **Q3.** The 2019 state of some places: which streets near chợ Xóm Lưới had shops, and which hotels stood near Bãi Trước. These facts have the status "Check".
 - **Q4.** The first release does not need all the town. Which part has houses of the near level first: the hẻm, the market streets, and the road to Bãi Trước?
+- **Q6.** The API of Mapillary needs a free account and a token (a secret `MAPILLARY_TOKEN`). Do I make them? Without them, the builder checks only KartaView.
+- **Q7.** When I am in Vũng Tàu, which things do I scan with a phone? Only things that did not change since 2019 are useful: for example a gate, a shrine, a stair, or a part of the sea wall.

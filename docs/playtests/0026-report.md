@@ -173,7 +173,7 @@ The side of the hill along Hạ Long is bare earth with palms (`terminal_and_slo
 
 ### 7.4 Answers to the questions of the plan
 
-- **Q13.** Do not wait for an Earth Engine account. Count the storeys of the houses of the slope from the photos of 2017 to 2021 (the photo from a drone of 2021 shows many of them), as for the other stand-ins. A footprint that no photo shows stays off. The account is a question for plan 0009.
+- **Q13.** Do not wait for an Earth Engine account. Count the storeys of the houses of the slope from the photos of 2017 to 2021 (the photo from a drone of 2021 shows many of them), as for the other stand-ins. A footprint that no photo shows stays off. The account is a question for plan 0009. Plan 0009 now needs no account (2026-11-18): the 2.5D data is in a public bucket, and its sources are open downloads or public services (plan 0009, section 3, "The sources").
 - **Q14.** Correct the build now: at a junction, both roads come to one smooth height. Build the geodata again, and run the geodata tests and PT-33 to PT-39.
 - **Q15.** Yes. Grow the outline of the area to the lot of the Palace Hotel (way 791795130) and to Nguyễn Trãi in front of it. Where the photos of 2014 and of 2022 show the same porch and the same faces, that was the look in 2019 too: Source (Q17, rule 1). Where they do not agree, the value stays Check. The video of 1992 (`docs/content/reference/video-1992.md`, 2:15) shows that the hotel is in the view from Quang Trung.
 - **Q16.** Yes: use the name. The letters HA LONG HOTEL of the photo of 2021 go on the model (AGENTS.md section 4; the culture notes list the exception).
