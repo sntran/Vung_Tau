@@ -186,6 +186,36 @@
 				"hang_rao_cong_vien.receipt.json": "d2ea319b256ef660972a9017bedf3fa82819407e462def07706832d17754560b"
 			}
 		},
+		"hang_rao_khach_san_grand": {
+			"hash": "26c813b111f8b6205ded3f0f5b8993ba",
+			"files": {
+				"hang_rao_khach_san_grand.far.glb": "31a570369ca9c1d255c1da0d990abdcc22a7bc22528179ff0ec3890c176a86e6",
+				"hang_rao_khach_san_grand.glb": "d542cd13d1455e72ac912437894ce24af5c67439d0f796549aa1b7613c7d0144",
+				"hang_rao_khach_san_grand.mid.glb": "329d5e95306862b6408f2d027ab6cbfa77ba5061fb4ba2e7f5a5c590fbf854ef",
+				"hang_rao_khach_san_grand.parts.json": "d43a1a0b5322870ec00da3a65000d99d497628f7a06ecd832901d237675d814d",
+				"hang_rao_khach_san_grand.receipt.json": "f896755c46c144965d81463f8db7b12cf74f92f7cb271b16332dbedaac240596"
+			}
+		},
+		"ke_da_bai_truoc": {
+			"hash": "e96e7363da7282ae20caaae7de81749c",
+			"files": {
+				"ke_da_bai_truoc.far.glb": "bfcba696e9f40766164154474e948f0cbee0a98e49dfe4d1431779cac1381ebe",
+				"ke_da_bai_truoc.glb": "03d5a9fac68f50677709be3061b1fa3e769fd5884fbf0d98af5607e88b8561f4",
+				"ke_da_bai_truoc.mid.glb": "d60ff0f3f487ae274186f5ebccfc30e431e7038b9f8db9c3112ba7ac7a27f53f",
+				"ke_da_bai_truoc.parts.json": "d5042981bbd242bae7662f525213e52e8f4219abebbea627099a9c62e2688317",
+				"ke_da_bai_truoc.receipt.json": "f2e5a083190443b6dff5c2c93e89c3f283207ad43d9aa3f1a1f1964d345e17ef"
+			}
+		},
+		"ke_ha_long": {
+			"hash": "18e8c38bc4eea1dacd0c5aaba7a7f9ee",
+			"files": {
+				"ke_ha_long.far.glb": "e2051bfe63101231c84c23cfb22dfc10875afacd30d417f7bb015370f87e0f6e",
+				"ke_ha_long.glb": "f206f35f3a31a3e3513f083f5161887db9744b9ed93d32bcccf3b373d78cefac",
+				"ke_ha_long.mid.glb": "fe5a529e1d32fedda6459de0b9cd9e2ebb8c7d55b52b0d09b590b6438c2d12ac",
+				"ke_ha_long.parts.json": "d4e357bb0333df0e6ffad1233c7f4e2ad902a0be0f8b2fcf6034ac32f7faab68",
+				"ke_ha_long.receipt.json": "f737223dc2601e58e5dbc773cc7f33ac0931c43595ce736987d8e193a44f4cd0"
+			}
+		},
 		"khach_san_buu_dien": {
 			"hash": "c660b5fac512441cf6f9075fbc796657",
 			"files": {
@@ -234,6 +264,16 @@
 				"lan_can_ha_long.mid.glb": "d488a0641faa150df1d33b4ad7645baef0566a65735f69d83bcbb8b053780dd9",
 				"lan_can_ha_long.parts.json": "a50fa240a8580c61518eabf4b249b1d58441d55a19f7be428cb0f13521e295f4",
 				"lan_can_ha_long.receipt.json": "404a4b8199729b74ab3016a6bd01256b045294478cb08ed9cf75d077a5e1560a"
+			}
+		},
+		"nha_mai_ngoi_cam": {
+			"hash": "982237071acf94af8a5d3dc0238f869f",
+			"files": {
+				"nha_mai_ngoi_cam.far.glb": "efcc413312596bedba200cb079799e585c9aadf8e55f1231cfcdfa6a8e18c40f",
+				"nha_mai_ngoi_cam.glb": "0119a9ba12cf326d0d0fc12b25e3879b741c144867758f0838bb99f3e5d38aac",
+				"nha_mai_ngoi_cam.mid.glb": "0988dca201496367e57572c0fe78d07a4bc20d159129197b070f889d84856b79",
+				"nha_mai_ngoi_cam.parts.json": "b28ac0db1637c13716263f183fd690daa23f95a797cea951ef3894b738e1c489",
+				"nha_mai_ngoi_cam.receipt.json": "a7c22b7b9ae090c2836d8ca0af2bd3c08764bd546c8fce3e35fea4ba6ea875fb"
 			}
 		},
 		"non_rong_vanh": {
