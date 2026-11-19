@@ -26,6 +26,8 @@ const MIN_DROP := 0.2
 const BACK_ON_WALK := 0.3
 ## The top of the model of the steps and the walk 1 m from the wall, and its foot and the sand (m).
 const TOP_ON_WALK := 0.25
+## The longest time of the turn from the sand back to the opening (s of real time).
+const LOOK_BACK_S := 45.0
 const FOOT_ON_SAND := 0.3
 ## An opening where the sand is this much under the walk has steps.
 const NEEDS_STEPS := 0.4
@@ -103,8 +105,10 @@ func _walk_through(d: PlaytestDriver, w: VungTau, k: int, opening: Dictionary) -
 	d.expect(player.y - w.ground_height(player.x, player.z) < 0.3 and player.distance_to(sand_point) < 2.0,
 			"opening %d: the player is on the sand: %.2f m over the ground, %.1f m from the point" % [
 				k, player.y - w.ground_height(player.x, player.z), player.distance_to(sand_point)])
-	# From the sand, the view back to the opening and its steps.
-	await d.look_at_point(at + Vector3(0, 0.6, 0), 3.0, 15.0)
+	# From the sand, the view back to the opening and its steps: a turn of about
+	# 180 degrees. In CI (about two times slower) 15 s of real time was too short
+	# at opening 2 (the CI of 1e1c173 and of 44d69ad).
+	await d.look_at_point(at + Vector3(0, 0.6, 0), 3.0, LOOK_BACK_S)
 	await d.wait_frames(6)
 	await d.screenshot("opening_%02d_sand" % k)
 	var up := PackedVector3Array([sand_point, at, walk_point])

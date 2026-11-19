@@ -132,6 +132,8 @@ var under_row: WorldRow
 ## with the ranges of "fence_ranges" of "wall_pieces". In the row of the walls
 ## (the mid level to 12 m on Low), the fence of S4 showed its far level on Low.
 var fence_row: WorldRow
+## The lift of the levels of a model in a row (_lift_of()), for each model.
+static var _lifts: Dictionary = {}
 ## The end of the range of the squares of a part in chunks (the color -> m).
 var _far_ends: Dictionary = {}
 ## Report 0026, D-0026-17: the hedges, the round bushes, the flowers of the
@@ -2240,15 +2242,23 @@ func _wall_piece(model_id: String, a: Vector3, b: Vector3, sea: Vector3, up := 1
 ## its depth: the steps stood over the walk, and the slope of Hạ Long, turned
 ## over to go down, lay as a flat deck over the beach (audit 3 of the
 ## corrections, D-0026-26 and D-0026-27). The pieces take the lift away.
+## The model is made, read, and freed at once: a template of WorldRow is freed
+## only by WorldRow.build(), and a play test that quits before the showcase
+## builds its rows leaked it (the CI of 44d69ad: geo_tide, tree_budget).
 func _lift_of(model_id: String) -> float:
-	var template := WorldRow._template(model_id)
-	if template == null:
-		return 0.0
-	for level: String in ["mid", "near", "far"]:
-		var node := template.level(level)
-		if node != null:
-			return node.position.y
-	return 0.0
+	if _lifts.has(model_id):
+		return _lifts[model_id]
+	var lift := 0.0
+	var model := WorldModel.make(model_id)
+	if model != null:
+		for level: String in ["mid", "near", "far"]:
+			var node := model.level(level)
+			if node != null:
+				lift = node.position.y
+				break
+		model.free()
+	_lifts[model_id] = lift
+	return lift
 
 
 ## Report 0026, D-0026-22: a fence of a model of this game (the fence of the
