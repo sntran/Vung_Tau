@@ -193,3 +193,94 @@ A game of the streets of Hà Nội in Unreal Engine 5 (screenshots shared on Fac
 - **R20. The surface of the roads** (with D-0026-18). Dark asphalt with patches, stains, manhole covers, and the painted lines and crossings of the photos; the granite curbs with their wear. Decals or a mask of the ground, from photos of 2017 to 2021.
 - **R21. A look on a real graphics card.** The screenshots of this report are on Low, with a software renderer and no graphics card: the worst case. Make the macOS build of the branch (the export workflow) run PT-72 on High with one command, and write the command in the report. I run it on my computer and put the sheets in the branch.
 - **PT-72 (change).** In S3, S4, and the street views of PT-74, count the things of R18 and R19 in the frame, against the counts of the photos.
+
+## 8. Audit 3: branch at `a9f6c6b` (2026-11-18)
+
+The pictures of this audit are in [`0026/audit-2026-11-18/`](0026/audit-2026-11-18/). The workspace of this audit has 2 CPUs and 8 GB of memory.
+
+### 8.1 Runs
+
+| Run | Result |
+|---|---|
+| CI of `a9f6c6b` | Pass: 17 of 17 jobs. |
+| PT-71 `showcase_places` | Pass (148 s). The scan of the edges: 11 of 6 136 points have a step of more than 0.25 m, and the longest run is 2 m. |
+| PT-72 `showcase_shots`, phases 1 and 2 (Low, 17:10 and 12:00) | Pass. The checks of the hill and of the water pass. |
+| PT-73 `showcase_budget`, phase 1 (Low) | Pass. S1 194 722, S2 289 293, S3 266 828, S4 158 239, S5 286 902 triangles (CI: S5 296 532). |
+| PT-74 `showcase_walk`, runs 1 to 8 | Pass, also run 5 with `PLAYTEST_MAX_FPS=3`. |
+| PT-75 `showcase_people`, phases 1 and 2 | Pass. At 17:00, 11 of 11 swimmers are in the sea, and 7 show in the frame of S1. |
+| PT-76 `showcase_night`, phase 1 (Low) | Pass. |
+| PT-76 `showcase_night`, phase 2 (High, Forward+) | **Stopped by the workspace**: Godot used 6.0 GB, more than the 8 GB of the workspace with the other processes. It passes in CI (16 GB). With lavapipe, the memory of the GPU is in the RAM, so this is not the memory of the computer of a player. R21 also records the memory on a real graphics card. |
+| PT-37 `geo_chunks`, phase 1 | Pass. The world is built in 3.3 s, and the first frame comes 17.1 s after the start of the engine. |
+| PT-58 `morning_exercise` | Pass. |
+
+### 8.2 What is correct
+
+- **D-0026-11.** The walk from the park to the jetty passes in its eight runs, also at 3 frames per second. The scan of the edges of PT-71 finds a ledge before a player does.
+- **D-0026-12.** CI is green, and each play test of the world starts in its time again.
+- **D-0026-13.** Hải Âu stands at the level of the sidewalk of Hạ Long, and its looks are of the files of the lock.
+- **D-0026-14.** Khách sạn Bưu điện and Cao ốc Sen Biển are models from their photos in S1. No box stands over the jetty.
+- **D-0026-16, D-0026-18, D-0026-19, D-0026-20.** The top of the low wall is one smooth line. The roads are dark asphalt with white lines. The blue poles stand along the walk of the sea. The swimmers wear T-shirts and shorts, some have swim rings, and the boats lie on the sand.
+- **D-0026-17.** The park has its hedges, round bushes, flower beds, benches, and paths of tiles, and S2 shows the grove of leaning palms.
+- **The fast ground** (`prepare_at()` and `is_settled()`, `39fa0b9` and `a43d35f`): a measure waits for the far tiles. **PT-58** measures the motion in game time for 2 s. **The impostors** of the bushes and of the flowers have their colors, and the check finds a white impostor.
+
+### 8.3 Defects
+
+#### D-0026-22: The Grand Hotel stands on a bank of earth (high)
+
+In S4, a bank of bare earth goes up from the sidewalk of Quang Trung to the front of the hotel (`s4_grand_hotel_bank.jpg`). The ground of the game is 6.65 m at x 115 (the outer edge of the sidewalk) and 8.83 m at the front of the model (x 125 to x 155): the hotel is 2.2 m over the sidewalk. The scan of the edges finds the foot of the bank (steps of 0.31 m to 0.34 m at x 116, z 8 to z 9), but the run is shorter than 5 m, so it passes. In the photo of S4, the fence with the lantern posts stands on the sidewalk, and the garden with the frangipani and the big trees is at the same level. This is the fault of D-0026-13 again.
+
+- Make the ground level from the sidewalk to the front of the hotel, as for Hải Âu (`forecourt_m`, `level_at`).
+- Put the fence with its lantern posts and the trees of the garden of the photo (Source from photos of 2017 to 2021, or Check).
+- Add a check to PT-71: for each model of World in the area, the ground from the curb of its street to its front does not go up or down more than 0.5 m.
+
+#### D-0026-23: The far hill is still a pattern of mounds (high)
+
+In S1, S5, and each walk view of PT-74, the forest of Núi Nhỏ on Low is dark green caps with flat bottoms, at even distances on a smooth green slope (`s1_hill_mounds.jpg`). In the photo, it is one rough canopy of crowns of many sizes, with dark gaps between them. This is the open item of the report of the builder, and the look of D-0026-15. PT-72 passes, because the box `hill` measures the mean color and the spread of blocks of 16 px: the caps and the slope between them have about the same mean.
+
+- Change the far form so that the crowns touch and the gaps are shade, not a lit slope.
+- Add a check of the shape: for example, the part of the pixels of the box on a sharp edge (a gradient filter), and the largest smooth area between two crowns, against the same values of the photo.
+- Put the box `hill` of the shot next to the photo at twice the size in the sheets.
+
+#### D-0026-24: A row of casuarinas along Hạ Long hides the hall (medium)
+
+In S1, an even row of trees of one kind, one size, and 7 m apart stands along Hạ Long from the beach to Cao ốc Sen Biển (`s1_trees_hide_hall.jpg`). It hides the hall with the roof of orange tiles (way 225803473: PT-72 sees its 18 points, but the trees cover it) and the fronts by the road. The trees come from the rule `coast_roads` of `data/geo/trees.json` (85 % casuarina, every 7 m: a builder value of plan 0020, Check). The photo of S1 and the photo from a drone of 2021 show a few coconut palms there. In the area of the showcase, the trees of Hạ Long come from the photos, as the grove of S2. Make the hall a subject of S1 in `data/showcase/shots.json`, so that PT-72 fails when a tree or a model hides it.
+
+#### D-0026-25: The low wall at the eye of S1 (medium)
+
+In the photo of S1, the wall in front of the eye is solid granite blocks with a thick flat cap, and the white wall with posts starts farther north (`s1_wall.jpg`). In the game, all the wall has posts and openings. Use the kind of wall of the photos at each part of the line, or Check where no photo shows it. Also, near the eye of S1 the walk goes down to the wall with a grade of about 0.3 in its last 2 m (the ground: 4.63 m at 3 m from the line, 4.02 m at 1 m). In the photos, the walk is level to the wall.
+
+#### D-0026-26: The steps in the openings of the low wall (medium)
+
+In PT-74 run 1 (150 m) and in S1, a flight of steps stands on the side of the walk and goes up from the walk to the top of the wall (`steps_on_the_walk_side.jpg`). The steps must go down from the walk to the sand, on the side of the beach. Find the cause: in the ground of the game, the side of the sea is lower along all the line except its flat north end (0.2 m to 0.8 m lower at 1 m from the line, 0.8 m to 2.0 m lower at 3 m). Add a play test that walks through each opening, down the steps to the sand, and back up, with a screenshot of each opening from the walk and from the sand.
+
+#### D-0026-27: Four models with the status Source are not in the game (medium)
+
+- `nha_mai_ngoi_cam` (the hall with the roof of orange tiles), `ke_ha_long` (the sea wall of Hạ Long), and `ke_da_bai_truoc` (the sea wall under the low wall of the beach) have the status Source and no order in `data/world/orders.json`, and their `status_note` does not say why. So the sea wall of Hạ Long is a plain slope of earth in PT-74 runs 3 to 6, and the hall is a stand-in. The near level of the hall needs the job "Models of World": put its order in `orders.json`, and the job of this repository builds it (no construction shift of World is necessary).
+- `nha_khach_ha_long`: its two looks are of "a preview in my workspace, not of the model of World". This is the fault of D-0026-13. A look is of the files of the lock.
+- The test `test_the_orders_of_the_drawings_are_in_the_orders_of_the_game` passes them: `order_problems()` checks only the drawings that are in `orders.json`, but its docstring says that it finds the drawings with the status Source whose order is not there. Make the test fail for a Source drawing with no order, unless its `status_note` says why it is not in the game (as `cay_thong_noel`).
+
+#### D-0026-28: The budget of S5 has no room (medium)
+
+In CI, S5 has 296 532 triangles on Low: 1.2 % under the limit. The builder found that two walkers near the eye at the same time can take it over the limit. A player sees the walkers at any moment, so PT-73 must measure the worst case: each walker of the spots of S5 at its point nearest to the eye. S5 must pass with that.
+
+#### D-0026-29: A gray slab on the raised lawn of S5 (low)
+
+In S5, at 17:10, 12:00, and 20:00, a light gray area covers about a third of the top of the raised lawn (way 234797330) (`s5_slab_on_the_lawn.jpg`). The ground under the lawn is level (4.73 m to 4.85 m at its corners and in its middle), so it is not the ground through the top. In the photo of S5, the top is all grass.
+
+#### D-0026-30: Small things (low)
+
+See `low_items.jpg`.
+
+- The south end of the park is bare sand with a blurred dark band at the edge of the lawn (PT-74 run 4, 550 m).
+- The south end of the median at the junction of Quang Trung and Hạ Long is a point of brown earth on the road (PT-74 run 5, 700 m).
+- A walker in a tight white top looks like a body with no clothes at 1 m (PT-74 run 2, 200 m). Give the light tops a texture or a second color, as the far hair of plan 0023.
+- The wet sand near the water has dark and white patches (S1, and PT-75 `008-swimmers_1700.png`).
+
+### 8.4 The plan
+
+- **R18 to R21 and the change of PT-72** (section 7.5, on `main` since `cd1e2b8`) are not on the branch yet. Merge `main` into the branch, and write them in the plan file.
+- **Q21 to Q23** wait for my answers. Mapillary has street photos of the area with their dates (plan 0009, R5e; the secret `MAPILLARY_TOKEN` is in the repository). A photo of 2017 to 2021 from there can answer Q21 (the back wings of the Grand Hotel), Q22 (the fronts along Hạ Long), and Q23 (the letters on Khách sạn Bưu điện).
+
+### 8.5 Status
+
+The plan stays "In progress". No defect of this audit needs a construction shift of World: the large models are built by the job "Models of World" of this repository (`mix world.order` in CI).
