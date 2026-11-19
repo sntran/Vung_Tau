@@ -280,6 +280,7 @@ See `low_items.jpg`.
 
 - **R18 to R21 and the change of PT-72** (section 7.5, on `main` since `cd1e2b8`) are not on the branch yet. Merge `main` into the branch, and write them in the plan file.
 - **Q21 to Q23** wait for my answers. Mapillary has street photos of the area with their dates (plan 0009, R5e; the secret `MAPILLARY_TOKEN` is in the repository). A photo of 2017 to 2021 from there can answer Q21 (the back wings of the Grand Hotel), Q22 (the fronts along Hạ Long), and Q23 (the letters on Khách sạn Bưu điện).
+  - **Decided (2026-11-19):** use Mapillary now, in this plan. Make the tool of plan 0009, R5e, on the branch of this plan. Use its photos of 2017 to 2021 for Q21 to Q23, for D-0026-21, D-0026-22, D-0026-24, and D-0026-25, and for the counts of R18 to R20. The workspace cannot reach Mapillary (`graph.mapillary.com`) or download the artifacts of CI (`*.blob.core.windows.net`, checked on 2026-11-19), so a workflow of CI gets the photos and commits what the builder must look at. A letter or a name of a business on a building (Q23) still waits for my approval (AGENTS.md, section 4).
 
 ### 8.5 Status
 
