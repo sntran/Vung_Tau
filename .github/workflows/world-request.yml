@@ -1,0 +1,44 @@
+name: World request
+
+# A request of this project to the factory of World with the ID token of
+# this job, as the game asks for its models (World, docs/factory.md, "The
+# secrets"). It measures the time from the request to the whole level of
+# an order (scripts/edit-time.mjs of World): the parts list, each part,
+# and the whole level. When no construction shift runs, the request
+# starts one. The job uses no secret.
+on:
+  push:
+    branches: [ci/world-request-measure]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # The ID token of the job proves the project to the factory.
+  id-token: write
+
+jobs:
+  request:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      # Hải Âu at mid (a storey of 4.2), and an edit that makes a new order.
+      HASH: 42bab18a507afa6fb1acc46d052f0666
+      EDITS: '[{"set": "options.storey", "to": 3.55}]'
+      # A short shift, if the request starts one.
+      WORLD_SHIFT_HOURS: "0.5"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: sntran/World
+          ref: main
+          persist-credentials: false
+          sparse-checkout: scripts
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Ask the factory
+        run: |
+          date -u +"The request starts at %H:%M:%S UTC." | tee -a "$GITHUB_STEP_SUMMARY"
+          node scripts/edit-time.mjs https://world.mkfifo.workers.dev "$HASH" mid "$EDITS" | tee -a "$GITHUB_STEP_SUMMARY"
