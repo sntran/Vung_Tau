@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Approved (2026-11-16), for the area of plan 0026 first. Changed (2026-11-18): all the sources of the data (section 3, "The sources"; D9 to D11, R1, R5 to R5d, Q1, Q5 to Q7). |
+| Status | Approved (2026-11-16), for the area of plan 0026 first. Changed (2026-11-18): all the sources of the data (section 3, "The sources"; D9 to D11, R1, R5 to R5e, Q1, Q5 to Q7). |
 | Branch | `feat/0009-houses-on-the-lots` |
 | Depends on | 0004 (the house kit and the palette), 0005 (the roads and the ground), 0008 (the known places stay as they are), 0023 (the houses come from World, D8). |
 | Used by | 0010 (the bus ride), 0011 to 0015 (the shops and the streets), 0021 (Tết), 0022 (the garden). |
@@ -86,8 +86,8 @@ Each source of the data of this plan, also the ones that the plan does not use, 
 |---|---|---|---|
 | Wikimedia Commons, Flickr | Photos with dates | CC0, CC BY, CC BY-SA, or public domain | In use. |
 | The video of 1992 (`docs/content/reference/video-1992.md`) | The things that did not change | Kept for reference (my decision) | In use. |
-| [Mapillary](https://www.mapillary.com) | Street photos with dates and positions | CC BY-SA 4.0. The API needs a free token (Q6). | New, a check. The builder counts the photos of 2017 to 2021 on the streets of this plan. |
-| KartaView | Street photos with dates and positions | CC BY-SA 4.0 | New, a check, as Mapillary. |
+| [Mapillary](https://www.mapillary.com) | Street photos with dates, positions, and directions. Mapillary blurs the faces and the number plates. | CC BY-SA 4.0. The API needs a free token (Q6). | New. Photos for the look of the houses, the streets, and the models of World (R5e). |
+| KartaView | Street photos with dates and positions | CC BY-SA 4.0 | New, a check. The builder counts its photos of 2017 to 2021 on the streets of this plan. |
 | OpenAerialMap | Aerial photos | CC BY 4.0 | Not available: it has no photos of Vũng Tàu. |
 | My scans with a phone (the lidar of an iPhone Pro, or many photos) | A mesh of a small thing: a gate, a shrine, a stair, the front of a house | Mine | An option, only for things that did not change since 2019 (Q7). |
 | My photos from a drone | A mesh of a street | Mine | An option. A flight in Vietnam can need a permit (Check). |
@@ -133,6 +133,10 @@ Each source of the data of this plan, also the ones that the plan does not use, 
   The report shows the maps before and after, and pictures of Bãi Trước and of Núi Nhỏ with each model side by side. The roads and the known places (plans 0005 and 0008) are built again on the new ground. Then PT-33 and PT-60 to PT-62 run again, and I look at the views of the hills.
 - **R5c.** The sea floor. The build compares the depths of ATL24 with the heights of the intertidal zone and of GEBCO (plan 0005, R8g), and the report gives the differences on a map. The build does not change the sea floor. I decide after the report.
 - **R5d.** The check of 2019 by OpenStreetMap. `tools/geo/buildings.py` gets the buildings of OpenStreetMap on 22 January 2019 from the ohsome API. The report lists the buildings that OpenStreetMap had then and the 2.5D data does not have in 2019, and the other way. It also lists the buildings with a `start_date` after 2019, or with `building=construction` in 2019. OpenStreetMap of 2019 did not have all the buildings, so a building that it does not have is not removed for that reason.
+- **R5e.** Street photos from Mapillary. `tools/geo/photos.py` (CI, with the secret `MAPILLARY_TOKEN`) lists the images of the play area from the coverage tiles (`mly1_public`, zoom 14) and the API of the images. It writes `data/geo/raw/mapillary.json`. For each image, it writes the id, the date, the position after processing (`computed_geometry`), the direction (`compass_angle`), the kind of camera (360 or not), the sequence, and the author. The report `photos_report.md` gives a map of the images by year, and the count of images of 2017 to 2021 on each street of this plan and at each known place (plan 0008).
+  - The build does not copy the images. For a model, the builder chooses the images and copies them into `docs/reference/photos/` with the link, the date, the author, and the license (`docs/world-models.md`, section 3).
+  - The URL of a picture expires, so the index keeps the id of the image, and not the URL.
+  - A sequence can have a point cloud (`sfm_cluster`). A size from a point cloud has the status "Check", and the report gives how it was measured.
 
 ### The game
 
@@ -153,7 +157,7 @@ Each source of the data of this plan, also the ones that the plan does not use, 
 
 ## 5. Phases
 
-1. The data pipeline and its report (R1 to R5d). I look at the maps in the report, and at the hills before and after R5b.
+1. The data pipeline and its report (R1 to R5e). I look at the maps in the report, and at the hills before and after R5b.
 2. The far level of the whole town (R6, R10), with boxes of the right size and roofs. I look from Núi Nhỏ and Núi Lớn.
 3. The houses of World, near and mid (R7, R8, R9), one kind at a time: the tube house first.
 4. The real hẻm and the homestay (R11).
@@ -188,5 +192,6 @@ Each source of the data of this plan, also the ones that the plan does not use, 
 - **Q4.** The first release does not need all the town. Which part has houses of the near level first: the hẻm, the market streets, and the road to Bãi Trước?
 - **Q6.** The API of Mapillary needs a free account and a token (a secret `MAPILLARY_TOKEN`). Do I make them? Without them, the builder checks only KartaView.
   - **Answered (2026-11-18):** I make them if Mapillary has good photos of the play area. The first look is on the public map of Mapillary, which needs no account.
+  - **Answered (2026-11-18), later:** the photos are good. I make the account and put the client token in the secret `MAPILLARY_TOKEN` (R5e).
 - **Q7.** When I am in Vũng Tàu, which things do I scan with a phone? Only things that did not change since 2019 are useful: for example a gate, a shrine, a stair, or a part of the sea wall.
   - **Partly answered (2026-11-18):** I asked some people to take photos later. It is not sure, so no step of this plan waits for them.

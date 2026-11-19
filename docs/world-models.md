@@ -29,6 +29,7 @@ The look of the model comes from photos, not from a guess.
 - **Write how each size was measured**: for example "the pole is 4.6 times the height of the person beside it (1.6 m): 7.4 m", or "70.9 m of the outline of OpenStreetMap over 20 bays: 3.5 m".
 - **A photo of 2017 to 2021** is the best source for 2019. A size or a look that only an older or newer photo shows is "Check", and the game does not use the model before I decide it.
 - **Open photos** (CC0, CC BY, CC BY-SA, public domain) are copied into `docs/reference/photos/` with their credits (plan 0026, R17). Other photos stay links.
+- **Street photos**: Mapillary has photos with their dates, positions, and directions (plan 0009, R5e, CC BY-SA 4.0). Find the photos of 2017 to 2021 near the model in `data/geo/raw/mapillary.json`.
 
 ## 4. The work: ask, look, edit
 
