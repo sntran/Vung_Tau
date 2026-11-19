@@ -158,6 +158,7 @@ Each source of the data of this plan, also the ones that the plan does not use, 
 ## 5. Phases
 
 1. The data pipeline and its report (R1 to R5e). I look at the maps in the report, and at the hills before and after R5b.
+   - Changed (2026-11-18): phase 1 has two parts. **1a**: the fetches and the reports (R1, R5, R5a, R5c, R5d, R5e). They change nothing in the game, so they can start before plan 0026 is on `main`, on the branch of this plan. They need no model of World and no construction shift of World. **1b**: the new ground (R5b). It changes the ground under the showcase of plan 0026, so it starts after plan 0026 is on `main`. Report 0026, D-0026-22 (the Grand Hotel on a bank of earth) is a fault of the same kind: the model of the surface has the trees of the garden and the roofs.
 2. The far level of the whole town (R6, R10), with boxes of the right size and roofs. I look from Núi Nhỏ and Núi Lớn.
 3. The houses of World, near and mid (R7, R8, R9), one kind at a time: the tube house first.
 4. The real hẻm and the homestay (R11).
