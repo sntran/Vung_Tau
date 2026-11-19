@@ -192,6 +192,6 @@ Each source of the data of this plan, also the ones that the plan does not use, 
 - **Q4.** The first release does not need all the town. Which part has houses of the near level first: the hẻm, the market streets, and the road to Bãi Trước?
 - **Q6.** The API of Mapillary needs a free account and a token (a secret `MAPILLARY_TOKEN`). Do I make them? Without them, the builder checks only KartaView.
   - **Answered (2026-11-18):** I make them if Mapillary has good photos of the play area. The first look is on the public map of Mapillary, which needs no account.
-  - **Answered (2026-11-18), later:** the photos are good. I make the account and put the client token in the secret `MAPILLARY_TOKEN` (R5e).
+  - **Answered (2026-11-18), later:** the photos are good. I made the account, and the secret `MAPILLARY_TOKEN` of this repository has the client token (R5e).
 - **Q7.** When I am in Vũng Tàu, which things do I scan with a phone? Only things that did not change since 2019 are useful: for example a gate, a shrine, a stair, or a part of the sea wall.
   - **Partly answered (2026-11-18):** I asked some people to take photos later. It is not sure, so no step of this plan waits for them.
