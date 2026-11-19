@@ -23,9 +23,10 @@ const SECOND := 0.5
 ## clumps are larger, so that they cover about as much of the hills as all
 ## the clumps. "height_max" (Low): a clump grows wider, but not higher than this
 ## scale (report 0026, D-0026-15: on Low the crowns of 11 m every 32 m stood on
-## the bare hill of S1 as small houses; the photo shows one canopy).
+## the bare hill of S1 as small houses; the photo shows one canopy). D-0026-23:
+## on Low the crowns are 25 m to 70 m wide far away (32 m apart), so that they overlap, and they lie on the slope.
 const DETAIL := {
-	"low": {"crown": true, "scale": [3.4, 5.0], "scale_m": [400.0, 1600.0], "dense_m": 0.0, "height_max": 1.8},
+	"low": {"crown": true, "scale": [7.0, 8.5], "scale_m": [400.0, 1600.0], "dense_m": 0.0, "height_max": 1.8},
 	"medium": {"crown": false, "scale": [1.0, 2.4], "scale_m": [900.0, 1500.0], "dense_m": 1000.0},
 	"high": {"crown": false, "scale": [1.0, 2.4], "scale_m": [1300.0, 2000.0], "dense_m": 1500.0},
 	"ultra": {"crown": false, "scale": [1.0, 2.4], "scale_m": [1800.0, 2600.0], "dense_m": 2000.0},
@@ -78,8 +79,16 @@ func setup(world: VungTau) -> void:
 				if not tiles.has(key):
 					tiles[key] = [[], []]
 				var sparse := i == 0 and row % 2 == 0 and col % 2 == 0
-				var size := rng.randf_range(1.0, 1.5)
+				# Report 0026, D-0026-23: crowns of many sizes, so the far forest is not even mounds.
+				var size := rng.randf_range(0.7, 1.6)
 				var basis := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(size, size * rng.randf_range(0.8, 1.1), size))
+				# Report 0026, D-0026-23: the crown lies on the slope (its up is the
+				# normal of the ground), so the crowns of a hillside are one layer:
+				# a level crown on a steep slope showed its flat lower side from the
+				# sea, with the lit slope between the crowns.
+				var normal := Vector3(-(heights[row * width + col + 1] - heights[row * width + col - 1]) / (2.0 * step), 1.0,
+						-(heights[(row + 1) * width + col] - heights[(row - 1) * width + col]) / (2.0 * step)).normalized()
+				basis = Basis(Quaternion(Vector3.UP, normal)) * basis
 				# The clumps stand a little into the ground: the overview grid is
 				# smoother than the near ground.
 				var y := world.data.overview_height(p.x, p.y) - 1.5
@@ -148,20 +157,21 @@ static func clump_mesh() -> Mesh:
 	return tool.commit()
 
 
-## The mesh of one sparse clump on Low: one round crown (24 triangles), 5 m
+## The mesh of one sparse clump on Low: one round crown (32 triangles), 5 m
 ## wide and 4 m high.
 static func crown_mesh() -> Mesh:
 	var tool := SurfaceTool.new()
 	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
 	# Darker than a crown of a clump: one crown has no shade of the other crowns on it.
-	_crown(tool, Vector3(0.0, 2.2, 0.0), Vector3(2.6, 2.0, 2.6), 0.4, 0.75)
+	# Eight sides: from far, the six sides of a large crown showed (report 0026, D-0026-23).
+	_crown(tool, Vector3(0.0, 2.2, 0.0), Vector3(2.6, 2.0, 2.6), 0.25, 0.9, 8)
 	tool.index()
 	return tool.commit()
 
 
 ## A half ellipsoid with a short skirt below it: 6 sides and 2 rings (24 triangles).
-static func _crown(tool: SurfaceTool, center: Vector3, radius: Vector3, low_shade := 0.55, top_shade := 1.0) -> void:
-	const SIDES := 6
+static func _crown(tool: SurfaceTool, center: Vector3, radius: Vector3, low_shade := 0.55, top_shade := 1.0, sides := 6) -> void:
+	var SIDES := sides
 	const RINGS := 2
 	var rings: Array[PackedVector3Array] = []
 	var normals: Array[PackedVector3Array] = []

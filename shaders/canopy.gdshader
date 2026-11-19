@@ -43,9 +43,13 @@ uniform vec2 far_haze_range = vec2(150.0, 650.0);
 uniform vec2 far_haze_fade = vec2(1500.0, 2500.0);
 uniform float far_haze = 0.58;
 uniform float far_haze_light = 1.0;
+// The part of the haze that the shade and the leaves of a crown change (D-0026-23).
+uniform float haze_contrast = 0.7;
 
 varying vec3 clump_color;
 varying float haze_part;
+varying vec3 world_point;
+varying float crown_shade;
 
 float hash(vec2 p) {
 	return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -75,18 +79,35 @@ void vertex() {
 	// that the far clumps do not stand out on it.
 	vec3 mean = mix(mix(leaf_dark, leaf_light, 0.5), (dry_brown + dry_red + dry_yellow) / 3.0 * 0.85, dryness * 0.4);
 	color = mix(color, mean, far_even * smoothstep(far_range.x, far_range.y, distance_xz));
-	// The vertex color is the shade low on the crowns; far away, less of it (toward a
-	// mean shade of 0.8).
-	float shade = mix(COLOR.r, 0.8, 0.5 * far_even * smoothstep(far_range.x, far_range.y, distance_xz));
+	// The vertex color is the shade low on the crowns. Report 0026, D-0026-23:
+	// it stays far away (only the colors take their mean), so that the crowns
+	// are light tops and dark sides, one rough canopy.
+	float shade = COLOR.r;
 	haze_part = far_haze * smoothstep(far_haze_range.x, far_haze_range.y, distance_xz)
 			* (1.0 - smoothstep(far_haze_fade.x, far_haze_fade.y, distance_xz));
 	clump_color = color * shade * (1.0 - haze_part);
+	crown_shade = shade;
+	world_point = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+}
+
+float value_noise(vec2 p) {
+	vec2 i = floor(p);
+	vec2 f = fract(p);
+	vec2 u = f * f * (3.0 - 2.0 * f);
+	return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
 }
 
 void fragment() {
-	ALBEDO = clump_color;
-	// The haze of the far land (shaders/terrain.gdshader): an emission.
-	EMISSION = far_haze_color * haze_part * far_haze_light;
+	// The leaves of the crowns (2.5 m and 1 m): from far, the crowns are rough, not smooth caps.
+	float leaves = value_noise(world_point.xz / 2.5) * 0.6 + value_noise(world_point.xz + world_point.y) * 0.4;
+	float rough = 0.45 + 1.1 * leaves;
+	ALBEDO = clump_color * rough;
+	// The haze of the far land (shaders/terrain.gdshader): an emission. Report
+	// 0026, D-0026-23: from far, the haze gave most of the color of a crown, and
+	// the crowns were one smooth green; the shade of the crown and its leaves
+	// take part of the haze too (the mean stays: the shade is about 0.6 and the
+	// leaves about 1.0).
+	EMISSION = far_haze_color * haze_part * far_haze_light * mix(1.0, rough * crown_shade / 0.6, haze_contrast);
 	ROUGHNESS = 0.9;
 	// Leaves have almost no shine: with the default specular, a low sun made
 	// the clumps pale tan on the Mobile renderer.

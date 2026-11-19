@@ -243,10 +243,18 @@ void fragment() {
 	float dry_share = dryness * 0.4;
 	float crown_dry = smoothstep(1.0 - dry_share - 0.06, 1.0 - dry_share + 0.06, value_noise(crown_uv * 1.3 + vec2(7.3, 2.1)));
 	canopy = mix(canopy, canopy_dry * (0.6 + 0.5 * crowns), crown_dry);
-	canopy *= mix(0.55, 1.0, smoothstep(0.15, 0.35, crowns));
-	// Far away, one pixel is many crowns: the canopy takes its mean color.
-	vec3 canopy_mean = mix(mix(canopy_dark, canopy_light, 0.5), canopy_dry * 0.85, dry_share) * 0.8;
+	// Far away, one pixel is many crowns: the canopy takes the mean of the
+	// colors. Report 0026, D-0026-23: only the colors. The light tops and the
+	// dark gaps between the crowns stay, with the leaves of a crown (2.5 m), so
+	// that the far forest is one rough canopy and not a smooth green slope.
+	vec3 canopy_mean = mix(mix(canopy_dark, canopy_light, 0.5), canopy_dry * 0.85, dry_share);
 	canopy = mix(canopy, canopy_mean, canopy_far_even * smoothstep(canopy_even_range.x, canopy_even_range.y, camera_distance));
+	float leaves = value_noise(world_position.xz / 2.5);
+	float canopy_rough = mix(0.4, 1.05, smoothstep(0.15, 0.45, crowns)) * (0.75 + 0.4 * leaves);
+	canopy *= canopy_rough * 0.85;
+	// The haze over the far forest takes the shade of the crowns too
+	// (shaders/canopy.gdshader, haze_contrast): it gave most of the color.
+	float forest_haze = mix(1.0, canopy_rough / 0.85, forest * far * 0.7);
 	color = mix(color, canopy, forest * far);
 	// Bare rock below the mean sea level is under the water for half of the
 	// time: it is darker, with algae and shells (the flat rocks along the sea
@@ -322,6 +330,6 @@ void fragment() {
 	float haze_part = far_haze * smoothstep(far_haze_range.x, far_haze_range.y, camera_distance)
 			* (1.0 - smoothstep(far_haze_fade.x, far_haze_fade.y, camera_distance)) * (1.0 - under);
 	ALBEDO = color * (1.0 - haze_part);
-	EMISSION = far_haze_color * haze_part * far_haze_light;
+	EMISSION = far_haze_color * haze_part * far_haze_light * forest_haze;
 	ROUGHNESS = mix(roughness, 0.6, under);
 }

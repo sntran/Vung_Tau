@@ -41,6 +41,13 @@ extends RefCounted
 # phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
 # phase: --start-time=12:00
 
+## D-0026-23: the shape of the box "hill": the change of brightness of an edge
+## (between pixels 2 apart), the least part of the edges of the photo, and the
+## largest smooth area. The mounds of audit 3 had 3 % on an edge and a smooth
+## area of 97 % (the photo of S1: 88 % and 1 %).
+const SHAPE_EDGE := 0.02
+const HILL_MIN_EDGES := 0.2
+const HILL_MAX_SMOOTH := 0.8
 ## D-0026-24: the radius of the crown of a palm or a pine, and the step of the search for trees along the line.
 const CROWN_RADIUS := {"coconut": 3.0, "casuarina": 2.5, "araucaria": 2.5, "frangipani": 2.0, "fan_palm": 1.5}
 const TREE_LOOK_M := 8.0
@@ -268,6 +275,17 @@ func _check_look(d: PlaytestDriver, shot: Dictionary, preset: String, time: Stri
 		d.step("%s, %s: the patches of the hill: %.3f (the photo %.3f)" % [shot.id, preset, game.patches, photo.patches])
 		d.expect(float(game.patches) <= float(photo.patches) * HILL_MAX, "%s, %s: the far trees of the hill are not patches: %.3f, at most %.1f times the photo (%.3f)" % [
 				shot.id, preset, game.patches, HILL_MAX, photo.patches])
+		# D-0026-23: the shape, not only the colors: the part of the box on a
+		# sharp edge (the crowns and the shade between them) and the largest
+		# smooth area (a lit slope between mounds), against the photo.
+		var game_shape := shape_stats(frame, shot.hill.shot)
+		var photo_shape := shape_stats(photo_image, shot.hill.photo)
+		d.step("%s, %s, %s: the shape of the hill: %.0f %% of the box on an edge, the largest smooth area %.0f %% (the photo %.0f %% and %.0f %%)" % [
+				shot.id, preset, time, game_shape.edges * 100.0, game_shape.smooth * 100.0, photo_shape.edges * 100.0, photo_shape.smooth * 100.0])
+		d.expect(float(game_shape.edges) >= float(photo_shape.edges) * HILL_MIN_EDGES and float(game_shape.smooth) <= HILL_MAX_SMOOTH,
+				"%s, %s, %s: the far forest is one rough canopy: %.0f %% of the box on an edge (at least %.0f %%, %.1f of the photo), the largest smooth area %.0f %% (at most %.0f %%)" % [
+					shot.id, preset, time, game_shape.edges * 100.0, float(photo_shape.edges) * HILL_MIN_EDGES * 100.0, HILL_MIN_EDGES,
+					game_shape.smooth * 100.0, HILL_MAX_SMOOTH * 100.0])
 		# D-0026-15: the colors, not only the brightness.
 		var g: Color = game.mean
 		var f: Color = photo.mean
@@ -294,6 +312,53 @@ func _check_look(d: PlaytestDriver, shot: Dictionary, preset: String, time: Stri
 
 ## The mean color of a box of an image (x0, y0, x1, y1 as parts of its size), and
 ## "patches": the standard deviation of the brightness of its blocks of BLOCK px.
+## D-0026-23: the shape of a box (parts of the image), on a grid of every
+## second pixel: "edges", the part of the grid where the brightness changes by
+## more than SHAPE_EDGE to the next point (right or down), and "smooth", the
+## largest connected area of the other points, as a part of the grid.
+static func shape_stats(image: Image, box: Array) -> Dictionary:
+	var size := image.get_size()
+	var x0 := int(float(box[0]) * size.x)
+	var y0 := int(float(box[1]) * size.y)
+	var w := int((float(box[2]) * size.x - x0) / 2.0)
+	var h := int((float(box[3]) * size.y - y0) / 2.0)
+	var luma := PackedFloat32Array()
+	luma.resize(w * h)
+	for j in h:
+		for i in w:
+			luma[j * w + i] = image.get_pixel(x0 + i * 2, y0 + j * 2).get_luminance()
+	var smooth := PackedByteArray()
+	smooth.resize((w - 1) * (h - 1))
+	var edges := 0
+	for j in h - 1:
+		for i in w - 1:
+			var here := luma[j * w + i]
+			var edge := maxf(absf(luma[j * w + i + 1] - here), absf(luma[(j + 1) * w + i] - here)) > SHAPE_EDGE
+			smooth[j * (w - 1) + i] = 0 if edge else 1
+			edges += 1 if edge else 0
+	var gw := w - 1
+	var total := gw * (h - 1)
+	var largest := 0
+	var seen := PackedByteArray()
+	seen.resize(total)
+	for start in total:
+		if smooth[start] == 0 or seen[start] == 1:
+			continue
+		var stack: Array[int] = [start]
+		seen[start] = 1
+		var count := 0
+		while not stack.is_empty():
+			var k: int = stack.pop_back()
+			count += 1
+			var ci := k % gw
+			for n: int in [k - 1 if ci > 0 else -1, k + 1 if ci < gw - 1 else -1, k - gw, k + gw]:
+				if n >= 0 and n < total and smooth[n] == 1 and seen[n] == 0:
+					seen[n] = 1
+					stack.append(n)
+		largest = maxi(largest, count)
+	return {"edges": float(edges) / maxf(total, 1.0), "smooth": float(largest) / maxf(total, 1.0)}
+
+
 ## The part of the pixels of a box (parts of the frame) whose green is more than
 ## their red and their blue (grass in the light of the day).
 static func green_part(image: Image, box: Array) -> float:
