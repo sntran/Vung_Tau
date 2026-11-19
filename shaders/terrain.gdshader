@@ -316,11 +316,13 @@ void fragment() {
 	wet *= 1.0 - max(rock, bare_rock) * 0.5;
 	color *= mix(1.0, 0.55, wet);
 	roughness = mix(roughness, 0.38, wet);
+	// Report 0026, D-0026-30: the puddles have soft edges and a little of the
+	// color of the water; with hard edges, the color of the sky (1.6 times the
+	// pool color), and a gloss of 0.05, the wet sand had white and dark patches.
 	float puddle = value_noise(world_position.xz * 0.5 + 11.0) * 0.7 + value_noise(world_position.xz * 1.7) * 0.3;
-	if (wet > 0.5 && puddle > 0.72 && mask.r > 0.5) {
-		color = mix(color, pool_color * 1.6, 0.6);
-		roughness = 0.05;
-	}
+	float in_puddle = smoothstep(0.74, 0.84, puddle) * smoothstep(0.5, 0.7, wet) * step(0.5, mask.r);
+	color = mix(color, pool_color, 0.3 * in_puddle);
+	roughness = mix(roughness, 0.2, in_puddle);
 	// The ground under the water is darker and wet.
 	float under = smoothstep(sea_level + 0.2, sea_level - 0.6, world_position.y);
 	color = mix(color, color * vec3(0.55, 0.65, 0.7), under);
