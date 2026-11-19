@@ -1,5 +1,5 @@
 {
-	"note": "Made by tools/geo/photos.py index (plan 0009, R5e). Do not change by hand. One row for each image of Mapillary in the play area (data/geo/area.json). date: the time of Vietnam (UTC+7). lon, lat: computed_geometry (computed 1), or the position of the camera (computed 0). compass: compass_angle; computed_compass: computed_compass_angle (degrees from the north to the east). camera: camera_type (spherical and equirectangular are 360). author: the username of the creator. The link of an image: https://www.mapillary.com/app/?pKey=ID. The images are CC BY-SA 4.0: the credit is the author, Mapillary, and the license.",
+	"note": "Made by tools/geo/photos.py index (plan 0009, R5e). Do not change by hand. One row for each image of Mapillary in the play area (data/geo/raw/mapillary.json, the box of data/geo/area.json). date: the time of Vietnam (UTC+7). lon, lat: computed_geometry (computed 1), the position of the camera (computed 0), or the position in the coverage tile (computed null: the API did not answer for the image yet). compass: compass_angle; computed_compass: computed_compass_angle (degrees from the north to the east). camera: camera_type (spherical and equirectangular are 360). author: the username of the creator (or the id of the creator, from the tile). The link of an image: https://www.mapillary.com/app/?pKey=ID. The images are CC BY-SA 4.0: the credit is the author, Mapillary, and the license.",
 	"license": "CC BY-SA 4.0",
 	"updated": "2026-11-19",
 	"bbox": {
@@ -10514,6 +10514,7 @@
 ["1740712776769353", "2025-01-04T15:04", 107.1299489, 10.393349, 1, 235.7, 252.4, "perspective", "QlCfiIaxGdoXA6E40T1stH", "DriveWithHoang"],
 ["1749868069132740", "2025-01-04T15:04", 107.1260562, 10.3907733, 1, 235.8, 249.4, "perspective", "QlCfiIaxGdoXA6E40T1stH", "DriveWithHoang"],
 ["1862377647905962", "2025-01-04T15:04", 107.1291032, 10.3927799, 1, 235.7, 251.6, "perspective", "QlCfiIaxGdoXA6E40T1stH", "DriveWithHoang"],
+["1980056445837890", "2025-01-04T15:04", 107.13005, 10.3934165, 1, 235.0, 252.6, "perspective", "QlCfiIaxGdoXA6E40T1stH", "DriveWithHoang"],
 ["2179083092528628", "2025-01-04T15:04", 107.1256686, 10.3905112, 1, 236.1, 249.6, "perspective", "QlCfiIaxGdoXA6E40T1stH", "DriveWithHoang"],
 ["2909781425861859", "2025-01-04T15:04", 107.129832, 10.3932719, 1, 235.7, 252.3, "perspective", "QlCfiIaxGdoXA6E40T1stH", "DriveWithHoang"],
 ["3052393884918373", "2025-01-04T15:04", 107.1274909, 10.3917312, 1, 235.7, 249.4, "perspective", "QlCfiIaxGdoXA6E40T1stH", "DriveWithHoang"],
@@ -22949,6 +22950,7 @@
 ["1430991944899831", "2025-06-23T12:48", 107.1298379, 10.3931225, 1, 182.0, 62.4, "perspective", "tVY50JumSqlZQ2ocEIRbz8", "VPTD"],
 ["1473552037353630", "2025-06-23T12:48", 107.1292842, 10.3928015, 1, 182.0, 65.6, "perspective", "tVY50JumSqlZQ2ocEIRbz8", "VPTD"],
 ["1562102874746919", "2025-06-23T12:48", 107.1283896, 10.3922454, 1, 183.0, 38.8, "perspective", "tVY50JumSqlZQ2ocEIRbz8", "VPTD"],
+["1925647594851222", "2025-06-23T12:48", 107.1300073, 10.3932489, 1, 182.0, 62.5, "perspective", "tVY50JumSqlZQ2ocEIRbz8", "VPTD"],
 ["23996450799951355", "2025-06-23T12:48", 107.1265395, 10.390986, 1, 184.0, 118.5, "perspective", "tVY50JumSqlZQ2ocEIRbz8", "VPTD"],
 ["2459628954399043", "2025-06-23T12:48", 107.1287496, 10.3924819, 1, 181.0, 13.1, "perspective", "tVY50JumSqlZQ2ocEIRbz8", "VPTD"],
 ["2751646651700228", "2025-06-23T12:48", 107.1281836, 10.3920497, 1, 183.0, 66.7, "perspective", "tVY50JumSqlZQ2ocEIRbz8", "VPTD"],
@@ -25005,6 +25007,7 @@
 ["789651893499060", "2025-08-15T21:20", 107.1258658, 10.3809203, 1, 329.0, 54.6, "perspective", "Aq6aLdDpRC1kTNUfO2xuSY", "sg_front_1"],
 ["794909553111483", "2025-08-15T21:20", 107.1271522, 10.3819119, 1, 324.0, 56.8, "perspective", "Aq6aLdDpRC1kTNUfO2xuSY", "sg_front_1"],
 ["979886684205920", "2025-08-15T21:20", 107.1264282, 10.3813683, 1, 327.0, 54.7, "perspective", "Aq6aLdDpRC1kTNUfO2xuSY", "sg_front_1"],
+["1005773031524625", "2025-08-15T21:21", 107.1300008, 10.3840385, 1, 309.0, 56.6, "perspective", "Aq6aLdDpRC1kTNUfO2xuSY", "sg_front_1"],
 ["1117500856978989", "2025-08-15T21:21", 107.1289462, 10.3832498, 1, 312.0, 56.4, "perspective", "Aq6aLdDpRC1kTNUfO2xuSY", "sg_front_1"],
 ["1184096190402186", "2025-08-15T21:21", 107.1296164, 10.3837507, 1, 311.0, 56.5, "perspective", "Aq6aLdDpRC1kTNUfO2xuSY", "sg_front_1"],
 ["1221985749698044", "2025-08-15T21:21", 107.1298099, 10.3838955, 1, 310.0, 56.6, "perspective", "Aq6aLdDpRC1kTNUfO2xuSY", "sg_front_1"],
