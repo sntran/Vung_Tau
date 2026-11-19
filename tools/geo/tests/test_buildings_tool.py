@@ -35,11 +35,28 @@ def test_medians_by_label():
     assert buildings.medians_by_label([], []) == {}
 
 
-def test_heights_by_year_needs_enough_pixels():
-    rows = [["a", {"2019": [7.5, 40], "2021": [8.0, 3]}], ["b", {"2021": [12.0, 50]}]]
-    heights = buildings.heights_by_year(rows)
-    # Three pixels at the edge of the outline are not a building of 2021.
-    assert heights == {"a": {2019: 7.5}, "b": {2021: 12.0}}
+def test_the_first_year_needs_a_part_of_the_area_and_the_height_is_the_median_of_the_years():
+    # An outline of 100 m² (400 pixels): a year needs 30 % of it, 120 pixels.
+    years = {"2016": [5.5, 40], "2017": [4.0, 150], "2018": [4.5, 300], "2019": [5.0, 310], "2020": [6.0, 3]}
+    first, height = buildings.first_and_height(years, 100.0)
+    # 2016 has only the edge of the next house; 2020 has 3 pixels (no data).
+    assert first == 2017
+    assert height == 4.5
+    # A small outline of 5 m² (20 pixels, 30 % is 6): at least 8 pixels.
+    assert buildings.first_and_height({"2021": [7.0, 9]}, 5.0) == (2021, 7.0)
+    assert buildings.first_and_height({"2021": [7.0, 7]}, 5.0) == (None, None)
+
+
+def test_the_groups_with_no_outline_are_far_from_the_outlines_and_large():
+    import numpy as np
+    building = np.zeros((8, 8), dtype=bool)
+    distance = np.full((8, 8), 10.0)
+    building[0:2, 0:2] = True  # a group of 4 cells, far from each outline
+    building[5, 5:8] = True  # a group of 3 cells: too small
+    building[0:3, 6] = True  # a band along an outline: 1 m from it
+    distance[0:3, 6] = 1.0
+    groups = buildings.groups_of_cells(building, distance)
+    assert [len(g) for g in groups] == [4]
 
 
 def test_osm_rows_keep_the_versions_of_the_day():

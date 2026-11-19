@@ -1,22 +1,38 @@
 #!/usr/bin/env python3
 """The lidar points of the play area from SlideRule (plan 0009, R5a and R5c).
-CI only: the workspace cannot reach slideruleearth.io (plan 0009, D9).
+The fetch runs in CI only: the Python package of SlideRule does not connect
+from the workspace (plan 0009, D9).
 
-    python tools/geo/lidar.py fetch     # ICESat-2 ATL08, ATL03 with the classes of ATL08, ATL24, GEDI L2A
-    python tools/geo/lidar.py report    # the report and the map of the sea floor (R5c), no network
+    python tools/geo/lidar.py fetch [--allow-fewer] [--refetch]
+    python tools/geo/lidar.py seed COMMIT ...   # the files of earlier runs in Git history to the store
+    python tools/geo/lidar.py tracks            # the short form: each 20 m of a track (Git)
+    python tools/geo/lidar.py report            # the report and the map of the sea floor (R5c)
 
-The fetch asks the public service of SlideRule (the Python package
-sliderule, no account) for the points in the box of data/geo/area.json, of
-all the years, and keeps only the points of good quality (the quality flags
-of each product). Each product goes to data/geo/raw/lidar/PRODUCT.json: for
-each point, the position, the date, the height of the ground or of the
-photon, the height of the top (or the class), and the height over EGM2008
-(the vertical datum of Copernicus and DeltaDTM: SlideRule gives the height
-over the WGS 84 ellipsoid). A product that fails does not stop the others,
-and the report says what each product gave, so that the first runs in CI
-show the formats. The fallback is the NASA Earthdata access (plan 0009, Q5).
+The products: ATL08 (segments), ATL03 with the classes of ATL08 (the ground
+photons, and the photons of the classes canopy, top of canopy, and no class
+over an outline of a building: the roofs, report 0009, D-0009-02), ATL24 (the
+sea floor), and GEDI L2A. For each point: the position, the date, the height
+over the WGS 84 ellipsoid and over EGM2008 (the datum of Copernicus), the top
+or the class, the quality, and the track (rgt, cycle, spot) where SlideRule
+gives it.
 
-R5c: the report compares the depths of ATL24 with the heights of the
+The data of each product is kept by year (report 0009, D-0009-01): one file
+for each product and year in the release of geostore.py, with its rows in
+data/geo/raw/lidar/manifest.json. The fetch asks only for the years that are
+not there, and for the current year. For each year that it asks for
+(decide()):
+
+- a year that fails, or that gets no time, keeps the data of the last good run;
+- a year with fewer rows than its file keeps its file;
+- a year with 0 rows where the last good run had rows is an error;
+- a product with fewer points than before is an error, unless the run has
+  --allow-fewer (an input of the workflow that a person sets).
+
+After an error the command ends with 1: the job writes the report and does
+not commit. The large files are not in Git (D-0009-06): Git has the manifest,
+the reports, the map, and the short form (data/geo/build/lidar_tracks.json).
+
+R5c: the report compares the sea floor of ATL24 with the heights of the
 intertidal zone and of GEBCO (data/geo/raw/intertidal.tif, gebco.tif), with a
 map. The build does not change the sea floor.
 """
@@ -26,33 +42,48 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import subprocess
 import sys
+import time
 import traceback
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import geostore  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[2]
 AREA = ROOT / "data" / "geo" / "area.json"
+WORLD = ROOT / "data" / "geo" / "build" / "world.json"
 RAW = ROOT / "data" / "geo" / "raw" / "lidar"
+MANIFEST = RAW / "manifest.json"
+TRACKS = ROOT / "data" / "geo" / "build" / "lidar_tracks.json"
 REPORT = ROOT / "data" / "geo" / "build" / "lidar_report.md"
 MAP = ROOT / "data" / "geo" / "build" / "lidar_seafloor.png"
 T0 = "2018-10-14T00:00:00Z"  # the first data of ICESat-2
-T1 = dt.date.today().isoformat() + "T00:00:00Z"
-# Each product: the names of the calls of the sliderule package to try, in turn.
-# The first run in CI (2026-11-19): atl08p and gedi02ap gave their rows for all
-# the years in one request; each "x" call (run) for all the years stopped at the
-# server after 600 s ("timed-out ... waiting for endpoint proxy") and gave
-# nothing. So a "run" call asks for one year at a time (BY_YEAR).
+COLUMNS = ["lon", "lat", "date", "height", "height_egm2008", "top", "class", "quality", "rgt", "cycle", "spot"]
+# Each product: the calls of the sliderule package to try, in turn, for one
+# year. The first run in CI (2026-11-19): atl08p and gedi02ap gave their rows
+# for all the years in one request; each "x" call (run) for all the years
+# stopped at the server after 600 s. So each call asks for one year.
 PRODUCTS = {
     "atl08": [("icesat2", "atl08p"), ("run", "atl08x")],
     "atl03_ground": [("run", "atl03x")],
+    "atl03_roof": [("run", "atl03x")],
     "atl24": [("run", "atl24x")],
     "gedi02a": [("gedi", "gedi02ap"), ("run", "gedi02ax")],
 }
-BY_YEAR = {"run"}
 # The columns of the heights that are over EGM2008 already (not over the WGS 84 ellipsoid).
 ORTHOMETRIC = {"ortho_h"}
 # The fetch stops to ask for more years after this many seconds (the job has 120 minutes).
 BUDGET_S = 75 * 60
+# The short form: the length of a bin along a track, and the gap across it that starts another beam (m).
+BIN_M = 20.0
+BEAM_GAP_M = 30.0
+TRACK_ANGLES = [k * 0.5 for k in range(-24, 25)]
+NOTE = ("Made by tools/geo/lidar.py (plan 0009, R5a; report 0009, D-0009-01 and D-0009-06): the files of the "
+        "lidar points, one for each product and year, are assets of the release of the repository; rows is the "
+        "count of points of each file. The data of NASA (ICESat-2, GEDI) is free to use.")
 
 
 def polygon() -> list[dict]:
@@ -62,13 +93,17 @@ def polygon() -> list[dict]:
             {"lon": box["west"], "lat": box["south"]}]
 
 
-def parms_for(product: str) -> dict:
-    parms = {"poly": polygon(), "t0": T0, "t1": T1}
+def parms_for(product: str, t0: str, t1: str) -> dict:
+    parms = {"poly": polygon(), "t0": t0, "t1": t1}
     if product == "atl08":
         parms.update({"atl08_class": ["atl08_ground", "atl08_canopy", "atl08_top_of_canopy"],
                       "phoreal": {"binsize": 1.0, "geoloc": "center", "above_classifier": True}})
     if product == "atl03_ground":
         parms.update({"atl08_class": ["atl08_ground"], "cnf": 4})
+    if product == "atl03_roof":
+        # D-0009-02: the photons over the roofs. ATL08 has no class for a
+        # building: a roof photon is canopy, top of canopy, or with no class.
+        parms.update({"atl08_class": ["atl08_canopy", "atl08_top_of_canopy", "atl08_unclassified"], "cnf": 4})
     if product == "gedi02a":
         parms.update({"degrade_filter": True, "l2_quality_filter": True})
     return parms
@@ -85,6 +120,32 @@ def year_spans(t0: str, t1: str) -> list[tuple[str, str]]:
     return spans
 
 
+def needs_fetch(old_rows: int | None, year: int, this_year: int, refetch: bool) -> bool:
+    """A year is asked for when it has no file, when it is the current year, or with --refetch."""
+    return refetch or old_rows is None or year >= this_year
+
+
+def decide(old_rows: int | None, new_rows: int | None, allow_fewer: bool = False) -> str:
+    """What the fetch does with the rows of one year: "keep" the file of the
+    last good run, "write" the new rows, or "error" (D-0009-01)."""
+    if new_rows is None:
+        return "keep"  # the year failed, or got no time
+    if new_rows == 0:
+        return "error" if old_rows else "keep"
+    if old_rows is not None and new_rows < old_rows and not allow_fewer:
+        return "keep"
+    return "write"
+
+
+def total(manifest: dict, product: str) -> int:
+    return sum(int(e.get("rows", 0)) for k, e in manifest.get("files", {}).items() if k.split("/")[0] == product)
+
+
+def by_year(manifest: dict, product: str) -> dict[int, int]:
+    return {int(k.split("/")[1]): int(e.get("rows", 0)) for k, e in sorted(manifest.get("files", {}).items())
+            if k.split("/")[0] == product}
+
+
 def egm2008(lon, lat, h):
     """Heights over the WGS 84 ellipsoid to heights over EGM2008 (PROJ gets the grid from its CDN)."""
     import pyproj
@@ -94,7 +155,79 @@ def egm2008(lon, lat, h):
     return out
 
 
-def fetch(lines: list[str]) -> None:
+def to_rows(frame) -> tuple[list, str | None]:
+    """The rows (COLUMNS) of a frame of SlideRule, and the name of its height column."""
+    import numpy as np
+    geometry = frame.geometry if hasattr(frame, "geometry") else None
+    lon = np.asarray(geometry.x if geometry is not None else frame["longitude"], dtype=float)
+    lat = np.asarray(geometry.y if geometry is not None else frame["latitude"], dtype=float)
+    columns = list(frame.columns)
+    used = {}
+
+    def column(key, *names):
+        for name in names:
+            if name in columns:
+                used[key] = name
+                return np.asarray(frame[name])
+        return None
+    # GEDI L2A of gedi02ap: elevation_lm (the lowest mode, the ground) and elevation_hr (the highest return).
+    ground = column("height", "h_te_median", "h_mean", "height", "elev_lowestmode", "elevation_lm", "ortho_h", "surface_h", "h_ph")
+    top = column("top", "h_max_canopy", "h_canopy", "elev_highestreturn", "elevation_hr", "bathy_h")
+    klass = column("class", "atl08_class", "class_ph", "class")
+    quality = column("quality", "quality_flag", "l2_quality_flag", "confidence", "quality_ph", "atl03_cnf")
+    rgt = column("rgt", "rgt", "track")
+    cycle = column("cycle", "cycle", "orbit")
+    spot = column("spot", "spot", "beam")
+    when = frame.index if "time" not in columns else frame["time"]
+    dates = [str(t)[:10] for t in when]
+    if ground is None:
+        raise ValueError(f"no column of the height in {columns}")
+    # ortho_h of ATL24 is already a height over EGM2008 (the first run turned it
+    # over the geoid a second time: -0.45 m became +2.11 m).
+    if used.get("height") in ORTHOMETRIC:
+        ground_egm = ground.astype(float)
+    else:
+        ground_egm = egm2008(lon, lat, ground.astype(float))
+
+    def value(array, i, digits=None):
+        if array is None:
+            return None
+        v = array[i]
+        if digits is None:
+            return str(v)
+        return round(float(v), digits)
+    rows = [[round(float(lon[i]), 6), round(float(lat[i]), 6), dates[i], round(float(ground[i]), 2),
+             round(float(ground_egm[i]), 2), value(top, i, 2), value(klass, i), value(quality, i),
+             value(rgt, i), value(cycle, i), value(spot, i)] for i in range(len(lon))]
+    return rows, used.get("height")
+
+
+def over_outlines(rows: list) -> list:
+    """The rows over an outline of overture.json, each with the id of its
+    outline at the end (the roof photons of D-0009-02)."""
+    import numpy as np
+    import shapely
+    sys.path.insert(0, str(ROOT / "tools" / "geo"))
+    import buildings
+    from geodata.projection import Projection
+    outlines = buildings.outlines()
+    origin = json.loads(WORLD.read_text(encoding="utf-8"))["origin"]
+    proj = Projection(float(origin["utm_e"]), float(origin["utm_n"]))
+    polygons = [shapely.Polygon(list(zip(flat[0::2], flat[1::2]))) for _oid, _s, _h, _f, flat in outlines]
+    tree = shapely.STRtree(polygons)
+    if not rows:
+        return []
+    xs, zs = proj.to_game(np.array([r[0] for r in rows]), np.array([r[1] for r in rows]))
+    points = shapely.points(np.asarray(xs, dtype=float), np.asarray(zs, dtype=float))
+    pairs = tree.query(points, predicate="within")
+    kept = {}
+    for point_index, polygon_index in zip(pairs[0], pairs[1]):
+        kept.setdefault(int(point_index), outlines[int(polygon_index)][0])
+    return [rows[i] + [kept[i]] for i in sorted(kept)]
+
+
+def fetch(lines: list[str], allow_fewer: bool, refetch: bool) -> list[str]:
+    """Fetches the years that are not there. Returns the errors (D-0009-01)."""
     import sliderule
     from sliderule import icesat2  # noqa: F401 - a module of the package
     try:
@@ -102,101 +235,201 @@ def fetch(lines: list[str]) -> None:
     except Exception:  # noqa: BLE001
         gedi = None  # noqa: F841
     sliderule.init(verbose=False)
-    lines.append(f"- sliderule {getattr(sliderule, '__version__', '?')}, {T0} to {T1}")
-    RAW.mkdir(parents=True, exist_ok=True)
-    import time
-    import pandas as pd
+    t1 = dt.date.today().isoformat() + "T00:00:00Z"
+    this_year = dt.date.today().year
+    lines.append(f"- sliderule {getattr(sliderule, '__version__', '?')}, {T0} to {t1}"
+                 + (", allow fewer points" if allow_fewer else "") + (", all the years again" if refetch else ""))
+    manifest = geostore.load(MANIFEST)
+    errors: list[str] = []
     started = time.time()
     for product, calls in PRODUCTS.items():
-        frame = None
-        for module_name, call in calls:
+        before = total(manifest, product)
+        for t0, t_end in year_spans(T0, t1):
+            year = int(t0[:4])
+            key = f"{product}/{year}"
+            old = manifest.get("files", {}).get(key, {}).get("rows")
+            if not needs_fetch(old, year, this_year, refetch):
+                continue
+            if time.time() - started > BUDGET_S:
+                lines.append(f"- {product} {year}: no time; the file of the last good run stays ({old} rows)")
+                continue
+            rows = None
+            height_column = None
+            for module_name, call in calls:
+                try:
+                    parms = parms_for(product, t0, t_end)
+                    if module_name == "run":
+                        frame = sliderule.run(call, parms)
+                    else:
+                        frame = getattr(getattr(sliderule, module_name), call)(parms)
+                    if frame is None:
+                        raise ValueError("no frame")
+                    rows, height_column = to_rows(frame) if len(frame) else ([], None)
+                    if product == "atl03_roof":
+                        rows = over_outlines(rows)
+                    break
+                except Exception as error:  # noqa: BLE001 - the next call
+                    lines.append(f"- {product} {year}: {call}: {type(error).__name__}: {str(error)[:200]}")
+            new = None if rows is None else len(rows)
+            action = decide(old, new, allow_fewer)
+            if action == "error":
+                errors.append(f"{product} {year}: 0 rows, and the last good run had {old}")
+                lines.append(f"- ERROR {product} {year}: 0 rows, and the last good run had {old}; the job does not commit")
+            elif action == "write":
+                columns = COLUMNS + (["outline"] if product == "atl03_roof" else [])
+                geostore.put(manifest, key, {"product": product, "year": year, "columns": columns, "points": rows,
+                                             "height_column": height_column},
+                             product=product, year=year, rows=new, fetched=dt.date.today().isoformat())
+                lines.append(f"- {product} {year}: {new} rows (it had {old})")
+            else:
+                lines.append(f"- {product} {year}: {new} rows; the file of the last good run stays ({old} rows)")
+        after = total(manifest, product)
+        if after < before and not allow_fewer:
+            errors.append(f"{product}: {after} points, it had {before}")
+            lines.append(f"- ERROR {product}: {after} points, it had {before}")
+    if not errors:
+        geostore.save(MANIFEST, manifest, NOTE)
+    return errors
+
+
+def seed(lines: list[str], commits: list[str]) -> list[str]:
+    """The files of the products in the Git history (the runs before the store)
+    to the store: for each year, the commit with the most rows (ties: the later
+    commit of the list). Only for the years that the store does not have."""
+    manifest = geostore.load(MANIFEST)
+    old_names = {"atl03_ground": "atl03_ground", "atl08": "atl08", "atl24": "atl24", "gedi02a": "gedi02a"}
+    for product, name in old_names.items():
+        best: dict[int, tuple[int, str, list]] = {}
+        meta = {}
+        for commit in commits:
             try:
-                if module_name in BY_YEAR:
-                    parts = []
-                    for t0, t1 in year_spans(T0, T1):
-                        if time.time() - started > BUDGET_S:
-                            lines.append(f"- {product}: {call}: no time for {t0[:4]} and later")
-                            break
-                        parms = {**parms_for(product), "t0": t0, "t1": t1}
-                        try:
-                            part = sliderule.run(call, parms)
-                        except Exception as error:  # noqa: BLE001 - the next year
-                            lines.append(f"- {product}: {call} {t0[:4]}: {type(error).__name__}: {str(error)[:200]}")
-                            continue
-                        lines.append(f"- {product}: {call} {t0[:4]}: {0 if part is None else len(part)} rows")
-                        if part is not None and len(part) > 0:
-                            parts.append(part)
-                    if not parts:
-                        continue
-                    frame = pd.concat(parts)
-                else:
-                    module = getattr(sliderule, module_name)
-                    frame = getattr(module, call)(parms_for(product))
-                lines.append(f"- {product}: {call} gave {len(frame)} rows; the columns: {list(frame.columns)[:30]}")
-                break
-            except Exception as error:  # noqa: BLE001 - try the next call
-                lines.append(f"- {product}: {call}: {type(error).__name__}: {str(error)[:300]}")
-        if frame is None or len(frame) == 0:
-            continue
-        try:
-            write_points(product, frame, lines)
-        except Exception as error:  # noqa: BLE001
-            lines.append(f"- {product}: ERROR when it writes the points: {error}")
-            lines += ["    " + t for t in traceback.format_exc().splitlines()[-4:]]
+                text = subprocess.run(["git", "show", f"{commit}:data/geo/raw/lidar/{name}.json"], cwd=ROOT,
+                                      capture_output=True, check=True).stdout.decode("utf-8")
+            except subprocess.CalledProcessError:
+                lines.append(f"- seed {product}: no file in {commit}")
+                continue
+            data = json.loads(text)
+            meta[commit] = data.get("height_column")
+            years: dict[int, list] = {}
+            for row in data["points"]:
+                years.setdefault(int(str(row[2])[:4]), []).append(list(row) + [None, None, None])
+            lines.append(f"- seed {product} {commit}: " + ", ".join(f"{y} {len(r)}" for y, r in sorted(years.items())))
+            for year, rows in years.items():
+                if year not in best or len(rows) >= best[year][0]:
+                    best[year] = (len(rows), commit, rows)
+        for year, (count, commit, rows) in sorted(best.items()):
+            key = f"{product}/{year}"
+            if key in manifest.get("files", {}):
+                continue
+            geostore.put(manifest, key, {"product": product, "year": year, "columns": COLUMNS, "points": rows,
+                                         "height_column": meta.get(commit), "from": commit},
+                         product=product, year=year, rows=count, fetched=f"Git {commit}")
+    geostore.save(MANIFEST, manifest, NOTE)
+    return []
 
 
-def write_points(product: str, frame, lines: list[str]) -> None:
+def track_bins(points: list[tuple], bin_m: float = BIN_M, gap_m: float = BEAM_GAP_M) -> list[dict]:
+    """The short form of the photons (D-0009-06): points are (date, x, z,
+    height, kind) in meters, kind "ground" or "roof". For each date, the
+    direction of the track is the angle near north to south that makes the
+    beams sharpest; a gap of more than
+    gap_m across it starts another beam; along it, a bin has bin_m. For each
+    bin: the date, the middle, the median ground, the median roof, and the
+    counts."""
     import numpy as np
-    geometry = frame.geometry if hasattr(frame, "geometry") else None
-    lon = np.asarray(geometry.x if geometry is not None else frame["longitude"], dtype=float)
-    lat = np.asarray(geometry.y if geometry is not None else frame["latitude"], dtype=float)
-    columns = list(frame.columns)
-    used = {}
-    def column(*names):
-        for name in names:
-            if name in columns:
-                used[names[0]] = name
-                return np.asarray(frame[name])
-        return None
-    # GEDI L2A of gedi02ap: elevation_lm (the lowest mode, the ground) and elevation_hr (the highest return).
-    ground = column("h_te_median", "h_mean", "height", "elev_lowestmode", "elevation_lm", "ortho_h", "surface_h", "h_ph")
-    top = column("h_max_canopy", "h_canopy", "elev_highestreturn", "elevation_hr", "bathy_h")
-    klass = column("atl08_class", "class_ph", "class")
-    quality = column("quality_flag", "l2_quality_flag", "confidence", "quality_ph")
-    when = frame.index if "time" not in columns else frame["time"]
-    dates = [str(t)[:10] for t in when]
-    if ground is None:
-        lines.append(f"- {product}: no column of the height in {columns}")
-        return
-    # ortho_h of ATL24 is already a height over EGM2008 (the first run turned it
-    # over the geoid a second time: -0.45 m became +2.11 m).
-    if used.get("h_te_median") in ORTHOMETRIC:
-        ground_egm = ground.astype(float)
-    else:
-        ground_egm = egm2008(lon, lat, ground.astype(float))
-    rows = []
-    for i in range(len(lon)):
-        rows.append([round(float(lon[i]), 6), round(float(lat[i]), 6), dates[i], round(float(ground[i]), 2),
-                     round(float(ground_egm[i]), 2), None if top is None else round(float(top[i]), 2),
-                     None if klass is None else str(klass[i]), None if quality is None else str(quality[i])])
-    head = {"note": f"Made by tools/geo/lidar.py fetch (plan 0009, R5a): the points of {product} from SlideRule (public). height: over the WGS 84 ellipsoid; height_egm2008: over EGM2008. top: the top of the canopy, or the height of the sea floor (ATL24). The data of NASA (ICESat-2, GEDI) is free to use.",
-            "product": product, "height_column": used.get("h_te_median"), "columns": ["lon", "lat", "date", "height", "height_egm2008", "top", "class", "quality"]}
-    text = json.dumps(head, ensure_ascii=False, indent="\t")[:-2] + ',\n\t"points": [\n' + \
-        ",\n".join(json.dumps(r) for r in rows) + "\n\t]\n}\n"
-    (RAW / f"{product}.json").write_text(text, encoding="utf-8")
-    lines.append(f"- {product}: {len(rows)} points in data/geo/raw/lidar/{product}.json")
+    by_date: dict[str, list] = {}
+    for p in points:
+        by_date.setdefault(p[0], []).append(p)
+    out = []
+    for date, group in sorted(by_date.items()):
+        xz = np.array([[p[1], p[2]] for p in group], dtype=float)
+        heights = np.array([p[3] for p in group], dtype=float)
+        roof = np.array([p[4] == "roof" for p in group])
+        middle = xz.mean(axis=0)
+        # The tracks of ICESat-2 are within a few degrees of north to south at
+        # 10° N (an inclination of 92°): the angle in TRACK_ANGLES that puts the
+        # photons in the fewest strips of 5 m across the track.
+        best = None
+        for angle in TRACK_ANGLES:
+            a = np.radians(angle)
+            across_try = (xz - middle) @ np.array([np.cos(a), -np.sin(a)])
+            strips = len(np.unique(np.floor(across_try / 5.0)))
+            if best is None or strips < best[0]:
+                best = (strips, a)
+        along_axis = np.array([np.sin(best[1]), np.cos(best[1])])
+        across_axis = np.array([np.cos(best[1]), -np.sin(best[1])])
+        along = (xz - middle) @ along_axis
+        across = (xz - middle) @ across_axis
+        order = np.argsort(across)
+        beam = np.zeros(len(group), dtype=int)
+        current = 0
+        for k in range(1, len(order)):
+            if across[order[k]] - across[order[k - 1]] > gap_m:
+                current += 1
+            beam[order[k]] = current
+        cells: dict[tuple[int, int], list[int]] = {}
+        for i in range(len(group)):
+            cells.setdefault((int(beam[i]), int(np.floor(along[i] / bin_m))), []).append(i)
+        for (_b, _k), index in sorted(cells.items()):
+            index = np.array(index)
+            ground_h = heights[index][~roof[index]]
+            roof_h = heights[index][roof[index]]
+            x, z = np.median(xz[index], axis=0)
+            out.append({"date": date, "x": round(float(x), 1), "z": round(float(z), 1),
+                        "ground": round(float(np.median(ground_h)), 2) if len(ground_h) else None,
+                        "roof": round(float(np.median(roof_h)), 2) if len(roof_h) else None,
+                        "ground_count": int(len(ground_h)), "roof_count": int(len(roof_h))})
+    return out
+
+
+def tracks(lines: list[str]) -> None:
+    """data/geo/build/lidar_tracks.json from the ATL03 photons of the store."""
+    import numpy as np
+    from geodata.projection import Projection
+    manifest = geostore.load(MANIFEST)
+    origin = json.loads(WORLD.read_text(encoding="utf-8"))["origin"]
+    proj = Projection(float(origin["utm_e"]), float(origin["utm_n"]))
+    points = []
+    for product, kind in (("atl03_ground", "ground"), ("atl03_roof", "roof")):
+        for key in sorted(k for k in manifest.get("files", {}) if k.split("/")[0] == product):
+            rows = geostore.get(manifest, key)["points"]
+            if not rows:
+                continue
+            xs, zs = proj.to_game(np.array([r[0] for r in rows]), np.array([r[1] for r in rows]))
+            points += [(r[2], float(x), float(z), float(r[4]), kind) for r, x, z in zip(rows, xs, zs)]
+    bins = track_bins(points)
+    head = {"note": "Made by tools/geo/lidar.py tracks (plan 0009, R5a; report 0009, D-0009-06): the short form of the "
+                    "ATL03 photons of the store. For each 20 m of a track (a date and a beam): the middle in the "
+                    "coordinates of the game, the median height of the ground photons and of the roof photons over "
+                    "EGM2008, and their counts. The data of NASA (ICESat-2) is free to use.",
+            "bin_m": BIN_M, "columns": ["date", "x", "z", "ground", "roof", "ground_count", "roof_count"]}
+    text = json.dumps(head, ensure_ascii=False, indent="\t")[:-2] + ',\n\t"bins": [\n' + ",\n".join(
+        json.dumps([b["date"], b["x"], b["z"], b["ground"], b["roof"], b["ground_count"], b["roof_count"]])
+        for b in bins) + "\n\t]\n}\n"
+    TRACKS.write_text(text, encoding="utf-8")
+    lines.append(f"- the short form: {len(bins)} bins of {BIN_M:.0f} m from {len(points)} photons "
+                 f"({TRACKS.stat().st_size // 1024} KB, data/geo/build/lidar_tracks.json)")
 
 
 def report(lines: list[str]) -> None:
-    """R5c: the depths of ATL24 against the intertidal heights and GEBCO, with a map."""
-    path = RAW / "atl24.json"
-    if not path.exists():
+    """The points at the head (the manifest), and R5c: ATL24 against the
+    intertidal heights and GEBCO, with a map."""
+    import numpy as np
+    manifest = geostore.load(MANIFEST)
+    lines += ["", "## The points in the store (the head of the branch)", "",
+              "| Product | " + " | ".join(str(y) for y in range(2018, dt.date.today().year + 1)) + " | All |",
+              "|---" * (dt.date.today().year - 2018 + 3) + "|"]
+    for product in PRODUCTS:
+        years = by_year(manifest, product)
+        lines.append(f"| {product} | " + " | ".join(str(years.get(y, "–")) for y in range(2018, dt.date.today().year + 1))
+                     + f" | {total(manifest, product)} |")
+    keys = sorted(k for k in manifest.get("files", {}) if k.startswith("atl24/"))
+    if not keys:
         lines.append("- R5c: no points of ATL24 yet")
         return
-    import numpy as np
     import rasterio
     from rasterio.warp import transform
-    points = json.loads(path.read_text(encoding="utf-8"))["points"]
+    points = [p for k in keys for p in geostore.get(manifest, k)["points"]]
     lon = np.array([p[0] for p in points])
     lat = np.array([p[1] for p in points])
     depth = np.array([p[4] if p[5] is None else p[5] for p in points], dtype=float)
@@ -231,21 +464,34 @@ def report(lines: list[str]) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", choices=["fetch", "report"])
+    parser.add_argument("command", choices=["fetch", "seed", "tracks", "report"])
+    parser.add_argument("commits", nargs="*")
+    parser.add_argument("--allow-fewer", action="store_true", help="a product may have fewer points than before")
+    parser.add_argument("--refetch", action="store_true", help="ask for all the years again")
     args = parser.parse_args()
     lines = [f"## lidar {args.command} ({dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%d %H:%M')} UTC)", ""]
+    errors: list[str] = []
     try:
-        fetch(lines) if args.command == "fetch" else report(lines)
+        if args.command == "fetch":
+            errors = fetch(lines, args.allow_fewer, args.refetch)
+        elif args.command == "seed":
+            errors = seed(lines, args.commits)
+        elif args.command == "tracks":
+            tracks(lines)
+        else:
+            report(lines)
     except Exception as error:  # noqa: BLE001 - the report says what failed
         lines.append(f"- ERROR: {error}")
         lines += ["    " + t for t in traceback.format_exc().splitlines()[-6:]]
+        errors.append(str(error))
     RAW.mkdir(parents=True, exist_ok=True)
     (RAW / f"{args.command}.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    parts = [(RAW / f"{c}.md").read_text(encoding="utf-8") for c in ("fetch", "report") if (RAW / f"{c}.md").exists()]
+    parts = [(RAW / f"{c}.md").read_text(encoding="utf-8") for c in ("seed", "fetch", "tracks", "report")
+             if (RAW / f"{c}.md").exists()]
     REPORT.write_text("# The lidar points of the play area (plan 0009, R5a and R5c)\n\nMade by `tools/geo/lidar.py`. Do not change by hand.\n\n"
                       + "\n".join(parts), encoding="utf-8")
     print("\n".join(lines))
-    return 0
+    return 1 if errors else 0
 
 
 if __name__ == "__main__":

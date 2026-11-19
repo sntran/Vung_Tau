@@ -1,19 +1,36 @@
 name: Buildings and lidar
 
 # Plan 0009, phase 1a (R1, R5a, R5c, R5d): the outlines of the buildings of
-# the play area (Overture Maps), the rasters of Open Buildings 2.5D Temporal
-# of 2016 to 2023, OpenStreetMap on 2019-01-22 (ohsome), and the lidar points
-# of ICESat-2 and GEDI (SlideRule). The workspace cannot reach these sources
-# (plan 0009, D2 and D9). The tools write the data in data/geo/raw/buildings/
-# and data/geo/raw/lidar/, and the reports in data/geo/build/; this workflow
-# commits them to the branch that it runs on with the message "Update the
-# buildings and the lidar". By hand, or on a push that changes the tools. A
-# part that fails does not stop the others: the reports say what each part
-# found. They change nothing in the game.
+# the play area (Overture Maps), Open Buildings 2.5D Temporal of 2016 to 2023,
+# OpenStreetMap on 2019-01-22 (ohsome), the checks of the heights (3D-GloBFP,
+# GHS-BUILT-H), and the lidar points of ICESat-2 and GEDI (SlideRule; its
+# Python package does not connect from the workspace). By hand, or on a push
+# that changes the tools.
+#
+# The large files go to the release geodata-0009-1 of the repository
+# (tools/geo/geostore.py; report 0009, D-0009-06). The job commits only the
+# manifests, the reports, the maps, and the short form of the lidar, with the
+# message "Update the buildings and the lidar".
+#
+# The guard of the lidar (report 0009, D-0009-01): the data of each product
+# is kept by year, and the fetch asks only for the years that are not there.
+# A year that fails or gets no time keeps its data; a year with 0 rows where
+# the last run had rows, or a product with fewer points than before, is an
+# error: the job ends red, uploads the reports as an artifact, and commits
+# nothing. A person can start the run with "allow_fewer".
 on:
   workflow_dispatch:
+    inputs:
+      allow_fewer:
+        description: "A product may have fewer points than before (a person decides it)"
+        type: boolean
+        default: false
+      refetch:
+        description: "Ask SlideRule for all the years again"
+        type: boolean
+        default: false
   push:
-    paths: ["tools/geo/buildings.py", "tools/geo/lidar.py", ".github/workflows/buildings.yml"]
+    paths: ["tools/geo/buildings.py", "tools/geo/lidar.py", "tools/geo/geostore.py", ".github/workflows/buildings.yml"]
 
 permissions:
   contents: write
@@ -22,13 +39,19 @@ concurrency:
   group: buildings-${{ github.ref }}
   cancel-in-progress: false
 
+env:
+  RELEASE: geodata-0009-1
+
 jobs:
   buildings:
     name: Get the buildings and the lidar
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The seed reads the files of the runs before the store from the history.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -37,23 +60,67 @@ jobs:
           cache-dependency-path: tools/geo/requirements.txt
 
       - name: Install the Python packages
-        run: pip install -r tools/geo/requirements.txt duckdb sliderule geopandas
+        run: pip install -r tools/geo/requirements.txt duckdb sliderule geopandas scipy
 
-      - name: The outlines, the 2.5D rasters, and OpenStreetMap of 2019
-        run: python tools/geo/buildings.py all
+      - name: The outlines, the 2.5D data, OpenStreetMap of 2019, and the checks of the heights
+        run: |
+          for part in outlines temporal osm2019 checks; do
+            python tools/geo/buildings.py "$part" || echo "the part $part failed: see its report"
+          done
 
-      - name: The lidar points (SlideRule)
-        run: python tools/geo/lidar.py fetch
+      - name: The lidar points of the runs before the store (one time)
+        run: |
+          if ! python3 -c 'import json,sys;sys.exit(0 if json.load(open("data/geo/raw/lidar/manifest.json"))["files"] else 1)' 2>/dev/null; then
+            python tools/geo/lidar.py seed 86f606a a36c84e 7d32458
+          fi
 
-      - name: The report of the sea floor
-        run: python tools/geo/lidar.py report
+      - name: The lidar points (with the guard)
+        run: |
+          args=""
+          if [ "${{ inputs.allow_fewer }}" = "true" ]; then args="$args --allow-fewer"; fi
+          if [ "${{ inputs.refetch }}" = "true" ]; then args="$args --refetch"; fi
+          python tools/geo/lidar.py fetch $args
+
+      - name: The short form of the lidar, the report of the sea floor, and the build of the buildings
+        run: |
+          python tools/geo/lidar.py tracks
+          python tools/geo/lidar.py report
+          python tools/geo/buildings.py build
+
+      - name: Keep the reports of a run that stopped
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: buildings-and-lidar-reports
+          path: |
+            data/geo/raw/lidar/*.md
+            data/geo/raw/buildings/*.md
+            data/geo/build/lidar_report.md
+            data/geo/build/buildings_report.md
+
+      - name: Upload the large files to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "$RELEASE" >/dev/null 2>&1; then
+            gh release create "$RELEASE" --title "Geodata of plan 0009, 1" \
+              --notes "The large files of the buildings and the lidar of plan 0009 (tools/geo/geostore.py). Each name has the start of its SHA-256; the manifests in data/geo/raw/buildings/ and data/geo/raw/lidar/ give each file. Licenses: data/geo/LICENSE."
+          fi
+          have=$(gh release view "$RELEASE" --json assets --jq '.assets[].name')
+          shopt -s nullglob
+          for file in build/geodata/upload/*; do
+            if ! grep -qx "$(basename "$file")" <<<"$have"; then
+              gh release upload "$RELEASE" "$file"
+            fi
+          done
 
       - name: Commit the files
         run: |
-          # Only the files that are there: one missing path stops "git add" for all
-          # (the first run had no lidar_seafloor.png and committed nothing).
-          for path in data/geo/raw/buildings data/geo/raw/lidar data/geo/build/buildings_2019.json \
-              data/geo/build/buildings_report.md data/geo/build/lidar_report.md data/geo/build/lidar_seafloor.png; do
+          for path in data/geo/raw/buildings data/geo/raw/lidar data/geo/build/buildings_report.md \
+              data/geo/build/buildings_r5d.json data/geo/build/buildings_all.png data/geo/build/buildings_2019.png \
+              data/geo/build/buildings_out.png data/geo/build/buildings_no_outline.png \
+              data/geo/build/lidar_report.md data/geo/build/lidar_seafloor.png data/geo/build/lidar_tracks.json; do
             if [ -e "$path" ]; then git add "$path"; fi
           done
           if git diff --cached --quiet; then

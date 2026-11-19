@@ -12,3 +12,12 @@
 # Python
 __pycache__/
 .pytest_cache/
+
+# Plan 0009 (report 0009, D-0009-06): the large raw files of the buildings and
+# the lidar are assets of the release geodata-0009-1 (tools/geo/geostore.py).
+/data/geo/raw/lidar/*.json
+!/data/geo/raw/lidar/manifest.json
+/data/geo/raw/buildings/overture.json
+/data/geo/raw/buildings/temporal.json
+/data/geo/raw/buildings/temporal_2019_unmatched.tif
+/data/geo/build/buildings_2019.json
