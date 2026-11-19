@@ -157,7 +157,7 @@ static func clump_mesh() -> Mesh:
 	return tool.commit()
 
 
-## The mesh of one sparse clump on Low: one round crown (32 triangles), 5 m
+## The mesh of one sparse clump on Low: one round crown (24 triangles), 5 m
 ## wide and 4 m high.
 static func crown_mesh() -> Mesh:
 	var tool := SurfaceTool.new()
@@ -169,7 +169,7 @@ static func crown_mesh() -> Mesh:
 	return tool.commit()
 
 
-## A half ellipsoid with a short skirt below it: 6 sides and 2 rings (24 triangles).
+## A half ellipsoid with a short skirt below it: 6 sides and 2 rings (18 triangles: the top band is a fan).
 static func _crown(tool: SurfaceTool, center: Vector3, radius: Vector3, low_shade := 0.55, top_shade := 1.0, sides := 6) -> void:
 	var SIDES := sides
 	const RINGS := 2
@@ -192,6 +192,11 @@ static func _crown(tool: SurfaceTool, center: Vector3, radius: Vector3, low_shad
 		for s in SIDES:
 			var n := (s + 1) % SIDES
 			var quad := [[r, s], [r + 1, s], [r + 1, n], [r, s], [r + 1, n], [r, n]]
+			# The top ring (90 degrees) is one point: the first triangle of a quad
+			# of the top band has no area (it drew nothing, and the clumps of Low
+			# were a quarter more triangles: PT-57).
+			if r + 1 == RINGS:
+				quad = [[r, s], [r + 1, n], [r, n]]
 			for corner: Array in quad:
 				var shade := lerpf(low_shade, top_shade, float(corner[0]) / RINGS)
 				tool.set_color(Color(shade, shade, shade))
