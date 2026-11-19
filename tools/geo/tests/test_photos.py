@@ -99,16 +99,19 @@ def test_the_direction_toward_a_point():
 def test_choose_spreads_the_years_and_the_sequences():
     images = []
     for k in range(10):
-        images.append({"id": str(k), "date": "2019-01-20T10:00", "x": float(k), "z": 0.0, "camera": "perspective",
+        images.append({"id": str(k), "date": "2019-01-20T10:00", "x": float(k) * 4.0, "z": 0.0, "camera": "perspective",
                        "compass": 0.0, "computed_compass": None, "sequence": "one", "author": "a"})
     images.append({"id": "100", "date": "2016-05-01T10:00", "x": 1.0, "z": 0.0, "camera": "perspective", "compass": 0.0,
                    "computed_compass": None, "sequence": "old", "author": "b"})
     images.append({"id": "200", "date": "2021-02-01T10:00", "x": 50.0, "z": 0.0, "camera": "perspective", "compass": 0.0,
                    "computed_compass": None, "sequence": "two", "author": "c"})
     point = {"id": "p", "at": [0.0, 0.0], "radius_m": 60, "look": "any", "max": 12}
+    assert photos.windows(dict(point, rule1=True), {"years": [2017, 2021], "rule1_years": {"before": [2013, 2016]}}) \
+        == [("", [2017, 2021]), ("before", [2013, 2016])]
     chosen, matched = photos.choose(images, point, [2017, 2021])
     assert matched == 11  # the image of 2016 is out
-    assert [r["id"] for r in chosen] == ["0", "1", "200"]  # 2 of the sequence "one", and the image of 2021
+    # The images of the sequence "one" 10 m apart or more (0, 12, 24, 36 m), and the image of 2021.
+    assert [r["id"] for r in chosen] == ["0", "3", "6", "9", "200"]
     tet = dict(point, dates=[["2021-01-22", "2021-02-12"]])
     assert [r["id"] for r in photos.choose(images, tet, [2017, 2021])[0]] == ["200"]
 

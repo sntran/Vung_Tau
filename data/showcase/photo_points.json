@@ -1,23 +1,323 @@
 {
-	"note": "The points where tools/geo/photos.py makes the contact sheets of the street photos of Mapillary (plan 0009, R5e; plan 0026, report 0026 section 8.4). One point for each question. at: the point in game meters [x, z] (x to the east, z to the south). radius_m: the images in this distance. look: \"toward\" (the camera points to \"target\", or to \"at\" with no target, within 50 degrees), \"any\", or a list of compass directions (degrees from the north to the east, within 45 degrees). years: the first and the last year. dates: (optional) only the images in these days, [from, to] in the time of Vietnam. max: the most images on the sheets of the point.",
-	"years": [2017, 2021],
+	"note": "The points where tools/geo/photos.py makes the contact sheets of the street photos of Mapillary (plan 0009, R5e; plan 0026, report 0026 section 8.4). One point for each question. at: the point in game meters [x, z] (x to the east, z to the south). radius_m: the images in this distance. look: \"toward\" (the camera points to \"target\", or to \"at\" with no target, within 50 degrees), \"any\", or a list of compass directions (degrees from the north to the east, within 45 degrees). years: the first and the last year. dates: (optional) only the images in these days, [from, to] in the time of Vietnam. max: the most images on the sheets of the point. rule1: also the sheets of the years before 2017 and after 2021 (rule1_years; report 0026, Q17, rule 1).",
+	"years": [
+		2017,
+		2021
+	],
 	"points": [
-		{"id": "q21_grand_back", "for": ["Q21"], "about": "The back wings of the Grand Hotel around the courtyard (way 791795131), from Nguyễn Du and the lanes behind the hotel.", "at": [178.0, 29.0], "radius_m": 90, "look": "toward", "max": 24},
-		{"id": "q22_ha_long_fronts", "for": ["Q22", "D-0026-21"], "about": "The fronts on the slope of Hạ Long, near the footprint fdc62561 and the hall with the orange roof (way 225803473).", "at": [-55.0, 330.0], "radius_m": 110, "look": "toward", "max": 24},
-		{"id": "q23_buu_dien_roof", "for": ["Q23"], "about": "The letters on the roof of Khách sạn Bưu điện (way 259750558).", "at": [21.7, 286.3], "radius_m": 180, "look": "toward", "max": 24},
-		{"id": "d22_grand_front", "for": ["D-0026-22"], "about": "The front of the Grand Hotel on Quang Trung: the fence with the lantern posts, the garden, and the level from the sidewalk to the front.", "at": [112.0, -5.0], "target": [135.0, -5.0], "radius_m": 60, "look": "toward", "max": 24},
-		{"id": "d24_ha_long_trees", "for": ["D-0026-24"], "about": "The trees along Hạ Long from the beach to Cao ốc Sen Biển, and the hall with the orange roof.", "at": [-20.0, 260.0], "radius_m": 120, "look": "any", "max": 24},
-		{"id": "d25_wall_north", "for": ["D-0026-25", "D-0026-26"], "about": "The low wall of the beach at its north end (way 458829436), near the eye of S1.", "at": [-5.3, -99.9], "radius_m": 45, "look": "any", "max": 12},
-		{"id": "d25_wall_middle_north", "for": ["D-0026-25", "D-0026-26"], "about": "The low wall of the beach between its north end and the park.", "at": [17.3, -38.9], "radius_m": 45, "look": "any", "max": 12},
-		{"id": "d25_wall_middle", "for": ["D-0026-25", "D-0026-26"], "about": "The low wall of the beach at the park.", "at": [31.7, 17.6], "radius_m": 45, "look": "any", "max": 12},
-		{"id": "d25_wall_south", "for": ["D-0026-25", "D-0026-26"], "about": "The low wall of the beach south of the park (way 458829436).", "at": [30.1, 102.7], "radius_m": 45, "look": "any", "max": 12},
-		{"id": "d25_wall_ha_long", "for": ["D-0026-25", "D-0026-26"], "about": "The low wall at the south end of the beach, by Hạ Long (way 458829438).", "at": [3.6, 195.0], "radius_m": 45, "look": "any", "max": 12},
-		{"id": "r18_quang_trung_north", "for": ["R18", "R20"], "about": "The sidewalks and the road of Quang Trung at the north of the showcase, near S1 and S5.", "at": [-60.0, -240.0], "radius_m": 70, "look": "any", "max": 24},
-		{"id": "r18_quang_trung_grand", "for": ["R18", "R20"], "about": "The sidewalks and the road of Quang Trung at the Grand Hotel and the bars of Quang Trung 4 to 26 (S4).", "at": [90.0, 0.0], "radius_m": 80, "look": "any", "max": 24},
-		{"id": "r18_quang_trung_south", "for": ["R18", "R20"], "about": "The sidewalks and the road of Quang Trung at the south of the park, and the junction with Hạ Long.", "at": [100.0, 170.0], "radius_m": 80, "look": "any", "max": 24},
-		{"id": "r18_ha_long", "for": ["R18", "R20"], "about": "The sidewalks and the road of Hạ Long near Khách sạn Bưu điện (S3).", "at": [40.0, 250.0], "radius_m": 80, "look": "any", "max": 24},
-		{"id": "r18_near_streets", "for": ["R18", "R20"], "about": "The streets near the showcase: Nguyễn Du, Trần Hưng Đạo, and Lê Lợi near the Grand Hotel.", "at": [200.0, -40.0], "radius_m": 120, "look": "any", "max": 24},
-		{"id": "r19_tet_quang_trung", "for": ["R19"], "about": "Quang Trung and the park in the weeks before Tết: the flags, the banners, the kumquat and the mai for sale.", "at": [30.0, -40.0], "radius_m": 320, "look": "any", "max": 36, "dates": [["2018-01-26", "2018-02-16"], ["2019-01-15", "2019-02-05"], ["2020-01-04", "2020-01-25"], ["2021-01-22", "2021-02-12"]]},
-		{"id": "r19_tet_ha_long", "for": ["R19"], "about": "Hạ Long and the streets near Khách sạn Bưu điện in the weeks before Tết.", "at": [60.0, 280.0], "radius_m": 250, "look": "any", "max": 24, "dates": [["2018-01-26", "2018-02-16"], ["2019-01-15", "2019-02-05"], ["2020-01-04", "2020-01-25"], ["2021-01-22", "2021-02-12"]]}
-	]
+		{
+			"id": "q21_grand_back",
+			"for": [
+				"Q21"
+			],
+			"about": "The back wings of the Grand Hotel around the courtyard (way 791795131), from Nguyễn Du and the lanes behind the hotel.",
+			"at": [
+				178.0,
+				29.0
+			],
+			"radius_m": 90,
+			"look": "toward",
+			"max": 12,
+			"rule1": true
+		},
+		{
+			"id": "q22_ha_long_fronts",
+			"for": [
+				"Q22",
+				"D-0026-21"
+			],
+			"about": "The fronts on the slope of Hạ Long, near the footprint fdc62561 and the hall with the orange roof (way 225803473).",
+			"at": [
+				-55.0,
+				330.0
+			],
+			"radius_m": 110,
+			"look": "toward",
+			"max": 12,
+			"rule1": true
+		},
+		{
+			"id": "q23_buu_dien_roof",
+			"for": [
+				"Q23"
+			],
+			"about": "The letters on the roof of Khách sạn Bưu điện (way 259750558).",
+			"at": [
+				21.7,
+				286.3
+			],
+			"radius_m": 180,
+			"look": "toward",
+			"max": 12,
+			"rule1": true
+		},
+		{
+			"id": "d22_grand_front",
+			"for": [
+				"D-0026-22"
+			],
+			"about": "The front of the Grand Hotel on Quang Trung: the fence with the lantern posts, the garden, and the level from the sidewalk to the front.",
+			"at": [
+				112.0,
+				-5.0
+			],
+			"target": [
+				135.0,
+				-5.0
+			],
+			"radius_m": 60,
+			"look": "toward",
+			"max": 12,
+			"rule1": true
+		},
+		{
+			"id": "d24_ha_long_trees",
+			"for": [
+				"D-0026-24"
+			],
+			"about": "The trees along Hạ Long from the beach to Cao ốc Sen Biển, and the hall with the orange roof.",
+			"at": [
+				-20.0,
+				260.0
+			],
+			"radius_m": 120,
+			"look": "any",
+			"max": 12,
+			"rule1": true
+		},
+		{
+			"id": "d25_wall_north",
+			"for": [
+				"D-0026-25",
+				"D-0026-26"
+			],
+			"about": "The low wall of the beach at its north end (way 458829436), near the eye of S1.",
+			"at": [
+				-5.3,
+				-99.9
+			],
+			"radius_m": 45,
+			"look": "any",
+			"max": 12,
+			"rule1": true
+		},
+		{
+			"id": "d25_wall_middle_north",
+			"for": [
+				"D-0026-25",
+				"D-0026-26"
+			],
+			"about": "The low wall of the beach between its north end and the park.",
+			"at": [
+				17.3,
+				-38.9
+			],
+			"radius_m": 45,
+			"look": "any",
+			"max": 12,
+			"rule1": true
+		},
+		{
+			"id": "d25_wall_middle",
+			"for": [
+				"D-0026-25",
+				"D-0026-26"
+			],
+			"about": "The low wall of the beach at the park.",
+			"at": [
+				31.7,
+				17.6
+			],
+			"radius_m": 45,
+			"look": "any",
+			"max": 12,
+			"rule1": true
+		},
+		{
+			"id": "d25_wall_south",
+			"for": [
+				"D-0026-25",
+				"D-0026-26"
+			],
+			"about": "The low wall of the beach south of the park (way 458829436).",
+			"at": [
+				30.1,
+				102.7
+			],
+			"radius_m": 45,
+			"look": "any",
+			"max": 12,
+			"rule1": true
+		},
+		{
+			"id": "d25_wall_ha_long",
+			"for": [
+				"D-0026-25",
+				"D-0026-26"
+			],
+			"about": "The low wall at the south end of the beach, by Hạ Long (way 458829438).",
+			"at": [
+				3.6,
+				195.0
+			],
+			"radius_m": 45,
+			"look": "any",
+			"max": 12,
+			"rule1": true
+		},
+		{
+			"id": "r18_quang_trung_north",
+			"for": [
+				"R18",
+				"R20"
+			],
+			"about": "The sidewalks and the road of Quang Trung at the north of the showcase, near S1 and S5.",
+			"at": [
+				-60.0,
+				-240.0
+			],
+			"radius_m": 70,
+			"look": "any",
+			"max": 12,
+			"rule1": true
+		},
+		{
+			"id": "r18_quang_trung_grand",
+			"for": [
+				"R18",
+				"R20"
+			],
+			"about": "The sidewalks and the road of Quang Trung at the Grand Hotel and the bars of Quang Trung 4 to 26 (S4).",
+			"at": [
+				90.0,
+				0.0
+			],
+			"radius_m": 80,
+			"look": "any",
+			"max": 12,
+			"rule1": true
+		},
+		{
+			"id": "r18_quang_trung_south",
+			"for": [
+				"R18",
+				"R20"
+			],
+			"about": "The sidewalks and the road of Quang Trung at the south of the park, and the junction with Hạ Long.",
+			"at": [
+				100.0,
+				170.0
+			],
+			"radius_m": 80,
+			"look": "any",
+			"max": 12,
+			"rule1": true
+		},
+		{
+			"id": "r18_ha_long",
+			"for": [
+				"R18",
+				"R20"
+			],
+			"about": "The sidewalks and the road of Hạ Long near Khách sạn Bưu điện (S3).",
+			"at": [
+				40.0,
+				250.0
+			],
+			"radius_m": 80,
+			"look": "any",
+			"max": 12,
+			"rule1": true
+		},
+		{
+			"id": "r18_near_streets",
+			"for": [
+				"R18",
+				"R20"
+			],
+			"about": "The streets near the showcase: Nguyễn Du, Trần Hưng Đạo, and Lê Lợi near the Grand Hotel.",
+			"at": [
+				200.0,
+				-40.0
+			],
+			"radius_m": 120,
+			"look": "any",
+			"max": 12,
+			"rule1": true
+		},
+		{
+			"id": "r19_tet_quang_trung",
+			"for": [
+				"R19"
+			],
+			"about": "Quang Trung and the park in the weeks before Tết: the flags, the banners, the kumquat and the mai for sale.",
+			"at": [
+				30.0,
+				-40.0
+			],
+			"radius_m": 320,
+			"look": "any",
+			"max": 36,
+			"dates": [
+				[
+					"2018-01-26",
+					"2018-02-16"
+				],
+				[
+					"2019-01-15",
+					"2019-02-05"
+				],
+				[
+					"2020-01-04",
+					"2020-01-25"
+				],
+				[
+					"2021-01-22",
+					"2021-02-12"
+				]
+			]
+		},
+		{
+			"id": "r19_tet_ha_long",
+			"for": [
+				"R19"
+			],
+			"about": "Hạ Long and the streets near Khách sạn Bưu điện in the weeks before Tết.",
+			"at": [
+				60.0,
+				280.0
+			],
+			"radius_m": 250,
+			"look": "any",
+			"max": 24,
+			"dates": [
+				[
+					"2018-01-26",
+					"2018-02-16"
+				],
+				[
+					"2019-01-15",
+					"2019-02-05"
+				],
+				[
+					"2020-01-04",
+					"2020-01-25"
+				],
+				[
+					"2021-01-22",
+					"2021-02-12"
+				]
+			]
+		}
+	],
+	"rule1_years": {
+		"before": [
+			2013,
+			2016
+		],
+		"after": [
+			2022,
+			2026
+		]
+	}
 }

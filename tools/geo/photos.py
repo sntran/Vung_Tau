@@ -68,6 +68,7 @@ PLACE_M = 100.0
 SHEET_COLUMNS = 3
 SHEET_ROWS = 4
 TILE_W = 512
+SEQUENCE_SPACING_M = 10.0
 PANO_VIEW_DEG = 100.0
 # The time of the API in one run of the index (the job stops at 100 minutes).
 INDEX_BUDGET_S = 45 * 60.0
@@ -529,10 +530,11 @@ def command_report() -> int:
         lines.append(f"| {place['name_vi']} | " + " | ".join(str(by[y]) for y in years) + f" | {len(near)} |")
     points = json.loads(POINTS.read_text(encoding="utf-8"))
     lines += ["", "## The points of the contact sheets (`data/showcase/photo_points.json`)", "",
-              "| Point | For | Images that match | On the sheets |", "|---|---|---|---|"]
-    for point in points["points"]:
-        chosen, matched = choose(images, point, points["years"])
-        lines.append(f"| `{point['id']}` | {', '.join(point['for'])} | {matched} | {len(chosen)} |")
+              "| Point | For | Years | Images that match | On the sheets |", "|---|---|---|---|---|"]
+    for point, window, years in [(p, w, y) for p in points["points"] for w, y in windows(p, points)]:
+        chosen, matched = choose(images, dict(point, years=years) if window else point, points["years"])
+        span = "the weeks before Tết" if point.get("dates") else f"{years[0]} to {years[1]}"
+        lines.append(f"| `{point['id']}` | {', '.join(point['for'])} | {span} | {matched} | {len(chosen)} |")
     REPORT.write_text("\n".join(lines) + "\n", encoding="utf-8")
     draw_map(images, roads, MAP)
     print(f"wrote {REPORT.name} and {MAP.name}")
@@ -543,11 +545,23 @@ def command_report() -> int:
 
 
 def in_dates(r: dict, point: dict, years: list[int]) -> bool:
+    """The image is in the days of the point, or in the years (the first and the last)."""
     day = str(r["date"])[:10]
     if point.get("dates"):
         return any(a <= day <= b for a, b in point["dates"])
     first, last = point.get("years", years)
     return first <= year(r) <= last
+
+
+def windows(point: dict, points: dict) -> list[tuple[str, list[int]]]:
+    """The windows of years of the sheets of a point: 2017 to 2021, and with
+    "rule1" also the years before and after (report 0026, Q17, rule 1: a look
+    that a photo before 2017 and a photo after 2021 both show was the look in 2019)."""
+    out = [("", list(point.get("years", points["years"])))]
+    if point.get("rule1") and not point.get("dates"):
+        for name, span in points.get("rule1_years", {}).items():
+            out.append((name, list(span)))
+    return out
 
 
 def direction(r: dict) -> float | None:
@@ -571,17 +585,19 @@ def looks(r: dict, point: dict) -> bool:
 
 
 def choose(images: list[dict], point: dict, years: list[int]) -> tuple[list[dict], int]:
-    """The images of a point (near first), spread over the years and the sequences: at most 2 of a sequence."""
+    """The images of a point (near first), spread over the years and the
+    sequences: in one sequence, the images are SEQUENCE_SPACING_M apart or more."""
     ax, az = point["at"]
     matched = [r for r in images if math.hypot(r["x"] - ax, r["z"] - az) <= point["radius_m"]
                and in_dates(r, point, years) and looks(r, point)]
     matched.sort(key=lambda r: math.hypot(r["x"] - ax, r["z"] - az))
     by_year: dict[int, list[dict]] = {}
-    per_sequence: dict[str, int] = {}
+    taken: dict[str, list[dict]] = {}
     for r in matched:
-        if per_sequence.get(r["sequence"], 0) >= 2:
+        same = taken.setdefault(r["sequence"], [])
+        if any(math.hypot(r["x"] - o["x"], r["z"] - o["z"]) < SEQUENCE_SPACING_M for o in same):
             continue
-        per_sequence[r["sequence"]] = per_sequence.get(r["sequence"], 0) + 1
+        same.append(r)
         by_year.setdefault(year(r), []).append(r)
     chosen: list[dict] = []
     limit = int(point.get("max", 12))
@@ -699,7 +715,7 @@ def command_sheets() -> int:
         ax, az = point["at"]
         for r in images:
             if r["computed"] is None and math.hypot(r["x"] - ax, r["z"] - az) <= point["radius_m"] + 30.0 \
-                    and in_dates(r, point, points["years"]):
+                    and any(in_dates(r, dict(point, years=y) if w else point, points["years"]) for w, y in windows(point, points)):
                 near.add(r["id"])
     if near:
         print(f"{len(near)} images near the points get their fields from the API")
@@ -716,8 +732,8 @@ def command_sheets() -> int:
         old.unlink()
     credits = [c for c in old_credits() if c.startswith("| `detail_")]
     per_sheet = SHEET_COLUMNS * SHEET_ROWS
-    for point in points["points"]:
-        chosen, matched = choose(images, point, points["years"])
+    for point, window, years in [(p, w, y) for p in points["points"] for w, y in windows(p, points)]:
+        chosen, matched = choose(images, dict(point, years=years) if window else point, points["years"])
         entries = []
         for r in chosen:
             toward = None
@@ -728,11 +744,12 @@ def command_sheets() -> int:
                 entries.append((r, view(r, picture(r["id"], r["camera"] in PANO), toward), label(r, toward)))
             except Exception as error:  # noqa: BLE001 - keep the others
                 print(f"  {point['id']}: image {r['id']}: {error}")
-        print(f"{point['id']}: {matched} images match, {len(entries)} on the sheets")
+        label_years = f"{years[0]} to {years[1]}" if not point.get("dates") else "the weeks before Tết"
+        print(f"{point['id']} {label_years}: {matched} images match, {len(entries)} on the sheets")
         for k in range(0, len(entries), per_sheet):
             part = entries[k:k + per_sheet]
-            name = f"sheet_{point['id']}_{k // per_sheet + 1}.jpg"
-            title = f"{point['id']} ({', '.join(point['for'])}): {k + 1} to {k + len(part)} of {len(entries)}. CC BY-SA 4.0, Mapillary: see CREDITS.md"
+            name = f"sheet_{point['id']}{'_' + window if window else ''}_{k // per_sheet + 1}.jpg"
+            title = f"{point['id']} ({', '.join(point['for'])}), {label_years}: {k + 1} to {k + len(part)} of {len(entries)}. CC BY-SA 4.0, Mapillary: see CREDITS.md"
             make_sheet(part, title).save(OUT / name, quality=78, optimize=True)
             credits.extend(credit_line(r, name) for r, _img, _t in part)
     write_credits(credits)
