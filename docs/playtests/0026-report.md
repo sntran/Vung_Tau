@@ -285,3 +285,110 @@ See `low_items.jpg`.
 ### 8.5 Status
 
 The plan stays "In progress". No defect of this audit needs a construction shift of World: the large models are built by the job "Models of World" of this repository (`mix world.order` in CI).
+
+## 9. Audit 4: branch at `38253fe` (2026-11-19)
+
+The pictures of this audit are in [`0026/audit-2026-11-19/`](0026/audit-2026-11-19/). The workspace has 2 CPUs and 8 GB of memory. The audit of plan 0009, phase 1a, is in [report 0009](0009-report.md).
+
+### 9.1 Runs
+
+| Run | Result |
+|---|---|
+| CI of `38253fe` | Pass: 24 jobs (12 parts of the play tests, the unit tests, "Models of World", and the macOS look build). |
+| PT-71 `showcase_places` | Pass (234 s). 11 of 6 136 points of the edges have a step of more than 0.25 m; the longest run is 2 m. But see D-0026-34. |
+| PT-72 `showcase_shots`, phases 1 and 2 (Low) | Pass. Phase 9 (the sheets) fails here because I did not run the six phases of High; this is not a defect. |
+| PT-73 `showcase_budget`, phase 1 (Low) | Pass. S1 182 046, S2 276 176 (283 410 with the walkers near the eye), S3 214 294, S4 163 151, S5 275 758 triangles. |
+| PT-74 `showcase_walk`, runs 1 to 8 | Pass. |
+| PT-75 `showcase_people`, phases 1 and 2 | Pass. At 17:00, 11 of 11 swimmers are in the sea, and 7 show in S1 with no boat in front of them. |
+| PT-76 `showcase_night`, phase 1 (Low) | Pass. |
+| PT-77 `showcase_steps`, phases 1 to 4 | Pass: 10 openings, each with steps down to the sand. |
+| PT-37 `geo_chunks`, PT-57 `parked_rows`, PT-58 `morning_exercise` | Pass. |
+| PT-72, phase 3 (High, Forward+) | The system stopped the engine (out of memory) at 84 s, after the first frame. This is the limit of this workspace (8 GB), as in audit 3, not a number of a player. |
+
+### 9.2 What is correct
+
+- **D-0026-22.** The ground in front of the Grand Hotel is level: 6.65 m at the outer edge of the sidewalk, 6.82 m at the front (it was 8.83 m). S4 has the fence with its posts and the trees of the garden. PT-71 checks the ground from the curb to the front of each model of World.
+- **D-0026-24.** The row of casuarinas is gone from the band of Hạ Long at the junction, and the hall with the orange roof shows in S1. It is a subject of S1 now.
+- **D-0026-26.** The steps of each opening go down from the walk to the sand (`Showcase._lift_of()`), and PT-77 walks through each opening, down and up, with a screenshot from the walk and from the sand. The cause (a model that hangs under its port comes out lifted by its depth) is in AGENTS.md.
+- **D-0026-27.** The hall and the two sea walls are models of World in the game. The sea wall of Hạ Long is no longer a slope of earth.
+- **D-0026-29 and part of D-0026-30.** The gray slab on the raised lawn is gone, the light shirts have a mid tone, and the puddles of the wet sand are soft.
+- **The street photos (R5e).** The tool, its workflow, the index of 25 462 images, the contact sheets with their credits, and the decisions are in the repository (section 9.4).
+- **R21.** The macOS look build is in the export workflow, and `tools/look_on_mac.sh` is ready for my computer.
+
+### 9.3 Defects
+
+#### D-0026-23 (still open): the far hill
+
+S1 on Low is better: the crowns are larger and overlap more. But the lower half of Núi Nhỏ is still separate dark caps on a lit slope (`s1_hill.jpg`), and on High the builder sees separate round crowns (the sheet `sheet_S1_hill.jpg`). The new check passes with limits that are far from the photo: S1 has 28 % of the box on an edge and a smooth area of 56 %; the photo has 92 % and 0 %. The limits (at least 20 % and at most 80 %) let a hill that looks very different pass. Make the limits a part of the values of the photo (for example at least half of its edges, and a smooth area of at most 20 %), and make the far forest pass them.
+
+#### D-0026-31: The walk of Hạ Long has no lamps (medium)
+
+The photo of Mapillary 1927330624091805 (2018-07-29, hoangvietanh, CC BY-SA 4.0) shows a green post with five white globes on the walk of Hạ Long, near (-111, 326), and a bench at the parapet (`ha_long_walk_lamps.jpg`). The images of 2024 (for example 605171615183890, lyduchuy) show the same posts. The note of the grove of D-0026-24 in `data/geo/trees.json` says so too. A photo of 2018 is a source for 2019 (`docs/world-models.md`, section 3). In the game, the walk of Hạ Long has no lamp (PT-74 runs 5 to 7). Make the post with five globes as a model of this game, with its sizes from the photos, and put the row along the parapet.
+
+#### D-0026-32: The mid level of the blue pole is a cone (medium)
+
+From about 20 m, each blue pole of the walk shows a large blue cone at half its height (S5, and PT-74 runs 1 to 3; `blue_pole_cones.jpg`). The near pole has a thin shaft with two arms. This is a fault of the same kind as the wedges of the far fence (the open point of D-0026-22). Correct the levels of `den_cot_xanh_hai_tay`, and add a check to PT-56 for each model: the outline of the mid and the far level seen from the side covers about the same area as the outline of the near level (for example within 30 %).
+
+#### D-0026-33: Blue poles stand in two openings of the low wall (medium)
+
+In openings 0 and 3, a blue pole stands at the top of the steps, in the middle of the way (`poles_in_openings.jpg`). The rows of lamps put a pole every 40 m, 0.8 m in from the wall, with no gap at the openings. Keep each pole at least 1.5 m from the side of an opening, and add to PT-77 a check that no part stands in the way of the opening (a body of the player from the walk to the sand).
+
+#### D-0026-34: PT-71 passes with a view that shows nothing (medium)
+
+The view of Cao ốc Sen Biển in PT-71 (`011-cao_oc_sen_bien.png`) is a flat olive plane over most of the frame, with a piece of the road at the bottom (`pt71_sen_bien_blocked.jpg`). In audit 3 the same view showed the tower. Find the object in front of the camera. One possibility: a far crown of the hill (25 m to 70 m wide on Low since `208b658`) near the camera, in a tile whose middle is far, so the visibility range of the tile shows it. Add a check to PT-71 and PT-72: a frame where one flat color covers more than half fails.
+
+#### D-0026-35: Trees stand on the walk of Hạ Long (low)
+
+Past Cao ốc Sen Biển, palms stand on the tiles of the walk, some in its middle (PT-74 run 6 at 950 m, run 7 at 1 050 m; `palms_on_the_walk.jpg`). These come from the rule `coast_roads`. A player walks into them. Keep the trees off the parts that a player walks on, and in the area of the showcase put a tree only where a photo shows one (as the grove of D-0026-24).
+
+#### D-0026-36: The hall with the orange roof stands in a pit (low)
+
+In PT-71 (`012-nha_mai_ngoi_cam.png`, `pt71_hall.jpg`), bare slopes rise on each side of the hall above its base. In the photo of S1, the hall stands at the level of the road, in front of the hill. The windows of its near level are blurred.
+
+#### D-0026-37: Two sitters of S5 are the same person (low)
+
+On the raised lawn of S5, two people sit side by side with the same face, hair, and clothes (`s5_two_sitters.jpg`; also PT-75). Do not put two of the same person next to each other.
+
+#### D-0026-38: The worst case of PT-73 can be behind the eye (low)
+
+S5 with "the walkers of its spots at their points nearest to the eye" has the same draw calls and triangles as S5 with no walkers moved (571 and 275 758). The nearest point of a way can be under or behind the eye. Put each walker in the frame, at the nearest point of its way that is 3 m to 10 m in front of the eye. (My words in D-0026-28 asked for the nearest point.)
+
+#### D-0026-39: A number plate in a sheet of Mapillary (low)
+
+The sheet `docs/reference/mapillary/sheet_q23_buu_dien_roof_after_1.jpg` shows a number plate that a person can read (image 1091249252584160). Mapillary did not blur it. Blur it, or leave out the image, as for the frames of the video of 1992 (`docs/content/reference/video-1992.md`).
+
+#### Still open from the builder
+
+- The far level of the fence of the Grand Hotel shows wedges at the posts (past 40 m on Low).
+- D-0026-30: the south end of the park is bare sand with a blurred band, and the end of the median at the junction is a point of brown earth (PT-74 runs 4 and 5).
+- D-0026-25: the kind of the low wall at the eye of S1 (Check, question 3 of the builder below).
+- `nha_khach_ha_long`: its looks are still of a preview in the workspace (D-0026-27).
+
+#### Observation: the video memory on Low
+
+On Low, PT-72 logs 1 448 MB of video memory, of which 1 307 MB are textures (for example S1: "489 MB static, 1448 MB video"). The budget of the plan (R16) has the draw calls and the triangles, not the memory. A computer for Low can have a graphics chip in the processor with little memory. This is a question for me (Q24 below), not a defect.
+
+### 9.4 The street photos of Mapillary
+
+- **What Mapillary has.** The index has 25 462 images of the play area. Only 725 are of 2017 to 2021: two drives of 2018. One drive (598 images, 2018-04-24, the author ff5722) is along the coast to the north-west, at about x −2 060 to −320 and z −4 760 to −1 960. The other (126 images, 2018-07-29, hoangvietanh) passes the park and goes east into the town, at about x 280 to 1 100 and z 130 to 450. All the other images are of 2024 to 2026. So for 2019, most of Mapillary is "after" photos: a look that both a photo before 2017 and a photo of Mapillary after 2021 show is a source (report 0026, Q17, rule 1). A look that only a photo of 2024 shows is Check.
+- **The decisions of the builder.** I looked at the sheets, and I agree with each one:
+  - **Q21:** the back of the Grand Hotel stays Check: no image of 2017 to 2021 shows it.
+  - **Q22:** the stand-in on the slope of Hạ Long is off.
+  - **Q23:** the images of 2018 point at Khách sạn Bưu điện, but they show only the trees of the park, not the roof. The roof text of 2019 is still not known.
+  - **D-0026-22:** the fence of the Grand Hotel: the photo of S4 (2014) and an image of 2024 both show it.
+  - **D-0026-24:** no tree on the walk of Hạ Long in 2018. The image of 2018 also shows the lamps of D-0026-31.
+
+### 9.5 The questions of the builder
+
+1. **Q23, the letters on Khách sạn Bưu điện.** I answer.
+2. **R18 and R19, the images of 2024 and 2025 for the counts.** Use them for the kinds of things, with rule 1 (a photo before 2017 of the same kind). The counts from them have the status Check, and the game uses them only after I look at the sheets.
+3. **The low wall at the eye of S1.** I answer.
+4. **The ATL03 file** and 5. **the values of plan 0009**: report 0009, D-0009-04 to D-0009-06.
+
+### 9.6 New questions
+
+- **Q24.** Is there a limit of the video memory on Low (for example 1 GB)? Then PT-72 and PT-73 check it, and the textures of the look (R12) get a smaller size on Low.
+
+### 9.7 Status
+
+The plan stays "In progress". No defect of this audit needs a construction shift of World.
