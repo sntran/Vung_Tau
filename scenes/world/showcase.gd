@@ -128,6 +128,10 @@ var wall_row: WorldRow
 ## no shadow (they lie on the sand). PT-73: in the row of the walls, S5 on Low
 ## had 312 688 triangles (the limit is 300 000).
 var under_row: WorldRow
+## The spans of the fences (the fence of the Grand Hotel): a row of their own,
+## with the ranges of "fence_ranges" of "wall_pieces". In the row of the walls
+## (the mid level to 12 m on Low), the fence of S4 showed its far level on Low.
+var fence_row: WorldRow
 ## The end of the range of the squares of a part in chunks (the color -> m).
 var _far_ends: Dictionary = {}
 ## Report 0026, D-0026-17: the hedges, the round bushes, the flowers of the
@@ -2281,7 +2285,7 @@ func _fence(cfg: Dictionary) -> void:
 		var basis := Basis(-dir / span, Vector3.UP, side)
 		if basis.determinant() < 0.0:
 			basis.x = -basis.x
-		_row_of_walls().add(model_id, Transform3D(basis, (a + b) / 2.0))
+		_row_of_fences().add(model_id, Transform3D(basis, (a + b) / 2.0))
 		var a_top := a + Vector3(0.0, height, 0.0)
 		var b_top := b + Vector3(0.0, height, 0.0)
 		# Both faces: a trimesh stops a body only on the front of a face.
@@ -2294,6 +2298,13 @@ func _row_of_walls() -> WorldRow:
 	if wall_row == null:
 		wall_row = _new_row("WallPieces", "ranges")
 	return wall_row
+
+
+## The row of the spans of the fences.
+func _row_of_fences() -> WorldRow:
+	if fence_row == null:
+		fence_row = _new_row("FencePieces", "fence_ranges")
+	return fence_row
 
 
 ## The row of the pieces under the low wall of the beach.
@@ -2362,6 +2373,9 @@ func _commit() -> void:
 	if wall_row != null:
 		wall_row.build()
 		_add_length("wall_pieces", float(wall_row.count()))
+	if fence_row != null:
+		fence_row.build()
+		_add_length("fence_pieces", float(fence_row.count()))
 	if under_row != null:
 		under_row.build()
 		for node: Node in under_row.find_children("*", "GeometryInstance3D", true, false):

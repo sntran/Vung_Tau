@@ -85,6 +85,8 @@ const WATER_MAX_VALUE := 0.72
 ## A stand-in covers at most this part of a frame (D-0026-14: the grey boxes of
 ## Khách sạn Bưu điện and Cao ốc Sen Biển in S1).
 const MAX_STAND_IN := 0.02
+## A fence nearer than this to the eye of a shot shows its near or mid level (m).
+const FENCE_NEAR_M := 30.0
 
 
 func run(d: PlaytestDriver) -> void:
@@ -193,6 +195,17 @@ func _check_view(d: PlaytestDriver, w: VungTau, camera: Camera3D, shot: Dictiona
 	d.step("%s: the largest stand-in covers %.1f %% of the frame" % [shot.id, largest * 100.0])
 	d.expect(main.is_empty(), "%s: no stand-in is a main subject of the shot (at most %.0f %% of the frame): %s" % [
 			shot.id, MAX_STAND_IN * 100.0, ", ".join(main)])
+	# Audit 3 of the corrections: the fence of the Grand Hotel in S4 on Low was its
+	# far level (a row of grey teeth) at 20 m, in the row of the walls.
+	if w.showcase.fence_row != null:
+		var r: Vector3 = w.showcase.fence_row.custom_ranges.get(WorldModel.preset, WorldModel.ranges)
+		var far_near := 0
+		for cell: Dictionary in w.showcase.fence_row.cells:
+			var to_cell := (cell.node as Node3D).global_position.distance_to(eye)
+			if to_cell < FENCE_NEAR_M and to_cell >= r.y:
+				far_near += 1
+		d.expect(far_near == 0, "%s: no cell of a fence nearer than %.0f m shows its far level: %d (the mid level to %.0f m)" % [
+				shot.id, FENCE_NEAR_M, far_near, r.y])
 
 
 ## The part of the frame that a stand-in covers (D-0026-14): the box of the

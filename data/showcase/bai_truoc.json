@@ -956,6 +956,10 @@
 		"under_ranges": {
 			"low": [0.0, 0.0, 40.0]
 		},
+		"fence_ranges": {
+			"low": [0.0, 40.0, 150.0]
+		},
+		"fence_ranges_note": "The spans of the fences (a row of their own): on Low the mid level (400 triangles a span) to 40 m and the far level to 150 m. With the ranges of the walls (the mid level to 12 m), the fence of the Grand Hotel in S4 on Low was its far level, a row of grey teeth (the sheet of S4 of audit 3 of the corrections).",
 		"under_ranges_note": "The pieces under the low wall (a row of their own, with no shadow): on Low only the far level (80 triangles) to 40 m: from the walk the wall hides them, and a range is for a whole cell of cell_m (with the mid level to 6 m, all the pieces of the cell of the eye had the mid level). PT-73: with the ranges of the walls (20 m and 120 m) and the shadow, S5 had 312 688 triangles; with the mid level to 8 m, the far level to 80 m, and no shadow, 306 528; with 6 m and 40 m, 305 568.",
 		"under_note": "Report 0026, D-0026-27: the sloped sea wall of granite blocks under each span of the low wall of the beach, on the side of the sand (data/world/drawings/ke_da_bai_truoc.json)."
 	},
