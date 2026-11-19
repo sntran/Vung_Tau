@@ -96,6 +96,29 @@ def full_order(order: dict) -> dict:
     return {"blueprint": "catalog", "options": {"name": order["options"]["name"]}, "colors": {}, "joints": {}}
 
 
+def first_difference(given, full, path: str = "") -> str:
+    """The path of the first value of the given order that is not in the full order ("" if none)."""
+    if isinstance(given, dict):
+        if not isinstance(full, dict):
+            return path or "/"
+        for k, v in given.items():
+            if k not in full:
+                return f"{path}/{k} (not in the receipt)"
+            found = first_difference(v, full[k], f"{path}/{k}")
+            if found:
+                return found
+        return ""
+    if isinstance(given, list):
+        if not isinstance(full, list) or len(given) != len(full):
+            return f"{path} (a list of {len(given)}, the receipt {len(full) if isinstance(full, list) else type(full).__name__})"
+        for i, (a, b) in enumerate(zip(given, full)):
+            found = first_difference(a, b, f"{path}/{i}")
+            if found:
+                return found
+        return ""
+    return "" if agrees(given, full) else f"{path} ({json.dumps(given)[:60]}, the receipt {json.dumps(full)[:60]})"
+
+
 def agrees(given, full) -> bool:
     """True when each value of the given order is the value in the full order."""
     if isinstance(given, dict):
@@ -227,7 +250,8 @@ def check(models: list[dict], lock: dict, assets: Path = ASSETS) -> list[str]:
             if rec.get("hash") != entry.get("hash"):
                 problems.append(f"{mid}: the hash of the receipt is not the hash of lock.json")
             if not agrees(model["order"], rec.get("order", {})):
-                problems.append(f"{mid}: the order of orders.json is not the order of the receipt")
+                problems.append(f"{mid}: the order of orders.json is not the order of the receipt: "
+                                f"{first_difference(model['order'], rec.get('order', {}))}")
             if rec.get("order") and order_hash(rec["order"]) != rec.get("hash"):
                 problems.append(f"{mid}: the hash of the receipt is not the hash of its order")
     for model_id in lock["models"]:

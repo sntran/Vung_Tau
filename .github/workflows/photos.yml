@@ -36,6 +36,8 @@ jobs:
           python-version: "3.13"
 
       - name: Get the open photos and write the credits
+        env:
+          MAPILLARY_TOKEN: ${{ secrets.MAPILLARY_TOKEN }}
         run: python tools/photos/photos.py
 
       - name: Check the photos

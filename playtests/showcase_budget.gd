@@ -5,7 +5,9 @@ extends RefCounted
 # most 2 000 draw calls and 2 000 000 triangles. As PT-54, the presets run on
 # Forward+ (the renderer of a computer); the Mobile renderer of a phone draws
 # the same objects. The values go to the log. High measures the shots in two
-# runs: a run of five views on Forward+ takes long under lavapipe.
+# runs: a run of five views on Forward+ takes long under lavapipe. Report 0026,
+# D-0026-28: at a shot with walker spots (S1, S2, S5), the test measures again
+# with each walker of its spots at the point of its way nearest to the eye.
 # sizes: 1280x720
 # phase: --world=vung_tau --renderer=forward_plus --quality=low --start-time=17:10
 # phase: --world=vung_tau --renderer=forward_plus --quality=high --start-time=17:10
@@ -49,5 +51,18 @@ func run(d: PlaytestDriver) -> void:
 		d.expect(draw_calls <= int(limit[0]), "%s, %s: at most %d draw calls: %d" % [preset, shot.id, limit[0], draw_calls])
 		d.expect(triangles <= int(limit[1]), "%s, %s: at most %d triangles: %d" % [preset, shot.id, limit[1], triangles])
 		await d.screenshot("%s_%s" % [shot.id, preset])
+		# D-0026-28: the worst case of the walkers of the spots of the shot: each
+		# at the point of its way nearest to the eye.
+		var held := w.showcase.people.hold_spot_walkers(str(shot.id), eye) if w.showcase.people else 0
+		if held > 0:
+			await d.wait_frames(8)
+			draw_calls = RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)
+			triangles = RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME)
+			d.step("%s, %s, the %d walkers of its spots at their points nearest to the eye: %d draw calls, %d triangles" % [
+					preset, shot.id, held, draw_calls, triangles])
+			d.expect(draw_calls <= int(limit[0]), "%s, %s, the walkers near: at most %d draw calls: %d" % [preset, shot.id, limit[0], draw_calls])
+			d.expect(triangles <= int(limit[1]), "%s, %s, the walkers near: at most %d triangles: %d" % [preset, shot.id, limit[1], triangles])
+			await d.screenshot("%s_%s_walkers_near" % [shot.id, preset])
+			w.showcase.people.release_walkers()
 		camera.fov = fov
 	d.fly_end()

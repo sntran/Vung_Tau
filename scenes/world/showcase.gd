@@ -187,6 +187,8 @@ func setup(w: VungTau, path := CONFIG) -> bool:
 		_steps.append(_walls.bind(wall))
 	for sea_wall: Dictionary in data.get("sea_walls", []):
 		_steps.append(_sea_wall.bind(sea_wall))
+	for fence: Dictionary in data.get("fences", []):
+		_steps.append(_fence.bind(fence))
 	for row: Dictionary in data.get("lamp_rows", []):
 		_steps.append(_lamp_row.bind(row))
 	if data.has("path_lamps"):
@@ -411,7 +413,12 @@ func _planter(ring: PackedVector2Array, cfg: Dictionary, osm := "") -> void:
 	var h := float(cfg.get("height", 0.45))
 	var border := float(cfg.get("border", 0.25))
 	var color := str(cfg.get("color", "#aaa69c"))
-	var top_of := func(p: Vector2) -> float: return world.ground_height(p.x, p.y) + h
+	# Report 0026, D-0026-29: the top is one plane, fitted to the ground at the
+	# corners (the slope of the walk). With the ground at each corner, the top
+	# and the lawn were two bent faces with other diagonals, and the grey top
+	# came over a third of the lawn.
+	var plane := _ground_plane(ring)
+	var top_of := func(p: Vector2) -> float: return plane.x + plane.y * p.x + plane.z * p.y + h
 	var clockwise := _area(ring) < 0.0
 	for i in ring.size():
 		var a := ring[i]
@@ -448,6 +455,44 @@ func _planter(ring: PackedVector2Array, cfg: Dictionary, osm := "") -> void:
 	_add_length("planter", 1.0)
 	if not stand_in:
 		_add_length("planter_models", 1.0)
+
+
+## The plane a + b x + c z (as Vector3(a, b, c)) nearest to the ground at the
+## points of a ring (least squares); a level plane for fewer than 3 points.
+func _ground_plane(ring: PackedVector2Array) -> Vector3:
+	var n := float(ring.size())
+	var sx := 0.0
+	var sz := 0.0
+	var sh := 0.0
+	for q in ring:
+		sx += q.x
+		sz += q.y
+		sh += world.ground_height(q.x, q.y)
+	if ring.size() < 3:
+		return Vector3(sh / maxf(n, 1.0), 0.0, 0.0)
+	var mx := sx / n
+	var mz := sz / n
+	var mh := sh / n
+	var xx := 0.0
+	var xz := 0.0
+	var zz := 0.0
+	var xh := 0.0
+	var zh := 0.0
+	for q in ring:
+		var dx := q.x - mx
+		var dz := q.y - mz
+		var dh := world.ground_height(q.x, q.y) - mh
+		xx += dx * dx
+		xz += dx * dz
+		zz += dz * dz
+		xh += dx * dh
+		zh += dz * dh
+	var det := xx * zz - xz * xz
+	if absf(det) < 0.000001:
+		return Vector3(mh, 0.0, 0.0)
+	var b := (xh * zz - zh * xz) / det
+	var c := (zh * xx - xh * xz) / det
+	return Vector3(mh - b * mx - c * mz, b, c)
 
 
 ## A flat face of the outline at the height y, that looks up.
@@ -2098,6 +2143,48 @@ func _wall_piece(model_id: String, a: Vector3, b: Vector3, sea: Vector3, up := 1
 	if basis.determinant() < 0.0:
 		basis.x = -basis.x
 	wall_row.add(model_id, Transform3D(basis, (a + b) / 2.0))
+
+
+## Report 0026, D-0026-22: a fence of a model of this game (the fence of the
+## Grand Hotel) along a line on the ground: spans of "span_m" one after another
+## (the port end of a span on the port start of the next), out of the gaps (the
+## gates), and a collision wall of "height_m" along each span.
+func _fence(cfg: Dictionary) -> void:
+	var model_id := str(cfg.get("model", ""))
+	if not _has_model(model_id):
+		return
+	var span := float(cfg.get("span_m", 2.8))
+	var height := float(cfg.get("height_m", 1.2))
+	var line := PackedVector3Array()
+	for q: Array in cfg.get("line", []):
+		line.append(Vector3(float(q[0]), 0.0, float(q[1])))
+	var gaps: Array[Vector2] = []
+	for g: Array in cfg.get("gaps", []):
+		gaps.append(Vector2(float(g[0]), float(g[1])))
+	var total := _line_length(line)
+	var k := 0
+	while (k + 1) * span <= total + 0.01:
+		var s0 := k * span
+		var s1 := s0 + span
+		k += 1
+		if _in_gaps((s0 + s1) / 2.0, gaps, span / 2.0):
+			continue
+		var a := _along_line(line, s0)
+		var b := _along_line(line, s1)
+		a.y = world.ground_height(a.x, a.z)
+		b.y = world.ground_height(b.x, b.z)
+		var dir := b - a
+		var side := Vector3(-dir.z, 0.0, dir.x).normalized()
+		# The x of World is -x of the GLB; the basis stays right-handed (_wall_piece()).
+		var basis := Basis(-dir / span, Vector3.UP, side)
+		if basis.determinant() < 0.0:
+			basis.x = -basis.x
+		_row_of_walls().add(model_id, Transform3D(basis, (a + b) / 2.0))
+		var a_top := a + Vector3(0.0, height, 0.0)
+		var b_top := b + Vector3(0.0, height, 0.0)
+		# Both faces: a trimesh stops a body only on the front of a face.
+		_collision.append_array([a, b, b_top, a, b_top, a_top, b, a, a_top, b, a_top, b_top])
+		_add_length("fence", span)
 
 
 ## The row of the pieces of the walls (and the steps down to the sand).

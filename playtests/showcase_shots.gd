@@ -254,6 +254,12 @@ static func _frame_part(d: PlaytestDriver, w: VungTau, camera: Camera3D, eye: Ve
 ## D-0026-05 and D-0026-06: the patches of the far hill and the color of the water.
 func _check_look(d: PlaytestDriver, shot: Dictionary, preset: String, time: String) -> void:
 	var frame := d.viewport().get_texture().get_image()
+	# D-0026-29: the top of the raised lawn of S5 is grass, with no grey slab.
+	if shot.has("lawn"):
+		var green := green_part(frame, shot.lawn.box)
+		d.step("%s, %s, %s: %.0f %% of the box of the lawn is green" % [shot.id, preset, time, green * 100.0])
+		d.expect(green >= float(shot.lawn.min_green), "%s, %s, %s: the top of the raised lawn is grass: %.0f %% of its box is green (at least %.0f %%)" % [
+				shot.id, preset, time, green * 100.0, float(shot.lawn.min_green) * 100.0])
 	if shot.has("hill"):
 		var game := box_stats(frame, shot.hill.shot)
 		var photo_image := Image.load_from_file(ProjectSettings.globalize_path(PHOTOS + str(shot.photos[0].file)))
@@ -288,6 +294,21 @@ func _check_look(d: PlaytestDriver, shot: Dictionary, preset: String, time: Stri
 
 ## The mean color of a box of an image (x0, y0, x1, y1 as parts of its size), and
 ## "patches": the standard deviation of the brightness of its blocks of BLOCK px.
+## The part of the pixels of a box (parts of the frame) whose green is more than
+## their red and their blue (grass in the light of the day).
+static func green_part(image: Image, box: Array) -> float:
+	var size := image.get_size()
+	var green := 0
+	var count := 0
+	for y in range(int(float(box[1]) * size.y), int(float(box[3]) * size.y), 2):
+		for x in range(int(float(box[0]) * size.x), int(float(box[2]) * size.x), 2):
+			var c := image.get_pixel(x, y)
+			count += 1
+			if c.g > c.r * 1.05 and c.g > c.b * 1.05:
+				green += 1
+	return float(green) / maxf(count, 1.0)
+
+
 static func box_stats(image: Image, box: Array) -> Dictionary:
 	var size := image.get_size()
 	var x0 := int(float(box[0]) * size.x)

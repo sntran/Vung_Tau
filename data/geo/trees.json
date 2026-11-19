@@ -239,6 +239,94 @@
 					}
 				],
 				"comment": "Report 0026, D-0026-24: the band of Hạ Long from the junction with Quang Trung to Cao ốc Sen Biển (20 m to each side of the middle of its two roads). The rule coast_roads put an even row of casuarinas every 7 m there, and it hid the hall with the orange roof in S1. The photos show no row: the photo of Mapillary of 2018-07-29 (image 1927330624091805, hoangvietanh, CC BY-SA 4.0, docs/reference/mapillary/) shows the walk of the sea of Hạ Long with its parapet and its lamps of five globes, and no tree; the photo from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0, docs/reference/photos/drone_2021_ha_long.jpg) shows the median with flower beds and a few small Norfolk pines, and no tree on the sea side; the photo of S1 (Commons, trungydang, 2014-04-05, CC BY 3.0) shows a few coconut palms in front of Khách sạn Bưu điện. So the grove has these trees only: four Norfolk pines in the median (araucaria, about 30 m apart) and three coconut palms on the sidewalk of the side of the hill in front of Khách sạn Bưu điện. Their places are by eye from the two photos (about 5 m)."
+			},
+			{
+				"name": "Grand Hotel",
+				"outline": [
+					[
+						107.5,
+						-22.0
+					],
+					[
+						147.0,
+						-22.0
+					],
+					[
+						147.0,
+						20.0
+					],
+					[
+						131.0,
+						22.0
+					],
+					[
+						131.0,
+						88.0
+					],
+					[
+						129.5,
+						88.0
+					]
+				],
+				"trees": [
+					{
+						"kind": "tall_shade",
+						"at": [
+							121.5,
+							24.0
+						]
+					},
+					{
+						"kind": "tall_shade",
+						"at": [
+							112.5,
+							-17.0
+						]
+					},
+					{
+						"kind": "frangipani",
+						"at": [
+							117.5,
+							-9.0
+						]
+					},
+					{
+						"kind": "frangipani",
+						"at": [
+							119.5,
+							-2.0
+						]
+					},
+					{
+						"kind": "frangipani",
+						"at": [
+							124.0,
+							16.0
+						]
+					},
+					{
+						"kind": "frangipani",
+						"at": [
+							127.0,
+							36.0
+						]
+					},
+					{
+						"kind": "frangipani",
+						"at": [
+							129.5,
+							48.0
+						]
+					},
+					{
+						"kind": "frangipani",
+						"at": [
+							129.5,
+							68.0
+						]
+					}
+				],
+				"comment": "Report 0026, D-0026-22: the garden of the Grand Hotel between the fence on Quang Trung and the fronts of the main block and of the south wing, at the level of the sidewalk. The photo of S4 and the wide photo from its place (2014-04-06, Commons, trungydang, CC BY 3.0) show frangipani with white flowers along the fence and a large rain tree in front of the south half of the main block; the street photos of Mapillary of 2024-11-09 (lyduchuy, CC BY-SA 4.0, docs/reference/mapillary/sheet_d22_grand_front_after_1.jpg) show the large trees at the corner of Nguyễn Du and the same rain tree (rule 1 of Q17). The places are by eye from the photos (about 5 m); the drive in front of the porch has no tree."
 			}
 		]
 	},

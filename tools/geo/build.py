@@ -41,7 +41,8 @@ LAND_ROCK_TAGS = {"scree"}
 CLIFF_ROCK_M = 6.0
 # tide.py, footprints.py, and photos.py (the street photos, plan 0009, R5e)
 # write these files before build.py runs. build.py keeps them.
-TIDE_FILES = ("tide.json", "tide_report.md", "footprints.json", "photos_report.md", "photos_map.png")
+TIDE_FILES = ("tide.json", "tide_report.md", "footprints.json", "photos_report.md", "photos_map.png",
+              "photos_map.png.import")
 BUILT_LANDUSE = {"residential", "commercial", "retail", "industrial", "construction", "military", "religious"}
 # A place where the roads cover more than this part of the ground (in a
 # Gaussian of TOWN_ROAD_SIGMA_M) is town.

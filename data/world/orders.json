@@ -39991,515 +39991,217 @@
 			"catalog": null
 		},
 		{
-			"id": "nha_khach_ha_long",
+			"id": "hang_rao_khach_san_grand",
 			"order": {
-				"blueprint": "building",
+				"blueprint": "drawing",
 				"options": {
-					"name": "nha_khach_ha_long",
-					"sources": [
-						"Nhà khách Hạ Long (102 Hạ Long), Vũng Tàu. Plan: OpenStreetMap way 235149416 (© OpenStreetMap contributors, ODbL), building:levels 8. Look: a photo of 2021-05-10 (Flickr, Venanzio_KH) and a photo of 2014 (trungydang, Wikimedia Commons, CC BY 3.0)."
-					],
-					"size": [
-						21.35,
-						17.07
-					],
-					"storeys": 8,
-					"ground": 3.0,
-					"band": 0.8,
-					"storey": 2.9,
-					"colors": {
-						"wall": "#e8e4df",
-						"trim": "#e8e4df",
-						"band": "#b5b8b8",
-						"glass": "#3d4650",
-						"frame": "#f4f1e4",
-						"letters": "#1c2f6b",
-						"ground": "#a49d92"
-					},
-					"roof": {
-						"kind": "flat",
-						"parapet": 0.8
-					},
-					"fronts": [
-						{
-							"side": 1,
-							"style": "windows",
-							"bays": 6,
-							"inset": 0.8,
-							"window": [
-								1.2,
-								1.4
-							],
-							"bars": 1
-						},
-						{
-							"side": 2,
-							"from": 6.6,
-							"to": 10.2,
-							"style": "windows",
-							"bays": 1,
-							"places": [
-								8.4
-							],
-							"window": [
-								1.1,
-								1.3
-							],
-							"ledges": true
-						},
-						{
-							"side": 3,
-							"style": "windows",
-							"bays": 6,
-							"inset": 0.8,
-							"window": [
-								1.1,
-								1.3
-							]
-						},
-						{
-							"side": 4,
-							"style": "windows",
-							"bays": 4,
-							"inset": 1.0,
-							"window": [
-								1.1,
-								1.3
-							]
-						}
-					],
-					"letters": [
-						{
-							"side": 2,
-							"at": 4.4,
-							"z": 24.599999999999998,
-							"high": 0.6,
-							"text": "HA LONG HOTEL",
-							"out": 0.55
-						}
-					],
-					"apron": 0.6,
-					"age": 0.5,
-					"more": {
-						"than": [
-							{
-								"shape": "box",
-								"size": [
-									11.275,
-									9.135,
-									0.15
-								],
-								"at": [
-									10.675,
-									-8.535,
-									21.0
-								],
-								"color": "#b5b8b8",
-								"mode": "paint",
-								"blend": 0.01,
-								"raise": 0.03,
-								"roughness": 0.8
-							},
-							{
-								"shape": "box",
-								"size": [
-									0.63,
-									0.73,
-									0.25
-								],
-								"at": [
-									0.0,
-									-2.7,
-									22.8
-								],
-								"color": "#f4f1e4",
-								"axis": [
-									-1.0,
-									0.0,
-									0
-								],
-								"up": [
-									0,
-									0,
-									1
-								],
-								"mode": "paint",
-								"blend": 0.015,
-								"raise": 0.015,
-								"roughness": 0.6
-							},
-							{
-								"shape": "box",
-								"size": [
-									0.55,
-									0.65,
-									0.25
-								],
-								"at": [
-									0.0,
-									-2.7,
-									22.8
-								],
-								"color": "#3d4650",
-								"axis": [
-									-1.0,
-									0.0,
-									0
-								],
-								"up": [
-									0,
-									0,
-									1
-								],
-								"mode": "paint",
-								"blend": 0.06,
-								"raise": -0.06,
-								"roughness": 0.1,
-								"metal": 0.2
-							},
-							{
-								"shape": "box",
-								"size": [
-									0.025,
-									0.65,
-									0.25
-								],
-								"at": [
-									0.0,
-									-2.7,
-									22.8
-								],
-								"color": "#f4f1e4",
-								"axis": [
-									-1.0,
-									0.0,
-									0
-								],
-								"up": [
-									0,
-									0,
-									1
-								],
-								"mode": "paint",
-								"blend": 0.006,
-								"roughness": 0.6
-							},
-							{
-								"shape": "box",
-								"size": [
-									0.63,
-									0.73,
-									0.25
-								],
-								"at": [
-									0.0,
-									-4.1,
-									22.8
-								],
-								"color": "#f4f1e4",
-								"axis": [
-									-1.0,
-									0.0,
-									0
-								],
-								"up": [
-									0,
-									0,
-									1
-								],
-								"mode": "paint",
-								"blend": 0.015,
-								"raise": 0.015,
-								"roughness": 0.6
-							},
-							{
-								"shape": "box",
-								"size": [
-									0.55,
-									0.65,
-									0.25
-								],
-								"at": [
-									0.0,
-									-4.1,
-									22.8
-								],
-								"color": "#3d4650",
-								"axis": [
-									-1.0,
-									0.0,
-									0
-								],
-								"up": [
-									0,
-									0,
-									1
-								],
-								"mode": "paint",
-								"blend": 0.06,
-								"raise": -0.06,
-								"roughness": 0.1,
-								"metal": 0.2
-							},
-							{
-								"shape": "box",
-								"size": [
-									0.025,
-									0.65,
-									0.25
-								],
-								"at": [
-									0.0,
-									-4.1,
-									22.8
-								],
-								"color": "#f4f1e4",
-								"axis": [
-									-1.0,
-									0.0,
-									0
-								],
-								"up": [
-									0,
-									0,
-									1
-								],
-								"mode": "paint",
-								"blend": 0.006,
-								"roughness": 0.6
-							},
-							{
-								"shape": "box",
-								"size": [
-									0.63,
-									0.73,
-									0.25
-								],
-								"at": [
-									0.0,
-									-5.8,
-									22.8
-								],
-								"color": "#f4f1e4",
-								"axis": [
-									-1.0,
-									0.0,
-									0
-								],
-								"up": [
-									0,
-									0,
-									1
-								],
-								"mode": "paint",
-								"blend": 0.015,
-								"raise": 0.015,
-								"roughness": 0.6
-							},
-							{
-								"shape": "box",
-								"size": [
-									0.55,
-									0.65,
-									0.25
-								],
-								"at": [
-									0.0,
-									-5.8,
-									22.8
-								],
-								"color": "#3d4650",
-								"axis": [
-									-1.0,
-									0.0,
-									0
-								],
-								"up": [
-									0,
-									0,
-									1
-								],
-								"mode": "paint",
-								"blend": 0.06,
-								"raise": -0.06,
-								"roughness": 0.1,
-								"metal": 0.2
-							},
-							{
-								"shape": "box",
-								"size": [
-									0.025,
-									0.65,
-									0.25
-								],
-								"at": [
-									0.0,
-									-5.8,
-									22.8
-								],
-								"color": "#f4f1e4",
-								"axis": [
-									-1.0,
-									0.0,
-									0
-								],
-								"up": [
-									0,
-									0,
-									1
-								],
-								"mode": "paint",
-								"blend": 0.006,
-								"roughness": 0.6
-							},
-							{
-								"shape": "box",
-								"size": [
-									0.63,
-									0.73,
-									0.25
-								],
-								"at": [
-									0.0,
-									-13.3,
-									22.8
-								],
-								"color": "#f4f1e4",
-								"axis": [
-									-1.0,
-									0.0,
-									0
-								],
-								"up": [
-									0,
-									0,
-									1
-								],
-								"mode": "paint",
-								"blend": 0.015,
-								"raise": 0.015,
-								"roughness": 0.6
-							},
-							{
-								"shape": "box",
-								"size": [
-									0.55,
-									0.65,
-									0.25
-								],
-								"at": [
-									0.0,
-									-13.3,
-									22.8
-								],
-								"color": "#3d4650",
-								"axis": [
-									-1.0,
-									0.0,
-									0
-								],
-								"up": [
-									0,
-									0,
-									1
-								],
-								"mode": "paint",
-								"blend": 0.06,
-								"raise": -0.06,
-								"roughness": 0.1,
-								"metal": 0.2
-							},
-							{
-								"shape": "box",
-								"size": [
-									0.025,
-									0.65,
-									0.25
-								],
-								"at": [
-									0.0,
-									-13.3,
-									22.8
-								],
-								"color": "#f4f1e4",
-								"axis": [
-									-1.0,
-									0.0,
-									0
-								],
-								"up": [
-									0,
-									0,
-									1
-								],
-								"mode": "paint",
-								"blend": 0.006,
-								"roughness": 0.6
-							},
-							{
-								"shape": "box",
-								"size": [
-									3.55,
-									1.5,
-									2.5
-								],
-								"at": [
-									3.5,
-									-11.55,
-									25.3
-								],
-								"color": "#e8e4df",
-								"axis": [
-									-1.0,
-									0.0,
-									0
-								],
-								"up": [
-									0,
-									0,
-									1
-								],
+					"drawing": {
+						"name": "hang_rao_khach_san_grand",
+						"kind": "prop",
+						"sources": [
+							"The fence of the Grand Hotel of Vũng Tàu on Quang Trung: the photos of S4 and of Nguyễn Du of 2014-04-06 (Commons, trungydang, CC BY 3.0) and the street photo of Mapillary of 2024-11-09 (image 1251897522687108, lyduchuy, CC BY-SA 4.0); the sizes at the scale of a man beside it (Vũng Tàu, data/world/drawings/hang_rao_khach_san_grand.json)."
+						],
+						"materials": {
+							"part_01": {
+								"color": "#ffffff",
 								"roughness": 0.85,
-								"surface": {
-									"kind": "plaster",
-									"scale": 0.04
+								"metalness": 0.0
+							},
+							"part_02": {
+								"color": "#ffffff",
+								"roughness": 0.45,
+								"metalness": 0.6
+							}
+						},
+						"nodes": [
+							{
+								"name": "span",
+								"skill": {
+									"sculpt": {
+										"edits": [
+											{
+												"shape": "box",
+												"size": [
+													1.4,
+													0.16,
+													0.125
+												],
+												"at": [
+													0,
+													0,
+													0.125
+												],
+												"material": "part_01",
+												"color": "#77736a"
+											},
+											{
+												"shape": "box",
+												"size": [
+													1.15,
+													0.02,
+													0.02
+												],
+												"at": [
+													0,
+													0,
+													0.73
+												],
+												"material": "part_02",
+												"color": "#2f3d33"
+											},
+											{
+												"shape": "box",
+												"size": [
+													1.15,
+													0.02,
+													0.015
+												],
+												"at": [
+													0,
+													0,
+													0.32
+												],
+												"material": "part_02",
+												"color": "#2f3d33"
+											},
+											{
+												"shape": "box",
+												"size": [
+													0.01,
+													0.01,
+													0.24
+												],
+												"at": [
+													-1.0899999999999999,
+													0,
+													0.5
+												],
+												"material": "part_02",
+												"color": "#2f3d33",
+												"repeat": {
+													"count": 20,
+													"move": [
+														0.1155,
+														0,
+														0
+													]
+												}
+											},
+											{
+												"shape": "box",
+												"size": [
+													0.125,
+													0.25,
+													0.475
+												],
+												"at": [
+													1.275,
+													0,
+													0.475
+												],
+												"mirror": "x",
+												"material": "part_01",
+												"color": "#e6dbb3"
+											},
+											{
+												"mode": "paint",
+												"shape": "box",
+												"size": [
+													0.06875,
+													0.26,
+													0.1
+												],
+												"at": [
+													1.2874999999999999,
+													0,
+													0.78
+												],
+												"mirror": "x",
+												"blend": 0.003,
+												"material": "part_01",
+												"color": "#3b3a33"
+											},
+											{
+												"shape": "box",
+												"size": [
+													0.155,
+													0.29,
+													0.03
+												],
+												"at": [
+													1.275,
+													0,
+													0.98
+												],
+												"mirror": "x",
+												"material": "part_01",
+												"color": "#ddd0a4"
+											},
+											{
+												"shape": "pyramid",
+												"size": [
+													0.155,
+													0.29,
+													0.1
+												],
+												"at": [
+													1.275,
+													0,
+													1.06
+												],
+												"mirror": "x",
+												"material": "part_01",
+												"color": "#d3c28c"
+											}
+										],
+										"ports": {
+											"start": {
+												"at": [
+													-1.4,
+													0,
+													0
+												],
+												"axis": [
+													-1,
+													0,
+													0
+												],
+												"up": [
+													0,
+													0,
+													1
+												]
+											},
+											"end": {
+												"at": [
+													1.4,
+													0,
+													0
+												],
+												"axis": [
+													1,
+													0,
+													0
+												],
+												"up": [
+													0,
+													0,
+													1
+												]
+											}
+										},
+										"cells": {
+											"near": 0.01,
+											"mid": 0.025,
+											"far": 0.06
+										},
+										"budget": {
+											"near": 3000,
+											"mid": 400,
+											"far": 40
+										}
+									}
 								}
-							},
-							{
-								"shape": "cylinder",
-								"size": [
-									0.06,
-									1.75
-								],
-								"at": [
-									2.5,
-									-9.0,
-									28.55
-								],
-								"color": "#9aa0a3",
-								"roughness": 0.5,
-								"metal": 0.6,
-								"levels": [
-									"near"
-								]
-							},
-							{
-								"shape": "cylinder",
-								"size": [
-									0.06,
-									1.4
-								],
-								"at": [
-									2.5,
-									-13.5,
-									28.2
-								],
-								"color": "#9aa0a3",
-								"roughness": 0.5,
-								"metal": 0.6,
-								"levels": [
-									"near"
-								]
 							}
 						]
 					}
@@ -40511,8 +40213,8 @@
 				"far"
 			],
 			"impostor": false,
-			"uses": "Plan 0026, R7, Q7: on its OSM outline (way 235149416) by Hạ Long, about 300 m south of Hải Âu (seen from the jetty and the walk of the sea); its place is in data/world/places/bai_truoc.json.",
-			"drawing": "data/world/drawings/nha_khach_ha_long.json",
+			"uses": "Plan 0026, report 0026, D-0026-22: along the outer edge of the sidewalk of Quang Trung in front of the Grand Hotel (fences of data/showcase/bai_truoc.json): the game puts the spans one after another along the line, the port end of a span on the port start of the next (two half posts make a whole post), the origin on the line, z up, with a gap at each gate.",
+			"drawing": "data/world/drawings/hang_rao_khach_san_grand.json",
 			"catalog": null
 		}
 	]

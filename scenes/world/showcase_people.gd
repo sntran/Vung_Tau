@@ -290,7 +290,7 @@ func _process(delta: float) -> void:
 	var camera := get_viewport().get_camera_3d()
 	for w: Dictionary in walkers:
 		var model: WorldModel = w.model
-		if not model.visible:
+		if not model.visible or bool(w.get("held", false)):
 			continue
 		# The player in front of the walker: the walker stops and steps aside,
 		# away from the player, in the width of its way.
@@ -334,6 +334,38 @@ func _process(delta: float) -> void:
 		if waits != bool(w.stopped):
 			w.stopped = waits
 			model.set_animation_active(not waits)
+
+
+## Report 0026, D-0026-28 (PT-73): the worst case of the budget of a shot. Each
+## walker of the spots of the shot stands still at the point of its way nearest
+## to the eye (a player can see the walkers at any moment). Returns the count.
+func hold_spot_walkers(shot_id: String, eye: Vector3) -> int:
+	var count := 0
+	for w: Dictionary in walkers:
+		if str(w.get("shot", "")) != shot_id:
+			continue
+		var line: PackedVector3Array = w.line
+		var best := 0.0
+		var best_gap := INF
+		var along := 0.0
+		for i in line.size() - 1:
+			var q := Geometry3D.get_closest_point_to_segment(eye, line[i], line[i + 1])
+			var gap := Vector2(q.x - eye.x, q.z - eye.z).length()
+			if gap < best_gap:
+				best_gap = gap
+				best = along + line[i].distance_to(q)
+			along += line[i].distance_to(line[i + 1])
+		w.at = best
+		w.held = true
+		_place_walker(w)
+		count += 1
+	return count
+
+
+## The walkers of hold_spot_walkers() walk again.
+func release_walkers() -> void:
+	for w: Dictionary in walkers:
+		w.held = false
 
 
 func _place_walker(w: Dictionary) -> void:
@@ -400,7 +432,7 @@ func _add_walkers(world: VungTau, showcase: Showcase, cfg: Dictionary, rng: Rand
 			spot_line.append(Vector3(float(p[0]), world.ground_height(float(p[0]), float(p[1])), float(p[1])))
 		var n := int(spot.get("count", 0))
 		for k in n:
-			spot_lines.append([spot_line, k, n])
+			spot_lines.append([spot_line, k, n, str(spot.get("shot", ""))])
 	# Every other walker is on a spot, so the spots have people at each hour (the
 	# order of the list is the order in which the people come: _show()).
 	var count := int(cfg.get("count", 0))
@@ -433,7 +465,8 @@ func _add_walkers(world: VungTau, showcase: Showcase, cfg: Dictionary, rng: Rand
 		model.play("walk", rng.randf())
 		var w := {"model": model, "body": _walker_body(model), "line": line, "length": length,
 				"at": start, "speed": rng.randf_range(float(speed[0]), float(speed[1])),
-				"sign": 1.0 if rng.randf() < 0.5 else -1.0, "side": side, "now": side, "room": maxf(room, 0.7), "stopped": false}
+				"sign": 1.0 if rng.randf() < 0.5 else -1.0, "side": side, "now": side, "room": maxf(room, 0.7), "stopped": false,
+				"shot": str(spot[3]) if not spot.is_empty() else "", "held": false}
 		_place_walker(w)
 		walkers.append(w)
 

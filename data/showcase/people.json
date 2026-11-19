@@ -104,7 +104,8 @@
 						-25.0,
 						-152.0
 					]
-				]
+				],
+				"shot": "S1"
 			},
 			{
 				"name": "the lawn of the leaning palms (S2)",
@@ -126,16 +127,13 @@
 						0.7,
 						-175.2
 					]
-				]
+				],
+				"shot": "S2"
 			},
 			{
 				"name": "the walk of the sea by the raised lawns at sunset (S5)",
 				"count": 6,
 				"line": [
-					[
-						-70.0,
-						-277.0
-					],
 					[
 						-67.5,
 						-272.0
@@ -152,7 +150,9 @@
 						-46.0,
 						-224.0
 					]
-				]
+				],
+				"shot": "S5",
+				"line_note": "Report 0026, D-0026-28: the line starts 10.5 m from the eye of S5. In the photo of S5 (Commons, Jean Van Jean, 2015-03, CC BY 3.0) the nearest person on the walk is about 15 m from the camera; with the first point 5 m from the eye, the six walkers of the spot at their points nearest to the eye were at their mid level, and S5 had 332 442 triangles on Low (PT-73)."
 			}
 		],
 		"models_note": "non_rong_vanh: the woman in the wide sun hat of report 0026, Q19 (data/world/drawings/non_rong_vanh.json)."

@@ -610,15 +610,7 @@
 		},
 		"jetty_access": 235006085,
 		"jetty_access_note": "The way from the land to the shore end of the jetty of Cầu Đá: the path of the port (OSM way). The shore end of the deck is in the outline of the old hydrofoil terminal, so a stand-in leaves a passage along the deck and a passage from the shore end to the nearest point of this path (report 0026, D-0026-02: with the terminal at its height of the photo, the passage along the deck had no way in from the land; PT-74 run 8).",
-		"footprints": {
-			"fdc62561-316a-4c62-acef-40d6239cbf18": {
-				"storeys": 1,
-				"name": "The low buildings with green roofs by Hạ Long, south-west of the hall with the orange roof",
-				"source": "The photo from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0, Vung_Tau,_Viet_Nam.jpg): by the road, south-west of the hall with the roof of orange tiles, low buildings of one storey with green roofs. The footprint (Microsoft ML Buildings) is the one next to the road there. The roofs are sheets of pale green grey with two slopes: the median color of the roofs in the photo is #a5b8b3 (#c0d2cd in the sun, #80959d in the shade).",
-				"status": "Source",
-				"roof_color": "#a5b8b3"
-			}
-		},
+		"footprints": {},
 		"footprints_note": "Footprints of data/geo/build/footprints.json (Overture Maps) with their storeys from a photo: a stand-in on each (report 0026, D-0026-03). footprints_check lists the footprints near Hạ Long that a photo shows, but that I could not match to a building of the photo: they are not built.",
 		"footprints_check": {
 			"ids": [
@@ -649,7 +641,15 @@
 				"69d6c45d-4a9c-49f8-b43d-e0cdf1eaa009",
 				"9991c136-b4e0-46e0-a80b-d16f9ac2940a"
 			],
-			"reason": "The photo from a drone of 2021-01-30 shows houses, villas, and hotels of one to six storeys on this side of the hill, but these footprints could not be matched one by one to the buildings of the photo: their storeys are Check."
+			"reason": "The photo from a drone of 2021-01-30 shows houses, villas, and hotels of one to six storeys on this side of the hill, but these footprints could not be matched one by one to the buildings of the photo: their storeys are Check.",
+			"fdc62561-316a-4c62-acef-40d6239cbf18": {
+				"storeys": 1,
+				"name": "The low buildings with green roofs by Hạ Long, south-west of the hall with the orange roof",
+				"source": "The photo from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0, Vung_Tau,_Viet_Nam.jpg): by the road, south-west of the hall with the roof of orange tiles, low buildings of one storey with green roofs. The footprint (Microsoft ML Buildings) is the one next to the road there. The roofs are sheets of pale green grey with two slopes: the median color of the roofs in the photo is #a5b8b3 (#c0d2cd in the sun, #80959d in the shade).",
+				"status": "Check",
+				"roof_color": "#a5b8b3",
+				"check_note": "Report 0026, Q22 (decided 2026-11-19 from the street photos of Mapillary): the images of 2024-11-09 (lyduchuy, CC BY-SA 4.0, docs/reference/mapillary/sheet_q22_ha_long_fronts_after_1.jpg) show the fronts along Hạ Long west of the hall: a row of low restaurants under large tarp roofs at the road, and the fence with blue posts of the hall. No image of 2017 to 2021 shows them (Mapillary has none there), and no image matches this footprint, which is behind the block of Sen Biển in the photo from a drone of 2021. So the stand-in is off until a photo of 2017 to 2021 shows the building (Q13: a footprint that no photo shows stays off)."
+			}
 		}
 	},
 	"beached": [
@@ -947,5 +947,145 @@
 			]
 		},
 		"note": "The pieces of the walls that are models of this game (the parapet of Hạ Long, the low wall of the beach): one row of MultiMeshes in cells of cell_m (fewer draw calls than cells of 6 m), and on Low no near level (as the buildings of plan 0026, D6): the mid level (470 triangles for a span of the low wall) to 20 m, the far level (60) to 120 m. PT-73: with the near level on Low and cells of 6 m, S5 had 575 draw calls and 322 686 triangles; with the mid level to 40 m and the far level to 150 m, 304 656."
-	}
+	},
+	"fences": [
+		{
+			"model": "hang_rao_khach_san_grand",
+			"span_m": 2.8,
+			"height_m": 1.16,
+			"line": [
+				[
+					109.5,
+					-20.67
+				],
+				[
+					110.55,
+					-16.9
+				],
+				[
+					111.6,
+					-13.13
+				],
+				[
+					112.72,
+					-9.12
+				],
+				[
+					113.25,
+					-6.67
+				],
+				[
+					114.04,
+					-2.97
+				],
+				[
+					114.83,
+					0.74
+				],
+				[
+					115.62,
+					4.46
+				],
+				[
+					116.41,
+					8.18
+				],
+				[
+					117.2,
+					11.9
+				],
+				[
+					117.95,
+					15.47
+				],
+				[
+					118.78,
+					18.96
+				],
+				[
+					119.65,
+					22.61
+				],
+				[
+					120.52,
+					26.24
+				],
+				[
+					121.39,
+					29.88
+				],
+				[
+					122.27,
+					33.54
+				],
+				[
+					123.13,
+					37.18
+				],
+				[
+					123.99,
+					40.81
+				],
+				[
+					124.86,
+					44.46
+				],
+				[
+					125.82,
+					48.48
+				],
+				[
+					126.53,
+					52.66
+				],
+				[
+					127.17,
+					56.44
+				],
+				[
+					127.9,
+					60.8
+				],
+				[
+					128.18,
+					64.89
+				],
+				[
+					128.4,
+					68.33
+				],
+				[
+					128.64,
+					71.88
+				],
+				[
+					128.8,
+					75.02
+				],
+				[
+					128.96,
+					78.07
+				],
+				[
+					129.11,
+					81.21
+				],
+				[
+					129.24,
+					84.76
+				]
+			],
+			"gaps": [
+				[
+					26.7,
+					32.7
+				],
+				[
+					77.1,
+					81.1
+				]
+			],
+			"note": "Report 0026, D-0026-22: the fence of the Grand Hotel on the outer edge of the sidewalk of Quang Trung (11.6 m from the middle of the east road), from the corner of Nguyễn Du to the south end of the south wing. The photos of S4 and of the place of S4 (2014, Commons, trungydang, CC BY 3.0) and the street photo of Mapillary of 2024-11-09 (image 1251897522687108, lyduchuy, CC BY-SA 4.0) show the fence there, with the gate of the drive in front of the porch of the main block (gaps: 6 m at the middle of the front of the main block, and 4 m at the middle of the south wing; their widths are estimates by eye from the photo of S4). The model hang_rao_khach_san_grand of data/world/drawings/."
+		}
+	]
 }

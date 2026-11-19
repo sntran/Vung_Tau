@@ -17,7 +17,9 @@ the builder can look at it. Its "file" (if it has one) is only its name in that
 folder (tools/world/drawings.py look --other), never a file of the repository.
 
 The workspace cannot reach upload.wikimedia.org, but it can reach the
-thumbnails of Commons through Special:FilePath; CI can reach both.
+thumbnails of Commons through Special:FilePath; CI can reach both. A photo of
+Mapillary (plan 0009, R5e) has "mapillary": the id of its image; CI gets its
+picture with the secret MAPILLARY_TOKEN (the workspace cannot reach Mapillary).
 """
 
 from __future__ import annotations
@@ -92,8 +94,29 @@ def image_url(photo: dict, width: int = WIDTH) -> str:
     return image
 
 
+def mapillary_photo(image_id: str) -> bytes:
+    """The picture of 2 048 px of an image of Mapillary (CC BY-SA 4.0), from the
+    API with the secret MAPILLARY_TOKEN (in the header, so that no log has it).
+    The URL of the picture expires, so a drawing keeps the id of the image."""
+    import os
+    token = os.environ.get("MAPILLARY_TOKEN", "").strip()
+    if not token:
+        raise RuntimeError("no MAPILLARY_TOKEN: a photo of Mapillary is copied in CI")
+    request = urllib.request.Request(
+        f"https://graph.mapillary.com/{urllib.parse.quote(image_id)}?fields=thumb_2048_url",
+        headers={"User-Agent": AGENT, "Authorization": f"OAuth {token}"})
+    with urllib.request.urlopen(request, timeout=60) as response:
+        url = json.loads(response.read()).get("thumb_2048_url")
+    if not url:
+        raise RuntimeError(f"the image {image_id} of Mapillary has no picture")
+    return get(url)
+
+
 def get_photo(photo: dict) -> bytes:
-    """The bytes of a photo: the first size of WIDTHS that Commons sends."""
+    """The bytes of a photo: the first size of WIDTHS that Commons sends, or the
+    picture of an image of Mapillary ("mapillary": its id)."""
+    if photo.get("mapillary"):
+        return mapillary_photo(str(photo["mapillary"]))
     urls = list(dict.fromkeys(image_url(photo, width) for width in WIDTHS))
     for k, url in enumerate(urls):
         try:

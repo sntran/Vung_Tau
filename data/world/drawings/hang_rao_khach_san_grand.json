@@ -1,0 +1,292 @@
+{
+	"id": "hang_rao_khach_san_grand",
+	"what": "hàng rào khách sạn Grand: one span of the fence of the Grand Hotel on Quang Trung and Nguyễn Du: cream posts with a lantern cap, a low base, and dark green iron bars",
+	"way": "drawing",
+	"status": "Source",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026, report 0026, D-0026-22: along the outer edge of the sidewalk of Quang Trung in front of the Grand Hotel (fences of data/showcase/bai_truoc.json): the game puts the spans one after another along the line, the port end of a span on the port start of the next (two half posts make a whole post), the origin on the line, z up, with a gap at each gate.",
+	"order": {
+		"blueprint": "drawing",
+		"options": {
+			"drawing": {
+				"name": "hang_rao_khach_san_grand",
+				"kind": "prop",
+				"sources": [
+					"The fence of the Grand Hotel of Vũng Tàu on Quang Trung: the photos of S4 and of Nguyễn Du of 2014-04-06 (Commons, trungydang, CC BY 3.0) and the street photo of Mapillary of 2024-11-09 (image 1251897522687108, lyduchuy, CC BY-SA 4.0); the sizes at the scale of a man beside it (Vũng Tàu, data/world/drawings/hang_rao_khach_san_grand.json)."
+				],
+				"materials": {
+					"part_01": {
+						"color": "#ffffff",
+						"roughness": 0.85,
+						"metalness": 0.0
+					},
+					"part_02": {
+						"color": "#ffffff",
+						"roughness": 0.45,
+						"metalness": 0.6
+					}
+				},
+				"nodes": [
+					{
+						"name": "span",
+						"skill": {
+							"sculpt": {
+								"edits": [
+									{
+										"shape": "box",
+										"size": [
+											1.4,
+											0.16,
+											0.125
+										],
+										"at": [
+											0,
+											0,
+											0.125
+										],
+										"material": "part_01",
+										"color": "#77736a"
+									},
+									{
+										"shape": "box",
+										"size": [
+											1.15,
+											0.02,
+											0.02
+										],
+										"at": [
+											0,
+											0,
+											0.73
+										],
+										"material": "part_02",
+										"color": "#2f3d33"
+									},
+									{
+										"shape": "box",
+										"size": [
+											1.15,
+											0.02,
+											0.015
+										],
+										"at": [
+											0,
+											0,
+											0.32
+										],
+										"material": "part_02",
+										"color": "#2f3d33"
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.01,
+											0.01,
+											0.24
+										],
+										"at": [
+											-1.0899999999999999,
+											0,
+											0.5
+										],
+										"material": "part_02",
+										"color": "#2f3d33",
+										"repeat": {
+											"count": 20,
+											"move": [
+												0.1155,
+												0,
+												0
+											]
+										}
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.125,
+											0.25,
+											0.475
+										],
+										"at": [
+											1.275,
+											0,
+											0.475
+										],
+										"mirror": "x",
+										"material": "part_01",
+										"color": "#e6dbb3"
+									},
+									{
+										"mode": "paint",
+										"shape": "box",
+										"size": [
+											0.06875,
+											0.26,
+											0.1
+										],
+										"at": [
+											1.2874999999999999,
+											0,
+											0.78
+										],
+										"mirror": "x",
+										"blend": 0.003,
+										"material": "part_01",
+										"color": "#3b3a33"
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.155,
+											0.29,
+											0.03
+										],
+										"at": [
+											1.275,
+											0,
+											0.98
+										],
+										"mirror": "x",
+										"material": "part_01",
+										"color": "#ddd0a4"
+									},
+									{
+										"shape": "pyramid",
+										"size": [
+											0.155,
+											0.29,
+											0.1
+										],
+										"at": [
+											1.275,
+											0,
+											1.06
+										],
+										"mirror": "x",
+										"material": "part_01",
+										"color": "#d3c28c"
+									}
+								],
+								"ports": {
+									"start": {
+										"at": [
+											-1.4,
+											0,
+											0
+										],
+										"axis": [
+											-1,
+											0,
+											0
+										],
+										"up": [
+											0,
+											0,
+											1
+										]
+									},
+									"end": {
+										"at": [
+											1.4,
+											0,
+											0
+										],
+										"axis": [
+											1,
+											0,
+											0
+										],
+										"up": [
+											0,
+											0,
+											1
+										]
+									}
+								},
+								"cells": {
+									"near": 0.01,
+									"mid": 0.025,
+									"far": 0.06
+								},
+								"budget": {
+									"near": 3000,
+									"mid": 400,
+									"far": 40
+								}
+							}
+						}
+					}
+				]
+			}
+		}
+	},
+	"sources": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Grand_hotel,_quang_trung_street-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"date": "2014-04-06 06:54",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "shot_s4_2014.jpg",
+			"shows": "The shot S4: the front of the Grand Hotel on Quang Trung, the fence on the outer edge of the sidewalk: square cream posts with a cap and a small roof and a dark window under the cap (a lantern), about 2.8 m apart, a low dark base, and dark iron bars between the posts, lower than the posts; the garden behind it with frangipani and a large rain tree, at the level of the sidewalk."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Khach_san_Grand_-_duong_quang_trung-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"date": "2014-04-06 (Commons: taken on)",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "grand_nguyen_du_2014.jpg",
+			"shows": "From the same place as the shot S4, with a wider view: the same fence along Quang Trung, and a man of about 1.65 m on the sidewalk next to a post."
+		},
+		{
+			"url": "https://www.mapillary.com/app/?pKey=1251897522687108",
+			"mapillary": "1251897522687108",
+			"date": "2024-11-09",
+			"license": "CC BY-SA 4.0",
+			"author": "lyduchuy, Mapillary",
+			"open": true,
+			"file": "mapillary_1251897522687108.jpg",
+			"shows": "A 360 image at the corner of Quang Trung and Nguyễn Du: the fence with the cream lantern posts and the iron bars on the edge of the sidewalk, the large trees of the garden behind it at the level of the sidewalk (docs/reference/mapillary/sheet_d22_grand_front_after_1.jpg)."
+		}
+	],
+	"sizes": {
+		"height": {
+			"value": 1.16,
+			"unit": "m",
+			"source": "The wide photo from the place of S4 (2014, grand_nguyen_du_2014.jpg): the man on the sidewalk is 70 px (1.65 m, a mean height of a man) and the post next to him 50 px from its foot to the top of its small roof: 1.18 m; 1.16 m."
+		},
+		"post": {
+			"value": 0.5,
+			"unit": "m",
+			"source": "The photo of S4 (2014): the posts square to the view on the right are 55 px wide and 115 px high (0.48 of their height): 0.55 m; 0.5 m, as the posts at the side of the man (21 px of 50 px)."
+		},
+		"span": {
+			"value": 2.8,
+			"unit": "m",
+			"source": "The photo of S4 (2014): the posts square to the view on the right are about 300 px apart, 2.6 times their height of 115 px: 3.0 m; the posts of the wide photo at the man are about 2.4 times their height apart (2.8 m). 2.8 m."
+		},
+		"bars": {
+			"value": 0.75,
+			"unit": "m",
+			"source": "The photo of S4 (2014): the top of the bars is 70 px over the foot of the posts of 115 px: 0.71 m; 0.75 m with the low base."
+		},
+		"base": {
+			"value": 0.25,
+			"unit": "m",
+			"source": "The photo of S4 (2014): the dark low base under the bars is about 20 px of the 115 px of a post: 0.2 m; 0.25 m."
+		},
+		"colors": {
+			"value": "posts #e6dbb3, cap #ddd0a4, small roof #d3c28c, window #3b3a33, base #77736a, bars #2f3d33",
+			"unit": "",
+			"source": "The photo of S4 (2014) and the Mapillary image of 2024 (the posts are white to cream in the light of 2024)."
+		}
+	},
+	"looks": [],
+	"status_note": "Source (report 0026, Q17, rule 1): the photos of 2014 (S4 and Nguyễn Du) and the street photo of Mapillary of 2024-11-09 show the same fence with the cream lantern posts and the iron bars on the edge of the sidewalk. No photo of 2017 to 2021 shows it (Mapillary has none there). The looks wait for the files of the lock (the job \"Models of World\")."
+}
