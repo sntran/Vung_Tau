@@ -304,6 +304,32 @@
 			"forecourt_m": 3.0,
 			"front_above_street_m": 9.4,
 			"front_above_street_source": "The block stands on the slope of the hill, 50 m from Hạ Long, behind the hall with the orange roof and its lane: in the photo of S1 (Commons, trungydang, 2014-04-05, CC BY 3.0) and the photo from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0), its lowest terrace is over the roof of the hall. The ground of the game: 7.5 m at the curb of Hạ Long in front of the middle of its front, 16.88 m at its level (report 0026, D-0026-22)."
+		},
+		{
+			"id": "nha_mai_ngoi_cam",
+			"front": [
+				-39.6,
+				321.8
+			],
+			"facing": [
+				-0.3994,
+				-0.9168
+			],
+			"front_middle_x": 0.0,
+			"box": [
+				-9.6,
+				9.6,
+				-9.6,
+				10.6
+			],
+			"street": "Hạ Long",
+			"level_at": [
+				-49.19,
+				299.8
+			],
+			"forecourt_m": 22.0,
+			"source": "Report 0026, D-0026-27: the outline of OpenStreetMap way 225803473 (© OpenStreetMap contributors, ODbL), a square of 19 m: the model has its origin in the middle of the hall and its porch to +z (the bounds of its files: -9.5 m to 10.5 m), so front is the middle of the outline, and the facing is square to its face to Hạ Long. It replaces the stand-in of the same outline.",
+			"level_note": "The ground of the game rises from 7.8 m at the curb of Hạ Long to 12.9 m in the middle of the hall (the radar heights of the slope), but the photo from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0, docs/reference/photos/drone_2021_ha_long.jpg) shows the yard of the hall with its parked cars at the level of the road, behind its fence, with the hill behind the hall. So the level is the sidewalk of Hạ Long in front of it (level_at, 8.4 m from the middle of the road), and the ground is level to 2 m before the outer edge of the sidewalk (forecourt_m, from the middle of the hall: the margin of the level ground stays in the sidewalk, and the road keeps its height). The cut of the hill behind it has the slope of the sides of a base."
 		}
 	]
 }

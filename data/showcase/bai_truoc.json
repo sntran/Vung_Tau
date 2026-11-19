@@ -527,7 +527,8 @@
 			"parapet_model": "lan_can_ha_long",
 			"pillar_model": "tru_lan_can_ha_long",
 			"pillar_every_m": 10.0,
-			"pieces_note": "The parapet is pieces of the models lan_can_ha_long (grey granite, 2 m) and tru_lan_can_ha_long (a panel of red brown granite, 0.75 m) of data/world/drawings/, a panel about every 10 m (VnExpress, 2021-07-16: the walk of Hạ Long with dark red pillars about every 10 m). The slope of the sea wall (ke_ha_long) is Check: the game keeps its plain face."
+			"pieces_note": "The parapet is pieces of the models lan_can_ha_long (grey granite, 2 m) and tru_lan_can_ha_long (a panel of red brown granite, 0.75 m) of data/world/drawings/, a panel about every 10 m (VnExpress, 2021-07-16: the walk of Hạ Long with dark red pillars about every 10 m). The slope of the sea wall is pieces of the model ke_ha_long (Source, report 0026, Q17 and D-0026-27), scaled in height to the drop at each place (slope_model); the plain face keeps its collision.",
+			"slope_model": "ke_ha_long"
 		}
 	],
 	"stand_ins": {
@@ -639,16 +640,12 @@
 				"66f44e96-135e-4157-9a09-a1c0f5ba7bc5",
 				"2037171d-0d9e-40cd-b809-6d827e772db8",
 				"69d6c45d-4a9c-49f8-b43d-e0cdf1eaa009",
-				"9991c136-b4e0-46e0-a80b-d16f9ac2940a"
+				"9991c136-b4e0-46e0-a80b-d16f9ac2940a",
+				"fdc62561-316a-4c62-acef-40d6239cbf18"
 			],
 			"reason": "The photo from a drone of 2021-01-30 shows houses, villas, and hotels of one to six storeys on this side of the hill, but these footprints could not be matched one by one to the buildings of the photo: their storeys are Check.",
-			"fdc62561-316a-4c62-acef-40d6239cbf18": {
-				"storeys": 1,
-				"name": "The low buildings with green roofs by Hạ Long, south-west of the hall with the orange roof",
-				"source": "The photo from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0, Vung_Tau,_Viet_Nam.jpg): by the road, south-west of the hall with the roof of orange tiles, low buildings of one storey with green roofs. The footprint (Microsoft ML Buildings) is the one next to the road there. The roofs are sheets of pale green grey with two slopes: the median color of the roofs in the photo is #a5b8b3 (#c0d2cd in the sun, #80959d in the shade).",
-				"status": "Check",
-				"roof_color": "#a5b8b3",
-				"check_note": "Report 0026, Q22 (decided 2026-11-19 from the street photos of Mapillary): the images of 2024-11-09 (lyduchuy, CC BY-SA 4.0, docs/reference/mapillary/sheet_q22_ha_long_fronts_after_1.jpg) show the fronts along Hạ Long west of the hall: a row of low restaurants under large tarp roofs at the road, and the fence with blue posts of the hall. No image of 2017 to 2021 shows them (Mapillary has none there), and no image matches this footprint, which is behind the block of Sen Biển in the photo from a drone of 2021. So the stand-in is off until a photo of 2017 to 2021 shows the building (Q13: a footprint that no photo shows stays off)."
+			"notes": {
+				"fdc62561-316a-4c62-acef-40d6239cbf18": "Report 0026, Q22 (decided 2026-11-19 from the street photos of Mapillary): the images of 2024-11-09 (lyduchuy, CC BY-SA 4.0, docs/reference/mapillary/sheet_q22_ha_long_fronts_after_1.jpg) show the fronts along Hạ Long west of the hall: a row of low restaurants under large tarp roofs at the road, and the fence with blue posts of the hall. No image of 2017 to 2021 shows them (Mapillary has none there), and no image matches this footprint, which is behind the block of Sen Biển in the photo from a drone of 2021. So the stand-in is off until a photo of 2017 to 2021 shows the building (Q13: a footprint that no photo shows stays off)."
 			}
 		}
 	},
@@ -946,7 +943,9 @@
 				120.0
 			]
 		},
-		"note": "The pieces of the walls that are models of this game (the parapet of Hạ Long, the low wall of the beach): one row of MultiMeshes in cells of cell_m (fewer draw calls than cells of 6 m), and on Low no near level (as the buildings of plan 0026, D6): the mid level (470 triangles for a span of the low wall) to 20 m, the far level (60) to 120 m. PT-73: with the near level on Low and cells of 6 m, S5 had 575 draw calls and 322 686 triangles; with the mid level to 40 m and the far level to 150 m, 304 656."
+		"note": "The pieces of the walls that are models of this game (the parapet of Hạ Long, the low wall of the beach): one row of MultiMeshes in cells of cell_m (fewer draw calls than cells of 6 m), and on Low no near level (as the buildings of plan 0026, D6): the mid level (470 triangles for a span of the low wall) to 20 m, the far level (60) to 120 m. PT-73: with the near level on Low and cells of 6 m, S5 had 575 draw calls and 322 686 triangles; with the mid level to 40 m and the far level to 150 m, 304 656.",
+		"under_model": "ke_da_bai_truoc",
+		"under_note": "Report 0026, D-0026-27: the sloped sea wall of granite blocks under each span of the low wall of the beach, on the side of the sand (data/world/drawings/ke_da_bai_truoc.json)."
 	},
 	"fences": [
 		{

@@ -791,6 +791,11 @@ def level_world_places(grid, folder, roads=(), walk_cells=None) -> None:
     for i, place in enumerate(places):
         shape = cores[i].buffer(LEVEL_MARGIN_M)
         side = terrain.rasterize(grid, [shape.buffer(BASE_SIDE_M)]) & ~all_level
+        # The side slope does not change the ground under a sidewalk of the
+        # showcase either (report 0026, D-0026-27: round the hall by Hạ Long it
+        # pulled the sidewalk down, a step of 0.6 m at its outer edge).
+        if walk_cells is not None:
+            side &= ~walk_cells
         rows, cols = np.nonzero(side)
         if rows.size:
             x = grid.x0 + cols * grid.step

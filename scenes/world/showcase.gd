@@ -11,6 +11,8 @@ extends Node3D
 ## Each part follows an OSM way of data/geo/build/roads.json. The parts are a
 ## few meshes, one for each color, and one collision shape.
 
+## Half the thickness of the low wall of the beach at its foot (tuong_bai_tam: width 0.42 m).
+const WALL_HALF_WIDTH := 0.21
 const CONFIG := "res://data/showcase/bai_truoc.json"
 const BUILDINGS := "res://data/geo/build/buildings.json"
 const PLACES := "res://data/world/places/bai_truoc.json"
@@ -599,6 +601,29 @@ func _steps_down(cfg: Dictionary, openings: Array, half: float) -> void:
 		_add_length("steps_down", 1.0)
 
 
+## Report 0026, D-0026-27: the sloped sea wall of granite blocks under a span
+## of the low wall of the beach (ke_da_bai_truoc of "under_model" of the wall
+## pieces): its top edge at the foot of the wall on the side of the sand, scaled
+## in height to the drop from the walk to the sand 0.5 m past it.
+func _sea_wall_under(a: Vector3, b: Vector3, sea: Vector3) -> void:
+	var model_id := str(data.get("wall_pieces", {}).get("under_model", ""))
+	if not _has_model(model_id):
+		return
+	var half := float(_option(model_id, "width", 0.42)) / 2.0
+	var height := float(_option(model_id, "height", 1.2))
+	var out := sea * (WALL_HALF_WIDTH + 0.02)
+	var a2 := a + out
+	var b2 := b + out
+	var sand := 0.0
+	for q: Vector3 in [a2 + sea * 0.5, b2 + sea * 0.5]:
+		sand += world.ground_height(q.x, q.z) / 2.0
+	var drop := (a.y + b.y) / 2.0 - sand
+	if drop < 0.1 or half <= 0.0:
+		return
+	_wall_piece(model_id, a2, b2, sea, drop / height)
+	_add_length("beach_sea_wall_pieces", 1.0)
+
+
 ## The side of a low wall of the beach that is the sand (side or -side):
 ## the side with less lawn and paving in the mask of the ground 2 m out (the
 ## walk is paving), else the lower side. Report 0026, D-0026-26: at the flat
@@ -634,6 +659,7 @@ func _wall_spans(model_id: String, line: PackedVector3Array, span: float, gaps: 
 		var middle := (a + b) / 2.0
 		var sea := _sand_side(middle, Vector3(-(b - a).z, 0.0, (b - a).x).normalized())
 		_wall_piece(model_id, a, b, sea)
+		_sea_wall_under(a, b, sea)
 
 
 ## The point at the distance s along the line.
@@ -875,6 +901,13 @@ func _sea_wall(cfg: Dictionary) -> void:
 	if pieces:
 		parapet = float(_option(parapet_id, "height", parapet))
 	var inset := float(_option(parapet_id, "cap_width", 0.45)) / 2.0
+	# Report 0026, D-0026-27: the pieces of the sloped sea wall of Hạ Long
+	# (ke_ha_long), each scaled in height to the drop at its place; the plain
+	# slope keeps its collision and draws nothing.
+	var slope_id := str(cfg.get("slope_model", ""))
+	var slope_pieces := _has_model(slope_id)
+	var slope_color := HIDDEN if slope_pieces else color
+	var slope_height := float(_option(slope_id, "height", 3.3))
 	var pillar_length := float(_option(pillar_id, "length", 0.75))
 	var next_pillar := pillar_every / 2.0
 	# The walk goes from the curb of the road: it covers the sidewalk of the road
@@ -997,7 +1030,12 @@ func _sea_wall(cfg: Dictionary) -> void:
 				var g1 := o1 + side1 * width
 				g0.y = minf(world.ground_height(g0.x, g0.z), o0.y) + 0.05
 				g1.y = minf(world.ground_height(g1.x, g1.z), o1.y) + 0.05
-				_slope(color, o0, o1, g0, g1, side0)
+				_slope(slope_color, o0, o1, g0, g1, side0)
+				if slope_pieces:
+					var drop := ((o0.y - g0.y) + (o1.y - g1.y)) / 2.0
+					if drop > 0.1:
+						_wall_piece(slope_id, o0, o1, side0, drop / slope_height)
+						_add_length("sea_wall_pieces", 1.0)
 				_add_length("sea_wall", e0.distance_to(e1))
 			# A closed end where the walk stops at a junction: past the end of the
 			# walk the ground falls to the beach (D-0026-01), so a player leaves the
