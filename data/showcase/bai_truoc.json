@@ -499,7 +499,12 @@
 			"opening_m": 2.4,
 			"color": "#b3ada1",
 			"note": "The low wall of granite blocks between the walk of the sea and the beach (R4): a base, square posts, and a top rail with gaps under it, as in the photo of S5 (2014, Wikimedia Commons, Lam Tr Th, CC BY-SA 3.0). The sizes are by eye from the photo. R10: an opening to the sand of one span (opening_m) in the middle of each opening_every_m of the wall, so that people go down to the beach (PT-35, PT-75): builder values (status check), as I found no photo of the places of the steps.",
-			"model": "tuong_bai_tam"
+			"model": "tuong_bai_tam",
+			"steps": {
+				"model": "bac_xuong_cat",
+				"min_drop_m": 0.25,
+				"note": "Report 0026, Q19: the granite steps down to the sand in each opening of the low wall (data/world/drawings/bac_xuong_cat.json: 8 steps of 0.18 m on treads of 0.3 m). The piece is scaled up and down to the drop from the walk to the sand at its foot; with less than min_drop_m, the opening has no steps. Report 0026, D-0026-26: the low walls of the walks of the park have the same steps (PT-77: the sand is 0.6 m to 2.3 m under the walk at their openings, and they had none)."
+			}
 		}
 	],
 	"sea_walls": [

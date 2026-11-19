@@ -12,6 +12,8 @@ extends Node3D
 ## few meshes, one for each color, and one collision shape.
 
 ## Half the thickness of the low wall of the beach at its foot (tuong_bai_tam: width 0.42 m).
+## The two sides of a low wall that differ by more than this (m, 2 m out) give the sand side by their heights.
+const SAND_SIDE_STEP := 0.15
 const WALL_HALF_WIDTH := 0.21
 const CONFIG := "res://data/showcase/bai_truoc.json"
 const BUILDINGS := "res://data/geo/build/buildings.json"
@@ -579,6 +581,11 @@ func _balustrade(line: PackedVector3Array, cfg: Dictionary) -> void:
 ## is scaled up and down to the drop to the sand at its foot.
 func _steps_down(cfg: Dictionary, openings: Array, half: float) -> void:
 	var model_id := str(cfg.get("model", ""))
+	# Each opening records its side of the sand (PT-77 walks through it).
+	for opening: Dictionary in openings:
+		var along_dir: Vector3 = opening.along
+		opening.sand = _sand_side(opening.at, Vector3(-along_dir.z, 0.0, along_dir.x).normalized())
+		opening.steps = false
 	if not _has_model(model_id):
 		return
 	var drop := float(_option(model_id, "drop", 1.44))
@@ -586,7 +593,7 @@ func _steps_down(cfg: Dictionary, openings: Array, half: float) -> void:
 	for opening: Dictionary in openings:
 		var at: Vector3 = opening.at
 		var along: Vector3 = opening.along
-		var sand := _sand_side(at, Vector3(-along.z, 0.0, along.x).normalized())
+		var sand: Vector3 = opening.sand
 		var top := at + sand * half
 		var foot := top + sand * run
 		var fall := top.y - world.ground_height(foot.x, foot.z)
@@ -598,6 +605,7 @@ func _steps_down(cfg: Dictionary, openings: Array, half: float) -> void:
 		if basis.determinant() < 0.0:
 			basis.x = -basis.x
 		_row_of_walls().add(model_id, Transform3D(basis, top))
+		opening.steps = true
 		_add_length("steps_down", 1.0)
 
 
@@ -624,20 +632,23 @@ func _sea_wall_under(a: Vector3, b: Vector3, sea: Vector3) -> void:
 	_add_length("beach_sea_wall_pieces", 1.0)
 
 
-## The side of a low wall of the beach that is the sand (side or -side):
-## the side with less lawn and paving in the mask of the ground 2 m out (the
-## walk is paving), else the lower side. Report 0026, D-0026-26: at the flat
-## north end of the line, the two sides have the same height, and the steps
-## of the openings went up on the side of the walk.
+## The side of a low wall of the beach that is the sand (side or -side): the
+## lower side 2 m out, where the two sides differ by more than SAND_SIDE_STEP;
+## else the side with less lawn and paving in the mask of the ground (the walk
+## is paving). Report 0026, D-0026-26: at the flat north end of the line the two
+## sides have the same height, and the steps of the openings went up on the
+## side of the walk; the paths of the park are not paving in the mask, so the
+## mask alone took the walk for the sand there.
 func _sand_side(at: Vector3, side: Vector3) -> Vector3:
+	var high := world.ground_height(at.x + side.x * 2.0, at.z + side.z * 2.0)
+	var low := world.ground_height(at.x - side.x * 2.0, at.z - side.z * 2.0)
+	if absf(high - low) > SAND_SIDE_STEP:
+		return side if high < low else -side
 	var a := ground_at(at.x + side.x * 2.0, at.z + side.z * 2.0)
 	var b := ground_at(at.x - side.x * 2.0, at.z - side.z * 2.0)
-	var walk_a := a.r + a.g
-	var walk_b := b.r + b.g
-	if absf(walk_a - walk_b) > 0.5:
-		return side if walk_a < walk_b else -side
-	return side if world.ground_height(at.x + side.x * 2.0, at.z + side.z * 2.0) \
-			< world.ground_height(at.x - side.x * 2.0, at.z - side.z * 2.0) else -side
+	if absf((a.r + a.g) - (b.r + b.g)) > 0.5:
+		return side if a.r + a.g < b.r + b.g else -side
+	return side if high < low else -side
 
 
 ## The spans of the model of a low wall along the line, end to end by their
