@@ -1,16 +1,16 @@
 {
 	"models": {
 		"bui_cay_tron": {
-			"glb": "9c3e05033aa6103c3beb6af78be6033e51082eca9f3648bd60bb5d3a63a8a1bf",
+			"glb": "2751af3e7ac9dae2425027c55f4277ad56c6110dd7b43c91da669aacdf156694",
 			"materials": "4e33c8ddb7893598165769f9db16ecd13f83d70585e8653e5215ea4941e32e25",
 			"script": "47e3afa47c92f831451c32e9bbc6f8e04f8b69fb10e3006977c57e0d54771aaf",
 			"version": 1,
-			"size": 1.7422,
+			"size": 1.7721,
 			"views": 8,
 			"cell_px": 128,
 			"files": {
-				"bui_cay_tron_impostor.png": "1cc84f74634e75241065080237de42e305286683b36c9004a7b5dfa3f193c80f",
-				"bui_cay_tron_impostor_normal.png": "c9c76cc0c357cc3e94eff9530b1c5a963d2db64d012e35f5c27fac682737f023"
+				"bui_cay_tron_impostor.png": "ae024f71d724b63829df329a8d74984f05093b3d7c12948cbd1e26369a9f0e9f",
+				"bui_cay_tron_impostor_normal.png": "18cdd8da84c7ed8e2c2d0a76fca25dacd5d6561f8643ddec3518e7f8b2dc4d2e"
 			}
 		},
 		"cay_hoa_tim_bon_hoa": {
