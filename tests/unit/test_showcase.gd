@@ -53,3 +53,39 @@ func test_the_autocorrelation_length_is_the_size_of_the_patches() -> void:
 	assert_lt(float(lengths[4]), 4.0, "patches of 4 px")
 	assert_gt(float(lengths[16]), 1.5 * float(lengths[4]), "patches of 16 px are more than 1.5 times longer")
 	assert_gt(float(lengths["noisy"]), 1.5 * float(lengths[4]), "a fine noise does not hide large patches")
+
+
+## Report 0026, Q28: each count of the dressing of Tết comes from a row of the
+## culture notes (the same link), and stays out of the game until the owner
+## confirms it: an item that is not Confirmed has in_game false, and no script
+## of the game reads the file while an item is Check.
+func test_the_dressing_of_tet_comes_from_the_culture_notes() -> void:
+	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/showcase/dressing.json"))
+	var notes := FileAccess.get_file_as_string("res://docs/content/culture-notes.md")
+	assert_gt(notes.length(), 0, "the culture notes are in the project")
+	var unconfirmed := 0
+	for item: Dictionary in data["items"]:
+		assert_gt((item["from"] as Array).size(), 0, "%s has a source" % item["id"])
+		for url: String in item["from"]:
+			assert_true(notes.contains(url), "%s: %s is in the culture notes" % [item["id"], url])
+		if item["status"] != "Confirmed":
+			unconfirmed += 1
+			assert_false(item["in_game"], "%s is not confirmed, so it is not in the game" % item["id"])
+	if unconfirmed > 0:
+		for dir_path in ["res://scenes", "res://scripts"]:
+			for path in _scripts_in(dir_path):
+				assert_false(FileAccess.get_file_as_string(path).contains("dressing.json"),
+					"%s does not read the dressing of Tết before the owner confirms it" % path)
+
+
+func _scripts_in(dir_path: String) -> Array[String]:
+	var out: Array[String] = []
+	var dir := DirAccess.open(dir_path)
+	if dir == null:
+		return out
+	for f in dir.get_files():
+		if f.ends_with(".gd"):
+			out.append(dir_path.path_join(f))
+	for sub in dir.get_directories():
+		out.append_array(_scripts_in(dir_path.path_join(sub)))
+	return out
