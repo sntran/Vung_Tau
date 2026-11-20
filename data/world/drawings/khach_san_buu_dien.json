@@ -1204,5 +1204,5 @@
 	],
 	"uses": "Plan 0026, R7, D-0026-14: on its OSM outline (way/259750558) by Hạ Long, in place of its stand-in; the shot S1 shows it.",
 	"impostor": false,
-	"letters_note": "Report 0026, Q23 (2026-11-20): the letters on the roof are not the same before 2017 (VUNG TAU P&T HOTEL, 2011 and 2014) and after 2021 (a logo of a wave and P&T HOTEL, 2024), so the letters of 2019 are Check: the photo nearest to 2019 (2014-04) has VUNG TAU P&T HOTEL. The order has no letters until I approve them (docs/content/culture-notes.md)."
+	"letters_note": "Report 0026, Q23 (2026-11-20): the letters on the roof are not the same before 2017 (VUNG TAU P&T HOTEL, 2011 and 2014) and after 2021 (a logo of a wave and P&T HOTEL, 2024); the photo nearest to 2019 (2014-04) has VUNG TAU P&T HOTEL. Q27 (2026-11-20): approved, VUNG TAU P&T HOTEL, if the letters fit the place of the sign on the white band as in the photo of 2014. The letters of World (e8754d6) take only A to Z and spaces (the factory refused the order: options.letters.0.text), so the order has no letters until World takes the sign & (the request to World eeacba85a0e3be9d2a0c89b06d26893d of 2026-11-20 asks for &, the digits, and the dot). Then the look of the near and the mid level next to the photo of 2014 checks that the line fits the band."
 }
