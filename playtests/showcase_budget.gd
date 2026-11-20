@@ -17,6 +17,9 @@ const SHOTS := "res://data/showcase/shots.json"
 ## The eye and the aim of a shot, as PT-72 takes it.
 const Shots := preload("res://playtests/showcase_shots.gd")
 const LIMITS := {"low": [600, 300000], "high": [2000, 2000000]}
+## Report 0026, D-0026-38: the worst case puts each walker of a spot this far in front of the eye (m).
+const HELD_NEAR_M := ShowcasePeople.HELD_NEAR_M
+const HELD_FAR_M := ShowcasePeople.HELD_FAR_M
 ## For each run: the preset, and the first and the last shot (from 0).
 const RUNS := [["low", 0, 4], ["high", 0, 2], ["high", 3, 4]]
 
@@ -53,8 +56,20 @@ func run(d: PlaytestDriver) -> void:
 		await d.screenshot("%s_%s" % [shot.id, preset])
 		# D-0026-28: the worst case of the walkers of the spots of the shot: each
 		# at the point of its way nearest to the eye.
-		var held := w.showcase.people.hold_spot_walkers(str(shot.id), eye) if w.showcase.people else 0
+		var held := w.showcase.people.hold_spot_walkers(str(shot.id), camera) if w.showcase.people else 0
+		d.step("%s, %s: %d walkers of its spots held in the frame, %d of them at %.0f m to %.0f m in front of the eye (the others at the nearest point of their way in the frame)" % [
+				preset, shot.id, held, held - w.showcase.people.held_far if w.showcase.people else 0, HELD_NEAR_M, HELD_FAR_M])
 		if held > 0:
+			# Report 0026, D-0026-38: each held walker is in the frame, 3 m to 10 m in front of the eye.
+			var out := PackedStringArray()
+			for q: Vector3 in w.showcase.people.held_points:
+				var ahead := (q - camera.global_position).dot(-camera.global_transform.basis.z)
+				var middle := q + Vector3(0, 0.9, 0)
+				var far_ok := w.showcase.people.held_far > 0
+				if ahead < HELD_NEAR_M - 0.1 or (ahead > HELD_FAR_M + 0.1 and not far_ok) or not camera.is_position_in_frustum(middle):
+					out.append("(%.1f, %.1f): %.1f m in front, %s" % [q.x, q.z, ahead, "in the frame" if camera.is_position_in_frustum(middle) else "out of the frame"])
+			d.expect(out.is_empty(), "%s, %s: the %d held walkers are in the frame, %.0f m to %.0f m in front of the eye%s" % [
+					preset, shot.id, held, HELD_NEAR_M, HELD_FAR_M, "" if out.is_empty() else ": " + "; ".join(out)])
 			await d.wait_frames(8)
 			draw_calls = RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)
 			triangles = RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME)

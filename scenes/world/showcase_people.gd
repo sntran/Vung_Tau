@@ -53,6 +53,10 @@ const SWIM_RANGES := {
 }
 
 var walkers: Array[Dictionary] = []
+## The places of the walkers of hold_spot_walkers() (PT-73), and how many of
+## them have no point of their way nearer than HELD_FAR_M in the frame.
+var held_points: Array[Vector3] = []
+var held_far := 0
 ## Each sitter: {"model", "shape"}.
 var sitters: Array[Dictionary] = []
 ## Each swimmer (report 0026, D-0026-20): {"model", "ring" (a swim ring or null),
@@ -336,28 +340,64 @@ func _process(delta: float) -> void:
 			model.set_animation_active(not waits)
 
 
-## Report 0026, D-0026-28 (PT-73): the worst case of the budget of a shot. Each
-## walker of the spots of the shot stands still at the point of its way nearest
-## to the eye (a player can see the walkers at any moment). Returns the count.
-func hold_spot_walkers(shot_id: String, eye: Vector3) -> int:
+## Report 0026, D-0026-28 and D-0026-38 (PT-73): the worst case of the budget
+## of a shot. Each walker of the spots of the shot stands still at the point of
+## its way nearest to the eye that is HELD_NEAR_M to HELD_FAR_M in front of the
+## eye and in the frame (the nearest point of a way could be under or behind
+## the eye). A walker whose way has no such point walks on. Returns the count.
+const HELD_NEAR_M := 3.0
+const HELD_FAR_M := 10.0
+const HELD_STEP_M := 0.5
+
+
+func hold_spot_walkers(shot_id: String, camera: Camera3D) -> int:
+	var eye := camera.global_position
+	var forward := -camera.global_transform.basis.z
+	held_points.clear()
+	held_far = 0
 	var count := 0
 	for w: Dictionary in walkers:
 		if str(w.get("shot", "")) != shot_id:
 			continue
 		var line: PackedVector3Array = w.line
-		var best := 0.0
-		var best_gap := INF
-		var along := 0.0
+		var total := 0.0
 		for i in line.size() - 1:
-			var q := Geometry3D.get_closest_point_to_segment(eye, line[i], line[i + 1])
-			var gap := Vector2(q.x - eye.x, q.z - eye.z).length()
-			if gap < best_gap:
-				best_gap = gap
-				best = along + line[i].distance_to(q)
-			along += line[i].distance_to(line[i + 1])
+			total += line[i].distance_to(line[i + 1])
+		var best := -1.0
+		var best_gap := INF
+		# With no such point: the nearest point in the frame at least HELD_NEAR_M in front.
+		var other := -1.0
+		var other_gap := INF
+		var keep: float = w.at
+		var s := 0.0
+		while s <= total:
+			w.at = s
+			var p := _walker_transform(w).origin
+			var ahead := (p - eye).dot(forward)
+			var gap := Vector2(p.x - eye.x, p.z - eye.z).length()
+			if ahead >= HELD_NEAR_M and camera.is_position_in_frustum(p + Vector3(0, 0.9, 0)):
+				if ahead <= HELD_FAR_M and gap < best_gap:
+					best_gap = gap
+					best = s
+				if gap < other_gap:
+					other_gap = gap
+					other = s
+			s += HELD_STEP_M
+		if best < 0.0:
+			best = other
+			if best >= 0.0:
+				held_far += 1
+		if best < 0.0:
+			w.at = keep
+			continue
 		w.at = best
 		w.held = true
 		_place_walker(w)
+		# A walker that the part of the hour hides shows while it is held: the
+		# worst case counts it (in audit 4 the counts of S5 did not change).
+		w.was_visible = (w.model as WorldModel).visible
+		(w.model as WorldModel).visible = true
+		held_points.append((w.model as WorldModel).global_position)
 		count += 1
 	return count
 
@@ -365,6 +405,8 @@ func hold_spot_walkers(shot_id: String, eye: Vector3) -> int:
 ## The walkers of hold_spot_walkers() walk again.
 func release_walkers() -> void:
 	for w: Dictionary in walkers:
+		if bool(w.get("held", false)):
+			(w.model as WorldModel).visible = bool(w.get("was_visible", true))
 		w.held = false
 
 
