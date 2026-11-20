@@ -304,7 +304,10 @@ func look_at_point(point: Vector3, tolerance := 2.0, timeout_s := 30.0) -> bool:
 			path.append(to_screen(from + out))
 		path.append(to_screen(from + move))
 		await drag_path(path, 0.25)
-		await wait_idle(5.0)
+		# 15 s of real time: at about 3 frames per second (CI), with a slow
+		# frame when the world loads cells, 5 still frames took more than 5 s
+		# (PT-74 run 1 in the CI of 61f4ed0).
+		await wait_idle(15.0)
 	fail("the view does not turn to %s" % point)
 	return false
 
