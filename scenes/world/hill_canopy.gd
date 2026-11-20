@@ -23,13 +23,16 @@ const SECOND := 0.5
 ## clumps are larger, so that they cover about as much of the hills as all
 ## the clumps. "height_max" (Low): a clump grows wider, but not higher than this
 ## scale (report 0026, D-0026-15: on Low the crowns of 11 m every 32 m stood on
-## the bare hill of S1 as small houses; the photo shows one canopy). D-0026-23:
-## on Low the crowns are 25 m to 70 m wide far away (32 m apart), so that they overlap, and they lie on the slope.
+## the bare hill of S1 as small houses; the photo shows one canopy). Report 0026,
+## D-0026-23 (audit 5): the clumps keep the size of the crowns of the photo of S1
+## (5 m to 12 m) at each distance; the canopy of the ground (shaders/terrain.gdshader,
+## crown_cells()) covers the slope between them with crowns of the same size. The
+## crowns of 25 m to 70 m of before were the dark caps with light ground between them.
 const DETAIL := {
-	"low": {"crown": true, "scale": [7.0, 8.5], "scale_m": [400.0, 1600.0], "dense_m": 0.0, "height_max": 1.8},
-	"medium": {"crown": false, "scale": [1.0, 2.4], "scale_m": [900.0, 1500.0], "dense_m": 1000.0},
-	"high": {"crown": false, "scale": [1.0, 2.4], "scale_m": [1300.0, 2000.0], "dense_m": 1500.0},
-	"ultra": {"crown": false, "scale": [1.0, 2.4], "scale_m": [1800.0, 2600.0], "dense_m": 2000.0},
+	"low": {"crown": true, "scale": [1.4, 1.4], "scale_m": [400.0, 1600.0], "dense_m": 0.0, "height_max": 1.8, "sparse_m": 0.0},
+	"medium": {"crown": false, "scale": [0.8, 0.8], "scale_m": [900.0, 1500.0], "dense_m": 1000.0},
+	"high": {"crown": false, "scale": [0.8, 0.8], "scale_m": [1300.0, 2000.0], "dense_m": 1500.0},
+	"ultra": {"crown": false, "scale": [0.8, 0.8], "scale_m": [1800.0, 2600.0], "dense_m": 2000.0},
 }
 
 ## The number of clumps, and the number of sparse clumps.
@@ -110,6 +113,10 @@ func set_preset(preset: String) -> void:
 	material.set_shader_parameter("height_scale_max", float(detail.get("height_max", 100.0)))
 	for instance: MultiMeshInstance3D in _sparse:
 		instance.multimesh.mesh = _crown_mesh if detail.crown else _mesh
+		# Report 0026, D-0026-23 (audit 5): on Low the canopy of the ground gives
+		# the crowns of the far forest; a sparse crown every 32 m stood above it
+		# as a dark blob.
+		instance.visible = float(detail.get("sparse_m", VISIBLE_RANGE)) > 0.0
 	for instance: MultiMeshInstance3D in _dense:
 		instance.visible = float(detail.dense_m) > 0.0
 		instance.visibility_range_end = float(detail.dense_m)
