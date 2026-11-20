@@ -31,7 +31,7 @@
 		},
 		{
 			"title": "3D models",
-			"text": "The scooters, the ceiling fans, the people, the buildings of Bãi Trước, the basket boats, and the fishing boats come from World (github.com/sntran/World), commit 1984a6f5155718a827b9190987112518f3c38c43. I make the lamps and the raised lawns of the park with the tools of World, and World builds them at the same commit. All under the GNU Affero General Public License 3.0 (AGPL-3.0). The bodies of the people use the data of MakeHuman, CC0. The game gives the materials and the light."
+			"text": "The scooters, the ceiling fans, the people, the buildings of Bãi Trước, the basket boats, and the fishing boats come from World (github.com/sntran/World), commit e8754d695e014799c1618bb682bba27c3dcfc338. I make the lamps and the raised lawns of the park with the tools of World, and World builds them at the same commit. All under the GNU Affero General Public License 3.0 (AGPL-3.0). The bodies of the people use the data of MakeHuman, CC0. The game gives the materials and the light."
 		},
 		{
 			"title": "Font",
