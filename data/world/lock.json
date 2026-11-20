@@ -276,6 +276,16 @@
 				"lan_can_ha_long.receipt.json": "404a4b8199729b74ab3016a6bd01256b045294478cb08ed9cf75d077a5e1560a"
 			}
 		},
+		"nha_khach_ha_long": {
+			"hash": "7104aed3b6a2a9030c355a6a16106029",
+			"files": {
+				"nha_khach_ha_long.far.glb": "138c1136f37539d8e6f6c8931f1a062802d1da4a8006845382e1c1b9b772a762",
+				"nha_khach_ha_long.glb": "632a46a55fda2744bcd68ec1d036ffcf7a1cfcc794b73eb30ffc8128e3503d4c",
+				"nha_khach_ha_long.mid.glb": "d93dfc0578f889f1305729832f27dfb1217af583596e9606930780446b075354",
+				"nha_khach_ha_long.parts.json": "7afdb812b480b7e3a469fe6822a0725afb05bd5d6606ec8297206742a3d86f94",
+				"nha_khach_ha_long.receipt.json": "c0c12a2fc3a3fcf4fee2d2706c944b0b3328a6e36e6a28f2c09511b8770c351e"
+			}
+		},
 		"nha_mai_ngoi_cam": {
 			"hash": "46ed43fa0d3acb7f86f59436ba4b67da",
 			"files": {
