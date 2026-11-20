@@ -626,43 +626,70 @@
 						"metal": 0.25
 					},
 					{
-						"shape": "revolve",
-						"size": {
-							"profile": [
-								[
-									0,
-									0
-								],
-								[
-									6.0,
-									0
-								],
-								[
-									6.3,
-									0.7
-								],
-								[
-									6.0,
-									1.4
-								],
-								[
-									4.0,
-									1.9
-								],
-								[
-									3.9,
-									2.1
-								],
-								[
-									0,
-									2.1
-								]
-							]
-						},
+						"shape": "cylinder",
+						"size": [
+							6.0,
+							0.7
+						],
 						"at": [
 							12.5,
 							-1.5,
-							34.6
+							35.300000000000004
+						],
+						"color": "#efefed",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						}
+					},
+					{
+						"shape": "ring",
+						"size": [
+							6.0,
+							0.3
+						],
+						"at": [
+							12.5,
+							-1.5,
+							35.300000000000004
+						],
+						"color": "#efefed",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						}
+					},
+					{
+						"shape": "cone",
+						"size": [
+							6.0,
+							4.0,
+							0.25
+						],
+						"at": [
+							12.5,
+							-1.5,
+							36.25
+						],
+						"color": "#efefed",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						}
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							3.95,
+							0.1
+						],
+						"at": [
+							12.5,
+							-1.5,
+							36.6
 						],
 						"color": "#efefed",
 						"roughness": 0.85,
