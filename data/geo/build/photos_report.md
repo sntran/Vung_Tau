@@ -99,6 +99,9 @@ The images are CC BY-SA 4.0 (the author, Mapillary). The map: `photos_map.png` (
 | `d25_wall_north` | D-0026-25, D-0026-26 | 2017 to 2021 | 0 | 0 |
 | `d25_wall_north` | D-0026-25, D-0026-26 | 2013 to 2016 | 0 | 0 |
 | `d25_wall_north` | D-0026-25, D-0026-26 | 2022 to 2026 | 0 | 0 |
+| `d25_wall_from_quang_trung` | D-0026-25 | 2017 to 2021 | 0 | 0 |
+| `d25_wall_from_quang_trung` | D-0026-25 | 2013 to 2016 | 0 | 0 |
+| `d25_wall_from_quang_trung` | D-0026-25 | 2022 to 2026 | 92 | 12 |
 | `d25_wall_middle_north` | D-0026-25, D-0026-26 | 2017 to 2021 | 0 | 0 |
 | `d25_wall_middle_north` | D-0026-25, D-0026-26 | 2013 to 2016 | 0 | 0 |
 | `d25_wall_middle_north` | D-0026-25, D-0026-26 | 2022 to 2026 | 0 | 0 |
