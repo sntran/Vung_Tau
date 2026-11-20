@@ -38,13 +38,51 @@ def test_medians_by_label():
 def test_the_first_year_needs_a_part_of_the_area_and_the_height_is_the_median_of_the_years():
     # An outline of 100 m² (400 pixels): a year needs 30 % of it, 120 pixels.
     years = {"2016": [5.5, 40], "2017": [4.0, 150], "2018": [4.5, 300], "2019": [5.0, 310], "2020": [6.0, 3]}
-    first, height = buildings.first_and_height(years, 100.0)
+    first, height, rule = buildings.first_and_height(years, 100.0)
     # 2016 has only the edge of the next house; 2020 has 3 pixels (no data).
-    assert first == 2017
-    assert height == 4.5
+    assert (first, height, rule) == (2017, 4.5, "part")
     # A small outline of 5 m² (20 pixels, 30 % is 6): at least 8 pixels.
-    assert buildings.first_and_height({"2021": [7.0, 9]}, 5.0) == (2021, 7.0)
-    assert buildings.first_and_height({"2021": [7.0, 7]}, 5.0) == (None, None)
+    assert buildings.first_and_height({"2021": [7.0, 9]}, 5.0) == (2021, 7.0, "part")
+
+
+# Report 0009, D-0009-08: 7 904 buildings of 2019 had no first year (no year
+# with 30 % of the outline), and 7 902 of them no height. One test for each kind.
+
+def test_no_year_with_a_part_takes_the_first_year_with_8_pixels_up_to_2019():
+    # An outline of 200 m² (800 pixels, 30 % is 240): no year has 240 pixels.
+    years = {"2016": [3.0, 5], "2017": [6.0, 60], "2018": [5.0, 90], "2019": [7.0, 100], "2020": [6.5, 120]}
+    first, height, rule = buildings.first_and_height(years, 200.0)
+    assert (first, rule) == (2017, "pixels")
+    # The median of 2017 to 2020 (2016 has fewer than 8 pixels).
+    assert height == 6.2
+    assert height is not None
+
+
+def test_no_year_with_a_part_and_8_pixels_only_after_2019_is_out():
+    years = {"2018": [4.0, 6], "2019": [4.0, 7], "2021": [9.0, 30], "2022": [9.5, 40]}
+    first, height, rule = buildings.first_and_height(years, 200.0)
+    assert (first, height, rule) == (2021, 9.2, "pixels")
+    assert first > 2019
+
+
+def test_fewer_than_8_pixels_in_each_year_is_not_seen():
+    assert buildings.first_and_height({"2018": [4.0, 7], "2019": [4.0, 5]}, 30.0) == (None, None, None)
+    assert buildings.first_and_height({}, 30.0) == (None, None, None)
+
+
+def test_the_buildings_of_each_kind_go_to_their_lists():
+    rows = [("a", [], 0.0, None, [0, 0, 20, 0, 20, 10, 0, 10]),   # 200 m²
+            ("b", [], 0.0, None, [0, 0, 20, 0, 20, 10, 0, 10]),
+            ("c", [], 0.0, None, [0, 0, 20, 0, 20, 10, 0, 10]),
+            ("d", [], 5.0, None, [0, 0, 6, 0, 6, 5, 0, 5])]        # 30 m²
+    years_of = {"a": {"2017": [6.0, 300]}, "b": {"2018": [5.0, 50]}, "c": {"2022": [8.0, 40]}, "d": {"2019": [4.0, 6]}}
+    kept, out, unseen, counts = buildings.sort_buildings(rows, years_of)
+    assert [i["id"] for i in kept] == ["a", "b"]
+    assert [i["id"] for i in out] == ["c"]
+    assert [i["id"] for i in unseen] == ["d"]
+    assert all(i["height"] is not None for i in kept + out)
+    assert unseen[0]["status"] == "Check"
+    assert counts == {"part_2019": 1, "part_after_2019": 0, "pixels_2019": 1, "pixels_after_2019": 1, "unseen": 1}
 
 
 def test_the_groups_with_no_outline_are_far_from_the_outlines_and_large():

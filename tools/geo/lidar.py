@@ -146,6 +146,40 @@ def decide(old_rows: int | None, new_rows: int | None, allow_fewer: bool = False
     return "write"
 
 
+# D-0009-09: the products of ICESat-2 over the land come from the same passes
+# (the ATL03 ground photons take their class from ATL08). ATL24 has passes over
+# the water only, and GEDI is another satellite: they are not compared.
+LAND = ("atl03_ground", "atl08", "atl03_roof")
+
+
+def incomplete_products(passes: dict) -> set:
+    """The products of one year that lost passes (report 0009, D-0009-09).
+    passes: {product: set of the dates of its passes}. ATL08 must have each pass
+    of the ATL03 ground photons, and the ground photons each pass of ATL08 and
+    of the roof photons (a pass can cross no roof)."""
+    found = set()
+    ground = passes.get("atl03_ground")
+    atl08 = passes.get("atl08")
+    roof = passes.get("atl03_roof") or set()
+    if ground is not None and atl08 is not None and set(ground) - set(atl08):
+        found.add("atl08")
+    if ground is not None and (set(atl08 or ()) | set(roof)) - set(ground):
+        found.add("atl03_ground")
+    return found
+
+
+def passes_of(manifest: dict, key: str) -> list[str]:
+    """The dates of the passes of one file of the store (from its entry, else from its points)."""
+    entry = manifest.get("files", {}).get(key)
+    if entry is None:
+        return []
+    if "passes" in entry:
+        return list(entry["passes"])
+    data = geostore.get(manifest, key)
+    i = data["columns"].index("date")
+    return sorted({p[i] for p in data["points"]})
+
+
 def total(manifest: dict, product: str) -> int:
     return sum(int(e.get("rows", 0)) for k, e in manifest.get("files", {}).items() if k.split("/")[0] == product)
 
@@ -251,13 +285,24 @@ def fetch(lines: list[str], allow_fewer: bool, refetch: bool) -> list[str]:
     manifest = geostore.load(MANIFEST)
     errors: list[str] = []
     started = time.time()
+    # D-0009-09: the years whose land products do not have the same passes.
+    incomplete: dict[int, set] = {}
+    for t0, _t in year_spans(T0, t1):
+        year = int(t0[:4])
+        passes = {p: set(passes_of(manifest, f"{p}/{year}")) for p in LAND
+                  if p in PRODUCTS and f"{p}/{year}" in manifest.get("files", {})}
+        incomplete[year] = incomplete_products(passes)
     for product, calls in PRODUCTS.items():
         before = total(manifest, product)
         for t0, t_end in year_spans(T0, t1):
             year = int(t0[:4])
             key = f"{product}/{year}"
             old = manifest.get("files", {}).get(key, {}).get("rows")
-            if not needs_fetch(old, year, this_year, refetch):
+            again = product in incomplete.get(year, set())
+            if again:
+                lines.append(f"- {product} {year}: not complete (it does not have the passes of the other land products "
+                             "of the year): asked for again")
+            if not (again or needs_fetch(old, year, this_year, refetch)):
                 continue
             if time.time() - started > BUDGET_S:
                 lines.append(f"- {product} {year}: no time; the file of the last good run stays ({old} rows)")
@@ -288,7 +333,8 @@ def fetch(lines: list[str], allow_fewer: bool, refetch: bool) -> list[str]:
                 columns = COLUMNS + (["outline"] if product == "atl03_roof" else [])
                 geostore.put(manifest, key, {"product": product, "year": year, "columns": columns, "points": rows,
                                              "height_column": height_column},
-                             product=product, year=year, rows=new, fetched=dt.date.today().isoformat())
+                             product=product, year=year, rows=new, fetched=dt.date.today().isoformat(),
+                             passes=sorted({r[2] for r in rows}))
                 lines.append(f"- {product} {year}: {new} rows (it had {old})")
             else:
                 lines.append(f"- {product} {year}: {new} rows; the file of the last good run stays ({old} rows)")
@@ -432,6 +478,24 @@ def report(lines: list[str]) -> None:
         years = by_year(manifest, product)
         lines.append(f"| {product} | " + " | ".join(str(years.get(y, "–")) for y in range(2018, dt.date.today().year + 1))
                      + f" | {total(manifest, product)} |")
+    # D-0009-09: the passes (the dates) of each product and year, and the years that are not complete.
+    lines += ["", "## The passes of each product and year (D-0009-09)", "",
+              "A year is complete when ATL08 has each pass of the ATL03 ground photons, and the ground photons each "
+              "pass of ATL08 and of the roof photons. ATL24 (passes over the water only) and GEDI (another satellite) "
+              "are not compared. The next run asks again for a product of a year that is not complete.", "",
+              "| Product | " + " | ".join(str(y) for y in range(2018, dt.date.today().year + 1)) + " | All |",
+              "|---" * (dt.date.today().year - 2018 + 3) + "|"]
+    for product in PRODUCTS:
+        counts = [len(passes_of(manifest, f"{product}/{y}")) if f"{product}/{y}" in manifest.get("files", {}) else None
+                  for y in range(2018, dt.date.today().year + 1)]
+        lines.append(f"| {product} | " + " | ".join("–" if c is None else str(c) for c in counts)
+                     + f" | {sum(c or 0 for c in counts)} |")
+    for y in range(2018, dt.date.today().year + 1):
+        passes = {p: set(passes_of(manifest, f"{p}/{y}")) for p in LAND if f"{p}/{y}" in manifest.get("files", {})}
+        missing = incomplete_products(passes)
+        if missing:
+            lines.append(f"- {y} is not complete: {', '.join(sorted(missing))} "
+                         f"(ATL03 {sorted(passes.get('atl03_ground', []))}, ATL08 {sorted(passes.get('atl08', []))})")
     keys = sorted(k for k in manifest.get("files", {}) if k.startswith("atl24/"))
     if not keys:
         lines.append("- R5c: no points of ATL24 yet")
@@ -466,6 +530,7 @@ def report(lines: list[str]) -> None:
             c = int(max(0, min(255, 128 + d * 12)))
             draw.point((px, py), fill=(0, c, 255 - c))
         img.save(MAP)
+        geostore.write_keep_import(MAP)
         lines.append(f"- the map of the depths of ATL24: {MAP.name}")
     except Exception as error:  # noqa: BLE001
         lines.append(f"- the map: {error}")

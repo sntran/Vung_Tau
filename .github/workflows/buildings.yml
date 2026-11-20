@@ -113,8 +113,11 @@ jobs:
         run: |
           for path in data/geo/raw/buildings data/geo/raw/lidar data/geo/build/buildings_report.md \
               data/geo/build/buildings_r5d.json data/geo/build/buildings_all.png data/geo/build/buildings_2019.png \
-              data/geo/build/buildings_out.png data/geo/build/buildings_no_outline.png \
-              data/geo/build/lidar_report.md data/geo/build/lidar_seafloor.png data/geo/build/lidar_tracks.json; do
+              data/geo/build/buildings_out.png data/geo/build/buildings_no_outline.png data/geo/build/buildings_unseen.png \
+              data/geo/build/lidar_report.md data/geo/build/lidar_seafloor.png data/geo/build/lidar_tracks.json \
+              data/geo/build/buildings_all.png.import data/geo/build/buildings_2019.png.import \
+              data/geo/build/buildings_out.png.import data/geo/build/buildings_no_outline.png.import \
+              data/geo/build/buildings_unseen.png.import data/geo/build/lidar_seafloor.png.import; do
             if [ -e "$path" ]; then git add "$path"; fi
           done
           if git diff --cached --quiet; then

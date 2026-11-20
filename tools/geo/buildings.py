@@ -574,19 +574,55 @@ def outlines() -> list:
     return geostore.get(geostore.load(MANIFEST), "overture")["buildings"]
 
 
-def first_and_height(years: dict, area_m2: float) -> tuple[int | None, float | None]:
-    """D-0009-05: the first year of an outline is the first year in which its
-    pixels with a building are at least FIRST_PART of its area (and at least
-    MIN_PIXELS); its height is the median of the heights of the years from
-    that year on (each with at least MIN_PIXELS pixels). years: {year: [height, pixels]}."""
+def first_and_height(years: dict, area_m2: float) -> tuple[int | None, float | None, str | None]:
+    """D-0009-05 and D-0009-08: the first year of an outline is the first year
+    in which its pixels with a building are at least FIRST_PART of its area
+    (and at least MIN_PIXELS): the rule "part". If no year has that part, it
+    is the first year with at least MIN_PIXELS pixels: the rule "pixels". Its
+    height is the median of the heights of the years from that year on (each
+    with at least MIN_PIXELS pixels). With fewer than MIN_PIXELS pixels in each
+    year, the 2.5D data does not see it: (None, None, None).
+    years: {year: [height, pixels]}."""
     import numpy as np
     need = max(MIN_PIXELS, int(math.ceil(FIRST_PART * area_m2 / 0.25)))
     found = sorted(int(y) for y, (_h, px) in years.items() if int(px) >= need)
+    rule = "part"
     if not found:
-        return None, None
+        found = sorted(int(y) for y, (_h, px) in years.items() if int(px) >= MIN_PIXELS)
+        rule = "pixels"
+    if not found:
+        return None, None, None
     first = found[0]
     heights = [float(h) for y, (h, px) in years.items() if int(y) >= first and int(px) >= MIN_PIXELS]
-    return first, round(float(np.median(heights)), 1)
+    return first, round(float(np.median(heights)), 1), rule
+
+
+def sort_buildings(rows: list, years_of: dict) -> tuple[list, list, list, dict]:
+    """D-0009-08: the buildings of 2019 (a first year up to 2019), the buildings
+    that are out (a first year after 2019), and the buildings that the 2.5D data
+    does not see (fewer than MIN_PIXELS pixels in each year: status Check, not in
+    the game), with the count of each kind. rows: the rows of outlines()."""
+    import shapely
+    kept, out, unseen = [], [], []
+    counts = {"part_2019": 0, "part_after_2019": 0, "pixels_2019": 0, "pixels_after_2019": 0, "unseen": 0}
+    for oid, sources, h, floors, flat in rows:
+        area = shapely.Polygon(list(zip(flat[0::2], flat[1::2]))).area
+        first, height, rule = first_and_height(years_of.get(oid, {}), area)
+        item = {"id": oid, "sources": sources, "outline": [flat[i:i + 2] for i in range(0, len(flat), 2)],
+                "height": height, "height_source": "Open Buildings 2.5D Temporal", "floors": floors,
+                "first_year": first, "first_rule": rule}
+        if first is None:
+            item.update({"height": h or None, "height_source": "Overture" if h else None, "status": "Check",
+                         "area_m2": round(area, 1)})
+            unseen.append(item)
+            counts["unseen"] += 1
+        elif first > 2019:
+            out.append(item)
+            counts[f"{rule}_after_2019"] += 1
+        else:
+            kept.append(item)
+            counts[f"{rule}_2019"] += 1
+    return kept, out, unseen, counts
 
 
 def groups_of_cells(building, distance, min_distance: float = GROUP_DISTANCE_M, min_cells: int = GROUP_CELLS) -> list[list]:
@@ -641,6 +677,7 @@ def draw_map(path: Path, layers: list, title: str, crop: tuple | None = None, si
         draw.rectangle([x, 22, x + 10, 28], fill=color)
         x += 10 + 7 * len(name) + 20
     image.save(path)
+    geostore.write_keep_import(path)
 
 
 def part_build(notes: Notes) -> None:
@@ -656,19 +693,25 @@ def part_build(notes: Notes) -> None:
     temporal = geostore.get(manifest, "temporal") if "temporal" in manifest.get("files", {}) else {"heights": [], "shifts": {}}
     years_of = {oid: years for oid, years in temporal["heights"]}
     polygons = [shapely.Polygon(list(zip(flat[0::2], flat[1::2]))) for _oid, _s, _h, _f, flat in rows]
-    result, out, firsts = [], [], {}
-    for (oid, sources, h, floors, flat), polygon in zip(rows, polygons):
-        first, height = first_and_height(years_of.get(oid, {}), polygon.area)
-        firsts[oid] = first
-        item = {"id": oid, "sources": sources, "outline": [flat[i:i + 2] for i in range(0, len(flat), 2)],
-                "height": height if height is not None else h,
-                "height_source": "Open Buildings 2.5D Temporal" if height is not None else ("Overture" if h else None),
-                "floors": floors, "first_year": first}
-        (out if first is not None and first > 2019 else result).append(item)
-    geostore.put(manifest, "buildings_2019", {"note": "Made by tools/geo/buildings.py build (plan 0009, R1). The height is the "
-                                              "median of the years of the 2.5D data from the first year on (D-0009-05). ODbL; "
-                                              "the heights of Open Buildings 2.5D Temporal: CC BY 4.0.",
+    result, out, unseen, kinds = sort_buildings(rows, years_of)
+    firsts = {i["id"]: i["first_year"] for i in result + out + unseen}
+    geostore.put(manifest, "buildings_2019", {"note": "Made by tools/geo/buildings.py build (plan 0009, R1). The first year is the "
+                                              "first year with 30 % of the outline, else the first year with 8 pixels or more "
+                                              "(first_rule: part or pixels, D-0009-08); the height is the median of the years of "
+                                              "the 2.5D data from the first year on (D-0009-05). ODbL; the heights of Open "
+                                              "Buildings 2.5D Temporal: CC BY 4.0.",
                                               "presence": PRESENCE, "first_part": FIRST_PART, "buildings": result}, rows=len(result))
+    # D-0009-08: the outlines that the 2.5D data does not see (fewer than 8 pixels in each year): status Check.
+    geostore.put(manifest, "buildings_unseen", {"note": "Made by tools/geo/buildings.py build (report 0009, D-0009-08). The "
+                                                "outlines of Overture Maps with fewer than 8 pixels of building in each year of "
+                                                "the 2.5D data: it does not see them. Status Check: not in the game until a person "
+                                                "decides. ODbL.", "buildings": unseen}, rows=len(unseen))
+    nulls = sum(1 for i in result + out if i["height"] is None)
+    if nulls:
+        raise SystemExit(f"D-0009-08: {nulls} buildings with a first year have no height")
+    notes.add(f"D-0009-08: the first year by 30 % of the outline: {kinds['part_2019']} up to 2019, {kinds['part_after_2019']} "
+              f"after; by 8 pixels (no year with 30 %): {kinds['pixels_2019']} up to 2019, {kinds['pixels_after_2019']} after; "
+              f"fewer than 8 pixels in each year: {kinds['unseen']} (buildings_unseen, Check)")
     by_first: dict = {}
     for item in result:
         by_first[item["first_year"]] = by_first.get(item["first_year"], 0) + 1
@@ -678,7 +721,18 @@ def part_build(notes: Notes) -> None:
     if len(heights):
         notes.add(f"the heights: median {np.median(heights):.1f} m, 90 % under {np.percentile(heights, 90):.1f} m, "
                   f"the highest {heights.max():.1f} m")
-    lines += [f"{len(result)} buildings of 2019, {len(out)} out (their first year is after 2019).", ""]
+    unseen_area = [i["area_m2"] for i in unseen]
+    lines += [f"{len(result)} buildings of 2019, {len(out)} out (their first year is after 2019), and {len(unseen)} that the "
+              "2.5D data does not see (Check).", "",
+              "## The first year of each outline (D-0009-05, D-0009-08)", "",
+              "| Kind | Up to 2019 | After 2019 |", "|---|---|---|",
+              f"| A year with 30 % of the outline | {kinds['part_2019']} | {kinds['part_after_2019']} |",
+              f"| No year with 30 %: the first year with 8 pixels or more | {kinds['pixels_2019']} | {kinds['pixels_after_2019']} |",
+              "",
+              f"Fewer than 8 pixels in each year: {len(unseen)} outlines (median area "
+              f"{float(np.median(unseen_area)) if unseen_area else 0:.0f} m²). They are not in `buildings_2019`: the list "
+              "`buildings_unseen` of the store and the map `buildings_unseen.png`, with the status Check. Each building of "
+              f"2019 and each building that is out has a height (no null).", ""]
 
     # D-0009-04: the groups of cells with a building and no outline.
     group_flats, group_cells, group_area = [], 0, 0.0
@@ -725,7 +779,7 @@ def part_build(notes: Notes) -> None:
     flat_of = {oid: flat for oid, _s, _h, _f, flat in rows}
     gray, red, orange, blue = (110, 110, 110), (210, 40, 40), (240, 140, 20), (40, 90, 200)
     crop = CENTER_CROP
-    draw_map(BUILD / "buildings_all.png", [([flat_of[i["id"]] for i in result + out], gray, "all the outlines")],
+    draw_map(BUILD / "buildings_all.png", [([flat_of[i["id"]] for i in result + out + unseen], gray, "all the outlines")],
              "All the outlines of Overture Maps", crop)
     draw_map(BUILD / "buildings_2019.png", [([flat_of[i["id"]] for i in result], gray, "a building of 2019")],
              "The buildings of 2019", crop)
@@ -735,8 +789,12 @@ def part_build(notes: Notes) -> None:
     draw_map(BUILD / "buildings_no_outline.png", [([flat_of[i["id"]] for i in result], (200, 200, 200), "an outline of 2019"),
                                                   (group_flats, orange, "a group of cells with a building and no outline")],
              "The buildings of the raster of 2019 with no outline (D-0009-04)", crop)
-    lines += ["## The maps (D-0009-03)", "", "`buildings_all.png`, `buildings_2019.png`, `buildings_out.png`, and "
-              "`buildings_no_outline.png`: the whole box at the left, the middle of the town at the right.", ""]
+    draw_map(BUILD / "buildings_unseen.png", [([flat_of[i["id"]] for i in result], (200, 200, 200), "2019"),
+                                              ([flat_of[i["id"]] for i in unseen], blue, "fewer than 8 pixels in each year (Check)")],
+             "The outlines that the 2.5D data does not see (D-0009-08)", crop)
+    lines += ["## The maps (D-0009-03)", "", "`buildings_all.png`, `buildings_2019.png`, `buildings_out.png`, "
+              "`buildings_no_outline.png`, and `buildings_unseen.png`: the whole box at the left, the middle of the town "
+              "at the right.", ""]
 
     # D-0009-03: the lists of R5d.
     lines += r5d_lists(notes, rows, polygons, firsts)

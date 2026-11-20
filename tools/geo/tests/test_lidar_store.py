@@ -131,3 +131,61 @@ def test_the_grid_of_dtu_is_read_from_north_to_south(tmp_path):
     assert at(107.0, 11.0) == pytest.approx(1.0)
     assert at(108.0 - 1e-9, 10.0 + 1e-9) == pytest.approx(9.0, abs=1e-6)
     assert at(107.25, 10.75) == pytest.approx(3.0)
+
+
+# Report 0009, D-0009-09: ATL08 had 17 of the 30 passes of ATL03 of the same
+# years; the guard kept the ATL08 of the years that lost passes.
+
+def test_the_land_products_of_a_year_have_the_same_passes():
+    ground = {"2019-03-14", "2019-06-13", "2019-12-12"}
+    assert lidar.incomplete_products({"atl03_ground": ground, "atl08": {"2019-03-14"},
+                                      "atl03_roof": {"2019-06-13"}}) == {"atl08"}
+    assert lidar.incomplete_products({"atl03_ground": {"2019-03-14"}, "atl08": ground}) == {"atl03_ground"}
+    # A roof photon is a photon of a pass of the ground photons; a pass can cross no roof.
+    assert lidar.incomplete_products({"atl03_ground": ground, "atl08": ground, "atl03_roof": {"2019-01-01"}}) == {"atl03_ground"}
+    assert lidar.incomplete_products({"atl03_ground": ground, "atl08": ground, "atl03_roof": set()}) == set()
+    # ATL24 (passes over the water only) and GEDI (another satellite) are not compared.
+    assert lidar.incomplete_products({"atl03_ground": ground, "atl08": ground, "atl24": {"2019-09-01"}}) == set()
+
+
+def test_a_year_with_fewer_passes_than_atl03_of_the_same_year_is_fetched_again(store, monkeypatch):
+    asked = []
+
+    def module_with(dates_of):
+        module = types.ModuleType("sliderule")
+
+        def run(call, parms):
+            year = int(parms["t0"][:4])
+            asked.append((call, year))
+            dates = dates_of.get((call, year), [])
+            times = pd.to_datetime([d for d in dates for _ in range(4)])
+            return pd.DataFrame({"longitude": np.full(len(times), 107.08), "latitude": np.full(len(times), 10.35),
+                                 "h_ph": np.arange(len(times), dtype=float)}, index=times)
+        module.run = run
+        module.init = lambda **_kw: None
+        module.icesat2 = types.ModuleType("sliderule.icesat2")
+        module.gedi = types.ModuleType("sliderule.gedi")
+        return module
+
+    def fetch_with(dates_of):
+        module = module_with(dates_of)
+        monkeypatch.setitem(sys.modules, "sliderule", module)
+        monkeypatch.setitem(sys.modules, "sliderule.icesat2", module.icesat2)
+        monkeypatch.setitem(sys.modules, "sliderule.gedi", module.gedi)
+        monkeypatch.setattr(lidar, "PRODUCTS", {"atl03_ground": [("run", "atl03x")], "atl08": [("run", "atl08x")]})
+        lines = []
+        return lidar.fetch(lines, False, False), lines
+
+    passes = ["2019-03-14", "2019-06-13", "2019-12-12"]
+    errors, _ = fetch_with({("atl03x", 2019): passes, ("atl08x", 2019): passes[:1]})
+    assert errors == []
+    assert lidar.passes_of(geostore.load(lidar.MANIFEST), "atl08/2019") == passes[:1]
+    asked.clear()
+    errors, lines = fetch_with({("atl03x", 2019): passes, ("atl08x", 2019): passes})
+    assert errors == []
+    # ATL08 of 2019 is asked again (it lost two passes); ATL03 of 2019 is complete and is not.
+    assert ("atl08x", 2019) in asked
+    assert ("atl03x", 2019) not in asked
+    manifest = geostore.load(lidar.MANIFEST)
+    assert lidar.passes_of(manifest, "atl08/2019") == passes
+    assert any("atl08 2019" in line and "not complete" in line for line in lines)
