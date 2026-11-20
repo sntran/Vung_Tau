@@ -32256,8 +32256,7 @@
 													"y"
 												],
 												"levels": [
-													"mid",
-													"far"
+													"mid"
 												],
 												"blend": 0.02,
 												"material": "part_02",

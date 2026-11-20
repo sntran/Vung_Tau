@@ -1361,8 +1361,7 @@
 											"y"
 										],
 										"levels": [
-											"mid",
-											"far"
+											"mid"
 										],
 										"blend": 0.02,
 										"material": "part_02",
@@ -1549,6 +1548,13 @@
 			"hash": "",
 			"seen": "The job \"Models of World\" at World e8754d6 stopped on this order: the bake of the near level (12 000 triangles of the hall and 6 000 of its roof in a map of 512 texels) had no room for the charts of the triangles (World.Sculpt.Bake: :small). World 1984a6f built it.",
 			"changed": "The maps of the near level: 1 024 texels (were 512). On Low the game does not load the near level of a building (WorldModel.levels_shown())."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "",
+			"seen": "Report 0026, D-0026-40: with the files of World e8754d6, PT-72 measured the roof of the hall in S1 on Low at hue 25 degrees (17:10) and 31 degrees (12:00), against 9 in the photo. The points of the roof of the far level were #b27f51: the mean of the tiles (#7f2d18) and the hips (#e6d38c). The paint of the hips (a band of 0.2 m) reached each point of the pyramid at the far level (cells of 0.4 m and 60 triangles: each point of a pyramid is on a hip). The orders of the factory with the variants: the plate of the eaves at the near and mid levels only, the same; the paint of the hips at the mid level only, the points of the roof #7e2c18.",
+			"changed": "The paint of the hips: at the mid level only (it was mid and far). The mid level keeps it in its map (#7f2d18 on the tiles, the hips cream)."
 		}
 	],
 	"status_note": "Source (report 0026, Q17, rule 2): photo 2 (2020-06-06) shows the hall from across Hạ Long (the pyramid roof with its light hips, the white pediment of the porch, the fence with blue posts; trees hide the walls of the front), and photo 1 (2021-01-30) shows the roof, the porch and two sides from a drone. The sizes come from the photos of 2014 (photos 0, 3 and 4) and of 2020 and 2021. The plinth, the hips, the depth of the porch and the sill of the arched windows are estimates (no source). The near level is not built: the factory stopped at each order of the near level (HTTP 503), so it needs a build with more memory (the job \"Models of World\")."
