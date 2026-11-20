@@ -6,6 +6,8 @@ its author, Mapillary, and the link of the image. A sheet keeps the license of i
 
 | File | Image | Date (UTC+7) | Author | License | Link |
 |---|---|---|---|---|---|
+| `detail_1927330624091805.jpg` | `1927330624091805` | 2018-07-29 10:41 | hoangvietanh, Mapillary | CC BY-SA 4.0 | [link](https://www.mapillary.com/app/?pKey=1927330624091805) |
+| `detail_605171615183890.jpg` | `605171615183890` | 2024-11-09 09:45 | lyduchuy, Mapillary | CC BY-SA 4.0 | [link](https://www.mapillary.com/app/?pKey=605171615183890) |
 | `sheet_d22_grand_front_after_1.jpg` | `1075981411010788` | 2025-05-18 20:23 | DriveWithHoang, Mapillary | CC BY-SA 4.0 | [link](https://www.mapillary.com/app/?pKey=1075981411010788) |
 | `sheet_d22_grand_front_after_1.jpg` | `1251897522687108` | 2024-11-09 09:46 | lyduchuy, Mapillary | CC BY-SA 4.0 | [link](https://www.mapillary.com/app/?pKey=1251897522687108) |
 | `sheet_d22_grand_front_after_1.jpg` | `1261401988216740` | 2024-11-09 09:46 | lyduchuy, Mapillary | CC BY-SA 4.0 | [link](https://www.mapillary.com/app/?pKey=1261401988216740) |
