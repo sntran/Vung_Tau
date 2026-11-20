@@ -536,7 +536,14 @@
 			"pillar_model": "tru_lan_can_ha_long",
 			"pillar_every_m": 10.0,
 			"pieces_note": "The parapet is pieces of the models lan_can_ha_long (grey granite, 2 m) and tru_lan_can_ha_long (a panel of red brown granite, 0.75 m) of data/world/drawings/, a panel about every 10 m (VnExpress, 2021-07-16: the walk of Hạ Long with dark red pillars about every 10 m). The slope of the sea wall is pieces of the model ke_ha_long (Source, report 0026, Q17 and D-0026-27), scaled in height to the drop at each place (slope_model); the plain face keeps its collision.",
-			"slope_model": "ke_ha_long"
+			"slope_model": "ke_ha_long",
+			"lamps": {
+				"kind": "globe_cast",
+				"every_m": 40.0,
+				"first_m": 20.0,
+				"in_m": 0.65,
+				"note": "Report 0026, D-0026-31: the cast green posts with five white globes (den_cot_den_cau_xanh) on the walk at the parapet. The photo of Mapillary 1927330624091805 (2018-07-29, hoangvietanh, CC BY-SA 4.0) shows a post at the parapet, with no other post in about 30 m of the parapet; the photo from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0, drone_2021_ha_long.jpg) shows posts with white heads at the parapet, about one every 40 m (an estimate from the photo). in_m: the foot 0.35 m in from the inner face of the parapet (0.3 m thick)."
+			}
 		}
 	],
 	"stand_ins": {
@@ -795,6 +802,26 @@
 				]
 			},
 			"ranges_note": "On Low the near level of the low lamp (6 376 triangles) shows to 6 m only, its mid level (300) to 30 m, and its far level to 60 m (PT-73: with the near level to 15 m, the shot S5 had more than 300 000 triangles on Low)."
+		},
+		"globe_cast": {
+			"shape": "globes",
+			"height": 4.8,
+			"base_radius": 0.3,
+			"top_radius": 0.05,
+			"globes": 4,
+			"globe_radius": 0.19,
+			"arm_length": 0.45,
+			"pole_color": "#1c564a",
+			"head_color": "#efeee8",
+			"note": "The cast green post with four white globes round its top and one on it (the model den_cot_den_cau_xanh: 4.8 m to the top of the top globe). The values of the stand-in follow it.",
+			"light": {
+				"color": "#FFE2B8",
+				"energy": 0.8,
+				"range": 7.0,
+				"y": 0.0
+			},
+			"model": "den_cot_den_cau_xanh",
+			"glow_role": "part_02"
 		}
 	},
 	"lamp_rows": [
@@ -954,10 +981,18 @@
 		"note": "The pieces of the walls that are models of this game (the parapet of Hạ Long, the low wall of the beach): one row of MultiMeshes in cells of cell_m (fewer draw calls than cells of 6 m), and on Low no near level (as the buildings of plan 0026, D6): the mid level (470 triangles for a span of the low wall) to 20 m, the far level (60) to 120 m. PT-73: with the near level on Low and cells of 6 m, S5 had 575 draw calls and 322 686 triangles; with the mid level to 40 m and the far level to 150 m, 304 656. Audit 3 of the corrections: with the pieces under the wall, the steps, and the fence of the Grand Hotel, S5 had 297 768 with the mid level to 20 m (a range is for a whole cell); with 12 m, less, so that the CI has room for the walkers.",
 		"under_model": "ke_da_bai_truoc",
 		"under_ranges": {
-			"low": [0.0, 0.0, 40.0]
+			"low": [
+				0.0,
+				0.0,
+				40.0
+			]
 		},
 		"fence_ranges": {
-			"low": [0.0, 40.0, 150.0]
+			"low": [
+				0.0,
+				40.0,
+				150.0
+			]
 		},
 		"fence_ranges_note": "The spans of the fences (a row of their own): on Low the mid level (400 triangles a span) to 40 m and the far level to 150 m. With the ranges of the walls (the mid level to 12 m), the fence of the Grand Hotel in S4 on Low was its far level, a row of grey teeth (the sheet of S4 of audit 3 of the corrections).",
 		"under_ranges_note": "The pieces under the low wall (a row of their own, with no shadow): on Low only the far level (80 triangles) to 40 m: from the walk the wall hides them, and a range is for a whole cell of cell_m (with the mid level to 6 m, all the pieces of the cell of the eye had the mid level). PT-73: with the ranges of the walls (20 m and 120 m) and the shadow, S5 had 312 688 triangles; with the mid level to 8 m, the far level to 80 m, and no shadow, 306 528; with 6 m and 40 m, 305 568.",

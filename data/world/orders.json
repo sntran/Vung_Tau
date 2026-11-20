@@ -709,11 +709,12 @@
 			"order": {
 				"blueprint": {
 					"name": "den_cong_vien",
-					"doc": "A lamp of the park and the walk of the sea of Bãi Trước: the blue pole with two arms (hai_tay), the dark post with five globes (den_cau), or the low square lamp of the paths (vuon_thap). Vũng Tàu, data/world/blueprints/den_cong_vien.json.",
+					"doc": "A lamp of the park and the walk of the sea of Bãi Trước: the blue pole with two arms (hai_tay), the dark post with five globes (den_cau), the cast green post with five globes of the walk of Hạ Long (den_cau_cot), or the low square lamp of the paths (vuon_thap). Vũng Tàu, data/world/blueprints/den_cong_vien.json.",
 					"sources": [
 						"The blue pole: photos of 2014-03-09 (Commons, CC BY-SA 3.0), 2017-02-01 (Flickr), 2019-04-30 (Tuổi Trẻ).",
 						"The post with five globes: photos of 2014-04-06 (Commons, trungydang, CC BY 3.0) and 2018-03-08 (Flickr).",
-						"The low lamp: photos of 2014-04-06 (Commons, trungydang, CC BY 3.0) and 2017-02-01 and 2018-03-08 (Flickr)."
+						"The low lamp: photos of 2014-04-06 (Commons, trungydang, CC BY 3.0) and 2017-02-01 and 2018-03-08 (Flickr).",
+						"The cast green post of the walk of Hạ Long: Mapillary 1927330624091805 (2018-07-29, hoangvietanh, CC BY-SA 4.0) and 605171615183890 (2024-11-09, lyduchuy, CC BY-SA 4.0)."
 					],
 					"params": [
 						{
@@ -722,10 +723,11 @@
 							"values": [
 								"hai_tay",
 								"den_cau",
-								"vuon_thap"
+								"vuon_thap",
+								"den_cau_cot"
 							],
 							"default": "vuon_thap",
-							"doc": "The kind of lamp."
+							"doc": "The kind of lamp: the blue pole with two arms, the dark post of the park with five globes, the cast green post of the walk of Hạ Long with five globes, or the low square lamp."
 						},
 						{
 							"name": "paint",
@@ -1735,6 +1737,453 @@
 											"near": 6000,
 											"mid": 700,
 											"far": 100
+										}
+									}
+								}
+							},
+							{
+								"name": "den_cau_cot",
+								"only": [
+									{
+										"param": "kind"
+									},
+									"den_cau_cot"
+								],
+								"skill": {
+									"sculpt": {
+										"edits": [
+											{
+												"shape": "cone",
+												"size": [
+													0.31,
+													0.25,
+													0.235
+												],
+												"at": [
+													0,
+													0,
+													0.235
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cone",
+												"size": [
+													0.2,
+													0.18,
+													0.37
+												],
+												"at": [
+													0,
+													0,
+													0.84
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.23,
+													0.04
+												],
+												"at": [
+													0,
+													0,
+													1.24
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cone",
+												"size": [
+													0.15,
+													0.12,
+													0.19
+												],
+												"at": [
+													0,
+													0,
+													1.43
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.21,
+													0.04
+												],
+												"at": [
+													0,
+													0,
+													1.62
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cone",
+												"size": [
+													0.1,
+													0.08,
+													0.24
+												],
+												"at": [
+													0,
+													0,
+													1.86
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.12,
+													0.035
+												],
+												"at": [
+													0,
+													0,
+													2.1
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															0,
+															2.1
+														],
+														[
+															0,
+															0,
+															{
+																"param": "post"
+															}
+														]
+													],
+													"radii": [
+														0.05,
+														0.04
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "box",
+												"size": [
+													0.015,
+													0.1,
+													0.31
+												],
+												"at": [
+													0.07,
+													0,
+													2.52
+												],
+												"material": "part_01",
+												"color": "#d8d8d2"
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.075,
+													0.05
+												],
+												"at": [
+													0,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															-0.55
+														]
+													}
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															-0.45,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														],
+														[
+															0.45,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														]
+													],
+													"radii": [
+														0.02,
+														0.02
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															-0.45,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														],
+														[
+															0,
+															0.45,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														]
+													],
+													"radii": [
+														0.02,
+														0.02
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0.04,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.22
+																]
+															}
+														],
+														[
+															0.22,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.2
+																]
+															}
+														],
+														[
+															0.36,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.08
+																]
+															}
+														]
+													],
+													"radii": [
+														0.015,
+														0.015,
+														0.015
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"repeat": {
+													"count": 4
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.03,
+													0.06
+												],
+												"at": [
+													0.45,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															0.02
+														]
+													}
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"repeat": {
+													"count": 4
+												}
+											},
+											{
+												"shape": "ball",
+												"size": [
+													0.19
+												],
+												"at": [
+													0.45,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															0.18
+														]
+													}
+												],
+												"material": "part_02",
+												"color": "#efeee8",
+												"repeat": {
+													"count": 4
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														],
+														[
+															0,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	0.32
+																]
+															}
+														]
+													],
+													"radii": [
+														0.03,
+														0.03
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "ball",
+												"size": [
+													0.19
+												],
+												"at": [
+													0,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															0.51
+														]
+													}
+												],
+												"material": "part_02",
+												"color": "#efeee8"
+											}
+										],
+										"cells": {
+											"near": 0.01,
+											"mid": 0.03,
+											"far": 0.05
+										},
+										"budget": {
+											"near": 6000,
+											"mid": 900,
+											"far": 300
 										}
 									}
 								}
@@ -1985,11 +2434,12 @@
 			"order": {
 				"blueprint": {
 					"name": "den_cong_vien",
-					"doc": "A lamp of the park and the walk of the sea of Bãi Trước: the blue pole with two arms (hai_tay), the dark post with five globes (den_cau), or the low square lamp of the paths (vuon_thap). Vũng Tàu, data/world/blueprints/den_cong_vien.json.",
+					"doc": "A lamp of the park and the walk of the sea of Bãi Trước: the blue pole with two arms (hai_tay), the dark post with five globes (den_cau), the cast green post with five globes of the walk of Hạ Long (den_cau_cot), or the low square lamp of the paths (vuon_thap). Vũng Tàu, data/world/blueprints/den_cong_vien.json.",
 					"sources": [
 						"The blue pole: photos of 2014-03-09 (Commons, CC BY-SA 3.0), 2017-02-01 (Flickr), 2019-04-30 (Tuổi Trẻ).",
 						"The post with five globes: photos of 2014-04-06 (Commons, trungydang, CC BY 3.0) and 2018-03-08 (Flickr).",
-						"The low lamp: photos of 2014-04-06 (Commons, trungydang, CC BY 3.0) and 2017-02-01 and 2018-03-08 (Flickr)."
+						"The low lamp: photos of 2014-04-06 (Commons, trungydang, CC BY 3.0) and 2017-02-01 and 2018-03-08 (Flickr).",
+						"The cast green post of the walk of Hạ Long: Mapillary 1927330624091805 (2018-07-29, hoangvietanh, CC BY-SA 4.0) and 605171615183890 (2024-11-09, lyduchuy, CC BY-SA 4.0)."
 					],
 					"params": [
 						{
@@ -1998,10 +2448,11 @@
 							"values": [
 								"hai_tay",
 								"den_cau",
-								"vuon_thap"
+								"vuon_thap",
+								"den_cau_cot"
 							],
 							"default": "vuon_thap",
-							"doc": "The kind of lamp."
+							"doc": "The kind of lamp: the blue pole with two arms, the dark post of the park with five globes, the cast green post of the walk of Hạ Long with five globes, or the low square lamp."
 						},
 						{
 							"name": "paint",
@@ -3011,6 +3462,453 @@
 											"near": 6000,
 											"mid": 700,
 											"far": 100
+										}
+									}
+								}
+							},
+							{
+								"name": "den_cau_cot",
+								"only": [
+									{
+										"param": "kind"
+									},
+									"den_cau_cot"
+								],
+								"skill": {
+									"sculpt": {
+										"edits": [
+											{
+												"shape": "cone",
+												"size": [
+													0.31,
+													0.25,
+													0.235
+												],
+												"at": [
+													0,
+													0,
+													0.235
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cone",
+												"size": [
+													0.2,
+													0.18,
+													0.37
+												],
+												"at": [
+													0,
+													0,
+													0.84
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.23,
+													0.04
+												],
+												"at": [
+													0,
+													0,
+													1.24
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cone",
+												"size": [
+													0.15,
+													0.12,
+													0.19
+												],
+												"at": [
+													0,
+													0,
+													1.43
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.21,
+													0.04
+												],
+												"at": [
+													0,
+													0,
+													1.62
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cone",
+												"size": [
+													0.1,
+													0.08,
+													0.24
+												],
+												"at": [
+													0,
+													0,
+													1.86
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.12,
+													0.035
+												],
+												"at": [
+													0,
+													0,
+													2.1
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															0,
+															2.1
+														],
+														[
+															0,
+															0,
+															{
+																"param": "post"
+															}
+														]
+													],
+													"radii": [
+														0.05,
+														0.04
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "box",
+												"size": [
+													0.015,
+													0.1,
+													0.31
+												],
+												"at": [
+													0.07,
+													0,
+													2.52
+												],
+												"material": "part_01",
+												"color": "#d8d8d2"
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.075,
+													0.05
+												],
+												"at": [
+													0,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															-0.55
+														]
+													}
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															-0.45,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														],
+														[
+															0.45,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														]
+													],
+													"radii": [
+														0.02,
+														0.02
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															-0.45,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														],
+														[
+															0,
+															0.45,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														]
+													],
+													"radii": [
+														0.02,
+														0.02
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0.04,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.22
+																]
+															}
+														],
+														[
+															0.22,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.2
+																]
+															}
+														],
+														[
+															0.36,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.08
+																]
+															}
+														]
+													],
+													"radii": [
+														0.015,
+														0.015,
+														0.015
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"repeat": {
+													"count": 4
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.03,
+													0.06
+												],
+												"at": [
+													0.45,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															0.02
+														]
+													}
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"repeat": {
+													"count": 4
+												}
+											},
+											{
+												"shape": "ball",
+												"size": [
+													0.19
+												],
+												"at": [
+													0.45,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															0.18
+														]
+													}
+												],
+												"material": "part_02",
+												"color": "#efeee8",
+												"repeat": {
+													"count": 4
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														],
+														[
+															0,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	0.32
+																]
+															}
+														]
+													],
+													"radii": [
+														0.03,
+														0.03
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "ball",
+												"size": [
+													0.19
+												],
+												"at": [
+													0,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															0.51
+														]
+													}
+												],
+												"material": "part_02",
+												"color": "#efeee8"
+											}
+										],
+										"cells": {
+											"near": 0.01,
+											"mid": 0.03,
+											"far": 0.05
+										},
+										"budget": {
+											"near": 6000,
+											"mid": 900,
+											"far": 300
 										}
 									}
 								}
@@ -3262,11 +4160,12 @@
 			"order": {
 				"blueprint": {
 					"name": "den_cong_vien",
-					"doc": "A lamp of the park and the walk of the sea of Bãi Trước: the blue pole with two arms (hai_tay), the dark post with five globes (den_cau), or the low square lamp of the paths (vuon_thap). Vũng Tàu, data/world/blueprints/den_cong_vien.json.",
+					"doc": "A lamp of the park and the walk of the sea of Bãi Trước: the blue pole with two arms (hai_tay), the dark post with five globes (den_cau), the cast green post with five globes of the walk of Hạ Long (den_cau_cot), or the low square lamp of the paths (vuon_thap). Vũng Tàu, data/world/blueprints/den_cong_vien.json.",
 					"sources": [
 						"The blue pole: photos of 2014-03-09 (Commons, CC BY-SA 3.0), 2017-02-01 (Flickr), 2019-04-30 (Tuổi Trẻ).",
 						"The post with five globes: photos of 2014-04-06 (Commons, trungydang, CC BY 3.0) and 2018-03-08 (Flickr).",
-						"The low lamp: photos of 2014-04-06 (Commons, trungydang, CC BY 3.0) and 2017-02-01 and 2018-03-08 (Flickr)."
+						"The low lamp: photos of 2014-04-06 (Commons, trungydang, CC BY 3.0) and 2017-02-01 and 2018-03-08 (Flickr).",
+						"The cast green post of the walk of Hạ Long: Mapillary 1927330624091805 (2018-07-29, hoangvietanh, CC BY-SA 4.0) and 605171615183890 (2024-11-09, lyduchuy, CC BY-SA 4.0)."
 					],
 					"params": [
 						{
@@ -3275,10 +4174,11 @@
 							"values": [
 								"hai_tay",
 								"den_cau",
-								"vuon_thap"
+								"vuon_thap",
+								"den_cau_cot"
 							],
 							"default": "vuon_thap",
-							"doc": "The kind of lamp."
+							"doc": "The kind of lamp: the blue pole with two arms, the dark post of the park with five globes, the cast green post of the walk of Hạ Long with five globes, or the low square lamp."
 						},
 						{
 							"name": "paint",
@@ -4288,6 +5188,453 @@
 											"near": 6000,
 											"mid": 700,
 											"far": 100
+										}
+									}
+								}
+							},
+							{
+								"name": "den_cau_cot",
+								"only": [
+									{
+										"param": "kind"
+									},
+									"den_cau_cot"
+								],
+								"skill": {
+									"sculpt": {
+										"edits": [
+											{
+												"shape": "cone",
+												"size": [
+													0.31,
+													0.25,
+													0.235
+												],
+												"at": [
+													0,
+													0,
+													0.235
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cone",
+												"size": [
+													0.2,
+													0.18,
+													0.37
+												],
+												"at": [
+													0,
+													0,
+													0.84
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.23,
+													0.04
+												],
+												"at": [
+													0,
+													0,
+													1.24
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cone",
+												"size": [
+													0.15,
+													0.12,
+													0.19
+												],
+												"at": [
+													0,
+													0,
+													1.43
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.21,
+													0.04
+												],
+												"at": [
+													0,
+													0,
+													1.62
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cone",
+												"size": [
+													0.1,
+													0.08,
+													0.24
+												],
+												"at": [
+													0,
+													0,
+													1.86
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.12,
+													0.035
+												],
+												"at": [
+													0,
+													0,
+													2.1
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															0,
+															2.1
+														],
+														[
+															0,
+															0,
+															{
+																"param": "post"
+															}
+														]
+													],
+													"radii": [
+														0.05,
+														0.04
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "box",
+												"size": [
+													0.015,
+													0.1,
+													0.31
+												],
+												"at": [
+													0.07,
+													0,
+													2.52
+												],
+												"material": "part_01",
+												"color": "#d8d8d2"
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.075,
+													0.05
+												],
+												"at": [
+													0,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															-0.55
+														]
+													}
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															-0.45,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														],
+														[
+															0.45,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														]
+													],
+													"radii": [
+														0.02,
+														0.02
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															-0.45,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														],
+														[
+															0,
+															0.45,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														]
+													],
+													"radii": [
+														0.02,
+														0.02
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0.04,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.22
+																]
+															}
+														],
+														[
+															0.22,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.2
+																]
+															}
+														],
+														[
+															0.36,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.08
+																]
+															}
+														]
+													],
+													"radii": [
+														0.015,
+														0.015,
+														0.015
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"repeat": {
+													"count": 4
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.03,
+													0.06
+												],
+												"at": [
+													0.45,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															0.02
+														]
+													}
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"repeat": {
+													"count": 4
+												}
+											},
+											{
+												"shape": "ball",
+												"size": [
+													0.19
+												],
+												"at": [
+													0.45,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															0.18
+														]
+													}
+												],
+												"material": "part_02",
+												"color": "#efeee8",
+												"repeat": {
+													"count": 4
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														],
+														[
+															0,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	0.32
+																]
+															}
+														]
+													],
+													"radii": [
+														0.03,
+														0.03
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "ball",
+												"size": [
+													0.19
+												],
+												"at": [
+													0,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															0.51
+														]
+													}
+												],
+												"material": "part_02",
+												"color": "#efeee8"
+											}
+										],
+										"cells": {
+											"near": 0.01,
+											"mid": 0.03,
+											"far": 0.05
+										},
+										"budget": {
+											"near": 6000,
+											"mid": 900,
+											"far": 300
 										}
 									}
 								}
@@ -40215,6 +41562,1732 @@
 			"impostor": false,
 			"uses": "Plan 0026, report 0026, D-0026-22: along the outer edge of the sidewalk of Quang Trung in front of the Grand Hotel (fences of data/showcase/bai_truoc.json): the game puts the spans one after another along the line, the port end of a span on the port start of the next (two half posts make a whole post), the origin on the line, z up, with a gap at each gate.",
 			"drawing": "data/world/drawings/hang_rao_khach_san_grand.json",
+			"catalog": null
+		},
+		{
+			"id": "den_cot_den_cau_xanh",
+			"order": {
+				"blueprint": {
+					"name": "den_cong_vien",
+					"doc": "A lamp of the park and the walk of the sea of Bãi Trước: the blue pole with two arms (hai_tay), the dark post with five globes (den_cau), the cast green post with five globes of the walk of Hạ Long (den_cau_cot), or the low square lamp of the paths (vuon_thap). Vũng Tàu, data/world/blueprints/den_cong_vien.json.",
+					"sources": [
+						"The blue pole: photos of 2014-03-09 (Commons, CC BY-SA 3.0), 2017-02-01 (Flickr), 2019-04-30 (Tuổi Trẻ).",
+						"The post with five globes: photos of 2014-04-06 (Commons, trungydang, CC BY 3.0) and 2018-03-08 (Flickr).",
+						"The low lamp: photos of 2014-04-06 (Commons, trungydang, CC BY 3.0) and 2017-02-01 and 2018-03-08 (Flickr).",
+						"The cast green post of the walk of Hạ Long: Mapillary 1927330624091805 (2018-07-29, hoangvietanh, CC BY-SA 4.0) and 605171615183890 (2024-11-09, lyduchuy, CC BY-SA 4.0)."
+					],
+					"params": [
+						{
+							"name": "kind",
+							"type": "choice",
+							"values": [
+								"hai_tay",
+								"den_cau",
+								"vuon_thap",
+								"den_cau_cot"
+							],
+							"default": "vuon_thap",
+							"doc": "The kind of lamp: the blue pole with two arms, the dark post of the park with five globes, the cast green post of the walk of Hạ Long with five globes, or the low square lamp."
+						},
+						{
+							"name": "paint",
+							"type": "color",
+							"default": "#3c3c38",
+							"doc": "The color of the pole, the post, or the frame of the low lamp."
+						},
+						{
+							"name": "junction",
+							"type": "number",
+							"default": 10.6,
+							"min": 6.0,
+							"max": 14.0,
+							"unit": "m",
+							"doc": "hai_tay: the height where the arms leave the pole."
+						},
+						{
+							"name": "post",
+							"type": "number",
+							"default": 3.6,
+							"min": 2.0,
+							"max": 6.0,
+							"unit": "m",
+							"doc": "den_cau: the height of the cross of the frame under the side globes."
+						}
+					],
+					"drawing": {
+						"name": "den_cong_vien",
+						"kind": "building",
+						"extras": {
+							"site": true
+						},
+						"sources": [
+							"The lamps of the park of Bãi Trước (Vũng Tàu, data/world/drawings/)."
+						],
+						"materials": {
+							"part_01": {
+								"color": "#ffffff",
+								"roughness": 0.45,
+								"metalness": 0.3
+							},
+							"part_02": {
+								"color": "#ffffff",
+								"roughness": 0.3,
+								"metalness": 0.0
+							},
+							"part_03": {
+								"color": "#ffffff",
+								"roughness": 0.6,
+								"metalness": 0.0
+							}
+						},
+						"nodes": [
+							{
+								"name": "hai_tay",
+								"only": [
+									{
+										"param": "kind"
+									},
+									"hai_tay"
+								],
+								"skill": {
+									"sculpt": {
+										"edits": [
+											{
+												"shape": "cylinder",
+												"size": [
+													0.15,
+													0.25
+												],
+												"at": [
+													0,
+													0,
+													0.25
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															0,
+															0.45
+														],
+														[
+															0,
+															0,
+															{
+																"param": "junction"
+															}
+														]
+													],
+													"radii": [
+														0.1,
+														0.055
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															0,
+															{
+																"param": "junction"
+															}
+														],
+														[
+															0,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	1.25
+																]
+															}
+														]
+													],
+													"radii": [
+														0.045,
+														0.03
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "ball",
+												"size": [
+													0.05
+												],
+												"at": [
+													0,
+													0,
+													{
+														"sum": [
+															{
+																"param": "junction"
+															},
+															1.3
+														]
+													}
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0.04,
+															0,
+															{
+																"param": "junction"
+															}
+														],
+														[
+															0.7,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.04
+																]
+															}
+														],
+														[
+															1.4,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.3
+																]
+															}
+														],
+														[
+															2.0,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.75
+																]
+															}
+														]
+													],
+													"radii": [
+														0.025,
+														0.025,
+														0.025,
+														0.025
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0.04,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.2
+																]
+															}
+														],
+														[
+															0.7,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.25
+																]
+															}
+														],
+														[
+															1.35,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.52
+																]
+															}
+														],
+														[
+															1.92,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.92
+																]
+															}
+														]
+													],
+													"radii": [
+														0.025,
+														0.025,
+														0.025,
+														0.025
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															2.0,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.75
+																]
+															}
+														],
+														[
+															1.92,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.92
+																]
+															}
+														]
+													],
+													"radii": [
+														0.025,
+														0.025
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															-0.04,
+															0,
+															{
+																"param": "junction"
+															}
+														],
+														[
+															-0.45,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.02
+																]
+															}
+														],
+														[
+															-0.85,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.12
+																]
+															}
+														]
+													],
+													"radii": [
+														0.025,
+														0.025,
+														0.025
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															-0.04,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.2
+																]
+															}
+														],
+														[
+															-0.45,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.2
+																]
+															}
+														],
+														[
+															-0.8,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.28
+																]
+															}
+														]
+													],
+													"radii": [
+														0.025,
+														0.025,
+														0.025
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															-0.85,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.12
+																]
+															}
+														],
+														[
+															-0.8,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.28
+																]
+															}
+														]
+													],
+													"radii": [
+														0.025,
+														0.025
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	1.25
+																]
+															}
+														],
+														[
+															1.95,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.84
+																]
+															}
+														]
+													],
+													"radii": [
+														0.012,
+														0.012
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"levels": [
+													"near"
+												]
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	1.25
+																]
+															}
+														],
+														[
+															-0.82,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "junction"
+																	},
+																	0.21
+																]
+															}
+														]
+													],
+													"radii": [
+														0.012,
+														0.012
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"levels": [
+													"near"
+												]
+											},
+											{
+												"shape": "ellipsoid",
+												"size": [
+													0.3,
+													0.12,
+													0.05
+												],
+												"at": [
+													1.45,
+													0,
+													{
+														"sum": [
+															{
+																"param": "junction"
+															},
+															0.38
+														]
+													}
+												],
+												"axis": [
+													-0.42,
+													0,
+													0.91
+												],
+												"up": [
+													0,
+													1,
+													0
+												],
+												"material": "part_02",
+												"color": "#e3e4dc"
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															-0.05,
+															0,
+															5.0
+														],
+														[
+															-0.45,
+															0,
+															5.25
+														],
+														[
+															-0.75,
+															0,
+															5.6
+														],
+														[
+															-0.82,
+															0,
+															5.75
+														]
+													],
+													"radii": [
+														0.03,
+														0.03,
+														0.03,
+														0.03
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "ball",
+												"size": [
+													0.16
+												],
+												"at": [
+													-0.82,
+													0,
+													5.9
+												],
+												"material": "part_02",
+												"color": "#e3e4dc"
+											},
+											{
+												"shape": "box",
+												"size": [
+													0.08,
+													0.04,
+													0.05
+												],
+												"at": [
+													0.12,
+													0,
+													5.6
+												],
+												"material": "part_03",
+												"color": "#e8e8e2"
+											},
+											{
+												"shape": "cone",
+												"size": [
+													0.05,
+													0.16,
+													0.12
+												],
+												"at": [
+													0.32,
+													0,
+													5.6
+												],
+												"axis": [
+													1,
+													0,
+													0
+												],
+												"material": "part_03",
+												"color": "#e8e8e2"
+											}
+										],
+										"cells": {
+											"near": 0.015,
+											"mid": 0.025,
+											"far": 0.035
+										},
+										"budget": {
+											"near": 6000,
+											"mid": 900,
+											"far": 400
+										}
+									}
+								}
+							},
+							{
+								"name": "den_cau",
+								"only": [
+									{
+										"param": "kind"
+									},
+									"den_cau"
+								],
+								"skill": {
+									"sculpt": {
+										"edits": [
+											{
+												"shape": "cone",
+												"size": [
+													0.14,
+													0.09,
+													0.3
+												],
+												"at": [
+													0,
+													0,
+													0.3
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															0,
+															0.55
+														],
+														[
+															0,
+															0,
+															{
+																"param": "post"
+															}
+														]
+													],
+													"radii": [
+														0.06,
+														0.045
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.075,
+													0.05
+												],
+												"at": [
+													0,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															-0.55
+														]
+													}
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															-0.45,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														],
+														[
+															0.45,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														]
+													],
+													"radii": [
+														0.02,
+														0.02
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															-0.45,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														],
+														[
+															0,
+															0.45,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														]
+													],
+													"radii": [
+														0.02,
+														0.02
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0.04,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.22
+																]
+															}
+														],
+														[
+															0.22,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.2
+																]
+															}
+														],
+														[
+															0.36,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.08
+																]
+															}
+														]
+													],
+													"radii": [
+														0.015,
+														0.015,
+														0.015
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"repeat": {
+													"count": 4
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.03,
+													0.06
+												],
+												"at": [
+													0.45,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															0.02
+														]
+													}
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"repeat": {
+													"count": 4
+												}
+											},
+											{
+												"shape": "ball",
+												"size": [
+													0.19
+												],
+												"at": [
+													0.45,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															0.18
+														]
+													}
+												],
+												"material": "part_02",
+												"color": "#efeee8",
+												"repeat": {
+													"count": 4
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														],
+														[
+															0,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	0.32
+																]
+															}
+														]
+													],
+													"radii": [
+														0.03,
+														0.03
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "ball",
+												"size": [
+													0.19
+												],
+												"at": [
+													0,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															0.51
+														]
+													}
+												],
+												"material": "part_02",
+												"color": "#efeee8"
+											}
+										],
+										"cells": {
+											"near": 0.01,
+											"mid": 0.03,
+											"far": 0.06
+										},
+										"budget": {
+											"near": 6000,
+											"mid": 700,
+											"far": 100
+										}
+									}
+								}
+							},
+							{
+								"name": "den_cau_cot",
+								"only": [
+									{
+										"param": "kind"
+									},
+									"den_cau_cot"
+								],
+								"skill": {
+									"sculpt": {
+										"edits": [
+											{
+												"shape": "cone",
+												"size": [
+													0.31,
+													0.25,
+													0.235
+												],
+												"at": [
+													0,
+													0,
+													0.235
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cone",
+												"size": [
+													0.2,
+													0.18,
+													0.37
+												],
+												"at": [
+													0,
+													0,
+													0.84
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.23,
+													0.04
+												],
+												"at": [
+													0,
+													0,
+													1.24
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cone",
+												"size": [
+													0.15,
+													0.12,
+													0.19
+												],
+												"at": [
+													0,
+													0,
+													1.43
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.21,
+													0.04
+												],
+												"at": [
+													0,
+													0,
+													1.62
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cone",
+												"size": [
+													0.1,
+													0.08,
+													0.24
+												],
+												"at": [
+													0,
+													0,
+													1.86
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.12,
+													0.035
+												],
+												"at": [
+													0,
+													0,
+													2.1
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															0,
+															2.1
+														],
+														[
+															0,
+															0,
+															{
+																"param": "post"
+															}
+														]
+													],
+													"radii": [
+														0.05,
+														0.04
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "box",
+												"size": [
+													0.015,
+													0.1,
+													0.31
+												],
+												"at": [
+													0.07,
+													0,
+													2.52
+												],
+												"material": "part_01",
+												"color": "#d8d8d2"
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.075,
+													0.05
+												],
+												"at": [
+													0,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															-0.55
+														]
+													}
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															-0.45,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														],
+														[
+															0.45,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														]
+													],
+													"radii": [
+														0.02,
+														0.02
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															-0.45,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														],
+														[
+															0,
+															0.45,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														]
+													],
+													"radii": [
+														0.02,
+														0.02
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0.04,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.22
+																]
+															}
+														],
+														[
+															0.22,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.2
+																]
+															}
+														],
+														[
+															0.36,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.08
+																]
+															}
+														]
+													],
+													"radii": [
+														0.015,
+														0.015,
+														0.015
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"repeat": {
+													"count": 4
+												}
+											},
+											{
+												"shape": "cylinder",
+												"size": [
+													0.03,
+													0.06
+												],
+												"at": [
+													0.45,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															0.02
+														]
+													}
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"repeat": {
+													"count": 4
+												}
+											},
+											{
+												"shape": "ball",
+												"size": [
+													0.19
+												],
+												"at": [
+													0.45,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															0.18
+														]
+													}
+												],
+												"material": "part_02",
+												"color": "#efeee8",
+												"repeat": {
+													"count": 4
+												}
+											},
+											{
+												"shape": "tube",
+												"size": {
+													"points": [
+														[
+															0,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	-0.06
+																]
+															}
+														],
+														[
+															0,
+															0,
+															{
+																"sum": [
+																	{
+																		"param": "post"
+																	},
+																	0.32
+																]
+															}
+														]
+													],
+													"radii": [
+														0.03,
+														0.03
+													]
+												},
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "ball",
+												"size": [
+													0.19
+												],
+												"at": [
+													0,
+													0,
+													{
+														"sum": [
+															{
+																"param": "post"
+															},
+															0.51
+														]
+													}
+												],
+												"material": "part_02",
+												"color": "#efeee8"
+											}
+										],
+										"cells": {
+											"near": 0.01,
+											"mid": 0.03,
+											"far": 0.05
+										},
+										"budget": {
+											"near": 6000,
+											"mid": 900,
+											"far": 300
+										}
+									}
+								}
+							},
+							{
+								"name": "vuon_thap",
+								"only": [
+									{
+										"param": "kind"
+									},
+									"vuon_thap"
+								],
+								"skill": {
+									"sculpt": {
+										"edits": [
+											{
+												"shape": "box",
+												"size": [
+													0.17,
+													0.17,
+													0.03
+												],
+												"at": [
+													0,
+													0,
+													0.03
+												],
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												}
+											},
+											{
+												"shape": "box",
+												"size": [
+													0.16,
+													0.16,
+													0.28
+												],
+												"at": [
+													0,
+													0,
+													0.34
+												],
+												"material": "part_02",
+												"color": "#ece8da"
+											},
+											{
+												"mode": "paint",
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"blend": 0.003,
+												"levels": [
+													"near"
+												],
+												"shape": "box",
+												"size": [
+													0.012,
+													0.012,
+													0.28
+												],
+												"at": [
+													0.16,
+													0.16,
+													0.34
+												],
+												"mirror": [
+													"x",
+													"y"
+												]
+											},
+											{
+												"mode": "paint",
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"blend": 0.003,
+												"levels": [
+													"near"
+												],
+												"shape": "box",
+												"size": [
+													0.009,
+													0.17,
+													0.28
+												],
+												"at": [
+													0,
+													0,
+													0.34
+												]
+											},
+											{
+												"mode": "paint",
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"blend": 0.003,
+												"levels": [
+													"near"
+												],
+												"shape": "box",
+												"size": [
+													0.17,
+													0.009,
+													0.28
+												],
+												"at": [
+													0,
+													0,
+													0.34
+												]
+											},
+											{
+												"mode": "paint",
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"blend": 0.003,
+												"levels": [
+													"near"
+												],
+												"shape": "box",
+												"size": [
+													0.17,
+													0.17,
+													0.009
+												],
+												"at": [
+													0,
+													0,
+													0.13
+												]
+											},
+											{
+												"mode": "paint",
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"blend": 0.003,
+												"levels": [
+													"near"
+												],
+												"shape": "box",
+												"size": [
+													0.17,
+													0.17,
+													0.009
+												],
+												"at": [
+													0,
+													0,
+													0.54
+												]
+											},
+											{
+												"mode": "paint",
+												"material": "part_01",
+												"color": {
+													"param": "paint"
+												},
+												"blend": 0.003,
+												"levels": [
+													"near"
+												],
+												"shape": "box",
+												"size": [
+													0.17,
+													0.17,
+													0.008
+												],
+												"at": [
+													0,
+													0,
+													0.615
+												]
+											},
+											{
+												"shape": "box",
+												"size": [
+													0.2,
+													0.2,
+													0.015
+												],
+												"at": [
+													0,
+													0,
+													0.635
+												],
+												"material": "part_03",
+												"color": "#d8d6ce"
+											},
+											{
+												"shape": "pyramid",
+												"size": [
+													0.2,
+													0.2,
+													0.025
+												],
+												"at": [
+													0,
+													0,
+													0.675
+												],
+												"material": "part_03",
+												"color": "#d8d6ce"
+											}
+										],
+										"cells": {
+											"near": 0.01,
+											"mid": 0.04,
+											"far": 0.1
+										},
+										"budget": {
+											"near": 8000,
+											"mid": 300,
+											"far": 40
+										}
+									}
+								}
+							}
+						]
+					}
+				},
+				"options": {
+					"kind": "den_cau_cot",
+					"paint": "#1c564a",
+					"post": 4.1
+				}
+			},
+			"levels": [
+				"near",
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R9 (report 0026, D-0026-31): the lamp posts of the walk of the sea of Hạ Long, in a row along the parapet (the kind globe_cast of data/showcase/bai_truoc.json).",
+			"drawing": "data/world/drawings/den_cot_den_cau_xanh.json",
 			"catalog": null
 		}
 	]

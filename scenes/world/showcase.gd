@@ -957,6 +957,13 @@ func _sea_wall(cfg: Dictionary) -> void:
 	var slope_height := float(_option(slope_id, "height", 3.3))
 	var pillar_length := float(_option(pillar_id, "length", 0.75))
 	var next_pillar := pillar_every / 2.0
+	# Report 0026, D-0026-31: the cast green posts with five globes along the
+	# parapet, on the walk (lamps of data/showcase/bai_truoc.json).
+	var lamps: Dictionary = cfg.get("lamps", {})
+	var lamp_kind := str(lamps.get("kind", ""))
+	var lamp_every := float(lamps.get("every_m", 40.0))
+	var lamp_in := float(lamps.get("in_m", 0.65))
+	var next_lamp := float(lamps.get("first_m", lamp_every / 2.0))
 	# The walk goes from the curb of the road: it covers the sidewalk of the road
 	# on the sea side (report 0026, D-0026-04: a strip of bare ground was between
 	# the road and the walk).
@@ -1072,6 +1079,13 @@ func _sea_wall(cfg: Dictionary) -> void:
 					for n in kinds.size():
 						if float(cut[n + 1]) - float(cut[n]) > 0.02:
 							_wall_piece(kinds[n], p0.lerp(p1, cut[n]), p0.lerp(p1, cut[n + 1]), side0)
+				if lamp_kind != "" and next_lamp < along:
+					var t_lamp := clampf((next_lamp - (along - step)) / maxf(step, 0.001), 0.0, 1.0)
+					var foot := (o0 - side0 * lamp_in).lerp(o1 - side1 * lamp_in, t_lamp)
+					var lamp_along := (o1 - o0)
+					lamp_along.y = 0.0
+					_lamp(lamp_kind, _clear_of_openings(foot), lamp_along.normalized())
+					next_lamp += lamp_every
 				# The face of stone from the walk down to the ground, then over the ground to the sea.
 				var g0 := o0 + side0 * width
 				var g1 := o1 + side1 * width
@@ -2117,7 +2131,8 @@ func _lamp(kind: String, at: Vector3, along: Vector3) -> void:
 	var base := at
 	base.y = maxf(at.y, world.ground_height(at.x, at.z))
 	var model_id := str(cfg.get("model", ""))
-	if model_id != "" and not WorldModel.order(model_id).is_empty():
+	# A model whose files wait for the job "Models of World" keeps its stand-in.
+	if model_id != "" and _has_model(model_id):
 		_world_lamp(kind, model_id, cfg, base, along)
 		return
 	var h := float(cfg.get("height", 8.0))

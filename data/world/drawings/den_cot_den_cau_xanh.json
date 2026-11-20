@@ -1,0 +1,98 @@
+{
+	"id": "den_cot_den_cau_xanh",
+	"what": "đèn cột đèn cầu xanh: the cast green post with five white globes of the walk of Hạ Long",
+	"way": "blueprint",
+	"status": "Source",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026, R9 (report 0026, D-0026-31): the lamp posts of the walk of the sea of Hạ Long, in a row along the parapet (the kind globe_cast of data/showcase/bai_truoc.json).",
+	"order": {
+		"blueprint": {
+			"file": "data/world/blueprints/den_cong_vien.json"
+		},
+		"options": {
+			"kind": "den_cau_cot",
+			"paint": "#1c564a",
+			"post": 4.1
+		}
+	},
+	"sources": [
+		{
+			"url": "https://www.mapillary.com/app/?pKey=1927330624091805",
+			"mapillary": "1927330624091805",
+			"date": "2018-07-29",
+			"license": "CC BY-SA 4.0",
+			"author": "hoangvietanh, Mapillary",
+			"open": true,
+			"file": "mapillary_1927330624091805.jpg",
+			"shows": "The walk of the sea of Hạ Long from the road: a green cast post with five white globes at the parapet, a granite bench at the parapet, the parapet of grey granite with a panel of red brown granite, the paving of the walk (docs/reference/mapillary/detail_1927330624091805.jpg)."
+		},
+		{
+			"url": "https://www.mapillary.com/app/?pKey=605171615183890",
+			"mapillary": "605171615183890",
+			"date": "2024-11-09",
+			"license": "CC BY-SA 4.0",
+			"author": "lyduchuy, Mapillary",
+			"open": true,
+			"file": "mapillary_605171615183890.jpg",
+			"shows": "A 360 image on Quang Trung near Hạ Long: posts with white globes on the median and on the walk of the sea, far and small (docs/reference/mapillary/detail_605171615183890.jpg). The kind of post of photo 0 is there in 2024 (rule 1 needs a photo before 2017 for a value of 2019 from a photo of 2024: photo 0 of 2018 is the source of each size)."
+		}
+	],
+	"sizes": {
+		"scale": {
+			"value": "0.0148 m/px in photo 0",
+			"unit": "",
+			"source": "Photo 0 (1024 px): the granite bench next to the post is 30.5 px from the top of its seat to its foot, and the bench is 0.45 m high (data/world/drawings/ghe_da_cong_vien.json). The foot of the bench is 4 px lower than the foot of the post: the post is a little farther, about 0.0155 m/px."
+		},
+		"height": {
+			"value": 4.8,
+			"unit": "m",
+			"source": "Photo 0: 309 px from the foot of the post to the top of the top globe, at 0.0155 m/px: 4.8 m."
+		},
+		"post": {
+			"value": "the cross of the frame at 4.1 m",
+			"unit": "",
+			"source": "Photo 0: the cross under the side globes is 266 px over the foot: 4.1 m (the option post)."
+		},
+		"globes": {
+			"value": "five globes of 0.38 m: four round the top and one over them",
+			"unit": "",
+			"source": "Photo 0: a globe is 24 px: 0.37 m, the globes of the dark post of the park (0.38 m, den_cot_den_cau): the same frame of five globes."
+		},
+		"foot": {
+			"value": "a plinth 0.62 m wide and 0.47 m high, a fluted body to 1.2 m, rings at 1.24 m, 1.62 m, and 2.1 m, the post above 2.1 m",
+			"unit": "",
+			"source": "Photo 0 (the crop at two times): the plinth is 40 px wide and 30 px high; the body 25 px wide to 74 px; the rings 30 px, 27 px and 15 px wide at 80 px, 105 px and 135 px over the foot; the post 6 px wide (0.09 m)."
+		},
+		"sign": {
+			"value": "a plate 0.2 m wide and 0.62 m high, 2.2 m to 2.8 m over the foot, on the side of the post",
+			"unit": "",
+			"source": "Photo 0: the plate is 12 px wide and 40 px high, 142 px to 182 px over the foot."
+		},
+		"colors": {
+			"value": "the post #1c564a, the globes #efeee8, the plate #d8d8d2",
+			"unit": "",
+			"source": "Photo 0: the median of the foot in the light is #1c564a (28, 86, 74); the post in the light of the sky #35505a. White glass as the post of the park."
+		},
+		"place": {
+			"value": "on the walk at the parapet, about 0.4 m from it",
+			"unit": "",
+			"source": "Photo 0: the foot of the post is at the parapet, a little in front of it; the bench next to it is against the parapet."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "65c9d8782d29df03b8a283b7cce1ff0f",
+			"seen": "Next to photo 0 (2018): the cast foot with its plinth, the fluted body and three rings, the white plate on the side of the post, the slim post, the cross with its curved brackets, and five globes (four round the top, one over them). The proportions are as the post of the photo; the globe is the globe of the dark post of the park.",
+			"changed": "Nothing."
+		}
+	],
+	"hash": "65c9d8782d29df03b8a283b7cce1ff0f",
+	"status_note": "The near level is built by the job \"Models of World\" (the factory answered HTTP 503 for it on 2026-11-20)."
+}

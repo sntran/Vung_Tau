@@ -66,6 +66,11 @@ const FORECOURT_EVERY := 0.5
 const FORECOURT_CURB_M := 0.5
 const FORECOURT_MAX_M := 80.0
 const FORECOURT_INSET := 3.0
+## Report 0026, D-0026-31: the cast green posts with five globes of the walk of
+## Hạ Long (the kind globe_cast): at least one for each WALK_LAMP_EVERY m of the
+## walk, each within WALK_LAMP_NEAR m of the way along the middle of the walk.
+const WALK_LAMP_EVERY := 60.0
+const WALK_LAMP_NEAR := 3.0
 ## Report 0026, D-0026-35: no tree within this of the middle of the walk of the sea (m).
 const WALK_TREE_M := 2.0
 ## The distance of the screenshot of a model in front of it, and the most (m).
@@ -101,6 +106,7 @@ func run(d: PlaytestDriver) -> void:
 	_scan_edges(d, w)
 	_check_wall_lines(d, w)
 	_check_walk_trees(d, w)
+	_check_walk_lamps(d, w)
 	for kind: String in ["median", "sidewalk", "path_border", "wall", "sea_wall", "stand_ins", "lawn_m2", "paving_m2",
 			"planter", "beach_wall", "median_trees", "lamps", "path_lamps"]:
 		d.expect(float(w.showcase.lengths.get(kind, 0.0)) > 0.0, "the showcase has the part %s" % kind)
@@ -543,3 +549,28 @@ func _check_walk_trees(d: PlaytestDriver, w: VungTau) -> void:
 				found.append("a %s at %s" % [tree[1], tree[0]])
 	d.expect(found.is_empty(), "no tree stands on the walk of the sea: %d%s" % [
 			found.size(), "" if found.is_empty() else " (" + "; ".join(found.slice(0, 8)) + ")"])
+
+
+## Report 0026, D-0026-31: the walk of Hạ Long had no lamp (PT-74, runs 5 to 7);
+## the photo of 2018 (Mapillary 1927330624091805) shows a green post with five
+## white globes at the parapet.
+func _check_walk_lamps(d: PlaytestDriver, w: VungTau) -> void:
+	var length := float(w.showcase.lengths.get("sea_walk_along", 0.0))
+	var near := 0
+	var far := PackedStringArray()
+	for lamp: Dictionary in w.showcase.lamps:
+		if str(lamp.get("kind", "")) != "globe_cast":
+			continue
+		var at: Vector3 = lamp.at
+		var best := INF
+		for i in w.showcase.sea_walk.size():
+			if w.showcase.sea_walk_on[i] == 1:
+				var q: Vector3 = w.showcase.sea_walk[i]
+				best = minf(best, Vector2(q.x - at.x, q.z - at.z).length())
+		if best <= WALK_LAMP_NEAR:
+			near += 1
+		else:
+			far.append("(%.1f, %.1f) %.1f m" % [at.x, at.z, best])
+	var least := floori(length / WALK_LAMP_EVERY)
+	d.expect(near >= least and far.is_empty(), "the walk of Hạ Long (%.0f m) has at least %d cast posts with five globes along it: %d%s" % [
+			length, least, near, "" if far.is_empty() else "; away from the walk: " + ", ".join(far)])
