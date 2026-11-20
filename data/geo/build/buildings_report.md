@@ -125,58 +125,58 @@ The difference is the height of the 2.5D data minus the height of the check (m).
 | 3D-GloBFP | 31467 | -4.84 | -3.70 | 8.42 | a building of 3D-GloBFP in an outline (46561 in the box) |
 | GHS-BUILT-H | 3598 | +5.32 | +3.95 | 8.33 | for each cell of 90 m: the mean of the 2.5D heights, weighted by area, against AGBH |
 | building:levels of OpenStreetMap | 40 | +5.75 | +1.65 | 17.46 | 40 buildings; the check is 3.3 m a storey |
-| ATL03 roof photons | 1396 | +2.06 | +1.27 | 6.62 | 35812 photons over 1944 outlines; the median of at least 3 photons over the median of the ground photons of the same pass within 40 m |
+| ATL03 roof photons | 2027 | +1.96 | +1.22 | 6.37 | 52510 photons over 2817 outlines; the median of at least 3 photons over the median of the ground photons of the same pass within 40 m |
 
 The median 2.5D height for each number of storeys of OpenStreetMap: 1: 7.3 m (2), 2: 10.0 m (5), 3: 11.0 m (13), 4: 11.5 m (4), 5: 16.8 m (5), 9: 23.1 m (2), 10: 44.0 m (1), 16: 76.0 m (1), 21: 64.2 m (1), 25: 78.0 m (3), 26: 86.8 m (3).
 
-## outlines (2026-11-19 23:51 UTC)
+## outlines (2026-11-20 01:37 UTC)
 
 - the release of Overture Maps: 2026-11-18.0
 - 56359 outlines; by source: {'Microsoft ML Buildings': 33087, 'Google Open Buildings': 21084, 'OpenStreetMap': 2188}
 
 
-## temporal (2026-11-19 23:51 UTC)
+## temporal (2026-11-20 01:37 UTC)
 
 - 1174 manifests in the bucket; 16 of EPSG:32648: ['31_EPSG_32648_2016_06_30.json', '31_EPSG_32648_2017_06_30.json', '31_EPSG_32648_2018_06_30.json', '31_EPSG_32648_2019_06_30.json', '31_EPSG_32648_2020_06_30.json', '31_EPSG_32648_2021_06_30.json', '31_EPSG_32648_2022_06_30.json', '31_EPSG_32648_2023_06_30.json', '37_EPSG_32648_2016_06_30.json', '37_EPSG_32648_2017_06_30.json', '37_EPSG_32648_2018_06_30.json', '37_EPSG_32648_2019_06_30.json', '37_EPSG_32648_2020_06_30.json', '37_EPSG_32648_2021_06_30.json', '37_EPSG_32648_2022_06_30.json', '37_EPSG_32648_2023_06_30.json']
 - the tiles of the play area: 2016: 4, 2017: 4, 2018: 4, 2019: 4, 2020: 4, 2021: 4, 2022: 4, 2023: 4
 - 56357 outlines in EPSG:32648
 - 2016: the outlines move -3.5 m down and +2.5 m right on the raster (at that shift 67 % of the pixels of the outlines near the middle have a building)
-- 2016: 4 tiles, 212 blocks with buildings, 43653 outlines with a building (47 s)
+- 2016: 4 tiles, 212 blocks with buildings, 43653 outlines with a building (50 s)
 - 2017: the outlines move +1.5 m down and +1.5 m right on the raster (at that shift 67 % of the pixels of the outlines near the middle have a building)
-- 2017: 4 tiles, 214 blocks with buildings, 44761 outlines with a building (95 s)
+- 2017: 4 tiles, 214 blocks with buildings, 44761 outlines with a building (96 s)
 - 2018: the outlines move +2.0 m down and +3.5 m right on the raster (at that shift 69 % of the pixels of the outlines near the middle have a building)
-- 2018: 4 tiles, 214 blocks with buildings, 45530 outlines with a building (139 s)
+- 2018: 4 tiles, 214 blocks with buildings, 45530 outlines with a building (144 s)
 - 2019: the outlines move +3.0 m down and +1.5 m right on the raster (at that shift 69 % of the pixels of the outlines near the middle have a building)
-- 2019: 4 tiles, 213 blocks with buildings, 46323 outlines with a building (189 s)
+- 2019: 4 tiles, 213 blocks with buildings, 46323 outlines with a building (190 s)
 - 2020: the outlines move +3.5 m down and +1.0 m right on the raster (at that shift 70 % of the pixels of the outlines near the middle have a building)
-- 2020: 4 tiles, 214 blocks with buildings, 46908 outlines with a building (242 s)
+- 2020: 4 tiles, 214 blocks with buildings, 46908 outlines with a building (236 s)
 - 2021: the outlines move +3.0 m down and +2.5 m right on the raster (at that shift 69 % of the pixels of the outlines near the middle have a building)
-- 2021: 4 tiles, 213 blocks with buildings, 47796 outlines with a building (291 s)
+- 2021: 4 tiles, 213 blocks with buildings, 47796 outlines with a building (283 s)
 - 2022: the outlines move -1.0 m down and -1.5 m right on the raster (at that shift 68 % of the pixels of the outlines near the middle have a building)
-- 2022: 4 tiles, 214 blocks with buildings, 48155 outlines with a building (334 s)
+- 2022: 4 tiles, 214 blocks with buildings, 48155 outlines with a building (331 s)
 - 2023: the outlines move -1.0 m down and -0.5 m right on the raster (at that shift 71 % of the pixels of the outlines near the middle have a building)
 - 2023: 4 tiles, 213 blocks with buildings, 48426 outlines with a building (380 s)
 - 52569 outlines with a building in a year; the map of 2019 of the buildings with no outline: 130632 cells of 5 m more than half building
 
 
-## osm2019 (2026-11-19 23:58 UTC)
+## osm2019 (2026-11-20 01:44 UTC)
 
 - 1119 versions from the ohsome API, 1119 valid on 2019-01-22
 - 1119 buildings of OpenStreetMap on 2019-01-22, 0 with building=construction
 - 2 buildings of OpenStreetMap on 2026-07-26 with a start_date
 
 
-## checks (2026-11-19 23:59 UTC)
+## checks (2026-11-20 01:45 UTC)
 
 - 3D-GloBFP grid 2108: 46561 buildings in the box; the columns ['Height', 'geometry']; the height Height
 - GHS-BUILT-H: a window of 96 × 144 cells, 4861 with a height
 
 
-## build (2026-11-20 01:09 UTC)
+## build (2026-11-20 01:56 UTC)
 
 - 51112 buildings of 2019, 5247 out (the first year is after 2019); the first years: 2016: 35956, 2017: 3468, 2018: 2156, 2019: 1628, None: 7904
 - the heights: median 6.0 m, 90 % under 10.0 m, the highest 90.0 m
 - D-0009-04: 130632 cells of 5 m more than half building with no outline; 2714 groups of at least 4 cells at least 3 m from an outline: 39419 cells, 0.985 km²; the largest groups [356, 329, 212, 206, 192] cells
 - R5d: 165 buildings of OpenStreetMap on 2019-01-22 not in the 2.5D data of 2019; 1094 outlines of OpenStreetMap of today in the 2.5D data of 2019 and not in OpenStreetMap on 2019-01-22; 1 buildings with a start_date after 2019
-- the checks of the heights: 3D-GloBFP 31467; GHS-BUILT-H 3598; building:levels of OpenStreetMap 40; ATL03 roof photons 1396
+- the checks of the heights: 3D-GloBFP 31467; GHS-BUILT-H 3598; building:levels of OpenStreetMap 40; ATL03 roof photons 2027
 

@@ -17,36 +17,25 @@ Made by `tools/geo/lidar.py`. Do not change by hand.
 - seed gedi02a a36c84e: 2019 188
 - seed gedi02a 7d32458: 2019 384, 2021 74, 2022 23, 2023 416, 2024 72, 2025 153
 
-## lidar fetch (2026-11-19 23:59 UTC)
+## lidar fetch (2026-11-20 01:45 UTC)
 
-- sliderule 5.8.1, 2018-10-14T00:00:00Z to 2026-11-19T00:00:00Z
-- atl08 2018: 4654 rows (it had None)
-- atl08 2021: 2464 rows (it had None)
-- atl08 2025: 9774 rows (it had None)
-- atl08 2026: 4919 rows (it had None)
+- sliderule 5.8.1, 2018-10-14T00:00:00Z to 2026-11-20T00:00:00Z
+- atl08 2026: 4919 rows (it had 4919)
 - atl03_ground 2026: 95798 rows (it had 95798)
-- atl03_roof 2018: 5662 rows (it had None)
-- atl03_roof 2019: 5679 rows (it had None)
-- atl03_roof 2020: 2244 rows (it had None)
-- atl03_roof 2021: atl03x: ValueError: no frame
-- atl03_roof 2021: None rows; the file of the last good run stays (None rows)
-- atl03_roof 2022: atl03x: ValueError: no frame
-- atl03_roof 2022: None rows; the file of the last good run stays (None rows)
-- atl03_roof 2023: atl03x: ValueError: no frame
-- atl03_roof 2023: None rows; the file of the last good run stays (None rows)
-- atl03_roof 2024: 6515 rows (it had None)
-- atl03_roof 2025: 9318 rows (it had None)
-- atl03_roof 2026: 11909 rows (it had None)
-- atl24 2026: 2500 rows (it had None)
+- atl03_roof 2021: 2090 rows (it had None)
+- atl03_roof 2022: 8474 rows (it had None)
+- atl03_roof 2023: 8543 rows (it had None)
+- atl03_roof 2026: 11909 rows (it had 11909)
+- atl24 2026: 2500 rows (it had 2500)
 - gedi02a 2018: 0 rows; the file of the last good run stays (None rows)
 - gedi02a 2020: 0 rows; the file of the last good run stays (None rows)
 - gedi02a 2026: 0 rows; the file of the last good run stays (None rows)
 
-## lidar tracks (2026-11-20 01:08 UTC)
+## lidar tracks (2026-11-20 01:56 UTC)
 
-- the short form: 43772 bins of 20 m from 937982 photons (2193 KB, data/geo/build/lidar_tracks.json)
+- the short form: 44185 bins of 20 m from 957089 photons (2215 KB, data/geo/build/lidar_tracks.json)
 
-## lidar report (2026-11-20 01:09 UTC)
+## lidar report (2026-11-20 01:56 UTC)
 
 
 ## The points in the store (the head of the branch)
@@ -55,7 +44,7 @@ Made by `tools/geo/lidar.py`. Do not change by hand.
 |---|---|---|---|---|---|---|---|---|---|---|
 | atl08 | 4654 | 5627 | 3 | 2464 | 1139 | 2202 | 2851 | 9774 | 4919 | 33633 |
 | atl03_ground | 98228 | 168384 | 48543 | 41168 | 108229 | 119835 | 68270 | 148200 | 95798 | 896655 |
-| atl03_roof | 5662 | 5679 | 2244 | – | – | – | 6515 | 9318 | 11909 | 41327 |
+| atl03_roof | 5662 | 5679 | 2244 | 2090 | 8474 | 8543 | 6515 | 9318 | 11909 | 60434 |
 | atl24 | 8505 | 6270 | 3551 | 3309 | 1407 | 2568 | 3634 | 3685 | 2500 | 35429 |
 | gedi02a | – | 384 | – | 74 | 23 | 416 | 72 | 153 | – | 1122 |
 
