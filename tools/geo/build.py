@@ -793,11 +793,13 @@ def level_world_places(grid, folder, roads=(), walk_cells=None) -> None:
             # model into it); outside it, the level only fills the lower ground.
             keep = terrain.rasterize(grid, [r.buffer(ROAD_KEEP_M) for r in road_lines]) if road_lines else np.zeros_like(core_masks[i])
             level_masks[i] = (core_masks[i] & ~keep) | (level_masks[i] & (grid.heights <= levels[i]))
-    # A model with a forecourt does not change the sidewalk of its street:
-    # its forecourt goes to the edge of the sidewalk (report 0026, D-0026-13).
+    # A model does not change the sidewalks: its forecourt goes to the edge of
+    # the sidewalk of its street (report 0026, D-0026-13), and its level sides
+    # stop at the sidewalk of a side way (D-0026-36: the curb west of the hall
+    # with the orange roof was a step of 8 m).
     if walk_cells is not None:
         for i, place in enumerate(places):
-            if float(place.get("forecourt_m", 0.0)) > 0.0:
+            if float(place.get("forecourt_m", 0.0)) > 0.0 or float(place.get("level_sides_m", 0.0)) > 0.0:
                 level_masks[i] &= ~walk_cells
     all_level = np.logical_or.reduce(level_masks)
     before = grid.heights.copy()

@@ -102,6 +102,25 @@
 			"rule1": true
 		},
 		{
+			"id": "d25_wall_from_quang_trung",
+			"for": [
+				"D-0026-25"
+			],
+			"about": "The low wall of the beach at the eye of S1 (way 458829436), seen from Quang Trung and the park: the images up to 120 m from it whose camera points at it (report 0026, section 9.5, question 3: the walk of the sea has no image at the points d25_wall_*).",
+			"at": [
+				-5.3,
+				-99.9
+			],
+			"target": [
+				-5.3,
+				-99.9
+			],
+			"radius_m": 120,
+			"look": "toward",
+			"max": 12,
+			"rule1": true
+		},
+		{
 			"id": "d25_wall_middle_north",
 			"for": [
 				"D-0026-25",
@@ -250,7 +269,7 @@
 			"for": [
 				"R19"
 			],
-			"about": "Quang Trung and the park in the weeks before Tết: the flags, the banners, the kumquat and the mai for sale.",
+			"about": "Quang Trung and the park in the weeks before Tết: the flags, the banners, the kumquat and the mai for sale. Report 0026, section 9.5: the weeks before Tết of 2024 to 2026 are for the kinds of things (rule 1); counts from them are Check.",
 			"at": [
 				30.0,
 				-40.0
@@ -274,6 +293,18 @@
 				[
 					"2021-01-22",
 					"2021-02-12"
+				],
+				[
+					"2024-01-20",
+					"2024-02-10"
+				],
+				[
+					"2025-01-08",
+					"2025-01-29"
+				],
+				[
+					"2026-01-27",
+					"2026-02-17"
 				]
 			]
 		},
@@ -282,14 +313,14 @@
 			"for": [
 				"R19"
 			],
-			"about": "Hạ Long and the streets near Khách sạn Bưu điện in the weeks before Tết.",
+			"about": "Hạ Long and the streets near Khách sạn Bưu điện in the weeks before Tết. Report 0026, section 9.5: the weeks before Tết of 2024 to 2026 are for the kinds of things (rule 1); counts from them are Check.",
 			"at": [
 				60.0,
 				280.0
 			],
 			"radius_m": 250,
 			"look": "any",
-			"max": 24,
+			"max": 36,
 			"dates": [
 				[
 					"2018-01-26",
@@ -306,6 +337,18 @@
 				[
 					"2021-01-22",
 					"2021-02-12"
+				],
+				[
+					"2024-01-20",
+					"2024-02-10"
+				],
+				[
+					"2025-01-08",
+					"2025-01-29"
+				],
+				[
+					"2026-01-27",
+					"2026-02-17"
 				]
 			]
 		}

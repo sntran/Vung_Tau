@@ -66,6 +66,13 @@ const FORECOURT_EVERY := 0.5
 const FORECOURT_CURB_M := 0.5
 const FORECOURT_MAX_M := 80.0
 const FORECOURT_INSET := 3.0
+## Report 0026, D-0026-36: the ground SIDE_FROM_M to SIDE_TO_M past each side
+## of the box of a model of World (not one against a hill, "keep_higher") is at
+## most SIDE_RISE m over its base: the hall with the orange roof stood in a pit.
+const SIDE_FROM_M := 3.0
+const SIDE_TO_M := 5.0
+const SIDE_RISE := 1.0
+const SIDE_FRONT_M := 3.0
 ## Report 0026, D-0026-31: the cast green posts with five globes of the walk of
 ## Hạ Long (the kind globe_cast): at least one for each WALK_LAMP_EVERY m of the
 ## walk, each within WALK_LAMP_NEAR m of the way along the middle of the walk.
@@ -156,6 +163,7 @@ func run(d: PlaytestDriver) -> void:
 		# forecourt into the cells next to it (Hải Âu, D-0026-13).
 		var inner := [t * Vector3(box.position.x + FORECOURT_INSET, 0, 0), t * Vector3(box.end.x - FORECOURT_INSET, 0, 0)]
 		_check_forecourt(d, w, entry.id, place, facing, [middle] + inner)
+		_check_sides(d, w, entry, place)
 	for i in models.size():
 		for j in range(i + 1, models.size()):
 			var common := 0.0
@@ -574,3 +582,28 @@ func _check_walk_lamps(d: PlaytestDriver, w: VungTau) -> void:
 	var least := floori(length / WALK_LAMP_EVERY)
 	d.expect(near >= least and far.is_empty(), "the walk of Hạ Long (%.0f m) has at least %d cast posts with five globes along it: %d%s" % [
 			length, least, near, "" if far.is_empty() else "; away from the walk: " + ", ".join(far)])
+
+
+## Report 0026, D-0026-36: no model of World in a pit (a bank on each side).
+func _check_sides(d: PlaytestDriver, w: VungTau, entry: Dictionary, place: Dictionary) -> void:
+	if bool(place.get("keep_higher", false)) or not place.has("box"):
+		return
+	var t: Transform3D = entry.model.transform
+	var box: Array = place.box
+	var base := float(entry.base)
+	var rises: Array[float] = []
+	for side in [-1.0, 1.0]:
+		var x := (float(box[1]) if side > 0.0 else float(box[0]))
+		var worst := -INF
+		for out in [SIDE_FROM_M, (SIDE_FROM_M + SIDE_TO_M) / 2.0, SIDE_TO_M]:
+			for k in 5:
+				# Not the last SIDE_FRONT_M before the front: there the ground is the
+				# street, which can fall along the front (Quang Trung at Cảng vụ).
+				var z := lerpf(float(box[2]), minf(float(box[3]), 0.0) - SIDE_FRONT_M, k / 4.0)
+				var p := t * Vector3(x + side * out, 0.0, z)
+				worst = maxf(worst, w.ground_height(p.x, p.z) - base)
+		rises.append(worst)
+	d.step("%s: the ground %.0f m to %.0f m past its sides rises %.2f m and %.2f m over its base" % [
+			entry.id, SIDE_FROM_M, SIDE_TO_M, rises[0], rises[1]])
+	d.expect(minf(rises[0], rises[1]) <= SIDE_RISE, "%s is not in a pit: the ground %.0f m to %.0f m past its sides rises %.2f m and %.2f m over its base (at most %.1f m on one side at least)" % [
+			entry.id, SIDE_FROM_M, SIDE_TO_M, rises[0], rises[1], SIDE_RISE])

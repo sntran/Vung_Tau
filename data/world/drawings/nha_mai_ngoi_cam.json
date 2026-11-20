@@ -1233,7 +1233,7 @@
 								},
 								"bake": {
 									"near": 512,
-									"mid": 128
+									"mid": 512
 								},
 								"dirt": 0.2
 							}
@@ -1396,7 +1396,7 @@
 								},
 								"bake": {
 									"near": 512,
-									"mid": 128
+									"mid": 512
 								}
 							}
 						}
@@ -1528,8 +1528,14 @@
 			"hash": "982237071acf94af8a5d3dc0238f869f",
 			"seen": "Next to the photos: a square hall of cream walls on a red brown plinth, five brown arched windows on each side (photo 1, 2021), two windows on each side of the porch on the front (photo 3, 2014), the porch with its white pediment over the eaves (photos 2 and 4), and the steep pyramid roof of orange tiles with light hips and fascia (photos 0 to 2). The proportions agree with photos 0 and 2. The roof is a little lighter than the tiles in the sun of photo 3, because of the light of the views.",
 			"changed": "Nothing at the mid level. I kept this order. Its near level (cells of 0.04 m and 0.05 m, maps of 512) and three lighter orders for the near level (cells of 0.08 m to 0.2 m, maps of 256 and 512) stopped the builder of the factory (HTTP 503: more memory than the edge has), so I could not look at the near level. It needs a build with more memory (for example mix world.order in CI)."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "",
+			"seen": "Report 0026, D-0026-36: on Low the mid level shows from 0 m (D6), and its maps of 128 texels made the windows of the hall blurred at 25 m (PT-71).",
+			"changed": "The maps of the mid level: 512 texels (were 128). The job \"Models of World\" builds the order."
 		}
 	],
-	"hash": "982237071acf94af8a5d3dc0238f869f",
 	"status_note": "Source (report 0026, Q17, rule 2): photo 2 (2020-06-06) shows the hall from across Hạ Long (the pyramid roof with its light hips, the white pediment of the porch, the fence with blue posts; trees hide the walls of the front), and photo 1 (2021-01-30) shows the roof, the porch and two sides from a drone. The sizes come from the photos of 2014 (photos 0, 3 and 4) and of 2020 and 2021. The plinth, the hips, the depth of the porch and the sill of the arched windows are estimates (no source). The near level is not built: the factory stopped at each order of the near level (HTTP 503), so it needs a build with more memory (the job \"Models of World\")."
 }
