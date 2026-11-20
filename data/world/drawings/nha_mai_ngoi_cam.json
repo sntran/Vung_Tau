@@ -1232,7 +1232,7 @@
 									"far": 150
 								},
 								"bake": {
-									"near": 512,
+									"near": 1024,
 									"mid": 512
 								},
 								"dirt": 0.2
@@ -1395,7 +1395,7 @@
 									"far": 60
 								},
 								"bake": {
-									"near": 512,
+									"near": 1024,
 									"mid": 512
 								}
 							}
@@ -1542,6 +1542,13 @@
 			"hash": "",
 			"seen": "Report 0026, D-0026-40: in S1 the roof of this level was a pale peach and near it was salmon pink: the color of the tiles in the sun (#c66c3e) was the albedo, and the light of the game made it near white. With the albedo #7f2d18 the roof in S1 has the hue and the saturation of the photo of S1 (PT-72, the box \"roof\").",
 			"changed": "The color of the pyramid of the roof: #7f2d18 (was #c66c3e), at each level."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "near",
+			"hash": "",
+			"seen": "The job \"Models of World\" at World e8754d6 stopped on this order: the bake of the near level (12 000 triangles of the hall and 6 000 of its roof in a map of 512 texels) had no room for the charts of the triangles (World.Sculpt.Bake: :small). World 1984a6f built it.",
+			"changed": "The maps of the near level: 1 024 texels (were 512). On Low the game does not load the near level of a building (WorldModel.levels_shown())."
 		}
 	],
 	"status_note": "Source (report 0026, Q17, rule 2): photo 2 (2020-06-06) shows the hall from across Hạ Long (the pyramid roof with its light hips, the white pediment of the porch, the fence with blue posts; trees hide the walls of the front), and photo 1 (2021-01-30) shows the roof, the porch and two sides from a drone. The sizes come from the photos of 2014 (photos 0, 3 and 4) and of 2020 and 2021. The plinth, the hips, the depth of the porch and the sill of the arched windows are estimates (no source). The near level is not built: the factory stopped at each order of the near level (HTTP 503), so it needs a build with more memory (the job \"Models of World\")."
