@@ -86,6 +86,14 @@ const VIEW_MAX_M := 80.0
 ## The eye of a screenshot stays this far out of the box of each model (m):
 ## at 1 m the view of Cao ốc Sen Biển was the wall of the hall in front of it.
 const VIEW_CLEAR_M := 6.0
+## Report 0026, D-0026-41: the place covers at least VIEW_MIN_COVER of the frame
+## of its view, and no other model covers more of the frame than the place (the
+## view of Cao ốc Sen Biển was the roof and the wall of the hall in front of it).
+## A pixel of a model is a pixel that changes by more than COVER_DIFFERENCE in a
+## channel when the model is hidden. A place can give the distance of its view
+## from a photo ("view_m" in data/world/places/).
+const VIEW_MIN_COVER := 0.2
+const COVER_DIFFERENCE := 0.04
 
 
 func run(d: PlaytestDriver) -> void:
@@ -181,18 +189,85 @@ func run(d: PlaytestDriver) -> void:
 		var middle := t * Vector3(float(data[entry.id].get("front_middle_x", 0.0)), 0, 0)
 		var out := t.basis * Vector3.BACK
 		var away := VIEW_M
+		if data[entry.id].has("view_m"):
+			away = float(data[entry.id].view_m)
+			d.step("the view of %s is %.0f m in front of it: %s" % [entry.id, away, data[entry.id].get("view_source", "?")])
 		while away < VIEW_MAX_M and _in_a_box(models, data, middle + out * away, VIEW_CLEAR_M):
 			away += 1.0
-		var eye := middle + out * away
-		if away > VIEW_M:
+		var side := t.basis * Vector3.RIGHT * float(data[entry.id].get("view_side_m", 0.0))
+		var eye := middle + out * away + side
+		if away > VIEW_M and not data[entry.id].has("view_m"):
 			d.step("the view of %s is %.0f m in front of it: nearer, the eye is in the box of another model or less than %.0f m from it" % [entry.id, away, VIEW_CLEAR_M])
 		eye.y = w.ground_height(eye.x, eye.z) + Player.EYE_HEIGHT
-		await d.fly_to(eye, middle + Vector3(0, 6.0, 0))
+		# A view from the side looks square to the front, past the model in front of the place.
+		await d.fly_to(eye, middle + side + Vector3(0, float(data[entry.id].get("view_target_m", 6.0)), 0))
 		await d.wait_ground(60.0)
 		await d.wait_frames(6)
 		await d.screenshot(str(entry.id))
 		d.expect_not_flat("the view of %s from its street" % entry.id)
+		await _check_cover(d, entry, models)
 	d.fly_end()
+
+
+## Report 0026, D-0026-41: the part of the frame of each model in the view (the
+## pixels that change when it is hidden). The place covers at least
+## VIEW_MIN_COVER, and no other model covers more than the place.
+func _check_cover(d: PlaytestDriver, entry: Dictionary, models: Array[Dictionary]) -> void:
+	var camera := d.viewport().get_camera_3d()
+	var parts := {}
+	for other: Dictionary in models:
+		var node: Node3D = other.model
+		if other != entry and not _in_frame(camera, node):
+			continue
+		parts[other.id] = await _cover_of(d, node)
+	var place: float = parts.get(entry.id, 0.0)
+	var largest := ""
+	for id: String in parts:
+		if id != entry.id and (largest == "" or float(parts[id]) > float(parts[largest])):
+			largest = id
+	d.step("the view of %s: it covers %.0f %% of the frame%s" % [entry.id, place * 100.0,
+			"" if largest == "" else ", the largest other model %s %.0f %%" % [largest, float(parts[largest]) * 100.0]])
+	d.expect(place >= VIEW_MIN_COVER, "the view of %s shows it: %.0f %% of the frame (at least %.0f %%)" % [
+			entry.id, place * 100.0, VIEW_MIN_COVER * 100.0])
+	if largest != "":
+		d.expect(float(parts[largest]) <= place, "the view of %s shows it more than another model: %s covers %.0f %% of the frame, the place %.0f %%" % [
+				entry.id, largest, float(parts[largest]) * 100.0, place * 100.0])
+
+
+## The part of the frame where the pixels change when the node is hidden.
+func _cover_of(d: PlaytestDriver, node: Node3D) -> float:
+	var shown := d.viewport().get_texture().get_image()
+	node.visible = false
+	await d.wait_frames(3)
+	var hidden := d.viewport().get_texture().get_image()
+	node.visible = true
+	await d.wait_frames(3)
+	var changed := 0
+	var total := 0
+	for y in range(0, shown.get_height(), 4):
+		for x in range(0, shown.get_width(), 4):
+			var a := shown.get_pixel(x, y)
+			var b := hidden.get_pixel(x, y)
+			total += 1
+			if absf(a.r - b.r) > COVER_DIFFERENCE or absf(a.g - b.g) > COVER_DIFFERENCE or absf(a.b - b.b) > COVER_DIFFERENCE:
+				changed += 1
+	return float(changed) / maxf(float(total), 1.0)
+
+
+## True if a corner or the middle of the bounds of the node is in the frame.
+static func _in_frame(camera: Camera3D, node: Node3D) -> bool:
+	var box := AABB(node.global_position - Vector3(5, 0, 5), Vector3(10, 10, 10))
+	for child in node.find_children("*", "VisualInstance3D", true, false):
+		var v := child as VisualInstance3D
+		if v.is_visible_in_tree():
+			box = box.merge(v.global_transform * v.get_aabb())
+	var points: Array[Vector3] = [box.get_center()]
+	for i in 8:
+		points.append(box.get_endpoint(i))
+	for p: Vector3 in points:
+		if not camera.is_position_behind(p) and camera.is_position_in_frustum(p):
+			return true
+	return false
 
 
 ## D-0026-22: from each point of the front, out along the facing of the model
