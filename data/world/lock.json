@@ -128,33 +128,43 @@
 			}
 		},
 		"den_cot_den_cau": {
-			"hash": "cc53ae441bcba8b7abdc0863fa233e39",
+			"hash": "003e759e217df9d1d6f27b7d498fd0d9",
 			"files": {
 				"den_cot_den_cau.far.glb": "5851174b1856935b6115f115fef8ef736027f22abf115310ebd8cf54e8b10776",
 				"den_cot_den_cau.glb": "5d9575187ec06c49fc7dd8726719d9fdcfb00609c50c3c5d3a1b91967b064023",
 				"den_cot_den_cau.mid.glb": "fe5eb88a282ed636e2a92ceb8c41bc7bf79e7bc8154047b9cbf7bd4245622241",
 				"den_cot_den_cau.parts.json": "d4aee1eb8b8f5c394b2d548a84d21b5dd998c13917497a4ceb527b61c3a93384",
-				"den_cot_den_cau.receipt.json": "fc803e3604fc5e7fa6b311358d82cbb8593025e242ba2eb6d8d12c518436bf6b"
+				"den_cot_den_cau.receipt.json": "51556350b5d2c2309f021691e481a1eeefd670f00456c4604a05b9dcba0790d5"
+			}
+		},
+		"den_cot_den_cau_xanh": {
+			"hash": "65c9d8782d29df03b8a283b7cce1ff0f",
+			"files": {
+				"den_cot_den_cau_xanh.far.glb": "2384cd63cdb1d6aaf513373d8c43e686f188a7f876a6fbf28573564f045213b4",
+				"den_cot_den_cau_xanh.glb": "e1f46e7a3455743a49918018fa1d3b42061ff27be6af40d4c59816584bfa32b9",
+				"den_cot_den_cau_xanh.mid.glb": "f02024f549beef445fbccc92caf746fcdaa2f38f4b21c976eb08f1406d7f2005",
+				"den_cot_den_cau_xanh.parts.json": "a33e08db5e3168ac8e9bff7258970e5ba9e5dcfa7d8724390d90acb4e8965025",
+				"den_cot_den_cau_xanh.receipt.json": "6605b92fad49ecf7f305fdee199a6fd9f616dbda65eaccefaaea75a0fd3b3297"
 			}
 		},
 		"den_cot_xanh_hai_tay": {
-			"hash": "814bd0d7cecf40a57dc39d8a90db6806",
+			"hash": "68f42079e1d1650be5c836a0258e619c",
 			"files": {
 				"den_cot_xanh_hai_tay.far.glb": "a6abee1dc8b1ca0bc98ba60b8692273261e64200bddd1c0dfccf43298eb48f05",
 				"den_cot_xanh_hai_tay.glb": "1a3ce5d51ad533275c347620304cb05d565b5b54fde4c2504d9b454fe1949da2",
 				"den_cot_xanh_hai_tay.mid.glb": "479f7242718ad9ef3f696551e93631aefd919899876aaf885ecc43dbf3ce09be",
 				"den_cot_xanh_hai_tay.parts.json": "fa71cec209c188aa5db11598dd545c86d228f6acf844654a8d4164ae64022bea",
-				"den_cot_xanh_hai_tay.receipt.json": "47d591e726dcc3b695fc978fdbca5112e24d56f40a948a3de8267f280724e476"
+				"den_cot_xanh_hai_tay.receipt.json": "462118a9762aa11a13e0d8cae541700ec32f52735b9037dbd7d1f945d0af2048"
 			}
 		},
 		"den_vuon_thap": {
-			"hash": "b65fc0fb5b844ae3fd1d76c317933d66",
+			"hash": "a1cd7a3162a1bf05872379fefacba6a3",
 			"files": {
 				"den_vuon_thap.far.glb": "f87e70e7468188b4197478112b6114ce29ff05d7d2457eccee68a783f42659e8",
 				"den_vuon_thap.glb": "5c70cafa3f09c77296c557c84c26aefbcbcfbf02e03066d2fc21db2c2da6bcf0",
 				"den_vuon_thap.mid.glb": "0dc9c9c9d340c3888baaf1ccbe48d5d2da8d016fa5dd0d5b374a8e14725a0480",
 				"den_vuon_thap.parts.json": "153dde0c34033921deff18d850745ea5c6ce20741266d189a9e6f79a601a6faa",
-				"den_vuon_thap.receipt.json": "a302f9bbe588bea5b909d082694594b908d289bd763074cc124f360b15798162"
+				"den_vuon_thap.receipt.json": "729683db0f2cbbad6b3cb41eecc6a9c4d322fad373b9615f8cfb6fc7c8c5a761"
 			}
 		},
 		"ghe_da_cong_vien": {
