@@ -235,3 +235,20 @@ func test_a_part_of_a_building_keeps_the_material_of_the_glb() -> void:
 	var material := library.material_for("part_03", source)
 	assert_same(material, source, "the game uses the material of the GLB as it is")
 	assert_almost_eq((material as StandardMaterial3D).roughness, 0.42, 0.001)
+
+
+# Report 0026, Q24: on Low a building of the showcase has no near level (plan
+# 0026, D6), and its file is not loaded (its pictures took about 800 MB of
+# video memory). A change to High loads the near level.
+func test_a_level_that_the_preset_does_not_show_loads_only_when_a_preset_shows_it() -> void:
+	var ranges := {"low": Vector3(0.0, 300.0, 1500.0), "high": Vector3(80.0, 500.0, 2000.0)}
+	WorldModel.set_ranges("low")
+	assert_eq(WorldModel.levels_shown("khach_san_hai_au", ranges), ["mid", "far"] as Array[String])
+	var model := WorldModel.make("khach_san_hai_au", WorldMaterials.DEFAULT_PAINT, "", ranges)
+	add_child_autofree(model)
+	assert_null(model.level("near"), "Low: no near level")
+	assert_not_null(model.level("mid"))
+	WorldModel.set_ranges("high")
+	assert_not_null(model.level("near"), "High: the near level loads")
+	assert_true(model.level("near").visible)
+	WorldModel.set_ranges("low")

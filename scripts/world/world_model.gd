@@ -126,10 +126,23 @@ static func release_dropped() -> void:
 		_dropped.erase(path)
 
 
+## The levels of a model that the preset shows, with the ranges of its place
+## (report 0026, Q24: on Low a building has no near level, plan 0026, D6, and
+## the file of the near level is not loaded: its pictures took video memory).
+static func levels_shown(model_id: String, model_ranges := {}) -> Array[String]:
+	var result: Array[String] = []
+	var r: Vector3 = model_ranges.get(preset, ranges)
+	for level: String in levels_of(model_id):
+		if level == "near" and r.x <= 0.0:
+			continue
+		result.append(level)
+	return result
+
+
 ## Starts the load of the files of the levels of a model in other threads, so
 ## that make() does not wait for them (report 0026, D-0026-12).
-static func request(model_id: String) -> void:
-	for level: String in levels_of(model_id):
+static func request(model_id: String, model_ranges := {}) -> void:
+	for level: String in levels_shown(model_id, model_ranges):
 		var path: String = ROOT + model_id + SUFFIX[level]
 		if _scenes.has(model_id + "/" + level) or _requested.has(path):
 			continue
@@ -138,8 +151,8 @@ static func request(model_id: String) -> void:
 
 
 ## True when no file of a level of the model is still in the load of request().
-static func is_loaded(model_id: String) -> bool:
-	for level: String in levels_of(model_id):
+static func is_loaded(model_id: String, model_ranges := {}) -> bool:
+	for level: String in levels_shown(model_id, model_ranges):
 		var path: String = ROOT + model_id + SUFFIX[level]
 		if _requested.has(path) and ResourceLoader.load_threaded_get_status(path) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
 			return false
@@ -147,7 +160,7 @@ static func is_loaded(model_id: String) -> bool:
 
 
 ## A model of World, or null with an error.
-static func make(model_id: String, model_paint := WorldMaterials.DEFAULT_PAINT, set_name := "") -> WorldModel:
+static func make(model_id: String, model_paint := WorldMaterials.DEFAULT_PAINT, set_name := "", model_ranges := {}) -> WorldModel:
 	if order(model_id).is_empty():
 		push_error("WorldModel: \"%s\" is not in %s." % [model_id, ORDERS])
 		return null
@@ -156,6 +169,7 @@ static func make(model_id: String, model_paint := WorldMaterials.DEFAULT_PAINT, 
 	model.name = model_id
 	model.paint = model_paint
 	model.material_set = set_name
+	model.custom_ranges = model_ranges
 	if not model._build():
 		model.free()
 		return null
@@ -176,24 +190,32 @@ static func set_ranges(preset_name: String, tree: SceneTree = null) -> void:
 
 
 func _build() -> bool:
-	for level: String in levels_of(id):
-		var packed := scene(id, level)
-		if packed == null:
-			push_error("WorldModel: the model \"%s\" has no file %s." % [id, ROOT + id + SUFFIX[level]])
+	for level: String in levels_shown(id, custom_ranges):
+		if not _add_level(level):
 			return false
-		var node := packed.instantiate() as Node3D
-		node.name = level
-		add_child(node)
-		_levels[level] = node
-		# R7: the model stands on y = 0. A mid or far level of World can be
-		# a little higher or lower (the soles of the shoes of a person are
-		# 1 to 2 cm higher at the mid level): the level moves to the ground.
-		node.position.y = -_lowest_of(level, node)
-		if not _apply_materials(node, level):
-			return false
-		_collect_joints(node, level)
 	add_to_group(GROUP)
 	apply_ranges()
+	return true
+
+
+func _add_level(level: String) -> bool:
+	var packed := scene(id, level)
+	if packed == null:
+		push_error("WorldModel: the model \"%s\" has no file %s." % [id, ROOT + id + SUFFIX[level]])
+		return false
+	var node := packed.instantiate() as Node3D
+	node.name = level
+	add_child(node)
+	if level == "near" and get_child_count() > 1:
+		move_child(node, 0)
+	_levels[level] = node
+	# R7: the model stands on y = 0. A mid or far level of World can be
+	# a little higher or lower (the soles of the shoes of a person are
+	# 1 to 2 cm higher at the mid level): the level moves to the ground.
+	node.position.y = -_lowest_of(level, node)
+	if not _apply_materials(node, level):
+		return false
+	_collect_joints(node, level)
 	return true
 
 
@@ -299,7 +321,12 @@ func apply_ranges() -> void:
 		if i < used.size() - 1:
 			end = r.x if level == "near" else r.y
 		var node: Node3D = _levels.get(level)
+		if node == null and end > begin and is_inside_tree():
+			# A preset that shows a level that the model did not load (Q24).
+			if _add_level(level):
+				node = _levels.get(level)
 		if node == null:
+			begin = maxf(begin, end) if end > begin else begin
 			continue
 		# An end of 0 is no end in Godot: a level with no range does not show.
 		node.visible = end > begin

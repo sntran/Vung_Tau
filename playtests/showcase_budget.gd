@@ -17,6 +17,8 @@ const SHOTS := "res://data/showcase/shots.json"
 ## The eye and the aim of a shot, as PT-72 takes it.
 const Shots := preload("res://playtests/showcase_shots.gd")
 const LIMITS := {"low": [600, 300000], "high": [2000, 2000000]}
+## Report 0026, Q24 (R16): the video memory of each shot on Low, at most (MB).
+const MEMORY_LIMITS := {"low": 1024.0}
 ## Report 0026, D-0026-38: the worst case puts each walker of a spot this far in front of the eye (m).
 const HELD_NEAR_M := ShowcasePeople.HELD_NEAR_M
 const HELD_FAR_M := ShowcasePeople.HELD_FAR_M
@@ -53,6 +55,7 @@ func run(d: PlaytestDriver) -> void:
 		d.step("%s, %s: %d draw calls, %d triangles (%d people)" % [preset, shot.id, draw_calls, triangles, people])
 		d.expect(draw_calls <= int(limit[0]), "%s, %s: at most %d draw calls: %d" % [preset, shot.id, limit[0], draw_calls])
 		d.expect(triangles <= int(limit[1]), "%s, %s: at most %d triangles: %d" % [preset, shot.id, limit[1], triangles])
+		_check_memory(d, preset, "%s" % shot.id)
 		await d.screenshot("%s_%s" % [shot.id, preset])
 		# D-0026-28: the worst case of the walkers of the spots of the shot: each
 		# at the point of its way nearest to the eye.
@@ -77,7 +80,20 @@ func run(d: PlaytestDriver) -> void:
 					preset, shot.id, held, draw_calls, triangles])
 			d.expect(draw_calls <= int(limit[0]), "%s, %s, the walkers near: at most %d draw calls: %d" % [preset, shot.id, limit[0], draw_calls])
 			d.expect(triangles <= int(limit[1]), "%s, %s, the walkers near: at most %d triangles: %d" % [preset, shot.id, limit[1], triangles])
+			_check_memory(d, preset, "%s, the walkers near" % shot.id)
 			await d.screenshot("%s_%s_walkers_near" % [shot.id, preset])
 			w.showcase.people.release_walkers()
 		camera.fov = fov
 	d.fly_end()
+
+
+## Report 0026, Q24: Low (the phones, the web build, and a computer with no
+## graphics card share the memory with the processor) uses at most 1 024 MB of
+## video memory at each shot, also in the worst case.
+static func _check_memory(d: PlaytestDriver, preset: String, what: String) -> void:
+	var used := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_VIDEO_MEM_USED) / 1048576.0
+	var textures := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TEXTURE_MEM_USED) / 1048576.0
+	d.step("%s, %s: %.0f MB of video memory (%.0f MB textures)" % [preset, what, used, textures])
+	if MEMORY_LIMITS.has(preset):
+		d.expect(used <= float(MEMORY_LIMITS[preset]), "%s, %s: at most %.0f MB of video memory: %.0f MB" % [
+				preset, what, MEMORY_LIMITS[preset], used])

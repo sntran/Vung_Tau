@@ -165,6 +165,8 @@ var _minutes := -1
 var _bounds := Rect2()
 ## The ids of the models of World at their places, and the state of the load of their files.
 var _place_ids: Array[String] = []
+## The ranges of the models of World of the places, for each preset (D6).
+var _place_ranges := {}
 var _requested := false
 ## True in build_all(): a step does not wait for the files of a model.
 var _forced := false
@@ -244,7 +246,7 @@ func build_some(budget_ms: float) -> void:
 	if not _requested:
 		_requested = true
 		for id: String in _place_ids:
-			WorldModel.request(id)
+			WorldModel.request(id, _place_ranges)
 	var end := Time.get_ticks_msec() + budget_ms
 	while not _steps.is_empty():
 		_waiting = false
@@ -1380,6 +1382,7 @@ func _place_steps(path: String) -> void:
 	for preset: String in parsed.get("ranges", {}):
 		var r: Array = parsed.ranges[preset]
 		ranges[preset] = Vector3(float(r[0]), float(r[1]), float(r[2]))
+	_place_ranges = ranges
 	for place: Dictionary in parsed.get("places", []):
 		# A model with the status Check (data/world/drawings/) has its place, but
 		# no order in data/world/orders.json: it waits, and its stand-in stays.
@@ -1392,13 +1395,14 @@ func _place_steps(path: String) -> void:
 ## One model of World at its place: one step of the build, because the load
 ## of a large model takes some time.
 func _place(place: Dictionary, ranges: Dictionary) -> void:
-	if not _forced and not WorldModel.is_loaded(str(place.id)):
+	if not _forced and not WorldModel.is_loaded(str(place.id), ranges):
 		_waiting = true
 		return
-	var model := WorldModel.make(str(place.id))
+	# Report 0026, Q24: with the ranges of the place, a level that the preset
+	# does not show (the near level on Low, D6) is not loaded.
+	var model := WorldModel.make(str(place.id), WorldMaterials.DEFAULT_PAINT, "", ranges)
 	if model == null:
 		return
-	model.custom_ranges = ranges
 	var facing := Vector2(float(place.facing[0]), float(place.facing[1])).normalized()
 	var front := Vector3(float(place.front[0]), 0.0, float(place.front[1]))
 	var basis := Basis(Vector3.UP, atan2(facing.x, facing.y))
