@@ -7,6 +7,7 @@ from the workspace (plan 0009, D9).
     python tools/geo/lidar.py seed COMMIT ...   # the files of earlier runs in Git history to the store
     python tools/geo/lidar.py tracks            # the short form: each 20 m of a track (Git)
     python tools/geo/lidar.py report            # the report and the map of the sea floor (R5c)
+    python tools/geo/lidar.py mdt               # R5c: the mean sea level over EGM2008 at Bãi Trước (D-0009-07)
 
 The products: ATL08 (segments), ATL03 with the classes of ATL08 (the ground
 photons, and the photons of the classes canopy, top of canopy, and no class
@@ -35,6 +36,14 @@ the reports, the map, and the short form (data/geo/build/lidar_tracks.json).
 R5c: the report compares the sea floor of ATL24 with the heights of the
 intertidal zone and of GEBCO (data/geo/raw/intertidal.tif, gebco.tif), with a
 map. The build does not change the sea floor.
+
+D-0009-07: ATL24 is over EGM2008, and the intertidal heights are over the
+mean sea level. mdt() gives the mean sea level over EGM2008 at the points of
+ATL24 of that comparison from two models: DTU22MDT (the mean dynamic
+topography of DTU), and the mean sea surface DTU21MSS minus the geoid
+EGM2008 (from the two heights of the photons of ATL03 near each point).
+The command runs in the workspace and in CI (ftp.space.dtu.dk); it writes
+data/geo/raw/lidar/mdt.md.
 """
 
 from __future__ import annotations
@@ -462,9 +471,110 @@ def report(lines: list[str]) -> None:
         lines.append(f"- the map: {error}")
 
 
+DTU_MDT = "https://ftp.space.dtu.dk/pub/DTU22/MDT/dtu22mdt.grd.gz"
+DTU_MDT_ERR = "https://ftp.space.dtu.dk/pub/DTU22/MDT/dtu22mdterr.grd.gz"
+DTU_MSS = "https://ftp.space.dtu.dk/pub/DTU21/1_MIN/DTU21MSS_1min_WGS84.nc.zip"
+# The parts of the comparison (west, south, east, north): Bãi Trước and the bay in front of it, and Bãi Sau.
+MDT_PARTS = {"Bãi Trước": (107.040, 10.315, 107.085, 10.360), "Bãi Sau": (107.085, 10.320, 107.130, 10.420)}
+
+
+def download(url: str) -> Path:
+    """A file of DTU in build/geodata/cache/ (it downloads one time)."""
+    import urllib.request
+    path = geostore.CACHE / url.rsplit("/", 1)[1]
+    if not path.exists():
+        geostore.CACHE.mkdir(parents=True, exist_ok=True)
+        request = urllib.request.Request(url, headers={"User-Agent": geostore.AGENT})
+        with urllib.request.urlopen(request, timeout=900) as response, open(path.with_suffix(".part"), "wb") as out:
+            while chunk := response.read(1 << 20):
+                out.write(chunk)
+        path.with_suffix(".part").rename(path)
+    return path
+
+
+def gravsoft(path: Path):
+    """A grid in the GRAVSOFT text form of DTU (gzip): the header is south, north,
+    west, east, the step of the latitude, the step of the longitude; the rows go
+    from north to south. Returns a function (lon, lat) -> value (bilinear)."""
+    import gzip
+    import numpy as np
+    values = np.array(gzip.decompress(path.read_bytes()).split(), dtype=float)
+    south, north, west, east, dlat, dlon = values[:6]
+    rows, cols = int(round((north - south) / dlat)) + 1, int(round((east - west) / dlon)) + 1
+    grid = values[6:6 + rows * cols].reshape(rows, cols)
+
+    def at(lon, lat):
+        y = (north - np.asarray(lat)) / dlat
+        x = (np.asarray(lon) % 360.0 - west) / dlon
+        y0, x0 = np.floor(y).astype(int), np.floor(x).astype(int)
+        fy, fx = y - y0, x - x0
+        return (grid[y0, x0] * (1 - fx) * (1 - fy) + grid[y0, x0 + 1] * fx * (1 - fy)
+                + grid[y0 + 1, x0] * (1 - fx) * fy + grid[y0 + 1, x0 + 1] * fx * fy)
+    return at
+
+
+def mdt(lines: list[str]) -> None:
+    """D-0009-07: the mean sea level over EGM2008 at the points of ATL24 of R5c."""
+    import zipfile
+    import numpy as np
+    import rasterio
+    from rasterio.warp import transform
+    from scipy.spatial import cKDTree
+    manifest = geostore.load(MANIFEST)
+    points = [p for k in sorted(manifest["files"]) if k.startswith("atl24/") for p in geostore.get(manifest, k)["points"]]
+    lon = np.array([p[0] for p in points])
+    lat = np.array([p[1] for p in points])
+    depth = np.array([p[4] if p[5] is None else p[5] for p in points], dtype=float)
+    with rasterio.open(ROOT / "data" / "geo" / "raw" / "intertidal.tif") as src:
+        xs, ys = transform("EPSG:4326", src.crs, list(lon), list(lat))
+        tidal = np.array([v[0] for v in src.sample(zip(xs, ys))], dtype=float)
+        ok = np.isfinite(tidal) & (tidal != (src.nodata if src.nodata is not None else -9999))
+    lon, lat, diff = lon[ok], lat[ok], (depth - tidal)[ok]
+    parts = {name: (lon >= w) & (lon <= e) & (lat >= s) & (lat <= n) for name, (w, s, e, n) in MDT_PARTS.items()}
+    parts["the other points"] = ~np.logical_or.reduce(list(parts.values()))
+    parts["all of R5c"] = np.ones_like(lon, dtype=bool)
+    model = gravsoft(download(DTU_MDT))(lon, lat)
+    error = gravsoft(download(DTU_MDT_ERR))(lon, lat)
+    # DTU21MSS (over the WGS 84 ellipsoid) minus EGM2008: the geoid from the photons of ATL03.
+    archive = download(DTU_MSS)
+    nc = archive.with_suffix("")
+    if not nc.exists():
+        with zipfile.ZipFile(archive) as z:
+            nc.write_bytes(z.read(nc.name))
+    with rasterio.open(f'netcdf:"{nc}":mean_sea_surf_sol2') as src:
+        rows, cols = rasterio.transform.rowcol(src.transform, lon % 360.0, lat)
+        window = rasterio.windows.Window(min(cols), min(rows), max(cols) - min(cols) + 1, max(rows) - min(rows) + 1)
+        block = src.read(1, window=window).astype(float) * float(src.scales[0] or 1.0)
+        mss = block[np.array(rows) - min(rows), np.array(cols) - min(cols)]
+    ground = [(p[0], p[1], p[3] - p[4]) for k in sorted(manifest["files"]) if k.startswith("atl03_ground/")
+              for p in geostore.get(manifest, k)["points"] if p[3] is not None and p[4] is not None]
+    g = np.array(ground)
+    _, near = cKDTree(g[:, :2]).query(np.c_[lon, lat], k=30)
+    geoid = g[near, 2].mean(axis=1)
+    msl = mss - geoid
+    lines += ["## D-0009-07: the mean sea level over EGM2008 (R5c)", "",
+              "ATL24 is over EGM2008 and the intertidal heights are over the mean sea level, so ATL24 minus the "
+              "intertidal height is the mean sea level over EGM2008 if both sources are correct.", "",
+              "| Points | ATL24 minus intertidal (m) | DTU22MDT (m) | Error of DTU22MDT (m) | DTU21MSS minus EGM2008 (m) | "
+              "Rest: ATL24 minus intertidal minus DTU22MDT (m) |", "|---|---|---|---|---|---|"]
+    for name, mask in parts.items():
+        if mask.any():
+            lines.append(f"| {name}: {int(mask.sum())} | {diff[mask].mean():.2f} (median {np.median(diff[mask]):.2f}) | "
+                         f"{model[mask].mean():.2f} | {error[mask].mean():.2f} | {msl[mask].mean():.2f} | "
+                         f"{(diff[mask] - model[mask]).mean():.2f} |")
+    lines += ["", "- The parts (west, south, east, north): " + "; ".join(f"{k} {v}" for k, v in MDT_PARTS.items()) + ".",
+              "- DTU22MDT: Knudsen and others (DTU Space), " + DTU_MDT + "; DTU21MSS: " + DTU_MSS + ".",
+              "- The geoid EGM2008 at each point: the mean of height minus height_egm2008 of the 30 nearest ground "
+              "photons of ATL03 (the PROJ grid of the fetch).",
+              "- DTU21MSS is a mean of 1993 to 2012 and has the mean-tide system; EGM2008 and ATL24 have the "
+              "tide-free system. At 10° N the two systems of the geoid differ by about (1 + 0.3) × (9.9 − 29.6 "
+              "sin² 10°) cm = 0.12 m. The sea level of the South China Sea goes up about 4 mm each year, so the "
+              "mean of 2018 to 2025 is about 0.06 m over the mean of 1993 to 2012."]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", choices=["fetch", "seed", "tracks", "report"])
+    parser.add_argument("command", choices=["fetch", "seed", "tracks", "report", "mdt"])
     parser.add_argument("commits", nargs="*")
     parser.add_argument("--allow-fewer", action="store_true", help="a product may have fewer points than before")
     parser.add_argument("--refetch", action="store_true", help="ask for all the years again")
@@ -478,6 +588,8 @@ def main() -> int:
             errors = seed(lines, args.commits)
         elif args.command == "tracks":
             tracks(lines)
+        elif args.command == "mdt":
+            mdt(lines)
         else:
             report(lines)
     except Exception as error:  # noqa: BLE001 - the report says what failed
@@ -486,7 +598,7 @@ def main() -> int:
         errors.append(str(error))
     RAW.mkdir(parents=True, exist_ok=True)
     (RAW / f"{args.command}.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    parts = [(RAW / f"{c}.md").read_text(encoding="utf-8") for c in ("seed", "fetch", "tracks", "report")
+    parts = [(RAW / f"{c}.md").read_text(encoding="utf-8") for c in ("seed", "fetch", "tracks", "report", "mdt")
              if (RAW / f"{c}.md").exists()]
     REPORT.write_text("# The lidar points of the play area (plan 0009, R5a and R5c)\n\nMade by `tools/geo/lidar.py`. Do not change by hand.\n\n"
                       + "\n".join(parts), encoding="utf-8")

@@ -119,3 +119,15 @@ def test_the_short_form_bins_each_beam_along_its_track():
     assert sorted({b["x"] for b in bins}) == [0.0, 90.0]
     roofed = [b for b in bins if b["roof_count"]]
     assert len(roofed) == 1 and roofed[0]["roof"] == 17.0 and roofed[0]["ground_count"] > 0
+
+
+def test_the_grid_of_dtu_is_read_from_north_to_south(tmp_path):
+    import gzip
+    # south 10, north 11, west 107, east 108, steps 0.5: three rows (11, 10.5, 10) of three values.
+    text = "10 11 107 108 0.5 0.5\n" + "1 2 3\n4 5 6\n7 8 9\n"
+    path = tmp_path / "grid.grd.gz"
+    path.write_bytes(gzip.compress(text.encode()))
+    at = lidar.gravsoft(path)
+    assert at(107.0, 11.0) == pytest.approx(1.0)
+    assert at(108.0 - 1e-9, 10.0 + 1e-9) == pytest.approx(9.0, abs=1e-6)
+    assert at(107.25, 10.75) == pytest.approx(3.0)
