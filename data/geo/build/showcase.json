@@ -120,8 +120,9 @@
 		}
 	],
 	"areas": {
-		"lawn_m2": 24083,
-		"paving_m2": 5464
+		"lawn_m2": 24004,
+		"paving_m2": 6402,
+		"bed_m2": 267
 	},
 	"ground": {
 		"file": "showcase_ground.png",

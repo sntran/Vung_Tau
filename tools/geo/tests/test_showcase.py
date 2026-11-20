@@ -52,6 +52,38 @@ def test_the_lawn_is_the_park_less_the_paths_the_paving_and_the_fountain():
     assert result["areas"]["lawn_m2"] < 40 * 40
 
 
+def test_the_areas_drawn_on_a_photo_add_a_lawn_and_a_bed_but_not_on_the_beach_or_a_path():
+    # Report 0026, D-0026-30: the south end of the park was bare where the
+    # photo from a drone shows a bed of soil, because OSM has no area there.
+    config = dict(CONFIG, not_lawn=[["amenity", "fountain"], ["natural", "beach"]], drawn=[
+        {"kind": "lawn", "outline": [[-30, -45], [45, -45], [45, -42], [-30, -42]]},
+        {"kind": "bed", "outline": [[-30, -49], [45, -49], [45, -46], [-30, -46]]},
+        {"kind": "paving", "outline": [[22, -20], [28, -20], [28, -10], [22, -10]]},
+    ])
+    outline = box(-50, -50, 50, 50)
+    path = SimpleNamespace(type="footway", width=2.0, points=np.array([[20.0, 0.0], [20.0, 50.0]]))
+    before = showcase.make(CONFIG, _areas(), [path], [], outline)
+    result = showcase.make(config, _areas(), [path], [], outline)
+    step = result["step"]
+
+    def at(r, x, y):
+        col = int((x - r["x0"]) / step)
+        row = int((-r["z0"] - y) / step)
+        if not (0 <= row < r["mask"].shape[0] and 0 <= col < r["mask"].shape[1]):
+            return (0, 0, 0, 0)
+        return r["mask"][row, col]
+
+    # Game z -43 is map y 43: north of the park of OSM.
+    assert tuple(at(before, 10, 43)[:3]) == (0, 0, 0), "nothing there before"
+    assert at(result, 10, 43)[0] == 255, "the drawn lawn"
+    assert at(result, 10, 47)[2] == 255 and at(result, 10, 47)[0] == 0, "the drawn bed, with no lawn"
+    assert at(result, -20, 43)[0] == 0 and at(result, -20, 47)[2] == 0, "nothing on the beach"
+    assert at(result, 20, 43)[0] == 0 and at(result, 20, 47)[2] == 0, "nothing on the path"
+    assert result["areas"]["lawn_m2"] > before["areas"]["lawn_m2"]
+    assert result["areas"]["bed_m2"] > 100
+    assert at(result, 25, 15)[1] == 255 and at(result, 25, 15)[0] == 0, "the drawn paving, with no lawn"
+
+
 def test_the_raised_lawns_and_the_wall_along_the_beach():
     result = showcase.make(CONFIG, _areas(), [], [], box(-50, -50, 50, 50))
     assert [p["osm"] for p in result["planters"]] == ["way/4"]
@@ -176,3 +208,28 @@ def test_the_footways_of_a_park_are_paved():
     road = SimpleNamespace(id=4, type="residential", points=np.array([[5.0, 10.0], [35.0, 10.0]]))
     assert build.paved_paths([inside, half_out, outside, road], [park]) == {1}
     assert build.paved_paths([inside], []) == set()
+
+
+def test_the_build_has_each_area_drawn_on_a_photo():
+    # Report 0026, D-0026-30: each area of the part "drawn" of the showcase is
+    # in the mask of the build (data/geo/build/showcase_ground.png) with its
+    # kind, less its paths: else the game shows the bare ground there.
+    import json
+    from pathlib import Path
+
+    from PIL import Image
+    from shapely import contains_xy
+
+    root = Path(__file__).resolve().parents[3]
+    config = json.loads((root / "data/showcase/bai_truoc.json").read_text(encoding="utf-8"))["ground"]
+    meta = json.loads((root / "data/geo/build/showcase.json").read_text(encoding="utf-8"))["ground"]
+    mask = np.asarray(Image.open(root / "data/geo/build" / meta["file"]).convert("RGBA"))
+    channel = {"lawn": 0, "paving": 1, "bed": 2}
+    for item in config.get("drawn", []):
+        area = Polygon(item["outline"])  # game (x, z)
+        rows, cols = np.mgrid[0:mask.shape[0], 0:mask.shape[1]]
+        x = meta["x0"] + (cols + 0.5) * meta["step"]
+        z = meta["z0"] + (rows + 0.5) * meta["step"]
+        inside = contains_xy(area, x, z)
+        share = float((mask[..., channel[item["kind"]]][inside] >= 128).mean()) if inside.any() else 0.0
+        assert share >= 0.6, f"{item['id']}: {share:.0%} of its cells are {item['kind']} in the build"

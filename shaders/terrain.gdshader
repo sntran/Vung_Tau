@@ -112,13 +112,16 @@ uniform vec3 wood_color : source_color = vec3(0.2, 0.32, 0.13);
 // Bà was almost black before (D-0005-05).
 uniform vec3 rock_color : source_color = vec3(0.34, 0.31, 0.28);
 // The ground of the showcase of Bãi Trước (plan 0026, R3, R4): a fine mask of
-// the lawns (R) and the paving (G) of OpenStreetMap (data/geo/build/showcase_ground.png).
+// the lawns (R) and the paving (G) of OpenStreetMap, and the beds of soil
+// that a photo shows (B; report 0026, D-0026-30) (data/geo/build/showcase_ground.png).
 uniform sampler2D detail_mask : filter_linear, repeat_disable;
 uniform vec2 detail_origin = vec2(0.0);
 uniform vec2 detail_size = vec2(1.0);
 uniform float detail_on = 0.0;
 // A park lawn: watered, so it is green in the dry season too.
 uniform vec3 lawn_color : source_color = vec3(0.2, 0.31, 0.1);
+// A bed of brown soil with a few low plants (the photo from a drone of 2021).
+uniform vec3 bed_color : source_color = vec3(0.3, 0.22, 0.15);
 uniform vec3 paving_color : source_color = vec3(0.66, 0.64, 0.6);
 uniform vec3 paving_color_b : source_color = vec3(0.56, 0.55, 0.53);
 // The side of a tile (m).
@@ -315,6 +318,12 @@ void fragment() {
 	vec3 lawn = lawn_color * grass_detail * far_shade;
 	lawn = mix(lawn, dry_color * far_shade, dry * 0.25);
 	color = mix(color, lawn, detail.r);
+	// The bed: soil in clods of about 0.3 m, with low plants in a third of it.
+	float clods = value_noise(world_position.xz * 3.3) * 0.6 + value_noise(world_position.xz * 9.0) * 0.4;
+	float plants = smoothstep(0.55, 0.75, value_noise(world_position.xz * 1.7 + vec2(13.0, 7.0)));
+	vec3 bed = bed_color * mix(0.8, 1.15, clods);
+	bed = mix(bed, lawn_color * grass_detail * 0.85, plants * 0.6) * far_shade;
+	color = mix(color, bed, detail.b);
 	// Square tiles in two tones with dark joints. From far, the pattern fades
 	// to its mean color (no moire).
 	vec2 tile_uv = world_position.xz / paving_tile;

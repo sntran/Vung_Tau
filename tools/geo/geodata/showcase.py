@@ -4,7 +4,8 @@ From the areas of OpenStreetMap that the "ground" part of
 data/showcase/bai_truoc.json names, this module makes:
 
 - a fine mask of the ground (cells of cell_m): R the lawns, G the paving of the
-  squares and of the walk of the sea. The lawns are the park and the grass
+  squares and of the walk of the sea, B the beds of soil with low plants that
+  a photo shows (the part "drawn", report 0026, D-0026-30). The lawns are the park and the grass
   areas, less the roads and the paths, the paved areas, the water, the beach,
   the parking areas, and the buildings.
 - the raised lawns (the strips of lawn in low granite borders on the walk of
@@ -104,7 +105,24 @@ def make(config: dict, areas: list[tuple[str, dict, object]], roads, buildings: 
     lawn_ids = _ids(config.get("lawns", []))
     paving_ids = _ids(config.get("paving", []))
     lawn = unary_union(shapes(lawn_ids)).intersection(outline) if lawn_ids else Polygon()
+    # The areas that a photo shows and OSM does not have (report 0026,
+    # D-0026-30): outlines in game (x, z), drawn on a photo with the ways of
+    # OSM as the reference. A "lawn" adds to the lawns, a "paving" to the
+    # paving; a "bed" (soil with low plants in a low border) is the channel B
+    # of the mask. The roads, the
+    # paths, the paving, and the areas of not_lawn come off them as off the
+    # lawns of OSM.
+    drawn: dict[str, list] = {"lawn": [], "paving": [], "bed": []}
+    for item in config.get("drawn", []):
+        if len(item.get("outline", [])) >= 3:
+            drawn.setdefault(item.get("kind", "lawn"), []).append(
+                Polygon([(float(x), -float(z)) for x, z in item["outline"]]))
+    if drawn["lawn"]:
+        lawn = unary_union([lawn] + drawn["lawn"]).intersection(outline)
+    bed = unary_union(drawn["bed"]).intersection(outline) if drawn["bed"] else Polygon()
     paving = unary_union(shapes(paving_ids)).intersection(outline) if paving_ids else Polygon()
+    if drawn.get("paving"):
+        paving = unary_union([paving] + drawn["paving"]).intersection(outline)
     # The paths and the walk of the sea (the lines of OSM) are paving too: the
     # game draws them as roads, and the mask keeps the lawn off them.
     margin = float(config.get("road_margin_m", 0.3))
@@ -124,6 +142,8 @@ def make(config: dict, areas: list[tuple[str, dict, object]], roads, buildings: 
     near = outline.buffer(50.0)
     not_lawn = [g for g in not_lawn if g.intersects(near)] + [b for b in buildings if b.intersects(near)]
     lawn = lawn.difference(unary_union(road_shapes + path_shapes + not_lawn + [paving]))
+    bed = bed.difference(unary_union(road_shapes + path_shapes + not_lawn + [paving]))
+    lawn = lawn.difference(bed)
     paving = paving.difference(unary_union(road_shapes))
 
     # The raised lawns: the grass areas of the walk of the sea.
@@ -150,9 +170,9 @@ def make(config: dict, areas: list[tuple[str, dict, object]], roads, buildings: 
                     if line.length >= min_length:
                         walls.append({"osm": osm, "points": _game_line(line)})
 
-    # The mask: its box is the box of the lawns and the paving, and a margin of two cells.
+    # The mask: its box is the box of the lawns, the paving, and the beds, and a margin of two cells.
     step = float(config.get("cell_m", 0.5))
-    both = unary_union([lawn, paving])
+    both = unary_union([lawn, paving, bed])
     if both.is_empty:
         return {"mask": None, "planters": planters, "walls": walls, "problems": problems}
     x_min, y_min, x_max, y_max = both.bounds
@@ -176,11 +196,11 @@ def make(config: dict, areas: list[tuple[str, dict, object]], roads, buildings: 
         share = cells.reshape(rows, FINE, columns, FINE).mean(axis=(1, 3))
         return np.round(share * 255).astype(np.uint8)
 
-    mask = np.dstack([channel(lawn), channel(paving), np.zeros((rows, columns), np.uint8),
+    mask = np.dstack([channel(lawn), channel(paving), channel(bed),
                       np.full((rows, columns), 255, np.uint8)])
     return {"mask": mask, "x0": float(x0), "z0": float(-top), "step": step, "columns": columns, "rows": rows,
             "planters": planters, "walls": walls, "problems": problems,
-            "areas": {"lawn_m2": round(lawn.area), "paving_m2": round(paving.area)}}
+            "areas": {"lawn_m2": round(lawn.area), "paving_m2": round(paving.area), "bed_m2": round(bed.area)}}
 
 
 # Report 0026, D-0026-11: the ground under and beside the parts of the showcase

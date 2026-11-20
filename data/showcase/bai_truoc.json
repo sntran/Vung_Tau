@@ -306,6 +306,162 @@
 			"way/234797330",
 			"way/220821624"
 		],
+		"drawn": [
+			{
+				"id": "south_end_square",
+				"kind": "paving",
+				"outline": [
+					[
+						-6.0,
+						113.0
+					],
+					[
+						-6.0,
+						190.0
+					],
+					[
+						-1.0,
+						190.0
+					],
+					[
+						3.5,
+						176.0
+					],
+					[
+						5.5,
+						165.0
+					],
+					[
+						7.0,
+						150.0
+					],
+					[
+						10.0,
+						113.0
+					]
+				],
+				"photo": "drone_2021_park.jpg",
+				"photo_points": [
+					[
+						1142.7,
+						561.5
+					],
+					[
+						803.4,
+						644.9
+					],
+					[
+						823.4,
+						643.8
+					],
+					[
+						913.5,
+						633.8
+					],
+					[
+						974.8,
+						625.0
+					],
+					[
+						1049.1,
+						612.9
+					],
+					[
+						1211.2,
+						575.6
+					]
+				],
+				"camera": {
+					"eye": [
+						200.4,
+						82.3,
+						344.8
+					],
+					"heading": -132.19,
+					"pitch": -14.02,
+					"roll": -0.01,
+					"hfov": 57.23
+				},
+				"how": "Report 0026, D-0026-30: the square of the five Norfolk pines at the south end of the park. In the photo, its paving goes to the parapet over the water. In the build, the paving of OSM stops 3 m to 10 m before the shore, and a strip of lawn and the bare ground of the town (a slope of sand down to the sea) were between them (PT-74, run 4, 550 m). The outline: from the paving of OSM to 1 m to 6 m past the shore of the build, from z 113 to the path along the low wall (way 458829438) at z 190. The photo: the photo from a drone of 2021-01-30 over the south end of the park (Tuong Lam Photos, CC BY-SA 4.0; a photo of 2017 to 2021 is a source for 2019). The camera: near the place of the camera file (10.340510 N, 107.075639 E; 25 m from it), with the heading, the pitch, the height, and the field of view that put three points of OSM on the photo (the east end of the median of Hạ Long, the south end of way 458829438 at the walk, and the end of way 118946676 at way 458829438) and the horizon of the sea at 90 px; with it the edges of the lawns and the paving of the build fall on their edges in the photo to about 2 m to 5 m. The outline is on the ways of OSM and the shore of the build (where the ground of the build goes under 0.5 m); the photo points are the outline through the camera. The photo does not give the places: a point of the photo on an edge over the water (a parapet) goes down past it to the sea floor. tools/showcase/lawn_sheet.py puts the outline on the photo and on the map (docs/showcase/south_end_lawns.jpg)."
+			},
+			{
+				"id": "south_end_bed",
+				"kind": "bed",
+				"outline": [
+					[
+						-11.0,
+						198.0
+					],
+					[
+						-3.6,
+						198.0
+					],
+					[
+						-3.6,
+						209.0
+					],
+					[
+						1.0,
+						215.5
+					],
+					[
+						2.5,
+						219.0
+					],
+					[
+						-3.0,
+						228.0
+					],
+					[
+						-12.0,
+						232.0
+					]
+				],
+				"photo": "drone_2021_park.jpg",
+				"photo_points": [
+					[
+						741.7,
+						660.4
+					],
+					[
+						770.0,
+						649.5
+					],
+					[
+						708.2,
+						663.2
+					],
+					[
+						688.1,
+						679.0
+					],
+					[
+						672.9,
+						686.3
+					],
+					[
+						594.9,
+						687.5
+					],
+					[
+						535.8,
+						676.4
+					]
+				],
+				"camera": {
+					"eye": [
+						200.4,
+						82.3,
+						344.8
+					],
+					"heading": -132.19,
+					"pitch": -14.02,
+					"roll": -0.01,
+					"hfov": 57.23
+				},
+				"how": "Report 0026, D-0026-30: in the photo, a long bed of brown soil with a few low plants in a low border, with a blue sign in it, between the tiled walk of Hạ Long, the path along the low wall, and the low wall. In the build, OSM has no area there, and the ground was the bare ground of the town. The outline: between the shore of the build, way 458829438, and the walk of Hạ Long (the paving of OSM comes off it). The photo: the photo from a drone of 2021-01-30 over the south end of the park (Tuong Lam Photos, CC BY-SA 4.0; a photo of 2017 to 2021 is a source for 2019). The camera: near the place of the camera file (10.340510 N, 107.075639 E; 25 m from it), with the heading, the pitch, the height, and the field of view that put three points of OSM on the photo (the east end of the median of Hạ Long, the south end of way 458829438 at the walk, and the end of way 118946676 at way 458829438) and the horizon of the sea at 90 px; with it the edges of the lawns and the paving of the build fall on their edges in the photo to about 2 m to 5 m. The outline is on the ways of OSM and the shore of the build (where the ground of the build goes under 0.5 m); the photo points are the outline through the camera. The photo does not give the places: a point of the photo on an edge over the water (a parapet) goes down past it to the sea floor. tools/showcase/lawn_sheet.py puts the outline on the photo and on the map (docs/showcase/south_end_lawns.jpg)."
+			}
+		],
 		"paving": [
 			"way/220617805",
 			"way/220617809",
