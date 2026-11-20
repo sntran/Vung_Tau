@@ -1,7 +1,7 @@
 {
 	"note": "Made by tools/geo/photos.py index (plan 0009, R5e). Do not change by hand. One row for each image of Mapillary in the play area (data/geo/raw/mapillary.json, the box of data/geo/area.json). date: the time of Vietnam (UTC+7). lon, lat: computed_geometry (computed 1), the position of the camera (computed 0), or the position in the coverage tile (computed null: the API did not answer for the image yet). compass: compass_angle; computed_compass: computed_compass_angle (degrees from the north to the east). camera: camera_type (spherical and equirectangular are 360). author: the username of the creator (or the id of the creator, from the tile). The link of an image: https://www.mapillary.com/app/?pKey=ID. The images are CC BY-SA 4.0: the credit is the author, Mapillary, and the license.",
 	"license": "CC BY-SA 4.0",
-	"updated": "2026-11-19",
+	"updated": "2026-11-20",
 	"bbox": {
 		"south": 10.3,
 		"west": 107.05,

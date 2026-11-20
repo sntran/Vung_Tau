@@ -1,6 +1,6 @@
 # The street photos of Mapillary in the play area
 
-Made by `tools/geo/photos.py report` (plan 0009, R5e) from `data/geo/raw/mapillary.json` (2026-11-19). Do not change by hand.
+Made by `tools/geo/photos.py report` (plan 0009, R5e) from `data/geo/raw/mapillary.json` (2026-11-20). Do not change by hand.
 The images are CC BY-SA 4.0 (the author, Mapillary). The map: `photos_map.png` (red: 2017 to 2021).
 
 25462 images, 74 sequences, 8 authors. 725 images of 2017 to 2021.
