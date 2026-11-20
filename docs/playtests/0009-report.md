@@ -95,3 +95,64 @@ See report 0026, section 9.4.
 ## 5. Status
 
 Phase 1a is not done: D-0009-01 to D-0009-06. R5b (phase 1b) waits for plan 0026, as the plan says.
+
+## 6. Audit 2: branch at `0038ab6` (2026-11-20)
+
+The pictures of this audit are in [`0009/audit-2026-11-20/`](0009/audit-2026-11-20/).
+
+### 6.1 Runs
+
+| Check | Result |
+|---|---|
+| CI of `0038ab6` | Pass: run 302, 12 of 12 jobs. |
+| The release `geodata-0009-1` | Each of the 48 files of the two manifests downloads in the workspace with `tools/geo/geostore.py`, and its SHA-256 agrees with the manifest. |
+| The history of the branch | No file of more than 2.3 MB (`lidar_tracks.json`). |
+| The data at the head | Read here with Python: the buildings of 2019, the 2.5D data of each outline, and the lidar of each product and year. |
+
+### 6.2 What is correct
+
+- **D-0009-01.** The lidar is kept by product and year, the guard is in the tool and its test, and the store has the data of the good run again (ATL03 ground photons 896 655, GEDI 1 122 shots). The report gives the numbers of the head.
+- **D-0009-02.** 60 434 roof photons, and their check against the 2.5D heights.
+- **D-0009-03.** The four maps, the four checks of the heights, and the lists of R5d.
+- **D-0009-04.** The groups of at least 4 cells, 3 m or more from an outline: 2 714 groups, 98.5 ha. The map now shows whole blocks with no outline, not bands along the outlines.
+- **D-0009-06.** The large files are assets of the release, with a manifest in Git, and the history of the branch has none of them.
+- **D-0009-07.** ATL24 minus the intertidal heights is 1.02 m at Bãi Trước (0.88 m for all the points), and the mean dynamic topography of DTU22 is 1.16 m. So most of the offset is the height of the mean sea level over the geoid, not an error of a source. This is a good piece of work.
+
+### 6.3 Defects
+
+#### D-0009-08: 7 904 buildings of 2019 have no first year and no height (medium)
+
+`buildings_2019.json` has 7 904 buildings with `first_year` null, and 7 902 of them have `height` null. Before D-0009-05 there were 4 670. The report does not say so: its median height leaves them out. My rule of D-0009-05 (30 % of the outline) did not say what to do when no year reaches it. In the 2.5D data, these buildings are of three kinds (`no_first_year.png`):
+
+| Kind | Buildings | What it means |
+|---|---|---|
+| 8 pixels or more in a year up to 2019, but under 30 % of the outline | 2 116 | Most likely a building of 2019 (the old rule gave it a year). |
+| 8 pixels or more only in a year after 2019 | 1 118 | Most likely a building after 2019: the old rule took it out, and now it is in 2019. |
+| Fewer than 8 pixels in each year | 4 670 | The 2.5D data does not see it. The median area is 31 m² (70 m² for all the buildings). |
+
+- The first year is the first year with 30 % of the outline. If no year has 30 %, it is the first year with 8 pixels or more. Its height is the median of its years from that year on.
+- A building with fewer than 8 pixels in each year is not in `buildings_2019.json`. Write it in a list of its own with a map, with the status Check. A guess is not in the game.
+- The report gives the count of each kind, and the heights with no null.
+- A unit test for each kind.
+
+#### D-0009-09: The guard keeps the ATL08 of a year that lost passes (medium)
+
+ATL08 has 17 of the 30 passes of ATL03 of the same years. The years that the last run fetched (2018, 2021, 2025, 2026) have all their passes. The years that came from the earlier runs (2019 from `a36c84e`; 2020 and 2022 from `7d32458`; 2023 and 2024 from `a36c84e`) have one or two passes of four or five: 2020 has 3 segments for 48 543 ground photons of ATL03. The ATL03 ground photons get their class from ATL08, so ATL08 has these passes.
+
+- A year is complete only when each product has the passes (the date and the track) that the other products of the same year have. The report gives the passes of each product and year, and the next run fetches each year that is not complete again.
+- Fetch ATL08 of 2019, 2020, 2022, 2023, and 2024 again.
+- A unit test: a year with fewer passes than ATL03 of the same year is fetched again.
+
+#### D-0009-10: The new maps have no import file (low)
+
+`buildings_2019.png`, `buildings_all.png`, `buildings_no_outline.png`, `buildings_out.png`, and `lidar_seafloor.png` in `data/geo/build/` have no `.import` file. The other maps there have one with `importer="keep"`. Without it, Godot imports each map as a texture and writes a new import file in the working copy. Add the import files.
+
+### 6.4 Notes for the next phases
+
+- **The zero of the heights (R5b).** The land of the game (Copernicus, over EGM2008) and its sea (the tide model, over the mean sea level) do not have the same zero: the mean sea level is about 1.0 m to 1.2 m over EGM2008 here (D-0009-07). So now the land is about 1.1 m too high against the sea. R5b uses one zero: the mean sea level. The heights over EGM2008 (the ground, the bare earth, ATL24, the lidar) take away the mean dynamic topography of DTU22 (1.16 m), and the report shows the beach of Bãi Trước before and after.
+- **The banks next to the hall of report 0026.** In PT-71 the hall with the orange roof still has a slope of bare ground 3 m to 5 m high at each side. Copernicus is a model of the surface, with the buildings and the trees in it. The bare earth of D9 (phase 1b) is the correction for that; check the hall in PT-71 after it.
+- **The heights of the buildings.** The checks do not agree: against the 2.5D heights, 3D-GloBFP is 3.70 m higher (median), GHS-BUILT-H is 3.95 m lower, and the roof photons are 1.22 m lower (RMSE 6.37 m). The roof photons are the only direct measure. I decide the heights of phase 2 from them.
+
+### 6.5 Status
+
+Phase 1a is not done: D-0009-08 to D-0009-10.
