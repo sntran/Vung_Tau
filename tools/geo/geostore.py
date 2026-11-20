@@ -79,3 +79,13 @@ def get(manifest: dict, key: str, tries: int = 4) -> dict:
         CACHE.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
     return json.loads(gzip.decompress(path.read_bytes()).decode("utf-8"))
+
+
+KEEP_IMPORT = '[remap]\n\nimporter="keep"\n'
+
+
+def write_keep_import(path: Path) -> None:
+    """The import file of a map of data/geo/build/ (report 0009, D-0009-10):
+    Godot keeps the file as it is, and does not write an import file of a
+    texture in the working copy."""
+    Path(str(path) + ".import").write_text(KEEP_IMPORT, encoding="utf-8")

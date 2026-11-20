@@ -685,3 +685,15 @@ def test_the_ground_under_steps_keeps_its_ends():
     out = terrain.limit_grade_exact(h, np.diff(s), 0.5, 8.0, keep_ends=True)
     assert abs(out[0] - h[0]) < 1e-9 and abs(out[-1] - h[-1]) < 1e-9
     assert np.max(np.abs(np.diff(out))) <= 0.5 * 0.5 + 1e-9
+
+
+def test_each_map_of_the_build_has_a_keep_import():
+    """Report 0009, D-0009-10: a PNG in data/geo/build/ with no import file is a
+    texture for Godot, and Godot writes a new import file in the working copy.
+    Each map there keeps its bytes (importer="keep")."""
+    from pathlib import Path
+    build = Path(__file__).resolve().parents[3] / "data" / "geo" / "build"
+    missing = [p.name for p in sorted(build.glob("*.png"))
+               if not Path(str(p) + ".import").exists()
+               or 'importer="keep"' not in Path(str(p) + ".import").read_text(encoding="utf-8")]
+    assert not missing, f"no import file with importer=\"keep\": {missing}"
