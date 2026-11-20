@@ -17,6 +17,8 @@ The images are CC BY-SA 4.0. The credit of each image: its author, "Mapillary",
 the license, and https://www.mapillary.com/app/?pKey=ID. The sheets and the
 pictures go into docs/reference/mapillary/ with CREDITS.md next to them. Look
 at each image before a value comes from it (docs/world-models.md, section 3).
+Before a picture goes on a sheet, tools/geo/privacy.py blurs the number plates
+and the faces, or leaves out the image (report 0026, D-0026-39).
 
 The token goes in the header of each request of the API, so that no log has it.
 The tiles take it in the URL: the tool never prints a URL of a tile.
@@ -39,6 +41,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import privacy  # noqa: E402
 
 AREA = ROOT / "data" / "geo" / "area.json"
 WORLD = ROOT / "data" / "geo" / "build" / "world.json"
@@ -741,9 +745,17 @@ def command_sheets() -> int:
                 tx, tz = point.get("target", point["at"])
                 toward = bearing(tx - r["x"], tz - r["z"]) if math.hypot(tx - r["x"], tz - r["z"]) > 3.0 else direction(r)
             try:
-                entries.append((r, view(r, picture(r["id"], r["camera"] in PANO), toward), label(r, toward)))
+                # The privacy step (report 0026, D-0026-39): no plate or face that a person can read.
+                img, blurred = privacy.clean(view(r, picture(r["id"], r["camera"] in PANO), toward), r["id"], point["id"])
             except Exception as error:  # noqa: BLE001 - keep the others
                 print(f"  {point['id']}: image {r['id']}: {error}")
+                continue
+            if img is None:
+                print(f"  {point['id']}: image {r['id']}: left out (data/showcase/photo_privacy.json)")
+                continue
+            if blurred:
+                print(f"  {point['id']}: image {r['id']}: {blurred} boxes blurred")
+            entries.append((r, img, label(r, toward)))
         label_years = f"{years[0]} to {years[1]}" if not point.get("dates") else "the weeks before Tết"
         print(f"{point['id']} {label_years}: {matched} images match, {len(entries)} on the sheets")
         for k in range(0, len(entries), per_sheet):
@@ -767,7 +779,11 @@ def command_detail(ids: list[str]) -> int:
             print(f"ERROR: image {image_id} is not in the index")
             continue
         from PIL import Image
-        img = Image.open(io.BytesIO(picture(image_id, r["camera"] in PANO))).convert("RGB")
+        img, _blurred = privacy.clean(Image.open(io.BytesIO(picture(image_id, r["camera"] in PANO))).convert("RGB"),
+                                      image_id, "detail")
+        if img is None:
+            print(f"the image {image_id} is left out (data/showcase/photo_privacy.json)")
+            continue
         name = f"detail_{image_id}.jpg"
         img.save(OUT / name, quality=85, optimize=True)
         credits = [c for c in credits if not c.startswith(f"| `{name}`")] + [credit_line(r, name)]

@@ -17,7 +17,8 @@ on:
         required: false
         default: ""
   push:
-    paths: ["data/showcase/photo_points.json", "tools/geo/photos.py", ".github/workflows/mapillary.yml"]
+    paths: ["data/showcase/photo_points.json", "data/showcase/photo_privacy.json", "tools/geo/photos.py",
+            "tools/geo/privacy.py", ".github/workflows/mapillary.yml"]
 
 permissions:
   contents: write
@@ -42,10 +43,11 @@ jobs:
           python-version: "3.13"
 
       - name: Install the Python packages
-        run: pip install numpy==2.5.4 pyproj==3.8.0 pillow==13.0.0 pytest==9.1.1
+        # onnxruntime and OpenCV: the detectors of the plates and the faces (tools/geo/privacy.py).
+        run: pip install numpy==2.5.4 pyproj==3.8.0 pillow==13.0.0 pytest==9.1.1 onnxruntime==1.22.1 opencv-python-headless==4.11.0.86
 
       - name: Test the tool
-        run: python -m pytest -q tools/geo/tests/test_photos.py
+        run: python -m pytest -q tools/geo/tests/test_photos.py tools/geo/tests/test_privacy.py
 
       - name: Get the index of the images
         env:

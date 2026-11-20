@@ -1,0 +1,9 @@
+{
+	"note": "The privacy of the street photos (report 0026, D-0026-39). tools/geo/privacy.py blurs the number plates and the faces that its detectors find before a picture goes on a contact sheet of tools/geo/photos.py. A detector can miss one: after a look at a sheet, put the image here with \"blur\" (for the id of the point of the sheet, boxes as fractions of the picture on that sheet: left, top, right, bottom; a 360 image has a view for each point) or \"leave_out\": true. tools/geo/tests/test_privacy.py checks that each box of this list is blurred on the sheets.",
+	"images": {
+		"1091249252584160": {
+			"blur": {"q23_buu_dien_roof": [[0.22, 0.6, 0.38, 0.68]]},
+			"why": "The number plate of the truck on the left (report 0026, D-0026-39). Mapillary did not blur it."
+		}
+	}
+}
