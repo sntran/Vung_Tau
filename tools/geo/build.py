@@ -10,6 +10,7 @@ The workspace can run this script: it needs no download.
 """
 
 import argparse
+import dataclasses
 import math
 import datetime
 import shutil
@@ -318,9 +319,25 @@ def build(raw: Path, out: Path, geo: Path) -> int:
                 osm_rows.append((shapely.LineString(np.column_stack([x, y])), w.tags))
         near = found_by_id.get(config.trees["parks"]["near_landmark"])
         near_point = shapely.Point(near["position"][0], -near["position"][1]) if near and near.get("found") else None
+        # Report 0026, D-0026-35: no tree of a rule on a part that a player walks
+        # on (the cells of the walk parts of the showcase, as level_walks() makes
+        # them below, on a copy of the grid), and in the showcase a tree of a
+        # rule only on a tree top of the canopy map.
+        keep_out, data_only = None, None
+        showcase_config = ROOT / "data" / "showcase" / "bai_truoc.json"
+        if showcase_config.exists():
+            showcase_data = load_json(showcase_config)
+            copy = dataclasses.replace(grid, heights=grid.heights.copy())
+            walk_mask = showcase_module.level_walks(copy, showcase_data, roads)["walks"]
+
+            def keep_out(x: float, y: float) -> bool:
+                row, col = int(round((-y - grid.z0) / grid.step)), int(round((x - grid.x0) / grid.step))
+                return 0 <= row < walk_mask.shape[0] and 0 <= col < walk_mask.shape[1] and bool(walk_mask[row, col])
+            if len(showcase_data.get("outline", [])) >= 3:
+                data_only = shapely.Polygon([(float(x), -float(z)) for x, z in showcase_data["outline"]])
         tree_record, tree_counts, tree_groups = trees_module.make(
             config.trees, roads, land, beaches, parks, osm_trees, osm_rows, home.get("coast_road", ""), beach_outline,
-            near_point, lambda x, y: grid.sample(np.asarray(x), -np.asarray(y)), tops)
+            near_point, lambda x, y: grid.sample(np.asarray(x), -np.asarray(y)), tops, keep_out, data_only)
         log(f"{sum(len(v) for v in tree_record['types'].values())} trees: {tree_counts}")
 
     # Write the files. Keep the files of tide.py and footprints.py.

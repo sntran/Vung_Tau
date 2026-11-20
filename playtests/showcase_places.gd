@@ -66,6 +66,8 @@ const FORECOURT_EVERY := 0.5
 const FORECOURT_CURB_M := 0.5
 const FORECOURT_MAX_M := 80.0
 const FORECOURT_INSET := 3.0
+## Report 0026, D-0026-35: no tree within this of the middle of the walk of the sea (m).
+const WALK_TREE_M := 2.0
 ## The distance of the screenshot of a model in front of it, and the most (m).
 const VIEW_M := 25.0
 const VIEW_MAX_M := 80.0
@@ -98,6 +100,7 @@ func run(d: PlaytestDriver) -> void:
 	_check_hill_side(d, w)
 	_scan_edges(d, w)
 	_check_wall_lines(d, w)
+	_check_walk_trees(d, w)
 	for kind: String in ["median", "sidewalk", "path_border", "wall", "sea_wall", "stand_ins", "lawn_m2", "paving_m2",
 			"planter", "beach_wall", "median_trees", "lamps", "path_lamps"]:
 		d.expect(float(w.showcase.lengths.get(kind, 0.0)) > 0.0, "the showcase has the part %s" % kind)
@@ -522,3 +525,21 @@ func _in_a_box(models: Array[Dictionary], data: Dictionary, point: Vector3) -> b
 				and local.z > float(box[2]) - VIEW_CLEAR_M and local.z < float(box[3]) + VIEW_CLEAR_M:
 			return true
 	return false
+
+
+## Report 0026, D-0026-35: palms of the rule of the coast roads stood on the
+## tiles of the walk of Hạ Long, some in its middle (PT-74, runs 6 and 7). No
+## tree stands within WALK_TREE_M of the way along the middle of the walk.
+func _check_walk_trees(d: PlaytestDriver, w: VungTau) -> void:
+	var found := PackedStringArray()
+	var seen := {}
+	for i in w.showcase.sea_walk.size():
+		if w.showcase.sea_walk_on[i] == 0:
+			continue
+		for tree: Array in w.trees.all_trees_near(w.showcase.sea_walk[i], WALK_TREE_M):
+			var key := "%s %s" % [tree[1], tree[0]]
+			if not seen.has(key):
+				seen[key] = true
+				found.append("a %s at %s" % [tree[1], tree[0]])
+	d.expect(found.is_empty(), "no tree stands on the walk of the sea: %d%s" % [
+			found.size(), "" if found.is_empty() else " (" + "; ".join(found.slice(0, 8)) + ")"])

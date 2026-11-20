@@ -1,6 +1,6 @@
 # Geodata report
 
-Made by `tools/geo/build.py` on 2026-11-17.
+Made by `tools/geo/build.py` on 2026-11-20.
 
 ## Extents
 
@@ -100,15 +100,15 @@ None.
 
 ## Trees (R12a)
 
-- araucaria: 2
-- bang: 1907
-- casuarina: 3490
-- coconut: 897
+- araucaria: 6
+- bang: 1858
+- casuarina: 3364
+- coconut: 755
 - flame: 1627
-- frangipani: 772
+- frangipani: 778
 - shade: 3571
-- tall_shade: 181
-- From: bai_truoc_road 81, bai_truoc_road_snapped 8, coast_roads 3959, coast_roads_snapped 314, grove 22, named_roads 497, named_roads_snapped 107, osm 385, park_bai_truoc 295, park_bai_truoc_snapped 68, parks 1384, parks_snapped 1384, street 5824, street_snapped 5824.
+- tall_shade: 183
+- From: bai_truoc_road 61, bai_truoc_road_snapped 8, coast_roads 3803, coast_roads_snapped 314, grove 38, kept_off_walks 15, named_roads 497, named_roads_snapped 107, no_data_in_showcase 314, osm 385, park_bai_truoc 150, park_bai_truoc_snapped 68, parks 1384, parks_snapped 1384, street 5824, street_snapped 5824.
 
 ## Land cover and trees (report 0005, D-0005-09; plan 0020, D8)
 
@@ -137,12 +137,12 @@ The street and park trees and the canopy map (report 0020, D-0020-03): on the ro
 
 | Group | Trees | Moved to a tree top | Not in the map |
 |---|---|---|---|
-| Quang Trung (Bãi Trước) | 81 | 10 % | 88 % |
-| Thùy Vân, Hạ Long, Trần Phú | 3959 | 8 % | 71 % |
-| grove | 22 | 0 % | 0 % |
+| Quang Trung (Bãi Trước) | 61 | 13 % | 97 % |
+| Thùy Vân, Hạ Long, Trần Phú | 3803 | 8 % | 71 % |
+| grove | 38 | 0 % | 26 % |
 | Trần Hưng Đạo, Ba Cu | 497 | 22 % | 35 % |
 | The trees of OSM | 385 | 0 % | 36 % |
-| The park of Bãi Trước | 295 | 23 % | 22 % |
+| The park of Bãi Trước | 150 | 45 % | 18 % |
 | The other parks | 1384 | 100 % | 0 % |
 | The other main roads | 5824 | 100 % | 0 % |
 

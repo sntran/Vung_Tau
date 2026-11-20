@@ -100,13 +100,19 @@ class _Tops:
 
 
 def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: list, osm_rows: list,
-         coast_road: str, beach_outline, near_point, sample_height, tops=None) -> tuple[dict, dict, dict]:
+         coast_road: str, beach_outline, near_point, sample_height, tops=None, keep_out=None,
+         data_only=None) -> tuple[dict, dict, dict]:
     """The trees for the build folder, the counts for the report, and the
     points of each group (map x, y) for the report.
     parks: park shapes (map). osm_trees: (x, y, tags). osm_rows: (LineString, tags).
     near_point: the map point of the landmark for the parks near it.
     sample_height(x, y): the ground height at map points (arrays).
-    tops: the tree tops of the canopy map (map x, y), or None for the rules alone."""
+    tops: the tree tops of the canopy map (map x, y), or None for the rules alone.
+    keep_out(x, y): True at a map point where a player walks (report 0026,
+    D-0026-35: the palms of the rule coast_roads stood on the walk of Hạ Long):
+    no tree of a rule there. data_only: a map polygon (the showcase) where a
+    tree of a rule stands only on a tree top of the canopy map; the groves give
+    the trees of the photos there."""
     rng = np.random.default_rng(int(spec.get("seed", 1)))
     street = spec["street"]
     place = _Place(land, beaches, roads, float(street["skip_near_road_m"]))
@@ -121,7 +127,14 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
 
     leans: dict[tuple[str, int], tuple[float, float]] = {}  # (kind, index in found) -> (tilt, direction), degrees
 
-    def add(kind: str, point, source: str, lean: tuple[float, float] | None = None) -> None:
+    def add(kind: str, point, source: str, lean: tuple[float, float] | None = None, on_top: bool = False) -> None:
+        if source != "osm":
+            if keep_out is not None and keep_out(float(point[0]), float(point[1])):
+                counts["kept_off_walks"] = counts.get("kept_off_walks", 0) + 1
+                return
+            if data_only is not None and not on_top and data_only.contains(Point(float(point[0]), float(point[1]))):
+                counts["no_data_in_showcase"] = counts.get("no_data_in_showcase", 0) + 1
+                return
         found.setdefault(kind, []).append((float(point[0]), float(point[1])))
         if lean is not None:
             leans[(kind, len(found[kind]) - 1)] = lean
@@ -172,7 +185,7 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
                 # A tree on a sidewalk is on the road surface of its own road.
                 if top >= 0 and place.free(moved, spacing * 0.6, own_road=road if road.sidewalk else None):
                     take(top, source)
-                    add(_pick(mix, rng), moved, source)
+                    add(_pick(mix, rng), moved, source, on_top=True)
                 elif place.free(tree, spacing * 0.6, own_road=road if road.sidewalk else None):
                     add(_pick(mix, rng), tree, source)
 
@@ -196,7 +209,7 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
                 point = on_line + out / distance * offset
             if place.free(point, gap, own_road=road if road.sidewalk else None):
                 take(i, source)
-                add(_pick(mix, rng), point, source)
+                add(_pick(mix, rng), point, source, on_top=True)
 
     coast = spec["coast_roads"]
     bai_truoc = spec["bai_truoc_road"]
@@ -240,7 +253,7 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
             for i in tree_tops.within(park):
                 if place.free(tree_tops.points[i], spacing * 0.5):
                     take(i, source)
-                    add(_pick(mix, rng), tree_tops.points[i], source)
+                    add(_pick(mix, rng), tree_tops.points[i], source, on_top=True)
             continue
         min_x, min_y, max_x, max_y = park.bounds
         prepared = prep(park)
@@ -253,7 +266,7 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
                 if top >= 0 and prepared.contains(Point(*moved)) and place.free(moved, spacing * 0.6):
                     take(top, source)
                     kind = _pick(mix, rng)
-                    add(kind, moved, source, lean_of(kind) if near else None)
+                    add(kind, moved, source, lean_of(kind) if near else None, on_top=True)
                 elif place.free(point, spacing * 0.6):
                     kind = _pick(mix, rng)
                     add(kind, point, source, lean_of(kind) if near else None)
