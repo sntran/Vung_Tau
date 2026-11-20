@@ -2,7 +2,16 @@
 
 Made by `tools/geo/buildings.py`. Do not change by hand. The large files are assets of the release `geodata-0009-1` (`data/geo/raw/buildings/manifest.json`).
 
-51112 buildings of 2019, 5247 out (their first year is after 2019).
+45324 buildings of 2019, 6365 out (their first year is after 2019), and 4670 that the 2.5D data does not see (Check).
+
+## The first year of each outline (D-0009-05, D-0009-08)
+
+| Kind | Up to 2019 | After 2019 |
+|---|---|---|
+| A year with 30 % of the outline | 43208 | 5247 |
+| No year with 30 %: the first year with 8 pixels or more | 2116 | 1118 |
+
+Fewer than 8 pixels in each year: 4670 outlines (median area 23 m²). They are not in `buildings_2019`: the list `buildings_unseen` of the store and the map `buildings_unseen.png`, with the status Check. Each building of 2019 and each building that is out has a height (no null).
 
 ## The buildings with no outline (D-0009-04)
 
@@ -10,13 +19,13 @@ Made by `tools/geo/buildings.py`. Do not change by hand. The large files are ass
 
 ## The maps (D-0009-03)
 
-`buildings_all.png`, `buildings_2019.png`, `buildings_out.png`, and `buildings_no_outline.png`: the whole box at the left, the middle of the town at the right.
+`buildings_all.png`, `buildings_2019.png`, `buildings_out.png`, `buildings_no_outline.png`, and `buildings_unseen.png`: the whole box at the left, the middle of the town at the right.
 
 ## The lists of R5d
 
 All the rows are in `buildings_r5d.json`.
 
-### In OpenStreetMap on 2019-01-22, not in the 2.5D data of 2019 (165)
+### In OpenStreetMap on 2019-01-22, not in the 2.5D data of 2019 (155)
 
 | OSM | x | z | building | name |
 |---|---|---|---|---|
@@ -46,7 +55,6 @@ All the rows are in `buildings_r5d.json`.
 | way/243309221 | 3590.7 | -6173.2 | yes |  |
 | way/243309229 | 3550.5 | -6215.2 | yes |  |
 | way/243309231 | 3603.0 | -6133.4 | yes |  |
-| way/243309265 | 3545.1 | -6553.0 | yes |  |
 | way/270798111 | 2895.0 | -5288.1 | yes |  |
 | way/286996176 | 2528.5 | -4973.8 | commercial | Toa nha XNK&SG Vietsovpetro |
 | way/428404916 | 4087.1 | -5661.5 | house | Nhà Thờ Trung Đồng |
@@ -60,8 +68,9 @@ All the rows are in `buildings_r5d.json`.
 | way/118929478 | 2191.3 | -313.0 | yes |  |
 | way/118939582 | 962.6 | -1728.3 | yes |  |
 | way/118939587 | 1112.6 | -1979.0 | yes |  |
+| way/118939595 | 1052.1 | -1855.5 | yes |  |
 
-### In the 2.5D data of 2019, not in OpenStreetMap on 2019-01-22 (1094)
+### In the 2.5D data of 2019, not in OpenStreetMap on 2019-01-22 (1152)
 
 Only the outlines that OpenStreetMap has today: the other outlines of 2019 (Microsoft, Google) were never in OpenStreetMap.
 
@@ -97,6 +106,7 @@ Only the outlines that OpenStreetMap has today: the other outlines of 2019 (Micr
 | 1cf342e6-028b-4457-b214-bc3c544a4801 | 4660.0 | -6180.9 | 2016 |
 | bba6f66b-4855-4f50-83fc-bf30d46891a7 | 4846.7 | -6053.1 | 2018 |
 | 51cad101-1e2d-4308-a056-16401180e279 | 4726.7 | -6060.5 | 2016 |
+| c6fd1fe2-95d7-419d-a071-fce19664a728 | 5504.3 | -6078.1 | 2016 |
 | 6d18ea71-3273-4712-a677-953d1ba94387 | 3787.7 | -6013.9 | 2016 |
 | ffcc58bf-4837-4d4f-b2db-6d76f70664ae | 3819.6 | -5989.9 | 2016 |
 | c52838d7-7a15-4de0-8716-f7c2225e5323 | 3750.5 | -5967.2 | 2016 |
@@ -106,7 +116,6 @@ Only the outlines that OpenStreetMap has today: the other outlines of 2019 (Micr
 | 40b01556-d1fa-4684-b214-964465f2ca3e | 4266.8 | -5884.7 | 2018 |
 | 0879d149-7e65-4ca3-ae28-7528320c2629 | 4546.8 | -5806.4 | 2016 |
 | 95733ad7-be27-4dbb-8403-4ad363306233 | 4319.9 | -5839.6 | 2016 |
-| e15a8a62-d57f-497a-b776-970cccff6eee | 4288.6 | -5836.6 | 2016 |
 
 ### A start_date after 2019 (1)
 
@@ -122,61 +131,62 @@ The difference is the height of the 2.5D data minus the height of the check (m).
 
 | Check | Buildings | Mean | Median | RMSE | Note |
 |---|---|---|---|---|---|
-| 3D-GloBFP | 31467 | -4.84 | -3.70 | 8.42 | a building of 3D-GloBFP in an outline (46561 in the box) |
-| GHS-BUILT-H | 3598 | +5.32 | +3.95 | 8.33 | for each cell of 90 m: the mean of the 2.5D heights, weighted by area, against AGBH |
+| 3D-GloBFP | 32948 | -4.80 | -3.70 | 8.35 | a building of 3D-GloBFP in an outline (46561 in the box) |
+| GHS-BUILT-H | 3663 | +5.23 | +3.91 | 8.21 | for each cell of 90 m: the mean of the 2.5D heights, weighted by area, against AGBH |
 | building:levels of OpenStreetMap | 40 | +5.75 | +1.65 | 17.46 | 40 buildings; the check is 3.3 m a storey |
-| ATL03 roof photons | 2027 | +1.96 | +1.22 | 6.37 | 52510 photons over 2817 outlines; the median of at least 3 photons over the median of the ground photons of the same pass within 40 m |
+| ATL03 roof photons | 2086 | +1.57 | +1.20 | 17.55 | 52510 photons over 2817 outlines; the median of at least 3 photons over the median of the ground photons of the same pass within 40 m |
 
 The median 2.5D height for each number of storeys of OpenStreetMap: 1: 7.3 m (2), 2: 10.0 m (5), 3: 11.0 m (13), 4: 11.5 m (4), 5: 16.8 m (5), 9: 23.1 m (2), 10: 44.0 m (1), 16: 76.0 m (1), 21: 64.2 m (1), 25: 78.0 m (3), 26: 86.8 m (3).
 
-## outlines (2026-11-20 01:37 UTC)
+## outlines (2026-11-20 16:03 UTC)
 
 - the release of Overture Maps: 2026-11-18.0
 - 56359 outlines; by source: {'Microsoft ML Buildings': 33087, 'Google Open Buildings': 21084, 'OpenStreetMap': 2188}
 
 
-## temporal (2026-11-20 01:37 UTC)
+## temporal (2026-11-20 16:03 UTC)
 
 - 1174 manifests in the bucket; 16 of EPSG:32648: ['31_EPSG_32648_2016_06_30.json', '31_EPSG_32648_2017_06_30.json', '31_EPSG_32648_2018_06_30.json', '31_EPSG_32648_2019_06_30.json', '31_EPSG_32648_2020_06_30.json', '31_EPSG_32648_2021_06_30.json', '31_EPSG_32648_2022_06_30.json', '31_EPSG_32648_2023_06_30.json', '37_EPSG_32648_2016_06_30.json', '37_EPSG_32648_2017_06_30.json', '37_EPSG_32648_2018_06_30.json', '37_EPSG_32648_2019_06_30.json', '37_EPSG_32648_2020_06_30.json', '37_EPSG_32648_2021_06_30.json', '37_EPSG_32648_2022_06_30.json', '37_EPSG_32648_2023_06_30.json']
 - the tiles of the play area: 2016: 4, 2017: 4, 2018: 4, 2019: 4, 2020: 4, 2021: 4, 2022: 4, 2023: 4
 - 56357 outlines in EPSG:32648
 - 2016: the outlines move -3.5 m down and +2.5 m right on the raster (at that shift 67 % of the pixels of the outlines near the middle have a building)
-- 2016: 4 tiles, 212 blocks with buildings, 43653 outlines with a building (50 s)
+- 2016: 4 tiles, 212 blocks with buildings, 43653 outlines with a building (32 s)
 - 2017: the outlines move +1.5 m down and +1.5 m right on the raster (at that shift 67 % of the pixels of the outlines near the middle have a building)
-- 2017: 4 tiles, 214 blocks with buildings, 44761 outlines with a building (96 s)
+- 2017: 4 tiles, 214 blocks with buildings, 44761 outlines with a building (65 s)
 - 2018: the outlines move +2.0 m down and +3.5 m right on the raster (at that shift 69 % of the pixels of the outlines near the middle have a building)
-- 2018: 4 tiles, 214 blocks with buildings, 45530 outlines with a building (144 s)
+- 2018: 4 tiles, 214 blocks with buildings, 45530 outlines with a building (99 s)
 - 2019: the outlines move +3.0 m down and +1.5 m right on the raster (at that shift 69 % of the pixels of the outlines near the middle have a building)
-- 2019: 4 tiles, 213 blocks with buildings, 46323 outlines with a building (190 s)
+- 2019: 4 tiles, 213 blocks with buildings, 46323 outlines with a building (132 s)
 - 2020: the outlines move +3.5 m down and +1.0 m right on the raster (at that shift 70 % of the pixels of the outlines near the middle have a building)
-- 2020: 4 tiles, 214 blocks with buildings, 46908 outlines with a building (236 s)
+- 2020: 4 tiles, 214 blocks with buildings, 46908 outlines with a building (165 s)
 - 2021: the outlines move +3.0 m down and +2.5 m right on the raster (at that shift 69 % of the pixels of the outlines near the middle have a building)
-- 2021: 4 tiles, 213 blocks with buildings, 47796 outlines with a building (283 s)
+- 2021: 4 tiles, 213 blocks with buildings, 47796 outlines with a building (200 s)
 - 2022: the outlines move -1.0 m down and -1.5 m right on the raster (at that shift 68 % of the pixels of the outlines near the middle have a building)
-- 2022: 4 tiles, 214 blocks with buildings, 48155 outlines with a building (331 s)
+- 2022: 4 tiles, 214 blocks with buildings, 48155 outlines with a building (234 s)
 - 2023: the outlines move -1.0 m down and -0.5 m right on the raster (at that shift 71 % of the pixels of the outlines near the middle have a building)
-- 2023: 4 tiles, 213 blocks with buildings, 48426 outlines with a building (380 s)
+- 2023: 4 tiles, 213 blocks with buildings, 48426 outlines with a building (265 s)
 - 52569 outlines with a building in a year; the map of 2019 of the buildings with no outline: 130632 cells of 5 m more than half building
 
 
-## osm2019 (2026-11-20 01:44 UTC)
+## osm2019 (2026-11-20 16:08 UTC)
 
 - 1119 versions from the ohsome API, 1119 valid on 2019-01-22
 - 1119 buildings of OpenStreetMap on 2019-01-22, 0 with building=construction
 - 2 buildings of OpenStreetMap on 2026-07-26 with a start_date
 
 
-## checks (2026-11-20 01:45 UTC)
+## checks (2026-11-20 16:11 UTC)
 
 - 3D-GloBFP grid 2108: 46561 buildings in the box; the columns ['Height', 'geometry']; the height Height
 - GHS-BUILT-H: a window of 96 × 144 cells, 4861 with a height
 
 
-## build (2026-11-20 01:56 UTC)
+## build (2026-11-20 16:14 UTC)
 
-- 51112 buildings of 2019, 5247 out (the first year is after 2019); the first years: 2016: 35956, 2017: 3468, 2018: 2156, 2019: 1628, None: 7904
-- the heights: median 6.0 m, 90 % under 10.0 m, the highest 90.0 m
+- D-0009-08: the first year by 30 % of the outline: 43208 up to 2019, 5247 after; by 8 pixels (no year with 30 %): 2116 up to 2019, 1118 after; fewer than 8 pixels in each year: 4670 (buildings_unseen, Check)
+- 45324 buildings of 2019, 6365 out (the first year is after 2019); the first years: 2016: 37023, 2017: 3919, 2018: 2464, 2019: 1918
+- the heights: median 5.8 m, 90 % under 9.8 m, the highest 90.0 m
 - D-0009-04: 130632 cells of 5 m more than half building with no outline; 2714 groups of at least 4 cells at least 3 m from an outline: 39419 cells, 0.985 km²; the largest groups [356, 329, 212, 206, 192] cells
-- R5d: 165 buildings of OpenStreetMap on 2019-01-22 not in the 2.5D data of 2019; 1094 outlines of OpenStreetMap of today in the 2.5D data of 2019 and not in OpenStreetMap on 2019-01-22; 1 buildings with a start_date after 2019
-- the checks of the heights: 3D-GloBFP 31467; GHS-BUILT-H 3598; building:levels of OpenStreetMap 40; ATL03 roof photons 2027
+- R5d: 155 buildings of OpenStreetMap on 2019-01-22 not in the 2.5D data of 2019; 1152 outlines of OpenStreetMap of today in the 2.5D data of 2019 and not in OpenStreetMap on 2019-01-22; 1 buildings with a start_date after 2019
+- the checks of the heights: 3D-GloBFP 32948; GHS-BUILT-H 3663; building:levels of OpenStreetMap 40; ATL03 roof photons 2086
 

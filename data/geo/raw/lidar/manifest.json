@@ -74,13 +74,17 @@
 			"fetched": "Git 7d32458"
 		},
 		"atl03_ground/2026": {
-			"name": "atl03_ground_2026_b594139ed9cc.json.gz",
-			"sha256": "b594139ed9ccdb2e8d6512a4530e922163ef94489033c5fddafe1ba143859d35",
-			"bytes": 618856,
+			"name": "atl03_ground_2026_427a65d5a8ba.json.gz",
+			"sha256": "427a65d5a8ba47b0f73171631a0bb681da343f9d49ca2f7df8ceee7de17af11a",
+			"bytes": 618257,
 			"product": "atl03_ground",
 			"year": 2026,
 			"rows": 95798,
-			"fetched": "2026-11-20"
+			"fetched": "2026-11-20",
+			"passes": [
+				"2026-02-28",
+				"2026-03-04"
+			]
 		},
 		"atl03_roof/2018": {
 			"name": "atl03_roof_2018_b23a0783fd69.json.gz",
@@ -155,13 +159,17 @@
 			"fetched": "2026-11-20"
 		},
 		"atl03_roof/2026": {
-			"name": "atl03_roof_2026_44326c88c91e.json.gz",
-			"sha256": "44326c88c91e7c6669b5c6bc8faf16005ea258c6c14ee82c1d74429413abe071",
-			"bytes": 115503,
+			"name": "atl03_roof_2026_7a1b13600827.json.gz",
+			"sha256": "7a1b136008279d3e5dc4072931c3a081b03d4cdfff44a7c831176777964369cd",
+			"bytes": 115319,
 			"product": "atl03_roof",
 			"year": 2026,
 			"rows": 11909,
-			"fetched": "2026-11-20"
+			"fetched": "2026-11-20",
+			"passes": [
+				"2026-02-28",
+				"2026-03-04"
+			]
 		},
 		"atl08/2018": {
 			"name": "atl08_2018_ac82cae86564.json.gz",
@@ -173,22 +181,35 @@
 			"fetched": "2026-11-20"
 		},
 		"atl08/2019": {
-			"name": "atl08_2019_3d012d7890ab.json.gz",
-			"sha256": "3d012d7890abae484291cc4ca2ec1ff25183bcbf5a2c8502713d95b67e7d2228",
-			"bytes": 65350,
+			"name": "atl08_2019_7e179fe8bef7.json.gz",
+			"sha256": "7e179fe8bef743ec59b3498a2084fc155e095764b605b2e38528ddb62d5c3d1e",
+			"bytes": 97113,
 			"product": "atl08",
 			"year": 2019,
-			"rows": 5627,
-			"fetched": "Git a36c84e"
+			"rows": 8016,
+			"fetched": "2026-11-20",
+			"passes": [
+				"2019-03-14",
+				"2019-03-19",
+				"2019-06-13",
+				"2019-06-17",
+				"2019-12-12"
+			]
 		},
 		"atl08/2020": {
-			"name": "atl08_2020_05ee5aabd32f.json.gz",
-			"sha256": "05ee5aabd32f3ce30d969c5287fa30edce9de8469fd590bd587e4f34448ad8dc",
-			"bytes": 230,
+			"name": "atl08_2020_d965b21142ea.json.gz",
+			"sha256": "d965b21142ea1ce6e632c7302c060c9c902b4733a52644023a1222dd5fce0658",
+			"bytes": 40781,
 			"product": "atl08",
 			"year": 2020,
-			"rows": 3,
-			"fetched": "Git 7d32458"
+			"rows": 3411,
+			"fetched": "2026-11-20",
+			"passes": [
+				"2020-03-11",
+				"2020-03-16",
+				"2020-09-09",
+				"2020-12-13"
+			]
 		},
 		"atl08/2021": {
 			"name": "atl08_2021_05c9be345a27.json.gz",
@@ -200,31 +221,47 @@
 			"fetched": "2026-11-20"
 		},
 		"atl08/2022": {
-			"name": "atl08_2022_13fd9c713bab.json.gz",
-			"sha256": "13fd9c713bab1d6098bf2fa6c096f5cb42b518dd795b37235bb7dfdfef0b58d6",
-			"bytes": 12922,
+			"name": "atl08_2022_67cdb96e4b8a.json.gz",
+			"sha256": "67cdb96e4b8a1a91a28b7c1f5f5273a89b65b7233c1ad247df46e2d19863c011",
+			"bytes": 94061,
 			"product": "atl08",
 			"year": 2022,
-			"rows": 1139,
-			"fetched": "Git 7d32458"
+			"rows": 7599,
+			"fetched": "2026-11-20",
+			"passes": [
+				"2022-03-08",
+				"2022-03-12",
+				"2022-12-05",
+				"2022-12-10"
+			]
 		},
 		"atl08/2023": {
-			"name": "atl08_2023_88d4fa05f5d8.json.gz",
-			"sha256": "88d4fa05f5d802619f2eb008cfb0d4c8b8fe8442adb9907a4bbb80af29eefc7e",
-			"bytes": 25584,
+			"name": "atl08_2023_d254998b561a.json.gz",
+			"sha256": "d254998b561ac580b72e47edab487e3e4104b962383d3d87f4011a01a313ad64",
+			"bytes": 67253,
 			"product": "atl08",
 			"year": 2023,
-			"rows": 2202,
-			"fetched": "Git a36c84e"
+			"rows": 5573,
+			"fetched": "2026-11-20",
+			"passes": [
+				"2023-06-05",
+				"2023-09-08",
+				"2023-12-04",
+				"2023-12-08"
+			]
 		},
 		"atl08/2024": {
-			"name": "atl08_2024_1bd6f047b7fe.json.gz",
-			"sha256": "1bd6f047b7fe31849d980144bbdeb74a7db3d514b5b7a67751c8a3fd9687212b",
-			"bytes": 35378,
+			"name": "atl08_2024_29facc05e7cc.json.gz",
+			"sha256": "29facc05e7cc12bc6b916c378a9dec6a908da0e26ef5c8fc64d99c22820e0aeb",
+			"bytes": 56245,
 			"product": "atl08",
 			"year": 2024,
-			"rows": 2851,
-			"fetched": "Git a36c84e"
+			"rows": 4464,
+			"fetched": "2026-11-20",
+			"passes": [
+				"2024-03-03",
+				"2024-03-08"
+			]
 		},
 		"atl08/2025": {
 			"name": "atl08_2025_ec9b46dbf712.json.gz",
@@ -236,13 +273,17 @@
 			"fetched": "2026-11-20"
 		},
 		"atl08/2026": {
-			"name": "atl08_2026_0d78c1b25695.json.gz",
-			"sha256": "0d78c1b256953a399299f836bf4e0ae7b575243283ee460263b2c95fc76e21d3",
-			"bytes": 58314,
+			"name": "atl08_2026_c86c851a92f1.json.gz",
+			"sha256": "c86c851a92f1d1d0d577506f42652d6db875a3ea9a2594a48a71faffb6774f0c",
+			"bytes": 58339,
 			"product": "atl08",
 			"year": 2026,
 			"rows": 4919,
-			"fetched": "2026-11-20"
+			"fetched": "2026-11-20",
+			"passes": [
+				"2026-02-28",
+				"2026-03-04"
+			]
 		},
 		"atl24/2018": {
 			"name": "atl24_2018_081dccc53b9e.json.gz",
@@ -317,13 +358,17 @@
 			"fetched": "Git 7d32458"
 		},
 		"atl24/2026": {
-			"name": "atl24_2026_4d0c4351b081.json.gz",
-			"sha256": "4d0c4351b0817bd4a04629edd33710cc1315af91cc605bc94a1f1556263ad0b5",
-			"bytes": 36778,
+			"name": "atl24_2026_7c7b6b426234.json.gz",
+			"sha256": "7c7b6b4262348cd80312328de2951014aa5120481fcf98aa6fc818f52ca5aff3",
+			"bytes": 36956,
 			"product": "atl24",
 			"year": 2026,
 			"rows": 2500,
-			"fetched": "2026-11-20"
+			"fetched": "2026-11-20",
+			"passes": [
+				"2026-02-28",
+				"2026-03-04"
+			]
 		},
 		"gedi02a/2019": {
 			"name": "gedi02a_2019_2cbed69a322a.json.gz",

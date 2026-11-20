@@ -2,10 +2,16 @@
 	"release": "geodata-0009-1",
 	"files": {
 		"buildings_2019": {
-			"name": "buildings_2019_a449d5165a62.json.gz",
-			"sha256": "a449d5165a62a33ced717b0f0e3a549560abdc49437721cf81b410c55605607e",
-			"bytes": 2962738,
-			"rows": 51112
+			"name": "buildings_2019_c4bc6634ec67.json.gz",
+			"sha256": "c4bc6634ec676064f79fd59d733d9bbb30fbce85320fb4d4bcc2fcdfe56068d3",
+			"bytes": 2667652,
+			"rows": 45324
+		},
+		"buildings_unseen": {
+			"name": "buildings_unseen_9f3f50f8a9ad.json.gz",
+			"sha256": "9f3f50f8a9ada29d4b1fc828ddeba53340ac051513382ec0eb9363e71289992f",
+			"bytes": 269765,
+			"rows": 4670
 		},
 		"ghs_built_h": {
 			"name": "ghs_built_h_7515ae39eef2.json.gz",

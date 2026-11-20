@@ -17,36 +17,55 @@ Made by `tools/geo/lidar.py`. Do not change by hand.
 - seed gedi02a a36c84e: 2019 188
 - seed gedi02a 7d32458: 2019 384, 2021 74, 2022 23, 2023 416, 2024 72, 2025 153
 
-## lidar fetch (2026-11-20 01:45 UTC)
+## lidar fetch (2026-11-20 16:11 UTC)
 
 - sliderule 5.8.1, 2018-10-14T00:00:00Z to 2026-11-20T00:00:00Z
+- atl08 2019: not complete (it does not have the passes of the other land products of the year): asked for again
+- atl08 2019: 8016 rows (it had 5627)
+- atl08 2020: not complete (it does not have the passes of the other land products of the year): asked for again
+- atl08 2020: 3411 rows (it had 3)
+- atl08 2022: not complete (it does not have the passes of the other land products of the year): asked for again
+- atl08 2022: 7599 rows (it had 1139)
+- atl08 2023: not complete (it does not have the passes of the other land products of the year): asked for again
+- atl08 2023: 5573 rows (it had 2202)
+- atl08 2024: not complete (it does not have the passes of the other land products of the year): asked for again
+- atl08 2024: 4464 rows (it had 2851)
 - atl08 2026: 4919 rows (it had 4919)
 - atl03_ground 2026: 95798 rows (it had 95798)
-- atl03_roof 2021: 2090 rows (it had None)
-- atl03_roof 2022: 8474 rows (it had None)
-- atl03_roof 2023: 8543 rows (it had None)
 - atl03_roof 2026: 11909 rows (it had 11909)
 - atl24 2026: 2500 rows (it had 2500)
 - gedi02a 2018: 0 rows; the file of the last good run stays (None rows)
 - gedi02a 2020: 0 rows; the file of the last good run stays (None rows)
 - gedi02a 2026: 0 rows; the file of the last good run stays (None rows)
 
-## lidar tracks (2026-11-20 01:56 UTC)
+## lidar tracks (2026-11-20 16:14 UTC)
 
 - the short form: 44185 bins of 20 m from 957089 photons (2215 KB, data/geo/build/lidar_tracks.json)
 
-## lidar report (2026-11-20 01:56 UTC)
+## lidar report (2026-11-20 16:14 UTC)
 
 
 ## The points in the store (the head of the branch)
 
 | Product | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 | All |
 |---|---|---|---|---|---|---|---|---|---|---|
-| atl08 | 4654 | 5627 | 3 | 2464 | 1139 | 2202 | 2851 | 9774 | 4919 | 33633 |
+| atl08 | 4654 | 8016 | 3411 | 2464 | 7599 | 5573 | 4464 | 9774 | 4919 | 50874 |
 | atl03_ground | 98228 | 168384 | 48543 | 41168 | 108229 | 119835 | 68270 | 148200 | 95798 | 896655 |
 | atl03_roof | 5662 | 5679 | 2244 | 2090 | 8474 | 8543 | 6515 | 9318 | 11909 | 60434 |
 | atl24 | 8505 | 6270 | 3551 | 3309 | 1407 | 2568 | 3634 | 3685 | 2500 | 35429 |
 | gedi02a | – | 384 | – | 74 | 23 | 416 | 72 | 153 | – | 1122 |
+
+## The passes of each product and year (D-0009-09)
+
+A year is complete when ATL08 has each pass of the ATL03 ground photons, and the ground photons each pass of ATL08 and of the roof photons. ATL24 (passes over the water only) and GEDI (another satellite) are not compared. The next run asks again for a product of a year that is not complete.
+
+| Product | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 | All |
+|---|---|---|---|---|---|---|---|---|---|---|
+| atl08 | 2 | 5 | 4 | 2 | 4 | 4 | 2 | 5 | 2 | 30 |
+| atl03_ground | 2 | 5 | 4 | 2 | 4 | 4 | 2 | 5 | 2 | 30 |
+| atl03_roof | 2 | 5 | 4 | 1 | 4 | 4 | 2 | 5 | 2 | 29 |
+| atl24 | 2 | 5 | 5 | 2 | 5 | 5 | 3 | 5 | 2 | 34 |
+| gedi02a | – | 1 | – | 2 | 1 | 2 | 1 | 1 | – | 8 |
 
 ## R5c: the sea floor
 
