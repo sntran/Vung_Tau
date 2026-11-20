@@ -94,6 +94,7 @@ uniform vec3 canopy_dry : source_color = vec3(0.4, 0.33, 0.17);
 // (crowns of 5 m to 12 m, as in the photo of S1).
 uniform float crown_spacing = 7.0;
 uniform vec2 crown_radius = vec2(2.5, 6.0);
+uniform float crown_dome_mean = 0.75;
 
 varying vec3 world_position;
 varying vec3 world_normal;
@@ -286,7 +287,12 @@ void fragment() {
 	canopy_rough = mix(canopy_rough, mix(0.3, 1.0, smoothstep(0.0, 0.5, crowns)) * 0.95, leaf_blur);
 	vec3 canopy_mean = mix(mix(canopy_dark, canopy_light, 0.6), canopy_dry * 0.65, dry_share);
 	canopy = mix(canopy, canopy_mean, blur);
-	canopy_rough = mix(canopy_rough, 0.8, blur);
+	// The mean of the canopy where its crowns blur: the mean of the leaves and
+	// the gaps (0.8), times the mean light of a field of domes (crown_dome_mean:
+	// 0.74 of a flat ground with the sun high; with the sun low the crowns shade
+	// each other). With a flat normal and no domes, a far forest was as light as
+	// grass (PT-33: the slopes of Núi Lớn from Núi Nhỏ, report 0026, D-0026-23).
+	canopy_rough = mix(canopy_rough, 0.8 * crown_dome_mean, blur);
 	canopy *= canopy_rough * 0.85;
 	// Each crown is a dome for the light of the sun: one side lit and one in
 	// its own shade, as the crowns of the photo of S1.
