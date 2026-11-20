@@ -621,6 +621,20 @@
 			"hash": "c212572faa567452ece017faba2f4c89",
 			"seen": "A preview in my workspace, not a build of the factory: the factory answers HTTP 503 (memory) when it places this order, so I made the edits of the rule (World.Town.Building, ported to Python) into voxels of 0.1 m and rendered them with tools/world/look.gd (build/look/nha_khach_ha_long_preview_near.png). The two masts on the machine room (near only) show; the rest is as at the mid level.",
 			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "7104aed3b6a2a9030c355a6a16106029",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/nha_khach_ha_long_mid.png), next to photo 0 (2021). A white block of 8 storeys on its outline (21.35 m by 17.07 m), the rows of windows of the south and the west face, the pairs of the top storey with the air conditioners, the grey band at the foot, the machine room at the east end of the roof, and the letters HA LONG HOTEL in blue on the edge of the roof over the west half of the south face, as in photo 0.",
+			"changed": "Nothing. (The looks of before were of a preview in my workspace, D-0026-27.)"
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "7104aed3b6a2a9030c355a6a16106029",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/nha_khach_ha_long_far.png). The same block, the windows and the letters a little softer, the machine room.",
+			"changed": "Nothing."
 		}
 	],
 	"status": "Source",
