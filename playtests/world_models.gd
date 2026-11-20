@@ -7,7 +7,9 @@ extends RefCounted
 # Checks: no magenta pixel and no surface with no material of the game; the
 # model stands on the ground (its lowest point at the floor, ±1 cm); the levels
 # have the ranges of the preset; at each change of level the mean color of the
-# model area changes by 12 % or less. The last phase makes one sheet for each
+# model area changes by 12 % or less; the outline of the mid and the far level
+# from the side covers the area of the outline of the first level within 30 %
+# (report 0026, D-0026-32). The last phase makes one sheet for each
 # model (sheet_ID.png): a row for each preset and level, a column for each
 # view. Each preset is in phases of GROUP_SIZE models, so that a phase takes
 # less than the time limit under lavapipe.
@@ -74,6 +76,11 @@ const VIEW_ORDER := ["front", "side", "three_quarters"]
 const ORIGIN := Vector3(-3200.0, 4.0, 600.0)
 const SPACING := 12.0
 const MAX_LEVEL_CHANGE := 0.12
+## Report 0026, D-0026-32: the outline of the mid and the far level from the
+## side covers the area of the outline of the first level, within this part.
+const MAX_OUTLINE_CHANGE := 0.3
+## A pixel of the model differs from the view with no level by more than this (0 to 1, in a channel).
+const OUTLINE_DIFFERENCE := 0.06
 const SHEET_CELL := Vector2i(320, 180)
 ## The models of one phase, and the phases of one preset.
 const GROUP_SIZE := 2
@@ -107,6 +114,11 @@ func run(d: PlaytestDriver) -> void:
 	for i in models.size():
 		var model := models[i]
 		_check_model(d, model, preset)
+		# Report 0026, D-0026-32: the side view with no level, for the outline of each level.
+		_show_only(model, "")
+		await _look(d, model, VIEWS.side, _distance(model))
+		var empty := d.viewport().get_texture().get_image()
+		var outlines := {}
 		for level: String in WorldModel.levels_of(model.id):
 			_show_only(model, level)
 			for view: String in VIEW_ORDER:
@@ -115,6 +127,9 @@ func run(d: PlaytestDriver) -> void:
 				d.expect(stats.magenta == 0, "%s %s %s: no magenta pixel (%d)" % [model.id, level, view, stats.magenta])
 				d.expect(stats.pixels > 0, "%s %s %s: the model is on the screen" % [model.id, level, view])
 				await d.screenshot("%s_%s_%s_%s" % [model.id, preset, level, view])
+				if view == "side":
+					outlines[level] = _outline_pixels(d.last_image, empty)
+		_check_outlines(d, model, outlines)
 		_show_all(model)
 		await _check_level_changes(d, model)
 	d.fly_end()
@@ -282,3 +297,29 @@ static func _make_sheets(d: PlaytestDriver) -> void:
 		d.step("sheet_%s.png: %d of %d screenshots (rows: %s; columns: %s)" % [model_id, found,
 				rows.size() * VIEW_ORDER.size(), ", ".join(rows), ", ".join(VIEW_ORDER)])
 		d.expect(found == rows.size() * VIEW_ORDER.size(), "sheet_%s.png has all its screenshots" % model_id)
+
+
+## The pixels of a view that differ from the same view with no level: the
+## outline of the level (and its shadow on the ground, the same for each level).
+static func _outline_pixels(image: Image, empty: Image) -> int:
+	var count := 0
+	for y in range(0, image.get_height(), 2):
+		for x in range(0, image.get_width(), 2):
+			var a := image.get_pixel(x, y)
+			var b := empty.get_pixel(x, y)
+			if absf(a.r - b.r) > OUTLINE_DIFFERENCE or absf(a.g - b.g) > OUTLINE_DIFFERENCE or absf(a.b - b.b) > OUTLINE_DIFFERENCE:
+				count += 1
+	return count
+
+
+## Report 0026, D-0026-32: the mid level of the blue pole showed a cone, and the
+## far level of the fence of the Grand Hotel showed wedges.
+static func _check_outlines(d: PlaytestDriver, model: WorldModel, outlines: Dictionary) -> void:
+	var levels: Array = outlines.keys()
+	if levels.size() < 2:
+		return
+	var first := maxf(float(outlines[levels[0]]), 1.0)
+	for k in range(1, levels.size()):
+		var part := float(outlines[levels[k]]) / first
+		d.expect(absf(part - 1.0) <= MAX_OUTLINE_CHANGE, "%s: the outline of the %s level from the side is %.2f of the %s level (%.2f to %.2f)" % [
+				model.id, levels[k], part, levels[0], 1.0 - MAX_OUTLINE_CHANGE, 1.0 + MAX_OUTLINE_CHANGE])

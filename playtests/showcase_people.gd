@@ -23,6 +23,8 @@ const Shots := preload("res://playtests/showcase_shots.gd")
 const PEOPLE_RANGE := 90.0
 ## Two people closer than this (m, from foot to foot) stand in each other.
 const MIN_GAP := 0.5
+## Report 0026, D-0026-37: two sitters nearer than this (m) are side by side.
+const SAME_NEAR := 4.0
 ## A person nearer than this (m) to the trunk of a tree stands in it.
 const TREE_GAP := 0.35
 ## Report 0026, D-0026-20: the swimmers at 17:00, and the water at their feet (m).
@@ -68,6 +70,18 @@ func run(d: PlaytestDriver) -> void:
 			if Vector2(feet[i].x - feet[j].x, feet[i].z - feet[j].z).length() < MIN_GAP:
 				crowded += 1
 	d.expect(crowded == 0, "nobody stands in another person: %d pairs closer than %.1f m" % [crowded, MIN_GAP])
+	# Report 0026, D-0026-37: two sitters side by side are not the same person.
+	var twins := PackedStringArray()
+	for i in people.sitters.size():
+		for j in range(i + 1, people.sitters.size()):
+			var a: WorldModel = people.sitters[i].model
+			var b: WorldModel = people.sitters[j].model
+			var gap := Vector2(a.global_position.x - b.global_position.x, a.global_position.z - b.global_position.z).length()
+			if gap < SAME_NEAR and a.id == b.id:
+				twins.append("%s at (%.1f, %.1f) and (%.1f, %.1f)" % [a.id, a.global_position.x, a.global_position.z,
+						b.global_position.x, b.global_position.z])
+	d.expect(twins.is_empty(), "no two sitters within %.1f m are the same person%s" % [
+			SAME_NEAR, "" if twins.is_empty() else ": " + "; ".join(twins)])
 	var in_trees := 0
 	for p in feet:
 		if not w.trees.all_trees_near(p, TREE_GAP).is_empty():

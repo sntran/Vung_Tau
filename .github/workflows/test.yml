@@ -58,8 +58,8 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Install pytest
-        run: pip install pytest
+      - name: Install pytest, numpy, and Pillow
+        run: pip install pytest numpy pillow
 
       # Plan 0023, R3: the files of assets/world agree with data/world/lock.json and orders.json.
       - name: Check the models of World

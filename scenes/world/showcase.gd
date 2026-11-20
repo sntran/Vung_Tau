@@ -369,7 +369,8 @@ func _wall_poles(line: PackedVector3Array, cfg: Dictionary) -> void:
 		var right := Vector3(-along.z, 0.0, along.x).normalized()
 		var land := right if world.ground_height(p.x + right.x * 2.0, p.z + right.z * 2.0) \
 				> world.ground_height(p.x - right.x * 2.0, p.z - right.z * 2.0) else -right
-		var foot := _on_ground(p + land * float(cfg.get("in_m", 1.0)))
+		# Report 0026, D-0026-33: not in an opening of the wall.
+		var foot := _on_ground(_clear_of_openings(p + land * float(cfg.get("in_m", 1.0))))
 		if not contains(foot.x, foot.z) or _in_model(foot):
 			continue
 		# A model with a long arm turns it to the right side of "along": to the land.
@@ -581,7 +582,8 @@ func _balustrade(line: PackedVector3Array, cfg: Dictionary) -> void:
 		for gap in gaps:
 			var mid := (gap.x + gap.y) / 2.0
 			if mid >= along and mid < along + length:
-				wall_openings.append({"at": a.lerp(b, (mid - along) / maxf(length, 0.001)), "along": dir})
+				wall_openings.append({"at": a.lerp(b, (mid - along) / maxf(length, 0.001)), "along": dir,
+						"half": (gap.y - gap.x) / 2.0})
 		along += length
 	_add_length("beach_wall", along)
 	_add_length("wall_openings", gaps.size())
@@ -1824,7 +1826,34 @@ func _lamp_row(cfg: Dictionary) -> void:
 			var along: Vector3 = at[1]
 			if bool(cfg.get("long_arm_over_way", false)) and sign > 0.0:
 				along = -along
-			_lamp(str(cfg.get("kind", "")), at[0], along)
+			_lamp(str(cfg.get("kind", "")), _clear_of_openings(at[0]), along)
+
+
+## Report 0026, D-0026-33: a pole of a row of lamps stands at least
+## OPENING_CLEAR_M from the side of an opening of the low wall (a blue pole
+## stood at the top of the steps of two openings). A point near an opening
+## moves along the wall to the nearer side, OPENING_CLEAR_M past it.
+const OPENING_CLEAR_M := 1.5
+## A pole nearer than this to the line of the wall is a pole of the wall (m).
+const OPENING_NEAR_M := 3.0
+
+
+func _clear_of_openings(p: Vector3) -> Vector3:
+	for opening: Dictionary in wall_openings:
+		var along: Vector3 = opening.along
+		along.y = 0.0
+		along = along.normalized()
+		var offset: Vector3 = p - opening.at
+		offset.y = 0.0
+		var side := offset.dot(along)
+		var across := (offset - along * side).length()
+		# 0.2 m more: the wall bends, and the pole is on the ground of the side.
+		var clear := float(opening.get("half", 1.35)) + OPENING_CLEAR_M + 0.2
+		if across <= OPENING_NEAR_M and absf(side) < clear:
+			var moved := p + along * ((clear if side >= 0.0 else -clear) - side)
+			moved.y = world.ground_height(moved.x, moved.z)
+			return moved
+	return p
 
 
 ## R9: the low lamps along the paths of the park, at alternate sides.

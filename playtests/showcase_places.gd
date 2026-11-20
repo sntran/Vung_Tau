@@ -66,6 +66,11 @@ const FORECOURT_EVERY := 0.5
 const FORECOURT_CURB_M := 0.5
 const FORECOURT_MAX_M := 80.0
 const FORECOURT_INSET := 3.0
+## The distance of the screenshot of a model in front of it, and the most (m).
+const VIEW_M := 25.0
+const VIEW_MAX_M := 80.0
+## The eye of a screenshot stays this far out of the box of each model (m).
+const VIEW_CLEAR_M := 1.0
 
 
 func run(d: PlaytestDriver) -> void:
@@ -149,17 +154,26 @@ func run(d: PlaytestDriver) -> void:
 				common += absf(_area(part))
 			d.expect(common <= MAX_COMMON_M2, "%s and %s do not overlap: %.1f m² in common" % [
 					models[i].id, models[j].id, common])
-	# A screenshot of each model from its street, 25 m in front of it.
+	# A screenshot of each model from its street, 25 m in front of it, or
+	# farther where that point is in the box of another model (report 0026,
+	# D-0026-34: the eye of the view of Cao ốc Sen Biển was in the hall with the
+	# orange roof, and the frame was one flat color).
 	for entry: Dictionary in models:
 		var t: Transform3D = entry.model.transform
 		var middle := t * Vector3(float(data[entry.id].get("front_middle_x", 0.0)), 0, 0)
 		var out := t.basis * Vector3.BACK
-		var eye := middle + out * 25.0
+		var away := VIEW_M
+		while away < VIEW_MAX_M and _in_a_box(models, data, middle + out * away):
+			away += 1.0
+		var eye := middle + out * away
+		if away > VIEW_M:
+			d.step("the view of %s is %.0f m in front of it: nearer, the eye is in the box of another model" % [entry.id, away])
 		eye.y = w.ground_height(eye.x, eye.z) + Player.EYE_HEIGHT
 		await d.fly_to(eye, middle + Vector3(0, 6.0, 0))
 		await d.wait_ground(60.0)
 		await d.wait_frames(6)
 		await d.screenshot(str(entry.id))
+		d.expect_not_flat("the view of %s from its street" % entry.id)
 	d.fly_end()
 
 
@@ -495,3 +509,16 @@ func _boat_view(d: PlaytestDriver, w: VungTau) -> void:
 		await d.wait_frames(6)
 		await d.screenshot(str(view[0]))
 	d.fly_end()
+
+
+## True if the point is in the box of a model (with VIEW_CLEAR_M round it).
+func _in_a_box(models: Array[Dictionary], data: Dictionary, point: Vector3) -> bool:
+	for entry: Dictionary in models:
+		var box: Array = data[entry.id].get("box", [])
+		if box.size() < 4:
+			continue
+		var local: Vector3 = entry.model.transform.affine_inverse() * point
+		if local.x > float(box[0]) - VIEW_CLEAR_M and local.x < float(box[1]) + VIEW_CLEAR_M \
+				and local.z > float(box[2]) - VIEW_CLEAR_M and local.z < float(box[3]) + VIEW_CLEAR_M:
+			return true
+	return false

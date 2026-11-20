@@ -11,6 +11,11 @@ extends RefCounted
 # the walk again (within 0.3 m of its height). The model of the steps has its
 # top at the walk and its foot on the sand (TOP_ON_WALK, FOOT_ON_SAND). The openings are in four runs
 # (five openings took 151 s in the workspace, and CI is about two times slower).
+# Report 0026, D-0026-33: no part stands in the way of an opening (the body of
+# the player, PLAYER_RADIUS, from WALK_BACK m on the walk to SAND_OUT m on the
+# sand), and no lamp pole stands nearer than POLE_CLEAR m to a side of an
+# opening (in audit 4 a blue pole stood at the top of the steps of openings 0
+# and 3).
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=17:00 --quality=low
 # phase: --world=vung_tau --start-time=17:00 --quality=low
@@ -31,6 +36,9 @@ const LOOK_BACK_S := 45.0
 const FOOT_ON_SAND := 0.3
 ## An opening where the sand is this much under the walk has steps.
 const NEEDS_STEPS := 0.4
+## D-0026-33: the radius of the body of the player, and the least distance of a pole from a side of an opening (m).
+const PLAYER_RADIUS := 0.3
+const POLE_CLEAR := 1.5
 
 
 func run(d: PlaytestDriver) -> void:
@@ -60,6 +68,7 @@ func _walk_through(d: PlaytestDriver, w: VungTau, k: int, opening: Dictionary) -
 		return
 	var walk_point := at - sand * WALK_BACK
 	var sand_point := at + sand * SAND_OUT
+	_check_way(d, w, k, opening, sand)
 	var walk_y := w.ground_height(walk_point.x, walk_point.z)
 	var sand_y := w.ground_height(sand_point.x, sand_point.z)
 	walk_point.y = walk_y
@@ -116,3 +125,39 @@ func _walk_through(d: PlaytestDriver, w: VungTau, k: int, opening: Dictionary) -
 	player = d.state().player
 	d.expect(reached and absf(player.y - walk_y) <= BACK_ON_WALK + 0.1,
 			"opening %d: the player walks back up to the walk: %.2f m (the walk %.2f m)" % [k, player.y, walk_y])
+
+
+## D-0026-33: the things of the showcase near an opening: the lamps (their
+## poles), the low lamps of the paths, and the plants and benches of the park.
+## A thing in the way of the body of the player through the opening fails, and
+## a lamp pole nearer than POLE_CLEAR to a side of the opening fails.
+func _check_way(d: PlaytestDriver, w: VungTau, k: int, opening: Dictionary, sand: Vector3) -> void:
+	var at: Vector3 = opening.at
+	var along: Vector3 = opening.get("along", Vector3.RIGHT)
+	along.y = 0.0
+	along = along.normalized()
+	var half := float(opening.get("half", 1.35))
+	var things: Array = []
+	for lamp: Dictionary in w.showcase.lamps:
+		things.append(["the lamp %s" % lamp.get("kind", ""), lamp.at, true])
+	for p: Vector3 in w.showcase.path_lamp_points:
+		things.append(["a low lamp of a path", p, true])
+	for plant: Dictionary in w.showcase.park_plants:
+		things.append(["the %s" % plant.get("kind", "plant"), plant.get("at", Vector3.INF), false])
+	var found := PackedStringArray()
+	for thing: Array in things:
+		var p: Vector3 = thing[1]
+		if not p.is_finite():
+			continue
+		var offset := p - at
+		offset.y = 0.0
+		var side := absf(offset.dot(along))
+		var out := offset.dot(sand)
+		if out >= -WALK_BACK and out <= SAND_OUT and side < half - PLAYER_RADIUS:
+			found.append("%s at (%.1f, %.1f) is in the way: %.1f m from the middle, %.1f m to the sand side" % [
+					thing[0], p.x, p.z, side, out])
+		elif bool(thing[2]) and absf(out) <= POLE_CLEAR and side < half + POLE_CLEAR:
+			found.append("%s at (%.1f, %.1f) is %.1f m from the side of the opening (at least %.1f)" % [
+					thing[0], p.x, p.z, side - half, POLE_CLEAR])
+	d.expect(found.is_empty(), "opening %d: nothing stands in the way of the opening%s" % [
+			k, "" if found.is_empty() else ": " + "; ".join(found)])

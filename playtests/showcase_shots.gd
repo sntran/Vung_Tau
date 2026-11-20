@@ -119,6 +119,7 @@ func run(d: PlaytestDriver) -> void:
 		await d.wait_frames(8)
 		_check_look(d, shot, str(run_values[0]), str(run_values[1]))
 		await d.screenshot("%s_%s_%s" % [shot.id, run_values[0], run_values[1]])
+		d.expect_not_flat("%s at %s on %s" % [shot.id, run_values[1], run_values[0]])
 		ui.visible = true
 		d.step("%s (%s): eye (%.1f, %.1f, %.1f), fov %.0f; %s" % [shot.id, shot.name, eye.x, eye.y, eye.z, camera.fov, memory_text()])
 		camera.fov = fov

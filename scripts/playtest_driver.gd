@@ -908,6 +908,51 @@ func screenshot(shot_name: String) -> void:
 	var image := viewport().get_texture().get_image()
 	var error := image.save_png(out_dir.path_join(file))
 	step("screenshot " + file, error == OK, "" if error == OK else "cannot save: error %d" % error)
+	last_image = image
+
+
+## The picture of the last screenshot.
+var last_image: Image
+## Report 0026, D-0026-34: a frame where one flat color covers more than this
+## part shows nothing (an object just in front of the eye).
+const FLAT_LIMIT := 0.5
+## The colors within this value (0 to 1, in each channel) of the most common
+## color are the same flat color. A sky has a gradient, and a lit surface has
+## a texture: both are wider.
+const FLAT_STEP := 0.025
+
+
+## The part of a picture (every 4th pixel) that one flat color covers.
+static func flat_part(image: Image) -> float:
+	var counts := {}
+	var colors: Array[Color] = []
+	for y in range(0, image.get_height(), 4):
+		for x in range(0, image.get_width(), 4):
+			var c := image.get_pixel(x, y)
+			colors.append(c)
+			var bucket := Vector3i(int(c.r * 40.0), int(c.g * 40.0), int(c.b * 40.0))
+			counts[bucket] = int(counts.get(bucket, 0)) + 1
+	var best := Vector3i.ZERO
+	var most := -1
+	for bucket: Vector3i in counts:
+		if counts[bucket] > most:
+			most = counts[bucket]
+			best = bucket
+	var mode := Color((best.x + 0.5) / 40.0, (best.y + 0.5) / 40.0, (best.z + 0.5) / 40.0)
+	var same := 0
+	for c in colors:
+		if absf(c.r - mode.r) <= FLAT_STEP and absf(c.g - mode.g) <= FLAT_STEP and absf(c.b - mode.b) <= FLAT_STEP:
+			same += 1
+	return float(same) / maxf(1.0, colors.size())
+
+
+## Fails when one flat color covers more than FLAT_LIMIT of the last screenshot.
+func expect_not_flat(what: String) -> bool:
+	if last_image == null:
+		return expect(false, "%s: no screenshot" % what)
+	var part := flat_part(last_image)
+	return expect(part <= FLAT_LIMIT, "%s: one flat color covers %.0f %% of the frame (at most %.0f %%)" % [
+			what, part * 100.0, FLAT_LIMIT * 100.0])
 
 
 # --- Read-only state -------------------------------------------------------

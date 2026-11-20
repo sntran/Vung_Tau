@@ -211,12 +211,12 @@
 								"cells": {
 									"near": 0.01,
 									"mid": 0.02,
-									"far": 0.06
+									"far": 0.03
 								},
 								"budget": {
 									"near": 3000,
-									"mid": 400,
-									"far": 160
+									"mid": 700,
+									"far": 600
 								}
 							}
 						}
@@ -306,7 +306,22 @@
 			"hash": "(the files of the lock of fe1c185)",
 			"seen": "In PT-56 on Low and in the shot S4 of PT-72 on Low: the far level (a budget of 40 triangles) had no posts, only slanted wedges at the ends and the bars as thin teeth; at the change from the mid level the mean color changed by 12.7 % (the limit is 12 %).",
 			"changed": "The far budget is 160 triangles, so that the posts and their caps stay boxes at cells of 6 cm."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "524f5fbf4672da485e6ab03bc03d22e0",
+			"seen": "Report 0026, D-0026-32: the mid level of the order before (400 triangles) had wedges between the bars. With 700 triangles: straight bars, the posts with their caps; the outline is 1.00 of the near level from the front and from the side.",
+			"changed": "Mid budget 700 (was 400)."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "7dc1b5dc21dd88ead5745e9f4d679852",
+			"seen": "Report 0026, D-0026-32: the far level of the order before (160 triangles, cells of 6 cm) had wedges at the posts and in place of the bars: its outline from the side was 0.57 of the near level. With 600 triangles and cells of 3 cm: the posts with their caps, the bars, the rail and the wall; the outline is 1.00 of the near level from the front and from the side.",
+			"changed": "Far cells 0.03 m (were 0.06), far budget 600 (was 160)."
 		}
 	],
-	"status_note": "Source (report 0026, Q17, rule 1): the photos of 2014 (S4 and Nguyễn Du) and the street photo of Mapillary of 2024-11-09 show the same fence with the cream lantern posts and the iron bars on the edge of the sidewalk. No photo of 2017 to 2021 shows it (Mapillary has none there). The looks wait for the files of the lock (the job \"Models of World\")."
+	"status_note": "Source (report 0026, Q17, rule 1): the photos of 2014 (S4 and Nguyễn Du) and the street photo of Mapillary of 2024-11-09 show the same fence with the cream lantern posts and the iron bars on the edge of the sidewalk. No photo of 2017 to 2021 shows it (Mapillary has none there). The looks wait for the files of the lock (the job \"Models of World\").",
+	"hash": "7dc1b5dc21dd88ead5745e9f4d679852"
 }

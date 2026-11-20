@@ -148,7 +148,14 @@
 			"hash": "f7b3a08f9256dd077631e9bb121e3b6f",
 			"seen": "Next to the crop of photo 3 (2019): the ball on the spike, the stays to the end of each arm, the two bars of each arm that curve up to a closed end, the head between the bars of the long arm.",
 			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "814bd0d7cecf40a57dc39d8a90db6806",
+			"seen": "Report 0026, D-0026-32: the far level of the order before (120 triangles, cells of 6 cm) was a wedge from the arms down to half the height of the pole: its outline from the front was 1.89 of the near level, and from the side 0.42. With 400 triangles and cells of 3.5 cm: the pole, the two arms, the globe on its arm and the horn; the outline is 0.89 of the near level from the front and 1.02 from the side (tools/world/outlines.py).",
+			"changed": "The far level of the node hai_tay of the blueprint den_cong_vien: cells 0.035 m (were 0.06), budget 400 (was 120)."
 		}
 	],
-	"hash": "f7b3a08f9256dd077631e9bb121e3b6f"
+	"hash": "814bd0d7cecf40a57dc39d8a90db6806"
 }

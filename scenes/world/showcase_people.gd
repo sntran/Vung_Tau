@@ -489,6 +489,10 @@ func _walker_body(model: WorldModel) -> AnimatableBody3D:
 	return body
 
 
+## Report 0026, D-0026-37: two sitters nearer than this (m) are not the same person.
+const SAME_NEAR_M := 4.0
+
+
 ## The sitters: on the borders of the raised lawns, with their backs to the lawn.
 func _add_sitters(world: VungTau, showcase: Showcase, cfg: Dictionary, rng: RandomNumberGenerator) -> void:
 	var seats: Array[Transform3D] = []
@@ -523,10 +527,33 @@ func _add_sitters(world: VungTau, showcase: Showcase, cfg: Dictionary, rng: Rand
 	body.collision_mask = 0
 	add_child(body)
 	var models := _with_files(cfg.get("models", []))
-	for i in mini(int(cfg.get("count", 0)), seats.size()):
-		var model := WorldModel.make(str(models[i % models.size()]))
+	if models.is_empty():
+		return
+	# Report 0026, D-0026-37: a sitter is not the same person as a sitter within
+	# SAME_NEAR_M (two sat side by side with the same face and clothes). A seat
+	# with no such person stays empty, and the next seat takes the sitter.
+	var placed: Array[Array] = []  # [position, model id]
+	var count := int(cfg.get("count", 0))
+	for i in seats.size():
+		if placed.size() >= count:
+			break
+		var near_ids := {}
+		for other: Array in placed:
+			var q: Vector3 = other[0]
+			if Vector2(q.x - seats[i].origin.x, q.z - seats[i].origin.z).length() < SAME_NEAR_M:
+				near_ids[other[1]] = true
+		var model_id := ""
+		for k in models.size():
+			var candidate := str(models[(placed.size() + k) % models.size()])
+			if not near_ids.has(candidate):
+				model_id = candidate
+				break
+		if model_id == "":
+			continue
+		var model := WorldModel.make(model_id)
 		if model == null:
 			continue
+		placed.append([seats[i].origin, model_id])
 		model.transform = seats[i]
 		add_child(model)
 		model.custom_ranges = PEOPLE_RANGES
