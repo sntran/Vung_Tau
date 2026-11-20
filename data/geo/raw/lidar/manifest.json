@@ -1,0 +1,357 @@
+{
+	"release": "geodata-0009-1",
+	"files": {
+		"atl03_ground/2018": {
+			"name": "atl03_ground_2018_15da164804ff.json.gz",
+			"sha256": "15da164804ff1d4058dac6b6a90263d4a78d9ba86cd2bff6a17b9bb969c22c3e",
+			"bytes": 609713,
+			"product": "atl03_ground",
+			"year": 2018,
+			"rows": 98228,
+			"fetched": "Git 7d32458"
+		},
+		"atl03_ground/2019": {
+			"name": "atl03_ground_2019_5a29a723cc2c.json.gz",
+			"sha256": "5a29a723cc2c3a2f3ce9345d82c0dab495de5a8e3f11fe12843c0265c926af53",
+			"bytes": 981629,
+			"product": "atl03_ground",
+			"year": 2019,
+			"rows": 168384,
+			"fetched": "Git 7d32458"
+		},
+		"atl03_ground/2020": {
+			"name": "atl03_ground_2020_1aac8df90a8f.json.gz",
+			"sha256": "1aac8df90a8f0a7a0c331a5f4a9801aef0b9ffc4dbafc470c6ee871cae57d0c0",
+			"bytes": 314867,
+			"product": "atl03_ground",
+			"year": 2020,
+			"rows": 48543,
+			"fetched": "Git 7d32458"
+		},
+		"atl03_ground/2021": {
+			"name": "atl03_ground_2021_7f464f2e40c4.json.gz",
+			"sha256": "7f464f2e40c406e94b4a8aefae54e82e30e2a8e9ffbaa03d971ad6c47edc1104",
+			"bytes": 279112,
+			"product": "atl03_ground",
+			"year": 2021,
+			"rows": 41168,
+			"fetched": "Git 7d32458"
+		},
+		"atl03_ground/2022": {
+			"name": "atl03_ground_2022_d8d96e25fc69.json.gz",
+			"sha256": "d8d96e25fc69462ec03012f88854a77fce4c3c933d9affdc9a9c1c378926f6da",
+			"bytes": 684196,
+			"product": "atl03_ground",
+			"year": 2022,
+			"rows": 108229,
+			"fetched": "Git 7d32458"
+		},
+		"atl03_ground/2023": {
+			"name": "atl03_ground_2023_44a039085540.json.gz",
+			"sha256": "44a0390855401588bf9ca09cb4e9c5cd4e7fe5e780af77730f582877c266050e",
+			"bytes": 745126,
+			"product": "atl03_ground",
+			"year": 2023,
+			"rows": 119835,
+			"fetched": "Git 7d32458"
+		},
+		"atl03_ground/2024": {
+			"name": "atl03_ground_2024_e65e4aa77902.json.gz",
+			"sha256": "e65e4aa779027ea80f50875fd95e19ede93c6763e310c49722e8bec1a503fe27",
+			"bytes": 477592,
+			"product": "atl03_ground",
+			"year": 2024,
+			"rows": 68270,
+			"fetched": "Git 7d32458"
+		},
+		"atl03_ground/2025": {
+			"name": "atl03_ground_2025_97c15196c3d4.json.gz",
+			"sha256": "97c15196c3d4e3173ce15ba731e934336750b00f9b553c49a922e1133a430ee4",
+			"bytes": 935569,
+			"product": "atl03_ground",
+			"year": 2025,
+			"rows": 148200,
+			"fetched": "Git 7d32458"
+		},
+		"atl03_ground/2026": {
+			"name": "atl03_ground_2026_73a302aefae6.json.gz",
+			"sha256": "73a302aefae69627107c46728b561d383918a3293e06d1d00ba43485131fd3cf",
+			"bytes": 618400,
+			"product": "atl03_ground",
+			"year": 2026,
+			"rows": 95798,
+			"fetched": "2026-11-20"
+		},
+		"atl03_roof/2018": {
+			"name": "atl03_roof_2018_b23a0783fd69.json.gz",
+			"sha256": "b23a0783fd6984ebf46784a739fcccfd2dd571203063e1e0491fd96cf00a0915",
+			"bytes": 55932,
+			"product": "atl03_roof",
+			"year": 2018,
+			"rows": 5662,
+			"fetched": "2026-11-20"
+		},
+		"atl03_roof/2019": {
+			"name": "atl03_roof_2019_29e4d06903fc.json.gz",
+			"sha256": "29e4d06903fce850f066d41d049e0e1ec56990f1404fcf210c3d5120a65175f7",
+			"bytes": 64784,
+			"product": "atl03_roof",
+			"year": 2019,
+			"rows": 5679,
+			"fetched": "2026-11-20"
+		},
+		"atl03_roof/2020": {
+			"name": "atl03_roof_2020_b2a2fd367466.json.gz",
+			"sha256": "b2a2fd367466df062fe13822ff47bd4bfe9d42018b4eaa0f99f8ed2739424063",
+			"bytes": 29282,
+			"product": "atl03_roof",
+			"year": 2020,
+			"rows": 2244,
+			"fetched": "2026-11-20"
+		},
+		"atl03_roof/2024": {
+			"name": "atl03_roof_2024_f187e66d3d64.json.gz",
+			"sha256": "f187e66d3d6434cfb5cc697594839677adaa71b524982c6216928d2592edc8de",
+			"bytes": 76612,
+			"product": "atl03_roof",
+			"year": 2024,
+			"rows": 6515,
+			"fetched": "2026-11-20"
+		},
+		"atl03_roof/2025": {
+			"name": "atl03_roof_2025_78fc8c82b93d.json.gz",
+			"sha256": "78fc8c82b93d0fefdc330f5a18e044647503cd4e9208e298844f33888bc8fd3b",
+			"bytes": 106721,
+			"product": "atl03_roof",
+			"year": 2025,
+			"rows": 9318,
+			"fetched": "2026-11-20"
+		},
+		"atl03_roof/2026": {
+			"name": "atl03_roof_2026_ae84ad6fa798.json.gz",
+			"sha256": "ae84ad6fa7980c7c440b921ebbb89c3311d9d3bad3cc8eb077ebf23a6d1e1531",
+			"bytes": 115301,
+			"product": "atl03_roof",
+			"year": 2026,
+			"rows": 11909,
+			"fetched": "2026-11-20"
+		},
+		"atl08/2018": {
+			"name": "atl08_2018_ac82cae86564.json.gz",
+			"sha256": "ac82cae865649a26f482510f0b0e4df96d9c52a2131b84a390a9a5da826f4b75",
+			"bytes": 57718,
+			"product": "atl08",
+			"year": 2018,
+			"rows": 4654,
+			"fetched": "2026-11-20"
+		},
+		"atl08/2019": {
+			"name": "atl08_2019_3d012d7890ab.json.gz",
+			"sha256": "3d012d7890abae484291cc4ca2ec1ff25183bcbf5a2c8502713d95b67e7d2228",
+			"bytes": 65350,
+			"product": "atl08",
+			"year": 2019,
+			"rows": 5627,
+			"fetched": "Git a36c84e"
+		},
+		"atl08/2020": {
+			"name": "atl08_2020_05ee5aabd32f.json.gz",
+			"sha256": "05ee5aabd32f3ce30d969c5287fa30edce9de8469fd590bd587e4f34448ad8dc",
+			"bytes": 230,
+			"product": "atl08",
+			"year": 2020,
+			"rows": 3,
+			"fetched": "Git 7d32458"
+		},
+		"atl08/2021": {
+			"name": "atl08_2021_05c9be345a27.json.gz",
+			"sha256": "05c9be345a27cc8129e7c19e940be7095916eaa32bf3aa9f6f732362b6b3cc39",
+			"bytes": 30827,
+			"product": "atl08",
+			"year": 2021,
+			"rows": 2464,
+			"fetched": "2026-11-20"
+		},
+		"atl08/2022": {
+			"name": "atl08_2022_13fd9c713bab.json.gz",
+			"sha256": "13fd9c713bab1d6098bf2fa6c096f5cb42b518dd795b37235bb7dfdfef0b58d6",
+			"bytes": 12922,
+			"product": "atl08",
+			"year": 2022,
+			"rows": 1139,
+			"fetched": "Git 7d32458"
+		},
+		"atl08/2023": {
+			"name": "atl08_2023_88d4fa05f5d8.json.gz",
+			"sha256": "88d4fa05f5d802619f2eb008cfb0d4c8b8fe8442adb9907a4bbb80af29eefc7e",
+			"bytes": 25584,
+			"product": "atl08",
+			"year": 2023,
+			"rows": 2202,
+			"fetched": "Git a36c84e"
+		},
+		"atl08/2024": {
+			"name": "atl08_2024_1bd6f047b7fe.json.gz",
+			"sha256": "1bd6f047b7fe31849d980144bbdeb74a7db3d514b5b7a67751c8a3fd9687212b",
+			"bytes": 35378,
+			"product": "atl08",
+			"year": 2024,
+			"rows": 2851,
+			"fetched": "Git a36c84e"
+		},
+		"atl08/2025": {
+			"name": "atl08_2025_ec9b46dbf712.json.gz",
+			"sha256": "ec9b46dbf712bcc41684d25b20ff26bf67efc6d1d029a1ee5bac4bf8a54975c9",
+			"bytes": 115387,
+			"product": "atl08",
+			"year": 2025,
+			"rows": 9774,
+			"fetched": "2026-11-20"
+		},
+		"atl08/2026": {
+			"name": "atl08_2026_5668a3a8410d.json.gz",
+			"sha256": "5668a3a8410d5ef6474eb8d7aedefb223a1ff039921c65a88f7f2c874746ec99",
+			"bytes": 58328,
+			"product": "atl08",
+			"year": 2026,
+			"rows": 4919,
+			"fetched": "2026-11-20"
+		},
+		"atl24/2018": {
+			"name": "atl24_2018_081dccc53b9e.json.gz",
+			"sha256": "081dccc53b9ef946e82c0415d868d575b27deef9d3cdb6c53f3f16793b0d98c3",
+			"bytes": 109592,
+			"product": "atl24",
+			"year": 2018,
+			"rows": 8505,
+			"fetched": "Git 7d32458"
+		},
+		"atl24/2019": {
+			"name": "atl24_2019_4528f0427dcc.json.gz",
+			"sha256": "4528f0427dccbbfcf890128f9a2978b15bb4350e8a8d74e581ac5542209bfbae",
+			"bytes": 85723,
+			"product": "atl24",
+			"year": 2019,
+			"rows": 6270,
+			"fetched": "Git 7d32458"
+		},
+		"atl24/2020": {
+			"name": "atl24_2020_7f28140125b9.json.gz",
+			"sha256": "7f28140125b9d2155e47b8b2f9c38d2fb70b6049670dbbf0dee5f6ca6fb8f5aa",
+			"bytes": 50800,
+			"product": "atl24",
+			"year": 2020,
+			"rows": 3551,
+			"fetched": "Git 7d32458"
+		},
+		"atl24/2021": {
+			"name": "atl24_2021_74361c99905c.json.gz",
+			"sha256": "74361c99905c8149b065d4d46611784af7f638b4f0bc4875ada31fda332e7301",
+			"bytes": 45713,
+			"product": "atl24",
+			"year": 2021,
+			"rows": 3309,
+			"fetched": "Git 7d32458"
+		},
+		"atl24/2022": {
+			"name": "atl24_2022_896d69fcc457.json.gz",
+			"sha256": "896d69fcc4575b0734e8e9d388e6f0f4b2f66a965f8fa48c7c8a259d6c34447c",
+			"bytes": 20609,
+			"product": "atl24",
+			"year": 2022,
+			"rows": 1407,
+			"fetched": "Git 7d32458"
+		},
+		"atl24/2023": {
+			"name": "atl24_2023_1615beb8cb21.json.gz",
+			"sha256": "1615beb8cb21b133db512537e28ff9e60763c4567038d1b9fedb2217390d2758",
+			"bytes": 37773,
+			"product": "atl24",
+			"year": 2023,
+			"rows": 2568,
+			"fetched": "Git 7d32458"
+		},
+		"atl24/2024": {
+			"name": "atl24_2024_e9de6425d61a.json.gz",
+			"sha256": "e9de6425d61a6d81b1a852ed55978a87b21b33e0a47767ab19c2c2a9d6cd2cd0",
+			"bytes": 51258,
+			"product": "atl24",
+			"year": 2024,
+			"rows": 3634,
+			"fetched": "Git 7d32458"
+		},
+		"atl24/2025": {
+			"name": "atl24_2025_802d21d1d40f.json.gz",
+			"sha256": "802d21d1d40fa1ab28beb7484058a9883cb07afe9fcdbbaf7d0db025b86d3c08",
+			"bytes": 53769,
+			"product": "atl24",
+			"year": 2025,
+			"rows": 3685,
+			"fetched": "Git 7d32458"
+		},
+		"atl24/2026": {
+			"name": "atl24_2026_6e8fb15934fd.json.gz",
+			"sha256": "6e8fb15934fde71b13b38e70eff1dfeb66ec0e5f1d75d54c4713c70f294d19dd",
+			"bytes": 36834,
+			"product": "atl24",
+			"year": 2026,
+			"rows": 2500,
+			"fetched": "2026-11-20"
+		},
+		"gedi02a/2019": {
+			"name": "gedi02a_2019_2cbed69a322a.json.gz",
+			"sha256": "2cbed69a322a33ca8beb7a9968b10685e30d714be64fe37ebe077b7c5ec814c1",
+			"bytes": 5628,
+			"product": "gedi02a",
+			"year": 2019,
+			"rows": 384,
+			"fetched": "Git 7d32458"
+		},
+		"gedi02a/2021": {
+			"name": "gedi02a_2021_666320789d52.json.gz",
+			"sha256": "666320789d52c425f93e4180a33b6b2c0d93bd8abfc23442167342de2930382e",
+			"bytes": 1358,
+			"product": "gedi02a",
+			"year": 2021,
+			"rows": 74,
+			"fetched": "Git 7d32458"
+		},
+		"gedi02a/2022": {
+			"name": "gedi02a_2022_6bd229c456fe.json.gz",
+			"sha256": "6bd229c456fe115f1f372770a38dce4c084fbf385decae68ad18a251345afffa",
+			"bytes": 547,
+			"product": "gedi02a",
+			"year": 2022,
+			"rows": 23,
+			"fetched": "Git 7d32458"
+		},
+		"gedi02a/2023": {
+			"name": "gedi02a_2023_a5d69e11f508.json.gz",
+			"sha256": "a5d69e11f508b8575bc709781163a952f4296c0dff6f092ca8930a56ab8f2453",
+			"bytes": 6299,
+			"product": "gedi02a",
+			"year": 2023,
+			"rows": 416,
+			"fetched": "Git 7d32458"
+		},
+		"gedi02a/2024": {
+			"name": "gedi02a_2024_87eeb37c9b07.json.gz",
+			"sha256": "87eeb37c9b07cac546d7bb83f7a1f2a83544db42d1a7fdc5ee4d0b7d6eae4846",
+			"bytes": 1273,
+			"product": "gedi02a",
+			"year": 2024,
+			"rows": 72,
+			"fetched": "Git 7d32458"
+		},
+		"gedi02a/2025": {
+			"name": "gedi02a_2025_76799a71eda2.json.gz",
+			"sha256": "76799a71eda2161d4fc0042c4ee447c85a1c4f1f5cff05187d84159ebac719e0",
+			"bytes": 2661,
+			"product": "gedi02a",
+			"year": 2025,
+			"rows": 153,
+			"fetched": "Git 7d32458"
+		}
+	},
+	"note": "Made by tools/geo/lidar.py (plan 0009, R5a; report 0009, D-0009-01 and D-0009-06): the files of the lidar points, one for each product and year, are assets of the release of the repository; rows is the count of points of each file. The data of NASA (ICESat-2, GEDI) is free to use."
+}

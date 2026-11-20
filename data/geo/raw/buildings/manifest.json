@@ -1,0 +1,42 @@
+{
+	"release": "geodata-0009-1",
+	"files": {
+		"buildings_2019": {
+			"name": "buildings_2019_a449d5165a62.json.gz",
+			"sha256": "a449d5165a62a33ced717b0f0e3a549560abdc49437721cf81b410c55605607e",
+			"bytes": 2962738,
+			"rows": 51112
+		},
+		"ghs_built_h": {
+			"name": "ghs_built_h_7515ae39eef2.json.gz",
+			"sha256": "7515ae39eef223185ae143a0719bcc3b39a151e410999bdd0fe26dbef2e6df07",
+			"bytes": 12900,
+			"rows": 4861
+		},
+		"globfp": {
+			"name": "globfp_4a3cf8adf7c1.json.gz",
+			"sha256": "4a3cf8adf7c1f590220d46f5d58c7c32264aaa17b5b12e579428dce7305780fd",
+			"bytes": 440940,
+			"rows": 46561
+		},
+		"overture": {
+			"name": "overture_4c28869dcbd6.json.gz",
+			"sha256": "4c28869dcbd611768623d8176a2766de4a410c5764c1b542d47099215fcc590f",
+			"bytes": 3033191,
+			"rows": 56359
+		},
+		"temporal": {
+			"name": "temporal_ecd7da8ce189.json.gz",
+			"sha256": "ecd7da8ce1891ece5a43e2ad53809c8a4d6a347505ab47718ca1195260a27275",
+			"bytes": 2554460,
+			"rows": 52569
+		},
+		"unmatched_2019": {
+			"name": "unmatched_2019_e7324b8f048f.json.gz",
+			"sha256": "e7324b8f048ff868539dcfadd90bc6ae570792af8b8734b9467e107fb3975721",
+			"bytes": 1419659,
+			"rows": 403723
+		}
+	},
+	"note": "Made by tools/geo/buildings.py (plan 0009, R1 and R5d; report 0009, D-0009-06): the large files of the buildings are assets of the release of the repository. ODbL (OpenStreetMap contributors, Overture Maps Foundation, Microsoft, Google); Open Buildings 2.5D Temporal, 3D-GloBFP, and GHS-BUILT-H: CC BY 4.0."
+}

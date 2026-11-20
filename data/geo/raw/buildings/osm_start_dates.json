@@ -1,0 +1,103 @@
+{
+	"note": "Made by tools/geo/buildings.py osm2019 (plan 0009, R5d): the buildings of OpenStreetMap on 2026-07-26 with a start_date, with their tags. (c) OpenStreetMap contributors, ODbL.",
+	"date": "2026-07-26",
+	"columns": [
+		"osm",
+		"tags",
+		"outline"
+	],
+	"buildings": [
+		[
+			"way/235008112",
+			{
+				"alt_name": "Tượng Chúa Dang Tay",
+				"alt_name:vi": "Tượng Chúa Dang Tay",
+				"building": "yes",
+				"height": "32",
+				"historic": "monument",
+				"level": "4",
+				"man_made": "tower",
+				"memorial": "statue",
+				"name": "Tượng Chúa Kitô Vua",
+				"name:en": "Christ of Vung Tau",
+				"name:fr": "Christ Roi de Vung Ta",
+				"name:id": "Kristus Raja Vung Tau",
+				"name:ja": "王であるキリスト像",
+				"name:ko": "붕따우 그리스도상",
+				"name:pt": "Cristo de Vung Tau",
+				"name:ru": "Христос Царь",
+				"name:vi": "Tượng Chúa Kitô Vua",
+				"name:zh": "基督君王像",
+				"official_name": "Tượng đài Chúa Kitô Vua Núi Tao Phùng",
+				"official_name:en": "State of Christ the King on Tao Phung Mountain",
+				"official_name:id": "Patung Kristus Raja Gunung Tao Phung",
+				"official_name:vi": "Tượng đài Chúa Kitô Vua Núi Tao Phùng",
+				"smoking": "outside",
+				"start_date": "1995-12-1",
+				"tourism": "attraction",
+				"wikidata": "Q277837",
+				"wikimedia_commons": "Category:Christ of Vung Tau",
+				"wikipedia": "en:Christ of Vũng Tàu"
+			},
+			[
+				1159.6,
+				1889.7,
+				1162.2,
+				1890.3,
+				1163.6,
+				1891.5,
+				1163.8,
+				1893.5,
+				1163.4,
+				1895.0,
+				1162.1,
+				1896.7,
+				1160.2,
+				1897.1,
+				1157.4,
+				1896.5,
+				1156.3,
+				1894.9,
+				1155.8,
+				1893.3,
+				1156.2,
+				1891.5,
+				1157.4,
+				1890.4,
+				1159.6,
+				1889.7
+			]
+		],
+		[
+			"way/1095432060",
+			{
+				"addr:city": "Thành phố Vũng Tàu",
+				"addr:housenumber": "139/31",
+				"addr:postcode": "78000",
+				"addr:province": "Bà Rịa Vũng Tàu",
+				"addr:street": "Hẻm 139 Đường Phan Chu Trinh",
+				"addr:subdistrict": "Phường 2",
+				"building": "retail",
+				"building:levels": "4",
+				"description": "Cơ sở lưu trú dạng homestay boutique có 12 phòng theo 12 chủ đề gia đình phong cách indochine.",
+				"height": "50",
+				"name": "Nhà Bà Tư Boutique Homestay",
+				"smoking": "outside",
+				"start_date": "2022-9-1",
+				"website": "https://www.nhabatuhomestay.vn/"
+			},
+			[
+				1321.7,
+				1258.6,
+				1321.6,
+				1263.7,
+				1340.9,
+				1265.5,
+				1341.0,
+				1259.0,
+				1321.7,
+				1258.6
+			]
+		]
+	]
+}
