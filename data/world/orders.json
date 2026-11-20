@@ -43270,6 +43270,531 @@
 			"uses": "Plan 0026, R9 (report 0026, D-0026-31): the lamp posts of the walk of the sea of Hạ Long, in a row along the parapet (the kind globe_cast of data/showcase/bai_truoc.json).",
 			"drawing": "data/world/drawings/den_cot_den_cau_xanh.json",
 			"catalog": null
+		},
+		{
+			"id": "nha_khach_ha_long",
+			"order": {
+				"blueprint": "building",
+				"options": {
+					"name": "nha_khach_ha_long",
+					"sources": [
+						"Nhà khách Hạ Long (102 Hạ Long), Vũng Tàu. Plan: OpenStreetMap way 235149416 (© OpenStreetMap contributors, ODbL), building:levels 8. Look: a photo of 2021-05-10 (Flickr, Venanzio_KH) and a photo of 2014 (trungydang, Wikimedia Commons, CC BY 3.0)."
+					],
+					"size": [
+						21.35,
+						17.07
+					],
+					"storeys": 8,
+					"ground": 3.0,
+					"band": 0.8,
+					"storey": 2.9,
+					"colors": {
+						"wall": "#e8e4df",
+						"trim": "#e8e4df",
+						"band": "#b5b8b8",
+						"glass": "#3d4650",
+						"frame": "#f4f1e4",
+						"letters": "#1c2f6b",
+						"ground": "#a49d92"
+					},
+					"roof": {
+						"kind": "flat",
+						"parapet": 0.8
+					},
+					"fronts": [
+						{
+							"side": 1,
+							"style": "windows",
+							"bays": 6,
+							"inset": 0.8,
+							"window": [
+								1.2,
+								1.4
+							],
+							"bars": 1
+						},
+						{
+							"side": 2,
+							"from": 6.6,
+							"to": 10.2,
+							"style": "windows",
+							"bays": 1,
+							"places": [
+								8.4
+							],
+							"window": [
+								1.1,
+								1.3
+							],
+							"ledges": true
+						},
+						{
+							"side": 3,
+							"style": "windows",
+							"bays": 6,
+							"inset": 0.8,
+							"window": [
+								1.1,
+								1.3
+							]
+						},
+						{
+							"side": 4,
+							"style": "windows",
+							"bays": 4,
+							"inset": 1.0,
+							"window": [
+								1.1,
+								1.3
+							]
+						}
+					],
+					"letters": [
+						{
+							"side": 2,
+							"at": 4.4,
+							"z": 24.599999999999998,
+							"high": 0.6,
+							"text": "HA LONG HOTEL",
+							"out": 0.55
+						}
+					],
+					"apron": 0.6,
+					"age": 0.5,
+					"more": {
+						"than": [
+							{
+								"shape": "box",
+								"size": [
+									11.275,
+									9.135,
+									0.15
+								],
+								"at": [
+									10.675,
+									-8.535,
+									21.0
+								],
+								"color": "#b5b8b8",
+								"mode": "paint",
+								"blend": 0.01,
+								"raise": 0.03,
+								"roughness": 0.8
+							},
+							{
+								"shape": "box",
+								"size": [
+									0.63,
+									0.73,
+									0.25
+								],
+								"at": [
+									0.0,
+									-2.7,
+									22.8
+								],
+								"color": "#f4f1e4",
+								"axis": [
+									-1.0,
+									0.0,
+									0
+								],
+								"up": [
+									0,
+									0,
+									1
+								],
+								"mode": "paint",
+								"blend": 0.015,
+								"raise": 0.015,
+								"roughness": 0.6
+							},
+							{
+								"shape": "box",
+								"size": [
+									0.55,
+									0.65,
+									0.25
+								],
+								"at": [
+									0.0,
+									-2.7,
+									22.8
+								],
+								"color": "#3d4650",
+								"axis": [
+									-1.0,
+									0.0,
+									0
+								],
+								"up": [
+									0,
+									0,
+									1
+								],
+								"mode": "paint",
+								"blend": 0.06,
+								"raise": -0.06,
+								"roughness": 0.1,
+								"metal": 0.2
+							},
+							{
+								"shape": "box",
+								"size": [
+									0.025,
+									0.65,
+									0.25
+								],
+								"at": [
+									0.0,
+									-2.7,
+									22.8
+								],
+								"color": "#f4f1e4",
+								"axis": [
+									-1.0,
+									0.0,
+									0
+								],
+								"up": [
+									0,
+									0,
+									1
+								],
+								"mode": "paint",
+								"blend": 0.006,
+								"roughness": 0.6
+							},
+							{
+								"shape": "box",
+								"size": [
+									0.63,
+									0.73,
+									0.25
+								],
+								"at": [
+									0.0,
+									-4.1,
+									22.8
+								],
+								"color": "#f4f1e4",
+								"axis": [
+									-1.0,
+									0.0,
+									0
+								],
+								"up": [
+									0,
+									0,
+									1
+								],
+								"mode": "paint",
+								"blend": 0.015,
+								"raise": 0.015,
+								"roughness": 0.6
+							},
+							{
+								"shape": "box",
+								"size": [
+									0.55,
+									0.65,
+									0.25
+								],
+								"at": [
+									0.0,
+									-4.1,
+									22.8
+								],
+								"color": "#3d4650",
+								"axis": [
+									-1.0,
+									0.0,
+									0
+								],
+								"up": [
+									0,
+									0,
+									1
+								],
+								"mode": "paint",
+								"blend": 0.06,
+								"raise": -0.06,
+								"roughness": 0.1,
+								"metal": 0.2
+							},
+							{
+								"shape": "box",
+								"size": [
+									0.025,
+									0.65,
+									0.25
+								],
+								"at": [
+									0.0,
+									-4.1,
+									22.8
+								],
+								"color": "#f4f1e4",
+								"axis": [
+									-1.0,
+									0.0,
+									0
+								],
+								"up": [
+									0,
+									0,
+									1
+								],
+								"mode": "paint",
+								"blend": 0.006,
+								"roughness": 0.6
+							},
+							{
+								"shape": "box",
+								"size": [
+									0.63,
+									0.73,
+									0.25
+								],
+								"at": [
+									0.0,
+									-5.8,
+									22.8
+								],
+								"color": "#f4f1e4",
+								"axis": [
+									-1.0,
+									0.0,
+									0
+								],
+								"up": [
+									0,
+									0,
+									1
+								],
+								"mode": "paint",
+								"blend": 0.015,
+								"raise": 0.015,
+								"roughness": 0.6
+							},
+							{
+								"shape": "box",
+								"size": [
+									0.55,
+									0.65,
+									0.25
+								],
+								"at": [
+									0.0,
+									-5.8,
+									22.8
+								],
+								"color": "#3d4650",
+								"axis": [
+									-1.0,
+									0.0,
+									0
+								],
+								"up": [
+									0,
+									0,
+									1
+								],
+								"mode": "paint",
+								"blend": 0.06,
+								"raise": -0.06,
+								"roughness": 0.1,
+								"metal": 0.2
+							},
+							{
+								"shape": "box",
+								"size": [
+									0.025,
+									0.65,
+									0.25
+								],
+								"at": [
+									0.0,
+									-5.8,
+									22.8
+								],
+								"color": "#f4f1e4",
+								"axis": [
+									-1.0,
+									0.0,
+									0
+								],
+								"up": [
+									0,
+									0,
+									1
+								],
+								"mode": "paint",
+								"blend": 0.006,
+								"roughness": 0.6
+							},
+							{
+								"shape": "box",
+								"size": [
+									0.63,
+									0.73,
+									0.25
+								],
+								"at": [
+									0.0,
+									-13.3,
+									22.8
+								],
+								"color": "#f4f1e4",
+								"axis": [
+									-1.0,
+									0.0,
+									0
+								],
+								"up": [
+									0,
+									0,
+									1
+								],
+								"mode": "paint",
+								"blend": 0.015,
+								"raise": 0.015,
+								"roughness": 0.6
+							},
+							{
+								"shape": "box",
+								"size": [
+									0.55,
+									0.65,
+									0.25
+								],
+								"at": [
+									0.0,
+									-13.3,
+									22.8
+								],
+								"color": "#3d4650",
+								"axis": [
+									-1.0,
+									0.0,
+									0
+								],
+								"up": [
+									0,
+									0,
+									1
+								],
+								"mode": "paint",
+								"blend": 0.06,
+								"raise": -0.06,
+								"roughness": 0.1,
+								"metal": 0.2
+							},
+							{
+								"shape": "box",
+								"size": [
+									0.025,
+									0.65,
+									0.25
+								],
+								"at": [
+									0.0,
+									-13.3,
+									22.8
+								],
+								"color": "#f4f1e4",
+								"axis": [
+									-1.0,
+									0.0,
+									0
+								],
+								"up": [
+									0,
+									0,
+									1
+								],
+								"mode": "paint",
+								"blend": 0.006,
+								"roughness": 0.6
+							},
+							{
+								"shape": "box",
+								"size": [
+									3.55,
+									1.5,
+									2.5
+								],
+								"at": [
+									3.5,
+									-11.55,
+									25.3
+								],
+								"color": "#e8e4df",
+								"axis": [
+									-1.0,
+									0.0,
+									0
+								],
+								"up": [
+									0,
+									0,
+									1
+								],
+								"roughness": 0.85,
+								"surface": {
+									"kind": "plaster",
+									"scale": 0.04
+								}
+							},
+							{
+								"shape": "cylinder",
+								"size": [
+									0.06,
+									1.75
+								],
+								"at": [
+									2.5,
+									-9.0,
+									28.55
+								],
+								"color": "#9aa0a3",
+								"roughness": 0.5,
+								"metal": 0.6,
+								"levels": [
+									"near"
+								]
+							},
+							{
+								"shape": "cylinder",
+								"size": [
+									0.06,
+									1.4
+								],
+								"at": [
+									2.5,
+									-13.5,
+									28.2
+								],
+								"color": "#9aa0a3",
+								"roughness": 0.5,
+								"metal": 0.6,
+								"levels": [
+									"near"
+								]
+							}
+						]
+					}
+				}
+			},
+			"levels": [
+				"near",
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0026, R7, Q7: on its OSM outline (way 235149416) by Hạ Long, about 300 m south of Hải Âu (seen from the jetty and the walk of the sea); outside the area of the showcase (D1), it has no place in data/world/places/ yet.",
+			"drawing": "data/world/drawings/nha_khach_ha_long.json",
+			"catalog": null
 		}
 	]
 }
