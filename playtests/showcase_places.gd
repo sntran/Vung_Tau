@@ -30,6 +30,10 @@ extends RefCounted
 # the sidewalk, and the scan of the edges passed it: its foot was a short run).
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=10:00 --quality=low
+# phase: --world=vung_tau --start-time=10:00 --quality=low
+# Run 1 does the checks of the models, the ground, and the parts; run 2 the
+# view of each model with the part of the frame that it covers (in CI one run
+# took more than 300 s with the check of D-0026-41).
 
 const PLACES := "res://data/world/places/bai_truoc.json"
 ## The base of a model and the ground under its front.
@@ -117,6 +121,9 @@ func run(d: PlaytestDriver) -> void:
 	d.expect(models.size() == data.size() - waiting.size(), "each place with an order has its model: %d of %d" % [
 			models.size(), data.size() - waiting.size()])
 	d.step("the parts of the showcase (m, or a count): %s" % [w.showcase.lengths])
+	if d.phase == 2:
+		await _views(d, w, models, data)
+		return
 	_check_models(d, w)
 	_check_hill_side(d, w)
 	_scan_edges(d, w)
@@ -180,10 +187,14 @@ func run(d: PlaytestDriver) -> void:
 				common += absf(_area(part))
 			d.expect(common <= MAX_COMMON_M2, "%s and %s do not overlap: %.1f m² in common" % [
 					models[i].id, models[j].id, common])
-	# A screenshot of each model from its street, 25 m in front of it, or
-	# farther where that point is in the box of another model (report 0026,
-	# D-0026-34: the eye of the view of Cao ốc Sen Biển was in the hall with the
-	# orange roof, and the frame was one flat color).
+	d.fly_end()
+
+
+## A screenshot of each model from its street, 25 m in front of it, or
+## farther where that point is in the box of another model (report 0026,
+## D-0026-34: the eye of the view of Cao ốc Sen Biển was in the hall with the
+## orange roof, and the frame was one flat color).
+func _views(d: PlaytestDriver, w: VungTau, models: Array[Dictionary], data: Dictionary) -> void:
 	for entry: Dictionary in models:
 		var t: Transform3D = entry.model.transform
 		var middle := t * Vector3(float(data[entry.id].get("front_middle_x", 0.0)), 0, 0)
@@ -211,22 +222,31 @@ func run(d: PlaytestDriver) -> void:
 
 ## Report 0026, D-0026-41: the part of the frame of each model in the view (the
 ## pixels that change when it is hidden). The place covers at least
-## VIEW_MIN_COVER, and no other model covers more than the place.
+## VIEW_MIN_COVER, and no other model covers more than the place. A model whose
+## box on the screen is not larger than the part of the place cannot cover more
+## than the place, so the check does not hide it (in CI the check of all the
+## models in each frame took more than 300 s).
 func _check_cover(d: PlaytestDriver, entry: Dictionary, models: Array[Dictionary]) -> void:
 	var camera := d.viewport().get_camera_3d()
+	var shown := _small_frame(d)
+	var place := await _cover_of(d, entry.model, shown)
 	var parts := {}
+	var measured := 1
 	for other: Dictionary in models:
 		var node: Node3D = other.model
-		if other != entry and not _in_frame(camera, node):
+		if other == entry or not _in_frame(camera, node):
 			continue
-		parts[other.id] = await _cover_of(d, node)
-	var place: float = parts.get(entry.id, 0.0)
+		if _screen_share(camera, node) <= place:
+			continue
+		parts[other.id] = await _cover_of(d, node, shown)
+		measured += 1
+	await d.wait_frames(2)
 	var largest := ""
 	for id: String in parts:
-		if id != entry.id and (largest == "" or float(parts[id]) > float(parts[largest])):
+		if largest == "" or float(parts[id]) > float(parts[largest]):
 			largest = id
-	d.step("the view of %s: it covers %.0f %% of the frame%s" % [entry.id, place * 100.0,
-			"" if largest == "" else ", the largest other model %s %.0f %%" % [largest, float(parts[largest]) * 100.0]])
+	d.step("the view of %s: it covers %.0f %% of the frame%s (%d models hidden one at a time)" % [entry.id, place * 100.0,
+			"" if largest == "" else ", the largest other model %s %.0f %%" % [largest, float(parts[largest]) * 100.0], measured])
 	d.expect(place >= VIEW_MIN_COVER, "the view of %s shows it: %.0f %% of the frame (at least %.0f %%)" % [
 			entry.id, place * 100.0, VIEW_MIN_COVER * 100.0])
 	if largest != "":
@@ -234,24 +254,52 @@ func _check_cover(d: PlaytestDriver, entry: Dictionary, models: Array[Dictionary
 				entry.id, largest, float(parts[largest]) * 100.0, place * 100.0])
 
 
-## The part of the frame where the pixels change when the node is hidden.
-func _cover_of(d: PlaytestDriver, node: Node3D) -> float:
-	var shown := d.viewport().get_texture().get_image()
+## The frame at a quarter of its size (the pixels of a cell of 4 by 4 in one).
+func _small_frame(d: PlaytestDriver) -> Image:
+	var image := d.viewport().get_texture().get_image()
+	image.resize(image.get_width() / 4, image.get_height() / 4, Image.INTERPOLATE_NEAREST)
+	return image
+
+
+## The part of the frame where the pixels change when the node is hidden. The
+## node shows again at once: the next frame that the test reads comes after
+## the next hide, or after the wait at the end of the check.
+func _cover_of(d: PlaytestDriver, node: Node3D, shown: Image) -> float:
 	node.visible = false
 	await d.wait_frames(3)
-	var hidden := d.viewport().get_texture().get_image()
+	var hidden := _small_frame(d)
 	node.visible = true
-	await d.wait_frames(3)
 	var changed := 0
-	var total := 0
-	for y in range(0, shown.get_height(), 4):
-		for x in range(0, shown.get_width(), 4):
+	for y in shown.get_height():
+		for x in shown.get_width():
 			var a := shown.get_pixel(x, y)
 			var b := hidden.get_pixel(x, y)
-			total += 1
 			if absf(a.r - b.r) > COVER_DIFFERENCE or absf(a.g - b.g) > COVER_DIFFERENCE or absf(a.b - b.b) > COVER_DIFFERENCE:
 				changed += 1
-	return float(changed) / maxf(float(total), 1.0)
+	return float(changed) / maxf(float(shown.get_width() * shown.get_height()), 1.0)
+
+
+## The part of the frame in the box of the node on the screen (1 when a corner
+## is behind the camera): no node covers more of the frame than this.
+static func _screen_share(camera: Camera3D, node: Node3D) -> float:
+	var box := AABB(node.global_position, Vector3.ZERO)
+	for child in node.find_children("*", "VisualInstance3D", true, false):
+		var v := child as VisualInstance3D
+		if v.is_visible_in_tree():
+			box = box.merge(v.global_transform * v.get_aabb())
+	var size := camera.get_viewport().get_visible_rect().size
+	var low := Vector2(INF, INF)
+	var high := Vector2(-INF, -INF)
+	for i in 8:
+		var p := box.get_endpoint(i)
+		if camera.is_position_behind(p):
+			return 1.0
+		var s := camera.unproject_position(p)
+		low = low.min(s)
+		high = high.max(s)
+	low = low.clamp(Vector2.ZERO, size)
+	high = high.clamp(Vector2.ZERO, size)
+	return maxf(high.x - low.x, 0.0) * maxf(high.y - low.y, 0.0) / maxf(size.x * size.y, 1.0)
 
 
 ## True if a corner or the middle of the bounds of the node is in the frame.
