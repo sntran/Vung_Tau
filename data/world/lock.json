@@ -277,13 +277,13 @@
 			}
 		},
 		"nha_mai_ngoi_cam": {
-			"hash": "05d757d27958ed0041451ca79b5a1ff7",
+			"hash": "46ed43fa0d3acb7f86f59436ba4b67da",
 			"files": {
-				"nha_mai_ngoi_cam.far.glb": "2220f95f577fb1d83e14b0a5f64f6c5ba7c9eb13b0839950220021d5aab0ad0c",
+				"nha_mai_ngoi_cam.far.glb": "75439b50ffaa28aaaeffcb434250d90d40ff7a83923d0b46a8d436709017a899",
 				"nha_mai_ngoi_cam.glb": "83ab7ad32938de11f4edff3992c5e17cb55515cfb3e851ee8ce88d10d5e4d871",
 				"nha_mai_ngoi_cam.mid.glb": "5d675c9f8b8fb6a0a3cd3d8d27368c27b0794544ba33890fe87c36d4ab3e79ea",
 				"nha_mai_ngoi_cam.parts.json": "b28ac0db1637c13716263f183fd690daa23f95a797cea951ef3894b738e1c489",
-				"nha_mai_ngoi_cam.receipt.json": "8309651ed334a4dcdf8c03eb5c1b4c2b3541046b8b15d5880044fe4a069d1d97"
+				"nha_mai_ngoi_cam.receipt.json": "4b74b422ac3349e5a0ae0acb6ea214c24913eb40d482781dd5f3489ce1f1fadf"
 			}
 		},
 		"non_rong_vanh": {
