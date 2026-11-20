@@ -83,8 +83,9 @@ const WALK_TREE_M := 2.0
 ## The distance of the screenshot of a model in front of it, and the most (m).
 const VIEW_M := 25.0
 const VIEW_MAX_M := 80.0
-## The eye of a screenshot stays this far out of the box of each model (m).
-const VIEW_CLEAR_M := 1.0
+## The eye of a screenshot stays this far out of the box of each model (m):
+## at 1 m the view of Cao ốc Sen Biển was the wall of the hall in front of it.
+const VIEW_CLEAR_M := 6.0
 
 
 func run(d: PlaytestDriver) -> void:
@@ -180,11 +181,11 @@ func run(d: PlaytestDriver) -> void:
 		var middle := t * Vector3(float(data[entry.id].get("front_middle_x", 0.0)), 0, 0)
 		var out := t.basis * Vector3.BACK
 		var away := VIEW_M
-		while away < VIEW_MAX_M and _in_a_box(models, data, middle + out * away):
+		while away < VIEW_MAX_M and _in_a_box(models, data, middle + out * away, VIEW_CLEAR_M):
 			away += 1.0
 		var eye := middle + out * away
 		if away > VIEW_M:
-			d.step("the view of %s is %.0f m in front of it: nearer, the eye is in the box of another model" % [entry.id, away])
+			d.step("the view of %s is %.0f m in front of it: nearer, the eye is in the box of another model or less than %.0f m from it" % [entry.id, away, VIEW_CLEAR_M])
 		eye.y = w.ground_height(eye.x, eye.z) + Player.EYE_HEIGHT
 		await d.fly_to(eye, middle + Vector3(0, 6.0, 0))
 		await d.wait_ground(60.0)
@@ -529,14 +530,14 @@ func _boat_view(d: PlaytestDriver, w: VungTau) -> void:
 
 
 ## True if the point is in the box of a model (with VIEW_CLEAR_M round it).
-func _in_a_box(models: Array[Dictionary], data: Dictionary, point: Vector3) -> bool:
+func _in_a_box(models: Array[Dictionary], data: Dictionary, point: Vector3, clear := 1.0) -> bool:
 	for entry: Dictionary in models:
 		var box: Array = data[entry.id].get("box", [])
 		if box.size() < 4:
 			continue
 		var local: Vector3 = entry.model.transform.affine_inverse() * point
-		if local.x > float(box[0]) - VIEW_CLEAR_M and local.x < float(box[1]) + VIEW_CLEAR_M \
-				and local.z > float(box[2]) - VIEW_CLEAR_M and local.z < float(box[3]) + VIEW_CLEAR_M:
+		if local.x > float(box[0]) - clear and local.x < float(box[1]) + clear \
+				and local.z > float(box[2]) - clear and local.z < float(box[3]) + clear:
 			return true
 	return false
 
