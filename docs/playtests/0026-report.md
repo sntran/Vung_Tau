@@ -393,3 +393,80 @@ On Low, PT-72 logs 1 448 MB of video memory, of which 1 307 MB are textures (for
 ### 9.7 Status
 
 The plan stays "In progress". No defect of this audit needs a construction shift of World.
+
+## 10. Audit 5: branch at `f54b22d` (2026-11-20)
+
+The pictures of this audit are in [`0026/audit-2026-11-20/`](0026/audit-2026-11-20/). I did not run the phases on High: the workspace has 8 GB of memory (section 9.1).
+
+### 10.1 Runs
+
+| Run | Result |
+|---|---|
+| CI of `f54b22d` | Pass: run 307, 17 of 17 jobs. |
+| PT-71 `showcase_places` | Pass (258 s). But see D-0026-41. |
+| PT-72 `showcase_shots`, phases 1 and 2 (Low) | Pass. The video memory is 665 MB to 679 MB at the five shots. But see D-0026-23 and D-0026-40. |
+| PT-73 `showcase_budget`, phase 1 (Low) | Pass. S1 180 066 triangles (184 989 with the walkers held), S2 274 736 (281 970), S3 213 792, S4 162 307, S5 276 419; 705 MB to 708 MB of video memory (it was 1 448 MB). |
+| PT-77 `showcase_steps`, phases 1 to 4 | Pass: no pole in an opening. |
+| PT-74 `showcase_walk`, runs 1 to 8 | Pass. |
+| PT-75 `showcase_people`, phases 1 and 2 | Pass. |
+| PT-76 `showcase_night`, phase 1 (Low) | Pass. |
+| PT-53 `bai_truoc_trees`, phase 3 (Low) | Pass: 856 coconut palms, and the palms of the park are back. |
+| PT-56 `world_models`, phases 1 to 11 | Pass. |
+
+### 10.2 What is correct
+
+- **D-0026-31.** The green posts with five globes stand every 40 m along the parapet of Hạ Long (`ha_long_lamps_840m.jpg`), as in the image of 2018.
+- **D-0026-32.** The blue poles are thin with their two arms at each distance (PT-74 runs 1 to 3, S5). The fence of the Grand Hotel and the black post of the park too. PT-56 and `tools/world/outlines.py` check the outline of each level.
+- **D-0026-33.** No pole stands in an opening (`openings_0_and_3.jpg`).
+- **D-0026-35.** No tree stands on the walk of Hạ Long, and the coconut palms of the park are back. The unit test that finds a rule with no photo is a good addition.
+- **D-0026-36.** The yard of the hall is level 3 m past each side. The banks past the yard are in the ground of Copernicus, a model of the surface: report 0009, section 6.4.
+- **D-0026-37.** The two sitters of S5 are two people (`s5_low.jpg`).
+- **D-0026-38.** PT-73 holds the walkers of each spot in the frame.
+- **D-0026-39.** The plate is blurred, a step of the sheets blurs the plates and the faces, and a list keeps the boxes that a detector misses.
+- **Q24.** Low uses 705 MB to 708 MB. The cause was the files of the near levels, which Low does not show. This is a better correction than smaller textures.
+- **Q23 and the low wall.** The builder used my answers and found a photo of 2019 (Kwozyn, 2019-02-21, CC BY-SA 4.0). It shows the parapet of Hạ Long, not the low wall of the beach.
+
+### 10.3 Defects
+
+#### D-0026-23 (still open): the far hill
+
+The check passes (12:00: 54 % on an edge and a smooth area of 6 %; 17:10: 46 % and 15 %), but the look is the same as in audit 4. At 12:00 the lower half of Núi Nhỏ is large dark caps with light ground between them (`s1_hill_1200.jpg`). Commit `d4aa97a` adds a fine noise, with a cell of about two pixels, to the far clumps and the far ground. The check counts a change of brightness of more than 0.02 between pixels 2 apart, so this noise passes it with no change of the shapes.
+
+A measure of the size of the patches finds the fault. I measured the distance at which the autocorrelation of the brightness of the box falls to one half, with the photo at the width of the shot: 4 px in the photo, 17 px in the game at 12:00, and 11 px at 17:10. So the patches of the game are 3 to 4 times the size of the crowns of the photo.
+
+- Make the crowns of the far forest the size of the crowns of the photo (about 5 m to 12 m), and cover the slope where the photo has trees (no light ground between them).
+- Replace the check of the edges by a check of the size: the autocorrelation length of the box in the game at most 1.5 times that of the photo, at 12:00 and 17:10, on Low and High. Keep the check of the color.
+- A noise that passes a check with no change that a person sees is not a correction. A check must find the defect that a person sees (AGENTS.md, section 3).
+
+#### D-0026-40: The roof of the hall is pale (medium)
+
+In S1, at 12:00 and at 17:10, the roof of `nha_mai_ngoi_cam` is a pale peach, and its walls are a blur (`hall_roof.jpg`). The photo of S1 shows a roof of orange red tiles. Near (PT-71), the roof is a salmon pink: also lighter than the photo. The hall is a subject of S1. Correct the color of the roof at each level against the photo. Add to PT-72 a check of the color of a box on the roof of the hall (the hue and the saturation against the photo, as for the box `hill`).
+
+#### D-0026-41: The view of Cao ốc Sen Biển in PT-71 shows the hall (low)
+
+After D-0026-34, the eye of this view stands next to the hall: the roof and the wall of the hall fill the lower half of the frame, and the tower shows only above them (`pt71_sen_bien_view.jpg`). A view of a place must show the place. PT-71 fails a view where the place covers less than 20 % of the frame, or where another model covers more of the frame than the place. Put the eye where a photo of the place stands, or across the road.
+
+#### Still open
+
+- **D-0026-30.** Answer to the builder: draw the outline of the lawns of the south end from the photo from a drone (`drone_2021_park.jpg`, 2021, CC BY-SA 4.0: a photo of 2017 to 2021 is a source for 2019), with the edges of the ways of OpenStreetMap as the reference. Put the outline next to the photo in a sheet.
+- **`nha_khach_ha_long`:** Q25 below.
+- **D-0026-25:** Q26 below.
+
+#### Notes
+
+- In S1, the lower slope of Núi Nhỏ behind the hotels is bare. The photo shows villas and houses there. Plan 0009, phase 2, builds them; this is not a defect of this plan.
+
+### 10.4 Questions for me
+
+- **Q25.** A new lock of World. World has 76 commits after `1984a6f`, with the tools that this plan asked for (a curved porch with its fascia, a width for a line of letters, blocks with their own storeys) and new files of the Grand Hotel and the people. The proposal: yes, one new lock after the defects of this audit, in a commit of its own, with PT-56, `tools/world/outlines.py`, PT-71 to PT-77, and the looks of each drawing run again.
+  - **Decided (2026-11-20):** yes, now, because World has the tools that this plan needs. Lock the newest commit of World `main` whose CI is green (World still works on its construction shifts; they do not change the files of the models). Make the new lock first, in a commit of its own, and run the checks again before the corrections of this audit.
+- **Q26.** The low wall at the eye of S1. Only the photo of S1 (2014) shows it: rough granite blocks with a flat cap. No photo after 2017 shows it. The proposal: use the look of 2014 there. Else the wall keeps its posts, and no photo shows posts at that place.
+  - **Decided (2026-11-20):** find photos of the year before or after 2019 (2018 or 2020) that show the wall at the eye of S1, from any source (news, travel pages, videos of a walk on the beach, the photos of a map service), only for the eyes, and use the kind of wall that they show. Write the link, the date, and what each shows in the drawing.
+- **Q27.** The letters on Khách sạn Bưu điện: VUNG TAU P&T HOTEL (2011 and April 2014), or a wave and P&T HOTEL (March 2024). The photo of April 2014 is the nearest to January 2019. The proposal: VUNG TAU P&T HOTEL.
+  - **Decided (2026-11-20):** use VUNG TAU P&T HOTEL, if the letters fit the place of the sign on the roof as in the photo of 2014.
+- **Q28.** R19, the dressing of Tết: no open photo shows the weeks before Tết of 2018 to 2021. The proposal: the builder looks at news photos and videos of those weeks only with the eyes (in `docs/content/culture-notes.md`, a link and a note of what each shows, and no copy, as plan 0009, D11), and I confirm each fact.
+  - **Decided (2026-11-20):** look at the photos and the videos of the weeks before Tết of 2018 to 2021 from any source. Vietnam has been in the Berne Convention since 2004, so a photo is protected also with no license or notice: do not copy such a photo into the repository. A fact that a photo shows (what is on a street, where, and how many) is not protected: write it in `docs/content/culture-notes.md` with the link and the date, and I confirm it there.
+
+### 10.5 Status
+
+The plan stays "In progress": D-0026-23, D-0026-30, D-0026-40, and D-0026-41, and the answers to Q25 to Q28. No defect of this audit needs a construction shift of World.
