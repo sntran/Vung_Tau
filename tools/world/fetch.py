@@ -280,10 +280,21 @@ def run(args: argparse.Namespace) -> int:
 
     assets.mkdir(parents=True, exist_ok=True)
     count = 0
+    failed: list[str] = []
     for model in chosen:
         if not args.update and not _needs(model, lock["models"].get(model["id"]), assets):
             continue
-        files = get(model)
+        try:
+            files = get(model)
+        except FetchError as error:
+            # Report 0026, Q25: one order that World cannot build (World e8754d6
+            # stopped at the round bush) stopped the job, and the 30 models that
+            # it built before were lost. With --keep-going the others go on.
+            if not getattr(args, "keep_going", False):
+                raise
+            print(f"ERROR: {model['id']}: {error}", flush=True)
+            failed.append(model["id"])
+            continue
         receipt = json.loads(files[model["id"] + ".receipt.json"])
         for name, data in files.items():
             (assets / name).write_bytes(data)
@@ -302,6 +313,9 @@ def run(args: argparse.Namespace) -> int:
             del lock["models"][model_id]
     wf.write_lock(lock, Path(args.lock))
     print(f"Got the files of {count} models from World {commit}.")
+    if failed:
+        print(f"ERROR: {len(failed)} models did not build: {', '.join(failed)}")
+        return 1
     return 0
 
 
@@ -313,6 +327,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--factory", default=FACTORY, help="the URL of the factory")
     parser.add_argument("--check", action="store_true", help="check the files against the lock, with no network")
     parser.add_argument("--update", action="store_true", help="get all files again from the newest World")
+    parser.add_argument("--keep-going", action="store_true",
+                        help="a model that does not build does not stop the others (the run ends with an error)")
     parser.add_argument("--only", nargs="*", help="only these ids")
     parser.add_argument("--orders", default=str(wf.ORDERS))
     parser.add_argument("--lock", default=str(wf.LOCK))

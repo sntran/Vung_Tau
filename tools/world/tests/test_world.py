@@ -161,3 +161,34 @@ def test_a_model_with_no_near_level_gets_the_receipt_of_its_first_level(monkeypa
     # A model that uses its near level needs the receipt of the factory.
     with pytest.raises(fetch.FetchError):
         fetch.factory_files({"id": "q", "order": model["order"], "levels": ["near", "mid", "far"]})
+
+
+def test_keep_going_builds_the_other_models(tmp_path, monkeypatch, capsys):
+    # Report 0026, Q25: World e8754d6 could not build the round bush, and the
+    # job lost the 30 models that it had built before it.
+    orders = tmp_path / "orders.json"
+    lock = tmp_path / "lock.json"
+    assets = tmp_path / "assets"
+    models = [{"id": i, "order": {"blueprint": "catalog", "options": {"id": i}}, "levels": ["near"], "impostor": False,
+               "uses": [], "catalog": i} for i in ("a", "bad", "c")]
+    orders.write_text(json.dumps({"models": models}), encoding="utf-8")
+    lock.write_text(json.dumps({"world": {"commit": "abc"}, "models": {}}), encoding="utf-8")
+
+    def files(model):
+        if model["id"] == "bad":
+            raise fetch.FetchError("mix.com world.order failed: ArithmeticError")
+        receipt = {"hash": model["id"] * 4, "order": model["order"]}
+        return {f"{model['id']}.glb": b"glb", f"{model['id']}.receipt.json": json.dumps(receipt).encode("utf-8")}
+
+    monkeypatch.setattr(fetch, "checkout_files", lambda model, clone, mix: files(model))
+    monkeypatch.setattr(fetch, "clone_commit", lambda clone: "abc")
+    monkeypatch.setattr(fetch, "write_import", lambda path: None)
+    args = ["--source=checkout", f"--world={tmp_path}", f"--orders={orders}", f"--lock={lock}", f"--assets={assets}"]
+    # With no --keep-going the run stops at the model that does not build.
+    assert fetch.main(args) == 1
+    assert sorted(json.loads(lock.read_text(encoding="utf-8"))["models"]) == ["a"]
+    lock.write_text(json.dumps({"world": {"commit": "abc"}, "models": {}}), encoding="utf-8")
+    assert fetch.main(args + ["--keep-going"]) == 1
+    written = json.loads(lock.read_text(encoding="utf-8"))["models"]
+    assert sorted(written) == ["a", "c"]
+    assert "bad" in capsys.readouterr().out

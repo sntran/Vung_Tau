@@ -96,16 +96,20 @@ jobs:
           mix.com local.rebar --force
           mix.com deps.get
 
+      # A model that World cannot build does not stop the others, and the
+      # job commits the models that it built (report 0026, Q25); the job and
+      # the check of the files stay red until each model has its files.
       - name: Build the models
+        id: build
         if: steps.need.outputs.build == 'true'
-        run: python tools/world/fetch.py --source=checkout --world=World --mix=mix.com
+        run: python tools/world/fetch.py --source=checkout --world=World --mix=mix.com --keep-going
 
       - name: Check the models
-        if: steps.need.outputs.build == 'true'
+        if: always() && steps.need.outputs.build == 'true'
         run: python tools/world/fetch.py --check
 
       - name: Commit the files
-        if: steps.need.outputs.build == 'true'
+        if: always() && steps.need.outputs.build == 'true'
         run: |
           git add assets/world data/world/lock.json
           if git diff --cached --quiet; then
