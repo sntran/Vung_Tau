@@ -45,7 +45,12 @@
 		"mix": {
 			"bang": 0.55,
 			"coconut": 0.45
-		}
+		},
+		"photos": [
+			"docs/reference/photos/street_kiosk_2014.jpg",
+			"docs/reference/photos/drone_2021_park.jpg"
+		],
+		"photos_comment": "Report 0026, D-0026-35: in the showcase a tree of a rule stands only where a photo shows such trees. These photos show the bàng trees and the coconut palms between Quang Trung and the park (also the culture notes, Confirmed). The walks keep no tree."
 	},
 	"named_roads": {
 		"comment": "Roads with their own trees (plan 0020, Q1, photos that I chose).",
@@ -79,6 +84,12 @@
 			"flame": 0.15
 		},
 		"comment": "Near Bãi Trước: mostly coconut palms, some bàng, a few casuarinas (plan 0020, Q2).",
+		"photos_near": [
+			"docs/reference/photos/park_paths_2014.jpg",
+			"docs/reference/photos/park_bushes_2014.jpg",
+			"docs/reference/photos/drone_2021_park.jpg"
+		],
+		"photos_near_comment": "Report 0026, D-0026-35: these photos show the coconut palms and the bàng of the park of Bãi Trước, so the park near the landmark keeps its trees in the showcase (PT-53 needs them). The walks keep no tree.",
 		"lean_near": {
 			"types": [
 				"coconut"

@@ -112,7 +112,9 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
     D-0026-35: the palms of the rule coast_roads stood on the walk of Hạ Long):
     no tree of a rule there. data_only: a map polygon (the showcase) where a
     tree of a rule stands only on a tree top of the canopy map; the groves give
-    the trees of the photos there."""
+    the trees of the photos there. A rule with "photos" (the photos that show its
+    trees in the showcase: the coconut palms of the park of Bãi Trước and the bàng
+    and coconut palms of Quang Trung) puts its trees there too."""
     rng = np.random.default_rng(int(spec.get("seed", 1)))
     street = spec["street"]
     place = _Place(land, beaches, roads, float(street["skip_near_road_m"]))
@@ -126,13 +128,18 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
     edge_m = float(canopy.get("edge_m", 6.0))
 
     leans: dict[tuple[str, int], tuple[float, float]] = {}  # (kind, index in found) -> (tilt, direction), degrees
+    # The rules whose photos show their trees in the showcase (PT-53 needs the
+    # coconut palms of Bãi Trước).
+    with_photos = {source for source, photos in (("bai_truoc_road", spec["bai_truoc_road"].get("photos")),
+                                                 ("park_bai_truoc", spec["parks"].get("photos_near"))) if photos}
 
     def add(kind: str, point, source: str, lean: tuple[float, float] | None = None, on_top: bool = False) -> None:
         if source != "osm":
             if keep_out is not None and keep_out(float(point[0]), float(point[1])):
                 counts["kept_off_walks"] = counts.get("kept_off_walks", 0) + 1
                 return
-            if data_only is not None and not on_top and data_only.contains(Point(float(point[0]), float(point[1]))):
+            if (data_only is not None and not on_top and source not in with_photos
+                    and data_only.contains(Point(float(point[0]), float(point[1])))):
                 counts["no_data_in_showcase"] = counts.get("no_data_in_showcase", 0) + 1
                 return
         found.setdefault(kind, []).append((float(point[0]), float(point[1])))

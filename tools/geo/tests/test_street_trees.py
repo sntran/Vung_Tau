@@ -71,3 +71,32 @@ def test_without_tree_tops_the_rules_stay():
     road = _road(1, "Đường A", "primary", 0.0)
     _record, _counts, groups = _make([road], None)
     assert len(groups["street"]) > 50
+
+
+def _make_in_showcase(spec, parks, keep_out=None):
+    showcase = Polygon([(-50, -100), (450, -100), (450, 100), (-50, 100)])
+    return trees.make(spec, [], LAND, [], list(parks), [], [], "Quang Trung", None, Point(50, 50),
+                      lambda x, y: np.zeros(len(x)), np.zeros((0, 2)), keep_out, showcase)
+
+
+def test_in_the_showcase_a_rule_tree_needs_a_photo():
+    # Report 0026, D-0026-35: in the showcase a tree of a rule stands only on a
+    # tree top or where a photo shows the trees of the rule. PT-53 found no
+    # coconut palm at Bãi Trước when the park of the landmark had no photos.
+    park = Polygon([(0, 20), (100, 20), (100, 90), (0, 90)])
+    _record, counts, groups = _make_in_showcase(SPEC, [park])
+    assert "park_bai_truoc" not in groups
+    assert counts["no_data_in_showcase"] > 10
+    with_photos = dict(SPEC, parks=dict(SPEC["parks"], photos_near=["docs/reference/photos/drone_2021_park.jpg"]))
+    record, counts, groups = _make_in_showcase(with_photos, [park])
+    assert len(groups["park_bai_truoc"]) > 10
+    assert "no_data_in_showcase" not in counts
+    assert len(record["types"]["coconut"]) == len(groups["park_bai_truoc"])
+
+
+def test_a_rule_with_photos_keeps_off_the_walks():
+    park = Polygon([(0, 20), (100, 20), (100, 90), (0, 90)])
+    with_photos = dict(SPEC, parks=dict(SPEC["parks"], photos_near=["docs/reference/photos/drone_2021_park.jpg"]))
+    _record, counts, groups = _make_in_showcase(with_photos, [park], keep_out=lambda x, y: 40.0 <= x <= 60.0)
+    assert counts["kept_off_walks"] > 0
+    assert all(not 40.0 <= p[0] <= 60.0 for p in groups["park_bai_truoc"])
