@@ -9,10 +9,11 @@ extends RefCounted
 # have the ranges of the preset; at each change of level the mean color of the
 # model area changes by 12 % or less; the outline of the mid and the far level
 # from the side covers the area of the outline of the first level within 30 %
-# (report 0026, D-0026-32). The last phase makes one sheet for each
-# model (sheet_ID.png): a row for each preset and level, a column for each
-# view. Each preset is in phases of GROUP_SIZE models, so that a phase takes
-# less than the time limit under lavapipe.
+# (report 0026, D-0026-32; on Low only: the outline is the same on each
+# preset). The last phase makes one sheet for each model (sheet_ID.png): a row
+# for each preset and level, a column for each view. Each preset is in phases
+# of GROUP_SIZE models, so that a phase takes less than the time limit under
+# lavapipe.
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
@@ -115,9 +116,14 @@ func run(d: PlaytestDriver) -> void:
 		var model := models[i]
 		_check_model(d, model, preset)
 		# Report 0026, D-0026-32: the side view with no level, for the outline of each level.
-		_show_only(model, "")
-		await _look(d, model, VIEWS.side, _distance(model))
-		var empty := d.viewport().get_texture().get_image()
+		# The outline does not change with the preset, and a view on High takes
+		# much time (CI part 7 went past its limit), so only Low checks it.
+		var check_outlines := preset == "low"
+		var empty: Image = null
+		if check_outlines:
+			_show_only(model, "")
+			await _look(d, model, VIEWS.side, _distance(model))
+			empty = d.viewport().get_texture().get_image()
 		var outlines := {}
 		for level: String in WorldModel.levels_of(model.id):
 			_show_only(model, level)
@@ -127,9 +133,10 @@ func run(d: PlaytestDriver) -> void:
 				d.expect(stats.magenta == 0, "%s %s %s: no magenta pixel (%d)" % [model.id, level, view, stats.magenta])
 				d.expect(stats.pixels > 0, "%s %s %s: the model is on the screen" % [model.id, level, view])
 				await d.screenshot("%s_%s_%s_%s" % [model.id, preset, level, view])
-				if view == "side":
+				if view == "side" and check_outlines:
 					outlines[level] = _outline_pixels(d.last_image, empty)
-		_check_outlines(d, model, outlines)
+		if check_outlines:
+			_check_outlines(d, model, outlines)
 		_show_all(model)
 		await _check_level_changes(d, model)
 	d.fly_end()

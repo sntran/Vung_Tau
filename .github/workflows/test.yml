@@ -119,7 +119,9 @@ jobs:
   playtest:
     name: Play tests (part ${{ matrix.shard }} of 12)
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    # Part 7 (PT-56 with 51 models on Low and High) took 88 minutes on 2026-11-19
+    # and more than 120 on a slower runner on 2026-11-20.
+    timeout-minutes: 150
     strategy:
       fail-fast: false
       matrix:
