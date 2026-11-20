@@ -93,6 +93,9 @@ uniform vec3 canopy_dry : source_color = vec3(0.4, 0.33, 0.17);
 // goes to its mean color (report 0026, D-0026-05).
 uniform vec2 canopy_even_range = vec2(250.0, 900.0);
 uniform float canopy_far_even = 0.75;
+// The fine noise of the far forest: its cell in pixels, and its part of the brightness.
+uniform float fine_pixels = 2.0;
+uniform float fine_amount = 0.5;
 
 varying vec3 world_position;
 varying vec3 world_normal;
@@ -250,7 +253,13 @@ void fragment() {
 	vec3 canopy_mean = mix(mix(canopy_dark, canopy_light, 0.5), canopy_dry * 0.85, dry_share);
 	canopy = mix(canopy, canopy_mean, canopy_far_even * smoothstep(canopy_even_range.x, canopy_even_range.y, camera_distance));
 	float leaves = value_noise(world_position.xz / 2.5);
-	float canopy_rough = mix(0.4, 1.05, smoothstep(0.15, 0.45, crowns)) * (0.75 + 0.4 * leaves);
+	// Report 0026, D-0026-23: the crowns and the gaps of a far forest change from
+	// one pixel to the next (the photo of S1: 92 % of the hill on an edge). A noise
+	// of 2.5 m is smooth at 600 m, so a fine noise with a cell of about two pixels.
+	float pixel_m = max(length(fwidth(world_position.xz)), 0.05);
+	float fine = value_noise(world_position.xz / max(1.0, pixel_m * fine_pixels) + vec2(5.1, 1.7));
+	float canopy_rough = mix(0.4, 1.05, smoothstep(0.15, 0.45, crowns)) * (0.75 + 0.4 * leaves)
+			* mix(1.0, 1.0 - fine_amount + 2.0 * fine_amount * fine, far);
 	canopy *= canopy_rough * 0.85;
 	// The haze over the far forest takes the shade of the crowns too
 	// (shaders/canopy.gdshader, haze_contrast): it gave most of the color.

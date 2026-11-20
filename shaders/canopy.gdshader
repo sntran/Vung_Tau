@@ -45,6 +45,9 @@ uniform float far_haze = 0.58;
 uniform float far_haze_light = 1.0;
 // The part of the haze that the shade and the leaves of a crown change (D-0026-23).
 uniform float haze_contrast = 0.7;
+// The fine noise of a crown: its cell in pixels, and its part of the brightness.
+uniform float fine_pixels = 2.0;
+uniform float fine_amount = 0.5;
 
 varying vec3 clump_color;
 varying float haze_part;
@@ -101,6 +104,10 @@ void fragment() {
 	// The leaves of the crowns (2.5 m and 1 m): from far, the crowns are rough, not smooth caps.
 	float leaves = value_noise(world_point.xz / 2.5) * 0.6 + value_noise(world_point.xz + world_point.y) * 0.4;
 	float rough = 0.45 + 1.1 * leaves;
+	// Report 0026, D-0026-23: a fine noise with a cell of about two pixels, so
+	// that a far crown is not a smooth cap (the leaves of 2.5 m are smooth at 600 m).
+	float pixel_m = max(length(fwidth(world_point.xz)), 0.05);
+	rough *= 1.0 - fine_amount + 2.0 * fine_amount * value_noise(world_point.xz / max(1.0, pixel_m * fine_pixels) + vec2(13.7, 4.2));
 	ALBEDO = clump_color * rough;
 	// The haze of the far land (shaders/terrain.gdshader): an emission. Report
 	// 0026, D-0026-23: from far, the haze gave most of the color of a crown, and

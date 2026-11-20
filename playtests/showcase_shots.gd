@@ -44,10 +44,13 @@ extends RefCounted
 ## D-0026-23: the shape of the box "hill": the change of brightness of an edge
 ## (between pixels 2 apart), the least part of the edges of the photo, and the
 ## largest smooth area. The mounds of audit 3 had 3 % on an edge and a smooth
-## area of 97 % (the photo of S1: 88 % and 1 %).
+## area of 97 % (the photo of S1: 88 % and 1 %). Audit 4: the limits are a
+## part of the values of the photo (at least half of its edges, and a smooth
+## area of at most 20 %); with 20 % and 80 % a hill that looked very different
+## passed (S1: 28 % and 56 %, the photo 92 % and 0 %).
 const SHAPE_EDGE := 0.02
-const HILL_MIN_EDGES := 0.2
-const HILL_MAX_SMOOTH := 0.8
+const HILL_MIN_EDGES := 0.5
+const HILL_MAX_SMOOTH := 0.2
 ## D-0026-24: the radius of the crown of a palm or a pine, and the step of the search for trees along the line.
 const CROWN_RADIUS := {"coconut": 3.0, "casuarina": 2.5, "araucaria": 2.5, "frangipani": 2.0, "fan_palm": 1.5}
 const TREE_LOOK_M := 8.0
