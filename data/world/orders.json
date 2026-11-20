@@ -43280,9 +43280,23 @@
 					"sources": [
 						"Nhà khách Hạ Long (102 Hạ Long), Vũng Tàu. Plan: OpenStreetMap way 235149416 (© OpenStreetMap contributors, ODbL), building:levels 8. Look: a photo of 2021-05-10 (Flickr, Venanzio_KH) and a photo of 2014 (trungydang, Wikimedia Commons, CC BY 3.0)."
 					],
-					"size": [
-						21.35,
-						17.07
+					"plan": [
+						[
+							21.35,
+							0.0
+						],
+						[
+							0.0,
+							0.0
+						],
+						[
+							0.0,
+							-17.07
+						],
+						[
+							21.35,
+							-17.07
+						]
 					],
 					"storeys": 8,
 					"ground": 3.0,

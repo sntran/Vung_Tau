@@ -9,9 +9,23 @@
 			"sources": [
 				"Nhà khách Hạ Long (102 Hạ Long), Vũng Tàu. Plan: OpenStreetMap way 235149416 (© OpenStreetMap contributors, ODbL), building:levels 8. Look: a photo of 2021-05-10 (Flickr, Venanzio_KH) and a photo of 2014 (trungydang, Wikimedia Commons, CC BY 3.0)."
 			],
-			"size": [
-				21.35,
-				17.07
+			"plan": [
+				[
+					21.35,
+					0.0
+				],
+				[
+					0.0,
+					0.0
+				],
+				[
+					0.0,
+					-17.07
+				],
+				[
+					21.35,
+					-17.07
+				]
 			],
 			"storeys": 8,
 			"ground": 3.0,
@@ -618,5 +632,5 @@
 	"uses": "Plan 0026, R7, Q7: on its OSM outline (way 235149416) by Hạ Long, about 300 m south of Hải Âu (seen from the jetty and the walk of the sea); outside the area of the showcase (D1), it has no place in data/world/places/ yet.",
 	"impostor": false,
 	"hash": "c212572faa567452ece017faba2f4c89",
-	"status_note": "Report 0026, Q25 (2026-11-20): with the lock of World e8754d6 its order is in data/world/orders.json again (the job \"Models of World\" builds it, and its looks are of the files of the lock). Nhà khách Hạ Long stands outside the area of the showcase (D1): it has no place in data/world/places/, so the game does not show it. Before: World 1984a6f did not keep the option size of the blueprint building in the receipt (\"/options/size (not in the receipt)\"), so its order waited."
+	"status_note": "Report 0026, Q25 (2026-11-20): with the lock of World e8754d6 its order is in data/world/orders.json again (the job \"Models of World\" builds it, and its looks are of the files of the lock). Nhà khách Hạ Long stands outside the area of the showcase (D1): it has no place in data/world/places/, so the game does not show it. Before: World 1984a6f did not keep the option size of the blueprint building in the receipt (\"/options/size (not in the receipt)\"), so its order waited; World e8754d6 makes the same rectangle the option plan of the receipt (the front on side 1), so the order has the plan [[21.35, 0], [0, 0], [0, -17.07], [21.35, -17.07]] in place of the size [21.35, 17.07]."
 }
