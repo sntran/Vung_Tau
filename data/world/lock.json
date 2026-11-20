@@ -277,13 +277,13 @@
 			}
 		},
 		"nha_mai_ngoi_cam": {
-			"hash": "982237071acf94af8a5d3dc0238f869f",
+			"hash": "017a67055042c83f09513492855f7a6b",
 			"files": {
 				"nha_mai_ngoi_cam.far.glb": "efcc413312596bedba200cb079799e585c9aadf8e55f1231cfcdfa6a8e18c40f",
 				"nha_mai_ngoi_cam.glb": "0119a9ba12cf326d0d0fc12b25e3879b741c144867758f0838bb99f3e5d38aac",
-				"nha_mai_ngoi_cam.mid.glb": "0988dca201496367e57572c0fe78d07a4bc20d159129197b070f889d84856b79",
+				"nha_mai_ngoi_cam.mid.glb": "325fa0d3b5b5862dce4b6a2bc66389905ce633b53b178d3492f5d69172601478",
 				"nha_mai_ngoi_cam.parts.json": "b28ac0db1637c13716263f183fd690daa23f95a797cea951ef3894b738e1c489",
-				"nha_mai_ngoi_cam.receipt.json": "a7c22b7b9ae090c2836d8ca0af2bd3c08764bd546c8fce3e35fea4ba6ea875fb"
+				"nha_mai_ngoi_cam.receipt.json": "1067dd4bd939aa51d187dac47b3a9087cece657068ce3808d97cbbca1ffe56aa"
 			}
 		},
 		"non_rong_vanh": {
