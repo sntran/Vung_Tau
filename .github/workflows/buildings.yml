@@ -17,7 +17,10 @@ name: Buildings and lidar
 # A year that fails or gets no time keeps its data; a year with 0 rows where
 # the last run had rows, or a product with fewer points than before, is an
 # error: the job ends red, uploads the reports as an artifact, and commits
-# nothing. A person can start the run with "allow_fewer".
+# nothing. A person can start the run with "allow_fewer". The first run with
+# the store (2026-11-20) got back the files of the runs before it from the
+# history (lidar.py seed); the history of the branch was then made again with
+# no large file (report 0009, D-0009-06).
 on:
   workflow_dispatch:
     inputs:
@@ -49,9 +52,6 @@ jobs:
     timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
-        with:
-          # The seed reads the files of the runs before the store from the history.
-          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -67,12 +67,6 @@ jobs:
           for part in outlines temporal osm2019 checks; do
             python tools/geo/buildings.py "$part" || echo "the part $part failed: see its report"
           done
-
-      - name: The lidar points of the runs before the store (one time)
-        run: |
-          if ! python3 -c 'import json,sys;sys.exit(0 if json.load(open("data/geo/raw/lidar/manifest.json"))["files"] else 1)' 2>/dev/null; then
-            python tools/geo/lidar.py seed 86f606a a36c84e 7d32458
-          fi
 
       - name: The lidar points (with the guard)
         run: |
