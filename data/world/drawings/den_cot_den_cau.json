@@ -108,6 +108,13 @@
 			"hash": "be160c87ca6f63435a567715f1487600",
 			"seen": "The same edits of this kind. The blueprint den_cong_vien changed in the kind hai_tay only, so the order of this kind has a new hash.",
 			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "dc5bb7137247103d344b10d747ffde16",
+			"seen": "Report 0026, D-0026-32: PT-56 found the far level of the order before (100 triangles, cells of 6 cm): a bent wedge with no globes, 0.61 of the near level from the side in Godot and 0.72 in tools/world/outlines.py. With 400 triangles and cells of 3.5 cm: the post, the foot, the frame and the five globes; the outline is 0.87 of the near level from the side.",
+			"changed": "The far level of the node den_cau of the blueprint den_cong_vien: cells 0.035 m (were 0.06), budget 400 (was 100)."
 		}
 	],
 	"hash": "be160c87ca6f63435a567715f1487600"
