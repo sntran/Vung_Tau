@@ -974,6 +974,20 @@
 			"hash": "fa52f111ab1c786f43a1d1d7af92505b",
 			"seen": "The files of the lock (build/look/cao_oc_sen_bien_mid.png): the same terraces, vaults, and tower with less detail.",
 			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "d7a1f96513bac0976335ff54b50344cf",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/cao_oc_sen_bien_mid.png). The block of terraces with the barrel vaults, the bands of blue windows, and the tower with its green bands, the mauve ring, and the disc of four shapes of 7a514bc under the spire, as in photos 0, 2, and 3.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "d7a1f96513bac0976335ff54b50344cf",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/cao_oc_sen_bien_far.png). The same masses; the terraces as steps with no vaults; the disc and the spire stay.",
+			"changed": "Nothing."
 		}
 	],
 	"status": "Source",

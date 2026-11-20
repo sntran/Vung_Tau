@@ -91,6 +91,20 @@
 			"hash": "65c9d8782d29df03b8a283b7cce1ff0f",
 			"seen": "Next to photo 0 (2018): the cast foot with its plinth, the fluted body and three rings, the white plate on the side of the post, the slim post, the cross with its curved brackets, and five globes (four round the top, one over them). The proportions are as the post of the photo; the globe is the globe of the dark post of the park.",
 			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "15cfb721370765a422898fa0a3817dc4",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/den_cot_den_cau_xanh_mid.png). The cast green post with its foot of rings, the plate, and five globes, as in photos 0 and 1.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "15cfb721370765a422898fa0a3817dc4",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/den_cot_den_cau_xanh_far.png). The same post with a simpler foot.",
+			"changed": "Nothing."
 		}
 	],
 	"hash": "65c9d8782d29df03b8a283b7cce1ff0f",

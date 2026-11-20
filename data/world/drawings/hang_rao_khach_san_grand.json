@@ -320,6 +320,20 @@
 			"hash": "7dc1b5dc21dd88ead5745e9f4d679852",
 			"seen": "Report 0026, D-0026-32: the far level of the order before (160 triangles, cells of 6 cm) had wedges at the posts and in place of the bars: its outline from the side was 0.57 of the near level. With 600 triangles and cells of 3 cm: the posts with their caps, the bars, the rail and the wall; the outline is 1.00 of the near level from the front and from the side.",
 			"changed": "Far cells 0.03 m (were 0.06), far budget 600 (was 160)."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "7dc1b5dc21dd88ead5745e9f4d679852",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/hang_rao_khach_san_grand_mid.png). A span of the fence: two cream posts with lantern caps and the dark bars, as in the photo of S4.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "7dc1b5dc21dd88ead5745e9f4d679852",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/hang_rao_khach_san_grand_far.png). The same span, the bars and the posts (D-0026-32).",
+			"changed": "Nothing."
 		}
 	],
 	"status_note": "Source (report 0026, Q17, rule 1): the photos of 2014 (S4 and Nguyễn Du) and the street photo of Mapillary of 2024-11-09 show the same fence with the cream lantern posts and the iron bars on the edge of the sidewalk. No photo of 2017 to 2021 shows it (Mapillary has none there). The looks wait for the files of the lock (the job \"Models of World\").",

@@ -3619,6 +3619,20 @@
 			"hash": "aaa26dbb58bd1d7481a1c748d0030686",
 			"seen": "The files of the lock, next to the same photos (build/look/khach_san_hai_au_mid.png): the same blocks, bands, and letters with less detail of the windows. On Low the game shows this level from 0 m (no near level of a building, D6).",
 			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "18584d0bcf7d574102c9dbc63c1ce008",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/khach_san_hai_au_mid.png). The sky blue wings with the white bands, the middle block, the tower with the letters HAI AU, as in photos 0 and 1.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "18584d0bcf7d574102c9dbc63c1ce008",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/khach_san_hai_au_far.png). The same masses and the letters; 1 450 triangles (were 1 300).",
+			"changed": "Nothing."
 		}
 	],
 	"status": "Source",

@@ -141,6 +141,20 @@
 			"hash": "504121c2118205fe22ac1abf586737c5",
 			"seen": "Next to photos 0 and 2: eight steps of granite blocks with joints a half block apart from one step to the next, as the flight along the wall in photo 0 and the courses of photo 2. In photo 0 sand lies on the low steps; the game puts the sand.",
 			"changed": "Nothing: the last level."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "504121c2118205fe22ac1abf586737c5",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/bac_xuong_cat_mid.png). Eight granite steps in their blocks, as in photos 0 and 2.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "504121c2118205fe22ac1abf586737c5",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/bac_xuong_cat_far.png). One block with the steps, no joints (a far level).",
+			"changed": "Nothing."
 		}
 	],
 	"hash": "504121c2118205fe22ac1abf586737c5"

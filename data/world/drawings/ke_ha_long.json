@@ -144,6 +144,20 @@
 			"hash": "18e8c38bc4eea1dacd0c5aaba7a7f9ee",
 			"seen": "Not built. The factory stopped at the near level of this order two times (HTTP 503: the order needs more memory than the edge has): the piece is now 7.0 m deep and 3.3 m high with cells of 0.04 m. The near level of the old order (2.0 m by 6.0 m by 4.0 m) built.",
 			"changed": "Nothing. The cells are in the blueprint ke_bien.json, and a change of the blueprint changes each order of its family, so I did not change them. The near level needs the job \"Models of World\" (mix world.order)."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "18e8c38bc4eea1dacd0c5aaba7a7f9ee",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/ke_ha_long_mid.png). The sloped sea wall of concrete panels with the rocks at its foot, as in photo 0.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "18e8c38bc4eea1dacd0c5aaba7a7f9ee",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/ke_ha_long_far.png). The same slope, the rocks as a few blocks.",
+			"changed": "Nothing."
 		}
 	],
 	"hash": "18e8c38bc4eea1dacd0c5aaba7a7f9ee",

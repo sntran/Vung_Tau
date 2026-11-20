@@ -190,6 +190,20 @@
 			"hash": "fa50dec6d68ca4f665e56e1ee2eb4df2",
 			"seen": "Next to photos 0, 2 and 3: courses of rough grey blocks of 0.3 m by 0.2 m with joints a half block apart from one course to the next, the opening under the rail, the lighter rail. In photo 2 the joints are deep and dark, here they are painted lines; the posts have no joints over the sill.",
 			"changed": "Nothing: the last level."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "fa50dec6d68ca4f665e56e1ee2eb4df2",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/tuong_bai_tam_mid.png). One span of the low wall: the grey granite blocks, the opening under the flat cap, and the half posts, as in photo 0.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "fa50dec6d68ca4f665e56e1ee2eb4df2",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/tuong_bai_tam_far.png). The same span and opening, one grey.",
+			"changed": "Nothing."
 		}
 	],
 	"hash": "fa50dec6d68ca4f665e56e1ee2eb4df2"

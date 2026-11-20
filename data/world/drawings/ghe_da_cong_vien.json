@@ -219,6 +219,20 @@
 			"hash": "169bd97aae3919c33603c44ecf44e456",
 			"seen": "The same shape with sharp edges, and the thin dark joint of the seat on each leg. The dark granite color agrees with the end of the bench in photo 0.",
 			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "169bd97aae3919c33603c44ecf44e456",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/ghe_da_cong_vien_mid.png). The dark granite bench on two slab legs, as in photo 0.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "169bd97aae3919c33603c44ecf44e456",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/ghe_da_cong_vien_far.png). The same.",
+			"changed": "Nothing."
 		}
 	],
 	"hash": "169bd97aae3919c33603c44ecf44e456",

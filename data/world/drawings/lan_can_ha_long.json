@@ -135,6 +135,20 @@
 			"hash": "95056aed2bdcf62d2ffb69122e59e056",
 			"seen": "Next to photos 0 and 1: sharp edges of the top slab, a thin dark joint at the start of the piece, the dark band at the foot. The grains of the granite do not show at this distance. The end face at the start is dark (the joint paints it): in a row it is hidden, at the end of a row it shows.",
 			"changed": "Nothing: the last level."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "95056aed2bdcf62d2ffb69122e59e056",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/lan_can_ha_long_mid.png). The parapet of grey granite with the light top slab and the dark band at the foot, as in photo 0.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "95056aed2bdcf62d2ffb69122e59e056",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/lan_can_ha_long_far.png). One grey block.",
+			"changed": "Nothing."
 		}
 	],
 	"hash": "95056aed2bdcf62d2ffb69122e59e056"

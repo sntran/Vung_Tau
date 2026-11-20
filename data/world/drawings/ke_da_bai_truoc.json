@@ -151,6 +151,20 @@
 			"hash": "e96e7363da7282ae20caaae7de81749c",
 			"seen": "Next to photo 4: four courses of grey blocks with joints a half block apart on a face that leans back, as the wall of blocks in photo 4. In photo 4 the blocks are rougher, and the lower half is dark and wet.",
 			"changed": "Nothing: the last level."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "e96e7363da7282ae20caaae7de81749c",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/ke_da_bai_truoc_mid.png). The sea wall of granite blocks that leans back, under the low wall, as in photos 0 and 2.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "e96e7363da7282ae20caaae7de81749c",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/ke_da_bai_truoc_far.png). The same face, one grey.",
+			"changed": "Nothing."
 		}
 	],
 	"hash": "e96e7363da7282ae20caaae7de81749c",

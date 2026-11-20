@@ -212,6 +212,20 @@
 			"hash": "744b553c0b81b6fdae01bae186dab48a",
 			"seen": "The far level: a ring of about 10 corners with a hole of 5 corners, in 80 triangles, the same orange. At the far distance (40 m to 150 m) the ring is less than 15 px, so the corners do not show.",
 			"changed": "No change."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "744b553c0b81b6fdae01bae186dab48a",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/phao_boi_mid.png). The orange swim ring, as in photos 0 and 1.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "744b553c0b81b6fdae01bae186dab48a",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/phao_boi_far.png). The ring in facets.",
+			"changed": "Nothing."
 		}
 	],
 	"hash": "744b553c0b81b6fdae01bae186dab48a"

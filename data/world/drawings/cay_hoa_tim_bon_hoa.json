@@ -577,6 +577,20 @@
 			"hash": "9498e6dc41a98b9d860d4ab6bc7a3018",
 			"seen": "The files of the lock (the job \"Models of World\" of 4814dd0), next to photo 0 (build/look/cay_hoa_tim_bon_hoa_near.png): the same green mound with violet flowers as the look of the factory files of this order.",
 			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "9498e6dc41a98b9d860d4ab6bc7a3018",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/cay_hoa_tim_bon_hoa_mid.png). A low clump of leaves with purple flowers, as in photo 0.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "9498e6dc41a98b9d860d4ab6bc7a3018",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/cay_hoa_tim_bon_hoa_far.png). A clump in facets with purple patches.",
+			"changed": "Nothing."
 		}
 	],
 	"hash": "9498e6dc41a98b9d860d4ab6bc7a3018",

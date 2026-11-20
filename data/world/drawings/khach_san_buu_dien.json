@@ -1194,6 +1194,20 @@
 			"hash": "c660b5fac512441cf6f9075fbc796657",
 			"seen": "The files of the lock (build/look/khach_san_buu_dien_mid.png): the same tower, corner, pier, and wing with less detail of the windows.",
 			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "9486d5f51e765285ad26f9476100fe07",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/khach_san_buu_dien_mid.png). The white tower of 12 storeys with the bands of blue windows, the round corner of dark glass, the red brown pier, and the wing with the pool; no letters (Q27: they wait for the sign & of World).",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "9486d5f51e765285ad26f9476100fe07",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/khach_san_buu_dien_far.png). The same masses and bands; the far level has 150 more triangles (1 350).",
+			"changed": "Nothing."
 		}
 	],
 	"status": "Source",

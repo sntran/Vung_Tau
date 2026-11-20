@@ -145,6 +145,20 @@
 			"hash": "b6717664bad38b42a22662f05d30b93b",
 			"seen": "The same edits of this kind. The blueprint den_cong_vien changed in the kind hai_tay only, so the order of this kind has a new hash.",
 			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "19132c740df8fb8dbd9230e0a03386f0",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/den_vuon_thap_mid.png). The low square lamp: the white body, the cap, and the dark foot, as in photos 0 and 1.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "19132c740df8fb8dbd9230e0a03386f0",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/den_vuon_thap_far.png). A white box: the cap and the foot are not in the far level (its files did not change with the new lock).",
+			"changed": "Nothing."
 		}
 	],
 	"hash": "b6717664bad38b42a22662f05d30b93b"

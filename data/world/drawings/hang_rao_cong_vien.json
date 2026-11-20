@@ -315,6 +315,20 @@
 			"hash": "f5b1de0205a135cfa13ad9d7d2b28b55",
 			"seen": "A block of small clipped leaves with round top edges, flat ends for the next piece, a lighter top and a dark foot, as photos 0 and 2. The leaves are a pattern of the maps; the outline is smooth, as a hedge that was clipped.",
 			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "f5b1de0205a135cfa13ad9d7d2b28b55",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/hang_rao_cong_vien_mid.png). A clipped hedge of 2 m with round edges and the texture of its leaves, as in photos 0 and 1.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "f5b1de0205a135cfa13ad9d7d2b28b55",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/hang_rao_cong_vien_far.png). The same box, one darker green.",
+			"changed": "Nothing."
 		}
 	],
 	"hash": "f5b1de0205a135cfa13ad9d7d2b28b55"

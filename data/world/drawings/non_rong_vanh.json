@@ -424,6 +424,20 @@
 			"hash": "af006a4cf20449b58390d222b3be6fce",
 			"seen": "The files of the lock (the job \"Models of World\" of 4814dd0), next to photos 0 and 1 (build/look/non_rong_vanh_mid.png): the woman with the light blue wide hat, a white top, and dark pants, as the look of the factory files of this order.",
 			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "af006a4cf20449b58390d222b3be6fce",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/non_rong_vanh_mid.png). A woman in a light blue wide hat, a light top, and dark pants, as in photo 0.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "af006a4cf20449b58390d222b3be6fce",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/non_rong_vanh_far.png). The same, the brim in fewer faces.",
+			"changed": "Nothing."
 		}
 	],
 	"hash": "af006a4cf20449b58390d222b3be6fce"

@@ -118,6 +118,20 @@
 			"hash": "5d04475242eacf38d35a66ca85140b88",
 			"seen": "The near level of the last blueprint: as the near level before; next to photo 0 the dark red brown panel under the grey top slab with sharp edges, the dark band at the foot.",
 			"changed": "Nothing: the last level."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "5d04475242eacf38d35a66ca85140b88",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/tru_lan_can_ha_long_mid.png). The panel of red brown granite with the light top slab and the dark foot, as in photo 0.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "5d04475242eacf38d35a66ca85140b88",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/tru_lan_can_ha_long_far.png). One red brown block with a lighter top.",
+			"changed": "Nothing."
 		}
 	],
 	"hash": "5d04475242eacf38d35a66ca85140b88"

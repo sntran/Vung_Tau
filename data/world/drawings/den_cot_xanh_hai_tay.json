@@ -155,6 +155,20 @@
 			"hash": "814bd0d7cecf40a57dc39d8a90db6806",
 			"seen": "Report 0026, D-0026-32: the far level of the order before (120 triangles, cells of 6 cm) was a wedge from the arms down to half the height of the pole: its outline from the front was 1.89 of the near level, and from the side 0.42. With 400 triangles and cells of 3.5 cm: the pole, the two arms, the globe on its arm and the horn; the outline is 0.89 of the near level from the front and 1.02 from the side (tools/world/outlines.py).",
 			"changed": "The far level of the node hai_tay of the blueprint den_cong_vien: cells 0.035 m (were 0.06), budget 400 (was 120)."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "658e150557179a7351642f171770db26",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/den_cot_xanh_hai_tay_mid.png). The blue pole with the long and the short arm, the head, the globe, and the horn, as in photos 0 and 1.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "658e150557179a7351642f171770db26",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/den_cot_xanh_hai_tay_far.png). The same pole and arms (the far level of D-0026-32).",
+			"changed": "Nothing."
 		}
 	],
 	"hash": "814bd0d7cecf40a57dc39d8a90db6806"
