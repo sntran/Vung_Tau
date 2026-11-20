@@ -618,5 +618,5 @@
 	"uses": "Plan 0026, R7, Q7: on its OSM outline (way 235149416) by Hạ Long, about 300 m south of Hải Âu (seen from the jetty and the walk of the sea); its place is in data/world/places/bai_truoc.json.",
 	"impostor": false,
 	"hash": "c212572faa567452ece017faba2f4c89",
-	"status_note": "Not in the game: Nhà khách Hạ Long stands outside the area of the showcase (D1). Its order is in data/world/orders.json again (report 0026, section 9.3: its looks must come from the files of the lock): the job \"Models of World\" builds it, and then tools/world/drawings.py look nha_khach_ha_long --lock gives its looks. Until then its looks are of a preview in my workspace (D-0026-27)."
+	"status_note": "Not in the game: Nhà khách Hạ Long stands outside the area of the showcase (D1), and its order waits. On 2026-11-20 the job \"Models of World\" built it again (CI of 8a8ec85), and the check of its files failed: \"/options/size (not in the receipt)\": World at the commit of the lock (1984a6f) does not keep the option size of the blueprint building in the receipt. Its looks from the files of the lock need a newer lock of World (report 0026, section 9.3); until then they are of a preview in my workspace (D-0026-27)."
 }
