@@ -92,7 +92,22 @@
 				0.95,
 				0.6
 			],
-			"people_range_m": 150.0
+			"people_range_m": 150.0,
+			"roof": {
+				"shot": [
+					0.555,
+					0.395,
+					0.598,
+					0.422
+				],
+				"photo": [
+					0.6,
+					0.475,
+					0.69,
+					0.5
+				],
+				"how": "Report 0026, D-0026-40: the side of the pyramid roof of tiles of the hall with the orange roof (nha_mai_ngoi_cam) to the beach, below its ridge and above its eaves, with no sky and no wall in the box. In the photo of S1 (2014) the tiles are orange red (hue 8 degrees)."
+			}
 		},
 		{
 			"id": "S2",

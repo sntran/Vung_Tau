@@ -49,6 +49,10 @@ extends RefCounted
 ## 4 px, the game 17 px at 12:00 and 11 px at 17:10 (patches 3 to 4 times the
 ## size of the crowns of the photo).
 const HILL_MAX_LENGTH := 1.5
+## D-0026-40: the box "roof" of a shot (the roof of the hall in S1) has the hue
+## and the saturation of the photo, within these.
+const ROOF_MAX_HUE := 12.0
+const ROOF_MAX_SATURATION := 0.12
 ## D-0026-24: the radius of the crown of a palm or a pine, and the step of the search for trees along the line.
 const CROWN_RADIUS := {"coconut": 3.0, "casuarina": 2.5, "araucaria": 2.5, "frangipani": 2.0, "fan_palm": 1.5}
 const TREE_LOOK_M := 8.0
@@ -312,6 +316,19 @@ func _check_look(d: PlaytestDriver, shot: Dictionary, preset: String, time: Stri
 		d.expect(float(game.color_patches) <= float(photo.color_patches) * HILL_MAX,
 				"%s, %s, %s: the hill has no patches of color (pink, teal roofs): %.3f, at most %.1f times the photo (%.3f)" % [
 					shot.id, preset, time, game.color_patches, HILL_MAX, photo.color_patches])
+	if shot.has("roof"):
+		var game_roof: Color = box_stats(frame, shot.roof.shot).mean
+		var photo_roof_image := Image.load_from_file(photo_path(str(shot.photos[0].file)))
+		photo_roof_image.resize(frame.get_width(), int(photo_roof_image.get_height() * float(frame.get_width()) / photo_roof_image.get_width()))
+		var photo_roof: Color = box_stats(photo_roof_image, shot.roof.photo).mean
+		var roof_hue := absf(game_roof.h - photo_roof.h) * 360.0
+		roof_hue = minf(roof_hue, 360.0 - roof_hue)
+		d.step("%s, %s, %s: the roof of the hall is #%s (hue %.0f, saturation %.2f, value %.2f); the photo #%s (hue %.0f, saturation %.2f, value %.2f)" % [
+				shot.id, preset, time, game_roof.to_html(false), game_roof.h * 360.0, game_roof.s, game_roof.v,
+				photo_roof.to_html(false), photo_roof.h * 360.0, photo_roof.s, photo_roof.v])
+		d.expect(roof_hue <= ROOF_MAX_HUE and absf(game_roof.s - photo_roof.s) <= ROOF_MAX_SATURATION,
+				"%s, %s, %s: the roof of the hall has the color of the tiles of the photo: the hue %.0f degrees from it (at most %.0f), the saturation %.2f from it (at most %.2f)" % [
+					shot.id, preset, time, roof_hue, ROOF_MAX_HUE, absf(game_roof.s - photo_roof.s), ROOF_MAX_SATURATION])
 	if shot.has("water") and time == "1200":
 		var water := box_stats(frame, shot.water)
 		var color: Color = water.mean
