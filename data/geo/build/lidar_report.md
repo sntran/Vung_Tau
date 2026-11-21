@@ -17,7 +17,7 @@ Made by `tools/geo/lidar.py`. Do not change by hand.
 - seed gedi02a a36c84e: 2019 188
 - seed gedi02a 7d32458: 2019 384, 2021 74, 2022 23, 2023 416, 2024 72, 2025 153
 
-## lidar fetch (2026-11-21 04:27 UTC)
+## lidar fetch (2026-11-21 21:44 UTC)
 
 - sliderule 5.8.1, 2018-10-14T00:00:00Z to 2026-11-21T00:00:00Z
 - atl08 2026: 4919 rows (it had 4919)
@@ -28,11 +28,11 @@ Made by `tools/geo/lidar.py`. Do not change by hand.
 - gedi02a 2020: 0 rows; the file of the last good run stays (None rows)
 - gedi02a 2026: 0 rows; the file of the last good run stays (None rows)
 
-## lidar tracks (2026-11-21 04:28 UTC)
+## lidar tracks (2026-11-21 21:45 UTC)
 
 - the short form: 44185 bins of 20 m from 957089 photons (2215 KB, data/geo/build/lidar_tracks.json)
 
-## lidar report (2026-11-21 04:28 UTC)
+## lidar report (2026-11-21 21:45 UTC)
 
 
 ## The points in the store (the head of the branch)
@@ -59,10 +59,12 @@ A year is complete when ATL08 has each pass of the ATL03 ground photons, and the
 
 ## R5c: the sea floor
 
+ATL24 over the mean sea level (its height over EGM2008 minus 1.16 m, the mean dynamic topography of DTU22, plan 0009, R5b) minus the source.
+
 | Source | Points | Mean difference (m) | RMSE (m) |
 |---|---|---|---|
-| intertidal.tif | 2994 | 0.88 | 2.27 |
-| gebco.tif | 35429 | 5.02 | 10.09 |
+| intertidal.tif | 2994 | -0.28 | 2.11 |
+| gebco.tif | 35429 | 3.86 | 9.56 |
 - the map of the depths of ATL24: lidar_seafloor.png
 
 ## lidar mdt (2026-11-20 01:34 UTC)
