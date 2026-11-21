@@ -82,7 +82,13 @@ const BLOCK := 16
 const HILL_MAX := 1.5
 ## D-0026-15: the mean color of the box "hill" and of the photo in its box.
 const HILL_MAX_HUE := 25.0
-const HILL_MAX_SATURATION := 0.15
+## D-0026-23 (audit 6): the saturation of the hill is within 0.05 of the photo
+## (it was 0.13 against 0.26 at 17:10, with the limit 0.15), and the color
+## patches of the box (the crowns of yellow green, dark green, and dry brown)
+## are at least HILL_MIN_COLOR_PATCHES times those of the photo (0.013 against
+## 0.050).
+const HILL_MAX_SATURATION := 0.05
+const HILL_MIN_COLOR_PATCHES := 0.5
 const HILL_MAX_VALUE := 0.12
 const WATER_MAX_SATURATION := 0.35
 ## The water of the photos is 0.45 to 0.7 bright (the value of its mean color).
@@ -316,6 +322,9 @@ func _check_look(d: PlaytestDriver, shot: Dictionary, preset: String, time: Stri
 		d.expect(float(game.color_patches) <= float(photo.color_patches) * HILL_MAX,
 				"%s, %s, %s: the hill has no patches of color (pink, teal roofs): %.3f, at most %.1f times the photo (%.3f)" % [
 					shot.id, preset, time, game.color_patches, HILL_MAX, photo.color_patches])
+		d.expect(float(game.color_patches) >= float(photo.color_patches) * HILL_MIN_COLOR_PATCHES,
+				"%s, %s, %s: the crowns of the hill have the colors of the photo (yellow green, dark green, dry brown): the color patches %.3f, at least %.1f times the photo (%.3f)" % [
+					shot.id, preset, time, game.color_patches, HILL_MIN_COLOR_PATCHES, photo.color_patches])
 	if shot.has("roof"):
 		var game_roof: Color = box_stats(frame, shot.roof.shot).mean
 		var photo_roof_image := Image.load_from_file(photo_path(str(shot.photos[0].file)))

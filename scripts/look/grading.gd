@@ -8,8 +8,10 @@ extends RefCounted
 ## the Mobile renderer): SDFGI does not use it.
 
 const PATH := "res://data/look/grading.json"
+## far_saturation (report 0026, D-0026-23, audit 6): the saturation of the far
+## forest and its haze is 1 + this value (the shaders terrain and canopy).
 const NUMBERS: Array[String] = ["exposure", "saturation", "contrast", "sun_warmth", "sky_mix", "ambient_mix", "glow", "haze",
-		"sea_mix"]
+		"sea_mix", "far_saturation"]
 
 ## The gloss of shaders/water.gdshader before the grading.
 const SEA_ROUGHNESS := 0.06

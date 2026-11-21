@@ -67,15 +67,19 @@ uniform float roof_far_even = 0.8;
 // far_haze_range.x to .y m, far_haze of the color of the land goes to
 // far_haze_color (the far forest of the photo of S1 is a pale blue green). The
 // far clumps of the hill trees (shaders/canopy.gdshader) take the same values.
-uniform vec3 far_haze_color : source_color = vec3(0.23, 0.38, 0.38);
+uniform vec3 far_haze_color : source_color = vec3(0.12, 0.35, 0.36);
 uniform vec2 far_haze_range = vec2(150.0, 650.0);
 // The haze fades out from far_haze_fade.x to .y m: there the fog of the world
 // covers the land, and the haze took the contrast of the crowns of Núi Lớn
 // from Núi Nhỏ (3 km, PT-33).
 uniform vec2 far_haze_fade = vec2(1500.0, 2500.0);
-uniform float far_haze = 0.58;
+uniform float far_haze = 0.5;
 // The light of the haze: 1 in the day, less in the twilight (VungTau sets it).
 uniform float far_haze_light = 1.0;
+// The saturation of the haze over the far forest (1 + far_saturation of
+// data/look/grading.json, report 0026, D-0026-23): the haze is one color with
+// no variation, so it changes the saturation of the hill and not its patches.
+uniform float far_saturation = 1.0;
 // The highest sea level of the last 12 hours: the sand below it is wet.
 uniform float last_high = -100.0;
 uniform vec3 shell_color : source_color = vec3(0.85, 0.82, 0.76);
@@ -86,15 +90,28 @@ uniform vec3 bare_color : source_color = vec3(0.42, 0.33, 0.24);
 uniform float canopy_near = 200.0;
 uniform float canopy_far = 400.0;
 // As dark as the far clumps of HillCanopy: on Low, the ground shows the far forest with fewer clumps (D-0005-10).
-uniform vec3 canopy_dark : source_color = vec3(0.08, 0.15, 0.06);
-uniform vec3 canopy_light : source_color = vec3(0.15, 0.24, 0.09);
-uniform vec3 canopy_dry : source_color = vec3(0.4, 0.33, 0.17);
-// Report 0026, D-0026-23: the crowns of the forest are cells on a grid of
-// crown_spacing m (jittered), each with a radius from crown_radius.x to .y m
-// (crowns of 5 m to 12 m, as in the photo of S1).
-uniform float crown_spacing = 7.0;
-uniform vec2 crown_radius = vec2(2.5, 6.0);
-uniform float crown_dome_mean = 0.75;
+uniform vec3 canopy_dark : source_color = vec3(0.04, 0.13, 0.08);
+uniform vec3 canopy_light : source_color = vec3(0.12, 0.27, 0.08);
+uniform vec3 canopy_dry : source_color = vec3(0.5, 0.33, 0.14);
+// Report 0026, D-0026-23: the crowns of the forest are domes on two grids
+// (crown_cells()): large crowns on a grid of crown_spacing.x m with a radius of
+// crown_radius_large m, and small crowns on a grid of crown_spacing.y m with a
+// radius of crown_radius_small m (crowns of 5 m to 12 m, as in the photo of S1).
+uniform vec2 crown_spacing = vec2(9.0, 5.0);
+uniform vec2 crown_radius_large = vec2(3.5, 6.0);
+uniform vec2 crown_radius_small = vec2(2.5, 3.5);
+uniform float crown_dome_mean = 0.6;
+// The colors of the crowns of the photo of S1 (audit 6): dark green, green,
+// yellow green, and dry brown; crown_kinds gives the part of the first three
+// (the rest is dry brown, and more in the dry patches and the dry season).
+uniform vec3 crown_yellow : source_color = vec3(0.28, 0.37, 0.05);
+uniform vec3 crown_kinds = vec3(0.35, 0.35, 0.22);
+// The part of the crowns that are trees on the town ground of a steep slope.
+uniform float hill_town_trees = 0.6;
+// The stands of crowns of one kind (m).
+uniform float crown_group_m = 25.0;
+// The dry patches of the photo: groups of brown crowns of about 40 m to 80 m.
+uniform float dry_patch_m = 60.0;
 
 varying vec3 world_position;
 varying vec3 world_normal;
@@ -151,30 +168,43 @@ float value_noise(vec2 p) {
 	return mix(mix(hash2(i), hash2(i + vec2(1.0, 0.0)), f.x), mix(hash2(i + vec2(0.0, 1.0)), hash2(i + vec2(1.0, 1.0)), f.x), f.y);
 }
 
-// The crowns of the forest (report 0026, D-0026-23): the nearest crown of p
-// (crowns on a jittered grid of spacing m, radius from radius.x to .y m):
-// dome (1 at its top, 0 at its edge and in a gap), id (a random value of the
-// crown), and offset (from the middle of the crown to p, as a part of its radius).
-void crown_cells(vec2 p, float spacing, vec2 radius, out float dome, out float id, out vec2 offset) {
+// The crowns of the forest (report 0026, D-0026-23): the highest crown at p.
+// Two grids of crowns, fully jittered: large crowns (spacing.x m, radius
+// radius_large m) and small crowns between them (spacing.y m, radius_small m).
+// A crown is a dome whose height is its radius times (1 - d * d), so a large
+// crown covers the edges of the small crowns next to it, and the crowns have
+// many sizes and no rows (audit 6: one grid of 7 m made crowns of one size in
+// even rows, like scales). dome: 1 at the top of the crown, 0 at its edge;
+// id: a random value of the crown; offset: from the middle of the crown to p,
+// as a part of its radius.
+void crown_grid(vec2 p, float spacing, vec2 radius, float seed, inout float best, inout float dome, inout float id, inout vec2 offset) {
 	vec2 g = floor(p / spacing);
-	float best = 10.0;
-	id = 0.0;
-	offset = vec2(0.0);
 	for (int j = -1; j <= 1; j++) {
 		for (int i = -1; i <= 1; i++) {
-			vec2 c = g + vec2(float(i), float(j));
-			vec2 center = (c + 0.15 + 0.7 * vec2(hash2(c), hash2(c + vec2(17.3, 5.9)))) * spacing;
+			vec2 c = g + vec2(float(i), float(j)) + seed;
+			vec2 center = (c - seed + vec2(hash2(c), hash2(c + vec2(17.3, 5.9)))) * spacing;
 			float r = mix(radius.x, radius.y, hash2(c + vec2(3.7, 11.1)));
 			vec2 o = (p - center) / r;
-			float d = length(o);
-			if (d < best) {
-				best = d;
+			float d2 = dot(o, o);
+			float h = r * (1.0 - d2);
+			if (h > best) {
+				best = h;
+				dome = 1.0 - d2;
 				id = hash2(c + vec2(9.1, 2.3));
 				offset = o;
 			}
 		}
 	}
-	dome = clamp(1.0 - best * best, 0.0, 1.0);
+}
+
+void crown_cells(vec2 p, vec2 spacing, vec2 radius_large, vec2 radius_small, out float dome, out float id, out vec2 offset) {
+	float best = 0.0;
+	dome = 0.0;
+	id = 0.0;
+	offset = vec2(0.0);
+	crown_grid(p, spacing.x, radius_large, 0.0, best, dome, id, offset);
+	crown_grid(p, spacing.y, radius_small, 41.0, best, dome, id, offset);
+	dome = clamp(dome, 0.0, 1.0);
 }
 
 void fragment() {
@@ -265,16 +295,36 @@ void fragment() {
 	// (report 0026, D-0026-23: the photo of S1 shows one canopy of small crowns;
 	// a smooth noise of 8 m, made even far away, gave large dark patches on a
 	// lighter slope). In the dry season, some crowns are brown and red.
-	float forest = smoothstep(0.4, 0.6, cover.r) * (1.0 - smoothstep(0.2, 0.3, mask.r));
+	// Audit 6: from far, the bushes of the hills and the trees of the town (the
+	// canopy map) are crowns too: the lower slope of Núi Nhỏ in the photo of S1
+	// has villas among trees, and the town ground there was large smooth light
+	// areas with no crowns.
+	float forest = max(max(smoothstep(0.4, 0.6, cover.r), smoothstep(0.3, 0.6, cover.g) * hill_ground * tree_cover), town_tree * town_ground * tree_cover)
+			* (1.0 - smoothstep(0.2, 0.3, mask.r));
 	float far = smoothstep(canopy_near, canopy_far, distance(world_position, CAMERA_POSITION_WORLD));
 	float crowns;
 	float crown_id;
 	vec2 crown_offset;
-	crown_cells(world_position.xz, crown_spacing, crown_radius, crowns, crown_id, crown_offset);
-	vec3 canopy = mix(canopy_dark, canopy_light, 0.35 + 0.5 * crown_id);
-	float dry_share = dryness * 0.4;
-	float crown_dry = step(1.0 - dry_share, fract(crown_id * 7.13));
-	canopy = mix(canopy, canopy_dry * (0.55 + 0.2 * crown_id), crown_dry);
+	crown_cells(world_position.xz, crown_spacing, crown_radius_large, crown_radius_small, crowns, crown_id, crown_offset);
+	// Audit 6: the town on the steep slopes of the hills is villas among trees
+	// (the lower slope of Núi Nhỏ in the photo of S1): from far, a part
+	// (hill_town_trees) of the crowns there are trees, and the roofs show
+	// between them. The town on the flat land keeps its roofs.
+	float hill_town = town_ground * smoothstep(0.97, 0.9, normalize(world_normal).y) * tree_cover;
+	forest = max(forest, hill_town * step(fract(crown_id * 5.31), hill_town_trees) * step(0.02, crowns) * (1.0 - smoothstep(0.2, 0.3, mask.r)));
+	// The kind of a crown, and its own light (0.55 to 1.45).
+	// The crowns grow in groups of one kind (stands of about crown_group_m):
+	// the kind of a crown is part random and part the group.
+	float kind = clamp(fract(crown_id * 7.13) * 0.5 + value_noise(world_position.xz / crown_group_m + vec2(2.9, 8.3)) * 0.8 - 0.15, 0.0, 0.999);
+	float dry_patch = smoothstep(0.55, 0.8, value_noise(world_position.xz / dry_patch_m + vec2(13.1, 4.7)));
+	float dry_share = clamp(1.0 - crown_kinds.x - crown_kinds.y - crown_kinds.z + dryness * 0.1 + dry_patch * 0.25, 0.0, 1.0);
+	float green_scale = (1.0 - dry_share) / max(crown_kinds.x + crown_kinds.y + crown_kinds.z, 0.001);
+	float edge_dark = crown_kinds.x * green_scale;
+	float edge_green = edge_dark + crown_kinds.y * green_scale;
+	vec3 canopy = kind < edge_dark ? canopy_dark : (kind < edge_green ? canopy_light : crown_yellow);
+	float crown_dry = step(1.0 - dry_share, kind);
+	canopy = mix(canopy, canopy_dry * 0.7, crown_dry);
+	canopy *= 0.55 + 0.9 * fract(crown_id * 3.71);
 	// The leaves of a crown: clusters of about 1 m with dark holes between them.
 	float leaves = value_noise(world_position.xz / 1.1) * 0.65 + value_noise(world_position.xz / 2.5 + vec2(3.1, 7.7)) * 0.35;
 	float canopy_rough = mix(0.3, 1.0, smoothstep(0.0, 0.5, crowns)) * (0.65 + 0.6 * leaves);
@@ -282,10 +332,11 @@ void fragment() {
 	// to their mean (no moire): about 3 km away on Low. The clusters of the
 	// leaves change to their mean where a pixel is larger than a cluster.
 	float pixel_m = max(length(fwidth(world_position.xz)), 0.05);
-	float blur = smoothstep(crown_spacing * 0.3, crown_spacing * 0.6, pixel_m);
+	float blur = smoothstep(crown_spacing.y * 0.5, crown_spacing.y, pixel_m);
 	float leaf_blur = smoothstep(0.6, 1.4, pixel_m);
 	canopy_rough = mix(canopy_rough, mix(0.3, 1.0, smoothstep(0.0, 0.5, crowns)) * 0.95, leaf_blur);
-	vec3 canopy_mean = mix(mix(canopy_dark, canopy_light, 0.6), canopy_dry * 0.65, dry_share);
+	vec3 canopy_mean = (canopy_dark * crown_kinds.x + canopy_light * crown_kinds.y + crown_yellow * crown_kinds.z) * green_scale
+			+ canopy_dry * 0.7 * dry_share;
 	canopy = mix(canopy, canopy_mean, blur);
 	// The mean of the canopy where its crowns blur: the mean of the leaves and
 	// the gaps (0.8), times the mean light of a field of domes (crown_dome_mean:
@@ -385,7 +436,8 @@ void fragment() {
 	float haze_part = far_haze * smoothstep(far_haze_range.x, far_haze_range.y, camera_distance)
 			* (1.0 - smoothstep(far_haze_fade.x, far_haze_fade.y, camera_distance)) * (1.0 - under);
 	ALBEDO = color * (1.0 - haze_part);
-	EMISSION = far_haze_color * haze_part * far_haze_light * forest_haze;
+	vec3 haze_color = mix(far_haze_color, mix(vec3(luminance(far_haze_color)), far_haze_color, far_saturation), forest * far);
+	EMISSION = haze_color * haze_part * far_haze_light * forest_haze;
 	ROUGHNESS = mix(roughness, 0.6, under);
 	// The domes of the crowns of the far forest (report 0026, D-0026-23).
 	NORMAL = normalize((VIEW_MATRIX * vec4(shaded_normal, 0.0)).xyz);

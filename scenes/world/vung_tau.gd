@@ -545,6 +545,14 @@ func update_time(minutes: int, day: int) -> void:
 		environment.glow_enabled = float(grade.glow) > 0.0
 		environment.glow_intensity = float(grade.glow)
 		environment.fog_density = float(grade.haze)
+		# The far forest keeps the saturation of the day in the golden hour of the
+		# Mobile renderer (report 0026, D-0026-23, audit 6).
+		var far_saturation := 1.0 + float(grade.get("far_saturation", 0.0))
+		_ground_material.set_shader_parameter("far_saturation", far_saturation)
+		if canopy:
+			for each: ShaderMaterial in [canopy.material, canopy.dense_material]:
+				if each:
+					each.set_shader_parameter("far_saturation", far_saturation)
 		environment.fog_light_color = environment.fog_light_color.lerp(grade.haze_color, mix)
 		# The sea is green grey, not cyan (report 0026, D-0026-06).
 		if _sea_material:

@@ -23,8 +23,14 @@ uniform float dryness = 0.0;
 // The part of the trees that have no leaves.
 uniform float bare_share = 0.0;
 // Darker than before: the land was too pale from far (report 0005, D-0005-09).
-uniform vec3 leaf_dark : source_color = vec3(0.09, 0.17, 0.06);
+uniform vec3 leaf_dark : source_color = vec3(0.06, 0.16, 0.1);
 uniform vec3 leaf_light : source_color = vec3(0.16, 0.26, 0.09);
+// Report 0026, D-0026-23 (audit 6): a part of the clumps are yellow green, as
+// the crowns of the photo of S1 and of the ground (shaders/terrain.gdshader).
+uniform vec3 leaf_yellow : source_color = vec3(0.28, 0.36, 0.06);
+uniform float yellow_share = 0.25;
+// A part of the clumps are dry brown in each season (the dry crowns of the photo of S1).
+uniform float brown_share = 0.1;
 uniform vec3 dry_brown : source_color = vec3(0.38, 0.34, 0.18);
 uniform vec3 dry_red : source_color = vec3(0.45, 0.25, 0.14);
 uniform vec3 dry_yellow : source_color = vec3(0.45, 0.42, 0.2);
@@ -37,12 +43,15 @@ uniform vec2 far_range = vec2(250.0, 900.0);
 uniform float far_even = 0.75;
 // The air between the eye and the far hill (report 0026, D-0026-15): the same
 // values as the far ground (shaders/terrain.gdshader).
-uniform vec3 far_haze_color : source_color = vec3(0.23, 0.38, 0.38);
+uniform vec3 far_haze_color : source_color = vec3(0.12, 0.35, 0.36);
 uniform vec2 far_haze_range = vec2(150.0, 650.0);
 // As the ground (shaders/terrain.gdshader): the haze fades out far away.
 uniform vec2 far_haze_fade = vec2(1500.0, 2500.0);
 uniform float far_haze = 0.58;
 uniform float far_haze_light = 1.0;
+// As the ground (shaders/terrain.gdshader): the saturation of the haze over
+// the far forest (1 + far_saturation of data/look/grading.json, D-0026-23).
+uniform float far_saturation = 1.0;
 // The part of the haze that the shade and the leaves of a crown change (D-0026-23).
 uniform float haze_contrast = 0.7;
 
@@ -68,9 +77,12 @@ void vertex() {
 	float a = hash(origin.xz);
 	float b = hash(origin.xz + vec2(17.0, 5.0));
 	vec3 color = mix(leaf_dark, leaf_light, a);
+	if (hash(origin.xz + vec2(7.0, 29.0)) < yellow_share) {
+		color = leaf_yellow * (0.8 + 0.4 * a);
+	}
 	if (b < bare_share * 0.6) {
 		color = bare_color;
-	} else if (b < dryness * 0.45) {
+	} else if (b < dryness * 0.45 + brown_share) {
 		float kind = hash(origin.xz + vec2(3.0, 11.0));
 		color = kind < 0.4 ? dry_brown : (kind < 0.7 ? dry_red : dry_yellow);
 	}
@@ -107,7 +119,8 @@ void fragment() {
 	// the crowns were one smooth green; the shade of the crown and its leaves
 	// take part of the haze too (the mean stays: the shade is about 0.6 and the
 	// leaves about 1.0).
-	EMISSION = far_haze_color * haze_part * far_haze_light * mix(1.0, rough * crown_shade / 0.6, haze_contrast);
+	vec3 haze_color = mix(vec3(dot(far_haze_color, vec3(0.2126, 0.7152, 0.0722))), far_haze_color, far_saturation);
+	EMISSION = haze_color * haze_part * far_haze_light * mix(1.0, rough * crown_shade / 0.6, haze_contrast);
 	ROUGHNESS = 0.9;
 	// Leaves have almost no shine: with the default specular, a low sun made
 	// the clumps pale tan on the Mobile renderer.

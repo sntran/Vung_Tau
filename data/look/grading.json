@@ -159,29 +159,52 @@
 				{
 					"hour": 15.5,
 					"saturation": 0.0,
-					"exposure": 0.0
+					"exposure": 0.0,
+					"far_saturation": 0.0
 				},
 				{
 					"hour": 16.5,
 					"saturation": -0.12,
-					"exposure": -0.06
+					"exposure": -0.06,
+					"far_saturation": 0.35
 				},
 				{
 					"hour": 17.75,
 					"saturation": -0.12,
-					"exposure": -0.06
+					"exposure": -0.06,
+					"far_saturation": 0.35
 				},
 				{
 					"hour": 18.5,
 					"saturation": 0.0,
-					"exposure": 0.0
+					"exposure": 0.0,
+					"far_saturation": 0.0
 				}
 			],
-			"note": "The Mobile renderer has no SDFGI: in the golden hour the sunlit sand and the walk were orange on Low (phase 4). From 16:30 to 17:45 it takes 0.12 from the saturation and 0.06 from the exposure, as the part forward_plus does all day."
+			"note": "The Mobile renderer has no SDFGI: in the golden hour the sunlit sand and the walk were orange on Low (phase 4). From 16:30 to 17:45 it takes 0.12 from the saturation and 0.06 from the exposure, as the part forward_plus does all day. far_saturation gives the haze over the far forest 0.35 more saturation in these hours: the cut of the saturation is for the sunlit sand, and the far forest of S1 lost a third of its saturation (report 0026, D-0026-23, audit 6)."
 		},
 		"forward_plus": {
 			"saturation": -0.12,
-			"exposure": -0.04
+			"exposure": -0.04,
+			"hours": [
+				{
+					"hour": 6.5,
+					"far_saturation": 0.0
+				},
+				{
+					"hour": 8.0,
+					"far_saturation": -0.35
+				},
+				{
+					"hour": 15.5,
+					"far_saturation": -0.35
+				},
+				{
+					"hour": 16.5,
+					"far_saturation": 0.0
+				}
+			],
+			"note": "The computer presets (Forward+): 0.12 less saturation and 0.04 less exposure all day. far_saturation: with SDFGI the far forest of S1 at 12:00 had a saturation of 0.44 (the photo 0.26) and 0.25 at 17:10, so from 8:00 to 15:30 it takes 0.35 from the saturation of the far forest and its haze (report 0026, D-0026-23, audit 6)."
 		}
 	},
 	"sea_deep": "#314a42",
