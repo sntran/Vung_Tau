@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Built (2026-11-21; approved 2026-11-16). Open: my review of the sheets `docs/showcase/sheet_S1.jpg` to `sheet_S5.jpg` (acceptance criterion 2, Q29) and R19 (the dressing of Tết, Q30). |
+| Status | Built (2026-11-21; approved 2026-11-16). Open (report 0026, section 12.5: the details wait for the town of plan 0009): D-0026-46 to D-0026-48, my review of the sheets `docs/showcase/sheet_S1.jpg` to `sheet_S5.jpg` (acceptance criterion 2, Q29), and R19 (the dressing of Tết, with plan 0021). |
 | Branch | `feat/0026-showcase-bai-truoc` |
 | Depends on | 0023 (models from World), 0020 (trees), 0008 (the known structures: the jetty of Cầu Đá, the views). Their branches go to `main` first (R1). |
 | Uses from later plans | 0006 (people), 0009 (houses), 0015 (the beach in the evening), 0018 (traffic): only the parts that this area needs. Those plans keep the rest of their work. |
