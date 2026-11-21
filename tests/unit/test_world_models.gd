@@ -252,3 +252,35 @@ func test_a_level_that_the_preset_does_not_show_loads_only_when_a_preset_shows_i
 	assert_not_null(model.level("near"), "High: the near level loads")
 	assert_true(model.level("near").visible)
 	WorldModel.set_ranges("low")
+
+
+# Report 0026, D-0026-42: the far level of a person is one draw call. Its
+# opaque surfaces become one surface, with the color of each surface at its
+# points, and the blend shapes of the blink stay.
+func test_the_far_level_of_a_person_is_one_surface_with_the_colors_of_its_parts() -> void:
+	WorldModel.set_ranges("low")
+	var source := WorldModel.scene("walker_1", "far").instantiate() as Node3D
+	var source_mesh := (source.find_children("*", "MeshInstance3D", true, false)[0] as MeshInstance3D).mesh as ArrayMesh
+	var points := 0
+	for i in source_mesh.get_surface_count():
+		points += source_mesh.surface_get_array_len(i)
+	var model := WorldModel.make("walker_1")
+	add_child_autofree(model)
+	var far := model.level("far").find_children("*", "MeshInstance3D", true, false)[0] as MeshInstance3D
+	assert_gt(source_mesh.get_surface_count(), 5, "the far level of World has a surface for each part")
+	assert_eq(far.mesh.get_surface_count(), 1, "the game draws the far level of a person with one surface")
+	assert_eq(far.mesh.surface_get_array_len(0), points, "the surface has the points of all the parts")
+	assert_eq((far.mesh as ArrayMesh).get_blend_shape_count(), source_mesh.get_blend_shape_count(), "the blink stays")
+	var material := far.get_active_material(0) as StandardMaterial3D
+	assert_true(material.vertex_color_use_as_albedo and material.vertex_color_is_srgb, "the colors are at the points")
+	# The first part (the sandals of World) keeps its color: the color of its material times its vertex color.
+	var part := WorldMaterials.shared().material_for(source_mesh.surface_get_material(0).resource_name, source_mesh.surface_get_material(0)) as StandardMaterial3D
+	var first: Color = (source_mesh.surface_get_arrays(0)[Mesh.ARRAY_COLOR] as PackedColorArray)[0] if source_mesh.surface_get_arrays(0)[Mesh.ARRAY_COLOR] != null else Color.WHITE
+	var want := part.albedo_color.srgb_to_linear()
+	if part.vertex_color_use_as_albedo or (source_mesh.surface_get_format(0) & Mesh.ARRAY_FORMAT_COLOR) != 0:
+		want *= first
+	var got: Color = (far.mesh.surface_get_arrays(0)[Mesh.ARRAY_COLOR] as PackedColorArray)[0].srgb_to_linear()
+	assert_almost_eq(got.r, want.r, 0.02, "the red of the first point")
+	assert_almost_eq(got.g, want.g, 0.02, "the green of the first point")
+	assert_almost_eq(got.b, want.b, 0.02, "the blue of the first point")
+	source.free()

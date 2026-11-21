@@ -40,6 +40,9 @@ static var _scenes: Dictionary = {}
 static var _requested: Dictionary = {}  # the paths in the load of request()
 static var _dropped: Dictionary = {}  # the paths whose load of request() is not used
 static var _lowest: Dictionary = {}  # id/level -> the lowest point of the level at rest
+static var _merged: Dictionary = {}  # id/paint/set -> the far mesh of a person with one opaque surface
+static var _merged_material: StandardMaterial3D
+static var _map_means: Dictionary = {}  # texture id -> the mean color of the map (linear)
 
 ## The id of the order in data/world/orders.json.
 var id := ""
@@ -215,8 +218,173 @@ func _add_level(level: String) -> bool:
 	node.position.y = -_lowest_of(level, node)
 	if not _apply_materials(node, level):
 		return false
+	if level == "far" and not node.find_children("*", "Skeleton3D", true, false).is_empty():
+		_merge_surfaces(node)
 	_collect_joints(node, level)
 	return true
+
+
+## Report 0026, D-0026-42: the far level of a person of World has 7 to 11
+## surfaces (each garment, the skin, the eyes), and each surface is a draw
+## call: the 40 people of S5 made 266 of its 597 draw calls on Low. The opaque
+## surfaces become one surface with the same color at each point: the color of
+## its material, times its vertex color when the material uses it, times the
+## mean color of its map (the skin and the eyes), in linear light, kept as sRGB. The blend shapes
+## (the blink of the eyes) stay on the merged surface. A transparent surface
+## stays as it is.
+func _merge_surfaces(root: Node) -> void:
+	for node in root.find_children("*", "MeshInstance3D", true, false):
+		var mi := node as MeshInstance3D
+		var mesh := mi.mesh as ArrayMesh
+		if mesh == null or mesh.get_surface_count() < 2:
+			continue
+		var key := "%s/%s/%s/%s" % [id, paint.to_html(false), material_set, mi.name]
+		if not _merged.has(key):
+			_merged[key] = _merged_mesh(mi)
+		var merged: Array = _merged[key]
+		if merged.is_empty():
+			continue
+		mi.mesh = merged[0]
+		for i in mi.get_surface_override_material_count():
+			mi.set_surface_override_material(i, null)
+		var kept: Array = merged[1]
+		for i in kept.size():
+			mi.set_surface_override_material(i + 1, kept[i])
+		if _merged_material == null:
+			_merged_material = StandardMaterial3D.new()
+			_merged_material.resource_name = "merged_far"
+			_merged_material.vertex_color_use_as_albedo = true
+			_merged_material.vertex_color_is_srgb = true
+			_merged_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+			_merged_material.roughness = 0.9
+			_merged_material.metallic_specular = 0.5
+		mi.set_surface_override_material(0, _merged_material)
+
+
+## [the new mesh (the merged surface first, then the kept surfaces), the
+## materials of the kept surfaces], or [] when no two surfaces merge.
+static func _merged_mesh(mi: MeshInstance3D) -> Array:
+	var mesh := mi.mesh as ArrayMesh
+	var opaque: Array[int] = []
+	var kept: Array[int] = []
+	var flags := 0
+	for i in mesh.get_surface_count():
+		var m := mi.get_active_material(i) as StandardMaterial3D
+		var format := mesh.surface_get_format(i)
+		if m == null or m.transparency != BaseMaterial3D.TRANSPARENCY_DISABLED or mesh.surface_get_primitive_type(i) != Mesh.PRIMITIVE_TRIANGLES:
+			kept.append(i)
+			continue
+		var surface_flags := format & Mesh.ARRAY_FLAG_USE_8_BONE_WEIGHTS
+		if not opaque.is_empty() and surface_flags != flags:
+			kept.append(i)
+			continue
+		flags = surface_flags
+		opaque.append(i)
+	if opaque.size() < 2:
+		return []
+	var vertices := PackedVector3Array()
+	var normals := PackedVector3Array()
+	var colors := PackedColorArray()
+	var bones := PackedInt32Array()
+	var weights := PackedFloat32Array()
+	var indices := PackedInt32Array()
+	var shapes := mesh.get_blend_shape_count()
+	var shape_vertices: Array[PackedVector3Array] = []
+	var shape_normals: Array[PackedVector3Array] = []
+	for k in shapes:
+		shape_vertices.append(PackedVector3Array())
+		shape_normals.append(PackedVector3Array())
+	var skinned := true
+	for i in opaque:
+		var arrays := mesh.surface_get_arrays(i)
+		var surface_shapes := mesh.surface_get_blend_shape_arrays(i)
+		for k in shapes:
+			var shape: Array = surface_shapes[k] if k < surface_shapes.size() else []
+			var sv: Variant = shape[Mesh.ARRAY_VERTEX] if shape.size() > Mesh.ARRAY_VERTEX else null
+			var sn: Variant = shape[Mesh.ARRAY_NORMAL] if shape.size() > Mesh.ARRAY_NORMAL else null
+			shape_vertices[k].append_array(sv if sv != null else arrays[Mesh.ARRAY_VERTEX])
+			shape_normals[k].append_array(sn if sn != null else (arrays[Mesh.ARRAY_NORMAL] if arrays[Mesh.ARRAY_NORMAL] != null else PackedVector3Array()))
+		var m := mi.get_active_material(i) as StandardMaterial3D
+		var base := m.albedo_color.srgb_to_linear()
+		if m.albedo_texture != null:
+			base *= _map_mean(m.albedo_texture)
+		var points: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+		var start := vertices.size()
+		vertices.append_array(points)
+		var n: Variant = arrays[Mesh.ARRAY_NORMAL]
+		normals.append_array(n if n != null else PackedVector3Array())
+		var c: Variant = arrays[Mesh.ARRAY_COLOR]
+		for k in points.size():
+			var color := base
+			if c != null and m.vertex_color_use_as_albedo:
+				var v: Color = (c as PackedColorArray)[k]
+				color *= v.srgb_to_linear() if m.vertex_color_is_srgb else v
+			# The points keep 8 bits for each color: sRGB keeps the steps of the dark colors.
+			colors.append(Color(color.r, color.g, color.b, 1.0).linear_to_srgb())
+		if arrays[Mesh.ARRAY_BONES] == null or arrays[Mesh.ARRAY_WEIGHTS] == null:
+			skinned = false
+		else:
+			bones.append_array(arrays[Mesh.ARRAY_BONES])
+			weights.append_array(arrays[Mesh.ARRAY_WEIGHTS])
+		var index: Variant = arrays[Mesh.ARRAY_INDEX]
+		if index == null:
+			for k in points.size():
+				indices.append(start + k)
+		else:
+			for k: int in index:
+				indices.append(start + k)
+	var arrays := []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = vertices
+	if normals.size() == vertices.size():
+		arrays[Mesh.ARRAY_NORMAL] = normals
+	arrays[Mesh.ARRAY_COLOR] = colors
+	if skinned:
+		arrays[Mesh.ARRAY_BONES] = bones
+		arrays[Mesh.ARRAY_WEIGHTS] = weights
+	arrays[Mesh.ARRAY_INDEX] = indices
+	var out := ArrayMesh.new()
+	out.blend_shape_mode = mesh.blend_shape_mode
+	var blend_arrays := []
+	for k in shapes:
+		out.add_blend_shape(mesh.get_blend_shape_name(k))
+		var shape := []
+		shape.resize(Mesh.ARRAY_MAX)
+		shape[Mesh.ARRAY_VERTEX] = shape_vertices[k]
+		if arrays[Mesh.ARRAY_NORMAL] != null:
+			shape[Mesh.ARRAY_NORMAL] = shape_normals[k]
+		blend_arrays.append(shape)
+	out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays, blend_arrays, {}, flags)
+	var materials := []
+	for i in kept:
+		out.add_surface_from_arrays(mesh.surface_get_primitive_type(i), mesh.surface_get_arrays(i), mesh.surface_get_blend_shape_arrays(i), {},
+				mesh.surface_get_format(i) & Mesh.ARRAY_FLAG_USE_8_BONE_WEIGHTS)
+		materials.append(mi.get_active_material(i))
+	out.resource_name = mesh.resource_name
+	return [out, materials]
+
+
+## The mean color of a map (linear), one time for each map.
+static func _map_mean(texture: Texture2D) -> Color:
+	var key := texture.get_instance_id()
+	if _map_means.has(key):
+		return _map_means[key]
+	var mean := Color.WHITE
+	var image := texture.get_image()
+	if image != null:
+		image = image.duplicate() as Image
+		if image.is_compressed():
+			image.decompress()
+		image.convert(Image.FORMAT_RGBA8)
+		image.resize(16, 16, Image.INTERPOLATE_BILINEAR)
+		var sum := Color(0, 0, 0, 0)
+		for y in image.get_height():
+			for x in image.get_width():
+				sum += image.get_pixel(x, y).srgb_to_linear()
+		var count := float(image.get_width() * image.get_height())
+		mean = Color(sum.r / count, sum.g / count, sum.b / count, 1.0)
+	_map_means[key] = mean
+	return mean
 
 
 # The lowest point of the meshes of a level at rest, one time for each model.

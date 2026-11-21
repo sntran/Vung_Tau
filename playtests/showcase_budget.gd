@@ -17,6 +17,10 @@ const SHOTS := "res://data/showcase/shots.json"
 ## The eye and the aim of a shot, as PT-72 takes it.
 const Shots := preload("res://playtests/showcase_shots.gd")
 const LIMITS := {"low": [600, 300000], "high": [2000, 2000000]}
+## Report 0026, D-0026-42: on Low each shot keeps a margin of 40 draw calls
+## under the limit of R16 for the letters of the hotels and the dressing of
+## Tết, so a shot has at most 560 draw calls.
+const MARGINS := {"low": 40}
 ## Report 0026, Q24 (R16): the video memory of each shot on Low, at most (MB).
 const MEMORY_LIMITS := {"low": 1024.0}
 ## Report 0026, D-0026-38: the worst case puts each walker of a spot this far in front of the eye (m).
@@ -52,8 +56,12 @@ func run(d: PlaytestDriver) -> void:
 		var draw_calls := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)
 		var triangles := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME)
 		var people := w.showcase.people.shown_count() if w.showcase.people else 0
-		d.step("%s, %s: %d draw calls, %d triangles (%d people)" % [preset, shot.id, draw_calls, triangles, people])
+		d.step("%s, %s: %d draw calls, %d triangles (%d people); the margin: %d draw calls under %d" % [
+				preset, shot.id, draw_calls, triangles, people, int(limit[0]) - draw_calls, limit[0]])
 		d.expect(draw_calls <= int(limit[0]), "%s, %s: at most %d draw calls: %d" % [preset, shot.id, limit[0], draw_calls])
+		if MARGINS.has(preset):
+			d.expect(int(limit[0]) - draw_calls >= int(MARGINS[preset]), "%s, %s: a margin of at least %d draw calls (at most %d): %d" % [
+					preset, shot.id, MARGINS[preset], int(limit[0]) - int(MARGINS[preset]), draw_calls])
 		d.expect(triangles <= int(limit[1]), "%s, %s: at most %d triangles: %d" % [preset, shot.id, limit[1], triangles])
 		_check_memory(d, preset, "%s" % shot.id)
 		await d.screenshot("%s_%s" % [shot.id, preset])
@@ -76,9 +84,12 @@ func run(d: PlaytestDriver) -> void:
 			await d.wait_frames(8)
 			draw_calls = RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)
 			triangles = RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME)
-			d.step("%s, %s, the %d walkers of its spots at their points nearest to the eye: %d draw calls, %d triangles" % [
-					preset, shot.id, held, draw_calls, triangles])
+			d.step("%s, %s, the %d walkers of its spots at their points nearest to the eye: %d draw calls, %d triangles; the margin: %d draw calls under %d" % [
+					preset, shot.id, held, draw_calls, triangles, int(limit[0]) - draw_calls, limit[0]])
 			d.expect(draw_calls <= int(limit[0]), "%s, %s, the walkers near: at most %d draw calls: %d" % [preset, shot.id, limit[0], draw_calls])
+			if MARGINS.has(preset):
+				d.expect(int(limit[0]) - draw_calls >= int(MARGINS[preset]), "%s, %s, the walkers near: a margin of at least %d draw calls (at most %d): %d" % [
+						preset, shot.id, MARGINS[preset], int(limit[0]) - int(MARGINS[preset]), draw_calls])
 			d.expect(triangles <= int(limit[1]), "%s, %s, the walkers near: at most %d triangles: %d" % [preset, shot.id, limit[1], triangles])
 			_check_memory(d, preset, "%s, the walkers near" % shot.id)
 			await d.screenshot("%s_%s_walkers_near" % [shot.id, preset])
