@@ -123,3 +123,39 @@ def test_best_shift_finds_the_offset_of_the_raster():
     # The building of the raster is 6 pixels (3 m) south and 2 pixels east of its outline.
     sure[16:26, 12:20] = True
     assert buildings.best_shift(sure, labels, 8) == (6, 2, 1.0)
+
+
+def test_the_roof_photons_of_clouds_are_out_of_the_check():
+    # D-0009-11: 5 photons at 758 m over a roof of 6 m (2025-08-30) made the
+    # RMSE of the roof photons 17.55 m.
+    height_of = {"a": 6.0, "b": 9.0}
+    photons = {"a": [758.0] * 5 + [5.5, 6.2, 5.9], "b": [8.0, 8.5, 9.1]}
+    low, towers, out = buildings.roof_differences(photons, height_of)
+    assert out == 5
+    assert towers == []
+    assert sorted(round(d, 2) for d in low) == [0.1, 0.5]
+
+
+def test_an_outline_with_only_photons_of_clouds_has_no_difference():
+    low, towers, out = buildings.roof_differences({"a": [758.0] * 5}, {"a": 6.0})
+    assert (low, towers, out) == ([], [], 5)
+
+
+def test_the_towers_have_a_row_of_their_own():
+    height_of = {"house": 12.0, "tower": 75.0}
+    photons = {"house": [11.0, 12.0, 13.0], "tower": [20.0, 22.0, 24.0]}
+    low, towers, _out = buildings.roof_differences(photons, height_of)
+    assert low == [0.0]
+    assert towers == [53.0]
+
+
+def test_the_check_rows_give_the_median_absolute_difference():
+    row = buildings.stats_line("x", [1.0, -3.0, 2.0])
+    cells = [c.strip() for c in row.split("|")[1:-1]]
+    assert cells[:6] == ["x", "3", "+0.00", "+1.00", "2.00", "2.16"]
+
+
+def test_the_roof_photons_are_of_a_high_signal_confidence():
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import lidar
+    assert lidar.parms_for("atl03_roof", "2025-01-01T00:00:00Z", "2026-01-01T00:00:00Z")["cnf"] == 4

@@ -91,6 +91,12 @@ CENTER_CROP = (-600.0, -700.0, 1400.0, 1300.0)
 LIST_ROWS = 40
 # A roof photon: the ground photons of the same pass within this distance (m).
 ROOF_GROUND_M = 40.0
+# D-0009-11: a roof photon is at most this height over the ground photons (m).
+# Higher photons are clouds (5 photons of 2025-08-30 at 758 m over a roof of 6 m).
+ROOF_MAX_M = 150.0
+# D-0009-11: a building with a 2.5D height over this (m) is a tower. Its photons
+# can fall on lower parts, so the towers have a row of their own in the checks.
+TOWER_M = 40.0
 # 3D-GloBFP: the grid of Vũng Tàu (106.25 to 107.5 E, 10.0 to 11.25 N) and its file on figshare.
 GLOBFP_GRID = 2108
 GLOBFP_URL = "https://ndownloader.figshare.com/files/54098810"
@@ -890,8 +896,26 @@ def stats_line(name: str, diff, extra: str = "") -> str:
     import numpy as np
     diff = np.asarray(diff, dtype=float)
     if not len(diff):
-        return f"| {name} | 0 | | | | {extra} |"
-    return (f"| {name} | {len(diff)} | {np.mean(diff):+.2f} | {np.median(diff):+.2f} | {np.sqrt(np.mean(diff ** 2)):.2f} | {extra} |")
+        return f"| {name} | 0 | | | | | {extra} |"
+    return (f"| {name} | {len(diff)} | {np.mean(diff):+.2f} | {np.median(diff):+.2f} | {np.median(np.abs(diff)):.2f} | "
+            f"{np.sqrt(np.mean(diff ** 2)):.2f} | {extra} |")
+
+
+def roof_differences(photons: dict, height_of: dict) -> tuple[list, list, int]:
+    """D-0009-11: the 2.5D height minus the median height of the roof photons
+    of each outline over the ground (at least 3 photons, each at most ROOF_MAX_M
+    over the ground), for the buildings to TOWER_M and for the towers, and the
+    count of the photons that are out (higher than ROOF_MAX_M)."""
+    import numpy as np
+    low, towers, out = [], [], 0
+    for outline, heights in photons.items():
+        kept = [h for h in heights if h <= ROOF_MAX_M]
+        out += len(heights) - len(kept)
+        if outline not in height_of or len(kept) < 3:
+            continue
+        diff = height_of[outline] - float(np.median(kept))
+        (towers if height_of[outline] > TOWER_M else low).append(diff)
+    return low, towers, out
 
 
 def height_checks(notes: Notes, manifest: dict, rows: list, polygons: list, result: list) -> list[str]:
@@ -903,8 +927,9 @@ def height_checks(notes: Notes, manifest: dict, rows: list, polygons: list, resu
     ids = [r[0] for r in rows]
     tree = shapely.STRtree(polygons)
     out = ["## The checks of the heights (R1)", "",
-           "The difference is the height of the 2.5D data minus the height of the check (m).", "",
-           "| Check | Buildings | Mean | Median | RMSE | Note |", "|---|---|---|---|---|---|"]
+           "The difference is the height of the 2.5D data minus the height of the check (m). The median absolute difference is "
+           "the median of the differences with no sign.", "",
+           "| Check | Buildings | Mean | Median | Median absolute difference | RMSE | Note |", "|---|---|---|---|---|---|---|"]
     files = manifest.get("files", {})
     if "globfp" in files:
         g = geostore.get(manifest, "globfp")["buildings"]
@@ -974,12 +999,16 @@ def height_checks(notes: Notes, manifest: dict, rows: list, polygons: list, resu
                 k = int(np.argmin(d))
                 if d[k] <= ROOF_GROUND_M:
                     per_outline.setdefault(r[col], []).append(float(r[4]) - float(arr[k, 2]))
-        diff = [height_of[o] - float(np.median(v)) for o, v in per_outline.items() if o in height_of and len(v) >= 3]
+        low, towers, high = roof_differences(per_outline, height_of)
         photons = sum(len(v) for v in per_outline.values())
-        out.append(stats_line("ATL03 roof photons", diff, f"{photons} photons over {len(per_outline)} outlines; the median of at "
-                              f"least 3 photons over the median of the ground photons of the same pass within {ROOF_GROUND_M:.0f} m"))
+        out.append(stats_line(f"ATL03 roof photons, 2.5D to {TOWER_M:.0f} m", low,
+                              f"{photons} photons of a high signal confidence over {len(per_outline)} outlines, {high} of them more "
+                              f"than {ROOF_MAX_M:.0f} m over the ground (clouds, out); the median of at least 3 photons over the "
+                              f"median of the ground photons of the same pass within {ROOF_GROUND_M:.0f} m"))
+        out.append(stats_line(f"ATL03 roof photons, towers (2.5D over {TOWER_M:.0f} m)", towers,
+                              "the photons can fall on the lower parts of a tower"))
     else:
-        out.append("| ATL03 roof photons | 0 | | | | no roof photons in the store yet |")
+        out.append("| ATL03 roof photons | 0 | | | | | no roof photons in the store yet |")
     if levels_note:
         out += ["", levels_note]
     notes.add("the checks of the heights: " + "; ".join(line.split("|")[1].strip() + " " + line.split("|")[2].strip()

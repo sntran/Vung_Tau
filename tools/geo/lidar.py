@@ -112,6 +112,7 @@ def parms_for(product: str, t0: str, t1: str) -> dict:
     if product == "atl03_roof":
         # D-0009-02: the photons over the roofs. ATL08 has no class for a
         # building: a roof photon is canopy, top of canopy, or with no class.
+        # D-0009-11: cnf 4 keeps only the photons of a high signal confidence.
         parms.update({"atl08_class": ["atl08_canopy", "atl08_top_of_canopy", "atl08_unclassified"], "cnf": 4})
     if product == "gedi02a":
         parms.update({"degrade_filter": True, "l2_quality_filter": True})

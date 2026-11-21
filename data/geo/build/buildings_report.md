@@ -127,14 +127,15 @@ Only the outlines that OpenStreetMap has today: the other outlines of 2019 (Micr
 
 ## The checks of the heights (R1)
 
-The difference is the height of the 2.5D data minus the height of the check (m).
+The difference is the height of the 2.5D data minus the height of the check (m). The median absolute difference is the median of the differences with no sign.
 
-| Check | Buildings | Mean | Median | RMSE | Note |
-|---|---|---|---|---|---|
-| 3D-GloBFP | 32948 | -4.80 | -3.70 | 8.35 | a building of 3D-GloBFP in an outline (46561 in the box) |
-| GHS-BUILT-H | 3663 | +5.23 | +3.91 | 8.21 | for each cell of 90 m: the mean of the 2.5D heights, weighted by area, against AGBH |
-| building:levels of OpenStreetMap | 40 | +5.75 | +1.65 | 17.46 | 40 buildings; the check is 3.3 m a storey |
-| ATL03 roof photons | 2086 | +1.57 | +1.20 | 17.55 | 52510 photons over 2817 outlines; the median of at least 3 photons over the median of the ground photons of the same pass within 40 m |
+| Check | Buildings | Mean | Median | Median absolute difference | RMSE | Note |
+|---|---|---|---|---|---|---|
+| 3D-GloBFP | 32948 | -4.80 | -3.70 | 4.10 | 8.35 | a building of 3D-GloBFP in an outline (46561 in the box) |
+| GHS-BUILT-H | 3663 | +5.23 | +3.91 | 3.92 | 8.21 | for each cell of 90 m: the mean of the 2.5D heights, weighted by area, against AGBH |
+| building:levels of OpenStreetMap | 40 | +5.75 | +1.65 | 3.45 | 17.46 | 40 buildings; the check is 3.3 m a storey |
+| ATL03 roof photons, 2.5D to 40 m | 2067 | +1.56 | +1.19 | 1.86 | 4.12 | 52510 photons of a high signal confidence over 2817 outlines, 6 of them more than 150 m over the ground (clouds, out); the median of at least 3 photons over the median of the ground photons of the same pass within 40 m |
+| ATL03 roof photons, towers (2.5D over 40 m) | 18 | +44.24 | +50.79 | 50.79 | 51.53 | the photons can fall on the lower parts of a tower |
 
 The median 2.5D height for each number of storeys of OpenStreetMap: 1: 7.3 m (2), 2: 10.0 m (5), 3: 11.0 m (13), 4: 11.5 m (4), 5: 16.8 m (5), 9: 23.1 m (2), 10: 44.0 m (1), 16: 76.0 m (1), 21: 64.2 m (1), 25: 78.0 m (3), 26: 86.8 m (3).
 
@@ -181,12 +182,12 @@ The median 2.5D height for each number of storeys of OpenStreetMap: 1: 7.3 m (2)
 - GHS-BUILT-H: a window of 96 × 144 cells, 4861 with a height
 
 
-## build (2026-11-20 16:14 UTC)
+## build (2026-11-21 04:12 UTC)
 
 - D-0009-08: the first year by 30 % of the outline: 43208 up to 2019, 5247 after; by 8 pixels (no year with 30 %): 2116 up to 2019, 1118 after; fewer than 8 pixels in each year: 4670 (buildings_unseen, Check)
 - 45324 buildings of 2019, 6365 out (the first year is after 2019); the first years: 2016: 37023, 2017: 3919, 2018: 2464, 2019: 1918
 - the heights: median 5.8 m, 90 % under 9.8 m, the highest 90.0 m
 - D-0009-04: 130632 cells of 5 m more than half building with no outline; 2714 groups of at least 4 cells at least 3 m from an outline: 39419 cells, 0.985 km²; the largest groups [356, 329, 212, 206, 192] cells
 - R5d: 155 buildings of OpenStreetMap on 2019-01-22 not in the 2.5D data of 2019; 1152 outlines of OpenStreetMap of today in the 2.5D data of 2019 and not in OpenStreetMap on 2019-01-22; 1 buildings with a start_date after 2019
-- the checks of the heights: 3D-GloBFP 32948; GHS-BUILT-H 3663; building:levels of OpenStreetMap 40; ATL03 roof photons 2086
+- the checks of the heights: 3D-GloBFP 32948; GHS-BUILT-H 3663; building:levels of OpenStreetMap 40; ATL03 roof photons, 2.5D to 40 m 2067; ATL03 roof photons, towers (2.5D over 40 m) 18
 
