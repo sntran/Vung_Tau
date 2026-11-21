@@ -539,3 +539,52 @@ Three new lines (`docs/content/culture-notes.md`, `data/showcase/dressing.json`,
 ### 11.5 Status
 
 The plan stays "In progress": D-0026-23, D-0026-30, and D-0026-42 to D-0026-45, the letters, the new tools of World, and Q29 and Q30.
+
+## 12. Audit 7: branch at `4dcee5e`, status "Built" (2026-11-21)
+
+The pictures of this audit are in [`0026/audit-2026-11-21b/`](0026/audit-2026-11-21b/).
+
+### 12.1 Runs
+
+| Run | Result |
+|---|---|
+| CI of `4dcee5e` | Pass: Test (18 jobs, also "Identity of the commits" and the play tests on High), Export, and Reference photos. |
+| The history of the branch | Each commit after `main` has my name and address. The tree of the new commit of `0076639` (`9297915`) is the same as the tree of `0076639`. |
+| PT-72, phases 1 and 2 (Low) | Pass. The hill of S1: 3.0 px and 3.5 px (the photo 4.0 px), saturation 0.23 and 0.26 (0.26), color patches 0.029 and 0.042 (0.050). |
+| PT-73, phase 1 (Low) | Pass. S5: 380 draw calls, a margin of 220. |
+| PT-71 run 2, PT-74 runs 2, 4, and 5, PT-75 phase 1, PT-76 phase 1, PT-56 phase 1 | Pass. |
+
+### 12.2 What is correct
+
+- **D-0026-23.** The crowns of the far forest have many sizes and colors, with no rows. The hill of S1 now reads as a forest (`docs/showcase/sheet_S1.jpg`).
+- **D-0026-30.** The paving of the south end, the parapet of the square, and the junction with no brown earth (`south_end_and_people.jpg`).
+- **D-0026-42.** S5 has 380 draw calls. The far level of a person as one surface looks the same as before in PT-75.
+- **D-0026-43 to D-0026-45**, and the check of the identity of each commit in CI.
+
+### 12.3 Defects
+
+#### D-0026-46: S5 is not compared at the time of its photo (medium)
+
+The photo of S5 is at dusk: a purple sky, and lamps with a warm orange light on wet-looking tiles. The sheet of S5 shows the shot at 17:10 and at 12:00, and PT-76 shows it at 20:00: a dark blue night with white lamps (`s5_night.jpg`). So no sheet compares S5 with its photo.
+
+- Add S5 at the time of its photo (dusk in January, about 18:05) to PT-72 and to its sheet, and compare the box of the sky and the light of the lamps with the photo (hue and saturation).
+- The color of the light of the lamps is a look. If a photo of 2017 to 2021 at night shows the lamps of the walk, use its color. If none does, the photo of 2015 and a photo after 2021 that agree give the color (rule 1). Else the color is Check.
+
+#### D-0026-47: The near part of S1 does not agree with its photo (medium)
+
+In the photo of S1, the low wall is a short cap at the lower left, and the beach, with its people and boats, fills the lower half. In the game, the wall fills the left third of the frame and turns away to the right, and the beach has a row of boats and a few swimmers (`docs/showcase/sheet_S1.jpg`). The hill and the buildings agree, so the eye looks in the correct direction, but the eye or the line of the wall is not at the correct place.
+
+- Draw the line of the low wall and of the boats from the data through the camera of S1 on the photo, as `tools/showcase/lawn_sheet.py` does for the lawns. If the line of the wall does not agree with the photo, find which is wrong: the eye of the shot, or the wall. Correct it, and add the check to PT-72.
+
+#### D-0026-48: A jagged dark band on the sand at the south end (low)
+
+PT-74 run 4, at 550 m: a dark green band with steps runs across the sand (`south_end_and_people.jpg`). Find what it is (the edge of a lawn of the mask, or a shadow), and correct it. Add a check for a band of the color of the lawn on the sand.
+
+#### Notes
+
+- In S3 the street is empty: the photo has many motorbikes. Moving traffic is not in this plan.
+- In S4 the Grand Hotel is a lemon yellow, and the photo shows a peach color. Its drawing has its sources, and I decide with the review of the sheets (Q29).
+
+### 12.4 Status
+
+The plan stays "Built" until D-0026-46 to D-0026-48 are corrected and I answer Q29 and Q30.
