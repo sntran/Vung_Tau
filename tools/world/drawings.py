@@ -305,7 +305,19 @@ def lock_level(model_id: str, level: str, out: Path) -> tuple[str, Path]:
 def command_look(args) -> int:
     drawing = load(args.id)
     work = LOOK / args.id
-    if args.lock:
+    if args.world:
+        # Report 0026, audit 6: mix world.order in a clone of World (CI), for an
+        # order that the factory cannot build and that is not an order of the game.
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        import fetch
+        model = {"id": args.id, "order": full_order(drawing), "levels": [args.level]}
+        files = fetch.checkout_files(model, Path(args.world), args.mix)
+        work.mkdir(parents=True, exist_ok=True)
+        suffix = {"near": ".glb", "mid": ".mid.glb", "far": ".far.glb"}[args.level]
+        glb = work / f"{args.id}{suffix}"
+        glb.write_bytes(files[args.id + suffix])
+        order_hash = json.loads(files[args.id + ".receipt.json"]).get("hash", "")
+    elif args.lock:
         order_hash, glb = lock_level(args.id, args.level, work)
         if drawing.get("hash") and drawing["hash"] != order_hash:
             print(f"{args.id}: the lock has the order {order_hash}, the drawing {drawing['hash']}")
@@ -367,6 +379,8 @@ def main() -> int:
     p.add_argument("--hash")
     p.add_argument("--other", help="a folder with the photos that are not open (tools/photos/photos.py --other)")
     p.add_argument("--lock", action="store_true", help="the files of the lock (assets/world/), not of the factory")
+    p.add_argument("--world", help="a clone of World: build the order with --mix there (CI), not at the factory")
+    p.add_argument("--mix", help="the command of mix in the clone (with --world)")
     p.set_defaults(run=command_look)
     p = sub.add_parser("sync")
     p.add_argument("ids", nargs="*")

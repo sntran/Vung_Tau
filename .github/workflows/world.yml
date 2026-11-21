@@ -11,6 +11,11 @@ name: Models of World
 # not start the test workflow: the next push to the branch starts it.
 on:
   workflow_dispatch:
+    inputs:
+      looks:
+        description: "Drawings (ids, with spaces) whose mid and far looks to build and commit to docs/world/looks/ (report 0026, audit 6)"
+        required: false
+        default: ""
   push:
     paths: ["data/world/orders.json", "data/world/lock.json"]
 
@@ -44,7 +49,7 @@ jobs:
         run: |
           commit=$(python -c 'import json; print(json.load(open("data/world/lock.json"))["world"]["commit"])')
           echo "commit=$commit" >> "$GITHUB_OUTPUT"
-          if python tools/world/fetch.py --check; then
+          if python tools/world/fetch.py --check && [ -z "${{ inputs.looks }}" ]; then
             echo "build=false" >> "$GITHUB_OUTPUT"
           else
             echo "build=true" >> "$GITHUB_OUTPUT"
@@ -128,9 +133,29 @@ jobs:
           mkdir -p build && touch build/.gdignore
           .tools/godot/godot --headless --path . --import > build/import.log 2>&1 || { tail -50 build/import.log; exit 1; }
 
+      # Report 0026, audit 6: the looks of drawings that the factory cannot
+      # build (HTTP 503, not enough memory) and that are not orders of the game
+      # (the status Check): mix world.order in the clone, the views of
+      # tools/world/look.gd next to the open photos.
+      - name: Build the looks
+        if: always() && inputs.looks != ''
+        env:
+          LOOKS: ${{ inputs.looks }}
+        run: |
+          sudo apt-get install -y xvfb > /dev/null || true
+          pip install pillow > /dev/null
+          mkdir -p docs/world/looks
+          for id in $LOOKS; do
+            for level in mid far; do
+              python tools/world/drawings.py look "$id" --level "$level" --world World --mix mix.com || exit 1
+              cp "build/look/${id}_${level}.png" docs/world/looks/
+            done
+          done
+
       - name: Commit the files
         if: always() && steps.need.outputs.build == 'true'
         run: |
+          git add docs/world/looks 2>/dev/null || true
           git add assets/world data/world/lock.json
           if git diff --cached --quiet; then
             echo "The models did not change."

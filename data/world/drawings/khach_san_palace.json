@@ -147,11 +147,16 @@
 					"wide": 18.0,
 					"deep": 10.0,
 					"high": 8.2,
-					"columns": 0,
+					"columns": 6,
 					"steps": 2,
 					"door": [
 						3.2,
 						2.8
+					],
+					"fascia": 1.3,
+					"round": [
+						5.0,
+						5.0
 					]
 				}
 			],
@@ -2134,77 +2139,6 @@
 							1
 						],
 						"roughness": 0.6
-					},
-					{
-						"shape": "extrude",
-						"size": {
-							"outline": [
-								[
-									37.0,
-									0.0
-								],
-								[
-									18.0,
-									0.0
-								],
-								[
-									18.0,
-									-35.4532
-								],
-								[
-									37.0,
-									-33.3539
-								]
-							],
-							"depth": 7.6
-						},
-						"at": [
-							0.0,
-							0.0,
-							24.5
-						],
-						"color": "#cfa2a2",
-						"roughness": 0.85,
-						"surface": {
-							"kind": "plaster",
-							"scale": 0.04
-						}
-					},
-					{
-						"shape": "extrude",
-						"size": {
-							"outline": [
-								[
-									36.6,
-									-0.4
-								],
-								[
-									18.4,
-									-0.4
-								],
-								[
-									18.4,
-									-35.0066
-								],
-								[
-									36.6,
-									-32.9957
-								]
-							],
-							"depth": 2.0
-						},
-						"at": [
-							0.0,
-							0.0,
-							28.3
-						],
-						"color": "#9a9d98",
-						"mode": "subtract",
-						"roughness": 0.95,
-						"surface": {
-							"kind": "concrete",
-							"scale": 0.05
-						}
 					},
 					{
 						"shape": "box",
@@ -8629,7 +8563,31 @@
 						"mode": "paint"
 					}
 				]
-			}
+			},
+			"blocks": [
+				{
+					"plan": [
+						[
+							37.0,
+							0.0
+						],
+						[
+							18.0,
+							0.0
+						],
+						[
+							18.0,
+							-35.4532
+						],
+						[
+							37.0,
+							-33.3539
+						]
+					],
+					"storeys": 8,
+					"parapet": 0.8
+				}
+			]
 		}
 	},
 	"sources": [
@@ -8796,6 +8754,6 @@
 	],
 	"uses": "Plan 0026, D-0026-10: the Palace Hotel across from the park, on its OSM outline (way 791795130, on Nguyễn Trãi); its place is in data/world/places/bai_truoc.json.",
 	"impostor": false,
-	"hash": "ae16d41fc33c1f04abecf3d17877700c",
-	"status_note": "Check. The photos of 2014 (photo 1) and of 2022 (photo 2) show the same porch, the same faces of the front block (brick bays, the column of the stair, the loggia and the pergola at the top), the same balconies of the tower and the east block 2 storeys lower: that was the look in 2019 (report 0026, Q17, rule 1). Photo 0 (2018) shows the tower, the front block, the letters and the pink walls (rule 2). They do not agree on: the color of HOTEL on the roof and of the brick panels (photo 0 of 2018 gives both), and the canopy of the porch (blue in 2014, clear glass in 2022; the model has none). Still Check: the height of a storey (3.2 m) and of the ground storey (4.2 m) are estimates (no source): the car in front of the porch in photo 1 is nearer than the porch, and no photo has a person or a car at the face. The model also differs from both photos: the fascia of the porch is straight (curved in the photos), and the porch has no canopy. No look of the model of the factory: the factory stops at this order (HTTP 503); the looks below are of a preview in my workspace. I grow the area to the lot (Q15)."
+	"status_note": "Check. The photos of 2014 (photo 1) and of 2022 (photo 2) show the same porch, the same faces of the front block (brick bays, the column of the stair, the loggia and the pergola at the top), the same balconies of the tower and the east block 2 storeys lower: that was the look in 2019 (report 0026, Q17, rule 1). Photo 0 (2018) shows the tower, the front block, the letters and the pink walls (rule 2). They do not agree on: the color of HOTEL on the roof and of the brick panels (photo 0 of 2018 gives both), and the canopy of the porch (blue in 2014, clear glass in 2022; the model has none). Still Check: the height of a storey (3.2 m) and of the ground storey (4.2 m) are estimates (no source): the car in front of the porch in photo 1 is nearer than the porch, and no photo has a person or a car at the face. The model also differs from both photos: the fascia of the porch is straight (curved in the photos), and the porch has no canopy. No look of the model of the factory: the factory stops at this order (HTTP 503); the looks below are of a preview in my workspace. I grow the area to the lot (Q15).",
+	"hash": "2cd8d267d7e901b03651c26e4bf512ab"
 }

@@ -471,73 +471,6 @@
 						"roughness": 0.85
 					},
 					{
-						"shape": "extrude",
-						"size": {
-							"outline": [
-								[
-									13.5,
-									-1.7
-								],
-								[
-									0.3,
-									-1.2
-								],
-								[
-									0.3,
-									-15.0
-								],
-								[
-									13.5,
-									-15.0
-								]
-							],
-							"depth": 4.3636
-						},
-						"at": [
-							0.0,
-							0.0,
-							18.1545
-						],
-						"color": "#78a8d8",
-						"roughness": 0.85,
-						"surface": {
-							"kind": "plaster",
-							"scale": 0.04
-						}
-					},
-					{
-						"shape": "extrude",
-						"size": {
-							"outline": [
-								[
-									13.1,
-									-2.0851
-								],
-								[
-									0.7,
-									-1.6154
-								],
-								[
-									0.7,
-									-14.6
-								],
-								[
-									13.1,
-									-14.6
-								]
-							],
-							"depth": 1.8182
-						},
-						"at": [
-							0.0,
-							0.0,
-							20.3364
-						],
-						"color": "#9a9d98",
-						"mode": "subtract",
-						"roughness": 0.95
-					},
-					{
 						"shape": "box",
 						"size": [
 							1.18,
@@ -918,41 +851,6 @@
 							0,
 							1
 						],
-						"roughness": 0.85,
-						"surface": {
-							"kind": "plaster",
-							"scale": 0.04
-						}
-					},
-					{
-						"shape": "extrude",
-						"size": {
-							"outline": [
-								[
-									-0.2,
-									-6.2
-								],
-								[
-									-3.6,
-									-6.2
-								],
-								[
-									-3.6,
-									-9.8
-								],
-								[
-									-0.2,
-									-9.8
-								]
-							],
-							"depth": 22.1545
-						},
-						"at": [
-							0.0,
-							0.0,
-							11.0773
-						],
-						"color": "#78a8d8",
 						"roughness": 0.85,
 						"surface": {
 							"kind": "plaster",
@@ -3472,7 +3370,115 @@
 						"roughness": 0.5
 					}
 				]
-			}
+			},
+			"blocks": [
+				{
+					"plan": [
+						[
+							13.5,
+							-1.7
+						],
+						[
+							0.3,
+							-1.2
+						],
+						[
+							0.3,
+							-15.0
+						],
+						[
+							13.5,
+							-15.0
+						]
+					],
+					"storeys": 6,
+					"parapet": 0.65,
+					"fronts": [
+						{
+							"side": 1,
+							"style": "windows",
+							"bays": 3,
+							"inset": 0.4,
+							"window": [
+								2.4,
+								1.6
+							],
+							"bars": 2,
+							"storeys": [
+								6,
+								6
+							]
+						},
+						{
+							"side": 2,
+							"style": "windows",
+							"bays": 4,
+							"inset": 0.4,
+							"window": [
+								1.4,
+								1.4
+							],
+							"storeys": [
+								6,
+								6
+							]
+						},
+						{
+							"side": 4,
+							"style": "windows",
+							"bays": 4,
+							"inset": 0.4,
+							"window": [
+								1.4,
+								1.4
+							],
+							"storeys": [
+								6,
+								6
+							]
+						}
+					]
+				},
+				{
+					"plan": [
+						[
+							-0.2,
+							-6.2
+						],
+						[
+							-3.6,
+							-6.2
+						],
+						[
+							-3.6,
+							-9.8
+						],
+						[
+							-0.2,
+							-9.8
+						]
+					],
+					"storeys": 7,
+					"parapet": 0.3,
+					"fronts": [
+						{
+							"side": 1,
+							"style": "glass",
+							"bays": 2
+						},
+						{
+							"side": 2,
+							"style": "glass",
+							"bays": 2
+						},
+						{
+							"side": 3,
+							"style": "glass",
+							"bays": 2
+						}
+					]
+				}
+			]
 		}
 	},
 	"sources": [
