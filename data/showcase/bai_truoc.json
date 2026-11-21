@@ -548,7 +548,7 @@
 			"tint": "#c2cdf1",
 			"mean": "#cebcae",
 			"note": "R12: the slabs of the walk and of the squares (the photos of S5 of 2014 and 2015: pale stone with a pink tone). The texture times tint times gain (the slabs of the photos are paler than the texture); mean is the color from far. Report 0026, D-0026-30 (audit 6): with the tint #fff2e6 and the gain 1.5 the square of the south end was darker than the sand at 17:00 and looked like it; the drone photo of 2021 gives the clean slabs of the square #cebcae, so tint times gain times the mean of the texture (#87755c) is that color.",
-			"gain": 2.2
+			"gain": 2.0
 		}
 	},
 	"park_note": "The outline of OpenStreetMap way 220617822 (leisure=park, Công viên Bãi Trước).",
