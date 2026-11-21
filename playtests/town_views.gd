@@ -67,6 +67,14 @@ static func read_views(w: VungTau) -> Array[Dictionary]:
 			eye = Vector3(p.x, 0.0, p.y)
 		w.prepare_at(eye, 64.0)
 		eye.y = w.ground_height(eye.x, eye.z) + float(v.get("eye_height", 1.6))
+		if v.get("over_trees", false):
+			# As PT-33: 1 m over the highest tree of the canopy map within 8 m (the
+			# photo is from a railing over the tree tops of the slope).
+			var trees := 0.0
+			for j in range(-2, 3):
+				for i in range(-2, 3):
+					trees = maxf(trees, w.canopy_height_at(eye.x + i * 4.0, eye.z + j * 4.0))
+			eye.y = maxf(eye.y, w.ground_height(eye.x, eye.z) + trees + 1.0)
 		var target := Vector3.ZERO
 		if v.has("aim_landmark"):
 			var aim := w.data.landmark(str(v.aim_landmark))

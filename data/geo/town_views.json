@@ -17,7 +17,7 @@
 			"photos": [
 				{
 					"url": "https://commons.wikimedia.org/wiki/File:View_of_Vung_Tau_from_Vung_Tau_lighthouse_(August_3,_2018)_(43913500872).jpg",
-					"image": "https://upload.wikimedia.org/wikipedia/commons/3/32/View_of_Vung_Tau_from_Vung_Tau_lighthouse_%28August_3%2C_2018%29_%2843913500872%29.jpg",
+					"image": "https://commons.wikimedia.org/wiki/File:View_of_Vung_Tau_from_Vung_Tau_lighthouse_(August_3,_2018)_(43913500872).jpg",
 					"date": "2018-08-03",
 					"license": "CC BY-SA 2.0",
 					"author": "Damian Vo",
@@ -42,7 +42,7 @@
 			"photos": [
 				{
 					"url": "https://commons.wikimedia.org/wiki/File:Nh%C3%ACn_to%C3%A0n_c%E1%BA%A3nh_TP.V%C5%A8NG_T%C3%80U_t%E1%BB%AB_C%C3%A1p_treo_V%C5%A9ng_T%C3%A0u.jpg",
-					"image": "https://upload.wikimedia.org/wikipedia/commons/3/31/Nh%C3%ACn_to%C3%A0n_c%E1%BA%A3nh_TP.V%C5%A8NG_T%C3%80U_t%E1%BB%AB_C%C3%A1p_treo_V%C5%A9ng_T%C3%A0u.jpg",
+					"image": "https://commons.wikimedia.org/wiki/File:Nh%C3%ACn_to%C3%A0n_c%E1%BA%A3nh_TP.V%C5%A8NG_T%C3%80U_t%E1%BB%AB_C%C3%A1p_treo_V%C5%A9ng_T%C3%A0u.jpg",
 					"date": "2023-08-25",
 					"license": "CC BY-SA 4.0",
 					"author": "Luci nguyễn",
@@ -77,7 +77,7 @@
 			"pitch": -6.0,
 			"fov": 50.0,
 			"min_boxes": 200,
-			"eye_note": "The point of the Hải Đăng road nearest to the geotag of the photo (12 m from it: the geotag is on a lot beside the road, where a building stands), 3 m over the road: the photo is from the railing, over the trees of the slope below it.",
+			"eye_note": "The point of the Hải Đăng road nearest to the geotag of the photo (12 m from it: the geotag is on a lot beside the road, where a building stands), 1 m over the highest tree of the canopy map within 8 m (as PT-33): the photo is from the railing, over the tree tops of the slope below the road.",
 			"photos": [
 				{
 					"url": "https://www.flickr.com/photos/han_chu/15594420532/",
@@ -92,7 +92,8 @@
 					"place": "the geotag of the file, on the lower Hải Đăng road",
 					"direction": "north to north-north-east"
 				}
-			]
+			],
+			"over_trees": true
 		},
 		{
 			"id": "bus_le_hong_phong",
