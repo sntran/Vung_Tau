@@ -6,6 +6,12 @@ extends RefCounted
 # The walk is on Thùy Vân, the road along Bãi Sau. The game runs 5 times
 # faster, and the walk is in 4 runs of 500 m, so that each run is shorter than
 # 180 s under lavapipe. Each run starts where the last run stops (a setup step).
+# The start of the world (report 0026, D-0026-12): the build of the world takes
+# at most 20 s, and the first frame comes at most 90 s after the start of the
+# engine. In the workspace: 3.4 s and 11 s (13 s with no shader cache); in CI,
+# with no shader cache, the first frame came at 45 s. With a showcase that
+# waited for all its parts: 33 s and 46 s in the workspace (more than 300 s for
+# a whole run in CI).
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=10:00
 # phase: --world=vung_tau --start-time=10:00
@@ -16,12 +22,21 @@ const LENGTH := 2000.0
 const RUNS := 4
 const STEP := 14.0
 const MAX_LOAD_MS := 2000.0
+const MAX_BUILD_MS := 20000
+const MAX_FIRST_FRAME_MS := 90000
 
 
 func run(d: PlaytestDriver) -> void:
 	var w := d.world()
 	if not d.expect(w != null, "the Vũng Tàu world starts"):
 		return
+	var main := d.main()
+	d.step("the world is built in %.1f s, and the first frame comes %.1f s after the start of the engine" % [
+			main.world_build_ms / 1000.0, main.first_frame_ms / 1000.0])
+	d.expect(main.world_build_ms >= 0 and main.world_build_ms <= MAX_BUILD_MS,
+			"the build of the world takes at most %d s: %.1f s" % [MAX_BUILD_MS / 1000, main.world_build_ms / 1000.0])
+	d.expect(main.first_frame_ms >= 0 and main.first_frame_ms <= MAX_FIRST_FRAME_MS,
+			"the first frame comes at most %d s after the start: %.1f s" % [MAX_FIRST_FRAME_MS / 1000, main.first_frame_ms / 1000.0])
 	await d.wait_ground()
 	var beach := w.data.landmark("bai_sau")
 	var near_beach := Vector3(beach.position[0], 0.0, beach.position[1])

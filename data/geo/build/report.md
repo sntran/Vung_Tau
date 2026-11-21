@@ -1,6 +1,6 @@
 # Geodata report
 
-Made by `tools/geo/build.py` on 2026-11-16.
+Made by `tools/geo/build.py` on 2026-11-21.
 
 ## Extents
 
@@ -17,7 +17,7 @@ Made by `tools/geo/build.py` on 2026-11-16.
 
 ## Roads
 
-Total road length: 692.3 km. Roads with a width tag: 7 of 4124. Hẻm: 2366.
+Total road length: 692.3 km. Roads with a width tag: 9 of 4124. Hẻm: 2366.
 
 | Type | Roads | Length (km) |
 |---|---|---|
@@ -51,16 +51,16 @@ Total road length: 692.3 km. Roads with a width tag: 7 of 4124. Hẻm: 2366.
 | Bãi Dâu | yes | way/895756059 | -1377.16, -2753.98 | 1.08 | 3 candidates, 435.3 m from the hint |
 | Mũi Nghinh Phong | yes | node/2435353682 | 1076.55, 2561.69 | 1.33 | 1 candidates, 85.4 m from the hint |
 | Núi Lớn | yes | node/2452682527 | -649.2, -1712.32 | 238.42 | 1 candidates, 188.9 m from the hint |
-| Núi Nhỏ | yes | node/-1 | 374.1, 1035.7 | 175.6 | 1 candidates, 0.0 m from the hint |
+| Núi Nhỏ | yes | node/-1 | 374.1, 1035.7 | 175.4 | 1 candidates, 0.0 m from the hint |
 | Tượng Chúa Kitô Vua | yes | way/235008112 | 1159.87, 1893.39 | 138.33 | 1 candidates, 83.3 m from the hint |
 | Hải đăng Vũng Tàu | yes | way/229301316 | 402.21, 1056.5 | 173.11 | 1 candidates, 21.8 m from the hint |
 | Bạch Dinh | yes | way/220753354 | -596.69, -776.93 | 28.11 | 1 candidates, 259.6 m from the hint |
-| Tượng Đức Mẹ Bãi Dâu | yes | way/790529433 | -1290.64, -3064.05 | 57.0 | 2 candidates, 7.3 m from the hint |
-| Miếu Hòn Bà | yes | way/221906193 | 1677.76, 2174.06 | 11.34 | 8 candidates, 8.4 m from the hint |
+| Tượng Đức Mẹ Bãi Dâu | yes | way/790529433 | -1290.64, -3064.05 | 57.09 | 2 candidates, 7.3 m from the hint |
+| Miếu Hòn Bà | yes | way/221906193 | 1677.76, 2174.06 | 11.35 | 8 candidates, 8.4 m from the hint |
 | Chùa Tam Bảo | yes | way/792193852 | -749.18, -1275.61 | 104.03 | 1 candidates, 5.1 m from the hint |
 | Vi Ba | yes | way/35923559 | -722.46, -1106.78 | 75.47 | 5 candidates, 299.0 m from the hint |
-| Hải Đăng | yes | way/35923584 | 332.79, 1014.55 | 169.1 | 3 candidates, 125.2 m from the hint |
-| Bến xe Vũng Tàu | yes | way/220891652 | 1418.58, -757.78 | 6.21 | 2 candidates, 7.3 m from the hint |
+| Hải Đăng | yes | way/35923584 | 332.79, 1014.55 | 169.07 | 3 candidates, 125.2 m from the hint |
+| Bến xe Vũng Tàu | yes | way/220891652 | 1418.58, -757.78 | 6.13 | 2 candidates, 7.3 m from the hint |
 | Chợ Vũng Tàu | yes | way/215166910 | 1299.74, -509.85 | 9.48 | 1 candidates, 785.3 m from the hint |
 | Chợ Xóm Lưới | yes | node/2649575440 | 224.65, 242.56 | 7.88 | 1 candidates, 3.1 m from the hint |
 | Chợ Phường 1 | yes | way/259528309 | 159.09, -708.46 | 8.75 | 1 candidates, 5.2 m from the hint |
@@ -100,27 +100,28 @@ None.
 
 ## Trees (R12a)
 
-- bang: 1989
-- casuarina: 3511
-- coconut: 901
-- flame: 1631
-- frangipani: 756
-- shade: 3596
-- tall_shade: 182
-- From: bai_truoc_road 195, bai_truoc_road_snapped 14, coast_roads 3973, coast_roads_snapped 324, named_roads 499, named_roads_snapped 113, osm 385, park_bai_truoc 292, park_bai_truoc_snapped 69, parks 1389, parks_snapped 1389, street 5833, street_snapped 5833.
+- araucaria: 6
+- bang: 1904
+- casuarina: 3369
+- coconut: 856
+- flame: 1627
+- frangipani: 778
+- shade: 3571
+- tall_shade: 183
+- From: bai_truoc_road 75, bai_truoc_road_snapped 8, coast_roads 3803, coast_roads_snapped 314, grove 37, kept_off_walks 15, named_roads 497, named_roads_snapped 107, no_data_in_showcase 153, osm 385, park_bai_truoc 289, park_bai_truoc_snapped 68, parks 1384, parks_snapped 1384, street 5824, street_snapped 5824.
 
 ## Land cover and trees (report 0005, D-0005-09; plan 0020, D8)
 
 - Sources: ESA WorldCover 2021 v200 (10 m classes) and Meta and WRI High Resolution Canopy Height Maps (v1) (about 1 m, kept on a grid of 2.0 m with the highest value). Both CC BY 4.0.
 - The canopy images over the play area are from 2019.42 to 2019.83 (decimal years, mean 2019.73).
 - A canopy of 3 m or more is a tree, and a canopy of 0.6 m to 3 m in tree cover is a bush (WorldCover has almost no shrubland here). Grassland and bare ground show the ground (R10a). The built-up and the cropland classes keep the rules of the town and of `trees.json`.
-- 86876 trees on the open land, with a mean height of 6.8 m and a mean crown radius of 4.5 m (`canopy_trees.json`, R10a). A tree stands on the highest canopy first, then on the lower canopy, at a spacing of 0.9 of its height (5 m to 12 m): the map has one height top for each group of crowns. The crown of a tree is the canopy that is nearer to it than to another tree.
+- 86883 trees on the open land, with a mean height of 6.8 m and a mean crown radius of 4.5 m (`canopy_trees.json`, R10a). A tree stands on the highest canopy first, then on the lower canopy, at a spacing of 0.9 of its height (5 m to 12 m): the map has one height top for each group of crowns. The crown of a tree is the canopy that is nearer to it than to another tree.
 - No trees and no bushes on 273.6 ha of paved places and platforms (the OSM areas and the landmarks of `data/geo/clearings.json`), and no tree trunks on the roads and the paths (report 0020, D-0020-01).
 
 | Hill | Area (km²) | Tree cover | Bushes | Grass | Bare | Trees | WorldCover classes |
 |---|---|---|---|---|---|---|---|
-| Núi Lớn | 2.32 | 73 % | 7 % | 8 % | 0 % | 15771 | tree cover 88 %, built-up 11 %, grassland 1 %, bare or sparse 0 %, water 0 % |
-| Núi Nhỏ | 0.92 | 76 % | 8 % | 6 % | 0 % | 6931 | tree cover 92 %, built-up 7 %, grassland 1 %, bare or sparse 0 % |
+| Núi Lớn | 2.31 | 73 % | 7 % | 8 % | 0 % | 15772 | tree cover 88 %, built-up 11 %, grassland 1 %, bare or sparse 0 %, water 0 % |
+| Núi Nhỏ | 0.92 | 76 % | 8 % | 6 % | 0 % | 6892 | tree cover 92 %, built-up 7 %, grassland 1 %, bare or sparse 0 % |
 
 The hills: the land within 1.1 km of the top of Núi Lớn and 0.7 km of the top of Núi Nhỏ, higher than 20 m.
 
@@ -136,13 +137,14 @@ The street and park trees and the canopy map (report 0020, D-0020-03): on the ro
 
 | Group | Trees | Moved to a tree top | Not in the map |
 |---|---|---|---|
-| Quang Trung (Bãi Trước) | 195 | 7 % | 72 % |
-| Thùy Vân, Hạ Long, Trần Phú | 3973 | 8 % | 71 % |
-| Trần Hưng Đạo, Ba Cu | 499 | 23 % | 35 % |
+| Quang Trung (Bãi Trước) | 75 | 11 % | 95 % |
+| Thùy Vân, Hạ Long, Trần Phú | 3803 | 8 % | 71 % |
+| grove | 37 | 0 % | 27 % |
+| Trần Hưng Đạo, Ba Cu | 497 | 22 % | 35 % |
 | The trees of OSM | 385 | 0 % | 36 % |
-| The park of Bãi Trước | 292 | 24 % | 22 % |
-| The other parks | 1389 | 100 % | 0 % |
-| The other main roads | 5833 | 100 % | 0 % |
+| The park of Bãi Trước | 289 | 24 % | 21 % |
+| The other parks | 1384 | 100 % | 0 % |
+| The other main roads | 5824 | 100 % | 0 % |
 
 ## Town anchors (R6a)
 
@@ -204,6 +206,8 @@ The street and park trees and the canopy map (report 0020, D-0020-03): on the ro
 - rock coast Mũi Nghinh Phong (150 m around 107.083721, 10.3204661): Mũi Nghinh Phong is a rocky cape (report 0005, D-0005-03). The point is the OSM node natural=cape (node 2435353682). OSM has bare rock, scree, and cliffs on its sides, but not at the tip, and the sea floor in front of the tip showed as sand at low tide.
 - rock shelf Đá ven kè Bãi Trước (25 m wide at -1.0 m): Plan 0005, Q6: at low tide, flat dark rocks show along the sea wall south of the main beach of Bãi Trước, toward Núi Nhỏ, and people walk and fish on them. The ends, the width, and the height are builder values from the map: the rocks are dry when the tide is below -1.0 m, at most low tides of the game days. Check.
 - add way -9001 ({'highway': 'footway'}): Report 0008, D-0008-02: the end of the footway 788327903 and the foot of the steps 788327902 on the route to the statue of Núi Nhỏ are 5.4 m apart in OSM. This footway joins them, so that the player walks on the path the whole way.
+- set tags of way 200554615 to {'width': '10', 'sidewalk': 'no'}: Plan 0026, R2: the south part of Quang Trung has two roads of about 10 m with a median of about 3 m (survey of World plan 0018, section 3.1). The showcase (data/showcase/bai_truoc.json) makes the median and the sidewalks.
+- set tags of way 1558591261 to {'width': '10', 'sidewalk': 'no'}: Plan 0026, R2: the south part of Quang Trung has two roads of about 10 m with a median of about 3 m (survey of World plan 0018, section 3.1). The showcase (data/showcase/bai_truoc.json) makes the median and the sidewalks.
 
 ## Problems with the data
 

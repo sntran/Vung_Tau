@@ -76,6 +76,17 @@ const MARKER_HEIGHT := 30.0
 const MARKER_SPACING := 120.0
 const MARKER_STACK := 16.0
 const TEXTURE_ROOT := "res://assets/textures/ground/"
+## The tint of the asphalt texture: the roads of the photos of Bãi Trước (S3, S4,
+## 2014) are dark grey, about #3c3d3f in the sun (report 0026, D-0026-18).
+const ASPHALT_TINT := Color(0.68, 0.68, 0.71)
+## The tiles of the footways (report 0026, D-0026-17): the side of the texture
+## (m), the tiles on a side, and the colors of the tiles and of the joints.
+const PAVING_TEXTURE_M := 1.6
+const PAVING_TILES := 4
+const PAVING_COLOR := Color("#9a7562")
+const PAVING_JOINT := Color("#6f5a4e")
+## The light of the haze of the far land at night, of its light in the day (D-0026-15).
+const FAR_HAZE_NIGHT := 0.08
 const TEXTURE_COLORS := {"sand": Color("#D9C79E"), "grass": Color("#6E8A47"), "rock": Color("#7D766C"),
 		"town": Color("#B3ADA3"), "wood": Color("#3F5A2C"), "asphalt": Color("#4A4A4C"),
 		"concrete": Color("#A9A59C")}
@@ -99,6 +110,9 @@ var ridge_width := 4.0
 var load_times: Array[float] = []
 var _ground_material: ShaderMaterial
 var _sea_material: ShaderMaterial
+## The colors of the sea of shaders/water.gdshader, before the grading of the hour.
+const SEA_DEEP := Color(0.04, 0.22, 0.32)
+const SEA_SHALLOW := Color(0.16, 0.48, 0.5)
 var _road_materials: Dictionary = {}
 ## The band of rocks around the Hòn Bà path (R8h): polygons in game X, Z.
 var band_polygons: Array[PackedVector2Array] = []
@@ -130,6 +144,17 @@ var places: KnownPlaces
 ## The name labels of the landmarks (plan 0005, R15). Plan 0008 (D5, R4): they
 ## show only with the debug key F3.
 var markers: Array[Label3D] = []
+## The rows of parked scooters (plan 0023, R9a).
+var parked: ParkedRows
+## The morning exercise at Bãi Trước (plan 0023, R9d).
+var exercise: MorningExercise
+## The showcase of Bãi Trước (plan 0026): the median, the sidewalks, the walls, and the stand-ins.
+var showcase: Showcase
+## The showcase builds its parts when the view is nearer than this to its area
+## (m), some in each frame (ms), so that the start of the world does not wait
+## for them (report 0026, D-0026-12).
+const SHOWCASE_NEAR_M := 600.0
+const SHOWCASE_FRAME_MS := 8.0
 ## The season values of the game day (R12a), from Season.of_day().
 var season: Dictionary = {}
 var _season_day := -1
@@ -215,6 +240,18 @@ func setup(folder := GeoData.ROOT) -> bool:
 	places.name = "KnownPlaces"
 	add_child(places)
 	places.setup(self)
+	parked = ParkedRows.new()
+	parked.name = "ParkedRows"
+	add_child(parked)
+	parked.setup(self)
+	exercise = MorningExercise.new()
+	exercise.name = "MorningExercise"
+	add_child(exercise)
+	exercise.setup(self)
+	showcase = Showcase.new()
+	showcase.name = "Showcase"
+	add_child(showcase)
+	showcase.setup(self)
 	return true
 
 
@@ -235,17 +272,57 @@ func markers_visible() -> bool:
 
 
 ## Builds the near chunks around the point at once (not in a worker thread), so
-## that the ground has collision before the player stands on it.
-func prepare_at(point: Vector3, radius := 64.0) -> void:
+## that the ground has collision before the player stands on it. Near the
+## showcase, also all its parts when "with_showcase" (they have collision too).
+func prepare_at(point: Vector3, radius := 64.0, with_showcase := true) -> void:
 	_focus = point
+	if with_showcase and _showcase_wanted(point):
+		showcase.build_all()
+	# Each chunk in the radius at the detail that the world wants for it now: a
+	# near chunk with its patches, a mid chunk with its mid grid. (A near build of
+	# all chunks in the radius was built again at the mid detail after it; on
+	# High in CI a shot then waited more than 120 s for the ground, PT-76.)
+	_update_wanted()
 	for key: Vector2i in _chunks:
-		if _distance_to_chunk(key) > radius or _chunks[key].detail == Detail.NEAR:
+		var state: Dictionary = _chunks[key]
+		if _distance_to_chunk(key) > radius or state.busy or state.wanted == Detail.FAR \
+				or state.detail == state.wanted:
 			continue
-		_chunks[key].asked = Time.get_ticks_msec()
-		_chunks[key].busy = true
+		state.asked = Time.get_ticks_msec()
+		state.busy = true
 		_tasks += 1
-		_build_chunk(key, Detail.NEAR, _patch_strides(key))
-		_chunks[key].wanted = Detail.NEAR
+		var detail := int(state.wanted)
+		_build_chunk(key, detail, _patch_strides(key) if detail == Detail.NEAR else {})
+	_apply_all_done()
+	# The patches of a chunk that was near before have the grids of the point
+	# before. The world built them again one in each frame: 71 patches took 73
+	# frames, more than 60 s on High in CI (PT-76, the CI of 52e373a).
+	for key: Vector2i in _chunks:
+		var state: Dictionary = _chunks[key]
+		if _distance_to_chunk(key) > radius or state.busy or not state.has("heights"):
+			continue
+		var patches: Dictionary = state.get("patches", {})
+		for at: Vector2i in patches:
+			var patch: Dictionary = patches[at]
+			var stride := _patch_stride(key, at, patch.stride)
+			if patch.busy or stride == patch.stride:
+				continue
+			patch.busy = true
+			_tasks += 1
+			_build_patch(key, at, stride, state.heights)
+	_apply_all_done()
+	# The far tiles with the grids of the point. The world makes one again in
+	# each frame, so a measure soon after a fly saw the finer grids of the
+	# point before (S2 of PT-73: 323 000 triangles, not 288 000).
+	for tile: Vector2i in _far_tiles:
+		var stride := _far_stride(tile)
+		if stride != _far_strides[tile]:
+			_far_strides[tile] = stride
+			_rebuild_far_tile(tile)
+
+
+## Shows each finished build now, not some in each frame.
+func _apply_all_done() -> void:
 	while true:
 		_mutex.lock()
 		var left := _done.size()
@@ -331,6 +408,26 @@ func spawn() -> Dictionary:
 	return {"position": best, "yaw": yaw}
 
 
+## The fine ground mask of the showcase (plan 0026, R3, R4): R the lawns, G the
+## paving, over the box from origin (x, z of the game) of size (m).
+func set_showcase_ground(mask: Texture2D, origin: Vector2, size: Vector2) -> void:
+	_ground_material.set_shader_parameter("detail_mask", mask)
+	_ground_material.set_shader_parameter("detail_origin", origin)
+	_ground_material.set_shader_parameter("detail_size", size)
+	_ground_material.set_shader_parameter("detail_on", 1.0 if mask != null else 0.0)
+
+
+## The texture of the paving of the showcase ground (plan 0026, R12): its side (m) and its tint.
+func set_showcase_paving(texture: Texture2D, size_m: float, tint: Color, mean: Color, gain := 1.0) -> void:
+	_ground_material.set_shader_parameter("paving_texture", texture)
+	_ground_material.set_shader_parameter("paving_textured", texture != null)
+	_ground_material.set_shader_parameter("paving_size", size_m)
+	_ground_material.set_shader_parameter("paving_tint", tint)
+	_ground_material.set_shader_parameter("paving_gain", gain)
+	_ground_material.set_shader_parameter("paving_color", mean)
+	_ground_material.set_shader_parameter("paving_color_b", mean)
+
+
 ## Shows or hides the far form of the hill trees: the clumps, and the canopy
 ## and the tree cover of the ground (D-0005-01). PT-33 compares the hills
 ## with it and without it (then the ground under the trees is grass).
@@ -347,7 +444,8 @@ func detail_at(point: Vector3) -> int:
 	return state.get("detail", -1)
 
 
-## True when each chunk has the detail that it needs, and no worker is busy.
+## True when each chunk, each patch of a near chunk, and each far tile has the
+## detail that it needs, and no worker is busy.
 func is_settled() -> bool:
 	if _tasks > 0:
 		return false
@@ -359,6 +457,9 @@ func is_settled() -> bool:
 		for at: Vector2i in patches:
 			if patches[at].stride != _patch_stride(key, at, patches[at].stride):
 				return false
+	for tile: Vector2i in _far_tiles:
+		if _far_strides[tile] != _far_stride(tile):
+			return false
 	return true
 
 
@@ -388,6 +489,12 @@ func update_time(minutes: int, day: int) -> void:
 		_apply_season(day)
 	if roadworks:
 		roadworks.update_time(minutes)
+	if parked:
+		parked.update_time(minutes)
+	if exercise:
+		exercise.update_time(minutes)
+	if showcase:
+		showcase.update_time(minutes)
 	if not Wind.held:
 		var wind := Wind.of_time(TreeLibrary.shared().settings.get("wind", {}), minutes)
 		Wind.apply(wind.direction, wind.strength)
@@ -414,7 +521,46 @@ func update_time(minutes: int, day: int) -> void:
 	environment.tonemap_exposure = lerpf(1.5, 1.0, high)
 	environment.fog_light_color = ambient.darkened(0.15)
 	environment.fog_light_energy = lerpf(0.25, 1.0, twilight)
+	# The light of the haze of the far land (report 0026, D-0026-15).
+	var haze_light := lerpf(FAR_HAZE_NIGHT, 1.0, twilight)
+	_ground_material.set_shader_parameter("far_haze_light", haze_light)
+	if canopy:
+		for each: ShaderMaterial in [canopy.material, canopy.dense_material]:
+			if each:
+				each.set_shader_parameter("far_haze_light", haze_light)
 	var colors := sky_colors(elevation)
+	# The beauty pass (plan 0026, R13): the grading of the hour.
+	var grade := Grading.at(minutes, Quality.current_renderer())
+	if not grade.is_empty():
+		environment.tonemap_exposure *= float(grade.exposure)
+		environment.adjustment_enabled = true
+		environment.adjustment_saturation = float(grade.saturation)
+		environment.adjustment_contrast = float(grade.contrast)
+		sun.light_color = sun.light_color.lerp(grade.sun_color, clampf(float(grade.sun_warmth), 0.0, 1.0))
+		var mix := clampf(float(grade.sky_mix), 0.0, 1.0)
+		colors[0] = colors[0].lerp(grade.sky_top, mix)
+		colors[1] = colors[1].lerp(grade.sky_horizon, mix)
+		# The shade of the golden hour takes the blue of the sky (with no SDFGI).
+		environment.ambient_light_color = ambient.lerp(grade.ambient_color, clampf(float(grade.ambient_mix), 0.0, 1.0))
+		environment.glow_enabled = float(grade.glow) > 0.0
+		environment.glow_intensity = float(grade.glow)
+		environment.fog_density = float(grade.haze)
+		# The far forest keeps the saturation of the day in the golden hour of the
+		# Mobile renderer (report 0026, D-0026-23, audit 6).
+		var far_saturation := 1.0 + float(grade.get("far_saturation", 0.0))
+		_ground_material.set_shader_parameter("far_saturation", far_saturation)
+		if canopy:
+			for each: ShaderMaterial in [canopy.material, canopy.dense_material]:
+				if each:
+					each.set_shader_parameter("far_saturation", far_saturation)
+		environment.fog_light_color = environment.fog_light_color.lerp(grade.haze_color, mix)
+		# The sea is green grey, not cyan (report 0026, D-0026-06).
+		if _sea_material:
+			var sea := clampf(float(grade.sea_mix), 0.0, 1.0)
+			_sea_material.set_shader_parameter("deep_color", SEA_DEEP.lerp(grade.sea_deep, sea))
+			_sea_material.set_shader_parameter("shallow_color", SEA_SHALLOW.lerp(grade.sea_shallow, sea))
+			_sea_material.set_shader_parameter("gloss_roughness", lerpf(Grading.SEA_ROUGHNESS, float(grade.sea_roughness), sea))
+			_sea_material.set_shader_parameter("gloss_specular", lerpf(Grading.SEA_SPECULAR, float(grade.sea_specular), sea))
 	var sky_material := environment.sky.sky_material as ProceduralSkyMaterial
 	sky_material.sky_top_color = colors[0]
 	sky_material.sky_horizon_color = colors[1]
@@ -475,11 +621,22 @@ func _process(delta: float) -> void:
 		for key: Vector2i in _chunks:
 			if _chunks[key].fine:
 				BoulderBuilder.set_preset(_chunks[key].fine, ground_preset)
+	# After the first frame (report 0026, D-0026-12).
+	# The steps of the showcase wait while the ground builds chunks: the loads
+	# of the models of World in other threads made the first ground of PT-33
+	# slower than 30 s in CI.
+	if _showcase_wanted(_focus) and Engine.get_frames_drawn() > 0 and _tasks == 0:
+		showcase.build_some(SHOWCASE_FRAME_MS)
 	_update_wanted()
 	_start_tasks()
 	_update_patches()
 	_update_far_strides()
 	_apply_done()
+
+
+## True when the showcase has parts to build and the point is near its area.
+func _showcase_wanted(point: Vector3) -> bool:
+	return showcase != null and not showcase.is_built() and showcase.distance_to(point) < SHOWCASE_NEAR_M
 
 
 func _distance_to_chunk(key: Vector2i) -> float:
@@ -743,7 +900,7 @@ func _show_far(key: Vector2i) -> void:
 
 
 func _add_roads(node: Node3D, body: StaticBody3D, roads: Dictionary) -> void:
-	for kind: String in ["asphalt", "concrete", "dirt", "sidewalk", "lines"]:
+	for kind: String in ["asphalt", "concrete", "dirt", "paving", "sidewalk", "lines"]:
 		if roads[kind] == null:
 			continue
 		var mesh := ArrayMesh.new()
@@ -1231,18 +1388,29 @@ func _make_materials() -> void:
 	if not bay.is_empty():
 		_sea_material.set_shader_parameter("calm_center", Vector2(bay.position[0], bay.position[1]))
 		_sea_material.set_shader_parameter("calm_radius", CALM_BAY_RADIUS)
-	for kind: String in ["asphalt", "concrete", "dirt", "sidewalk", "lines"]:
+	for kind: String in ["asphalt", "concrete", "dirt", "paving", "sidewalk", "lines"]:
 		var material := StandardMaterial3D.new()
 		material.cull_mode = BaseMaterial3D.CULL_DISABLED
 		material.roughness = 0.9
 		match kind:
 			"asphalt":
 				material.albedo_texture = _texture_or_color("asphalt", "asphalt")
-				material.uv1_scale = Vector3(1.0, 1.0, 1.0)
+				# Dark smooth asphalt, as in the photos of Quang Trung and Hạ Long
+				# (report 0026, D-0026-18): the texture (mean #5a5a55) is darker.
+				material.albedo_color = ASPHALT_TINT
+				material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 			"concrete":
 				material.albedo_texture = _texture_or_color("concrete", "concrete")
 			"dirt":
 				material.albedo_color = Color("#9C8462")
+			"paving":
+				# The square tiles of the paths of the park (report 0026,
+				# D-0026-17; park_paths_2014.jpg: tiles of about 40 cm, brown red
+				# against the grey granite of the borders).
+				material.albedo_texture = _tile_texture()
+				var repeat := RoadBuilder.TEXTURE_M / PAVING_TEXTURE_M
+				material.uv1_scale = Vector3(repeat, repeat, 1.0)
+				material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 			"sidewalk":
 				material.albedo_texture = _texture_or_color("concrete", "concrete")
 				material.albedo_color = Color("#C9B9A6")
@@ -1271,6 +1439,27 @@ static func roof_colors() -> Array[Color]:
 	while result.size() < 8:
 		result.append(Color("#B28469"))
 	return result
+
+
+## A texture of square tiles with joints (PAVING_TILES on a side), each tile a
+## little lighter or darker.
+static func _tile_texture() -> Texture2D:
+	const SIZE := 256
+	var image := Image.create(SIZE, SIZE, false, Image.FORMAT_RGB8)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 17
+	var cell := SIZE / PAVING_TILES
+	for ty in PAVING_TILES:
+		for tx in PAVING_TILES:
+			var tile := PAVING_COLOR * rng.randf_range(0.9, 1.08)
+			for y in cell:
+				for x in cell:
+					var joint := x < 2 or y < 2
+					var grain := rng.randf_range(0.96, 1.04)
+					var c := PAVING_JOINT if joint else tile * grain
+					image.set_pixel(tx * cell + x, ty * cell + y, Color(c.r, c.g, c.b))
+	image.generate_mipmaps()
+	return ImageTexture.create_from_image(image)
 
 
 func _texture_or_color(texture_kind: String, color_kind: String) -> Texture2D:

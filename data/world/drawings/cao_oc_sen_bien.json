@@ -1,0 +1,1001 @@
+{
+	"id": "cao_oc_sen_bien",
+	"what": "Cao ốc Sen Biển (Khách sạn Hoa Tiêu in 2014), by Hạ Long behind the hall with the orange roof: a block of white terraces with blue bands that steps down from its north-east face to its south-west face, barrel vaults over the rooms of each terrace, and at its north corner a round tower of green glass with a white strip, a mauve ring, a deck of glass under a white disc, and the lotus top of four cream ribs with a spire",
+	"way": "order",
+	"order": {
+		"blueprint": "building",
+		"options": {
+			"name": "cao_oc_sen_bien",
+			"sources": [
+				"Cao ốc Sen Biển (in 2014 Khách sạn Hoa Tiêu: a block of terraces and the tower with the lotus top) by Hạ Long, Vũng Tàu, as in 2019 (plan 0026, R7, D-0026-14). Plan: OpenStreetMap way 225803467 (© OpenStreetMap contributors, ODbL). Look: photos of 2014 (trungydang, Wikimedia Commons, CC BY 3.0), 2021 (Tuong Lam Photos, Wikimedia Commons, CC BY-SA 4.0) and 2024 (Xuanphuocle, Wikimedia Commons, CC0)."
+			],
+			"plan": [
+				[
+					-18.572,
+					0.0
+				],
+				[
+					-18.385,
+					-47.03
+				],
+				[
+					18.773,
+					-47.048
+				],
+				[
+					18.572,
+					0.0
+				]
+			],
+			"storeys": 7,
+			"ground": 3.0,
+			"band": 0.3,
+			"storey": 3.0,
+			"colors": {
+				"wall": "#eceef0",
+				"trim": "#f3f4f5",
+				"band": "#5573aa",
+				"glass": "#3a4250",
+				"frame": "#e8eaec",
+				"rail": "#dfe3e6",
+				"deck": "#b9bab4",
+				"ground": "#a49d92"
+			},
+			"roof": {
+				"kind": "flat",
+				"parapet": 0.9
+			},
+			"fronts": [
+				{
+					"side": 1,
+					"style": "windows",
+					"bays": 12,
+					"inset": 0.8,
+					"window": [
+						1.5,
+						1.4
+					],
+					"sill": 0.9,
+					"bars": 1
+				},
+				{
+					"side": 2,
+					"style": "windows",
+					"bays": 9,
+					"inset": 0.8,
+					"window": [
+						1.5,
+						1.4
+					],
+					"sill": 0.9,
+					"bars": 1
+				},
+				{
+					"side": 3,
+					"style": "windows",
+					"bays": 12,
+					"inset": 0.8,
+					"window": [
+						1.6,
+						1.4
+					],
+					"sill": 0.9,
+					"bars": 1
+				},
+				{
+					"side": 4,
+					"style": "windows",
+					"bays": 10,
+					"inset": 0.8,
+					"window": [
+						1.8,
+						1.5
+					],
+					"sill": 0.9,
+					"bars": 2
+				}
+			],
+			"letters": [],
+			"apron": 0.6,
+			"age": 0.45,
+			"more": {
+				"than": [
+					{
+						"shape": "box",
+						"size": [
+							23.715,
+							0.35,
+							0.25
+						],
+						"at": [
+							-18.479,
+							-23.515,
+							3.65
+						],
+						"color": "#5573aa",
+						"axis": [
+							-0.999992,
+							-0.003976,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.8,
+						"repeat": {
+							"count": 6,
+							"move": [
+								0,
+								0,
+								3.0
+							]
+						}
+					},
+					{
+						"shape": "box",
+						"size": [
+							18.779,
+							0.35,
+							0.25
+						],
+						"at": [
+							0.194,
+							-47.039,
+							3.65
+						],
+						"color": "#5573aa",
+						"axis": [
+							0,
+							-1.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.8,
+						"repeat": {
+							"count": 6,
+							"move": [
+								0,
+								0,
+								3.0
+							]
+						}
+					},
+					{
+						"shape": "box",
+						"size": [
+							23.724,
+							0.35,
+							0.25
+						],
+						"at": [
+							18.672,
+							-23.524,
+							3.65
+						],
+						"color": "#5573aa",
+						"axis": [
+							0.999991,
+							0.004272,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.8,
+						"repeat": {
+							"count": 6,
+							"move": [
+								0,
+								0,
+								3.0
+							]
+						}
+					},
+					{
+						"shape": "box",
+						"size": [
+							18.772,
+							0.35,
+							0.25
+						],
+						"at": [
+							0.0,
+							0.0,
+							3.65
+						],
+						"color": "#5573aa",
+						"axis": [
+							0.0,
+							1.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.8,
+						"repeat": {
+							"count": 6,
+							"move": [
+								0,
+								0,
+								3.0
+							]
+						}
+					},
+					{
+						"shape": "box",
+						"size": [
+							11.086,
+							24.124,
+							2.85
+						],
+						"at": [
+							-8.086,
+							-23.524,
+							21.15
+						],
+						"color": "#dadbd8",
+						"mode": "subtract",
+						"roughness": 0.9
+					},
+					{
+						"shape": "box",
+						"size": [
+							9.086,
+							24.124,
+							4.35
+						],
+						"at": [
+							-10.086,
+							-23.524,
+							19.65
+						],
+						"color": "#dadbd8",
+						"mode": "subtract",
+						"roughness": 0.9
+					},
+					{
+						"shape": "box",
+						"size": [
+							7.086,
+							24.124,
+							5.85
+						],
+						"at": [
+							-12.086,
+							-23.524,
+							18.15
+						],
+						"color": "#dadbd8",
+						"mode": "subtract",
+						"roughness": 0.9
+					},
+					{
+						"shape": "box",
+						"size": [
+							5.086,
+							24.124,
+							7.35
+						],
+						"at": [
+							-14.086,
+							-23.524,
+							16.65
+						],
+						"color": "#dadbd8",
+						"mode": "subtract",
+						"roughness": 0.9
+					},
+					{
+						"shape": "box",
+						"size": [
+							3.086,
+							24.124,
+							8.85
+						],
+						"at": [
+							-16.086,
+							-23.524,
+							15.15
+						],
+						"color": "#dadbd8",
+						"mode": "subtract",
+						"roughness": 0.9
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							1.8,
+							7.486
+						],
+						"at": [
+							10.886,
+							-2.3,
+							21.0
+						],
+						"axis": [
+							1,
+							0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#c8c8c0",
+						"roughness": 0.7,
+						"repeat": {
+							"count": 11,
+							"move": [
+								0,
+								-4.2,
+								0
+							]
+						}
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							1.8,
+							1.6
+						],
+						"at": [
+							1.0,
+							-2.3,
+							18.3
+						],
+						"axis": [
+							1,
+							0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#c8c8c0",
+						"roughness": 0.7,
+						"repeat": {
+							"count": 11,
+							"move": [
+								0,
+								-4.2,
+								0
+							]
+						}
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							1.8,
+							1.6
+						],
+						"at": [
+							-3.0,
+							-2.3,
+							15.3
+						],
+						"axis": [
+							1,
+							0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#c8c8c0",
+						"roughness": 0.7,
+						"repeat": {
+							"count": 11,
+							"move": [
+								0,
+								-4.2,
+								0
+							]
+						}
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							1.8,
+							1.6
+						],
+						"at": [
+							-7.0,
+							-2.3,
+							12.3
+						],
+						"axis": [
+							1,
+							0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#c8c8c0",
+						"roughness": 0.7,
+						"repeat": {
+							"count": 11,
+							"move": [
+								0,
+								-4.2,
+								0
+							]
+						}
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							1.8,
+							1.6
+						],
+						"at": [
+							-11.0,
+							-2.3,
+							9.3
+						],
+						"axis": [
+							1,
+							0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#c8c8c0",
+						"roughness": 0.7,
+						"repeat": {
+							"count": 11,
+							"move": [
+								0,
+								-4.2,
+								0
+							]
+						}
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							1.8,
+							2.386
+						],
+						"at": [
+							-15.786,
+							-2.3,
+							6.3
+						],
+						"axis": [
+							1,
+							0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"color": "#c8c8c0",
+						"roughness": 0.7,
+						"repeat": {
+							"count": 11,
+							"move": [
+								0,
+								-4.2,
+								0
+							]
+						}
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							3.6,
+							15.0
+						],
+						"at": [
+							12.5,
+							-1.5,
+							15.0
+						],
+						"color": "#4a8f93",
+						"roughness": 0.12,
+						"metal": 0.25
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							3.63,
+							0.04
+						],
+						"at": [
+							12.5,
+							-1.5,
+							3.0
+						],
+						"color": "#dfe6e6",
+						"mode": "paint",
+						"blend": 0.01,
+						"roughness": 0.5,
+						"repeat": {
+							"count": 9,
+							"move": [
+								0,
+								0,
+								3.0
+							]
+						}
+					},
+					{
+						"shape": "round_box",
+						"size": [
+							1.6,
+							1.6,
+							15.0,
+							0.3
+						],
+						"at": [
+							14.9,
+							-3.9,
+							15.0
+						],
+						"color": "#efefed",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						}
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							3.68,
+							0.35
+						],
+						"at": [
+							12.5,
+							-1.5,
+							22.5
+						],
+						"color": "#2f8a6a",
+						"mode": "paint",
+						"blend": 0.02,
+						"roughness": 0.12,
+						"metal": 0.25,
+						"repeat": {
+							"count": 3,
+							"move": [
+								0,
+								0,
+								2.5
+							]
+						}
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							6.15,
+							1.05
+						],
+						"at": [
+							12.5,
+							-1.5,
+							31.05
+						],
+						"color": "#b48c98",
+						"roughness": 0.7
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							5.75,
+							1.25
+						],
+						"at": [
+							12.5,
+							-1.5,
+							33.35
+						],
+						"color": "#4d4a48",
+						"roughness": 0.12,
+						"metal": 0.25
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							6.0,
+							0.7
+						],
+						"at": [
+							12.5,
+							-1.5,
+							35.300000000000004
+						],
+						"color": "#efefed",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						}
+					},
+					{
+						"shape": "ring",
+						"size": [
+							6.0,
+							0.3
+						],
+						"at": [
+							12.5,
+							-1.5,
+							35.300000000000004
+						],
+						"color": "#efefed",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						}
+					},
+					{
+						"shape": "cone",
+						"size": [
+							6.0,
+							4.0,
+							0.25
+						],
+						"at": [
+							12.5,
+							-1.5,
+							36.25
+						],
+						"color": "#efefed",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						}
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							3.95,
+							0.1
+						],
+						"at": [
+							12.5,
+							-1.5,
+							36.6
+						],
+						"color": "#efefed",
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						}
+					},
+					{
+						"shape": "box",
+						"size": [
+							2.4,
+							2.4,
+							0.9
+						],
+						"at": [
+							12.5,
+							-1.5,
+							37.6
+						],
+						"color": "#d9c9a3",
+						"roughness": 0.7
+					},
+					{
+						"shape": "tube",
+						"size": {
+							"points": [
+								[
+									15.47,
+									1.47,
+									36.7
+								],
+								[
+									14.975,
+									0.975,
+									37.7
+								],
+								[
+									14.338,
+									0.338,
+									39.1
+								],
+								[
+									13.631,
+									-0.369,
+									40.7
+								],
+								[
+									12.995,
+									-1.005,
+									42.3
+								],
+								[
+									12.585,
+									-1.415,
+									43.7
+								]
+							],
+							"radii": [
+								0.35,
+								0.32,
+								0.28,
+								0.24,
+								0.18,
+								0.12
+							]
+						},
+						"color": "#e0cfa0",
+						"roughness": 0.5,
+						"repeat": {
+							"count": 4,
+							"center": [
+								12.5,
+								-1.5,
+								0
+							]
+						}
+					},
+					{
+						"shape": "cone",
+						"size": [
+							0.25,
+							0.05,
+							4.3
+						],
+						"at": [
+							12.5,
+							-1.5,
+							47.7
+						],
+						"color": "#9a9ea2",
+						"roughness": 0.4,
+						"metal": 0.6
+					}
+				]
+			}
+		}
+	},
+	"sources": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:V%C5%A9ng_T%C3%A0u,_Ba_Ria_-_Vung_Tau,_Vietnam_-_panoramio_(2).jpg",
+			"date": "2014-04-05 17:53",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "shot_s1_2014.jpg",
+			"shows": "Photo 0 (the shot S1). The beach to the south, from about 450 m: the tower of green glass with a white strip on its east side, the mauve ring, the deck of glass, the white disc and the lotus top of white ribs with a spire; the block on each side of the tower: on the left the north-east face with blue and white bands and 7 arches on its top, on the right the north-west face that steps down to the west, storey by storey, to a low part behind the hall with the orange roof."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Vung_Tau,_Viet_Nam.jpg",
+			"date": "2021-01-30 14:44",
+			"license": "CC BY-SA 4.0",
+			"author": "Tuong Lam Photos",
+			"open": true,
+			"file": "drone_2021_ha_long.jpg",
+			"shows": "Photo 1. From a drone over Hạ Long, from the south-east: the tower at the north end of the block, white on its south side with three green bands under the mauve ring, the deck of glass, the white disc, a beige box and four cream ribs (a cross) with a spire; the block: white walls with blue grey bands and dark windows, rounded corners, grey barrel vaults on the terraces that step down to the south, a flat roof with skylights by the tower."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Ks_Hoa_Tieu_Vung_tau-_duong_Ha_Long_-_panoramio.jpg",
+			"image": "https://commons.wikimedia.org/wiki/Special:FilePath/Ks_Hoa_Tieu_Vung_tau-_duong_Ha_Long_-_panoramio.jpg?width=1280",
+			"date": "2014-04-05",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "hall_front_2014b.jpg",
+			"shows": "Photo 2. Hạ Long, from across the road: the tower at the north-east end of the block, over the hall with the orange roof; the block of white terraces with blue bands steps down to the right, with white arches on the terraces."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Building_on_Ha_Long_street_in_Vung_Tau_030324_2.jpg",
+			"image": "https://commons.wikimedia.org/wiki/Special:FilePath/Building_on_Ha_Long_street_in_Vung_Tau_030324_2.jpg?width=1280",
+			"date": "2024-03-06",
+			"license": "CC0",
+			"author": "Xuanphuocle",
+			"open": true,
+			"file": "sen_bien_2024.jpg",
+			"shows": "Photo 3. From Hạ Long, up: the tower in front of the block: the shaft of blue green glass with a white strip on its left, the mauve ring, the deck of glass, the white disc and the lotus top with a high spire; the block behind it: terraces with arched hoods, grey bands, a flat face with windows by the tower. An open photo: its copy is not in docs/reference/photos/ yet."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Khach_san_Tram_Hoa_Tieu,_ph%C6%B0%E1%BB%9Dng_2,_V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"image": "https://commons.wikimedia.org/wiki/Special:FilePath/Khach_san_Tram_Hoa_Tieu%2C_ph%C6%B0%E1%BB%9Dng_2%2C_V%C5%A9ng_T%C3%A0u%2C_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u%2C_Vi%E1%BB%87t_Nam_-_panoramio.jpg?width=1280",
+			"date": "2014-04-11 or before (the upload to Panoramio)",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "sen_bien_2014.jpg",
+			"shows": "Photo 4. The terraces from near: rooms with rounded balconies and blue bands, one row over the other, each row set back; white arched hoods with lamps over the top rooms; a flat face with rows of windows and blue bands on the right. An open photo: its copy is not in docs/reference/photos/ yet."
+		},
+		{
+			"url": "https://pthotel.vn",
+			"image": "https://pthotel.vn/wp-content/uploads/2023/06/1A3A2692-scaled.jpg",
+			"date": "2023-06 or before (the folder of the upload on the site); the second photo of the site, wp-content/uploads/2023/04/gt.jpg, 2023-04 or before",
+			"license": "all rights reserved",
+			"author": "Vung Tau P&T Hotel (the site of the hotel)",
+			"open": false,
+			"file": "pthotel_2023_1a3a2692.jpg",
+			"shows": "Photo 5 (a photo of Khách sạn Bưu điện). At its right edge: the block of Cao ốc Sen Biển with white terraces and blue bands, rounded balconies, arched hoods on the top; the tower of green glass with the mauve ring, the deck and the white disc."
+		},
+		{
+			"url": "https://www.flickr.com/photos/beos_album/50955595227/",
+			"image": "https://live.staticflickr.com/65535/50955595227_b86c7c86b7_b.jpg",
+			"date": "2019-02-02 (Flickr: date taken)",
+			"license": "all rights reserved",
+			"author": "Nguyễn Huỳnh Hữu Nghĩa (Flickr beos_album)",
+			"open": false,
+			"file": "flickr_50955595227_b.jpg",
+			"shows": "Photo 6. The beach to the south at sunset, from far: the tower with its white top and the lotus top; the block of terraces that steps down to the west, with a scalloped top (the vaults)."
+		},
+		{
+			"url": "https://tuoitre.vn/vung-tau-sau-30-nam-thanh-lap-thu-ngan-sach-gap-gan-300-lan-20211230155102555.htm",
+			"image": "https://cdn.tuoitre.vn/2021/12/30/logo-du-khach-30-4-2019-20-1640854141848374700459.jpg",
+			"date": "2019-04-30 (the name of the file; the article is of 2021-12-30)",
+			"license": "all rights reserved",
+			"author": "Đông Hà, Tuổi Trẻ",
+			"open": false,
+			"file": "tuoitre_2019_04_30.jpg",
+			"shows": "Photo 7. The beach to the south, from far: the tower of green glass with the white top; the block: a flat top at the left of the tower, and a regular stair of terraces with grey blue bands from the tower down to the west end."
+		},
+		{
+			"url": "https://www.flickr.com/photos/project-j13/49980798862/",
+			"image": "https://live.staticflickr.com/65535/49980798862_54a3e86a9f_b.jpg",
+			"date": "2020-06-06 17:55",
+			"license": "all rights reserved",
+			"author": "Viet Nhan Tran (Flickr user project-j13)",
+			"open": false,
+			"file": "flickr_49980798862_b.jpg",
+			"shows": "Photo 8. Hạ Long at the end of the afternoon, from across the road: the tower of green glass with a white strip on its left, the pink brown ring, the deck of glass, the white disc and the ribs of the lotus top with a high spire; the block behind it, white with grey bands, 7 storeys by the tower and steps down to the right; arched hoods on the top on the left."
+		},
+		{
+			"url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
+			"image": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/19/247002/418081",
+			"date": "unknown (Esri does not give the date of this image)",
+			"license": "Esri World Imagery terms of use (not open)",
+			"author": "Esri and its providers",
+			"open": false,
+			"file": "sen_bien_esri_z19.jpg",
+			"shows": "Photo 9. From above (tiles of zoom 19): rows of barrel vaults over the whole block (about 11 vaults from the front to the back), light grey vaults along the south-east side, the round white top of the tower with a cross of four ribs, and its shadow to the north-west."
+		}
+	],
+	"sizes": {
+		"plan": {
+			"value": "37.1 m along the front (the north-west face) by 47.0 m",
+			"unit": "",
+			"source": "The outline of OpenStreetMap (way 225803467; © OpenStreetMap contributors, ODbL), a rectangle."
+		},
+		"storeys": {
+			"value": 7,
+			"unit": "",
+			"source": "Photo 0 (2014): on the north-east face, 6 storeys of balconies under the top storey with the arches; photos 7 (2019) and 8 (2020): 7 storeys by the tower. The lower storeys of the terraces: see terraces."
+		},
+		"storey": {
+			"value": 3.0,
+			"unit": "m",
+			"source": "Photo 0: 25 px from a band to the next. The scale at the block (1.03 times the distance of the hall with the orange roof, see the storey of khach_san_buu_dien): 0.116 m a px: 2.9 m. I use 3.0 m."
+		},
+		"terraces": {
+			"value": "the top (7 storeys) from the north-east face to 15.6 m from it, then 4 terraces of 4 m, each one storey lower (6, 5, 4 and 3 storeys), and 2 storeys on the last 5.6 m to the south-west face",
+			"unit": "",
+			"source": "Photo 0 (2014): the north-west face steps down to the west at each storey, then a low part behind the hall; photos 6 and 7 (2019): a regular stair of terraces from the tower to the west end; photo 1 (2021): rows of vaults that step down to the south. The width of each terrace (4 m) is an estimate: 5 steps from 7 to 2 storeys fill the front."
+		},
+		"vaults": {
+			"value": "barrel vaults of 1.8 m radius every 4.2 m (11 on each terrace), their axes across the block, their arched ends to the north-east and the south-west",
+			"unit": "",
+			"source": "Photo 0: 7 arches on the top of the north-east face (the others are behind Khách sạn Bưu điện); photo 4 (2014): arched hoods over the rooms of the terraces; photo 1 (2021): grey vaults on the terraces; photo 9: about 11 vaults from the front to the back. The radius is an estimate (no source)."
+		},
+		"bands": {
+			"value": "a blue band 0.7 m high at each floor, on each face",
+			"unit": "",
+			"source": "Photo 0 (2014): blue; photo 1 (2021): blue grey; photo 5 (2023): blue; photos 3 (2024) and 8 (2020): grey blue. I use a blue between them."
+		},
+		"tower_place": {
+			"value": "its middle 12.5 m to the north-east of the middle of the front and 1.5 m behind the front: at the north corner, half in front of the block",
+			"unit": "",
+			"source": "Photo 0: the tower is between the north-east face (on the left) and the steps of the north-west face (on the right), and the shaft shows down to the second storey; photos 2 (2014), 3 (2024), 5 (2023) and 8 (2020): the tower in front of the north-east end of the block; photo 1 (2021): the tower at the north end of the north-east face. The OSM outline has no tower: its place is an estimate (within 4 m)."
+		},
+		"tower_shaft": {
+			"value": "a cylinder of glass of 3.6 m radius, 30.0 m high to the ring, with a white strip (a box of 3.2 m) on its east side and white floor lines every 3 m",
+			"unit": "",
+			"source": "Photo 0: the glass 52 px and the white strip 15 px wide; the scale at the tower (1.04 times the distance of the hall): 0.118 m a px: 6.1 m and 1.8 m. From the foot of the block (about 493 px from the top of photo 0, behind the hall: an estimate) to the ring: 250 px, 29.5 m."
+		},
+		"tower_top": {
+			"value": "the ring (mauve) from 30.0 m to 32.1 m, 6.15 m radius; the deck of glass to 34.6 m, 5.75 m radius; the white disc to 36.7 m, 6.3 m radius; a beige box to 38.5 m; four cream ribs to 43.7 m; a spire to 52.0 m",
+			"unit": "",
+			"source": "Photo 0, at 0.118 m a px: the ring 18 px high and 104 px wide (2.1 m, 12.3 m), the glass 21 px (2.5 m), the disc 19 px high and 106 px wide (2.2 m, 12.5 m), the ribs 63 px (7.4 m), the spire 74 px (8.7 m). Photo 1 (2021): four ribs (a cross from above), the beige box. Photos 3 (2024) and 8 (2020): the same top."
+		},
+		"green_bands": {
+			"value": "three green bands on the shaft under the ring, 0.7 m high, every 2.5 m",
+			"unit": "",
+			"source": "Photo 1 (2021): green bands at the top of the shaft on its south side. In the model they go round the shaft (an estimate)."
+		},
+		"faces": {
+			"value": "windows on each face, 9 to 12 bays a storey, 1.5 m to 1.8 m wide",
+			"unit": "",
+			"source": "estimate (no source) of the counts. The rounded balconies with rails of glass of photos 1 and 4 are not in the model: the bands give their lines."
+		},
+		"colors": {
+			"value": "walls #eceef0, bands #5573aa, windows #3a4250, vaults #c8c8c0, shaft #4a8f93, strip #efefed, green bands #2f8a6a, ring #b48c98, deck of glass #4d4a48, disc #efefed, box #d9c9a3, ribs #e0cfa0, spire #9a9ea2",
+			"unit": "",
+			"source": "Photo 0 (2014) and photo 1 (2021): white walls, blue (2014) and blue grey (2021) bands, light grey vaults; the green blue glass of the shaft (photos 0, 3, 8); the mauve ring and the cream ribs (photos 1, 8)."
+		},
+		"ground": {
+			"value": "the front of the block on the ground of its front",
+			"unit": "",
+			"source": "In the ground of the game (data/geo/build/height) the hill rises 17 m from the front of the block to its back. Photo 1 shows more storeys on the south-east side than this ground leaves. See the place (keep_higher)."
+		},
+		"letters": {
+			"value": "none",
+			"unit": "",
+			"source": "No letters: I did not approve a name of a business on it (the design rules of the game: no real businesses)."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "fa52f111ab1c786f43a1d1d7af92505b",
+			"seen": "The files of the lock (the job \"Models of World\" of 4e0d0cc), next to photos 0 to 8 (build/look/cao_oc_sen_bien_near.png). The block of white terraces that steps down to the south-west, with the barrel vaults on each terrace and a blue band at each floor, and the tower of green glass with the white strip, the mauve ring, the deck of glass, the white disc, and the spire, as in photos 0, 3, and 4. No letters.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "fa52f111ab1c786f43a1d1d7af92505b",
+			"seen": "The files of the lock (build/look/cao_oc_sen_bien_mid.png): the same terraces, vaults, and tower with less detail.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "d7a1f96513bac0976335ff54b50344cf",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/cao_oc_sen_bien_mid.png). The block of terraces with the barrel vaults, the bands of blue windows, and the tower with its green bands, the mauve ring, and the disc of four shapes of c6385ca under the spire, as in photos 0, 2, and 3.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "d7a1f96513bac0976335ff54b50344cf",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/cao_oc_sen_bien_far.png). The same masses; the terraces as steps with no vaults; the disc and the spire stay.",
+			"changed": "Nothing."
+		}
+	],
+	"status": "Source",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"uses": "Plan 0026, R7, D-0026-14: on its OSM outline (way/225803467) by Hạ Long, in place of its stand-in; the shot S1 shows it.",
+	"impostor": false
+}

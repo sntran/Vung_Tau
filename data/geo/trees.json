@@ -45,7 +45,12 @@
 		"mix": {
 			"bang": 0.55,
 			"coconut": 0.45
-		}
+		},
+		"photos": [
+			"docs/reference/photos/street_kiosk_2014.jpg",
+			"docs/reference/photos/drone_2021_park.jpg"
+		],
+		"photos_comment": "Report 0026, D-0026-35: in the showcase a tree of a rule stands only where a photo shows such trees. These photos show the bàng trees and the coconut palms between Quang Trung and the park (also the culture notes, Confirmed). The walks keep no tree."
 	},
 	"named_roads": {
 		"comment": "Roads with their own trees (plan 0020, Q1, photos that I chose).",
@@ -78,7 +83,263 @@
 			"frangipani": 0.15,
 			"flame": 0.15
 		},
-		"comment": "Near Bãi Trước: mostly coconut palms, some bàng, a few casuarinas (plan 0020, Q2)."
+		"comment": "Near Bãi Trước: mostly coconut palms, some bàng, a few casuarinas (plan 0020, Q2).",
+		"photos_near": [
+			"docs/reference/photos/park_paths_2014.jpg",
+			"docs/reference/photos/park_bushes_2014.jpg",
+			"docs/reference/photos/drone_2021_park.jpg"
+		],
+		"photos_near_comment": "Report 0026, D-0026-35: these photos show the coconut palms and the bàng of the park of Bãi Trước, so the park near the landmark keeps its trees in the showcase (PT-53 needs them). The walks keep no tree.",
+		"lean_near": {
+			"types": [
+				"coconut"
+			],
+			"share": 0.55,
+			"deg": [
+				8.0,
+				30.0
+			],
+			"comment": "Plan 0026, R9: many coconut palms of the park of Bãi Trước lean by 10 to 35 degrees, in all directions (the photos of S2 of 2014, Wikimedia Commons, trungydang, CC BY 3.0). The share and the angles are builder values from the photos."
+		},
+		"groves": [
+			{
+				"name": "S2",
+				"outline": [
+					[
+						-8.3,
+						-202.8
+					],
+					[
+						-14.7,
+						-203.6
+					],
+					[
+						-46.1,
+						-174.3
+					],
+					[
+						-17.3,
+						-155.4
+					],
+					[
+						15.1,
+						-166.7
+					]
+				],
+				"spacing_m": 6.5,
+				"gap": 0.55,
+				"jitter_m": 1.6,
+				"mix": {
+					"coconut": 1.0
+				},
+				"seed": 202,
+				"lean": {
+					"types": [
+						"coconut"
+					],
+					"share": 0.85,
+					"deg": [
+						8.0,
+						32.0
+					],
+					"toward_part": 0.7,
+					"toward_deg": 270.0,
+					"spread_deg": 50.0
+				},
+				"comment": "Report 0026, D-0026-17: the grove of leaning coconut palms of the photo of S2 (Commons, trungydang, 2014-04-05, CC BY 3.0, docs/reference/photos/shot_s2_2014.jpg), in the frame of S2 (the eye of data/showcase/shots.json, from 5 m to 50 m, 40 degrees to each side of its heading): about 20 palms 5 m to 8 m apart on the lawn (6.5 m: with 5 m, the 39 palms of the grove made S2 370 000 triangles on Low, PT-73), most of them leaning by 10 to 35 degrees, more to the sea (to -x) than to other sides. The Norfolk pines of the photo stand at its side to the sea (the grove S2 pines). The trees of the other rules in the outline give their place to the grove. The spacing, the parts, and the angles are builder values from the photo."
+			},
+			{
+				"name": "S2 pines",
+				"outline": [
+					[
+						-28.0,
+						-190.0
+					],
+					[
+						-36.0,
+						-193.0
+					],
+					[
+						-50.0,
+						-166.0
+					],
+					[
+						-40.0,
+						-160.0
+					]
+				],
+				"spacing_m": 8.0,
+				"gap": 0.6,
+				"jitter_m": 1.5,
+				"mix": {
+					"araucaria": 1.0
+				},
+				"seed": 203,
+				"lean": {},
+				"comment": "Report 0026, D-0026-17: the Norfolk pines at the right of the photo of S2, between the grove and the walk of the sea (to -x). The trees of the grove S2 in this outline give their place to them."
+			},
+			{
+				"name": "Hạ Long",
+				"outline": [
+					[
+						92.0,
+						227.0
+					],
+					[
+						72.0,
+						193.0
+					],
+					[
+						-116.0,
+						311.0
+					],
+					[
+						-96.0,
+						345.0
+					]
+				],
+				"trees": [
+					{
+						"kind": "araucaria",
+						"at": [
+							40.0,
+							233.8
+						]
+					},
+					{
+						"kind": "araucaria",
+						"at": [
+							10.0,
+							250.7
+						]
+					},
+					{
+						"kind": "araucaria",
+						"at": [
+							-20.0,
+							268.2
+						]
+					},
+					{
+						"kind": "araucaria",
+						"at": [
+							-50.0,
+							285.7
+						]
+					},
+					{
+						"kind": "coconut",
+						"at": [
+							30.0,
+							256.5
+						]
+					},
+					{
+						"kind": "coconut",
+						"at": [
+							19.0,
+							262.0
+						]
+					},
+					{
+						"kind": "coconut",
+						"at": [
+							8.0,
+							267.5
+						]
+					}
+				],
+				"comment": "Report 0026, D-0026-24: the band of Hạ Long from the junction with Quang Trung to Cao ốc Sen Biển (20 m to each side of the middle of its two roads). The rule coast_roads put an even row of casuarinas every 7 m there, and it hid the hall with the orange roof in S1. The photos show no row: the photo of Mapillary of 2018-07-29 (image 1927330624091805, hoangvietanh, CC BY-SA 4.0, docs/reference/mapillary/) shows the walk of the sea of Hạ Long with its parapet and its lamps of five globes, and no tree; the photo from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0, docs/reference/photos/drone_2021_ha_long.jpg) shows the median with flower beds and a few small Norfolk pines, and no tree on the sea side; the photo of S1 (Commons, trungydang, 2014-04-05, CC BY 3.0) shows a few coconut palms in front of Khách sạn Bưu điện. So the grove has these trees only: four Norfolk pines in the median (araucaria, about 30 m apart) and three coconut palms on the sidewalk of the side of the hill in front of Khách sạn Bưu điện. Their places are by eye from the two photos (about 5 m)."
+			},
+			{
+				"name": "Grand Hotel",
+				"outline": [
+					[
+						107.5,
+						-22.0
+					],
+					[
+						147.0,
+						-22.0
+					],
+					[
+						147.0,
+						20.0
+					],
+					[
+						131.0,
+						22.0
+					],
+					[
+						131.0,
+						88.0
+					],
+					[
+						129.5,
+						88.0
+					]
+				],
+				"trees": [
+					{
+						"kind": "tall_shade",
+						"at": [
+							121.5,
+							24.0
+						]
+					},
+					{
+						"kind": "tall_shade",
+						"at": [
+							112.5,
+							-17.0
+						]
+					},
+					{
+						"kind": "frangipani",
+						"at": [
+							117.5,
+							-9.0
+						]
+					},
+					{
+						"kind": "frangipani",
+						"at": [
+							119.5,
+							-2.0
+						]
+					},
+					{
+						"kind": "frangipani",
+						"at": [
+							124.0,
+							16.0
+						]
+					},
+					{
+						"kind": "frangipani",
+						"at": [
+							127.0,
+							36.0
+						]
+					},
+					{
+						"kind": "frangipani",
+						"at": [
+							129.5,
+							48.0
+						]
+					},
+					{
+						"kind": "frangipani",
+						"at": [
+							129.5,
+							68.0
+						]
+					}
+				],
+				"comment": "Report 0026, D-0026-22: the garden of the Grand Hotel between the fence on Quang Trung and the fronts of the main block and of the south wing, at the level of the sidewalk. The photo of S4 and the wide photo from its place (2014-04-06, Commons, trungydang, CC BY 3.0) show frangipani with white flowers along the fence and a large rain tree in front of the south half of the main block; the street photos of Mapillary of 2024-11-09 (lyduchuy, CC BY-SA 4.0, docs/reference/mapillary/sheet_d22_grand_front_after_1.jpg) show the large trees at the corner of Nguyễn Du and the same rain tree (rule 1 of Q17). The places are by eye from the photos (about 5 m); the drive in front of the porch has no tree."
+			}
+		]
 	},
 	"osm_trees": {
 		"comment": "OSM natural=tree nodes and natural=tree_row ways. A tag genus or species can select the type.",

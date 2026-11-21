@@ -59,6 +59,13 @@ var new_card := false
 var world_name := "hem"
 ## The real ground of Vũng Tàu, or null in the hẻm world.
 var vung_tau: VungTau = null
+## The time from the start of the engine to the end of the draw of the first
+## frame (ms), or -1 (report 0026, D-0026-12: PT-37 checks the start of the
+## Vũng Tàu world).
+var first_frame_ms := -1
+## The time of the build of the Vũng Tàu world, from the load of its scene to
+## its first chunks (ms), or -1.
+var world_build_ms := -1
 var debug_overlay: Label
 
 @onready var hem: Hem = $World/Hem
@@ -129,6 +136,9 @@ func _ready() -> void:
 	player.arrived.connect(_on_arrived)
 	player.blocked.connect(_on_blocked)
 	AudioServer.set_bus_mute(0, not GameState.sound)
+	RenderingServer.frame_post_draw.connect(func() -> void:
+		if first_frame_ms < 0:
+			first_frame_ms = Time.get_ticks_msec(), CONNECT_ONE_SHOT)
 	if GameState.arg_value("world") == "vung_tau":
 		_start_vung_tau()
 	if vung_tau == null:
@@ -158,6 +168,7 @@ func _ready() -> void:
 ## Plan 0005: the real ground in place of the hẻm. The hẻm world, its sun,
 ## and its sky go. The save of the hẻm world stays as it is.
 func _start_vung_tau() -> void:
+	var begin := Time.get_ticks_msec()
 	var world: VungTau = load("res://scenes/world/vung_tau.tscn").instantiate()
 	$World.add_child(world)
 	if not world.setup():
@@ -175,8 +186,10 @@ func _start_vung_tau() -> void:
 	player.walk_limit = world.can_stand
 	player.camera.far = 6000.0
 	var start := world.spawn()
-	world.prepare_at(start.position)
+	# The parts of the showcase build in the first frames (report 0026, D-0026-12).
+	world.prepare_at(start.position, 64.0, false)
 	player.place(start.position, start.yaw)
+	world_build_ms = Time.get_ticks_msec() - begin
 
 
 ## Stops all sounds. An Ogg stream that still plays when the game quits is

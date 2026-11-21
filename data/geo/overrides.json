@@ -111,6 +111,24 @@
 				]
 			],
 			"reason": "Report 0008, D-0008-02: the end of the footway 788327903 and the foot of the steps 788327902 on the route to the statue of Núi Nhỏ are 5.4 m apart in OSM. This footway joins them, so that the player walks on the path the whole way."
+		},
+		{
+			"action": "set_tags",
+			"way": 200554615,
+			"tags": {
+				"width": "10",
+				"sidewalk": "no"
+			},
+			"reason": "Plan 0026, R2: the south part of Quang Trung has two roads of about 10 m with a median of about 3 m (survey of World plan 0018, section 3.1). The showcase (data/showcase/bai_truoc.json) makes the median and the sidewalks."
+		},
+		{
+			"action": "set_tags",
+			"way": 1558591261,
+			"tags": {
+				"width": "10",
+				"sidewalk": "no"
+			},
+			"reason": "Plan 0026, R2: the south part of Quang Trung has two roads of about 10 m with a median of about 3 m (survey of World plan 0018, section 3.1). The showcase (data/showcase/bai_truoc.json) makes the median and the sidewalks."
 		}
 	]
 }

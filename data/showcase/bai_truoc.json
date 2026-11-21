@@ -1,0 +1,1326 @@
+{
+	"note": "The showcase area of Bãi Trước (plan 0026, D1, R2 to R7). Positions are x and z of the game (meters, x to the east, z to the south). \"outline\" is the area: inside it, scenes/world/showcase.gd builds the median and the sidewalks of Quang Trung (R2), the granite borders of the paths of the park and the low wall of the walk of the sea (R3, R4), the sea wall of Hạ Long (R4, R6), and a stand-in for each building that World does not have yet (R7). Each road is an OSM way of data/geo/build/roads.json; a side is the side of the way in the direction of its points. Colors are sRGB. The status of each value is \"check\" until I confirm it.",
+	"status": "check",
+	"outline": [
+		[
+			-260,
+			-285
+		],
+		[
+			-150,
+			-365
+		],
+		[
+			-15,
+			-365
+		],
+		[
+			10,
+			-285
+		],
+		[
+			60,
+			-125
+		],
+		[
+			145,
+			-110
+		],
+		[
+			205,
+			-30
+		],
+		[
+			205,
+			125
+		],
+		[
+			155,
+			235
+		],
+		[
+			45,
+			300
+		],
+		[
+			-110,
+			415
+		],
+		[
+			-150,
+			565
+		],
+		[
+			-240,
+			570
+		],
+		[
+			-430,
+			505
+		],
+		[
+			-650,
+			410
+		],
+		[
+			-640,
+			330
+		]
+	],
+	"outline_note": "From the north end of the park (S5 is there) to Hải Âu and the jetty of Cầu Đá, and from the bay to the lots behind Quang Trung. D1 says the north end of Nhà thiếu nhi; the park goes about 150 m farther north (plan 0026, Q5).",
+	"park": [
+		[
+			6.22,
+			221.19
+		],
+		[
+			18.43,
+			213.81
+		],
+		[
+			23.49,
+			209.84
+		],
+		[
+			29.11,
+			204.74
+		],
+		[
+			33.6,
+			199.47
+		],
+		[
+			40.05,
+			190.27
+		],
+		[
+			57.47,
+			206.95
+		],
+		[
+			63.05,
+			206.86
+		],
+		[
+			69.37,
+			204.09
+		],
+		[
+			74.38,
+			196.21
+		],
+		[
+			82.37,
+			165.88
+		],
+		[
+			85.2,
+			154.03
+		],
+		[
+			89.49,
+			136.03
+		],
+		[
+			92.89,
+			111.15
+		],
+		[
+			93.4,
+			91.86
+		],
+		[
+			92.74,
+			73.05
+		],
+		[
+			87.38,
+			41.67
+		],
+		[
+			74.26,
+			-17.7
+		],
+		[
+			60.75,
+			-63.62
+		],
+		[
+			32.49,
+			-136.88
+		],
+		[
+			21.15,
+			-159.07
+		],
+		[
+			1.07,
+			-195.95
+		],
+		[
+			-28.07,
+			-237.92
+		],
+		[
+			-39.06,
+			-250.35
+		],
+		[
+			-49.1,
+			-261.51
+		],
+		[
+			-53.08,
+			-258.14
+		],
+		[
+			-47.19,
+			-250.74
+		],
+		[
+			-45.84,
+			-248.97
+		],
+		[
+			-45.05,
+			-246.66
+		],
+		[
+			-44.4,
+			-232.94
+		],
+		[
+			-43.73,
+			-215.48
+		],
+		[
+			-42.01,
+			-194.84
+		],
+		[
+			-20.13,
+			-145.67
+		],
+		[
+			-24.64,
+			-143.39
+		],
+		[
+			-28.49,
+			-141.69
+		],
+		[
+			-22.49,
+			-121.31
+		],
+		[
+			-13.47,
+			-100.74
+		],
+		[
+			-9.17,
+			-97.58
+		],
+		[
+			-8.18,
+			-97.74
+		],
+		[
+			-6.32,
+			-92.9
+		],
+		[
+			13.3,
+			-41.87
+		],
+		[
+			22.49,
+			1.1
+		],
+		[
+			28.13,
+			27.04
+		],
+		[
+			28.54,
+			54.65
+		],
+		[
+			28.69,
+			87.02
+		],
+		[
+			28.02,
+			109.42
+		],
+		[
+			27.46,
+			121.71
+		],
+		[
+			26.88,
+			124.11
+		],
+		[
+			25.7,
+			129.1
+		],
+		[
+			17.68,
+			144.63
+		],
+		[
+			8.82,
+			161.22
+		],
+		[
+			2.04,
+			173.18
+		],
+		[
+			-1.15,
+			189.95
+		],
+		[
+			0.25,
+			201.37
+		],
+		[
+			0.9,
+			213.55
+		],
+		[
+			6.22,
+			221.19
+		]
+	],
+	"ground": {
+		"note": "R3 and R4: the ground of the park and of the walk of the sea, from the areas of OpenStreetMap. tools/geo/build.py makes data/geo/build/showcase_ground.png (R the lawns, G the paving, cells of cell_m) and data/geo/build/showcase.json. The lawns are the park areas and the grass areas, less the roads and the paths (and road_margin_m, the granite borders), the paved areas, and the areas with a key of not_lawn. The raised lawns are the two grass areas of OSM on the walk of the sea across the park Tam Giác (World survey of Quang Trung, QT-S02: four strips of lawn in low granite borders between the walk and the road; the photo of S5, 2015). The low wall stands along the edges of the walk that are near the beach (the photo of S5, 2014).",
+		"cell_m": 0.5,
+		"road_margin_m": 0.3,
+		"lawns": [
+			"way/220617822",
+			"way/220617816",
+			"way/229240641",
+			"way/234797329",
+			"way/234797330",
+			"way/220821624"
+		],
+		"drawn": [
+			{
+				"id": "south_end_square",
+				"kind": "paving",
+				"outline": [
+					[
+						-6.0,
+						113.0
+					],
+					[
+						-6.0,
+						190.0
+					],
+					[
+						-1.0,
+						190.0
+					],
+					[
+						3.5,
+						176.0
+					],
+					[
+						5.5,
+						165.0
+					],
+					[
+						7.0,
+						150.0
+					],
+					[
+						10.0,
+						113.0
+					]
+				],
+				"photo": "drone_2021_park.jpg",
+				"photo_points": [
+					[
+						1142.7,
+						561.5
+					],
+					[
+						803.4,
+						644.9
+					],
+					[
+						823.4,
+						643.8
+					],
+					[
+						913.5,
+						633.8
+					],
+					[
+						974.8,
+						625.0
+					],
+					[
+						1049.1,
+						612.9
+					],
+					[
+						1211.2,
+						575.6
+					]
+				],
+				"camera": {
+					"eye": [
+						200.4,
+						82.3,
+						344.8
+					],
+					"heading": -132.19,
+					"pitch": -14.02,
+					"roll": -0.01,
+					"hfov": 57.23
+				},
+				"how": "Report 0026, D-0026-30: the square of the five Norfolk pines at the south end of the park. In the photo, its paving goes to the parapet over the water. In the build, the paving of OSM stops 3 m to 10 m before the shore, and a strip of lawn and the bare ground of the town (a slope of sand down to the sea) were between them (PT-74, run 4, 550 m). The outline: from the paving of OSM to 1 m to 6 m past the shore of the build, from z 113 to the path along the low wall (way 458829438) at z 190. The photo: the photo from a drone of 2021-01-30 over the south end of the park (Tuong Lam Photos, CC BY-SA 4.0; a photo of 2017 to 2021 is a source for 2019). The camera: near the place of the camera file (10.340510 N, 107.075639 E; 25 m from it), with the heading, the pitch, the height, and the field of view that put three points of OSM on the photo (the east end of the median of Hạ Long, the south end of way 458829438 at the walk, and the end of way 118946676 at way 458829438) and the horizon of the sea at 90 px; with it the edges of the lawns and the paving of the build fall on their edges in the photo to about 2 m to 5 m. The outline is on the ways of OSM and the shore of the build (where the ground of the build goes under 0.5 m); the photo points are the outline through the camera. The photo does not give the places: a point of the photo on an edge over the water (a parapet) goes down past it to the sea floor. tools/showcase/lawn_sheet.py puts the outline on the photo and on the map (docs/showcase/south_end_lawns.jpg).",
+				"platform": true,
+				"platform_note": "Report 0026, D-0026-30 (audit 6): the square is a platform over the water with its parapet (the drone photo of 2021). The build fills the ground under its outline to the height of the square at its land side (geodata/showcase.py, level_platforms())."
+			},
+			{
+				"id": "south_end_bed",
+				"kind": "bed",
+				"outline": [
+					[
+						-11.0,
+						198.0
+					],
+					[
+						-3.6,
+						198.0
+					],
+					[
+						-3.6,
+						209.0
+					],
+					[
+						1.0,
+						215.5
+					],
+					[
+						2.5,
+						219.0
+					],
+					[
+						-3.0,
+						228.0
+					],
+					[
+						-12.0,
+						232.0
+					]
+				],
+				"photo": "drone_2021_park.jpg",
+				"photo_points": [
+					[
+						741.7,
+						660.4
+					],
+					[
+						770.0,
+						649.5
+					],
+					[
+						708.2,
+						663.2
+					],
+					[
+						688.1,
+						679.0
+					],
+					[
+						672.9,
+						686.3
+					],
+					[
+						594.9,
+						687.5
+					],
+					[
+						535.8,
+						676.4
+					]
+				],
+				"camera": {
+					"eye": [
+						200.4,
+						82.3,
+						344.8
+					],
+					"heading": -132.19,
+					"pitch": -14.02,
+					"roll": -0.01,
+					"hfov": 57.23
+				},
+				"how": "Report 0026, D-0026-30: in the photo, a long bed of brown soil with a few low plants in a low border, with a blue sign in it, between the tiled walk of Hạ Long, the path along the low wall, and the low wall. In the build, OSM has no area there, and the ground was the bare ground of the town. The outline: between the shore of the build, way 458829438, and the walk of Hạ Long (the paving of OSM comes off it). The photo: the photo from a drone of 2021-01-30 over the south end of the park (Tuong Lam Photos, CC BY-SA 4.0; a photo of 2017 to 2021 is a source for 2019). The camera: near the place of the camera file (10.340510 N, 107.075639 E; 25 m from it), with the heading, the pitch, the height, and the field of view that put three points of OSM on the photo (the east end of the median of Hạ Long, the south end of way 458829438 at the walk, and the end of way 118946676 at way 458829438) and the horizon of the sea at 90 px; with it the edges of the lawns and the paving of the build fall on their edges in the photo to about 2 m to 5 m. The outline is on the ways of OSM and the shore of the build (where the ground of the build goes under 0.5 m); the photo points are the outline through the camera. The photo does not give the places: a point of the photo on an edge over the water (a parapet) goes down past it to the sea floor. tools/showcase/lawn_sheet.py puts the outline on the photo and on the map (docs/showcase/south_end_lawns.jpg)."
+			}
+		],
+		"paving": [
+			"way/220617805",
+			"way/220617809",
+			"way/220617813",
+			"way/220617818",
+			"way/220821620",
+			"way/234797331"
+		],
+		"not_lawn": [
+			[
+				"amenity",
+				"fountain"
+			],
+			[
+				"amenity",
+				"parking"
+			],
+			[
+				"natural",
+				"water"
+			],
+			[
+				"natural",
+				"beach"
+			],
+			[
+				"leisure",
+				"swimming_pool"
+			],
+			[
+				"man_made",
+				"pier"
+			]
+		],
+		"planters": {
+			"osm": [
+				"way/234797329",
+				"way/234797330"
+			],
+			"height": 0.45,
+			"border": 0.25,
+			"color": "#aaa69c",
+			"top_color": "#4f6e35",
+			"models": {
+				"way/234797329": "bon_co_234797329",
+				"way/234797330": "bon_co_234797330"
+			},
+			"models_note": "The raised lawns that are models of data/world/drawings/ (D-0026-08), at their places of data/world/places/bai_truoc.json: the stand-in keeps only its collision and the seats of the sitters."
+		},
+		"beach_wall": {
+			"walks": [
+				"way/234797331"
+			],
+			"near_beach_m": 4.0,
+			"min_length_m": 3.0,
+			"style": "balustrade",
+			"height": 0.8,
+			"width": 0.4,
+			"base": 0.3,
+			"rail": 0.14,
+			"post": 0.32,
+			"post_every": 2.4,
+			"opening_every_m": 40.0,
+			"opening_m": 2.4,
+			"color": "#b3ada1",
+			"model": "tuong_bai_tam",
+			"poles": {
+				"kind": "blue_double",
+				"every_m": 30.0,
+				"from_end_m": 10.0,
+				"in_m": 1.0,
+				"note": "Report 0026, D-0026-19: the blue poles of the walk of the sea along the low wall of the beach, 1 m in from the wall, with the long arm over the walk. The photo of 2014-03-09 (Commons, CC BY-SA 3.0, beach_wall_2014.jpg) shows a pole by the wall; the photo of S1 (2014-04-05) shows the poles along the walk at the left of the beach, and the photo from a drone of 2021-01-30 (drone_2021_park.jpg) the poles at the beach edge of the walk. The spacing of 30 m is by eye from the photo of S1 (an estimate)."
+			},
+			"steps": {
+				"model": "bac_xuong_cat",
+				"min_drop_m": 0.25,
+				"note": "Report 0026, Q19: the granite steps down to the sand in each opening of the low wall (data/world/drawings/bac_xuong_cat.json: 8 steps of 0.18 m on treads of 0.3 m). The piece is scaled up and down to the drop from the walk to the sand at its foot; with less than min_drop_m, the opening has no steps."
+			}
+		},
+		"paving_texture": {
+			"texture": "walk_slabs",
+			"tint": "#c2cdf1",
+			"mean": "#cebcae",
+			"note": "R12: the slabs of the walk and of the squares (the photos of S5 of 2014 and 2015: pale stone with a pink tone). The texture times tint times gain (the slabs of the photos are paler than the texture); mean is the color from far. Report 0026, D-0026-30 (audit 6): with the tint #fff2e6 and the gain 1.5 the square of the south end was darker than the sand at 17:00 and looked like it; the drone photo of 2021 gives the clean slabs of the square #cebcae, so tint times gain times the mean of the texture (#87755c) is that color.",
+			"gain": 2.0
+		}
+	},
+	"park_note": "The outline of OpenStreetMap way 220617822 (leisure=park, Công viên Bãi Trước).",
+	"median": {
+		"ways": [
+			200554615,
+			1558591261
+		],
+		"curb_height": 0.15,
+		"curb_width": 0.3,
+		"curb_colors": [
+			"#b5332c",
+			"#ebe9e1"
+		],
+		"curb_band_m": 1.0,
+		"top_color": "#4f6e35",
+		"min_gap_m": 1.2,
+		"note": "The south part of Quang Trung: two roads of about 10 m with a median of about 3 m (survey of World plan 0018, section 3.1). The curb is red and white in bands (R2), the median has a hedge and a lawn (photos from a drone, 2021-01-30).",
+		"trees": {
+			"type": "araucaria",
+			"spacing_m": 12.0,
+			"from_end_m": 6.0,
+			"note": "R9: a row of Norfolk pines on the median of Quang Trung (Wikimedia Commons, Tuong Lam Photos, a photo from a drone, 2021-01-30, CC BY-SA 4.0; the World survey of Quang Trung, photo c07 of 2014). The spacing is by eye from the photo of 2021."
+		},
+		"lamps": {
+			"kind": "blue_double",
+			"every_m": 36.0,
+			"from_end_m": 12.0,
+			"note": "R9: the light blue lamp poles with two curved arms on the median (the photo from a drone of 2021-01-30; photos of 2014). The spacing is by eye from the photo of 2021."
+		},
+		"hedge_note": "No hedge: the photos of Tết 2019 (Flickr, quitle, 2019-02-07) show the median of Quang Trung as a lawn with its row of Norfolk pines and no hedge (the photo of 2014 shows low bushes). Report 0026, D-0026-08."
+	},
+	"sidewalks": [
+		{
+			"way": 200554615,
+			"side": "right",
+			"width": 6.5,
+			"height": 0.15,
+			"color": "#b9a68d",
+			"curb_color": "#c9c6bd",
+			"note": "The sidewalk of the side of the town, with tiles: about 5.5 m in the survey (section 3.1); 6.5 m reaches the fronts of the survey (11.5 m from the line of the road). Where a model of World stands, its own sidewalk is there."
+		},
+		{
+			"way": 1558591261,
+			"side": "right",
+			"width": 2.5,
+			"height": 0.15,
+			"color": "#b9a68d",
+			"curb_color": "#c9c6bd",
+			"note": "The sidewalk of the side of the park (a guess of its width: Check)."
+		},
+		{
+			"way": 235149400,
+			"side": "right",
+			"width": 3.0,
+			"height": 0.15,
+			"color": "#b9a68d",
+			"curb_color": "#c9c6bd",
+			"note": "The sidewalk of the side of the hill of Hạ Long, from Quang Trung (its width is a guess: Check)."
+		},
+		{
+			"way": 1423071603,
+			"side": "left",
+			"width": 3.0,
+			"height": 0.15,
+			"color": "#b9a68d",
+			"curb_color": "#c9c6bd",
+			"note": "The sidewalk of the side of the hill of Hạ Long (its width is a guess: Check)."
+		},
+		{
+			"way": 200554632,
+			"side": "left",
+			"width": 3.0,
+			"height": 0.15,
+			"color": "#b9a68d",
+			"curb_color": "#c9c6bd",
+			"note": "The sidewalk of the side of the hill of Hạ Long to Hải Âu (its width is a guess: Check)."
+		}
+	],
+	"path_borders": {
+		"types": [
+			"footway",
+			"pedestrian"
+		],
+		"inside": "park",
+		"height": 0.14,
+		"width": 0.16,
+		"color": "#8f8c86",
+		"chunk_m": 60.0,
+		"far_m": 120.0,
+		"note": "The lawns of the park have granite borders along the paths (photos of section 3, S5).",
+		"far_note": "The borders are in squares of chunk_m, each to far_m (a border of 14 cm is less than a pixel there): PT-73, as one mesh for the whole park of 480 m, they were 10 700 triangles of S2 and 12 700 of S5 on Low (audit 3 of the corrections)."
+	},
+	"walls": [
+		{
+			"ways": [
+				458829436,
+				458829438
+			],
+			"side": "left",
+			"style": "balustrade",
+			"height": 0.8,
+			"width": 0.4,
+			"base": 0.3,
+			"rail": 0.14,
+			"post": 0.32,
+			"post_every": 2.4,
+			"opening_every_m": 40.0,
+			"opening_m": 2.4,
+			"color": "#b3ada1",
+			"note": "The low wall of granite blocks between the walk of the sea and the beach (R4): a base, square posts, and a top rail with gaps under it, as in the photo of S5 (2014, Wikimedia Commons, Lam Tr Th, CC BY-SA 3.0). The sizes are by eye from the photo. R10: an opening to the sand of one span (opening_m) in the middle of each opening_every_m of the wall, so that people go down to the beach (PT-35, PT-75): builder values (status check), as I found no photo of the places of the steps.",
+			"model": "tuong_bai_tam",
+			"steps": {
+				"model": "bac_xuong_cat",
+				"min_drop_m": 0.25,
+				"note": "Report 0026, Q19: the granite steps down to the sand in each opening of the low wall (data/world/drawings/bac_xuong_cat.json: 8 steps of 0.18 m on treads of 0.3 m). The piece is scaled up and down to the drop from the walk to the sand at its foot; with less than min_drop_m, the opening has no steps. Report 0026, D-0026-26: the low walls of the walks of the park have the same steps (PT-77: the sand is 0.6 m to 2.3 m under the walk at their openings, and they had none)."
+			}
+		},
+		{
+			"side": "left",
+			"style": "balustrade",
+			"height": 0.8,
+			"width": 0.4,
+			"base": 0.3,
+			"rail": 0.14,
+			"post": 0.32,
+			"post_every": 2.4,
+			"color": "#b3ada1",
+			"model": "tuong_bai_tam",
+			"lines": [
+				[
+					[
+						-5.8,
+						112.5
+					],
+					[
+						-5.8,
+						189.8
+					]
+				]
+			],
+			"opening_every_m": 0.0,
+			"opening_m": 0.0,
+			"note": "Report 0026, D-0026-30 (audit 6): the parapet of the square of the south end over the water: the drone photo of 2021 (drone_2021_park.jpg) shows a low wall with a light top along the sea edge of the square, from the walk of the sea to the south tip of the square, as the low wall of the beach. Its line is the sea edge of the square in the build (x = -6, the outline of south_end_square), 0.2 m inside the paving; it has no openings (the sea is under it)."
+		}
+	],
+	"sea_walls": [
+		{
+			"ways": [
+				200554629,
+				1423071603,
+				200554632
+			],
+			"side": "right",
+			"until_z": 560.0,
+			"width": 7.0,
+			"walk": 3.0,
+			"over_sidewalk": true,
+			"over_sidewalk_note": "The walk goes from the curb of the road to the parapet: it covers the sidewalk of the road on the sea side (2 m, scripts/geo/road_builder.gd). The photo of the sea wall of 2014 (ha_long_slope_2014.jpg) shows the paved walk from the parapet to the curb of the road, with no strip of ground (report 0026, D-0026-04).",
+			"walk_color": "#b9a68d",
+			"parapet": 0.6,
+			"color": "#77746c",
+			"note": "The walk on the sea side of Hạ Long and the sea wall of stone blocks under it, from Quang Trung to Cầu Đá (R4, R6; photos of trungydang, 2014).",
+			"models": [
+				"lan_can_ha_long",
+				"tru_lan_can_ha_long",
+				"ke_ha_long"
+			],
+			"parapet_model": "lan_can_ha_long",
+			"pillar_model": "tru_lan_can_ha_long",
+			"pillar_every_m": 10.0,
+			"pieces_note": "The parapet is pieces of the models lan_can_ha_long (grey granite, 2 m) and tru_lan_can_ha_long (a panel of red brown granite, 0.75 m) of data/world/drawings/, a panel about every 10 m (VnExpress, 2021-07-16: the walk of Hạ Long with dark red pillars about every 10 m). The slope of the sea wall is pieces of the model ke_ha_long (Source, report 0026, Q17 and D-0026-27), scaled in height to the drop at each place (slope_model); the plain face keeps its collision.",
+			"slope_model": "ke_ha_long",
+			"lamps": {
+				"kind": "globe_cast",
+				"every_m": 40.0,
+				"first_m": 20.0,
+				"in_m": 0.65,
+				"note": "Report 0026, D-0026-31: the cast green posts with five white globes (den_cot_den_cau_xanh) on the walk at the parapet. The photo of Mapillary 1927330624091805 (2018-07-29, hoangvietanh, CC BY-SA 4.0) shows a post at the parapet, with no other post in about 30 m of the parapet; the photo from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0, drone_2021_ha_long.jpg) shows posts with white heads at the parapet, about one every 40 m (an estimate from the photo). in_m: the foot 0.35 m in from the inner face of the parapet (0.3 m thick)."
+			}
+		}
+	],
+	"stand_ins": {
+		"storey_m": 3.3,
+		"color": "#c9c4b8",
+		"roof_color": "#a89f90",
+		"note": "A building of OSM in the area that World does not have yet (R7): its outline, and its storeys from OSM (building:levels) or from a photo (\"storeys\", by its OSM id, with its source and its status). A building with no storeys from a source is left out (report 0026, Q6: count the storeys from the photos; a stand-in of 1 storey is not correct in a shot). A building under a model of World, or around one, has no stand-in. \"height\" replaces the storeys for a building with a high roof; \"pyramid_roof\" puts a roof of four sides of that height on the walls.",
+		"storeys": {
+			"way/259750558": {
+				"storeys": 12,
+				"name": "Khách sạn Bưu điện (158 Hạ Long)",
+				"source": "About 12 storeys counted from a photo from a drone of 2021-01-30 (Wikimedia Commons, Tuong Lam Photos, CC BY-SA 4.0, File:Vung_Tau,_Viet_Nam_2021.jpg); a hotel list gives it an outdoor pool, as the photo shows.",
+				"status": "Source"
+			},
+			"way/225803473": {
+				"storeys": 1,
+				"height": 3.9,
+				"pyramid_roof": 6.2,
+				"roof_color": "#c8704a",
+				"name": "The hall with the roof of orange tiles by Hạ Long",
+				"source": "The shot S1 (Commons, trungydang, 2014-04-05, CC BY 3.0): the front of 19 m is 710 px, the walls 145 px (3.9 m), the pyramid roof 230 px (6.2 m); the drone photo of 2021-01-30 (Tuong Lam Photos, CC BY-SA 4.0) and the photo of 2019-04-30 (Tuổi Trẻ) show the same roof. The model nha_mai_ngoi_cam of data/world/drawings/.",
+				"status": "Source"
+			},
+			"way/580493843": {
+				"storeys": 2,
+				"name": "The low building east of Khách sạn Bưu điện",
+				"source": "The photos from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0, Vung_Tau,_Viet_Nam_2021.jpg and Vung_Tau,_Viet_Nam.jpg): east of the wing of Khách sạn Bưu điện with the pool (the pool is in the outline of way/259750558, data/world/drawings/khach_san_buu_dien.json), a low building of two storeys.",
+				"status": "Source"
+			},
+			"way/580493842": {
+				"storeys": 3,
+				"name": "The building south of Cảng vụ",
+				"source": "The shot S3 (Commons, trungydang, 2014-04-06, CC BY 3.0): at its right edge, the building south of Cảng vụ has a ground floor and two storeys with balconies.",
+				"status": "Source"
+			},
+			"way/790529521": {
+				"storeys": 2,
+				"name": "The shops north of Hải Âu",
+				"source": "The photo of Hải Âu (Commons, trungydang, 2014-04-05, CC BY 3.0, Ks_Hai_au...jpg): north of Hải Âu, the shops have a ground floor and one storey over it.",
+				"status": "Source"
+			},
+			"way/790529522": {
+				"storeys": 2,
+				"name": "The shops north of Hải Âu",
+				"source": "As way/790529521.",
+				"status": "Source"
+			},
+			"way/790529523": {
+				"storeys": 6,
+				"name": "Khách sạn Hải Âu (until the model khach_san_hai_au of data/world/drawings/ is in the game)",
+				"source": "The photo of Hải Âu (Commons, trungydang, 2014-04-05, CC BY 3.0): the middle block has a ground floor and five storeys (the wings have five storeys). The model khach_san_hai_au of data/world/drawings/.",
+				"status": "Source"
+			},
+			"way/791795131": {
+				"storeys": 1,
+				"name": "The back wings of the Grand Hotel around its courtyard",
+				"source": "Report 0026, D-0026-14: one storey with a roof terrace at 4.1 m, not three. The images from above of 2018-07-04 and 2020-11-18 (Esri World Imagery Wayback, not open) show the plan, the roof terrace, the pergola, and the tile roofs of the low blocks behind the main block; the photo of S4 and the photo from Nguyễn Du (Commons, trungydang, 2014-04-06, CC BY 3.0) show the hall on the terrace. The terrace is level with the terrace over the porch of the main block (4.1 m in the photo of S4). The three storeys before came from the photo of the south wing (2015), which is another wing. The model khach_san_grand_canh_sau of data/world/drawings/ (Check: the ground storey, the pergola, and the letters show only in photos with no date or after 2021).",
+				"status": "Source",
+				"height": 4.1
+			},
+			"way/791795151": {
+				"storeys": 4,
+				"name": "Nhà thiếu nhi tỉnh Bà Rịa - Vũng Tàu (until World plan 0018, step 4)",
+				"source": "The photo of the survey of World plan 0018, c13 (Commons, trungydang, 2014-04-06, CC BY 3.0, Nha_thieu_nhi_tin_ba_ria_vung_tau...jpg): the middle and the left blocks have a ground floor and three storeys, with a spire; the right hall is as high.",
+				"status": "Source"
+			},
+			"way/225803467": {
+				"storeys": 7,
+				"name": "Cao ốc Sen Biển (the Lotus Tower), its stepped block",
+				"source": "The shot S1 (Commons, trungydang, 2014-04-05, CC BY 3.0): the stepped block of blue and white bands is 135 px high at 574 m, and Khách sạn Bưu điện (12 storeys, about 40 m) 255 px at 511 m: about 24 m, 7 storeys. The photo of 2019-04-30 (Tuổi Trẻ) shows the same block. Its tower of glass (about 46 m) is not in the stand-in: it waits for a model of data/world/drawings/",
+				"status": "Source"
+			}
+		},
+		"extra": [
+			"way/225803467"
+		],
+		"extra_note": "Buildings of OSM out of the outline that the shots show (S1, S2): Cao ốc Sen Biển (the Lotus Tower) by Hạ Long.",
+		"left_out": {
+			"way/200554626": "Bến tàu cánh ngầm cũ, the old hydrofoil terminal: the OSM outline is the area of the port, not the building, and its box of 11 m stood over the shore end of the jetty of Cầu Đá and over the way to it (report 0026, D-0026-14). The building waits for its real outline."
+		},
+		"jetty_access": 235006085,
+		"jetty_access_note": "The way from the land to the shore end of the jetty of Cầu Đá: the path of the port (OSM way). The shore end of the deck is in the outline of the old hydrofoil terminal, so a stand-in leaves a passage along the deck and a passage from the shore end to the nearest point of this path (report 0026, D-0026-02: with the terminal at its height of the photo, the passage along the deck had no way in from the land; PT-74 run 8).",
+		"footprints": {},
+		"footprints_note": "Footprints of data/geo/build/footprints.json (Overture Maps) with their storeys from a photo: a stand-in on each (report 0026, D-0026-03). footprints_check lists the footprints near Hạ Long that a photo shows, but that I could not match to a building of the photo: they are not built.",
+		"footprints_check": {
+			"ids": [
+				"7cf06628-919e-458c-a8ba-b1ec8df0b8ad",
+				"bc006ac7-527c-4245-8288-b983873d056f",
+				"14e9cc96-7945-4369-844d-3faf5f0a501c",
+				"7385085b-a969-46ae-a22e-ae91d9586356",
+				"2ba1be26-eea3-4b38-8b73-aca7214251e4",
+				"4bd59211-1078-4c78-9206-752ec0033a08",
+				"57b758fc-e8f3-4b70-9444-906f1f0a2156",
+				"1c5a20a3-3f1e-49f0-b5d6-c67489c42609",
+				"47aada3d-e713-469f-a3b5-951a768147d5",
+				"44638a03-21e2-4405-b2d8-a8cce0e21694",
+				"4222f4ed-7112-4e59-81ec-d4f076824dc0",
+				"45174a9a-ead8-4490-84d4-f2dc86f02b46",
+				"738e024c-5f43-4c3b-8180-4b698b6f9465",
+				"d5ec4995-8620-4f45-8bcf-b4ddc29c2e92",
+				"16abe3ee-5b3a-4611-9b9a-c8bab4e84b92",
+				"cfe23015-f259-4e15-a470-b7c84fdfcafd",
+				"0d260804-e804-4c0b-b492-605c21e335c1",
+				"bfba093a-b313-4ecc-96fc-236eafceb9cc",
+				"e777bf07-def7-4685-b0d0-f16fdde292bc",
+				"762c335f-1f46-4f4a-9846-91bfb22b756a",
+				"45b448e9-7ee2-452b-980f-196d0de29d08",
+				"e0d92ead-7af0-44c0-a922-0580f6eb0103",
+				"66f44e96-135e-4157-9a09-a1c0f5ba7bc5",
+				"2037171d-0d9e-40cd-b809-6d827e772db8",
+				"69d6c45d-4a9c-49f8-b43d-e0cdf1eaa009",
+				"9991c136-b4e0-46e0-a80b-d16f9ac2940a",
+				"fdc62561-316a-4c62-acef-40d6239cbf18"
+			],
+			"reason": "The photo from a drone of 2021-01-30 shows houses, villas, and hotels of one to six storeys on this side of the hill, but these footprints could not be matched one by one to the buildings of the photo: their storeys are Check.",
+			"notes": {
+				"fdc62561-316a-4c62-acef-40d6239cbf18": "Report 0026, Q22 (decided 2026-11-19 from the street photos of Mapillary): the images of 2024-11-09 (lyduchuy, CC BY-SA 4.0, docs/reference/mapillary/sheet_q22_ha_long_fronts_after_1.jpg) show the fronts along Hạ Long west of the hall: a row of low restaurants under large tarp roofs at the road, and the fence with blue posts of the hall. No image of 2017 to 2021 shows them (Mapillary has none there), and no image matches this footprint, which is behind the block of Sen Biển in the photo from a drone of 2021. So the stand-in is off until a photo of 2017 to 2021 shows the building (Q13: a footprint that no photo shows stays off)."
+			}
+		}
+	},
+	"beached": [
+		{
+			"model": "thung_chai",
+			"material_set": "boat",
+			"min_ground": 1.0,
+			"points": [
+				[
+					-2.0,
+					104.0,
+					20.0
+				],
+				[
+					1.0,
+					112.0,
+					75.0
+				],
+				[
+					-3.0,
+					118.0,
+					140.0
+				],
+				[
+					2.0,
+					126.0,
+					200.0
+				],
+				[
+					3.0,
+					140.0,
+					300.0
+				]
+			],
+			"note": "R5: basket boats (thúng chai) on the sand at the south end of the beach, above the water line: x, z, and the turn in degrees. The landing of the boats of Bãi Trước (Tuổi Trẻ, 2017-08-02) and two thúng chai on the beach on 2019-01-24 (Flickr, Ted McGrath). Their places are a guess (plan 0026, Q3). A point with ground lower than min_ground (m) has no boat."
+		},
+		{
+			"model": "ghe_danh_ca",
+			"material_set": "boat",
+			"min_ground": 0.5,
+			"length_m": 11.15,
+			"sink_m": 0.15,
+			"points": [
+				[
+					-40.25,
+					-128.0,
+					108.0
+				],
+				[
+					-37.25,
+					-116.0,
+					102.0
+				],
+				[
+					-33.25,
+					-104.0,
+					110.0
+				],
+				[
+					-31.25,
+					-92.0,
+					104.0
+				],
+				[
+					-27.25,
+					-80.0,
+					112.0
+				]
+			],
+			"note": "Report 0026, D-0026-20: the fishing boats (the ghe of World, Q10) pulled up on the sand in front of the shot S1, with the bow to the land: x, z, and the turn in degrees (105 puts the bow, with its eyes, at right angles to the water's edge there, to the land). The photo of S1 (2014-04-05, docs/reference/photos/shot_s1_2014.jpg) shows a row of ghe pulled up at the water's edge in front of the hotels of Hạ Long, with the sea round their sterns, and the landing of the boats of Bãi Trước is on this beach (Tuổi Trẻ, 2017-08-02: Source). The middle of each boat is where the ground of the game is 0.9 m: at a high tide the sea is round its stern, at a low tide it is on the sand. The swimmers keep away from them. The places along the beach are builder values: in the photo the row of boats is behind the people in the water, at 430 px to 470 px of 1045 under the top, and the edge of the water at that height of the frame of the shot is from z -130 to z -100; so the row is from z -128 to z -80 (five boats: the far level of a ghe is 3 000 triangles, and seven made the shot S2 too many triangles on Low, PT-73), and the water in front of it (z -180 to z -130) is free for the swimmers (from z -160 to z -84, the boats hid the swimmers from the eye of S1). length_m: the length of the model, which lies along the slope of the sand; sink_m: the keel in the sand."
+		}
+	],
+	"lamp_kinds": {
+		"note": "R9: the lamps of the park and of Quang Trung. Each kind names its model (\"model\": data/world/drawings/ID.json, a lamp of the blueprint den_cong_vien that I make with the tools of World, report 0026, D-0026-09). The game shows the model when its order is in data/world/orders.json; until then, it shows a stand-in from the other values of the kind. R14: at night (DayLight.lamps_on()), the surfaces of the role glow_role of a model glow (the head of a stand-in), and each kind with \"light\" lights the ground. The warm color is the color of the lamps of the photo of S5 at dusk (2015).",
+		"blue_double": {
+			"shape": "arms",
+			"height": 10.6,
+			"base_radius": 0.1,
+			"top_radius": 0.055,
+			"arms": 2,
+			"arm_length": 1.6,
+			"arm_rise": 0.35,
+			"head": [
+				0.55,
+				0.12,
+				0.24
+			],
+			"pole_color": "#2f6aa8",
+			"head_color": "#e9e8e2",
+			"note": "The blue pole with a long arm and a short arm at the top, a globe and a horn at the middle (the model den_cot_xanh_hai_tay: the arms at 10.6 m). The values of the stand-in follow it.",
+			"light": {
+				"color": "#FFC982",
+				"energy": 1.6,
+				"range": 17.0,
+				"y": 0.4,
+				"note": "The arms of the lamp are at 10.6 m (the model den_cot_xanh_hai_tay): a range of 17 m makes a pool of light of about 13 m on the ground (PT-76)."
+			},
+			"model": "den_cot_xanh_hai_tay",
+			"glow_role": "part_02"
+		},
+		"globe_post": {
+			"shape": "globes",
+			"height": 3.9,
+			"base_radius": 0.08,
+			"top_radius": 0.05,
+			"globes": 4,
+			"globe_radius": 0.2,
+			"arm_length": 0.35,
+			"pole_color": "#3a3d3c",
+			"head_color": "#f1f0ea",
+			"note": "The dark post with four white globes round its top and one on it (the model den_cot_den_cau: 4.3 m to the top of the top globe). The values of the stand-in follow it.",
+			"light": {
+				"color": "#FFE2B8",
+				"energy": 0.8,
+				"range": 7.0,
+				"y": 0.0
+			},
+			"model": "den_cot_den_cau",
+			"glow_role": "part_02"
+		},
+		"path_lamp": {
+			"shape": "box_lamp",
+			"height": 0.7,
+			"body": 0.32,
+			"cap": 0.4,
+			"cap_height": 0.08,
+			"head_color": "#ece8da",
+			"pole_color": "#d8d6ce",
+			"note": "A low square lamp at the side of a path of the park (the model den_vuon_thap). Its panes (the role part_02) glow at night. Its far level ends at 60 m (a lamp of 0.70 m is some pixels there). The other values are the stand-in.",
+			"model": "den_vuon_thap",
+			"glow_role": "part_02",
+			"far_end_m": 60.0,
+			"ranges": {
+				"low": [
+					6.0,
+					30.0,
+					60.0
+				]
+			},
+			"ranges_note": "On Low the near level of the low lamp (6 376 triangles) shows to 6 m only, its mid level (300) to 30 m, and its far level to 60 m (PT-73: with the near level to 15 m, the shot S5 had more than 300 000 triangles on Low)."
+		},
+		"globe_cast": {
+			"shape": "globes",
+			"height": 4.8,
+			"base_radius": 0.3,
+			"top_radius": 0.05,
+			"globes": 4,
+			"globe_radius": 0.19,
+			"arm_length": 0.45,
+			"pole_color": "#1c564a",
+			"head_color": "#efeee8",
+			"note": "The cast green post with four white globes round its top and one on it (the model den_cot_den_cau_xanh: 4.8 m to the top of the top globe). The values of the stand-in follow it.",
+			"light": {
+				"color": "#FFE2B8",
+				"energy": 0.8,
+				"range": 7.0,
+				"y": 0.0
+			},
+			"model": "den_cot_den_cau_xanh",
+			"glow_role": "part_02"
+		}
+	},
+	"lamp_rows": [
+		{
+			"way": 1558591261,
+			"side": "right",
+			"offset_m": 0.7,
+			"kind": "blue_double",
+			"every_m": 36.0,
+			"from_end_m": 18.0,
+			"note": "R9: the lamp poles on the sidewalk of the park (the photo from a drone of 2021-01-30).",
+			"long_arm_over_way": true,
+			"long_arm_note": "The long arm of the pole reaches over the road. The photos of 2014 and 2019 show the poles of the walk of the sea with the long arm over the walk and the beach; for the poles of Quang Trung, this side is a builder value."
+		},
+		{
+			"way": 458829436,
+			"side": "left",
+			"offset_m": -0.8,
+			"kind": "blue_double",
+			"every_m": 40.0,
+			"from_end_m": 10.0,
+			"long_arm_over_way": true,
+			"note": "Report 0026, D-0026-19: the blue poles of the walk of the sea, 0.8 m in from the low wall of the beach. The photo of 2014-03-09 (Commons, CC BY-SA 3.0, beach_wall_2014.jpg) shows a pole by the wall with its long arm over the walk, and the photo from a drone of 2021-01-30 (Tuong Lam Photos, CC BY-SA 4.0, drone_2021_park.jpg) shows the poles at the beach edge of the walk. The spacing of 40 m is an estimate (no source): about four poles along the part of the walk in the photo from the drone."
+		},
+		{
+			"way": 458829438,
+			"side": "left",
+			"offset_m": -0.8,
+			"kind": "blue_double",
+			"every_m": 40.0,
+			"from_end_m": 10.0,
+			"long_arm_over_way": true,
+			"note": "Report 0026, D-0026-19: the blue poles of the walk of the sea, 0.8 m in from the low wall of the beach. The photo of 2014-03-09 (Commons, CC BY-SA 3.0, beach_wall_2014.jpg) shows a pole by the wall with its long arm over the walk, and the photo from a drone of 2021-01-30 (Tuong Lam Photos, CC BY-SA 4.0, drone_2021_park.jpg) shows the poles at the beach edge of the walk. The spacing of 40 m is an estimate (no source): about four poles along the part of the walk in the photo from the drone."
+		}
+	],
+	"path_lamps": {
+		"kind": "path_lamp",
+		"types": [
+			"footway"
+		],
+		"every_m": 14.0,
+		"offset_m": 0.45,
+		"from_end_m": 3.0,
+		"note": "R9: the low lamps along the paths of the park, at alternate sides (the photo of S2 of 2014). The spacing is a builder value."
+	},
+	"park_plants": {
+		"note": "Report 0026, D-0026-17 and Q19: the park of the photos (park_paths_2014.jpg, park_flower_bed_2014.jpg, park_bushes_2014.jpg; the photo of 2018-03-08 on Flickr and the photo from a drone of 2021-01-30 show the bushes and the hedges, so they are Source by Q17, rule 2). Low clipped hedges (hang_rao_cong_vien) stand at the edge of the lawns along the paths of the park, offset_m behind the granite border, with a gap at each low lamp and at each bench, and junction_gap_m from the other paths; benches (ghe_da_cong_vien) stand in gaps of the hedges, to the path, about every every_m; groups of 3 to 5 round bushes (bui_cay_tron, the tall one at the back: 1.25 to 1.5 times the model, as the photos) stand behind the hedge at some corners where paths meet (part: the part of the ends of the hedges with a group); round flower beds of purple flowers (cay_hoa_tim_bon_hoa) in a granite border stand on the lawn behind the middle of some long hedges (the photos show round beds of 3 m to 5 m). The plants are on the lawn of the ground mask and away from the trunks of the trees. The parts, the offsets, and the spacing are builder values; the places of the beds and of the groups are not from a photo (the photos do not show all of them).",
+		"seed": 17,
+		"cell_m": 24.0,
+		"ranges": {
+			"low": [
+				0.0,
+				6.0,
+				80.0
+			]
+		},
+		"hedges": {
+			"model": "hang_rao_cong_vien",
+			"types": [
+				"footway"
+			],
+			"offset_m": 0.3,
+			"junction_gap_m": 1.5,
+			"lamp_gap_m": 0.35,
+			"min_run_m": 4.0
+		},
+		"benches": {
+			"model": "ghe_da_cong_vien",
+			"every_m": 26.0
+		},
+		"bushes": {
+			"model": "bui_cay_tron",
+			"part": 0.45,
+			"count": [
+				3,
+				5
+			],
+			"behind_m": 1.9
+		},
+		"flower_beds": {
+			"model": "cay_hoa_tim_bon_hoa",
+			"part": 0.5,
+			"min_run_m": 30.0,
+			"radius_m": [
+				1.4,
+				2.0
+			],
+			"behind_m": 2.0,
+			"border_m": 0.16,
+			"border_height_m": 0.12,
+			"spacing": 0.9,
+			"clump_scale": 1.5
+		},
+		"ranges_note": "On Low: no near level, the mid level to 6 m, the far level to 80 m (a hedge piece: 300 and 40 triangles; a bush: 600, then the impostor; a clump of flowers: 400, then the impostor). PT-73: S2 and S5 stay under 300 000 triangles also with the walkers near the eye of S2 (the mid level to 10 m and the walkers in the frame of S2 made 303 438 in the CI of 6cb8daa)."
+	},
+	"materials": {
+		"note": "R12: the colors of the parts that take a texture set of data/look/textures.json (shaders/showcase_surface.gdshader). tint multiplies the texture; tones makes the dark and the light of the texture two colors; mean is the color from far. The other colors stay flat. Builder values from the photos of section 3 and the photo from a drone of 2021: I approve them with the shots of PT-72.",
+		"#b9a68d": {
+			"texture": "sidewalk_tiles",
+			"tones": [
+				"#8f8d88",
+				"#dcdad4"
+			],
+			"tone_range": [
+				0.04,
+				0.11
+			],
+			"note": "The sidewalks and the walk of Hạ Long: grey and white tiles in a checker pattern."
+		},
+		"#c9c6bd": {
+			"texture": "granite",
+			"tint": "#e2ded6",
+			"mean": "#a9a5a0",
+			"note": "The curbs of the sidewalks."
+		},
+		"#8f8c86": {
+			"texture": "granite",
+			"tint": "#c8c4bd",
+			"mean": "#a9a5a0",
+			"note": "The borders of the paths of the park."
+		},
+		"#b3ada1": {
+			"texture": "granite",
+			"tint": "#ebe6dc",
+			"mean": "#a9a5a0",
+			"note": "The low wall along the beach."
+		},
+		"#aaa69c": {
+			"texture": "granite",
+			"tint": "#e2ddd3",
+			"mean": "#a9a5a0",
+			"note": "The borders of the raised lawns."
+		},
+		"#77746c": {
+			"texture": "granite",
+			"tint": "#a7a299",
+			"mean": "#a9a5a0",
+			"note": "The sea wall of Hạ Long."
+		},
+		"#c9c4b8": {
+			"texture": "plaster",
+			"tint": "#f1ece2",
+			"mean": "#8e8779",
+			"note": "The stand-ins of the buildings."
+		}
+	},
+	"lamp_glow": 3.0,
+	"wall_pieces": {
+		"cell_m": 24.0,
+		"ranges": {
+			"low": [
+				0.0,
+				12.0,
+				120.0
+			]
+		},
+		"note": "The pieces of the walls that are models of this game (the parapet of Hạ Long, the low wall of the beach): one row of MultiMeshes in cells of cell_m (fewer draw calls than cells of 6 m), and on Low no near level (as the buildings of plan 0026, D6): the mid level (470 triangles for a span of the low wall) to 20 m, the far level (60) to 120 m. PT-73: with the near level on Low and cells of 6 m, S5 had 575 draw calls and 322 686 triangles; with the mid level to 40 m and the far level to 150 m, 304 656. Audit 3 of the corrections: with the pieces under the wall, the steps, and the fence of the Grand Hotel, S5 had 297 768 with the mid level to 20 m (a range is for a whole cell); with 12 m, less, so that the CI has room for the walkers.",
+		"under_model": "ke_da_bai_truoc",
+		"under_ranges": {
+			"low": [
+				0.0,
+				0.0,
+				40.0
+			]
+		},
+		"fence_ranges": {
+			"low": [
+				0.0,
+				40.0,
+				150.0
+			]
+		},
+		"fence_ranges_note": "The spans of the fences (a row of their own): on Low the mid level (400 triangles a span) to 40 m and the far level to 150 m. With the ranges of the walls (the mid level to 12 m), the fence of the Grand Hotel in S4 on Low was its far level, a row of grey teeth (the sheet of S4 of audit 3 of the corrections).",
+		"under_ranges_note": "The pieces under the low wall (a row of their own, with no shadow): on Low only the far level (80 triangles) to 40 m: from the walk the wall hides them, and a range is for a whole cell of cell_m (with the mid level to 6 m, all the pieces of the cell of the eye had the mid level). PT-73: with the ranges of the walls (20 m and 120 m) and the shadow, S5 had 312 688 triangles; with the mid level to 8 m, the far level to 80 m, and no shadow, 306 528; with 6 m and 40 m, 305 568.",
+		"under_note": "Report 0026, D-0026-27: the sloped sea wall of granite blocks under each span of the low wall of the beach, on the side of the sand (data/world/drawings/ke_da_bai_truoc.json)."
+	},
+	"fences": [
+		{
+			"model": "hang_rao_khach_san_grand",
+			"span_m": 2.8,
+			"height_m": 1.16,
+			"line": [
+				[
+					109.5,
+					-20.67
+				],
+				[
+					110.55,
+					-16.9
+				],
+				[
+					111.6,
+					-13.13
+				],
+				[
+					112.72,
+					-9.12
+				],
+				[
+					113.25,
+					-6.67
+				],
+				[
+					114.04,
+					-2.97
+				],
+				[
+					114.83,
+					0.74
+				],
+				[
+					115.62,
+					4.46
+				],
+				[
+					116.41,
+					8.18
+				],
+				[
+					117.2,
+					11.9
+				],
+				[
+					117.95,
+					15.47
+				],
+				[
+					118.78,
+					18.96
+				],
+				[
+					119.65,
+					22.61
+				],
+				[
+					120.52,
+					26.24
+				],
+				[
+					121.39,
+					29.88
+				],
+				[
+					122.27,
+					33.54
+				],
+				[
+					123.13,
+					37.18
+				],
+				[
+					123.99,
+					40.81
+				],
+				[
+					124.86,
+					44.46
+				],
+				[
+					125.82,
+					48.48
+				],
+				[
+					126.53,
+					52.66
+				],
+				[
+					127.17,
+					56.44
+				],
+				[
+					127.9,
+					60.8
+				],
+				[
+					128.18,
+					64.89
+				],
+				[
+					128.4,
+					68.33
+				],
+				[
+					128.64,
+					71.88
+				],
+				[
+					128.8,
+					75.02
+				],
+				[
+					128.96,
+					78.07
+				],
+				[
+					129.11,
+					81.21
+				],
+				[
+					129.24,
+					84.76
+				]
+			],
+			"gaps": [
+				[
+					26.7,
+					32.7
+				],
+				[
+					77.1,
+					81.1
+				]
+			],
+			"note": "Report 0026, D-0026-22: the fence of the Grand Hotel on the outer edge of the sidewalk of Quang Trung (11.6 m from the middle of the east road), from the corner of Nguyễn Du to the south end of the south wing. The photos of S4 and of the place of S4 (2014, Commons, trungydang, CC BY 3.0) and the street photo of Mapillary of 2024-11-09 (image 1251897522687108, lyduchuy, CC BY-SA 4.0) show the fence there, with the gate of the drive in front of the porch of the main block (gaps: 6 m at the middle of the front of the main block, and 4 m at the middle of the south wing; their widths are estimates by eye from the photo of S4). The model hang_rao_khach_san_grand of data/world/drawings/."
+		}
+	]
+}

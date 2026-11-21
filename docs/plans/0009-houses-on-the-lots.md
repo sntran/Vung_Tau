@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | In progress: phase 1a is done (2026-11-21); phase 1b waits for plan 0026 to go to `main`. Approved (2026-11-16), for the area of plan 0026 first. Changed (2026-11-18): all the sources of the data (section 3, "The sources"; D9 to D11, R1, R5 to R5e, Q1, Q5 to Q7). |
+| Status | In progress: phase 1a is done (2026-11-21). Approved (2026-11-16). Changed (2026-11-18): all the sources of the data (section 3, "The sources"; D9 to D11, R1, R5 to R5e, Q1, Q5 to Q7). Changed (2026-11-21): the whole town first, not the area of plan 0026 first (section 5). |
 | Branch | `feat/0009-houses-on-the-lots` |
 | Depends on | 0004 (the house kit and the palette), 0005 (the roads and the ground), 0008 (the known places stay as they are), 0023 (the houses come from World, D8). |
 | Used by | 0010 (the bus ride), 0011 to 0015 (the shops and the streets), 0021 (Tết), 0022 (the garden). |
@@ -160,7 +160,9 @@ Each source of the data of this plan, also the ones that the plan does not use, 
 1. The data pipeline and its report (R1 to R5e). I look at the maps in the report, and at the hills before and after R5b.
    - Changed (2026-11-18): phase 1 has two parts. **1a**: the fetches and the reports (R1, R5, R5a, R5c, R5d, R5e). They change nothing in the game, so they can start before plan 0026 is on `main`, on the branch of this plan. R5e is made on the branch of plan 0026 (my decision, 2026-11-19: plan 0026 uses the photos of Mapillary now), and it comes to this plan with plan 0026. They need no model of World and no construction shift of World. **1b**: the new ground (R5b). It changes the ground under the showcase of plan 0026, so it starts after plan 0026 is on `main`. Report 0026, D-0026-22 (the Grand Hotel on a bank of earth) is a fault of the same kind: the model of the surface has the trees of the garden and the roofs.
 2. The far level of the whole town (R6, R10), with boxes of the right size and roofs. I look from Núi Nhỏ and Núi Lớn.
+   - Changed (2026-11-21): this phase comes right after phase 1b, for the whole play area. A part of the town alone makes the comparisons with the photos hard (report 0026, section 12.5). The builder stops after this phase, and I look at the views of PT-68 before phase 3.
 3. The houses of World, near and mid (R7, R8, R9), one kind at a time: the tube house first.
+   - Changed (2026-11-21): first the streets between Bãi Trước and chợ Xóm Lưới (for example the road to the market at the corner of the shot S3 of plan 0026), then the rest of the town by its distance from them.
 4. The real hẻm and the homestay (R11).
 5. The streets near chợ Xóm Lưới (R12, R13), then the night (R14).
 

@@ -96,8 +96,9 @@ func _run() -> void:
 		return
 	var scenario: Object = load(path).new()
 	_limit_on = true
-	driver.step("start %s, phase %d, %s, %s" % [scenario_name, driver.phase,
-			GameClock.format_time(GameState.minutes), get_window().size])
+	driver.step("start %s, phase %d, %s, %s, first frame %.1f s after the start of the engine" % [
+			scenario_name, driver.phase, GameClock.format_time(GameState.minutes), get_window().size,
+			driver.main().first_frame_ms / 1000.0])
 	await scenario.run(driver)
 	_finish()
 

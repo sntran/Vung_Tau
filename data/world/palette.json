@@ -258,5 +258,65 @@
 				"weight": 0.086
 			}
 		]
+	},
+	"scooters": {
+		"note": "The paint colors of the scooters (plan 0023, R9a): white, red, black, gray, dark blue, and pastel colors. The weights are the share of each color. The source \"builder\" means a first value that I check.",
+		"status": "check",
+		"colors": [
+			{
+				"color": "#EDEDE8",
+				"weight": 0.22,
+				"name": "white",
+				"source": "builder"
+			},
+			{
+				"color": "#B3262A",
+				"weight": 0.16,
+				"name": "red",
+				"source": "builder"
+			},
+			{
+				"color": "#1E1F22",
+				"weight": 0.18,
+				"name": "black",
+				"source": "builder"
+			},
+			{
+				"color": "#8C8F93",
+				"weight": 0.12,
+				"name": "gray",
+				"source": "builder"
+			},
+			{
+				"color": "#1F3357",
+				"weight": 0.1,
+				"name": "dark blue",
+				"source": "builder"
+			},
+			{
+				"color": "#A8D5C2",
+				"weight": 0.06,
+				"name": "pastel mint",
+				"source": "builder"
+			},
+			{
+				"color": "#E8B9C4",
+				"weight": 0.06,
+				"name": "pastel pink",
+				"source": "builder"
+			},
+			{
+				"color": "#A9C6E3",
+				"weight": 0.05,
+				"name": "pastel blue",
+				"source": "builder"
+			},
+			{
+				"color": "#EADFB8",
+				"weight": 0.05,
+				"name": "cream",
+				"source": "builder"
+			}
+		]
 	}
 }

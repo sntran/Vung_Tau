@@ -131,6 +131,9 @@ func _check(d: PlaytestDriver) -> void:
 	# The land cover and the trees (report 0005, D-0005-09, correction 0): both CC BY 4.0.
 	d.expect(text.contains("© ESA WorldCover project 2021") and text.contains("High Resolution Canopy Height Maps"),
 			"the credits show the WorldCover and canopy height notices")
+	# The footprints of the buildings (report 0026, D-0026-03): ODbL.
+	d.expect(text.contains("Overture Maps Foundation") and text.contains("Microsoft ML Buildings"),
+			"the credits show the Overture Maps notice")
 	await PlaytestLayout.check(d, "credits")
 	await d.tap_phone_id("phone.home")
 	d.expect(d.state().app == "", "Home closes the credits page")

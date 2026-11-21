@@ -10,6 +10,8 @@ The workspace can run this script: it needs no download.
 """
 
 import argparse
+import dataclasses
+import math
 import datetime
 import shutil
 import sys
@@ -27,6 +29,7 @@ from geodata import visibility, blocks as blocks_module  # noqa: E402
 from geodata import anchors as anchors_module  # noqa: E402
 from geodata import clearings, coast, homestay, landcover, landmarks, mapdraw, osm, roads as roads_module, terrain  # noqa: E402
 from geodata import roadworks as roadworks_module, sea as sea_module, seafloor, trees as trees_module  # noqa: E402
+from geodata import showcase as showcase_module  # noqa: E402
 from geodata.config import BUILD, GEO, RAW, ROOT, Config, load_json, write_json  # noqa: E402
 from geodata.projection import Projection, map_to_game  # noqa: E402
 
@@ -37,11 +40,13 @@ SEA_ROCK_TAGS = {"rock", "reef", "bare_rock"}
 # scree areas, and cliff lines with CLIFF_ROCK_M on each side.
 LAND_ROCK_TAGS = {"scree"}
 CLIFF_ROCK_M = 6.0
-# tide.py, buildings.py, and lidar.py (plan 0009, R1, R5a, R5c) write these files before
-# build.py runs. build.py keeps them.
+# tide.py, buildings.py, lidar.py (plan 0009, R1, R5a, R5c), footprints.py, and
+# photos.py (the street photos, plan 0009, R5e) write these files before build.py
+# runs. build.py keeps them.
 TIDE_FILES = ("tide.json", "tide_report.md", "buildings_report.md", "buildings_r5d.json", "buildings_all.png",
               "buildings_2019.png", "buildings_out.png", "buildings_no_outline.png", "lidar_report.md",
-              "lidar_seafloor.png", "lidar_tracks.json")
+              "lidar_seafloor.png", "lidar_tracks.json", "footprints.json", "photos_report.md", "photos_map.png",
+              "photos_map.png.import")
 BUILT_LANDUSE = {"residential", "commercial", "retail", "industrial", "construction", "military", "religious"}
 # A place where the roads cover more than this part of the ground (in a
 # Gaussian of TOWN_ROAD_SIGMA_M) is town.
@@ -110,6 +115,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     land = coast.land_polygon(coast.coastline_lines(data.ways, projection), box, problems)
     beaches, beach_records, buildings, landuse, woods, water, rocks, parks = [], [], [], [], [], [], [], []
     land_rocks = []
+    building_tags = []
     for a in data.areas:
         shape = to_map_geometry(a.geometry, projection).intersection(box)
         if shape.is_empty:
@@ -118,7 +124,9 @@ def build(raw: Path, out: Path, geo: Path) -> int:
             beaches.append(shape)
             beach_records.append({"osm": f"{a.kind}/{a.id}", "name": a.tags.get("name", ""), "polygons": polygons_of(shape)})
         if "building" in a.tags:
-            buildings.extend(polygons_of(shape))
+            for part in polygons_of(shape):
+                buildings.append(part)
+                building_tags.append(building_record_tags(a))
         if a.tags.get("landuse") in BUILT_LANDUSE:
             landuse.append((a.tags["landuse"], shape))
         if any(a.tags.get(k) == v for k, v in WOOD_TAGS):
@@ -314,12 +322,28 @@ def build(raw: Path, out: Path, geo: Path) -> int:
                 osm_rows.append((shapely.LineString(np.column_stack([x, y])), w.tags))
         near = found_by_id.get(config.trees["parks"]["near_landmark"])
         near_point = shapely.Point(near["position"][0], -near["position"][1]) if near and near.get("found") else None
+        # Report 0026, D-0026-35: no tree of a rule on a part that a player walks
+        # on (the cells of the walk parts of the showcase, as level_walks() makes
+        # them below, on a copy of the grid), and in the showcase a tree of a
+        # rule only on a tree top of the canopy map.
+        keep_out, data_only = None, None
+        showcase_config = ROOT / "data" / "showcase" / "bai_truoc.json"
+        if showcase_config.exists():
+            showcase_data = load_json(showcase_config)
+            copy = dataclasses.replace(grid, heights=grid.heights.copy())
+            walk_mask = showcase_module.level_walks(copy, showcase_data, roads)["walks"]
+
+            def keep_out(x: float, y: float) -> bool:
+                row, col = int(round((-y - grid.z0) / grid.step)), int(round((x - grid.x0) / grid.step))
+                return 0 <= row < walk_mask.shape[0] and 0 <= col < walk_mask.shape[1] and bool(walk_mask[row, col])
+            if len(showcase_data.get("outline", [])) >= 3:
+                data_only = shapely.Polygon([(float(x), -float(z)) for x, z in showcase_data["outline"]])
         tree_record, tree_counts, tree_groups = trees_module.make(
             config.trees, roads, land, beaches, parks, osm_trees, osm_rows, home.get("coast_road", ""), beach_outline,
-            near_point, lambda x, y: grid.sample(np.asarray(x), -np.asarray(y)), tops)
+            near_point, lambda x, y: grid.sample(np.asarray(x), -np.asarray(y)), tops, keep_out, data_only)
         log(f"{sum(len(v) for v in tree_record['types'].values())} trees: {tree_counts}")
 
-    # Write the files. Keep the files of tide.py.
+    # Write the files. Keep the files of tide.py and footprints.py.
     kept = {name: (out / name).read_bytes() for name in TIDE_FILES if (out / name).exists()}
     if out.exists():
         shutil.rmtree(out)
@@ -329,6 +353,24 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     # Plan 0008, R2 and D7: the ground under each known place is level, at the
     # lowest point of its outline; the base of the place is 0.1 m over it.
     level_places(grid, config.landmarks, found_by_id)
+    # Report 0026, D-0026-11: the ground under and beside the sidewalks and the
+    # walk on the sea wall of the showcase is at their tops.
+    showcase_path = ROOT / "data" / "showcase" / "bai_truoc.json"
+    walk_cells = None
+    if showcase_path.exists():
+        platform_cells = showcase_module.level_platforms(grid, load_json(showcase_path))
+        log(f"showcase platforms: {platform_cells} cells filled to the height of their land side")
+        walks = showcase_module.level_walks(grid, load_json(showcase_path), roads)
+        walk_cells = walks["walks"]
+        log(f"showcase walks: {walks['cells']} cells of ground at the tops of the walk parts")
+    # Plan 0026, D3 (and plan 0009, R8): the ground under each model of World
+    # of data/world/places/ is level, at the height of the ground at its front.
+    level_world_places(grid, ROOT / "data" / "world" / "places", roads, walk_cells)
+    # Report 0026, D-0026-25: the walk is level to the low wall of the beach.
+    if showcase_path.exists():
+        lines = beach_wall_lines(data.areas, roads, buildings, projection, showcase_path)
+        cells = showcase_module.level_to_beach_walls(grid, lines, beaches)
+        log(f"showcase: the walk is level to {len(lines)} low walls of the beach ({cells} cells)")
     cut_stairs(grid, config.landmarks, found_by_id, roads)
     # The roads take the heights of the ground again: the bases and the stairs changed it.
     for road in roads:
@@ -353,6 +395,9 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     write_keep_import(out / "surface.png")
     write_keep_import(out / "rock.png")
     cover_record = write_cover(grid, raw, out, projection, land_mask, area, found_by_id, place_mask, road_mask, canopy)
+    # Plan 0026, R3 and R4: the lawns, the paving, the raised lawns, and the wall of the showcase.
+    showcase_record = write_showcase(data.areas, roads, buildings, projection, out, ROOT / "data" / "showcase" / "bai_truoc.json")
+    problems += showcase_record.pop("problems", [])
 
     lon_min, lat_min = projection.map_to_lonlat(box.bounds[0], box.bounds[1])
     lon_max, lat_max = projection.map_to_lonlat(box.bounds[2], box.bounds[3])
@@ -416,12 +461,14 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     write_json(out / "beaches.json", {"beaches": [
         {"osm": b["osm"], "name": b["name"], "polygons": [blocks_module.polygon_to_game(p) for p in b["polygons"]]}
         for b in beach_records]}, None)
-    write_json(out / "roads.json", {"roads": [road_record(r) for r in roads]}, None)
+    paved = paved_paths(roads, parks)
+    write_json(out / "roads.json", {"roads": [road_record(r, r.id in paved) for r in roads]}, None)
     write_json(out / "blocks.json", {"blocks": [
         dict(id=i, buildings=b["buildings"], has_buildings=b["buildings"] > 0, landuse=b["landuse"],
              area_m2=round(b["polygon"].area, 1), **blocks_module.polygon_to_game(b["polygon"]))
         for i, b in enumerate(block_list)]}, None)
-    write_json(out / "buildings.json", {"buildings": [blocks_module.polygon_to_game(b.simplify(0.2)) for b in buildings]}, None)
+    write_json(out / "buildings.json", {"buildings": [dict(blocks_module.polygon_to_game(b.simplify(0.2)), **tags)
+                                                      for b, tags in zip(buildings, building_tags)]}, None)
     write_json(out / "landmarks.json", {"landmarks": found})
     write_json(out / "homestay.json", homestay_record(home))
     write_json(out / "roadworks.json", {"note": "Made by tools/geo/build.py from overrides.json (R11a). Do not change by hand.",
@@ -483,12 +530,34 @@ def shore_end(line, islet: dict, projection) -> tuple[float, float]:
     return (end.x, end.y)
 
 
-def road_record(road) -> dict:
+PAVED_PATH_TYPES = ("footway", "pedestrian")
+
+
+def paved_paths(roads, parks) -> set:
+    """Report 0026, D-0026-17: the ids of the footways and the pedestrian ways
+    that are in a park for at least half of their length. The game gives them
+    tiles (the paths of the park of Bãi Trước), not the concrete of a hẻm."""
+    if not parks:
+        return set()
+    union = shapely.ops.unary_union(parks)
+    result = set()
+    for road in roads:
+        if road.type not in PAVED_PATH_TYPES or road.points is None or len(road.points) < 2:
+            continue
+        line = shapely.LineString(road.points)
+        if line.length > 0 and line.intersection(union).length >= 0.5 * line.length:
+            result.add(road.id)
+    return result
+
+
+def road_record(road, paved: bool = False) -> dict:
     record = {"id": road.id, "type": road.type, "name": road.name, "width": road.width,
               "width_source": road.width_source, "surface": road.surface, "hem": road.hem,
               "sidewalk": road.sidewalk, "oneway": road.oneway, "lanes": road.lanes,
               "points": [[round(float(x), 2), round(float(h), 2), round(-float(y), 2)]
                          for (x, y), h in zip(road.points, road.heights)]}
+    if paved:
+        record["paved"] = True
     if road.bridge:
         record["bridge"] = True
     if road.tunnel:
@@ -497,6 +566,19 @@ def road_record(road) -> dict:
         record["source"] = road.source
     return record
 
+
+
+def building_record_tags(area) -> dict:
+    """The OSM id, the name, and the storeys of a building (plan 0026, R7: the stand-ins)."""
+    record = {"osm": f"{area.kind}/{area.id}"}
+    if area.tags.get("name"):
+        record["name"] = area.tags["name"]
+    for key in ("building:levels", "height"):
+        try:
+            record[key.replace("building:", "")] = float(str(area.tags[key]).replace("m", "").strip())
+        except (KeyError, ValueError):
+            pass
+    return record
 
 def write_surface(grid, land_mask, beach_mask, building_mask, block_list, woods, landuse, roads, area, path,
                   rock_mask, rock_path, pebble_mask=None) -> dict:
@@ -546,6 +628,11 @@ COVER_HILLS = {"nui_lon": (1100.0, 20.0), "nui_nho": (700.0, 20.0)}
 # Round a base (plan 0008, R2): the ground climbs at most this grade from the base, in this band.
 BASE_SIDE_GRADE = 0.6
 BASE_SIDE_M = 6.0
+# The level ground round the box of a model of World (plan 0026, D3).
+LEVEL_MARGIN_M = 2.5
+# Under a model against a hill, the cells within this distance of the edge of
+# another road keep their height (one cell of the grid).
+ROAD_KEEP_M = 2.0
 
 
 def level_places(grid, landmarks_config, found_by_id) -> None:
@@ -584,6 +671,202 @@ def level_places(grid, landmarks_config, found_by_id) -> None:
             grid.heights[rows, cols] = np.minimum(grid.heights[rows, cols], lowest + BASE_SIDE_GRADE * d)
         record["base_height"] = round(lowest + 0.1, 2)
         log(f"{landmark['id']}: the ground under it is level at {lowest:.2f} m ({int(mask.sum())} cells)")
+
+
+
+def beach_wall_lines(areas, roads, buildings, projection, config_path: Path) -> list[list[list[float]]]:
+    """The lines ([x, z] of the game) of the low walls of the beach of the
+    showcase: the edges of the walk that face the beach (showcase_module.make)
+    and the ways of the part "walls" of data/showcase/bai_truoc.json."""
+    config = load_json(config_path)
+    lines = []
+    if config.get("ground") and len(config.get("outline", [])) >= 3:
+        outline = Polygon([(x, -z) for x, z in config["outline"]])
+        found = [(f"{a.kind}/{a.id}", a.tags, to_map_geometry(a.geometry, projection)) for a in areas]
+        lines += [w["points"] for w in showcase_module.make(config["ground"], found, roads, buildings, outline)["walls"]]
+    by_id = {road.id: road for road in roads}
+    for wall in config.get("walls", []):
+        for way in wall.get("ways", []):
+            road = by_id.get(int(way))
+            if road is not None and road.points is not None and len(road.points) >= 2:
+                lines.append([[float(x), float(-y)] for x, y in road.points])
+    return lines
+
+
+def write_showcase(areas, roads, buildings, projection, out: Path, config_path: Path) -> dict:
+    """The ground of the showcase of Bãi Trước (plan 0026, R3, R4): showcase_ground.png
+    (R the lawns, G the paving, on cells of "cell_m") and showcase.json (the
+    place of the mask, the raised lawns, and the low wall along the beach)."""
+    from PIL import Image
+
+    if not config_path.exists():
+        return {}
+    config = load_json(config_path)
+    ground = config.get("ground")
+    if not ground or len(config.get("outline", [])) < 3:
+        return {}
+    outline = Polygon([(x, -z) for x, z in config["outline"]])
+    found = [(f"{a.kind}/{a.id}", a.tags, to_map_geometry(a.geometry, projection)) for a in areas]
+    result = showcase_module.make(ground, found, roads, buildings, outline)
+    record = {"note": "Made by tools/geo/build.py from the part \"ground\" of data/showcase/bai_truoc.json. "
+                      "Do not change by hand.",
+              "planters": result["planters"], "walls": result["walls"], "areas": result.get("areas", {})}
+    if result.get("mask") is not None:
+        Image.fromarray(result["mask"], "RGBA").save(out / "showcase_ground.png")
+        write_keep_import(out / "showcase_ground.png")
+        record["ground"] = {"file": "showcase_ground.png", "x0": result["x0"], "z0": result["z0"],
+                            "step": result["step"], "columns": result["columns"], "rows": result["rows"]}
+    write_json(out / "showcase.json", record)
+    log(f"showcase: {record['areas'].get('lawn_m2', 0)} m² of lawn, {record['areas'].get('paving_m2', 0)} m² of "
+        f"paving, {len(record['planters'])} raised lawns, {len(record['walls'])} walls along the beach")
+    return {"problems": result.get("problems", [])}
+
+
+def world_place_footprint(place: dict) -> list[tuple[float, float]]:
+    """The footprint of the body of a model of World at its place (x and z of
+    the game): its "outline" when the place gives one (the outline of the
+    building in OpenStreetMap: the box of a building with wings can cover a
+    lane behind a wing), else its box from its back to its front (z <= 0 in
+    the model)."""
+    if place.get("outline"):
+        return [(float(x), float(z)) for x, z in place["outline"]]
+    fx, fz = place["facing"]
+    norm = math.hypot(fx, fz)
+    fx, fz = fx / norm, fz / norm
+    yaw = math.atan2(fx, fz)
+    ax, az = math.cos(yaw), -math.sin(yaw)  # the x axis of the model in the game
+    x0, x1, z0, _z1 = place["box"]
+    # The level ground past each side of the box ("level_sides_m"): on a slope
+    # the grid of 2 m mixes the higher ground next to a side into the corners
+    # of the front (report 0026, PT-71: Cao ốc Sen Biển, 0.14 m).
+    side = float(place.get("level_sides_m", 0.0))
+    x0, x1 = x0 - side, x1 + side
+    ox = place["front"][0] - place.get("front_middle_x", 0.0) * ax
+    oz = place["front"][1] - place.get("front_middle_x", 0.0) * az
+    # The level ground in front of the model to its street (report 0026, D-0026-13).
+    front = float(place.get("forecourt_m", 0.0))
+    return [(ox + x * ax + z * fx, oz + x * az + z * fz) for x, z in ((x0, z0), (x1, z0), (x1, front), (x0, front))]
+
+
+def level_world_places(grid, folder, roads=(), walk_cells=None) -> None:
+    """Makes the ground level under each model of World of the places files
+    (plan 0026, D3), at the height of the ground at the middle of its front,
+    and LEVEL_MARGIN_M round its box. Where the margins of two models meet,
+    a cell takes the level of the nearest model. Round the level ground, the
+    ground changes by not more than BASE_SIDE_GRADE to the level, and no slope
+    goes onto the level ground of a model. A model against a hill
+    ("keep_higher": true, Hải Âu) keeps all the ground that is higher than
+    its level, also under it: the level only fills the lower ground. The hill
+    and the lane behind it stay (the grid of 2 m mixes the cells under a
+    model into a lane next to its wall), and the walls of the model hide the
+    hill inside it."""
+    from shapely.geometry import Polygon
+
+    places = []
+    for path in sorted(Path(folder).glob("*.json")) if Path(folder).exists() else []:
+        places += [p for p in load_json(path).get("places", []) if "box" in p]
+    from shapely.geometry import LineString
+    road_lines = [LineString([(float(q[0]), float(q[1])) for q in r.points]).buffer(r.width / 2.0)
+                  for r in roads if len(r.points) >= 2 and r.type not in ("footway", "path", "steps", "pedestrian")]
+    if not places:
+        return
+    cores = [Polygon([(x, -z) for x, z in world_place_footprint(p)]) for p in places]
+    # The level is the ground at the front, or at "level_at" (a point of the
+    # sidewalk of its street, report 0026, D-0026-13: Hải Âu stood 9.8 m over Hạ
+    # Long, and a bank of earth hid its ground storey).
+    levels = [float(grid.sample(np.array([p.get("level_at", p["front"])[0]]),
+                                np.array([p.get("level_at", p["front"])[1]]))[0]) for p in places]
+    core_masks = [terrain.rasterize(grid, [c]) for c in cores]
+    # The margin (the ground between two cells of the grid, 2 m, mixes their heights).
+    margins = [terrain.rasterize(grid, [c.buffer(LEVEL_MARGIN_M)]) for c in cores]
+    any_core = np.logical_or.reduce(core_masks)
+    shared = np.logical_or.reduce(margins) & ~any_core
+    rows, cols = np.nonzero(shared)
+    level_masks = [m.copy() for m in core_masks]
+    if rows.size:
+        points = shapely.points(grid.x0 + cols * grid.step, -(grid.z0 + rows * grid.step))
+        distance = np.stack([np.where(margins[i][rows, cols], shapely.distance(c, points), np.inf)
+                             for i, c in enumerate(cores)])
+        owner = np.argmin(distance, axis=0)
+        for i in range(len(places)):
+            level_masks[i][rows[owner == i], cols[owner == i]] = True
+    for i, place in enumerate(places):
+        if place.get("keep_higher"):
+            # Inside its outline the ground is level (cut and fill); the cells
+            # near another road keep their height (Hẻm 2 Hải Đăng runs along the
+            # east wall of Hải Âu, and the grid of 2 m mixes the cells under the
+            # model into it); outside it, the level only fills the lower ground.
+            keep = terrain.rasterize(grid, [r.buffer(ROAD_KEEP_M) for r in road_lines]) if road_lines else np.zeros_like(core_masks[i])
+            level_masks[i] = (core_masks[i] & ~keep) | (level_masks[i] & (grid.heights <= levels[i]))
+    # A model does not change the sidewalks: its forecourt goes to the edge of
+    # the sidewalk of its street (report 0026, D-0026-13), and its level sides
+    # stop at the sidewalk of a side way (D-0026-36: the curb west of the hall
+    # with the orange roof was a step of 8 m).
+    if walk_cells is not None:
+        for i, place in enumerate(places):
+            if float(place.get("forecourt_m", 0.0)) > 0.0 or float(place.get("level_sides_m", 0.0)) > 0.0:
+                level_masks[i] &= ~walk_cells
+    all_level = np.logical_or.reduce(level_masks)
+    before = grid.heights.copy()
+    for i, place in enumerate(places):
+        grid.heights[level_masks[i]] = levels[i]
+    for i, place in enumerate(places):
+        forecourt_ramp(grid, place, level_masks[i], levels[i], before)
+    for i, place in enumerate(places):
+        shape = cores[i].buffer(LEVEL_MARGIN_M)
+        side = terrain.rasterize(grid, [shape.buffer(BASE_SIDE_M)]) & ~all_level
+        # The side slope does not change the ground under a sidewalk of the
+        # showcase either (report 0026, D-0026-27: round the hall by Hạ Long it
+        # pulled the sidewalk down, a step of 0.6 m at its outer edge).
+        if walk_cells is not None:
+            side &= ~walk_cells
+        rows, cols = np.nonzero(side)
+        if rows.size:
+            x = grid.x0 + cols * grid.step
+            z = grid.z0 + rows * grid.step
+            d = shapely.distance(shape, shapely.points(x, -z))
+            high = np.inf if place.get("keep_higher") else BASE_SIDE_GRADE * d
+            change = np.clip(grid.heights[rows, cols] - levels[i], -BASE_SIDE_GRADE * d, high)
+            grid.heights[rows, cols] = levels[i] + change
+        log(f"{place['id']}: the ground under it is level at {levels[i]:.2f} m ({int(level_masks[i].sum())} cells)")
+
+
+def forecourt_ramp(grid, place: dict, mask, level: float, before) -> None:
+    """The forecourt of a model ("forecourt_m" in front of its front) goes
+    from the level of the model at its front to the ground where the level
+    ground ends in front of it (the sidewalk of its street, before the
+    level), in a straight ramp: a street that climbs along a wide model
+    has no step to the forecourt (report 0026, D-0026-13: Hạ Long climbs 2 m
+    along Hải Âu, and it curves)."""
+    depth = float(place.get("forecourt_m", 0.0))
+    if depth <= 0.0:
+        return
+    fx, fz = place["facing"]
+    norm = math.hypot(fx, fz)
+    fx, fz = fx / norm, fz / norm
+    rows, cols = np.nonzero(mask)
+    x = grid.x0 + cols * grid.step
+    z = grid.z0 + rows * grid.step
+    ahead = (x - place["front"][0]) * fx + (z - place["front"][1]) * fz
+    front = ahead > 0.0
+    if not front.any():
+        return
+    rows, cols, x, z, ahead = rows[front], cols[front], x[front], z[front], ahead[front]
+    # March forward to the first point out of the level ground.
+    step = grid.step / 2.0
+    rest = np.full(len(x), np.nan)
+    edge = np.zeros(len(x))
+    for k in range(1, int((depth + 2.0 * grid.step) / step) + 1):
+        px = x + k * step * fx
+        pz = z + k * step * fz
+        col = np.clip(np.round((px - grid.x0) / grid.step).astype(int), 0, grid.shape[1] - 1)
+        row = np.clip(np.round((pz - grid.z0) / grid.step).astype(int), 0, grid.shape[0] - 1)
+        out = np.isnan(rest) & ~mask[row, col]
+        rest[out] = k * step
+        edge[out] = before[row[out], col[out]]
+    done = ~np.isnan(rest)
+    t = np.clip(ahead[done] / (ahead[done] + rest[done]), 0.0, 1.0)
+    grid.heights[rows[done], cols[done]] = level + t * (edge[done] - level)
 
 
 def cut_stairs(grid, landmarks_config, found_by_id, roads) -> None:

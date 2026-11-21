@@ -1,0 +1,444 @@
+{
+	"id": "non_rong_vanh",
+	"what": "nón rộng vành: a woman of Bãi Trước in a wide sun hat (a remix of an order of the person blueprint of World: the hat is a sculpture from edits at the port crown)",
+	"way": "remix",
+	"status": "Source",
+	"levels": [
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026, R10: women on the walk of the sea and on the sand in a wide hat against the sun, in place of the nón lá for some.",
+	"order": {
+		"blueprint": "drawing",
+		"options": {
+			"drawing": {
+				"name": "non_rong_vanh",
+				"kind": "item",
+				"sources": [
+					"A woman of Bãi Trước in a wide sun hat: the person of the blueprint person, and the hat from edits at its port crown. The hat is 0.44 m across with a crown of 0.2 m, from photos of 2017-03-24 (Flickr), 2019-04-30 (Tuổi Trẻ) and 2020-04-02 (VnExpress) (Vũng Tàu, data/world/drawings/non_rong_vanh.json)."
+				],
+				"materials": {
+					"part_12": {
+						"color": "#ffffff",
+						"roughness": 0.8,
+						"metalness": 0.0
+					}
+				},
+				"nodes": [
+					{
+						"name": "model",
+						"item": {
+							"blueprint": "person",
+							"options": {
+								"gender": 0.0,
+								"age": 40,
+								"height": 0.42,
+								"weight": 0.48,
+								"skin": "middleage_asian_female",
+								"hair": "bob02",
+								"hair_color": "#2e2925",
+								"clothes": [
+									"world_t_shirt",
+									"world_pants"
+								],
+								"clothes_colors": [
+									"#e8e6e0",
+									"#26272b"
+								],
+								"animations": [
+									"walk"
+								]
+							}
+						}
+					},
+					{
+						"name": "hat",
+						"to": "model",
+						"at": "crown",
+						"port": "crown",
+						"skill": {
+							"sculpt": {
+								"edits": [
+									{
+										"shape": "superellipsoid",
+										"size": [
+											0.097,
+											0.107,
+											0.115,
+											2.6
+										],
+										"at": [
+											0,
+											-0.004,
+											-0.07
+										],
+										"material": "part_12",
+										"color": "#3fa6d8",
+										"roughness": 0.8,
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "superellipsoid",
+										"size": [
+											0.107,
+											0.117,
+											0.125,
+											2.6
+										],
+										"at": [
+											0,
+											-0.004,
+											-0.07
+										],
+										"material": "part_12",
+										"color": "#3fa6d8",
+										"roughness": 0.8,
+										"levels": [
+											"far"
+										]
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.2,
+											0.2,
+											0.1
+										],
+										"at": [
+											0,
+											0,
+											-0.17
+										],
+										"mode": "subtract",
+										"material": "part_12",
+										"color": "#3fa6d8",
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.2,
+											0.2,
+											0.1
+										],
+										"at": [
+											0,
+											0,
+											-0.184
+										],
+										"mode": "subtract",
+										"material": "part_12",
+										"color": "#3fa6d8",
+										"levels": [
+											"far"
+										]
+									},
+									{
+										"shape": "revolve",
+										"size": {
+											"profile": [
+												[
+													0.085,
+													-0.066
+												],
+												[
+													0.14,
+													-0.07200000000000001
+												],
+												[
+													0.19,
+													-0.084
+												],
+												[
+													0.22,
+													-0.10500000000000001
+												],
+												[
+													0.218,
+													-0.11300000000000002
+												],
+												[
+													0.19,
+													-0.092
+												],
+												[
+													0.14,
+													-0.08000000000000002
+												],
+												[
+													0.085,
+													-0.07400000000000001
+												]
+											],
+											"smooth": 2
+										},
+										"at": [
+											0,
+											0,
+											0
+										],
+										"material": "part_12",
+										"color": "#3fa6d8",
+										"roughness": 0.8,
+										"blend": 0.01,
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "revolve",
+										"size": {
+											"profile": [
+												[
+													0.085,
+													-0.064
+												],
+												[
+													0.14,
+													-0.07200000000000001
+												],
+												[
+													0.19,
+													-0.084
+												],
+												[
+													0.22,
+													-0.10500000000000001
+												],
+												[
+													0.216,
+													-0.125
+												],
+												[
+													0.19,
+													-0.10400000000000001
+												],
+												[
+													0.14,
+													-0.092
+												],
+												[
+													0.085,
+													-0.084
+												]
+											],
+											"smooth": 2
+										},
+										"at": [
+											0,
+											0,
+											0
+										],
+										"material": "part_12",
+										"color": "#3fa6d8",
+										"roughness": 0.8,
+										"blend": 0.01,
+										"levels": [
+											"far"
+										]
+									},
+									{
+										"shape": "cylinder",
+										"size": [
+											0.105,
+											0.012
+										],
+										"at": [
+											0,
+											-0.004,
+											-0.054000000000000006
+										],
+										"mode": "paint",
+										"material": "part_12",
+										"color": "#2f8cbc",
+										"blend": 0.002,
+										"levels": [
+											"near"
+										]
+									}
+								],
+								"ports": {
+									"crown": {
+										"at": [
+											0,
+											0,
+											0
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0,
+											1,
+											0
+										]
+									}
+								},
+								"cells": {
+									"near": 0.003,
+									"mid": 0.004,
+									"far": 0.01
+								},
+								"budget": {
+									"near": 3000,
+									"mid": 1200,
+									"far": 250
+								}
+							}
+						}
+					}
+				]
+			}
+		}
+	},
+	"sources": [
+		{
+			"url": "https://tuoitre.vn/vung-tau-sau-30-nam-thanh-lap-thu-ngan-sach-gap-gan-300-lan-20211230155102555.htm",
+			"image": "https://cdn.tuoitre.vn/2021/12/30/logo-du-khach-30-4-2019-20-1640854141848374700459.jpg",
+			"date": "2019-04-30 (in the file name of the photo)",
+			"license": "all rights reserved",
+			"author": "Đông Hà / Tuổi Trẻ",
+			"open": false,
+			"file": "nrv_tt.jpg",
+			"shows": "Bãi Trước at the end of the afternoon of a holiday, to the south. A woman in a light blue wide hat of straw, a top of black and white stripes and dark pants takes a photo of the sea. The brim is wide and goes down a little at its edge; the crown is a round dome. The file is a crop of the woman."
+		},
+		{
+			"url": "https://www.flickr.com/photos/149467103@N05/33590781980/",
+			"image": "https://live.staticflickr.com/3933/33590781980_f44c472a2b_b.jpg",
+			"date": "2017-03-24",
+			"license": "all rights reserved",
+			"author": "Bich Hanh (Flickr user tbhanh)",
+			"open": false,
+			"file": "nrv_fl2017.jpg",
+			"shows": "A woman in an áo dài and a wide hat of beige straw on the square at the south end of Bãi Trước, by the low wall of the sea: a round crown, a wide brim that goes down at its edge, a cord under the chin. The file is a crop of her head and shoulders."
+		},
+		{
+			"url": "https://vnexpress.net/pho-bien-yen-vang-4079788.html",
+			"image": "https://vcdn1-dulich.vnecdn.net/2020/04/05/11-1586054525.jpg",
+			"date": "2020-04-02",
+			"license": "all rights reserved",
+			"author": "Đỗ Tuấn Hùng / VnExpress",
+			"open": false,
+			"file": "nrv_vne11.jpg",
+			"shows": "A woman who sells fruit by the low wall of Bãi Trước, in a green cloth hat with a wide brim that goes down at its edge, a mask and a jacket of checks. The file is a crop of her head."
+		}
+	],
+	"sizes": {
+		"width": {
+			"value": 0.44,
+			"unit": "m",
+			"source": "Photo 0 (2019): the brim is 300 px across, and the shoulders of the woman under it are about 240 px (0.37 m): 0.46 m. Photo 1 (2017): the brim is about as wide as the shoulders and the arms of the woman (305 px and 330 px; 0.40 m): 0.37 m to 0.40 m. I use 0.44 m, near the light blue hat of photo 0."
+		},
+		"crown": {
+			"value": "0.2 m across, 0.115 m high from the foot of the brim (0.045 m over the top of the head)",
+			"unit": "",
+			"source": "Photo 0: the crown is about 0.45 of the brim across (135 px of 300 px) and about 0.6 of its own width high over the brim; photo 1: a round crown of about the same part of the brim."
+		},
+		"drop": {
+			"value": 0.035,
+			"unit": "m",
+			"source": "Photo 0: the near edge of the brim is about 35 px (0.054 m) under its foot at the crown, but the view is from a little over the hat, so the near edge looks lower than it is: about 0.035 m. Photo 1: the brim is near flat at the crown and goes down at its edge. Photo 2: the green brim goes down more."
+		},
+		"foot_of_brim": {
+			"value": 0.07,
+			"unit": "m",
+			"source": "Photo 0: the brim is at the line of the brow, about 0.07 m under the top of the head of a woman of World (the head is 0.22 m high); estimate from the photo."
+		},
+		"brim_thickness": {
+			"value": 0.008,
+			"unit": "m",
+			"source": "estimate (no source): a thin brim of straw."
+		},
+		"colors": {
+			"value": "light blue #3fa6d8; also green #4f9a3a, beige and white",
+			"unit": "",
+			"source": "Photo 0: light blue straw (#288098 in the shade of the brim, brighter in the sun on the crown); photo 1: beige straw; photo 2: a green cloth hat. One color for each woman."
+		},
+		"woman": {
+			"value": "a woman of 40 years in a light top and dark pants, with bare feet",
+			"unit": "",
+			"source": "Photo 0: a top of black and white stripes and dark pants. The order has two garments of World (world_t_shirt, world_pants) and no shoes: the same woman in the trousers and the sandals of MakeHuman with the hat stopped the builder of the factory (HTTP 503) six times."
+		},
+		"band": {
+			"value": "a band of 2.4 cm a little darker than the hat (near only)",
+			"unit": "",
+			"source": "estimate (no source): the photos are too small to show a band."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "c7e51a51d7439a63cf5a0ee8e0e43d5d",
+			"seen": "The hat alone (the node hat as an order of kind prop, not on the person; the factory stopped at the person order). At a mid budget of 500 the cut to the budget made one cone from the edge of the brim to a peak: a nón lá, not a wide hat.",
+			"changed": "The mid budget of the hat to 1200 and the far budget to 200 (as non_la_edits of World); the brim 0.44 m (photo 1 of 2017)."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "c77e1de7e6f54249f87ab79d8d170000",
+			"seen": "The hat alone, mid budget 1200: a crown and a brim, but the dent along the top makes two peaks from the front, and the brim goes down in a straight cone of 22 degrees. In photos 0 and 1 the crown is a round dome and the brim is near flat at the crown and goes down at its edge.",
+			"changed": "No dent; a brim that is near flat to 0.19 m from the middle and goes down 0.035 m at its edge."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "466e5b4b6ca85b817e8ab8eb6c71673d",
+			"seen": "Before this look, the same hat on the woman in the trousers and the sandals of MakeHuman (order 1d9d1c0a6a19d4371fcf4577102b1088) stopped the builder six times (HTTP 503). Now, on the woman in world_t_shirt and world_pants with bare feet: a light blue hat with a round crown and a wide brim that is a little wider than her shoulders and goes down a little at its edge; the hair shows under the brim at the back and the sides. This agrees with photos 0 and 1 (the brim 1.2 to 1.25 times the shoulders, the crown a dome). The brim is at the line of the eyes from the front; in photo 1 it is a little higher, at the brow.",
+			"changed": "No change: the hat agrees with the photos at the mid level. Next: the far level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "far",
+			"hash": "466e5b4b6ca85b817e8ab8eb6c71673d",
+			"seen": "The far level: the cut of the hat to 200 triangles makes the crown a point (a witch hat), and the far hair shows through it as dark holes. The brim is right.",
+			"changed": "The far level gets its own crown and brim (edits only at far): a crown 1 cm larger round the far hair and a brim of 2 cm, with cells of 1 cm and 250 triangles; the near and mid edits do not change."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "far",
+			"hash": "af006a4cf20449b58390d222b3be6fce",
+			"seen": "The far level now has a round crown with no holes and a wide brim, as at the mid level and in photos 0 and 1.",
+			"changed": "No change. The near and mid edits are the same as in order 466e5b4b6ca85b817e8ab8eb6c71673d; next a look at the mid level of this order."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "af006a4cf20449b58390d222b3be6fce",
+			"seen": "The same as the mid look of order 466e5b4b6ca85b817e8ab8eb6c71673d (the views are the same): the light blue wide hat on the woman, as in photos 0 and 1.",
+			"changed": "No change. The near level of a person cannot be built by the factory, so the levels are mid and far."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "af006a4cf20449b58390d222b3be6fce",
+			"seen": "The files of the lock (the job \"Models of World\" of 4e0d0cc), next to photos 0 and 1 (build/look/non_rong_vanh_mid.png): the woman with the light blue wide hat, a white top, and dark pants, as the look of the factory files of this order.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "af006a4cf20449b58390d222b3be6fce",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/non_rong_vanh_mid.png). A woman in a light blue wide hat, a light top, and dark pants, as in photo 0.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "af006a4cf20449b58390d222b3be6fce",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/non_rong_vanh_far.png). The same, the brim in fewer faces.",
+			"changed": "Nothing."
+		}
+	],
+	"hash": "af006a4cf20449b58390d222b3be6fce"
+}

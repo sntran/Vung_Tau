@@ -60,6 +60,9 @@ const PLAZA_OPENING_M := 3.0
 const JETTY_OVER_TIDE := 0.6
 const JETTY_CURB := 0.35
 const JETTY_WALL := 1.1
+## The deck has no walls this far from its shore end (m): there it is on the
+## land, and the player steps onto it from the sides (plan 0026, PT-74).
+const JETTY_LAND_OPEN := 3.0
 
 ## The places by id: {"id", "config", "record", "place", "node", "base", "top", "center"}.
 var places: Dictionary = {}
@@ -923,10 +926,12 @@ func _jetty(entry: Dictionary) -> void:
 		var body_height := mid.y - body_low
 		_add_box(st, {"center": mid - deck_basis.y * (body_height / 2.0), "size": Vector3(length, body_height, width),
 				"turn": turn, "tilt": tilt})
+		# On the land at the shore end, the deck has no walls.
+		var open := minf(JETTY_LAND_OPEN, length - 0.5) if i == 0 and shore != Vector3.INF else 0.0
 		for k: float in [-1.0, 1.0]:
-			var edge := mid + side * k * (width / 2.0 - 0.15)
-			_add_box(st, {"center": edge + Vector3(0, JETTY_CURB / 2.0, 0), "size": Vector3(length + 0.3, JETTY_CURB, 0.3), "turn": turn, "tilt": tilt})
-			_box_shape(entry, Vector3(length + 0.3, JETTY_WALL + 0.6, 0.3),
+			var edge := mid + side * k * (width / 2.0 - 0.15) + deck_basis.x * (open / 2.0)
+			_add_box(st, {"center": edge + Vector3(0, JETTY_CURB / 2.0, 0), "size": Vector3(length + 0.3 - open, JETTY_CURB, 0.3), "turn": turn, "tilt": tilt})
+			_box_shape(entry, Vector3(length + 0.3 - open, JETTY_WALL + 0.6, 0.3),
 					Transform3D(deck_basis, edge + deck_basis.y * ((JETTY_WALL + 0.6) / 2.0 - 0.3)))
 		_box_shape(entry, Vector3(length, 0.6, width), Transform3D(deck_basis, mid - deck_basis.y * 0.3))
 	# The end wall at the sea end.

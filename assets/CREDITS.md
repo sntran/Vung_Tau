@@ -12,11 +12,20 @@
 
 The 3D shapes in plan 0001 are made in code (`scripts/greybox.gd`). They use no model files.
 
+## Models of World (plan 0023)
+
+| Asset | Path | Source | License |
+|---|---|---|---|
+| 3D models: the scooters, the ceiling fans, the people, the buildings of Bãi Trước, the basket boats, the fishing boats; and the lamps and the raised lawns of the park, which I make with the tools of World (`data/world/drawings/`, `data/world/blueprints/`) | `assets/world/*.glb`, `*.parts.json`, `*.receipt.json` | [World](https://github.com/sntran/World), commit `e8754d695e014799c1618bb682bba27c3dcfc338` (`data/world/lock.json`). The orders are in `data/world/orders.json`. I have the copyright of World. | GNU Affero General Public License 3.0 (AGPL-3.0) |
+| The bodies, the skins, the hair, and the clothes of the people | (in the GLB files of the people) | The data of [MakeHuman](http://www.makehumancommunity.org) through World | CC0 |
+| Impostors of the models of World | `assets/world/*_impostor*.png` | Made by `tools/world/impostors.py` from the GLB files above | AGPL-3.0, as the models |
+
 ## Geodata (plan 0005)
 
 | Asset | Path | Source | License |
 |---|---|---|---|
 | Map data: roads, coastline, beaches, buildings, names | `data/geo/raw/osm.pbf`, `data/geo/build/` | © OpenStreetMap contributors ([openstreetmap.org](https://www.openstreetmap.org)) | ODbL 1.0. The changed data in `data/geo/` is a Derivative Database under ODbL 1.0 (`data/geo/LICENSE`). |
+| Building footprints (plan 0026, D-0026-03; plan 0009, R1) | `data/geo/build/footprints.json` | [Overture Maps Foundation](https://overturemaps.org), buildings theme: © OpenStreetMap contributors, Microsoft ML Buildings, Google Open Buildings | ODbL 1.0. The changed copy in `data/geo/build/` is a Derivative Database under ODbL 1.0 (`data/geo/LICENSE`). |
 | Ground height | `data/geo/raw/dem.tif`, `data/geo/build/height/` | Copernicus DEM GLO-30. Produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved. | Copernicus DEM license. The organisations in charge of the Copernicus programme by law or by delegation do not incur any liability for any use of the Copernicus WorldDEM-30. |
 | Tide model | `data/geo/build/tide.json` | EOT20: Hart-Davis, M. G., Piccioni, G., Dettmering, D., Schwatke, C., Passaro, M., Seitz, F. (2021). EOT20 - A global Empirical Ocean Tide model from multi-mission satellite altimetry. SEANOE. [doi:10.17882/79489](https://doi.org/10.17882/79489). The game uses the tide constituents at Hòn Bà and Bãi Trước. | CC BY 4.0 |
 | Tide software | (used in CI by `tools/geo/tide.py`, not in the game) | [pyTMD](https://github.com/tsutterley/pyTMD), by Tyler Sutterley | MIT License |
@@ -29,5 +38,9 @@ The 3D shapes in plan 0001 are made in code (`scripts/greybox.gd`). They use no 
 | Ground texture: rock | `assets/textures/ground/rock/` | [Poly Haven: Rocky Terrain 02](https://polyhaven.com/a/rocky_terrain_02) | CC0 |
 | Ground texture: asphalt | `assets/textures/ground/asphalt/` | [Poly Haven: Asphalt 02](https://polyhaven.com/a/asphalt_02) | CC0 |
 | Ground texture: concrete | `assets/textures/ground/concrete/` | [Poly Haven: Brushed Concrete](https://polyhaven.com/a/brushed_concrete) | CC0 |
+| Showcase texture: sidewalk tiles (plan 0026, R12) | `assets/textures/look/sidewalk_tiles/` | [Poly Haven: Checkered Pavement Tiles](https://polyhaven.com/a/checkered_pavement_tiles) (Amal Kumar) | CC0 |
+| Showcase texture: walk slabs | `assets/textures/look/walk_slabs/` | [Poly Haven: Mixed Stone Tiles](https://polyhaven.com/a/mixed_stone_tiles) (Dimitrios Savva) | CC0 |
+| Showcase texture: granite | `assets/textures/look/granite/` | [Poly Haven: Stone Tile Wall](https://polyhaven.com/a/stone_tile_wall) (Charlotte Baglioni) | CC0 |
+| Showcase texture: plaster | `assets/textures/look/plaster/` | [Poly Haven: White Plaster 02](https://polyhaven.com/a/white_plaster_02) (Rob Tuytel) | CC0 |
 
 `data/geo/raw/manifest.json` records the download URL, the date, and the SHA-256 of each file. The game shows these notices on the Credits sheet (Settings → Credits).

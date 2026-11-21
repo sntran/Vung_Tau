@@ -697,3 +697,93 @@ def test_each_map_of_the_build_has_a_keep_import():
                if not Path(str(p) + ".import").exists()
                or 'importer="keep"' not in Path(str(p) + ".import").read_text(encoding="utf-8")]
     assert not missing, f"no import file with importer=\"keep\": {missing}"
+
+
+def test_a_road_comes_to_the_height_of_a_junction_with_a_ramp():
+    """Report 0026, Q14: a road that takes the height of a more important road
+    at a junction comes to it over JUNCTION_BLEND_M, not with a step."""
+    spacing = np.full(30, 2.0)
+    profile = np.full(31, 13.0)
+    raw = profile.copy()
+    raw[-1] = 12.0
+    fixed = np.zeros(31, dtype=bool)
+    fixed[-1] = True
+    out = terrain.blend_to_fixed(profile, raw, fixed, spacing, terrain.JUNCTION_BLEND_M)
+    assert out[-1] == pytest.approx(12.0)
+    grades = np.abs(np.diff(out)) / 2.0
+    assert grades.max() <= 1.5 / terrain.JUNCTION_BLEND_M + 1e-6, "the drop of 1 m spreads over the blend"
+    assert np.abs(np.diff(grades)).max() < 0.01, "no kink in the ramp"
+    assert out[0] == pytest.approx(13.0), "60 m from the junction the road keeps its own height"
+
+
+def test_the_two_ways_of_a_street_with_a_median_have_one_height():
+    """Report 0026, D-0026-11: the two ways of Quang Trung were 2.8 m apart in
+    height across a median of 4 m. The two ways of a street take the mean."""
+    cols, rows = 61, 61
+    gx = np.arange(cols) * 2.0
+    # The ground climbs 0.5 m for each meter to the east: way B (x 70) is 6 m higher than way A (x 58).
+    heights = np.tile((0.5 * gx).astype(np.float32), (rows, 1))
+    grid = terrain.Grid(x0=0.0, z0=-120.0, step=2.0, heights=heights)
+    a = _road(1, "primary", [(58.0, 10.0), (58.0, 110.0)], width=8.0)
+    b = _road(2, "primary", [(70.0, 110.0), (70.0, 10.0)], width=8.0)
+    for road in (a, b):
+        road.name = "Quang Trung"
+        road.oneway = True
+    assert terrain.find_twins([a, b]) == 1
+    terrain.flatten_roads(grid, [a, b], 2.0)
+    ya = grid.sample([58.0], [-60.0])[0]
+    yb = grid.sample([70.0], [-60.0])[0]
+    assert abs(ya - yb) < 0.2, f"the two ways are at one height: {ya:.2f} and {yb:.2f}"
+
+
+def test_a_road_is_flat_to_its_edge():
+    """Report 0026, D-0026-11: the ground under a road is flat to its edge, also
+    between two samples of the grid (it was 0.15 m lower at the edge)."""
+    cols, rows = 41, 41
+    gx = np.arange(cols) * 2.0
+    heights = np.tile((0.3 * gx).astype(np.float32), (rows, 1))
+    grid = terrain.Grid(x0=0.0, z0=-80.0, step=2.0, heights=heights)
+    road = _road(1, "primary", [(41.0, 0.0), (41.0, 80.0)], width=10.0)
+    terrain.flatten_roads(grid, [road], 2.0)
+    middle = grid.sample([41.0], [-40.0])[0]
+    for x in (36.3, 36.9, 45.1, 45.7):
+        assert grid.sample([x], [-40.0])[0] == pytest.approx(middle, abs=0.02), f"at x {x}"
+
+
+def test_a_twin_road_takes_the_height_of_a_junction():
+    """The mean height of the two ways of a street does not change the height
+    at a junction with a more important road (it made a step of 1.27 m)."""
+    profile = np.full(31, 13.0)
+    raw = np.full(31, 13.0)
+    raw[-1] = 11.0
+    fixed = np.zeros(31, dtype=bool)
+    fixed[-1] = True
+    out = terrain.blend_to_fixed(profile, raw, fixed, np.full(30, 2.0), terrain.JUNCTION_BLEND_M)
+    assert out[-1] == pytest.approx(11.0)
+    assert np.abs(np.diff(out)).max() < 0.2
+
+
+def test_a_road_from_a_fixed_junction_is_not_steeper_than_the_grade():
+    """PT-36: after a fixed point (a junction), the profile of a steep road
+    comes under the grade, also where the ground falls fast."""
+    profile = np.array([41.13, 40.6, 39.0, 37.0, 35.5, 34.0, 33.0, 32.5])
+    spacing = np.full(len(profile) - 1, 3.2)
+    fixed = np.zeros(len(profile), dtype=bool)
+    fixed[0] = True
+    result = terrain.limit_grade(profile, spacing, 0.25, fixed=fixed)
+    assert result[0] == pytest.approx(41.13)
+    assert np.max(np.abs(np.diff(result)) / spacing) <= 0.25 + 1e-6
+
+
+def test_a_sample_with_a_mask_takes_only_the_set_cells():
+    """PT-36, run 3: a fixed point at the edge of the round end of a road takes
+    the height of the set surface, not a mean with the lower ground."""
+    heights = np.full((4, 4), 35.5, dtype=np.float32)
+    heights[:, :2] = 41.13
+    mask = np.zeros((4, 4), dtype=bool)
+    mask[:, :2] = True
+    grid = terrain.Grid(x0=0.0, z0=0.0, step=2.0, heights=heights)
+    assert grid.sample(np.array([2.8]), np.array([1.0]))[0] < 39.5
+    assert grid.sample(np.array([2.8]), np.array([1.0]), mask=mask)[0] == pytest.approx(41.13)
+    # A point with no set cell takes the bilinear height.
+    assert grid.sample(np.array([5.0]), np.array([1.0]), mask=mask)[0] == pytest.approx(35.5)
