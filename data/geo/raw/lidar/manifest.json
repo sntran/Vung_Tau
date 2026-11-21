@@ -74,13 +74,13 @@
 			"fetched": "Git 7d32458"
 		},
 		"atl03_ground/2026": {
-			"name": "atl03_ground_2026_427a65d5a8ba.json.gz",
-			"sha256": "427a65d5a8ba47b0f73171631a0bb681da343f9d49ca2f7df8ceee7de17af11a",
-			"bytes": 618257,
+			"name": "atl03_ground_2026_641f8b63469f.json.gz",
+			"sha256": "641f8b63469f921cb0a473535f265bed2e129f10cfeb3e0caba6e8bc11709e19",
+			"bytes": 618694,
 			"product": "atl03_ground",
 			"year": 2026,
 			"rows": 95798,
-			"fetched": "2026-11-20",
+			"fetched": "2026-11-21",
 			"passes": [
 				"2026-02-28",
 				"2026-03-04"
@@ -159,13 +159,13 @@
 			"fetched": "2026-11-20"
 		},
 		"atl03_roof/2026": {
-			"name": "atl03_roof_2026_7a1b13600827.json.gz",
-			"sha256": "7a1b136008279d3e5dc4072931c3a081b03d4cdfff44a7c831176777964369cd",
-			"bytes": 115319,
+			"name": "atl03_roof_2026_621932c4f20f.json.gz",
+			"sha256": "621932c4f20f03707afd64909a52f15f159343864a4b206e23f6803d5b8f3a19",
+			"bytes": 115268,
 			"product": "atl03_roof",
 			"year": 2026,
 			"rows": 11909,
-			"fetched": "2026-11-20",
+			"fetched": "2026-11-21",
 			"passes": [
 				"2026-02-28",
 				"2026-03-04"
@@ -273,13 +273,13 @@
 			"fetched": "2026-11-20"
 		},
 		"atl08/2026": {
-			"name": "atl08_2026_c86c851a92f1.json.gz",
-			"sha256": "c86c851a92f1d1d0d577506f42652d6db875a3ea9a2594a48a71faffb6774f0c",
-			"bytes": 58339,
+			"name": "atl08_2026_f1aebcebb1a8.json.gz",
+			"sha256": "f1aebcebb1a872527c792403f3ae3a4f050bb14cedded5ebab4a1a465fd405d6",
+			"bytes": 58319,
 			"product": "atl08",
 			"year": 2026,
 			"rows": 4919,
-			"fetched": "2026-11-20",
+			"fetched": "2026-11-21",
 			"passes": [
 				"2026-02-28",
 				"2026-03-04"
@@ -358,13 +358,13 @@
 			"fetched": "Git 7d32458"
 		},
 		"atl24/2026": {
-			"name": "atl24_2026_7c7b6b426234.json.gz",
-			"sha256": "7c7b6b4262348cd80312328de2951014aa5120481fcf98aa6fc818f52ca5aff3",
-			"bytes": 36956,
+			"name": "atl24_2026_cdd13299b4c2.json.gz",
+			"sha256": "cdd13299b4c2fdfe404e57925477dd91f5f59b9ae3e2021d1233597dc4cc26ff",
+			"bytes": 36808,
 			"product": "atl24",
 			"year": 2026,
 			"rows": 2500,
-			"fetched": "2026-11-20",
+			"fetched": "2026-11-21",
 			"passes": [
 				"2026-02-28",
 				"2026-03-04"
