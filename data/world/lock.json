@@ -257,13 +257,13 @@
 			}
 		},
 		"khach_san_hai_au": {
-			"hash": "18584d0bcf7d574102c9dbc63c1ce008",
+			"hash": "33c8be7b446ddc89c7d749bbdfd5091f",
 			"files": {
-				"khach_san_hai_au.far.glb": "fe6ddf260a3cfee7d08b5f34fc623919dacf72894b04316de169fd4aa743c440",
-				"khach_san_hai_au.glb": "1af54dcc4fc12654ec815de72ceeff26d02ebff5017c33849fc556fe3d4c0704",
-				"khach_san_hai_au.mid.glb": "d4d42e9ee2b7a153f9184a26787cf36e2006ebe132858c30c7f5a652b5b86ea5",
+				"khach_san_hai_au.far.glb": "4ffdf822c80e054b274fb222073a6c7ea288bc886048f76e92fa7f8313983f26",
+				"khach_san_hai_au.glb": "2b94e9880cde680177008212223cddefc93de5792079cf0cafc7901f3bbdd56f",
+				"khach_san_hai_au.mid.glb": "69cc3d66bdcdefba6f8f6df6787ea629c0f54d2a038ba3c7fdc6fd6478fbdf37",
 				"khach_san_hai_au.parts.json": "f59519447e9efe0d7071bd40660ff4d42b4493d6f758f95133164e38426fbe45",
-				"khach_san_hai_au.receipt.json": "27499af3e915ab44e918fce4d8f2ebaea3592f8ecc9f9d3d8473e8b3a1ea072a"
+				"khach_san_hai_au.receipt.json": "e0be980ab9315be766078be872ed21e4d067b0a9a1430e48a2dce8c24a940c78"
 			}
 		},
 		"lan_can_ha_long": {
