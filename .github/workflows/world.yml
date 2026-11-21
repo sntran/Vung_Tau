@@ -108,6 +108,26 @@ jobs:
         if: always() && steps.need.outputs.build == 'true'
         run: python tools/world/fetch.py --check
 
+      # Report 0026, D-0026-44: fetch.py writes a short import file for a new
+      # model, and Godot writes it again in the full form at each import. The
+      # job commits the files that Godot writes, so an import changes no file
+      # of the repository (tools/test.sh checks it).
+      - name: Cache Godot
+        if: always() && steps.need.outputs.build == 'true'
+        uses: actions/cache@v4
+        with:
+          path: .tools
+          key: godot-${{ runner.os }}-${{ hashFiles('tools/setup.sh') }}
+
+      - name: Write the import files with Godot
+        if: always() && steps.need.outputs.build == 'true'
+        run: |
+          tools/setup.sh
+          # Godot must not import the clone of World or the files in build/.
+          touch World/.gdignore
+          mkdir -p build && touch build/.gdignore
+          .tools/godot/godot --headless --path . --import > build/import.log 2>&1 || { tail -50 build/import.log; exit 1; }
+
       - name: Commit the files
         if: always() && steps.need.outputs.build == 'true'
         run: |
