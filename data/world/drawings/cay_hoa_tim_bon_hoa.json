@@ -575,7 +575,7 @@
 			"date": "2026-11-17",
 			"level": "near",
 			"hash": "9498e6dc41a98b9d860d4ab6bc7a3018",
-			"seen": "The files of the lock (the job \"Models of World\" of 4814dd0), next to photo 0 (build/look/cay_hoa_tim_bon_hoa_near.png): the same green mound with violet flowers as the look of the factory files of this order.",
+			"seen": "The files of the lock (the job \"Models of World\" of 4e0d0cc), next to photo 0 (build/look/cay_hoa_tim_bon_hoa_near.png): the same green mound with violet flowers as the look of the factory files of this order.",
 			"changed": "Nothing."
 		},
 		{
@@ -594,5 +594,5 @@
 		}
 	],
 	"hash": "9498e6dc41a98b9d860d4ab6bc7a3018",
-	"impostor_note": "Report 0026, PT-73 (CI of c1fd259): with no impostor, each clump of a bed showed its far level (60 triangles) to 80 m on Low, and a bed has 30 to 50 clumps: the shot S2 had 303 568 triangles (the limit is 300 000). With the impostor, a clump past the mid level is 2 triangles, as a bush."
+	"impostor_note": "Report 0026, PT-73 (CI of 308cbc2): with no impostor, each clump of a bed showed its far level (60 triangles) to 80 m on Low, and a bed has 30 to 50 clumps: the shot S2 had 303 568 triangles (the limit is 300 000). With the impostor, a clump past the mid level is 2 triangles, as a bush."
 }

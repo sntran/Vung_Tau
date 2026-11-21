@@ -116,7 +116,7 @@ func _walk_through(d: PlaytestDriver, w: VungTau, k: int, opening: Dictionary) -
 				k, player.y - w.ground_height(player.x, player.z), player.distance_to(sand_point)])
 	# From the sand, the view back to the opening and its steps: a turn of about
 	# 180 degrees. In CI (about two times slower) 15 s of real time was too short
-	# at opening 2 (the CI of 1e1c173 and of 44d69ad).
+	# at opening 2 (the CI of a55e83e and of ad8c8bd).
 	await d.look_at_point(at + Vector3(0, 0.6, 0), 3.0, LOOK_BACK_S)
 	await d.wait_frames(6)
 	await d.screenshot("opening_%02d_sand" % k)

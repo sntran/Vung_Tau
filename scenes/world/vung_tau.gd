@@ -296,7 +296,7 @@ func prepare_at(point: Vector3, radius := 64.0, with_showcase := true) -> void:
 	_apply_all_done()
 	# The patches of a chunk that was near before have the grids of the point
 	# before. The world built them again one in each frame: 71 patches took 73
-	# frames, more than 60 s on High in CI (PT-76, the CI of 112ed1c).
+	# frames, more than 60 s on High in CI (PT-76, the CI of 52e373a).
 	for key: Vector2i in _chunks:
 		var state: Dictionary = _chunks[key]
 		if _distance_to_chunk(key) > radius or state.busy or not state.has("heights"):

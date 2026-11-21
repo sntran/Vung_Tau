@@ -28,6 +28,7 @@ All documents speak for the project in my voice. Do not write about me in the th
   git -c user.name="Sơn Trần-Nguyễn" -c user.email=github@sntran.com -c commit.gpgsign=false commit
   ```
 
+- Use the same identity for each merge (`git -c user.name=... merge`) and for each commit that ends a merge with conflicts. The author and the committer of each commit of a branch are this identity. The job "Identity of the commits" of `.github/workflows/test.yml` fails when one is not (`tools/ci/check_identity.sh`).
 - Do not add a `Co-Authored-By` trailer or any other note to a commit.
 - Do not put references to the tools that wrote the code in files or commits.
 - Write the commit subject in STE, in the imperative ("Add the clock sheet").

@@ -104,7 +104,7 @@ static func scene(model_id: String, level: String) -> PackedScene:
 			_scenes[key] = ResourceLoader.load_threaded_get(path) as PackedScene
 		elif _requested.has(path):
 			# The main thread does not wait for the load in the other thread: in CI
-			# (the CI of c1fd259, report 0026) such a wait in build_all() stopped the
+			# (the CI of 308cbc2, report 0026) such a wait in build_all() stopped the
 			# game for more than 4 minutes. The main thread loads its own copy, and
 			# release_dropped() frees the other copy when its load ends.
 			_requested.erase(path)

@@ -2292,7 +2292,7 @@ func _wall_piece(model_id: String, a: Vector3, b: Vector3, sea: Vector3, up := 1
 ## corrections, D-0026-26 and D-0026-27). The pieces take the lift away.
 ## The model is made, read, and freed at once: a template of WorldRow is freed
 ## only by WorldRow.build(), and a play test that quits before the showcase
-## builds its rows leaked it (the CI of 44d69ad: geo_tide, tree_budget).
+## builds its rows leaked it (the CI of ad8c8bd: geo_tide, tree_budget).
 func _lift_of(model_id: String) -> float:
 	if _lifts.has(model_id):
 		return _lifts[model_id]

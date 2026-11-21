@@ -29,7 +29,7 @@ const KEEP_GAP := 0.6
 ## than the limit of 300 000 (PT-73); with the mid level to 20 m and the hedges,
 ## the grove, and the poles of audit 2, S2 had 304 000 and S5 312 000. With the
 ## mid level to 12 m, one walker 7 m from the eye of S2 made 303 438 (the CI of
-## 0732db6): S2 must have room for a person near the eye. The other presets
+## 6cb8daa): S2 must have room for a person near the eye. The other presets
 ## keep WorldModel.RANGES.
 const PEOPLE_RANGES := {"low": Vector3(5.0, 6.0, 150.0)}
 ## A swimmer goes out at most this many steps of 0.5 m from the water's edge.

@@ -1071,7 +1071,7 @@
 			"spacing": 0.9,
 			"clump_scale": 1.5
 		},
-		"ranges_note": "On Low: no near level, the mid level to 6 m, the far level to 80 m (a hedge piece: 300 and 40 triangles; a bush: 600, then the impostor; a clump of flowers: 400, then the impostor). PT-73: S2 and S5 stay under 300 000 triangles also with the walkers near the eye of S2 (the mid level to 10 m and the walkers in the frame of S2 made 303 438 in the CI of 0732db6)."
+		"ranges_note": "On Low: no near level, the mid level to 6 m, the far level to 80 m (a hedge piece: 300 and 40 triangles; a bush: 600, then the impostor; a clump of flowers: 400, then the impostor). PT-73: S2 and S5 stay under 300 000 triangles also with the walkers near the eye of S2 (the mid level to 10 m and the walkers in the frame of S2 made 303 438 in the CI of 6cb8daa)."
 	},
 	"materials": {
 		"note": "R12: the colors of the parts that take a texture set of data/look/textures.json (shaders/showcase_surface.gdshader). tint multiplies the texture; tones makes the dark and the light of the texture two colors; mean is the color from far. The other colors stay flat. Builder values from the photos of section 3 and the photo from a drone of 2021: I approve them with the shots of PT-72.",
