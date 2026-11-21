@@ -1,6 +1,6 @@
 {
 	"note": "Footprints of the buildings of the area of plan 0026 from the buildings theme of Overture Maps (tools/geo/footprints.py, report 0026, D-0026-03). (c) OpenStreetMap contributors, Overture Maps Foundation, Microsoft, Google, and the other sources of the theme: ODbL. No year and no storeys: a stand-in needs its storeys from a photo.",
-	"release": "2026-10-21.0",
+	"release": "2026-11-18.0",
 	"box": {
 		"west": 107.07,
 		"south": 10.336,
@@ -4267,47 +4267,6 @@
 			]
 		},
 		{
-			"id": "a0774749-a54d-4111-9ade-517af7c80842",
-			"sources": [
-				"OpenStreetMap"
-			],
-			"records": [
-				"w118950627@3"
-			],
-			"height": null,
-			"floors": null,
-			"outline": [
-				[
-					175.13,
-					-25.43
-				],
-				[
-					151.59,
-					-21.17
-				],
-				[
-					158.28,
-					15.39
-				],
-				[
-					171.13,
-					12.78
-				],
-				[
-					181.83,
-					11.13
-				],
-				[
-					179.74,
-					-0.24
-				],
-				[
-					175.13,
-					-25.43
-				]
-			]
-		},
-		{
 			"id": "7bd37d3b-f3dc-483a-ba12-26dfea3e859a",
 			"sources": [
 				"OpenStreetMap"
@@ -4477,6 +4436,47 @@
 				[
 					172.99,
 					18.73
+				],
+				[
+					171.13,
+					12.78
+				],
+				[
+					181.83,
+					11.13
+				],
+				[
+					179.74,
+					-0.24
+				],
+				[
+					175.13,
+					-25.43
+				]
+			]
+		},
+		{
+			"id": "a0774749-a54d-4111-9ade-517af7c80842",
+			"sources": [
+				"OpenStreetMap"
+			],
+			"records": [
+				"w118950627@3"
+			],
+			"height": null,
+			"floors": null,
+			"outline": [
+				[
+					175.13,
+					-25.43
+				],
+				[
+					151.59,
+					-21.17
+				],
+				[
+					158.28,
+					15.39
 				],
 				[
 					171.13,
@@ -16214,39 +16214,6 @@
 			]
 		},
 		{
-			"id": "bfba093a-b313-4ecc-96fc-236eafceb9cc",
-			"sources": [
-				"Google Open Buildings"
-			],
-			"records": [
-				"7P2983QC+VX6P"
-			],
-			"height": null,
-			"floors": null,
-			"outline": [
-				[
-					-178.01,
-					452.76
-				],
-				[
-					-171.17,
-					441.47
-				],
-				[
-					-177.5,
-					437.64
-				],
-				[
-					-184.34,
-					448.92
-				],
-				[
-					-178.01,
-					452.76
-				]
-			]
-		},
-		{
 			"id": "e777bf07-def7-4685-b0d0-f16fdde292bc",
 			"sources": [
 				"Google Open Buildings"
@@ -16280,43 +16247,35 @@
 			]
 		},
 		{
-			"id": "40f47093-eb83-4904-8fda-93081d685c96",
+			"id": "bfba093a-b313-4ecc-96fc-236eafceb9cc",
 			"sources": [
-				"OpenStreetMap"
+				"Google Open Buildings"
 			],
 			"records": [
-				"w790529525@1"
+				"7P2983QC+VX6P"
 			],
 			"height": null,
 			"floors": null,
 			"outline": [
 				[
-					-146.99,
-					455.83
+					-178.01,
+					452.76
 				],
 				[
-					-155.4,
-					451.62
+					-171.17,
+					441.47
 				],
 				[
-					-160.03,
-					460.75
+					-177.5,
+					437.64
 				],
 				[
-					-164.19,
-					458.66
+					-184.34,
+					448.92
 				],
 				[
-					-169.89,
-					469.89
-				],
-				[
-					-157.33,
-					476.19
-				],
-				[
-					-146.99,
-					455.83
+					-178.01,
+					452.76
 				]
 			]
 		},
@@ -16348,6 +16307,47 @@
 				[
 					-109.61,
 					455.9
+				]
+			]
+		},
+		{
+			"id": "40f47093-eb83-4904-8fda-93081d685c96",
+			"sources": [
+				"OpenStreetMap"
+			],
+			"records": [
+				"w790529525@1"
+			],
+			"height": null,
+			"floors": null,
+			"outline": [
+				[
+					-146.02,
+					458.08
+				],
+				[
+					-154.43,
+					453.87
+				],
+				[
+					-159.06,
+					463.0
+				],
+				[
+					-163.23,
+					460.92
+				],
+				[
+					-168.93,
+					472.14
+				],
+				[
+					-156.36,
+					478.44
+				],
+				[
+					-146.02,
+					458.08
 				]
 			]
 		},
