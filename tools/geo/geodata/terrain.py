@@ -146,14 +146,29 @@ def make_grid(bounds, chunk: float, step: float) -> Grid:
     return Grid(cx0 * chunk, cz0 * chunk, step, np.zeros((rows, cols), dtype=np.float32))
 
 
-def load_dem(grid: Grid, dem_path, projection) -> None:
-    """Resamples the DEM to the grid with bicubic interpolation (D7)."""
+# Copernicus GLO-30 has this value on the sea (its mask of the water).
+DEM_SEA_VALUE = 0.0
+
+
+def load_dem(grid: Grid, dem_path, projection, land: np.ndarray | None = None) -> None:
+    """Resamples the DEM to the grid with bicubic interpolation (D7). The sea
+    pixels of the DEM (DEM_SEA_VALUE) have no value: with land, a land cell
+    with no value (next to the coastline, where the cubic sample has a sea
+    pixel) takes the nearest land value of the DEM (plan 0009, R5b: the walk on
+    the sea wall of Bãi Trước fell 3 m where the sample mixed the sea in)."""
+    grid.heights[:] = np.nan
     with rasterio.open(dem_path) as src:
         transform = Affine(grid.step, 0, projection.origin_e + grid.x0 - grid.step / 2,
                            0, -grid.step, projection.origin_n - grid.z0 + grid.step / 2)
         reproject(source=rasterio.band(src, 1), destination=grid.heights, src_transform=src.transform,
-                  src_crs=src.crs, dst_transform=transform, dst_crs=f"EPSG:{projection.epsg}",
-                  resampling=Resampling.cubic, dst_nodata=0.0)
+                  src_crs=src.crs, src_nodata=DEM_SEA_VALUE, dst_transform=transform,
+                  dst_crs=f"EPSG:{projection.epsg}", resampling=Resampling.cubic, dst_nodata=np.nan)
+    if land is not None:
+        missing = ~np.isfinite(grid.heights)
+        if missing.any() and not missing.all():
+            _d, (rows, cols) = ndimage.distance_transform_edt(missing, return_indices=True)
+            filled = grid.heights[rows, cols]
+            grid.heights[missing & land] = filled[missing & land]
     np.nan_to_num(grid.heights, copy=False, nan=0.0)
 
 

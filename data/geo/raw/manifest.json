@@ -158,12 +158,28 @@
 			"bytes": 383892
 		},
 		{
+			"file": "deltadtm.tif",
+			"url": "https://data.4tu.nl/file/1da2e70f-6c4d-4b03-86bd-b53e789cc629/672eba4c-1334-44c6-8119-8879ded25912 (DeltaDTM_v1_1_N10E107.tif)",
+			"license": "CC BY 4.0, DeltaDTM v1.1 (Pronk et al., Deltares, DOI 10.4121/21997565); from Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018",
+			"date": "2026-11-21",
+			"sha256": "9dd730613dcddbdc26fb53ab8ad9c9efebf0c5e966d9e9533c7261783e93ad7c",
+			"bytes": 161714
+		},
+		{
 			"file": "dem.tif",
 			"url": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N10_00_E107_00_DEM/Copernicus_DSM_COG_10_N10_00_E107_00_DEM.tif",
 			"license": "Copernicus DEM license, © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018",
-			"date": "2026-10-24",
-			"sha256": "4a212aa18836991384b62f6113393c2f0a6190718fbf2f6b74a97f4df8f492a6",
-			"bytes": 177608
+			"date": "2026-11-21",
+			"sha256": "7a59c8411dffb719417f740a3c588591be6148464fcc80b3c2a33175063d6821",
+			"bytes": 177925
+		},
+		{
+			"file": "gedtm30.tif",
+			"url": "https://s3.opengeohub.org/global/dtm/v1.2/gedtm_rf_m_30m_s_20060101_20151231_go_epsg.4326.3855_v1.2.tif",
+			"license": "CC BY 4.0, GEDTM30 v1.2 (Ho et al., OpenGeoHub, DOI 10.5281/zenodo.18887460)",
+			"date": "2026-11-21",
+			"sha256": "e8fd22a9932bc3891ab9e47a45f38931fa5790040d10bc1d145df9256a9ebada",
+			"bytes": 130193
 		},
 		{
 			"file": "osm.pbf",

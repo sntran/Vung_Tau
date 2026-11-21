@@ -29,7 +29,7 @@ from geodata import visibility, blocks as blocks_module  # noqa: E402
 from geodata import anchors as anchors_module  # noqa: E402
 from geodata import clearings, coast, homestay, landcover, landmarks, mapdraw, osm, roads as roads_module, terrain  # noqa: E402
 from geodata import roadworks as roadworks_module, sea as sea_module, seafloor, trees as trees_module  # noqa: E402
-from geodata import showcase as showcase_module  # noqa: E402
+from geodata import bareearth, groundreport, showcase as showcase_module  # noqa: E402
 from geodata.config import BUILD, GEO, RAW, ROOT, Config, load_json, write_json  # noqa: E402
 from geodata.projection import Projection, map_to_game  # noqa: E402
 
@@ -44,9 +44,9 @@ CLIFF_ROCK_M = 6.0
 # photos.py (the street photos, plan 0009, R5e) write these files before build.py
 # runs. build.py keeps them.
 TIDE_FILES = ("tide.json", "tide_report.md", "buildings_report.md", "buildings_r5d.json", "buildings_all.png",
-              "buildings_2019.png", "buildings_out.png", "buildings_no_outline.png", "lidar_report.md",
-              "lidar_seafloor.png", "lidar_tracks.json", "footprints.json", "photos_report.md", "photos_map.png",
-              "photos_map.png.import")
+              "buildings_2019.png", "buildings_out.png", "buildings_no_outline.png", "buildings_unseen.png",
+              "lidar_report.md", "lidar_seafloor.png", "lidar_tracks.json", "footprints.json", "photos_report.md",
+              "photos_map.png")
 BUILT_LANDUSE = {"residential", "commercial", "retail", "industrial", "construction", "military", "religious"}
 # A place where the roads cover more than this part of the ground (in a
 # Gaussian of TOWN_ROAD_SIGMA_M) is town.
@@ -183,10 +183,18 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     # The ground.
     grid = terrain.make_grid(box.bounds, area["chunk_size_m"], area["grid_m"])
     log(f"grid {grid.shape[1]} x {grid.shape[0]} samples")
-    terrain.load_dem(grid, raw / "dem.tif", projection)
+    # The land of the coastline takes the land values of the DEM, not its sea (plan 0009, R5b).
+    terrain.load_dem(grid, raw / "dem.tif", projection, terrain.rasterize(grid, polygons_of(land)))
+    # Plan 0009, R5b: one zero for the land and the sea (the mean sea level).
+    ground_config = load_json(geo / "ground.json")
+    mdt = float(ground_config["mean_dynamic_topography_m"])
+    grid.heights -= mdt
     dem_max = float(grid.heights.max())
     building_mask = terrain.rasterize(grid, buildings)
     town_mask = building_mask | terrain.rasterize(grid, [p for _k, s in landuse for p in polygons_of(s)])
+    # Plan 0009, R5b: the bare earth under the trees and the roofs.
+    ground_stats = bare_earth(grid, raw, out, ground_config, projection, config,
+                              terrain.rasterize(grid, polygons_of(land)), town_mask)
     # Small islands keep the heights of the DEM: the filter would make them flat.
     islands = [p for p in polygons_of(land) if p.area < ISLAND_MAX_M2]
     island_mask = terrain.rasterize(grid, [p.buffer(ISLAND_MARGIN_M) for p in islands])
@@ -344,12 +352,16 @@ def build(raw: Path, out: Path, geo: Path) -> int:
         log(f"{sum(len(v) for v in tree_record['types'].values())} trees: {tree_counts}")
 
     # Write the files. Keep the files of tide.py and footprints.py.
-    kept = {name: (out / name).read_bytes() for name in TIDE_FILES if (out / name).exists()}
+    # (A map keeps its import file, report 0009, D-0009-10.)
+    kept = {name: (out / name).read_bytes() for base in TIDE_FILES for name in (base, base + ".import")
+            if (out / name).exists()}
     if out.exists():
         shutil.rmtree(out)
     out.mkdir(parents=True)
     for name, content in kept.items():
         (out / name).write_bytes(content)
+    if ground_stats is not None:
+        ground_stats.pop("write")(out)
     # Plan 0008, R2 and D7: the ground under each known place is level, at the
     # lowest point of its outline; the base of the place is 0.1 m over it.
     level_places(grid, config.landmarks, found_by_id)
@@ -383,6 +395,8 @@ def build(raw: Path, out: Path, geo: Path) -> int:
                                       area["height_step_m"], out / "height" / "overview.png")
     for png in (out / "height").glob("*.png"):
         write_keep_import(png)
+    # Plan 0009, phase 2 (R6): the boxes of the buildings of 2019, on the final ground.
+    town_numbers = write_town(grid, raw, out, area)
     rock_mask = terrain.rasterize(grid, [p for r in rocks + land_rocks + [rock_band] + islands if r is not None
                                          for p in polygons_of(r)])
     pebble_mask = terrain.rasterize(grid, [p for r in pebble_shapes + [rock_band] if r is not None
@@ -633,6 +647,111 @@ LEVEL_MARGIN_M = 2.5
 # Under a model against a hill, the cells within this distance of the edge of
 # another road keep their height (one cell of the grid).
 ROAD_KEEP_M = 2.0
+
+
+def bare_earth(grid, raw: Path, out: Path, settings: dict, projection, config: Config, land: np.ndarray,
+               town: np.ndarray) -> dict | None:
+    """Plan 0009, R5b (D9): changes the ground of the grid (Copernicus over the
+    mean sea level) to the bare earth, and writes ground_report.md with its
+    maps. None when the files of the models or the lidar are not there."""
+    mdt = float(settings["mean_dynamic_topography_m"])
+    tracks = out / "lidar_tracks.json"
+    files = {name: raw / m["file"] for name, m in settings["models"].items()}
+    if not tracks.exists() or not all(f.exists() for f in files.values()):
+        log("bare earth: the models or the lidar are not there; Copernicus stays")
+        return None
+    models = {bareearth.COPERNICUS: grid.heights.copy()}
+    for name, path in files.items():
+        # Cubic, as the DEM (D7): a bilinear sample of 30 m cells makes facets on the slopes.
+        models[name] = bareearth.msl(terrain.load_raster(grid, path, projection, terrain.Resampling.cubic), mdt)
+    classes = np.nan_to_num(terrain.load_raster(grid, raw / "worldcover.tif", projection, terrain.Resampling.nearest),
+                            nan=0.0).astype(np.uint8)
+    canopy = terrain.load_raster(grid, raw / "canopy.tif", projection, terrain.Resampling.max)
+    masks = landcover.cover_masks(classes, np.nan_to_num(canopy, nan=0.0), land)
+    class_cells = bareearth.class_map(land, masks["tree"], masks["bush"], town | ((classes == landcover.BUILT) & land))
+    del canopy
+    by_id = {l["id"]: l for l in config.landmarks}
+    hills = {}
+    for hill_id, hill in settings["hills"].items():
+        hint = by_id[hill_id]["hint"]
+        hills[hill_id] = hill | {"position": [float(v) for v in projection.to_game(hint["lon"], hint["lat"])]}
+    zones, zone_names = bareearth.zone_map(grid.shape, grid.step, grid.x0, grid.z0, grid.heights, hills)
+    bins = load_json(tracks)
+    columns = bins["columns"]
+    ix, iz, ig = columns.index("x"), columns.index("z"), columns.index("ground")
+    points = np.array([[b[ix], b[iz], b[ig] - mdt] for b in bins["bins"] if b[ig] is not None], dtype=np.float64)
+    result = bareearth.compare(models, points, class_cells, zones, zone_names, grid.x0, grid.z0, grid.step)
+    choice = bareearth.choose(result, int(settings["min_points"]))
+    before = grid.heights.copy()
+    keep = bareearth.coast_keep(land, grid.step, float(settings["coast_band_m"]))
+    applied = bareearth.apply(grid.heights, models, class_cells, zones, zone_names, choice, keep, grid.step,
+                              float(settings["min_difference_m"]), float(settings["difference_mean_m"]),
+                              float(settings["blend_m"]))
+    log(f"bare earth: {applied['numbers']['changed_ha']} ha change, a mean of {applied['numbers']['mean_change_m']:+.2f} m")
+    def write(out: Path) -> None:
+        # The report: the places before and after, the map of the change, and the models side by side.
+        places = []
+        world_places = {}
+        for path in sorted((GEO.parent / "world" / "places").glob("*.json")):
+            for p in load_json(path).get("places", []):
+                world_places[p["id"]] = p
+        marks = []
+        for place in settings["places"]:
+            if "landmark" in place:
+                hint = by_id[place["landmark"]]["hint"]
+                point = [float(v) for v in projection.to_game(hint["lon"], hint["lat"])]
+            else:
+                point = [float(v) for v in world_places[place["world_place"]]["level_at"]]
+            area = groundreport.window(grid.shape, grid.step, grid.x0, grid.z0, point, float(place["radius_m"]))
+            inside = land[area]
+            if not inside.any():
+                continue
+            places.append({"id": place["id"], "name": place["name"], "point": point,
+                           "before_egm": float(before[area][inside].mean() + mdt),
+                           "before_msl": float(before[area][inside].mean()),
+                           "after": float(grid.heights[area][inside].mean())})
+            marks.append((place["name"], (point[1] - grid.z0) / grid.step, (point[0] - grid.x0) / grid.step))
+        maps = {"change": "ground_change.png"}
+        groundreport.draw_change(out / maps["change"], applied["change"], land, 8, marks)
+        write_keep_import(out / maps["change"])
+        names = {bareearth.COPERNICUS: "Copernicus"} | {k: m["name"] for k, m in settings["models"].items()}
+        for key, view in settings["views"].items():
+            center = hills[key]["position"] if key in hills else next(p["point"] for p in places if p["id"] == "beach")
+            area = groundreport.window(grid.shape, grid.step, grid.x0, grid.z0, center, float(view["radius_m"]))
+            crops = {names[k]: v[area] for k, v in models.items()} | {"The ground of the game": grid.heights[area].copy()}
+            maps[key] = f"ground_models_{key}.png"
+            groundreport.draw_models(out / maps[key], f"{view['name']}: each model over the mean sea level", crops,
+                                     land[area], grid.step)
+            write_keep_import(out / maps[key])
+        report_settings = {"mdt": mdt} | {k: settings[k] for k in ("min_points", "min_difference_m", "difference_mean_m",
+                                                                    "blend_m")}
+        (out / "ground_report.md").write_text(
+            groundreport.report(result, choice, applied, zone_names, hills, {k: m["name"] for k, m in settings["models"].items()},
+                                report_settings, places, maps), encoding="utf-8")
+    return {"mdt_m": mdt, "changed_ha": applied["numbers"]["changed_ha"],
+            "choice": {g: c["model"] for g, c in choice.items()}, "write": write}
+
+
+def write_town(grid, raw: Path, out: Path, area: dict) -> dict | None:
+    """Plan 0009, phase 2 (R6, R10): data/geo/build/town/ (geodata/town.py) from
+    buildings_2019 of the store of the release. None when the store is not there."""
+    manifest_path = raw / "buildings" / "manifest.json"
+    if not manifest_path.exists():
+        return None
+    import geostore
+    from geodata import town
+    store = geostore.load(manifest_path)
+    if "buildings_2019" not in store.get("files", {}):
+        return None
+    buildings = geostore.get(store, "buildings_2019")["buildings"]
+    palette = load_json(ROOT / "data" / "world" / "palette.json")
+    chunks, numbers = town.make(buildings, lambda x, z: grid.sample(x, z), palette, float(area["chunk_size_m"]))
+    numbers["written"] = town.write(out / "town", chunks, float(area["chunk_size_m"]))
+    index = load_json(out / "town" / "index.json")
+    write_json(out / "town" / "index.json", index | {"numbers": numbers})
+    log(f"town: {numbers['written']} boxes in {numbers['chunks']} chunks, roofs {numbers['roofs']}, "
+        f"{numbers['hidden_walls']} of {numbers['walls']} walls hidden by a neighbor")
+    return numbers
 
 
 def level_places(grid, landmarks_config, found_by_id) -> None:

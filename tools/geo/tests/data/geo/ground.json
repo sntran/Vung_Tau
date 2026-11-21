@@ -1,0 +1,68 @@
+{
+	"note": "Plan 0009, R5b (D9): the bare earth under the trees and the roofs, and the zero of the heights. tools/geo/build.py reads this file. See data/geo/build/ground_report.md.",
+	"mean_dynamic_topography_m": 1.16,
+	"mean_dynamic_topography_source": "DTU22MDT at Bãi Trước (report 0009, D-0009-07 and section 6.4): the mean sea level is 1.16 m over EGM2008. The heights over EGM2008 (Copernicus, GEDTM30, DeltaDTM, the lidar, ATL24) take it away, so the land and the sea of the tide have one zero: the mean sea level.",
+	"models": {
+		"gedtm30": {
+			"file": "gedtm30.tif",
+			"name": "GEDTM30 v1.2"
+		},
+		"deltadtm": {
+			"file": "deltadtm.tif",
+			"name": "DeltaDTM v1.1"
+		}
+	},
+	"min_points": 30,
+	"min_difference_m": 2.0,
+	"difference_mean_m": 30.0,
+	"blend_m": 60.0,
+	"coast_band_m": 30.0,
+	"hills": {
+		"nui_lon": {
+			"name": "Núi Lớn",
+			"radius_m": 1100.0,
+			"lowest_m": 20.0
+		},
+		"nui_nho": {
+			"name": "Núi Nhỏ",
+			"radius_m": 700.0,
+			"lowest_m": 20.0
+		}
+	},
+	"views": {
+		"bai_truoc": {
+			"name": "Bãi Trước",
+			"radius_m": 450.0
+		},
+		"nui_nho": {
+			"name": "Núi Nhỏ",
+			"radius_m": 900.0
+		}
+	},
+	"places": [
+		{
+			"id": "beach",
+			"name": "The beach of Bãi Trước",
+			"landmark": "bai_truoc",
+			"radius_m": 80.0
+		},
+		{
+			"id": "hall",
+			"name": "The hall with the orange roof",
+			"world_place": "nha_mai_ngoi_cam",
+			"radius_m": 40.0
+		},
+		{
+			"id": "sen_bien",
+			"name": "Cao ốc Sen Biển",
+			"world_place": "cao_oc_sen_bien",
+			"radius_m": 50.0
+		},
+		{
+			"id": "grand",
+			"name": "The Grand Hotel",
+			"world_place": "khach_san_grand",
+			"radius_m": 60.0
+		}
+	]
+}

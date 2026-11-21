@@ -506,8 +506,14 @@ def report(lines: list[str]) -> None:
     points = [p for k in keys for p in geostore.get(manifest, k)["points"]]
     lon = np.array([p[0] for p in points])
     lat = np.array([p[1] for p in points])
-    depth = np.array([p[4] if p[5] is None else p[5] for p in points], dtype=float)
-    out = ["", "## R5c: the sea floor", "", "| Source | Points | Mean difference (m) | RMSE (m) |", "|---|---|---|---|"]
+    # Plan 0009, R5b: one zero for the land and the sea. ATL24 is over EGM2008;
+    # the intertidal heights and the sea of the game are over the mean sea level.
+    mdt = float(json.loads((ROOT / "data" / "geo" / "ground.json").read_text(encoding="utf-8"))["mean_dynamic_topography_m"])
+    depth = np.array([p[4] if p[5] is None else p[5] for p in points], dtype=float) - mdt
+    out = ["", "## R5c: the sea floor", "",
+           f"ATL24 over the mean sea level (its height over EGM2008 minus {mdt:.2f} m, the mean dynamic topography of "
+           "DTU22, plan 0009, R5b) minus the source.", "",
+           "| Source | Points | Mean difference (m) | RMSE (m) |", "|---|---|---|---|"]
     for name in ("intertidal.tif", "gebco.tif"):
         raster = ROOT / "data" / "geo" / "raw" / name
         if not raster.exists():

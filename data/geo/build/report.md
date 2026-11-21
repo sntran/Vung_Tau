@@ -12,7 +12,7 @@ Made by `tools/geo/build.py` on 2026-11-21.
 | Game Z (m) | -8484.0 to 4849.8 |
 | Origin | 10.34368307° N, 107.07404669° E (UTM 48N 727110 E, 1144150 N) |
 | Height chunks | 960 (756 with land) |
-| Highest DEM sample | 249.8 m |
+| Highest DEM sample | 248.6 m |
 | Mean height change in towns (buildings removed) | 0.16 m |
 
 ## Roads
@@ -46,29 +46,29 @@ Total road length: 692.3 km. Roads with a width tag: 9 of 4124. Hẻm: 2366.
 
 | Landmark | Found | OSM | Position (game X, Z) | Height (m) | Note |
 |---|---|---|---|---|---|
-| Bãi Trước | yes | way/220821647 | -2.55, -1.31 | 1.2 | 3 candidates, 347.9 m from the hint |
+| Bãi Trước | yes | way/220821647 | -2.55, -1.31 | 1.47 | 3 candidates, 347.9 m from the hint |
 | Bãi Sau | yes | way/234800751 | 2463.57, 115.52 | -0.96 | 5 candidates, 391.9 m from the hint |
-| Bãi Dâu | yes | way/895756059 | -1377.16, -2753.98 | 1.08 | 3 candidates, 435.3 m from the hint |
-| Mũi Nghinh Phong | yes | node/2435353682 | 1076.55, 2561.69 | 1.33 | 1 candidates, 85.4 m from the hint |
-| Núi Lớn | yes | node/2452682527 | -649.2, -1712.32 | 238.42 | 1 candidates, 188.9 m from the hint |
-| Núi Nhỏ | yes | node/-1 | 374.1, 1035.7 | 175.4 | 1 candidates, 0.0 m from the hint |
-| Tượng Chúa Kitô Vua | yes | way/235008112 | 1159.87, 1893.39 | 138.33 | 1 candidates, 83.3 m from the hint |
-| Hải đăng Vũng Tàu | yes | way/229301316 | 402.21, 1056.5 | 173.11 | 1 candidates, 21.8 m from the hint |
-| Bạch Dinh | yes | way/220753354 | -596.69, -776.93 | 28.11 | 1 candidates, 259.6 m from the hint |
-| Tượng Đức Mẹ Bãi Dâu | yes | way/790529433 | -1290.64, -3064.05 | 57.09 | 2 candidates, 7.3 m from the hint |
-| Miếu Hòn Bà | yes | way/221906193 | 1677.76, 2174.06 | 11.35 | 8 candidates, 8.4 m from the hint |
-| Chùa Tam Bảo | yes | way/792193852 | -749.18, -1275.61 | 104.03 | 1 candidates, 5.1 m from the hint |
-| Vi Ba | yes | way/35923559 | -722.46, -1106.78 | 75.47 | 5 candidates, 299.0 m from the hint |
-| Hải Đăng | yes | way/35923584 | 332.79, 1014.55 | 169.07 | 3 candidates, 125.2 m from the hint |
-| Bến xe Vũng Tàu | yes | way/220891652 | 1418.58, -757.78 | 6.13 | 2 candidates, 7.3 m from the hint |
-| Chợ Vũng Tàu | yes | way/215166910 | 1299.74, -509.85 | 9.48 | 1 candidates, 785.3 m from the hint |
-| Chợ Xóm Lưới | yes | node/2649575440 | 224.65, 242.56 | 7.88 | 1 candidates, 3.1 m from the hint |
-| Chợ Phường 1 | yes | way/259528309 | 159.09, -708.46 | 8.75 | 1 candidates, 5.2 m from the hint |
-| Vòng xoay Đài tưởng niệm Liệt sĩ | yes | way/975192902 | 1953.62, -562.5 | 9.62 | 8 candidates, 811.8 m from the hint |
-| Ngã Năm | yes | node/3144051066 | 1178.71, -1254.11 | 6.48 | 1 candidates, 5.8 m from the hint |
+| Bãi Dâu | yes | way/895756059 | -1377.16, -2753.98 | 1.41 | 3 candidates, 435.3 m from the hint |
+| Mũi Nghinh Phong | yes | node/2435353682 | 1076.55, 2561.69 | 2.37 | 1 candidates, 85.4 m from the hint |
+| Núi Lớn | yes | node/2452682527 | -649.2, -1712.32 | 233.7 | 1 candidates, 188.9 m from the hint |
+| Núi Nhỏ | yes | node/-1 | 374.1, 1035.7 | 173.23 | 1 candidates, 0.0 m from the hint |
+| Tượng Chúa Kitô Vua | yes | way/235008112 | 1159.87, 1893.39 | 135.33 | 1 candidates, 83.3 m from the hint |
+| Hải đăng Vũng Tàu | yes | way/229301316 | 402.21, 1056.5 | 173.23 | 1 candidates, 21.8 m from the hint |
+| Bạch Dinh | yes | way/220753354 | -596.69, -776.93 | 17.64 | 1 candidates, 259.6 m from the hint |
+| Tượng Đức Mẹ Bãi Dâu | yes | way/790529433 | -1290.64, -3064.05 | 57.27 | 2 candidates, 7.3 m from the hint |
+| Miếu Hòn Bà | yes | way/221906193 | 1677.76, 2174.06 | 10.02 | 8 candidates, 8.4 m from the hint |
+| Chùa Tam Bảo | yes | way/792193852 | -749.18, -1275.61 | 99.84 | 1 candidates, 5.1 m from the hint |
+| Vi Ba | yes | way/35923559 | -722.46, -1106.78 | 70.83 | 5 candidates, 299.0 m from the hint |
+| Hải Đăng | yes | way/35923584 | 332.79, 1014.55 | 164.05 | 3 candidates, 125.2 m from the hint |
+| Bến xe Vũng Tàu | yes | way/220891652 | 1418.58, -757.78 | 5.09 | 2 candidates, 7.3 m from the hint |
+| Chợ Vũng Tàu | yes | way/215166910 | 1299.74, -509.85 | 8.3 | 1 candidates, 785.3 m from the hint |
+| Chợ Xóm Lưới | yes | node/2649575440 | 224.65, 242.56 | 6.46 | 1 candidates, 3.1 m from the hint |
+| Chợ Phường 1 | yes | way/259528309 | 159.09, -708.46 | 7.34 | 1 candidates, 5.2 m from the hint |
+| Vòng xoay Đài tưởng niệm Liệt sĩ | yes | way/975192902 | 1953.62, -562.5 | 7.5 | 8 candidates, 811.8 m from the hint |
+| Ngã Năm | yes | node/3144051066 | 1178.71, -1254.11 | 6.34 | 1 candidates, 5.8 m from the hint |
 | Cầu Đá cổ | yes | way/286293879 | -502.58, 448.48 | -4.0 | 1 candidates, 133.4 m from the hint |
-| Nhà thờ Vũng Tàu | yes | way/791795169 | 362.37, -272.07 | 10.05 | 1 candidates, 13.7 m from the hint |
-| Tượng Trần Hưng Đạo | yes | way/235156180 | 360.93, 141.55 | 7.26 | 1 candidates, 4.1 m from the hint |
+| Nhà thờ Vũng Tàu | yes | way/791795169 | 362.37, -272.07 | 7.88 | 1 candidates, 13.7 m from the hint |
+| Tượng Trần Hưng Đạo | yes | way/235156180 | 360.93, 141.55 | 6.07 | 1 candidates, 4.1 m from the hint |
 
 ## Homestay hẻm
 
@@ -120,8 +120,8 @@ None.
 
 | Hill | Area (km²) | Tree cover | Bushes | Grass | Bare | Trees | WorldCover classes |
 |---|---|---|---|---|---|---|---|
-| Núi Lớn | 2.31 | 73 % | 7 % | 8 % | 0 % | 15772 | tree cover 88 %, built-up 11 %, grassland 1 %, bare or sparse 0 %, water 0 % |
-| Núi Nhỏ | 0.92 | 76 % | 8 % | 6 % | 0 % | 6892 | tree cover 92 %, built-up 7 %, grassland 1 %, bare or sparse 0 % |
+| Núi Lớn | 2.27 | 74 % | 7 % | 8 % | 0 % | 15597 | tree cover 89 %, built-up 10 %, grassland 1 %, bare or sparse 0 %, water 0 % |
+| Núi Nhỏ | 0.90 | 76 % | 8 % | 6 % | 0 % | 6806 | tree cover 93 %, built-up 6 %, grassland 1 %, bare or sparse 0 % |
 
 The hills: the land within 1.1 km of the top of Núi Lớn and 0.7 km of the top of Núi Nhỏ, higher than 20 m.
 
@@ -212,8 +212,6 @@ The street and park trees and the canopy map (report 0020, D-0020-03): on the ro
 ## Problems with the data
 
 - area 18343238 is not a correct polygon: invalid area (area_id=36686477)
-- Núi Lớn is not in the OSM data of the box
-- Núi Nhỏ is not in the OSM data of the box
 
 ## Source files
 
@@ -234,5 +232,7 @@ The street and park trees and the canopy map (report 0020, D-0020-03): on the ro
 | assets/textures/ground/sand/diffuse.jpg | https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/coast_sand_01/coast_sand_01_diff_1k.jpg | 2026-10-24 | `58af2e40100f7f40…` | CC0 (Poly Haven) |
 | assets/textures/ground/sand/normal.jpg | https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/coast_sand_01/coast_sand_01_nor_gl_1k.jpg | 2026-10-24 | `fe4d045aec99e71e…` | CC0 (Poly Haven) |
 | assets/textures/ground/sand/roughness.jpg | https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/coast_sand_01/coast_sand_01_rough_1k.jpg | 2026-10-24 | `cbc3e0bf2214e043…` | CC0 (Poly Haven) |
-| dem.tif | https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N10_00_E107_00_DEM/Copernicus_DSM_COG_10_N10_00_E107_00_DEM.tif | 2026-10-24 | `4a212aa188369913…` | Copernicus DEM license, © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 |
+| deltadtm.tif | https://data.4tu.nl/file/1da2e70f-6c4d-4b03-86bd-b53e789cc629/672eba4c-1334-44c6-8119-8879ded25912 (DeltaDTM_v1_1_N10E107.tif) | 2026-11-21 | `9dd730613dcddbdc…` | CC BY 4.0, DeltaDTM v1.1 (Pronk et al., Deltares, DOI 10.4121/21997565); from Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 |
+| dem.tif | https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N10_00_E107_00_DEM/Copernicus_DSM_COG_10_N10_00_E107_00_DEM.tif | 2026-11-21 | `7a59c8411dffb719…` | Copernicus DEM license, © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 |
+| gedtm30.tif | https://s3.opengeohub.org/global/dtm/v1.2/gedtm_rf_m_30m_s_20060101_20151231_go_epsg.4326.3855_v1.2.tif | 2026-11-21 | `e8fd22a9932bc389…` | CC BY 4.0, GEDTM30 v1.2 (Ho et al., OpenGeoHub, DOI 10.5281/zenodo.18887460) |
 | osm.pbf | https://download.geofabrik.de/asia/vietnam-latest.osm.pbf | 2026-10-24 | `862cef84cb27aa2b…` | ODbL 1.0, © OpenStreetMap contributors |

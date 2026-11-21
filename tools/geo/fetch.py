@@ -3,12 +3,17 @@
 
 Usage:
   python tools/geo/fetch.py                 Download the OSM data, the DEM, and the textures.
-  python tools/geo/fetch.py --only dem      Download one part: osm, dem, or textures.
+  python tools/geo/fetch.py --only dem      Download one part: osm, dem, textures, or bare_earth.
 
 The OSM data comes from the Overpass API. If all Overpass servers fail, the
 script downloads the Vietnam extract from Geofabrik and clips it with
 "osmium extract" (package osmium-tool). The DEM comes from the public AWS
 bucket of Copernicus GLO-30. The textures come from Poly Haven (CC0).
+
+The bare earth (plan 0009, R5b): a window of GEDTM30 v1.2 (OpenGeoHub, a COG
+read over HTTP) and the tile of DeltaDTM v1.1 (4TU.ResearchData, the file of
+Asia, read with range requests). Both are over EGM2008, as Copernicus. These
+two sources answer from the workspace too (2026-11-21).
 """
 
 import argparse
@@ -26,7 +31,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from geodata import landmarks  # noqa: E402
+from geodata import httpzip, landmarks  # noqa: E402
 from geodata.config import RAW, TEXTURES, Config, load_json, write_json  # noqa: E402
 
 OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter",
@@ -43,7 +48,19 @@ LICENSES = {
     "osm": "ODbL 1.0, © OpenStreetMap contributors",
     "dem": "Copernicus DEM license, © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018",
     "texture": "CC0 (Poly Haven)",
+    "gedtm30": "CC BY 4.0, GEDTM30 v1.2 (Ho et al., OpenGeoHub, DOI 10.5281/zenodo.18887460)",
+    "deltadtm": "CC BY 4.0, DeltaDTM v1.1 (Pronk et al., Deltares, DOI 10.4121/21997565); "
+                "from Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018",
 }
+# Plan 0009, R5b (D9): the models of the bare earth.
+GEDTM30_URL = ("https://s3.opengeohub.org/global/dtm/v1.2/"
+               "gedtm_rf_m_30m_s_20060101_20151231_go_epsg.4326.3855_v1.2.tif")
+DELTADTM_ZIP = ("https://data.4tu.nl/file/1da2e70f-6c4d-4b03-86bd-b53e789cc629/"
+                "672eba4c-1334-44c6-8119-8879ded25912")  # Asia.zip of DOI 10.4121/21997565 (v1.1)
+DELTADTM_NODATA = -9999.0
+# DeltaDTM has only the land below 30 m over EGM2008: a cell over it has the
+# value 30 (the clip of its mask, 255), and no ground.
+DELTADTM_CLIP_M = 30.0
 USER_AGENT = "VungTau-game-geodata/1.0 (https://github.com/sntran/Vung_Tau)"
 DEM_MARGIN_DEG = 0.01
 
@@ -125,9 +142,23 @@ def dem_tiles(bbox) -> list[str]:
     return names
 
 
+def merge_on_grid(sources, bounds):
+    """The mosaic of the tiles in bounds, on the grid of the tiles (plan 0009,
+    R5b): merge() with the bounds of the box put the pixels of the tiles on the
+    edges of the box, half a pixel (about 15 m) west and north of their place."""
+    from rasterio.merge import merge
+    first = sources[0].transform
+    res_x, res_y = first.a, -first.e
+    west, south, east, north = bounds
+    west = first.c + math.floor((west - first.c) / res_x) * res_x
+    east = first.c + math.ceil((east - first.c) / res_x) * res_x
+    north = first.f - math.floor((first.f - north) / res_y) * res_y
+    south = first.f - math.ceil((first.f - south) / res_y) * res_y
+    return merge(sources, bounds=(west, south, east, north))
+
+
 def fetch_dem(config: Config, raw: Path) -> dict:
     import rasterio
-    from rasterio.merge import merge
     west, south, east, north = config.bbox
     with tempfile.TemporaryDirectory() as tmp:
         files, urls = [], []
@@ -139,7 +170,7 @@ def fetch_dem(config: Config, raw: Path) -> dict:
             urls.append(url)
         sources = [rasterio.open(f) for f in files]
         bounds = (west - DEM_MARGIN_DEG, south - DEM_MARGIN_DEG, east + DEM_MARGIN_DEG, north + DEM_MARGIN_DEG)
-        mosaic, transform = merge(sources, bounds=bounds)
+        mosaic, transform = merge_on_grid(sources, bounds)
         profile = sources[0].profile
         profile.update(driver="GTiff", height=mosaic.shape[1], width=mosaic.shape[2], transform=transform,
                        compress="deflate", predictor=3, tiled=False)
@@ -149,6 +180,49 @@ def fetch_dem(config: Config, raw: Path) -> dict:
         for s in sources:
             s.close()
     return {"file": "dem.tif", "url": " ".join(urls), "license": LICENSES["dem"]}
+
+
+def _write_window(path: Path, data, transform) -> None:
+    import rasterio
+    profile = {"driver": "GTiff", "height": data.shape[0], "width": data.shape[1], "count": 1, "dtype": "float32",
+               "crs": "EPSG:4326", "transform": transform, "nodata": float("nan"), "compress": "deflate", "predictor": 3}
+    with rasterio.open(path, "w", **profile) as dst:
+        dst.write(data, 1)
+
+
+def fetch_bare_earth(config: Config, raw: Path) -> list[dict]:
+    """Plan 0009, R5b: the windows of GEDTM30 and DeltaDTM over the box of the DEM, in meters
+    over EGM2008, with NaN where a model has no value (the sea; DeltaDTM over 30 m)."""
+    import numpy as np
+    import rasterio
+    from rasterio.windows import from_bounds
+    west, south, east, north = config.bbox
+    bounds = (west - DEM_MARGIN_DEG, south - DEM_MARGIN_DEG, east + DEM_MARGIN_DEG, north + DEM_MARGIN_DEG)
+    records = []
+    with rasterio.Env(GDAL_HTTP_USERAGENT=USER_AGENT, GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR"):
+        with rasterio.open("/vsicurl/" + GEDTM30_URL) as src:
+            window = from_bounds(*bounds, src.transform).round_offsets().round_lengths()
+            data = src.read(1, window=window).astype("float32")
+            if np.issubdtype(src.dtypes[0], np.integer):
+                data /= 10.0  # GEDTM30 v1.1 and before: decimeters
+            data[(data > 1e4) | (data < -1e3)] = np.nan
+            _write_window(raw / "gedtm30.tif", data, src.window_transform(window))
+    records.append({"file": "gedtm30.tif", "url": GEDTM30_URL, "license": LICENSES["gedtm30"]})
+    tiles = [f"DeltaDTM_v1_1_{'N' if lat >= 0 else 'S'}{abs(lat):02d}{'E' if lon >= 0 else 'W'}{abs(lon):03d}.tif"
+             for lat in range(math.floor(bounds[1]), math.floor(bounds[3]) + 1)
+             for lon in range(math.floor(bounds[0]), math.floor(bounds[2]) + 1)]
+    if len(tiles) != 1:
+        raise RuntimeError(f"the box needs {len(tiles)} tiles of DeltaDTM; fetch_bare_earth reads one")
+    with tempfile.TemporaryDirectory() as tmp:
+        tile = Path(tmp) / tiles[0]
+        httpzip.extract(DELTADTM_ZIP, tiles[0], tile, USER_AGENT)
+        with rasterio.open(tile) as src:
+            window = from_bounds(*bounds, src.transform).round_offsets().round_lengths()
+            data = src.read(1, window=window).astype("float32")
+            data[(data == DELTADTM_NODATA) | (data >= DELTADTM_CLIP_M - 0.01)] = np.nan
+            _write_window(raw / "deltadtm.tif", data, src.window_transform(window))
+    records.append({"file": "deltadtm.tif", "url": f"{DELTADTM_ZIP} ({tiles[0]})", "license": LICENSES["deltadtm"]})
+    return records
 
 
 def fetch_textures(_config: Config, _raw: Path) -> list[dict]:
@@ -202,7 +276,7 @@ def check_found(config: Config, raw: Path) -> list[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--only", choices=["osm", "dem", "textures"])
+    parser.add_argument("--only", choices=["osm", "dem", "textures", "bare_earth"])
     parser.add_argument("--raw", type=Path, default=RAW)
     args = parser.parse_args()
     config = Config()
@@ -215,7 +289,7 @@ def main() -> int:
     manifest = load_json(manifest_path) if manifest_path.exists() else {"files": []}
     by_file = {f["file"]: f for f in manifest["files"]}
     today = datetime.date.today().isoformat()
-    steps = {"osm": fetch_osm, "dem": fetch_dem, "textures": fetch_textures}
+    steps = {"osm": fetch_osm, "dem": fetch_dem, "textures": fetch_textures, "bare_earth": fetch_bare_earth}
     for name, step in steps.items():
         if args.only and args.only != name:
             continue
