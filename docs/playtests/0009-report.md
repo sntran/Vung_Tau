@@ -156,3 +156,35 @@ ATL08 has 17 of the 30 passes of ATL03 of the same years. The years that the las
 ### 6.5 Status
 
 Phase 1a is not done: D-0009-08 to D-0009-10.
+
+## 7. Audit 3: branch at `a6ffd2c` (2026-11-21)
+
+### 7.1 Runs
+
+| Check | Result |
+|---|---|
+| CI of `a6ffd2c` | Pass. |
+| The data at the head | Read here with Python from the release `geodata-0009-1`. |
+
+### 7.2 What is correct
+
+- **D-0009-08.** 45 324 buildings of 2019 and 6 365 out, each with a first year and a height. The 4 670 buildings that the 2.5D data does not see are in the list `buildings_unseen`, with the status Check, and the build stops on a building of 2019 with no height.
+- **D-0009-09.** ATL08 has the 30 passes of ATL03, and a year that loses a pass is fetched again.
+- **D-0009-10.** The maps have their import files.
+
+### 7.3 Defects
+
+#### D-0009-11: Photons of clouds in the check of the roofs (low)
+
+The RMSE of the roof photons went from 6.37 m to 17.55 m. The cause is one building: 5 photons of 2025-08-30 at 758 m over a roof of 6 m (clouds). Without the 10 differences of more than 50 m, the RMSE is 4.66 m. The other large differences are towers (a 2.5D height of 60 m to 90 m), where the photons fall on lower parts.
+
+- Keep only the photons of a high signal confidence, and at most 150 m over the ground.
+- Give the median and the median absolute difference with the RMSE, and give the towers (2.5D over 40 m) in a row of their own.
+
+#### D-0009-12: A commit with another author (high, before the merge to `main`)
+
+See report 0026, D-0026-43: the merge commit `8990b37`.
+
+### 7.4 Status
+
+Phase 1a is done when D-0009-11 and D-0009-12 are corrected. Phase 1b waits for plan 0026 to go to `main`.

@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft |
+| Status | Approved (2026-11-20) |
 | Branch | `feat/0027-construction-in-the-game` |
-| Depends on | 0023 (models from World). World steps W24 to W28 (section 5). |
+| Depends on | 0023 (models from World). World steps W24 to W28 (section 5: done in World on 2026-11-20, `main` at `0a467e6`). |
 | Changes | 0023 (D1, R2, R3, R5: a model is its parts, not one GLB for each level), 0026 (D5, `docs/world-models.md`: the loop of look and edit). |
 
 ## 1. Goal
@@ -33,12 +33,13 @@ Why now (report 0026, section 3): the edge of World answers 503 for each buildin
 
 ## 4. Requirements
 
-- **R1.** `tools/world/fetch.py` gets the parts list and the part files of each order from the factory (W24, W25), and from a clone of World for the catalog. A request of Vũng Tàu proves its project (World `docs/factory.md`, "The secrets"; changed on 2026-11-19, this repository needs no secret for it). A job of GitHub Actions of this repository sends its ID token (`permissions: id-token: write`, the audience `https://world.mkfifo.com`) to `https://world.mkfifo.workers.dev`, and its project is `vung_tau`. A workspace sends the token `WORLD_TOKEN` of World with the header `x-world-project: vung_tau`, only when I give it that token. With a proof, a part that the edge cannot build waits for a construction shift of World ("Construction shifts"); with no proof, the factory answers 422 for such a part.
+- **R1.** `tools/world/fetch.py` gets the parts list and the part files of each order from the factory (W24, W25), and from a clone of World for the catalog. A request of Vũng Tàu proves its project (World `docs/factory.md`, "The secrets"; changed on 2026-11-19, this repository needs no secret for it). A job of GitHub Actions of this repository sends its ID token (`permissions: id-token: write`, the audience `https://world.mkfifo.com`) to `https://world.mkfifo.workers.dev`, and its project is `vung_tau`. A workspace sends the token `WORLD_TOKEN` of World with the header `x-world-project: vung_tau`, only when I give it that token. With a proof, a part that the edge cannot build waits for a construction shift of World ("Construction shifts"); with no proof, the factory answers 422 for such a part. The parts list of an order is `/o/HASH.elements.json` (and `.mid.` and `.far.`), and each part is `/p/KEY.glb` (World `docs/factory.md`, "The parts of a model"). Ask for all the parts of a list at one time, so that a shift builds them at the same time. A part can answer 202 with `retry-after`, and the edge can start again during a construction (a deploy, or the limit of its memory): `fetch.py` asks again until each part comes or a limit of time ends, and then fails with the keys that did not come. The workflow `world-request.yml` of the branch `ci/world-request-measure` (World `docs/factory.md`, "The start of a shift by the edge, and a request with an ID token") did this in a measure: 7 parts of an edit of Hải Âu in about 5 minutes, with no secret.
 - **R2.** The lock of D4. A new lock lists each part, and `fetch.py --check` checks each file.
 - **R3.** The glue of D3 (`tools/world/glue.py`, or an import plugin of Godot). The same parts always give the same scene. Unit tests: the bounds of the glued model are the bounds of its parts; its triangles are the sum of the triangles of its parts; a repeated part is a MultiMesh.
 - **R4.** `WorldModel` loads a glued model as before: the levels and their ranges, the joints, `set_pose()`, `parts()`, and the receipt.
 - **R5.** The loop of D5 in `drawings.py look`: the parts as they come, then the views next to the photos, then an edit with only the changed parts.
 - **R6.** Hải Âu is the first model: its parts come from the factory, and the game glues them. The time from an edit of Hải Âu to its new mid level is at most 5 minutes.
+- **R6a.** The first lock of parts takes no file that the old Previews of World could change: World checks the objects of its bucket written from 2026-11-18 20:10 UTC to 2026-11-21 (World `docs/factory.md`, "The listeners of the VM") before that lock. Until World says that the check is done, take the files from a clone of World or from a build in CI, not from the factory.
 - **R7.** When each order of `data/world/orders.json` comes as parts, the job "Models of World" (`mix world.order` in CI) builds only what World does not give as parts yet.
 
 ## 5. What Vũng Tàu needs from World
@@ -51,14 +52,14 @@ Why now (report 0026, section 3): the edge of World answers 503 for each buildin
 
 ## 6. Play-test scenarios
 
-- **PT-77 `world_parts`.** Hải Âu at each level, glued from its parts, next to its whole GLB of plan 0023: the bounds agree within 1 cm, the triangles are the same, and the draw calls are not more. Screenshots of both, near and from the walk of Hạ Long.
-- PT-56 `world_models` and PT-71 to PT-76 pass with the glued models.
+- **PT-78 `world_parts`.** Hải Âu at each level, glued from its parts, next to its whole GLB of plan 0023: the bounds agree within 1 cm, the triangles are the same, and the draw calls are not more. Screenshots of both, near and from the walk of Hạ Long.
+- PT-56 `world_models` and PT-71 to PT-77 pass with the glued models.
 
 ## 7. Acceptance criteria
 
 | # | Criterion |
 |---|---|
-| 1 | The unit tests, PT-56, PT-71 to PT-77 pass, and CI is green. |
+| 1 | The unit tests, PT-56, PT-71 to PT-78 pass, and CI is green. |
 | 2 | Hải Âu comes from the factory as parts, with no build in CI, and an edit gives a new mid level in at most 5 minutes (R6). |
 | 3 | The budget of plan 0026 (R16) holds on Low. |
 

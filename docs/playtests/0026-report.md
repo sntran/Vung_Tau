@@ -460,6 +460,7 @@ After D-0026-34, the eye of this view stands next to the hall: the roof and the 
 
 - **Q25.** A new lock of World. World has 76 commits after `1984a6f`, with the tools that this plan asked for (a curved porch with its fascia, a width for a line of letters, blocks with their own storeys) and new files of the Grand Hotel and the people. The proposal: yes, one new lock after the defects of this audit, in a commit of its own, with PT-56, `tools/world/outlines.py`, PT-71 to PT-77, and the looks of each drawing run again.
   - **Decided (2026-11-20):** yes, now, because World has the tools that this plan needs. Lock the newest commit of World `main` whose CI is green (World still works on its construction shifts; they do not change the files of the models). Make the new lock first, in a commit of its own, and run the checks again before the corrections of this audit.
+  - **Added (2026-11-20):** take the files of the new lock from a clone of World or from a build in CI (`--source=checkout`, the job "Models of World"), not from the factory, until World says that the check of its bucket is done (plan 0027, R6a). A lock that already has files from the factory is checked again then.
 - **Q26.** The low wall at the eye of S1. Only the photo of S1 (2014) shows it: rough granite blocks with a flat cap. No photo after 2017 shows it. The proposal: use the look of 2014 there. Else the wall keeps its posts, and no photo shows posts at that place.
   - **Decided (2026-11-20):** find photos of the year before or after 2019 (2018 or 2020) that show the wall at the eye of S1, from any source (news, travel pages, videos of a walk on the beach, the photos of a map service), only for the eyes, and use the kind of wall that they show. Write the link, the date, and what each shows in the drawing.
 - **Q27.** The letters on Khách sạn Bưu điện: VUNG TAU P&T HOTEL (2011 and April 2014), or a wave and P&T HOTEL (March 2024). The photo of April 2014 is the nearest to January 2019. The proposal: VUNG TAU P&T HOTEL.
@@ -470,3 +471,71 @@ After D-0026-34, the eye of this view stands next to the hall: the roof and the 
 ### 10.5 Status
 
 The plan stays "In progress": D-0026-23, D-0026-30, D-0026-40, and D-0026-41, and the answers to Q25 to Q28. No defect of this audit needs a construction shift of World.
+
+## 11. Audit 6: branch at `0076639` (2026-11-21)
+
+The pictures of this audit are in [`0026/audit-2026-11-21/`](0026/audit-2026-11-21/).
+
+### 11.1 Runs
+
+| Run | Result |
+|---|---|
+| CI of `0076639` | Pass: Test, Export, and Reference photos. |
+| PT-71 `showcase_places`, runs 1 and 2 | Pass (195 s and 104 s). |
+| PT-72 `showcase_shots`, phases 1 and 2 (Low) | Pass. The hill of S1: 4.0 px (the photo 4.0 px) at 12:00 and 17:10. The roof of the hall: hue 14 at 12:00 and 8 at 17:10 (the photo 9). |
+| PT-73 `showcase_budget`, phase 1 (Low) | Pass. S1 162 071 triangles, S2 248 967, S3 196 808, S4 147 835, S5 250 281 with 597 draw calls; 706 MB to 709 MB of video memory. |
+| PT-33 `geo_views`, phases 2 and 5 | Pass. |
+| PT-74 `showcase_walk`, runs 1, 4, 5, and 6 | Pass. |
+| PT-77 `showcase_steps`, phase 1, and PT-75 `showcase_people`, phase 1 | Pass. |
+
+### 11.2 What is correct
+
+- **D-0026-40.** The roof of the hall is orange red at each level, and PT-72 checks its color.
+- **D-0026-41.** The view of Cao ốc Sen Biển shows the tower (22 % of the frame), and PT-71 checks the part of each place in its view (`pt71_views.jpg`).
+- **Q25.** The new lock is World `e8754d6`. The job "Models of World" built its files from a clone of World in CI, so no file comes from the bucket of the factory (plan 0027, R6a).
+- **Q26.** Two photos of 2019 show the wall at the eye of S1: courses of granite on a base, square posts with low openings between them, and a flat cap. That is the kind of wall that the game has there.
+- **Q28.** The facts of the weeks before Tết are in `docs/content/culture-notes.md` with their links and the status Check, and no copy of a photo is in the repository. The game does not use them.
+
+### 11.3 Defects
+
+#### D-0026-23 (still open, now medium): the far hill
+
+The crowns are now the size of the crowns of the photo. But they are all of one size, in even rows, like scales (`s1_hill.jpg`). The photo has crowns of many sizes, in yellow green, dark green, and dry brown. PT-72 logs the color patches of the box: 0.013 to 0.014 in the game, 0.050 in the photo. It does not fail on them. At 17:10 the saturation is 0.13, and the photo has 0.26. On the lower slope at the right, large smooth light areas have no crowns.
+
+- Make the crowns of different sizes (5 m to 12 m), light, and colors, with the dry patches of the photo.
+- PT-72 fails when the color patches of the box are less than half of those of the photo, or when the saturation differs from the photo by more than 0.05, at 12:00 and 17:10.
+
+#### D-0026-42: S5 is at the limit of the draw calls (medium)
+
+S5 has 597 of 600 draw calls on Low. The letters of Hải Âu, of the Palace Hotel, and of Khách sạn Bưu điện, and the dressing of Tết, add draw calls in the shots. Get a margin at S5 (at most 560 draw calls) before you add them. PT-73 logs the margin of each shot.
+
+#### D-0026-43: Commits with another author (high, before the merge to `main`)
+
+Ten merge commits on this branch (for example `5368f60`) and one on the branch of plan 0009 (`8990b37`) have another author and committer, not my name and address. Each commit has my name and address (CONTRIBUTING.md). Make the history of each branch again with my name and address on these commits before it goes to `main`, and make each merge with that identity.
+
+#### D-0026-44: The import files of Nhà khách Hạ Long (low)
+
+The three import files of `nha_khach_ha_long` are in a short form. Godot writes them in the full form at each import, so each play test leaves three changed files in the working copy. Commit the files that Godot writes.
+
+#### D-0026-45: "the owner" (low)
+
+Three new lines (`docs/content/culture-notes.md`, `data/showcase/dressing.json`, and the builder notes of the plan) say "the owner". Write them in the first person, as AGENTS.md does.
+
+#### Still open
+
+- **D-0026-30.** At 17:00 the paving of the south end looks like sand, the parapet of the square is not there, and brown earth shows between the road meshes at the junction (`south_end_walk.jpg`: PT-74 run 4 at 550 m, run 5 at 700 m).
+- **Q27.** The letters of Khách sạn Bưu điện wait for World.
+- **The new tools of World** are in the lock, but no drawing uses them yet: the letters of Hải Âu and of the Palace Hotel, and the porch and the blocks of Hải Âu and of `khach_san_grand_canh_sau`.
+
+#### Notes
+
+- In PT-71, bare banks stand next to the hall and under Cao ốc Sen Biển (`pt71_views.jpg`). This is the ground of Copernicus, a model of the surface: report 0009, section 6.4 (the bare earth of phase 1b).
+
+### 11.4 Questions for me
+
+- **Q29.** Acceptance criterion 2: I look at each shot of PT-72 next to its photo (`docs/showcase/sheet_S1.jpg` to `sheet_S5.jpg`) and say whether it is Bãi Trước.
+- **Q30.** R19, the dressing of Tết: I confirm the rows of `docs/content/culture-notes.md`, and I say what I know of the counts that no source gives (the red flags, the lanterns on the poles, the banners, and the sellers of mai and quất). The festival of 2019 opens on 1 February (day 11 of the game): what does the park show on days 1 to 10?
+
+### 11.5 Status
+
+The plan stays "In progress": D-0026-23, D-0026-30, and D-0026-42 to D-0026-45, the letters, the new tools of World, and Q29 and Q30.
