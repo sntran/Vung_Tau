@@ -8744,6 +8744,13 @@
 			"hash": "ae16d41fc33c1f04abecf3d17877700c",
 			"seen": "A preview in my workspace, not a build of the factory: the factory answers HTTP 503 (memory) when it places this order, so I made the edits of the rule (World.Town.Building, ported to Python) into voxels of 0.12 m and rendered them with tools/world/look.gd (build/look/khach_san_palace_preview_near.png and _turn90.png). The rail panels of the loggias show; the rest is as at the mid level.",
 			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-21",
+			"level": "mid",
+			"hash": "",
+			"seen": "No look. mix world.order at World e8754d6 in the job Models of World (run 44880044279) stopped after 115 minutes in the bake of the maps of a sculpted tile: ** (MatchError) no match of right hand side value: :small (World.Skills.Sculpt.maps/3, lib/world/skills/sculpt.ex:461), when the image has no place for the charts of the tile. check_order of World gives no errors (2cd8d267d7e901b03651c26e4bf512ab), and the factory answers HTTP 503 for it. This is a fault of World: the request 250719db9954f205898be879d2b36983 asks World to give an error of the order or a larger image.",
+			"changed": "Nothing."
 		}
 	],
 	"status": "Check",

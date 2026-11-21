@@ -3809,6 +3809,20 @@
 			"hash": "7e76673aaa4213696ccf4780cc0ef5b2",
 			"seen": "No look. The factory answered HTTP 503 after 34 s for the near level of the same smaller order (a map of 2 048).",
 			"changed": "Nothing. The job Models of World (mix world.order in CI) can build this order; then a look with --lock at the mid and near levels, next to the photos."
+		},
+		{
+			"date": "2026-11-21",
+			"level": "mid",
+			"hash": "",
+			"seen": "The first build of this whole order, with mix world.order at World e8754d6 in the job Models of World (run 44896559506, docs/world/looks/khach_san_grand_canh_sau_mid.png): the factory still cannot build it. Next to photos 0 to 2 and from above: the quarter of a disc of one storey with its shop fronts and the cream fascia, the white terrace, the hall on the terrace as a block of the rule, the pergola of two rings of columns and rafters over the curve, and the roofs of brown tiles east of the curve agree. Still different: the hall is grey in the light of the look (in the photos a pale cream), and the letters GRAND HOTEL are too small to read in the views of 400 px.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-21",
+			"level": "far",
+			"hash": "",
+			"seen": "The far level of the same build (docs/world/looks/khach_san_grand_canh_sau_far.png): the same forms with no pergola, no rail, and no letters (they are thinner than two cells of the far level), as the drawing wants. The shop fronts show as dark bays.",
+			"changed": "Nothing."
 		}
 	],
 	"status": "Check",
