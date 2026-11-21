@@ -156,7 +156,24 @@ static func _sidewalk_runs(line: PackedVector3Array, offsets: Array, origin: Vec
 		current.append(line[i])
 	if current.size() >= 2:
 		runs.append([current_free, current])
+	# The points of the dense line on a straight part go: each run keeps its
+	# ends and its turns (more points made S5 27 000 triangles more, PT-73).
+	for run: Array in runs:
+		run[1] = _corners(run[1])
 	return runs
+
+
+static func _corners(line: PackedVector3Array) -> PackedVector3Array:
+	if line.size() <= 2:
+		return line
+	var out := PackedVector3Array([line[0]])
+	for i in range(1, line.size() - 1):
+		var a := (line[i] - out[out.size() - 1]).normalized()
+		var b := (line[i + 1] - line[i]).normalized()
+		if a.dot(b) < 0.99999:
+			out.append(line[i])
+	out.append(line[line.size() - 1])
+	return out
 
 
 static func _dense(line: PackedVector3Array, step: float) -> PackedVector3Array:
