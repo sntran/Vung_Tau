@@ -32,6 +32,7 @@ static func build(data: GeoData, key: Vector2i, origin: Vector3) -> Dictionary:
 	var parts := {"asphalt": _Strip.new(), "concrete": _Strip.new(), "dirt": _Strip.new(), "paving": _Strip.new(),
 			"sidewalk": _Strip.new(), "lines": _Strip.new()}
 	var collision := PackedVector3Array()
+	var others: Array = []
 	for part: Array in data.road_parts.get(key, []):
 		var road: Dictionary = data.roads[part[0]]
 		var points: Array = road.points
@@ -57,13 +58,25 @@ static func build(data: GeoData, key: Vector2i, origin: Vector3) -> Dictionary:
 			var left_edge := -inner if sides.has(-1.0) else -half
 			var right_edge := inner if sides.has(1.0) else half
 			parts[surface].ribbon(line, left_edge, right_edge, LIFT, LIFT)
+			if others.is_empty():
+				others = _carriageways(data, key)
+			var dense := _dense(line, 0.5)
 			for side: float in sides:
 				var a := inner * side
 				var b := half * side
-				# The sidewalk top and the curb face toward the road.
-				parts.sidewalk.ribbon(line, minf(a, b), maxf(a, b), LIFT + CURB, LIFT + CURB)
-				parts.sidewalk.wall(line, a, LIFT, LIFT + CURB, side > 0.0)
-				collision.append_array(parts.sidewalk.last_triangles())
+				# Report 0026, D-0026-30 (audit 6): a sidewalk stops where it is
+				# on the carriageway of another road (a junction); there the road
+				# has its surface to its edge. A sidewalk that started at the node
+				# of a junction went across the other roads.
+				for run: Array in _sidewalk_runs(dense, [a + 0.1 * side, (a + b) / 2.0, b - 0.1 * side], origin, others, part[0]):
+					var run_line: PackedVector3Array = run[1]
+					if run[0]:
+						# The sidewalk top and the curb face toward the road.
+						parts.sidewalk.ribbon(run_line, minf(a, b), maxf(a, b), LIFT + CURB, LIFT + CURB)
+						parts.sidewalk.wall(run_line, a, LIFT, LIFT + CURB, side > 0.0)
+						collision.append_array(parts.sidewalk.last_triangles())
+					else:
+						parts[surface].ribbon(run_line, minf(a, b), maxf(a, b), LIFT, LIFT)
 			if kind in LINE_TYPES:
 				_lines(parts.lines, line, minf(-left_edge, right_edge), road.get("oneway", false))
 		else:
@@ -74,6 +87,86 @@ static func build(data: GeoData, key: Vector2i, origin: Vector3) -> Dictionary:
 	for name: String in parts:
 		result[name] = parts[name].arrays()
 	return result
+
+
+## The carriageways (the road without its sidewalks) of the roads of the chunk
+## and of the chunks round it: [road index, points (x, z), half width, box].
+static func _carriageways(data: GeoData, key: Vector2i) -> Array:
+	var result: Array = []
+	var seen := {}
+	for dx in range(-1, 2):
+		for dz in range(-1, 2):
+			for part: Array in data.road_parts.get(key + Vector2i(dx, dz), []):
+				if seen.has(part[0]):
+					continue
+				seen[part[0]] = true
+				var road: Dictionary = data.roads[part[0]]
+				var half := float(road.width) / 2.0
+				if str(road.get("sidewalk", "")) != "" and float(road.width) >= MIN_SIDEWALK_ROAD:
+					half -= SIDEWALK_WIDTH
+				var points := PackedVector2Array()
+				var box := Rect2()
+				for p: Array in road.points:
+					var q := Vector2(float(p[0]), float(p[2]))
+					box = Rect2(q, Vector2.ZERO) if points.is_empty() else box.expand(q)
+					points.append(q)
+				result.append([part[0], points, half, box.grow(half)])
+	return result
+
+
+## The runs of a line where a sidewalk (its points at the offsets across it)
+## is free of the carriageways of the other roads: [[free, line], ...]. Two
+## runs that meet share their point.
+static func _sidewalk_runs(line: PackedVector3Array, offsets: Array, origin: Vector3, others: Array, road: int) -> Array:
+	var sides := _Strip._sides(line)
+	var runs: Array = []
+	var current := PackedVector3Array()
+	var current_free := true
+	for i in line.size():
+		var free := true
+		for offset: float in offsets:
+			var p := line[i] + sides[i] * offset + origin
+			var q := Vector2(p.x, p.z)
+			for other: Array in others:
+				if other[0] == road or not (other[3] as Rect2).has_point(q):
+					continue
+				var points: PackedVector2Array = other[1]
+				for j in points.size() - 1:
+					if q.distance_to(Geometry2D.get_closest_point_to_segment(q, points[j], points[j + 1])) < float(other[2]):
+						free = false
+						break
+				if not free:
+					break
+			if not free:
+				break
+		if i > 0 and free != current_free:
+			# The segment where the state changes is not a sidewalk: it goes to
+			# the run of the surface of the road.
+			if current_free:
+				if current.size() >= 2:
+					runs.append([true, current])
+				current = PackedVector3Array()
+				current.append(line[i - 1])
+			else:
+				current.append(line[i])
+				if current.size() >= 2:
+					runs.append([false, current])
+				current = PackedVector3Array()
+		current_free = free
+		current.append(line[i])
+	if current.size() >= 2:
+		runs.append([current_free, current])
+	return runs
+
+
+static func _dense(line: PackedVector3Array, step: float) -> PackedVector3Array:
+	var out := PackedVector3Array()
+	for i in line.size() - 1:
+		var n := maxi(1, ceili(line[i].distance_to(line[i + 1]) / step))
+		for k in n:
+			out.append(line[i].lerp(line[i + 1], float(k) / n))
+	out.append(line[line.size() - 1])
+	return out
 
 
 static func _lines(strip: _Strip, line: PackedVector3Array, half: float, oneway: bool) -> void:

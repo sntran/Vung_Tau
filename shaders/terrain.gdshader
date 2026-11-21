@@ -418,6 +418,10 @@ void fragment() {
 	float span = max(last_high - sea_level, 0.05);
 	float wet = pow(clamp((last_high - world_position.y) / span, 0.0, 1.0), 0.6) * step(sea_level, world_position.y);
 	wet *= 1.0 - max(rock, bare_rock) * 0.5;
+	// The paving, the lawns, and the beds of the showcase are not wet sand
+	// (report 0026, D-0026-30, audit 6: the square of the south end was darker
+	// than the sand at 17:00).
+	wet *= 1.0 - clamp(detail.r + detail.g + detail.b, 0.0, 1.0);
 	color *= mix(1.0, 0.55, wet);
 	roughness = mix(roughness, 0.38, wet);
 	// Report 0026, D-0026-30: the puddles have soft edges and a little of the

@@ -24,6 +24,9 @@ const TEXTURES := "res://assets/textures/look"
 const SURFACE_SHADER := "res://shaders/showcase_surface.gdshader"
 ## As RoadBuilder.LIFT: the road surface is this much over its line.
 const LIFT := 0.04
+## Report 0026, D-0026-30: the asphalt between the two roads of a median where
+## the median ends, up to this gap between their edges (m).
+const MEDIAN_END_GAP := 12.0
 ## The color of a part that a model of this game replaces: the part keeps its
 ## collision and draws nothing (report 0026, D-0026-09).
 const HIDDEN := "hidden"
@@ -744,6 +747,38 @@ static func _in_gaps(at: float, gaps: Array[Vector2], margin: float) -> bool:
 	return false
 
 
+## The asphalt between the two roads of the median, under the median and
+## where it ends (report 0026, D-0026-30), with the material of the roads of
+## the world, a little under them.
+func _median_ends(ends: Array) -> void:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var count := 0
+	for i in ends.size() - 1:
+		if ends[i] == null or ends[i + 1] == null:
+			continue
+		var s0: Array = ends[i]
+		var s1: Array = ends[i + 1]
+		if not s0[2] and not s1[2]:
+			continue
+		# Clockwise when seen from above (the front faces in Godot).
+		for v: Vector3 in [s0[0], s1[0], s0[1], s0[1], s1[0], s1[1]]:
+			st.set_normal(Vector3.UP)
+			st.set_uv(Vector2(v.x, v.z) / RoadBuilder.TEXTURE_M)
+			st.add_vertex(v)
+		count += 1
+	if count == 0:
+		return
+	var node := MeshInstance3D.new()
+	node.name = "MedianEnds"
+	node.mesh = st.commit()
+	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if world != null and world._road_materials.has("asphalt"):
+		node.material_override = world._road_materials["asphalt"]
+	add_child(node)
+	_add_length("median_ends", float(count) * STEP)
+
+
 ## R2: the median between the two roads of Quang Trung: a raised lawn with a
 ## curb in red and white bands at each side, and a hedge in its middle.
 func _median(cfg: Dictionary) -> void:
@@ -762,11 +797,25 @@ func _median(cfg: Dictionary) -> void:
 	var others := _other_roads([int(ways[0]), int(ways[1])])
 	# A cross section at each point of road a: the edge of a and the edge of b.
 	var sections: Array = []
+	# Report 0026, D-0026-30 (audit 6): where the median ends (near the
+	# junction, or where the two roads come together), the space between the
+	# two roads is asphalt, not the ground: [the edge of a, the edge of b] or null.
+	var ends: Array = []
 	for p: Vector3 in _dense(_line(a), STEP):
 		var q := _nearest(line_b, p)
 		var across := Vector3(q.x - p.x, 0.0, q.z - p.z)
 		var gap := across.length() - float(a.width) / 2.0 - float(b.width) / 2.0
 		var mid := (p + q) / 2.0
+		# The asphalt also under the median: on curves the edges of the roads and
+		# of the median left thin slivers of ground (PT-74, run 5). Each section
+		# out of the area keeps it too (the segment to the edge of the area);
+		# _median_ends() leaves out the segments with both ends out.
+		if gap > -3.0 and gap < MEDIAN_END_GAP:
+			var d := across.normalized()
+			ends.append([p + d * (float(a.width) / 2.0 - 0.3) + Vector3(0, LIFT - 0.005, 0),
+					q - d * (float(b.width) / 2.0 - 0.3) + Vector3(0, LIFT - 0.005, 0), contains(mid.x, mid.z)])
+		else:
+			ends.append(null)
 		if not contains(mid.x, mid.z) or gap < float(cfg.get("min_gap_m", 1.2)) or _near_other(mid, others, gap / 2.0):
 			sections.append(null)
 			continue
@@ -825,6 +874,7 @@ func _median(cfg: Dictionary) -> void:
 		_add_length("median", length)
 	if current.size() >= 2:
 		runs.append(current)
+	_median_ends(ends)
 	var trees: Dictionary = cfg.get("trees", {})
 	var lamps: Dictionary = cfg.get("lamps", {})
 	var tree_points: Array[Vector3] = []
@@ -926,6 +976,20 @@ func _walls(cfg: Dictionary) -> void:
 			else:
 				_ridge(str(cfg.get("color", "#8a867e")), run, offset, width, float(cfg.get("height", 0.55)))
 			_add_length("wall", _length(run))
+	# Report 0026, D-0026-30 (audit 6): a wall on its own points (x, z), not
+	# along a way: the parapet of the square of the south end over the water.
+	for points: Array in cfg.get("lines", []):
+		var line := PackedVector3Array()
+		for q: Array in points:
+			line.append(Vector3(float(q[0]), world.ground_height(float(q[0]), float(q[1])) if world else 0.0, float(q[1])))
+		line = _dense(line, STEP)
+		if str(cfg.get("style", "")) == "balustrade":
+			var base := _wall_base(line)
+			wall_lines.append(base)
+			_balustrade(base, cfg)
+		else:
+			_ridge(str(cfg.get("color", "#8a867e")), line, 0.0, float(cfg.get("width", 0.45)), float(cfg.get("height", 0.55)))
+		_add_length("wall", _length(line))
 
 
 ## R4, R6: the walk on the sea side of Hạ Long, its parapet, and the sea wall

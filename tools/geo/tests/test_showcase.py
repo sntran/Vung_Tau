@@ -233,3 +233,42 @@ def test_the_build_has_each_area_drawn_on_a_photo():
         inside = contains_xy(area, x, z)
         share = float((mask[..., channel[item["kind"]]][inside] >= 128).mean()) if inside.any() else 0.0
         assert share >= 0.6, f"{item['id']}: {share:.0%} of its cells are {item['kind']} in the build"
+
+
+def test_a_platform_drawn_on_a_photo_is_over_the_sea_in_the_build():
+    # Report 0026, D-0026-30 (audit 6): the square of the south end is a
+    # platform over the water with its parapet (the drone photo of 2021). In
+    # the build its west part was under the sea (about -0.9 m), so the paving
+    # and the parapet stood in the water. Each cell of the ground in the
+    # outline of a drawn area with "platform" is over the sea level by 0.5 m.
+    import json
+    import math
+    from pathlib import Path
+
+    from geodata.pngio import read_gray16
+
+    root = Path(__file__).resolve().parents[3]
+    config = json.loads((root / "data/showcase/bai_truoc.json").read_text(encoding="utf-8"))["ground"]
+    area = json.loads((root / "data/geo/area.json").read_text(encoding="utf-8"))
+    platforms = [item for item in config.get("drawn", []) if item.get("platform")]
+    assert platforms, "the square of the south end is a platform"
+    chunks = {}
+    for item in platforms:
+        outline = Polygon(item["outline"])
+        x0, z0, x1, z1 = outline.bounds
+        low = []
+        for x in np.arange(math.floor(x0) + 1.0, x1, 2.0):
+            for z in np.arange(math.floor(z0) + 1.0, z1, 2.0):
+                if not outline.buffer(-1.5).contains(Polygon([(x - 0.1, z - 0.1), (x + 0.1, z - 0.1), (x + 0.1, z + 0.1)])):
+                    continue
+                key = (math.floor(x / area["chunk_size_m"]), math.floor(z / area["chunk_size_m"]))
+                if key not in chunks:
+                    chunks[key] = read_gray16(root / "data/geo/build/height" / f"{key[0]}_{key[1]}.png").astype(float) \
+                        * area["height_step_m"] + area["height_offset_m"]
+                grid = chunks[key]
+                col = int((x - key[0] * area["chunk_size_m"]) / area["grid_m"])
+                row = int((z - key[1] * area["chunk_size_m"]) / area["grid_m"])
+                h = float(grid[min(row, grid.shape[0] - 1), min(col, grid.shape[1] - 1)])
+                if h < 0.5:
+                    low.append((float(x), float(z), round(h, 2)))
+        assert low == [], f"{item['id']}: {len(low)} cells under 0.5 m: {low[:6]}"

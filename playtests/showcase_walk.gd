@@ -89,6 +89,8 @@ func run(d: PlaytestDriver) -> void:
 	d.expect(_backs.is_empty(), "the way along the sea wall of Hạ Long never turns back: %s" % str(_backs))
 	if d.phase == 1:
 		_check_walk_surface(d, w)
+	if d.phase == 5:
+		_check_divided_road(d, w)
 	var jetty_start := length - ON_JETTY
 	var hai_au := _hai_au(w)
 	var hai_au_at := PlaytestDriver.route_distance(route, hai_au) if hai_au != Vector3.INF else -1.0
@@ -203,6 +205,9 @@ func run(d: PlaytestDriver) -> void:
 		d.expect(w.places.floor_at(p.x, p.z) > -INF and absf(p.y - deck) < 0.3,
 				"the player stands on the deck of the jetty (%.2f m, the deck %.2f m)" % [p.y, deck])
 	d.expect(hai_au != Vector3.INF, "the showcase has Hải Âu (%s)" % HAI_AU)
+	if d.phase == 4:
+		await _check_south_paving(d, w)
+		_check_square_parapet(d, w)
 
 
 ## The route of the walk: the walk of the sea, the walks of the park, the walk
@@ -428,3 +433,292 @@ func _check_walk_surface(d: PlaytestDriver, w: VungTau) -> void:
 				misses.append("(%.0f, %.0f)" % [at.x, at.z])
 	d.step("the walk on the sea wall from the curb: %d rays, %d miss the walk" % [tested, misses.size()])
 	d.expect(tested > 50 and misses.is_empty(), "the walk on the sea wall goes from the curb of the road: %s" % ", ".join(misses.slice(0, 10)))
+
+
+## Report 0026, D-0026-30 (audit 6): between the two roads of a divided road
+## (the median of Quang Trung) the ground does not show. In the area of the
+## showcase, points across the space between the edges of the two roads, each
+## DIVIDED_STEP m along the first road, are each under a face of a road mesh
+## or of a part of the showcase (the median, its curbs, the asphalt where the
+## median ends). At the junction of Quang Trung with Hạ Long, the brown earth
+## showed between the road meshes (PT-74 run 5 at 700 m).
+const DIVIDED_STEP := 1.0
+func _check_divided_road(d: PlaytestDriver, w: VungTau) -> void:
+	var ways: Array = w.showcase.data.get("median", {}).get("ways", [])
+	if not d.expect(ways.size() == 2, "the showcase has the median of Quang Trung"):
+		return
+	var a: Dictionary = w.showcase._roads[int(ways[0])]
+	var b: Dictionary = w.showcase._roads[int(ways[1])]
+	var line_a: PackedVector3Array = w.showcase._dense(w.showcase._line(a), DIVIDED_STEP)
+	var line_b: PackedVector3Array = w.showcase._line(b)
+	var points := PackedVector2Array()
+	for p: Vector3 in line_a:
+		var q: Vector3 = w.showcase._nearest(line_b, p)
+		var across := Vector2(q.x - p.x, q.z - p.z)
+		var gap := across.length() - float(a.width) / 2.0 - float(b.width) / 2.0
+		if gap <= 0.1 or gap > 12.0 or not w.showcase.contains((p.x + q.x) / 2.0, (p.z + q.z) / 2.0):
+			continue
+		var dir := across.normalized()
+		var from := Vector2(p.x, p.z) + dir * (float(a.width) / 2.0 + 0.05)
+		for k in 5:
+			points.append(from + dir * (gap - 0.1) * k / 4.0)
+	var faces := _top_faces(w, points)
+	var bare := PackedVector2Array()
+	for point in points:
+		if not _covered(faces, point):
+			bare.append(point)
+	var listed := PackedStringArray()
+	for i in mini(bare.size(), 6):
+		listed.append("(%.1f, %.1f)" % [bare[i].x, bare[i].y])
+	d.step("the space between the two roads of Quang Trung: %d points, %d with no road and no part over them%s" % [
+			points.size(), bare.size(), "" if bare.is_empty() else ": " + ", ".join(listed)])
+	d.expect(points.size() > 50 and bare.is_empty(), "the ground does not show between the two roads of Quang Trung: %d of %d points are bare ground" % [
+			bare.size(), points.size()])
+	_check_junction_sidewalks(d, w, Vector2(80.0, 204.0))
+
+
+## Report 0026, D-0026-30 (audit 6): in a junction, a sidewalk does not go
+## across the carriageway of another road (brown strips across the junction of
+## Quang Trung with Hạ Long). The points of the carriageway (the road minus its
+## sidewalks) of each road within JUNCTION_M of the point, each 1 m along and
+## across it, are not under a face of a sidewalk.
+const JUNCTION_M := 30.0
+func _check_junction_sidewalks(d: PlaytestDriver, w: VungTau, at: Vector2) -> void:
+	var points := PackedVector2Array()
+	for road: Dictionary in w.showcase._roads.values():
+		var half := float(road.width) / 2.0
+		if str(road.get("sidewalk", "")) != "" and float(road.width) >= RoadBuilder.MIN_SIDEWALK_ROAD:
+			half -= RoadBuilder.SIDEWALK_WIDTH
+		var line: PackedVector3Array = w.showcase._dense(w.showcase._line(road), 1.0)
+		for i in line.size() - 1:
+			var p := Vector2(line[i].x, line[i].z)
+			if p.distance_to(at) > JUNCTION_M:
+				continue
+			var along := Vector2(line[i + 1].x - p.x, line[i + 1].z - p.y).normalized()
+			var across := Vector2(-along.y, along.x)
+			var k := -half + 0.3
+			while k <= half - 0.3:
+				points.append(p + across * k)
+				k += 1.0
+	var faces := {}
+	for node in w.find_children("Road_sidewalk", "MeshInstance3D", true, false):
+		var mesh_node := node as MeshInstance3D
+		var t := mesh_node.global_transform
+		var tri := mesh_node.mesh.get_faces()
+		for i in range(0, tri.size(), 3):
+			var p0 := t * tri[i]
+			var p1 := t * tri[i + 1]
+			var p2 := t * tri[i + 2]
+			if absf((p1 - p0).cross(p2 - p0).normalized().y) < 0.5:
+				continue
+			var f := [Vector2(p0.x, p0.z), Vector2(p1.x, p1.z), Vector2(p2.x, p2.z)]
+			if f[0].distance_to(at) > JUNCTION_M + 20.0:
+				continue
+			var r := Rect2(f[0], Vector2.ZERO).expand(f[1]).expand(f[2])
+			for cx in range(floori(r.position.x / 4.0), floori(r.end.x / 4.0) + 1):
+				for cz in range(floori(r.position.y / 4.0), floori(r.end.y / 4.0) + 1):
+					faces.get_or_add(Vector2i(cx, cz), []).append(f)
+	var under := PackedVector2Array()
+	for point in points:
+		if _covered(faces, point):
+			under.append(point)
+	var listed := PackedStringArray()
+	for i in mini(under.size(), 6):
+		listed.append("(%.1f, %.1f)" % [under[i].x, under[i].y])
+	d.step("the junction at (%.0f, %.0f): %d points of the carriageways, %d under a sidewalk%s" % [
+			at.x, at.y, points.size(), under.size(), "" if under.is_empty() else ": " + ", ".join(listed)])
+	d.expect(points.size() > 100 and under.is_empty(), "no sidewalk goes across a carriageway in the junction at (%.0f, %.0f): %d of %d points" % [
+			at.x, at.y, under.size(), points.size()])
+
+
+## The faces that look up of the road meshes and of the parts of the showcase
+## near the points, in cells of 4 m: {cell: [[a, b, c] in x, z]}.
+static func _top_faces(w: VungTau, points: PackedVector2Array) -> Dictionary:
+	var box := Rect2(points[0], Vector2.ZERO) if not points.is_empty() else Rect2()
+	for point in points:
+		box = box.expand(point)
+	box = box.grow(2.0)
+	var nodes: Array[Node] = w.showcase.find_children("*", "MeshInstance3D", true, false)
+	for node in w.find_children("Road_*", "MeshInstance3D", true, false):
+		if node.name != "Road_lines":
+			nodes.append(node)
+	var cells := {}
+	for node in nodes:
+		var mesh_node := node as MeshInstance3D
+		if mesh_node.mesh == null or not mesh_node.is_visible_in_tree():
+			continue
+		var t := mesh_node.global_transform
+		var aabb := t * mesh_node.get_aabb()
+		if not box.intersects(Rect2(aabb.position.x, aabb.position.z, aabb.size.x, aabb.size.z)):
+			continue
+		var tri := mesh_node.mesh.get_faces()
+		for i in range(0, tri.size(), 3):
+			var p0 := t * tri[i]
+			var p1 := t * tri[i + 1]
+			var p2 := t * tri[i + 2]
+			if absf((p1 - p0).cross(p2 - p0).normalized().y) < 0.5:
+				continue
+			var f := [Vector2(p0.x, p0.z), Vector2(p1.x, p1.z), Vector2(p2.x, p2.z)]
+			var r := Rect2(f[0], Vector2.ZERO).expand(f[1]).expand(f[2])
+			if not box.intersects(r):
+				continue
+			for cx in range(floori(r.position.x / 4.0), floori(r.end.x / 4.0) + 1):
+				for cz in range(floori(r.position.y / 4.0), floori(r.end.y / 4.0) + 1):
+					cells.get_or_add(Vector2i(cx, cz), []).append(f)
+	return cells
+
+
+static func _covered(cells: Dictionary, point: Vector2) -> bool:
+	for f: Array in cells.get(Vector2i(floori(point.x / 4.0), floori(point.y / 4.0)), []):
+		if Geometry2D.point_is_inside_triangle(point, f[0], f[1], f[2]):
+			return true
+	return false
+
+
+## Report 0026, D-0026-30 (audit 6): the paving of the square at the south end
+## of the park does not look like the sand of the beach next to it at 17:00
+## (PT-74 run 4, at 550 m: it was orange, saturation 0.42 against 0.37 of the
+## sand; the slabs of the photo have 0.16). The drone photo of 2021 shows the
+## square in pale cream slabs. From
+## above the square, the mean color of the points of the paving (the ground
+## mask of the showcase in the outline of the square, over the water) and of
+## the points of dry sand near it (the surface mask of the world) in the frame:
+## the paving is less saturated than the sand by PAVING_GREYER at least, its
+## saturation is within PAVING_PHOTO of the clean slabs of the photo (the
+## pixels in the outline of the square on the photo with a value over 0.55),
+## and it is not darker than the sand by more than PAVING_DARKER.
+const PAVING_GREYER := 0.03
+const PAVING_PHOTO := 0.1
+const PAVING_DARKER := 0.05
+func _check_south_paving(d: PlaytestDriver, w: VungTau) -> void:
+	var square: Dictionary = {}
+	for item: Dictionary in w.showcase.data.get("ground", {}).get("drawn", []):
+		if str(item.get("id", "")) == "south_end_square":
+			square = item
+	if not d.expect(not square.is_empty(), "the showcase has the square of the south end"):
+		return
+	var outline := PackedVector2Array()
+	for q: Array in square.outline:
+		outline.append(Vector2(float(q[0]), float(q[1])))
+	var box := Rect2(outline[0], Vector2.ZERO)
+	for q in outline:
+		box = box.expand(q)
+	var middle := box.get_center()
+	var ground_y := w.ground_height(middle.x, middle.y)
+	var eye := Vector3(middle.x + 14.0, ground_y + 30.0, middle.y)
+	await d.fly_to(eye, Vector3(middle.x - 10.0, ground_y, middle.y))
+	await d.wait_ground(60.0)
+	d.main().ui_root.visible = false
+	await d.wait_frames(8)
+	var camera := d.viewport().get_camera_3d()
+	var frame := d.viewport().get_texture().get_image()
+	var rect := Rect2(Vector2.ZERO, Vector2(frame.get_size()))
+	var sums := {"paving": [Color(0, 0, 0), 0], "sand": [Color(0, 0, 0), 0]}
+	var x := box.position.x - 60.0
+	while x <= box.end.x + 20.0:
+		var z := box.position.y - 30.0
+		while z <= box.end.y + 30.0:
+			var kind := ""
+			var g := w.showcase.ground_at(x, z)
+			var h := w.ground_height(x, z)
+			if g.g > 0.5 and Geometry2D.is_point_in_polygon(Vector2(x, z), outline) and h > w.sea_level + 0.2:
+				kind = "paving"
+			elif w.surface_at(x, z).r > 0.5 and g.r < 0.3 and g.g < 0.3 and g.b < 0.3 and h > w.sea_level + 0.2:
+				kind = "sand"
+			if kind != "":
+				var p := Vector3(x, h, z)
+				if not camera.is_position_behind(p):
+					var px := camera.unproject_position(p)
+					if rect.grow(-4.0).has_point(px):
+						var hit := d.viewport().world_3d.direct_space_state.intersect_ray(PhysicsRayQueryParameters3D.create(camera.global_position, p + Vector3(0, 0.3, 0)))
+						if hit.is_empty() or (hit.position as Vector3).distance_to(p) < 1.0:
+							var c := frame.get_pixelv(Vector2i(px))
+							sums[kind][0] += c
+							sums[kind][1] += 1
+			z += 1.5
+		x += 1.5
+	await d.screenshot("south_end_square_paving")
+	d.main().ui_root.visible = true
+	d.fly_end()
+	if not d.expect(int(sums.paving[1]) > 30 and int(sums.sand[1]) > 10, "the frame shows the paving of the square (%d points) and the sand (%d points)" % [
+			sums.paving[1], sums.sand[1]]):
+		return
+	var paving: Color = sums.paving[0] / float(sums.paving[1])
+	var sand: Color = sums.sand[0] / float(sums.sand[1])
+	var photo := _photo_slabs(square)
+	d.step("the square of the south end at 17:00: the paving #%s (saturation %.2f, value %.2f), the sand #%s (saturation %.2f, value %.2f); the slabs of the photo #%s (saturation %.2f)" % [
+			paving.to_html(false), paving.s, paving.v, sand.to_html(false), sand.s, sand.v, photo.to_html(false), photo.s])
+	d.expect(sand.s - paving.s >= PAVING_GREYER and absf(paving.s - photo.s) <= PAVING_PHOTO and sand.v - paving.v <= PAVING_DARKER,
+			"the paving of the square is pale slabs, not sand: %.2f less saturated than the sand (at least %.2f), %.2f from the saturation of the slabs of the photo (at most %.2f), %.2f darker than the sand (at most %.2f)" % [
+				sand.s - paving.s, PAVING_GREYER, absf(paving.s - photo.s), PAVING_PHOTO, sand.v - paving.v, PAVING_DARKER])
+
+
+## The mean color of the clean slabs of the square on its photo: the pixels in
+## the outline of the square on the photo (photo_points) with a value over 0.55.
+static func _photo_slabs(square: Dictionary) -> Color:
+	var image := Image.load_from_file(ProjectSettings.globalize_path("res://docs/reference/photos/" + str(square.photo)))
+	if image == null:
+		return Color(0, 0, 0)
+	var polygon := PackedVector2Array()
+	for q: Array in square.photo_points:
+		polygon.append(Vector2(float(q[0]), float(q[1])))
+	var box := Rect2(polygon[0], Vector2.ZERO)
+	for q in polygon:
+		box = box.expand(q)
+	var total := Color(0, 0, 0)
+	var count := 0
+	for y in range(int(box.position.y), int(box.end.y), 2):
+		for x in range(int(box.position.x), int(box.end.x), 2):
+			if Geometry2D.is_point_in_polygon(Vector2(x, y), polygon):
+				var c := image.get_pixel(x, y)
+				if c.v > 0.55:
+					total += c
+					count += 1
+	return total / float(maxi(count, 1))
+
+
+## Report 0026, D-0026-30 (audit 6): the square of the south end has its
+## parapet over the water (the drone photo of 2021: a low wall with a light top
+## along its sea edge). Every PARAPET_STEP m along the sea edge of the square
+## (the side of its outline with the sea next to it), a ray 0.15 m or 0.72 m
+## over the paving (the base and the rail of a balustrade) from 3 m inside the
+## edge out to the sea meets a wall within PARAPET_OUT m past the edge.
+const PARAPET_STEP := 3.0
+const PARAPET_OUT := 1.5
+func _check_square_parapet(d: PlaytestDriver, w: VungTau) -> void:
+	var outline: Array = []
+	for item: Dictionary in w.showcase.data.get("ground", {}).get("drawn", []):
+		if str(item.get("id", "")) == "south_end_square":
+			outline = item.outline
+	var space := d.viewport().world_3d.direct_space_state
+	var rays := 0
+	var open := PackedStringArray()
+	for i in outline.size():
+		var a := Vector2(float(outline[i][0]), float(outline[i][1]))
+		var b := Vector2(float(outline[(i + 1) % outline.size()][0]), float(outline[(i + 1) % outline.size()][1]))
+		var along := (b - a).normalized()
+		# The outside of the side: the outline goes round; the side whose outside is over the sea.
+		for out: Vector2 in [Vector2(along.y, -along.x), Vector2(-along.y, along.x)]:
+			var probe := (a + b) / 2.0 + out * 3.0
+			if w.ground_height(probe.x, probe.y) > w.sea_level - 0.3:
+				continue
+			var t := 1.0
+			while t < a.distance_to(b) - 1.0:
+				var at := a + along * t
+				var inside := at - out * 1.0
+				var ground := w.ground_height(inside.x, inside.y)
+				rays += 1
+				# At the base of the wall and at its rail (a balustrade has gaps between).
+				var hit := false
+				for over: float in [0.15, 0.72]:
+					var from := Vector3(at.x - out.x * 3.0, ground + over, at.y - out.y * 3.0)
+					var to := Vector3(at.x + out.x * PARAPET_OUT, ground + over, at.y + out.y * PARAPET_OUT)
+					if not space.intersect_ray(PhysicsRayQueryParameters3D.create(from, to)).is_empty():
+						hit = true
+				if not hit:
+					open.append("(%.0f, %.0f)" % [at.x, at.y])
+				t += PARAPET_STEP
+	d.step("the parapet of the square of the south end: %d rays along its sea edge, %d with no wall%s" % [
+			rays, open.size(), "" if open.is_empty() else ": " + ", ".join(open.slice(0, 8))])
+	d.expect(rays >= 10 and open.is_empty(), "the square of the south end has its parapet over the water: %d of %d places have no wall" % [
+			open.size(), rays])

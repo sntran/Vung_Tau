@@ -219,6 +219,55 @@ SIDE_RAMP_M = 10.0
 WALK_WAY_TYPES = {"footway", "path", "steps", "pedestrian", "cycleway", "track"}
 
 
+# Report 0026, D-0026-30 (audit 6): a platform is level to the highest ground
+# of its outline within this distance (m) of each cell.
+PLATFORM_REACH_M = 12.0
+
+
+def level_platforms(grid, config: dict) -> int:
+    """Fills the ground under each area of the part "drawn" of the ground with
+    "platform" (the square of the south end: a platform over the water with
+    its parapet, the drone photo of 2021) to the height of its land side: each
+    cell in the outline takes at least the highest ground of the outline
+    within PLATFORM_REACH_M of it. The ground that is higher stays. Returns
+    the count of cells that changed."""
+    from .terrain import rasterize
+    changed = 0
+    for item in config.get("ground", {}).get("drawn", []):
+        if not item.get("platform"):
+            continue
+        # One grid step past the outline: the ground between two cells mixes
+        # their heights, and the parapet at the edge stood on the slope to the sea.
+        outline = Polygon([(float(x), -float(z)) for x, z in item["outline"]]).buffer(grid.step, join_style=2)
+        mask = rasterize(grid, [outline])
+        if not mask.any():
+            continue
+        heights = np.where(mask, grid.heights, -np.inf)
+        reach = int(round(PLATFORM_REACH_M / grid.step))
+        level = np.full(grid.heights.shape, -np.inf)
+        rows, cols = np.nonzero(mask)
+        r0, r1 = max(rows.min() - reach, 0), min(rows.max() + reach + 1, mask.shape[0])
+        c0, c1 = max(cols.min() - reach, 0), min(cols.max() + reach + 1, mask.shape[1])
+        window = heights[r0:r1, c0:c1]
+        top = np.full(window.shape, -np.inf)
+        for dr in range(-reach, reach + 1):
+            for dc in range(-reach, reach + 1):
+                if dr * dr + dc * dc > reach * reach:
+                    continue
+                shifted = np.full(window.shape, -np.inf)
+                rs = slice(max(dr, 0), window.shape[0] + min(dr, 0))
+                rd = slice(max(-dr, 0), window.shape[0] + min(-dr, 0))
+                cs = slice(max(dc, 0), window.shape[1] + min(dc, 0))
+                cd = slice(max(-dc, 0), window.shape[1] + min(-dc, 0))
+                shifted[rd, cd] = window[rs, cs]
+                top = np.maximum(top, shifted)
+        level[r0:r1, c0:c1] = top
+        fill = mask & np.isfinite(level) & (grid.heights < level)
+        grid.heights[fill] = level[fill]
+        changed += int(fill.sum())
+    return changed
+
+
 def level_walks(grid, config: dict, roads) -> dict:
     """Sets the ground under the sidewalks and the walk on the sea wall of
     the showcase (the parts "sidewalks" and "sea_walls" of

@@ -382,7 +382,9 @@
 					"roll": -0.01,
 					"hfov": 57.23
 				},
-				"how": "Report 0026, D-0026-30: the square of the five Norfolk pines at the south end of the park. In the photo, its paving goes to the parapet over the water. In the build, the paving of OSM stops 3 m to 10 m before the shore, and a strip of lawn and the bare ground of the town (a slope of sand down to the sea) were between them (PT-74, run 4, 550 m). The outline: from the paving of OSM to 1 m to 6 m past the shore of the build, from z 113 to the path along the low wall (way 458829438) at z 190. The photo: the photo from a drone of 2021-01-30 over the south end of the park (Tuong Lam Photos, CC BY-SA 4.0; a photo of 2017 to 2021 is a source for 2019). The camera: near the place of the camera file (10.340510 N, 107.075639 E; 25 m from it), with the heading, the pitch, the height, and the field of view that put three points of OSM on the photo (the east end of the median of Hạ Long, the south end of way 458829438 at the walk, and the end of way 118946676 at way 458829438) and the horizon of the sea at 90 px; with it the edges of the lawns and the paving of the build fall on their edges in the photo to about 2 m to 5 m. The outline is on the ways of OSM and the shore of the build (where the ground of the build goes under 0.5 m); the photo points are the outline through the camera. The photo does not give the places: a point of the photo on an edge over the water (a parapet) goes down past it to the sea floor. tools/showcase/lawn_sheet.py puts the outline on the photo and on the map (docs/showcase/south_end_lawns.jpg)."
+				"how": "Report 0026, D-0026-30: the square of the five Norfolk pines at the south end of the park. In the photo, its paving goes to the parapet over the water. In the build, the paving of OSM stops 3 m to 10 m before the shore, and a strip of lawn and the bare ground of the town (a slope of sand down to the sea) were between them (PT-74, run 4, 550 m). The outline: from the paving of OSM to 1 m to 6 m past the shore of the build, from z 113 to the path along the low wall (way 458829438) at z 190. The photo: the photo from a drone of 2021-01-30 over the south end of the park (Tuong Lam Photos, CC BY-SA 4.0; a photo of 2017 to 2021 is a source for 2019). The camera: near the place of the camera file (10.340510 N, 107.075639 E; 25 m from it), with the heading, the pitch, the height, and the field of view that put three points of OSM on the photo (the east end of the median of Hạ Long, the south end of way 458829438 at the walk, and the end of way 118946676 at way 458829438) and the horizon of the sea at 90 px; with it the edges of the lawns and the paving of the build fall on their edges in the photo to about 2 m to 5 m. The outline is on the ways of OSM and the shore of the build (where the ground of the build goes under 0.5 m); the photo points are the outline through the camera. The photo does not give the places: a point of the photo on an edge over the water (a parapet) goes down past it to the sea floor. tools/showcase/lawn_sheet.py puts the outline on the photo and on the map (docs/showcase/south_end_lawns.jpg).",
+				"platform": true,
+				"platform_note": "Report 0026, D-0026-30 (audit 6): the square is a platform over the water with its parapet (the drone photo of 2021). The build fills the ground under its outline to the height of the square at its land side (geodata/showcase.py, level_platforms())."
 			},
 			{
 				"id": "south_end_bed",
@@ -543,10 +545,10 @@
 		},
 		"paving_texture": {
 			"texture": "walk_slabs",
-			"tint": "#fff2e6",
-			"mean": "#c9bcab",
-			"note": "R12: the slabs of the walk and of the squares (the photos of S5 of 2014 and 2015: pale stone with a pink tone). The texture times tint times gain (the slabs of the photos are paler than the texture); mean is the color from far.",
-			"gain": 1.5
+			"tint": "#c2cdf1",
+			"mean": "#cebcae",
+			"note": "R12: the slabs of the walk and of the squares (the photos of S5 of 2014 and 2015: pale stone with a pink tone). The texture times tint times gain (the slabs of the photos are paler than the texture); mean is the color from far. Report 0026, D-0026-30 (audit 6): with the tint #fff2e6 and the gain 1.5 the square of the south end was darker than the sand at 17:00 and looked like it; the drone photo of 2021 gives the clean slabs of the square #cebcae, so tint times gain times the mean of the texture (#87755c) is that color.",
+			"gain": 2.2
 		}
 	},
 	"park_note": "The outline of OpenStreetMap way 220617822 (leisure=park, Công viên Bãi Trước).",
@@ -664,6 +666,33 @@
 				"min_drop_m": 0.25,
 				"note": "Report 0026, Q19: the granite steps down to the sand in each opening of the low wall (data/world/drawings/bac_xuong_cat.json: 8 steps of 0.18 m on treads of 0.3 m). The piece is scaled up and down to the drop from the walk to the sand at its foot; with less than min_drop_m, the opening has no steps. Report 0026, D-0026-26: the low walls of the walks of the park have the same steps (PT-77: the sand is 0.6 m to 2.3 m under the walk at their openings, and they had none)."
 			}
+		},
+		{
+			"side": "left",
+			"style": "balustrade",
+			"height": 0.8,
+			"width": 0.4,
+			"base": 0.3,
+			"rail": 0.14,
+			"post": 0.32,
+			"post_every": 2.4,
+			"color": "#b3ada1",
+			"model": "tuong_bai_tam",
+			"lines": [
+				[
+					[
+						-5.8,
+						112.5
+					],
+					[
+						-5.8,
+						189.8
+					]
+				]
+			],
+			"opening_every_m": 0.0,
+			"opening_m": 0.0,
+			"note": "Report 0026, D-0026-30 (audit 6): the parapet of the square of the south end over the water: the drone photo of 2021 (drone_2021_park.jpg) shows a low wall with a light top along the sea edge of the square, from the walk of the sea to the south tip of the square, as the low wall of the beach. Its line is the sea edge of the square in the build (x = -6, the outline of south_end_square), 0.2 m inside the paving; it has no openings (the sea is under it)."
 		}
 	],
 	"sea_walls": [

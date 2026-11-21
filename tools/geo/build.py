@@ -355,6 +355,8 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     showcase_path = ROOT / "data" / "showcase" / "bai_truoc.json"
     walk_cells = None
     if showcase_path.exists():
+        platform_cells = showcase_module.level_platforms(grid, load_json(showcase_path))
+        log(f"showcase platforms: {platform_cells} cells filled to the height of their land side")
         walks = showcase_module.level_walks(grid, load_json(showcase_path), roads)
         walk_cells = walks["walks"]
         log(f"showcase walks: {walks['cells']} cells of ground at the tops of the walk parts")
