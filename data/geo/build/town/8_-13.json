@@ -1,1 +1,1 @@
-{"chunk_m":256.0,"columns":["id","base","top","roof","wall","roof_color","outline","hidden","tile_rise"],"roofs":["terrace","metal","tiles"],"buildings":[["1be95c1f-ecf",3.82,7.16,2,"#FEFFFB","#D39B83",[2167.6,-3259.7,2173.1,-3259.0,2173.7,-3264.4,2168.2,-3265.0],[0.0,0.0,0.0,0.0],1.49]]}
+{"chunk_m":256.0,"columns":["id","base","top","roof","wall","roof_color","outline","hidden","tile_rise"],"roofs":["terrace","metal","tiles"],"buildings":[["1be95c1f-ecf",3.82,7.16,2,"#F5F6F2","#D39B83",[2167.6,-3259.7,2173.1,-3259.0,2173.7,-3264.4,2168.2,-3265.0],[0.0,0.0,0.0,0.0],1.49]]}

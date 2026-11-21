@@ -99,7 +99,9 @@ def make(buildings: list, sample, palette: dict, chunk_m: float) -> tuple[dict, 
     sample(x, z) gives the height of the ground at game points (arrays)."""
     shares = roof_shares(palette)
     walls = palette["walls"]
-    wall_colors = [w["color"] for w in walls]
+    # The measured colors: the colors of the palette are 10 % lighter for the
+    # haze of the house kit (R10a), and a far level has the haze of the scene.
+    wall_colors = [w.get("measured", w["color"]) for w in walls]
     wall_weights = [float(w["weight"]) for w in walls]
     metal = palette["metal_roofs"]["colors"]
     terraces = palette["terraces"]["colors"]

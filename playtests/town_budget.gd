@@ -3,7 +3,7 @@ extends RefCounted
 # and the video memory at the views of PT-68 (data/geo/town_views.json) at
 # 18:00, on Low and on High (Forward+, as PT-73). R10: Low has at most 300 000
 # triangles at each view. The draw calls go to the log; the builder proposes
-# their limits, and the owner approves them. High measures the views in two runs.
+# their limits, and I approve them. High measures the views in two runs.
 # sizes: 1280x720
 # phase: --world=vung_tau --renderer=forward_plus --quality=low --start-time=18:00
 # phase: --world=vung_tau --renderer=forward_plus --quality=high --start-time=18:00

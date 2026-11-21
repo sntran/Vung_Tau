@@ -8,9 +8,11 @@ extends Node3D
 ## range of the preset (RANGES). A wall that a neighbor hides (a row of houses)
 ## draws only its part over the neighbor.
 ##
-## A building that another part of the world already draws is left out: a model
-## of World or a stand-in of the showcase (plan 0026), and a known place (plan
-## 0008, R3). So a chunk that touches the area of the showcase waits for it.
+## A building that another part of the world already draws is left out: each
+## building in the area of the showcase (plan 0026: its models, its stand-ins,
+## and its details), a model or a stand-in of the showcase out of its area, and
+## a known place (plan 0008, R3). So a chunk that touches the area of the
+## showcase waits for it.
 
 const FOLDER := "town"
 ## The distance (m) to which the boxes of a chunk show, for each preset (R10).
@@ -42,6 +44,7 @@ var _material: StandardMaterial3D
 ## The parts that draw their own buildings: [outline, its box, its middle].
 var _keep_out: Array = []
 var _keep_out_ready := false
+var _showcase_area := PackedVector2Array()
 var _focus := Vector3.ZERO
 var _applied_range := -1.0
 
@@ -53,6 +56,8 @@ static func set_preset(preset: String) -> void:
 
 func setup(w: VungTau) -> bool:
 	world = w
+	if w.showcase:
+		_showcase_area = w.showcase.outline
 	var path := w.data.root.path_join(FOLDER).path_join("index.json")
 	if not FileAccess.file_exists(path):
 		return false
@@ -242,6 +247,10 @@ static func _circle(c: Vector2, r: float) -> PackedVector2Array:
 ## True when a part of the world already draws the building of this outline:
 ## its middle is in a kept part, or a kept part has its middle in the outline.
 func _kept(ring: PackedVector2Array, middle: Vector2) -> bool:
+	# The area of the showcase draws its own buildings (plan 0026; its details
+	# come later, report 0026, section 12.5): the town is round it.
+	if _showcase_area.size() >= 3 and Geometry2D.is_point_in_polygon(middle, _showcase_area):
+		return true
 	var box := Rect2(ring[0], Vector2.ZERO)
 	for p in ring:
 		box = box.expand(p)
