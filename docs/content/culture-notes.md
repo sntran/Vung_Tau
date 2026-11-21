@@ -162,7 +162,7 @@ Status values:
 
 ### The weeks before Tết, 2018 to 2021 (report 0026, Q28)
 
-The builder looked at these photos and videos only with the eyes. No copy is in the repository (Vietnam is in the Berne Convention, so a photo is protected also with no license or notice). Each row gives what a photo or a text shows, where, and how many. All rows are Check until the owner confirms them. The counts of `data/showcase/dressing.json` come from these rows, and the game does not use them until then. The dates of the game: day 1 is 22 January 2019 (17 tháng Chạp); 27 tháng Chạp is 1 February 2019 (day 11).
+I looked at these photos and videos only with the eyes. No copy is in the repository (Vietnam is in the Berne Convention, so a photo is protected also with no license or notice). Each row gives what a photo or a text shows, where, and how many. All rows are Check until I confirm them. The counts of `data/showcase/dressing.json` come from these rows, and the game does not use them until then. The dates of the game: day 1 is 22 January 2019 (17 tháng Chạp); 27 tháng Chạp is 1 February 2019 (day 11).
 
 | Fact | Status | Source |
 |---|---|---|

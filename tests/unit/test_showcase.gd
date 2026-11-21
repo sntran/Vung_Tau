@@ -56,8 +56,8 @@ func test_the_autocorrelation_length_is_the_size_of_the_patches() -> void:
 
 
 ## Report 0026, Q28: each count of the dressing of Tết comes from a row of the
-## culture notes (the same link), and stays out of the game until the owner
-## confirms it: an item that is not Confirmed has in_game false, and no script
+## culture notes (the same link), and stays out of the game until I confirm it
+## (Q30): an item that is not Confirmed has in_game false, and no script
 ## of the game reads the file while an item is Check.
 func test_the_dressing_of_tet_comes_from_the_culture_notes() -> void:
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/showcase/dressing.json"))
@@ -75,7 +75,7 @@ func test_the_dressing_of_tet_comes_from_the_culture_notes() -> void:
 		for dir_path in ["res://scenes", "res://scripts"]:
 			for path in _scripts_in(dir_path):
 				assert_false(FileAccess.get_file_as_string(path).contains("dressing.json"),
-					"%s does not read the dressing of Tết before the owner confirms it" % path)
+					"%s does not read the dressing of Tết before I confirm it" % path)
 
 
 func _scripts_in(dir_path: String) -> Array[String]:
