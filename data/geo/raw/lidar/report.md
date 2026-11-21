@@ -1,4 +1,4 @@
-## lidar report (2026-11-21 04:28 UTC)
+## lidar report (2026-11-21 21:45 UTC)
 
 
 ## The points in the store (the head of the branch)
@@ -25,8 +25,10 @@ A year is complete when ATL08 has each pass of the ATL03 ground photons, and the
 
 ## R5c: the sea floor
 
+ATL24 over the mean sea level (its height over EGM2008 minus 1.16 m, the mean dynamic topography of DTU22, plan 0009, R5b) minus the source.
+
 | Source | Points | Mean difference (m) | RMSE (m) |
 |---|---|---|---|
-| intertidal.tif | 2994 | 0.88 | 2.27 |
-| gebco.tif | 35429 | 5.02 | 10.09 |
+| intertidal.tif | 2994 | -0.28 | 2.11 |
+| gebco.tif | 35429 | 3.86 | 9.56 |
 - the map of the depths of ATL24: lidar_seafloor.png
