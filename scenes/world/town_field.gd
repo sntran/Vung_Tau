@@ -69,6 +69,9 @@ func setup(w: VungTau) -> bool:
 		counts[Vector2i(int(entry[0]), int(entry[1]))] = int(entry[2])
 	_material = StandardMaterial3D.new()
 	_material.vertex_color_use_as_albedo = true
+	# The colors of the palette are sRGB (as in sea_objects.gd and roadworks.gd):
+	# read as linear colors, each wall shows almost white.
+	_material.vertex_color_is_srgb = true
 	_material.roughness = 0.92
 	return true
 

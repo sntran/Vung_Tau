@@ -73,8 +73,8 @@
 			"people_how": "The photo shows about 45 people on the beach at 17:53 (2014) and the photo of 2019-04-30 (Tuổi Trẻ) a full beach. In the frame of the game: the swimmers in the sea in front of the row of boats on the sand (report 0026, D-0026-20; 45 m to 150 m from the eye, so people_range_m is 150 m) and the walkers on the walk at the left of the wall: at least 6. swimmers: at least 6 swimmers show with no boat in front of them, as in the photo the people in the water are nearer than the boats (7 at 17:00 on Low).",
 			"hill": {
 				"shot": [
-					0.58,
-					0.165,
+					0.55,
+					0.16,
 					0.7,
 					0.235
 				],
@@ -84,7 +84,7 @@
 					0.7,
 					0.3
 				],
-				"how": "The forest of Núi Nhỏ right of the tower, with no sky, no leaf of a near palm, and no building in the box: the box of the shot is higher in the frame, as the eye of the game is 16 m from the place of the photo. Plan 0009, R5b (the ground on the grid of Copernicus, 15 m east and south of the old one): the ridge of Núi Nhỏ is lower in the frame, so the box is 0.04 lower, with no sky in it. Plan 0009, phase 2: a villa of the town on the slope stands under the box, and the towers of the far side of the ridge right of it, so the box is the forest over the villa and left of the towers, from x 0.58 (the tower of Sen Biển is at 0.48 to 0.52)."
+				"how": "The forest of Núi Nhỏ right of the tower, with no sky, no leaf of a near palm, and no building in the box: the box of the shot is higher in the frame, as the eye of the game is 16 m from the place of the photo. Plan 0009, R5b (the ground on the grid of Copernicus, 15 m east and south of the old one): the ridge of Núi Nhỏ is lower in the frame, so the box is 0.04 lower, with no sky in it. Plan 0009, phase 2: a villa of the town on the slope stands under the box, so the box is the forest over the villa: the largest box with no sky over it, from x 0.55 to 0.7 as the box of the photo (the tower of Sen Biển is at 0.48 to 0.52). In this box the forest has fewer blocks than the box of the photo (36, not 60), so its color patches change with the box: from 0.023 to 0.029 for the boxes of forest near it (17:10, Low)."
 			},
 			"water": [
 				0.6,
