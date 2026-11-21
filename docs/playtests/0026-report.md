@@ -588,3 +588,7 @@ PT-74 run 4, at 550 m: a dark green band with steps runs across the sand (`south
 ### 12.4 Status
 
 The plan stays "Built" until D-0026-46 to D-0026-48 are corrected and I answer Q29 and Q30.
+
+### 12.5 Decision (2026-11-21)
+
+The details wait. A part of the town alone makes the comparisons with the photos hard: for example, the corner of S3 is the road to chợ Xóm Lưới, a busy small market, and now the street is empty. So plan 0026 goes to `main` now, with the status "Built", and the town of plan 0009 comes first (its phases 1b to 5). D-0026-46 to D-0026-48, the review of the sheets (Q29), and the dressing of Tết (R19, with plan 0021) wait for a later pass of the look, when the town is around the shots. Then the builder makes the sheets again, and I look at them.
