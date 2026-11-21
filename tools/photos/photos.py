@@ -7,7 +7,7 @@
 
 A photo is an entry of "sources" in data/world/drawings/*.json (the models
 that this game makes with the tools of World, docs/world-models.md) and of
-"photos" in data/showcase/shots.json: url (the page), image (the file to get,
+"photos" in data/showcase/shots.json and data/geo/town_views.json (plan 0009, PT-68): url (the page), image (the file to get,
 or the page for Wikimedia Commons), date, license, author, open, file, shows.
 An open photo (CC0, CC BY, CC BY-SA, public domain) is copied to
 docs/reference/photos/FILE, and docs/reference/photos/CREDITS.md lists its
@@ -37,6 +37,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 DRAWINGS = ROOT / "data" / "world" / "drawings"
 SHOTS = ROOT / "data" / "showcase" / "shots.json"
+# Plan 0009, PT-68: the photos of the views of the town.
+TOWN_VIEWS = ROOT / "data" / "geo" / "town_views.json"
 OUT = ROOT / "docs" / "reference" / "photos"
 OPEN_LICENSES = re.compile(r"^(CC0|CC BY(-SA)? [0-9.]+|CC BY(-SA)?|public domain|PD)", re.IGNORECASE)
 NOT_OPEN = re.compile(r"\b(NC|ND)\b|all rights reserved", re.IGNORECASE)
@@ -54,10 +56,12 @@ def photos() -> list[dict]:
     files = sorted(DRAWINGS.glob("*.json")) if DRAWINGS.exists() else []
     if SHOTS.exists():
         files.append(SHOTS)
+    if TOWN_VIEWS.exists():
+        files.append(TOWN_VIEWS)
     for path in files:
         data = json.loads(path.read_text(encoding="utf-8"))
         entries = list(data.get("photos", [])) + [s for s in data.get("sources", []) if isinstance(s, dict)]
-        for shot in data.get("shots", []):
+        for shot in data.get("shots", []) + data.get("views", []):
             entries.extend(shot.get("photos", []))
         for photo in entries:
             result.append({**photo, "_from": str(path.relative_to(ROOT))})

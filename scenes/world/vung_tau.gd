@@ -150,6 +150,8 @@ var parked: ParkedRows
 var exercise: MorningExercise
 ## The showcase of Bãi Trước (plan 0026): the median, the sidewalks, the walls, and the stand-ins.
 var showcase: Showcase
+## Plan 0009, phase 2: the boxes of the buildings of the town.
+var town: TownField
 ## The showcase builds its parts when the view is nearer than this to its area
 ## (m), some in each frame (ms), so that the start of the world does not wait
 ## for them (report 0026, D-0026-12).
@@ -252,6 +254,12 @@ func setup(folder := GeoData.ROOT) -> bool:
 	showcase.name = "Showcase"
 	add_child(showcase)
 	showcase.setup(self)
+	town = TownField.new()
+	town.name = "Town"
+	add_child(town)
+	if not town.setup(self):
+		town.queue_free()
+		town = null
 	return true
 
 
@@ -319,6 +327,9 @@ func prepare_at(point: Vector3, radius := 64.0, with_showcase := true) -> void:
 		if stride != _far_strides[tile]:
 			_far_strides[tile] = stride
 			_rebuild_far_tile(tile)
+	# Plan 0009, phase 2: the boxes of the town in the range of the preset.
+	if town:
+		town.prepare_at(point, TownField.range_end)
 
 
 ## Shows each finished build now, not some in each frame.
@@ -460,6 +471,8 @@ func is_settled() -> bool:
 	for tile: Vector2i in _far_tiles:
 		if _far_strides[tile] != _far_stride(tile):
 			return false
+	if town and town.pending() > 0:
+		return false
 	return true
 
 

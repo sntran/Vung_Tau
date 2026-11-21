@@ -89,6 +89,7 @@ static func apply(preset: String, environment: Environment, sun: DirectionalLigh
 	WorldModel.set_ranges(valid(preset))
 	# The detail levels of the ground of the Vũng Tàu world (report 0005, D-0005-10).
 	VungTau.set_ground_detail(valid(preset))
+	TownField.set_preset(valid(preset))
 
 
 ## True when the sun casts shadows. Plan 0001 (note N18) turned them off,

@@ -212,6 +212,8 @@ The street and park trees and the canopy map (report 0020, D-0020-03): on the ro
 ## Problems with the data
 
 - area 18343238 is not a correct polygon: invalid area (area_id=36686477)
+- Núi Lớn is not in the OSM data of the box
+- Núi Nhỏ is not in the OSM data of the box
 
 ## Source files
 

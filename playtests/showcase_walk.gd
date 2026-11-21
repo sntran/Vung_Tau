@@ -106,7 +106,7 @@ func run(d: PlaytestDriver) -> void:
 	await d.wait_frames(10)
 	var player: Player = d.main().player
 	var people: ShowcasePeople = w.showcase.people
-	var stats := {"under": 0.0, "under_at": Vector3.ZERO, "over": 0.0, "over_at": Vector3.ZERO, "overlaps": 0, "overlap_names": {},
+	var stats := {"under": 0.0, "under_at": Vector3.ZERO, "over": 0.0, "over_at": Vector3.ZERO, "overlaps": 0, "overlap_at": Vector3.ZERO, "overlap_names": {},
 			"near_person": INF, "frames": 0, "off_floor": 0, "drawn": 0}
 	var check := func() -> void:
 		stats.frames += 1
@@ -137,6 +137,8 @@ func run(d: PlaytestDriver) -> void:
 			stats.under_at = p
 		var hits := d.player_overlaps()
 		if not hits.is_empty():
+			if stats.overlaps == 0:
+				stats.overlap_at = p
 			stats.overlaps += 1
 			for hit: String in hits:
 				stats.overlap_names[hit] = true
@@ -195,8 +197,8 @@ func run(d: PlaytestDriver) -> void:
 			d.phase, stats.under, stats.under_at.x, stats.under_at.z])
 	d.expect(stats.over <= MAX_OVER, "run %d: the player stays on the ground (%.2f m over it at %.0f, %.0f)" % [
 			d.phase, stats.over, stats.over_at.x, stats.over_at.z])
-	d.expect(stats.overlaps == 0, "run %d: the player is never inside a wall, a part, or a person: %s" % [
-			d.phase, ", ".join(stats.overlap_names.keys())])
+	d.expect(stats.overlaps == 0, "run %d: the player is never inside a wall, a part, or a person: %s (%d steps, the first at %.1f, %.2f, %.1f)" % [
+			d.phase, ", ".join(stats.overlap_names.keys()), stats.overlaps, stats.overlap_at.x, stats.overlap_at.y, stats.overlap_at.z])
 	d.expect(stats.near_person >= Player.RADIUS + ShowcasePeople.BODY_RADIUS - 0.1,
 			"run %d: the player does not walk through a person (the nearest at %.2f m)" % [d.phase, stats.near_person])
 	if d.phase == RUNS:

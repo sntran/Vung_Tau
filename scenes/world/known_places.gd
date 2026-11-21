@@ -121,6 +121,10 @@ static func check(entries: Dictionary, records: Dictionary, bounds := Rect2()) -
 	return problems
 
 
+## The height from which the canopy map has a tree (landcover.TREE_MIN_M).
+const TREE_MIN_M := 3.0
+
+
 func setup(w: VungTau, path := CONFIG) -> bool:
 	world = w
 	var entries := configs(path)
@@ -886,15 +890,20 @@ func _jetty(entry: Dictionary) -> void:
 	var g1 := world.ground_height(line[line.size() - 1].x, line[line.size() - 1].z)
 	if g1 > g0:
 		line.reverse()
-	# On along the line to the shore: the first point with ground over the highest tide.
+	# On along the line to the shore: the first point where the ground is at the
+	# height of the deck, so the deck meets the land at its own height (plan 0009,
+	# R5b: on the new ground the coast at the jetty is a step of 2 m, the sea
+	# wall; the old rule, the ground over the highest tide and 2 m on, put the end
+	# of the deck high on the step). The deck ends 1.5 m into the land, under its ground.
 	var out := Vector3(line[0].x - line[1].x, 0.0, line[0].z - line[1].z).normalized()
 	var shore := Vector3.INF
-	for k in range(1, 151):
-		var p := line[0] + out * float(k)
+	for k in range(1, 301):
+		var p := line[0] + out * (float(k) * 0.5)
 		var g := world.ground_height(p.x, p.z)
-		if g > high + 0.2:
-			shore = Vector3(p.x, maxf(g, deck - 3.0), p.z) + out * 2.0
-			shore.y = world.ground_height(shore.x, shore.z)
+		if g >= deck:
+			# The end goes on 1.5 m into the slope at the height of the deck: no
+			# corner of the deck stands out of the ground there.
+			shore = Vector3(p.x, deck, p.z) + out * 1.5
 			break
 	if shore != Vector3.INF:
 		line.insert(0, shore)
@@ -1121,7 +1130,7 @@ func place_in_view(eye: Vector3, forward: Vector3, max_deg := 6.0) -> String:
 
 ## True when the ground of the game does not hide the point from the eye
 ## (the same test as tools/geo/geodata/visibility.py, R8).
-func seen(eye: Vector3, target: Vector3, step := 1.0) -> bool:
+func seen(eye: Vector3, target: Vector3, step := 1.0, with_trees := false) -> bool:
 	var flat := Vector2(target.x - eye.x, target.z - eye.z).length()
 	var n := maxi(1, int(flat / step))
 	for k in range(1, n):
@@ -1129,17 +1138,30 @@ func seen(eye: Vector3, target: Vector3, step := 1.0) -> bool:
 		if flat * (1.0 - t) < 3.0:
 			break
 		var p := eye.lerp(target, t)
-		if world.ground_height(p.x, p.z) > p.y:
+		var top := world.ground_height(p.x, p.z)
+		if with_trees:
+			top += _tree_top(p.x, p.z)
+		if top > p.y:
 			return false
+		# (The trees near the eye are not in the way: the eye stands among them.)
 	return true
 
 
+## The height of the trees of the canopy map over the ground (a tree is 3 m or
+## more, as the trees of the game), else 0.
+func _tree_top(x: float, z: float) -> float:
+	var h := world.canopy_height_at(x, z)
+	return h if h >= TREE_MIN_M else 0.0
+
+
 ## The part of the points from the ground of a target to its top that the eye
-## sees (R8: the same rays as the tools).
-func seen_part(eye: Vector3, base: Vector3, top_m: float, samples := 10, step := 1.0) -> float:
+## sees (R8: the same rays as the tools). With with_trees, the tree tops of the
+## canopy map are in the way too (plan 0009, R5b: the ground is the bare earth,
+## so the trees that hide a place from a view are no longer in the ground).
+func seen_part(eye: Vector3, base: Vector3, top_m: float, samples := 10, step := 1.0, with_trees := false) -> float:
 	var count := 0
 	for i in samples:
-		if seen(eye, base + Vector3(0, top_m * (i + 1) / samples, 0), step):
+		if seen(eye, base + Vector3(0, top_m * (i + 1) / samples, 0), step, with_trees):
 			count += 1
 	return float(count) / samples
 

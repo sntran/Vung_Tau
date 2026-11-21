@@ -1,0 +1,113 @@
+{
+	"note": "Plan 0009, PT-68 town_views and PT-69 town_budget: the four views of the town (R6). The eye is a point in degrees (lat, lon) at eye_height over the ground; heading in degrees from the north to the east; pitch in degrees up; fov the vertical field of view of the game for the frame of the photo. A view with a photo has the place and the direction of that photo (the camera place of the file, else the place that the photo shows). tools/town/sheets.py puts each view next to its photo.",
+	"views": [
+		{
+			"id": "nui_nho_top",
+			"name": "The top of Núi Nhỏ, at the lighthouse",
+			"eye": [
+				10.3346,
+				107.0775
+			],
+			"eye_height": 16.0,
+			"heading": 35.0,
+			"pitch": -12.0,
+			"fov": 50.0,
+			"min_boxes": 200,
+			"eye_note": "The gallery of the lighthouse (the photo is from it; the ground at its foot has trees round it).",
+			"photos": [
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:View_of_Vung_Tau_from_Vung_Tau_lighthouse_(August_3,_2018)_(43913500872).jpg",
+					"image": "https://upload.wikimedia.org/wikipedia/commons/3/32/View_of_Vung_Tau_from_Vung_Tau_lighthouse_%28August_3%2C_2018%29_%2843913500872%29.jpg",
+					"date": "2018-08-03",
+					"license": "CC BY-SA 2.0",
+					"author": "Damian Vo",
+					"open": true,
+					"file": "town_nui_nho_top_2018.jpg",
+					"shows": "The town from the gallery of the lighthouse on Núi Nhỏ, looking north-east: roofs below, Bàu Sen lake, the twin towers, the coast of Bãi Sau, and the hills of Long Hải far away.",
+					"title": "View of Vung Tau from Vung Tau lighthouse (August 3, 2018) (43913500872).jpg",
+					"place": "the lighthouse (the geotag of the file is in the town, 1 km north: not used)",
+					"direction": "north-east, 30 to 40 degrees"
+				}
+			]
+		},
+		{
+			"id": "nui_lon_top",
+			"name": "The top of Núi Lớn",
+			"eye_height": 30.0,
+			"fov": 50.0,
+			"min_boxes": 200,
+			"eye_note": "The top of Núi Lớn (the peak of OpenStreetMap), over the trees and the edge of the top, as the view nui_lon_south_east of PT-33 (12 m over the top and 18 m more), looking at Bãi Trước with Núi Nhỏ behind it: the direction of the photo from the cable car. The geotag of the photo of 2011 (looking east) is on the flat top, where the trees and the edge hide the town.",
+			"eye_landmark": "nui_lon",
+			"aim_landmark": "bai_truoc",
+			"photos": [
+				{
+					"url": "https://commons.wikimedia.org/wiki/File:Nh%C3%ACn_to%C3%A0n_c%E1%BA%A3nh_TP.V%C5%A8NG_T%C3%80U_t%E1%BB%AB_C%C3%A1p_treo_V%C5%A9ng_T%C3%A0u.jpg",
+					"image": "https://upload.wikimedia.org/wikipedia/commons/3/31/Nh%C3%ACn_to%C3%A0n_c%E1%BA%A3nh_TP.V%C5%A8NG_T%C3%80U_t%E1%BB%AB_C%C3%A1p_treo_V%C5%A9ng_T%C3%A0u.jpg",
+					"date": "2023-08-25",
+					"license": "CC BY-SA 4.0",
+					"author": "Luci nguyễn",
+					"open": true,
+					"file": "town_nui_lon_2023.jpg",
+					"shows": "From the cable car on the south-west side of Núi Lớn, looking south-east: Bạch Dinh below, Trần Phú road, the bay of Bãi Trước with boats, and Núi Nhỏ at the end of the bay.",
+					"title": "Nhìn toàn cảnh TP.VŨNG TÀU từ Cáp treo Vũng Tàu.jpg",
+					"place": "the cable car on the south-west flank of Núi Lớn, over Bạch Dinh (no coordinates in the file)",
+					"direction": "south-east, 140 to 150 degrees"
+				}
+			],
+			"photos_other": [
+				{
+					"title": "Phường 6, Vũng Tàu, Ba Ria - Vung Tau, Vietnam - panoramio.jpg",
+					"page": "https://commons.wikimedia.org/wiki/File:Ph%C6%B0%E1%BB%9Dng_6,_V%C5%A9ng_T%C3%A0u,_Ba_Ria_-_Vung_Tau,_Vietnam_-_panoramio.jpg",
+					"license": "CC BY 3.0",
+					"author": "Trần Minh Quang",
+					"date": "2011-09-03",
+					"direction": "east"
+				}
+			]
+		},
+		{
+			"id": "hai_dang_road",
+			"name": "The Hải Đăng road",
+			"eye": [
+				10.336993,
+				107.074204
+			],
+			"eye_height": 3.0,
+			"heading": 10.0,
+			"pitch": -6.0,
+			"fov": 50.0,
+			"min_boxes": 200,
+			"eye_note": "The point of the Hải Đăng road nearest to the geotag of the photo (12 m from it: the geotag is on a lot beside the road, where a building stands), 3 m over the road: the photo is from the railing, over the trees of the slope below it.",
+			"photos": [
+				{
+					"url": "https://www.flickr.com/photos/han_chu/15594420532/",
+					"image": "https://live.staticflickr.com/3947/15594420532_58d40cd848_o.jpg",
+					"date": "2014-06-01",
+					"license": "CC BY 2.0",
+					"author": "Han Minh Chu",
+					"open": true,
+					"file": "town_hai_dang_road_2014.jpg",
+					"shows": "The whole town from the Hải Đăng road over the trees, looking north to north-north-east: far hills on the left and the water of Bãi Sau on the far right.",
+					"title": "Hometown (Flickr 15594420532)",
+					"place": "the geotag of the file, on the lower Hải Đăng road",
+					"direction": "north to north-north-east"
+				}
+			]
+		},
+		{
+			"id": "bus_le_hong_phong",
+			"name": "The bus view of plan 0010: Lê Hồng Phong near Ngã Năm, toward Núi Lớn",
+			"eye": [
+				10.354,
+				107.0905
+			],
+			"eye_height": 2.6,
+			"heading": 279.6,
+			"pitch": 2.0,
+			"fov": 50.0,
+			"min_boxes": 50,
+			"photo": null,
+			"photo_note": "No open photo of 2017 to 2021 or of another year shows this view (searched on Wikimedia Commons and Flickr, 2026-11-21); Mapillary cannot be reached from the workspace."
+		}
+	]
+}
