@@ -3639,6 +3639,20 @@
 			"hash": "18584d0bcf7d574102c9dbc63c1ce008",
 			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/khach_san_hai_au_far.png). The same masses and the letters; 1 450 triangles (were 1 300).",
 			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-21",
+			"level": "mid",
+			"hash": "33c8be7b446ddc89c7d749bbdfd5091f",
+			"seen": "Report 0026, audit 6: the files of the lock (build/look/khach_san_hai_au_mid.png), next to photos 0 and 1. The middle block of 6 storeys and the stair tower are blocks of the rule (World fb3c185): the stair tower is a narrow grid of glass in white frames as in photo 0, and the 6th storey of the middle block has its windows on its three sides. The canopy and the letters HAI AU stay hand edits (the request to World e717ea75).",
+			"changed": "The middle block and the stair tower: blocks in place of three extrudes."
+		},
+		{
+			"date": "2026-11-21",
+			"level": "far",
+			"hash": "33c8be7b446ddc89c7d749bbdfd5091f",
+			"seen": "Report 0026, audit 6: the files of the lock (build/look/khach_san_hai_au_far.png): the same masses, the tower of glass, and the letters.",
+			"changed": "Nothing."
 		}
 	],
 	"status": "Source",
