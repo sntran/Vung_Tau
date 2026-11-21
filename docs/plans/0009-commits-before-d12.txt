@@ -1,0 +1,11 @@
+# The commits of plan 0009 before and after D-0009-12 (2026-11-21)
+#
+# The history of feat/0009-houses-on-the-lots was made again with the
+# identity of CONTRIBUTING.md. The reports name the old commits. Each line is
+# an old commit and its new commit (the same files).
+
+a6ffd2c 1e812d0
+efe2b54 acf1062
+9790cf5 1746c38
+b8facbc 7298026
+8990b37 c6f830f

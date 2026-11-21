@@ -5,6 +5,23 @@ on:
   pull_request:
 
 jobs:
+  identity:
+    # Report 0026, D-0026-43: each commit of the branch (also each merge) has
+    # the identity of CONTRIBUTING.md, as author and as committer.
+    name: Identity of the commits
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check the author and the committer of each commit
+        env:
+          BASE: origin/${{ github.base_ref || 'main' }}
+          TIP: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: tools/ci/check_identity.sh "$BASE" "$TIP"
+
   python:
     name: Voice build tests
     runs-on: ubuntu-latest
