@@ -1,0 +1,282 @@
+{
+	"note": "Plan 0026, R10, D8: the people of the showcase of Bãi Trước (scenes/world/showcase_people.gd). The walkers go back and forth along the footways of the park and the ways of the walk of the sea, keep_right_m to the right of the middle of the way (less on a narrow way), and stop when the player stands in front of them; the sitters sit on the borders of the raised lawns, with their backs to the lawn. hours gives the part of the people that is there at each hour: [hour, part]. At 17:00 all of them are there (about 40, R10); at noon fewer. The culture notes (Confirmed): in the evening many families come to Bãi Trước, swim, and sit on the paved edge of the park. The counts and the parts are builder values. spots: some of the walkers walk on a short way in the frame of a shot (report 0026, D-0026-07: at 17:00 people walk on the walk of the sea and in the park, near the places of the shots and of the player); the others go on the ways of the park.",
+	"seed": 26,
+	"hours": [
+		[
+			0.0,
+			0.0
+		],
+		[
+			5.0,
+			0.15
+		],
+		[
+			7.0,
+			0.3
+		],
+		[
+			9.0,
+			0.15
+		],
+		[
+			12.0,
+			0.25
+		],
+		[
+			15.0,
+			0.4
+		],
+		[
+			16.5,
+			0.85
+		],
+		[
+			17.0,
+			1.0
+		],
+		[
+			18.5,
+			0.9
+		],
+		[
+			20.0,
+			0.6
+		],
+		[
+			22.0,
+			0.15
+		],
+		[
+			24.0,
+			0.0
+		]
+	],
+	"walkers": {
+		"count": 28,
+		"models": [
+			"walker_1",
+			"walker_2",
+			"walker_3",
+			"non_rong_vanh",
+			"walker_4",
+			"walker_5",
+			"walker_6"
+		],
+		"types": [
+			"footway",
+			"pedestrian"
+		],
+		"ways": [
+			458829436,
+			458829438
+		],
+		"min_length_m": 20.0,
+		"speed_m_s": [
+			0.9,
+			1.3
+		],
+		"keep_right_m": [
+			0.6,
+			1.1
+		],
+		"spots": [
+			{
+				"name": "the walk at the top of the beach (S1)",
+				"count": 6,
+				"line": [
+					[
+						-45.0,
+						-206.0
+					],
+					[
+						-42.5,
+						-192.0
+					],
+					[
+						-35.5,
+						-176.0
+					],
+					[
+						-28.5,
+						-160.0
+					],
+					[
+						-25.0,
+						-152.0
+					]
+				],
+				"shot": "S1"
+			},
+			{
+				"name": "the lawn of the leaning palms (S2)",
+				"count": 4,
+				"line": [
+					[
+						-7.9,
+						-198.9
+					],
+					[
+						-3.4,
+						-192.2
+					],
+					[
+						-0.9,
+						-183.6
+					],
+					[
+						0.7,
+						-175.2
+					]
+				],
+				"shot": "S2"
+			},
+			{
+				"name": "the walk of the sea by the raised lawns at sunset (S5)",
+				"count": 6,
+				"line": [
+					[
+						-67.5,
+						-272.0
+					],
+					[
+						-54.0,
+						-256.0
+					],
+					[
+						-48.0,
+						-240.0
+					],
+					[
+						-46.0,
+						-224.0
+					]
+				],
+				"shot": "S5",
+				"line_note": "Report 0026, D-0026-28: the line starts 10.5 m from the eye of S5. In the photo of S5 (Commons, Jean Van Jean, 2015-03, CC BY 3.0) the nearest person on the walk is about 15 m from the camera; with the first point 5 m from the eye, the six walkers of the spot at their points nearest to the eye were at their mid level, and S5 had 332 442 triangles on Low (PT-73)."
+			}
+		],
+		"models_note": "non_rong_vanh: the woman in the wide sun hat of report 0026, Q19 (data/world/drawings/non_rong_vanh.json)."
+	},
+	"sitters": {
+		"count": 12,
+		"models": [
+			"sitter_1",
+			"sitter_2",
+			"sitter_3"
+		],
+		"every_m": 1.8,
+		"out_m": 0.3
+	},
+	"swimmers": {
+		"note": "Report 0026, D-0026-20 and Q20: the swimmers of Bãi Trước in T-shirts and shorts (the person blueprint of World: swimmer_1 to swimmer_4, and walker_5, a boy in a T-shirt and quần đùi), some with a swim ring phao_boi at the water line: a child stands in its ring, an adult holds the ring at its side. Each swimmer has a point on the line, which is on the sand at the top of the beach in front of the shot S1 (the ground of the game is 1.5 m there), between the eye of S1 and the row of boats on the sand: in the photo of S1 the people in the water are nearer than the boats, and goes out along to_sea (at right angles to the water's edge from z -182 to z -126) to the point where the water at its feet is its depth (depth_m, child_depth_m for a person younger than child_age), at each sea level of the tide. hours: the part of the swimmers in the sea at each hour (the culture notes: people swim at Bãi Trước early in the morning and in the evening; no photo gives the counts). The count (11: with 14, the far levels of the swimmers and the walkers in the frame of S2 made more than 300 000 triangles on Low, PT-73), the depths, the part with a ring, and the hours are builder values.",
+		"count": 11,
+		"models": [
+			"swimmer_1",
+			"swimmer_2",
+			"swimmer_3",
+			"walker_5",
+			"swimmer_4",
+			"swimmer_2",
+			"swimmer_1"
+		],
+		"line": [
+			[
+				-52.5,
+				-182.0
+			],
+			[
+				-47.0,
+				-170.0
+			],
+			[
+				-42.0,
+				-158.0
+			],
+			[
+				-37.5,
+				-146.0
+			],
+			[
+				-35.0,
+				-134.0
+			],
+			[
+				-33.0,
+				-126.0
+			]
+		],
+		"to_sea": [
+			-0.93,
+			0.36
+		],
+		"depth_m": [
+			0.6,
+			1.0
+		],
+		"child_depth_m": [
+			0.5,
+			0.7
+		],
+		"child_age": 14,
+		"ring_model": "phao_boi",
+		"ring_part": 0.4,
+		"hours": [
+			[
+				0.0,
+				0.0
+			],
+			[
+				4.5,
+				0.0
+			],
+			[
+				5.5,
+				0.6
+			],
+			[
+				7.0,
+				0.4
+			],
+			[
+				9.0,
+				0.1
+			],
+			[
+				11.0,
+				0.05
+			],
+			[
+				14.0,
+				0.05
+			],
+			[
+				15.5,
+				0.3
+			],
+			[
+				16.5,
+				0.8
+			],
+			[
+				17.0,
+				1.0
+			],
+			[
+				18.5,
+				0.6
+			],
+			[
+				19.5,
+				0.1
+			],
+			[
+				20.0,
+				0.0
+			],
+			[
+				24.0,
+				0.0
+			]
+		]
+	}
+}

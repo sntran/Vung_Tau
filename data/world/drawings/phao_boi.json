@@ -1,0 +1,232 @@
+{
+	"id": "phao_boi",
+	"what": "phao bơi: the inflatable swim ring of the people who swim at Bãi Trước, on the ground (a drawing of edits)",
+	"way": "drawing",
+	"status": "Source",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026, R10: a swimmer in the water holds one or sits in one; children wear one; piles of them by the steps to the sand.",
+	"order": {
+		"blueprint": "drawing",
+		"options": {
+			"drawing": {
+				"name": "phao_boi",
+				"kind": "prop",
+				"sources": [
+					"The swim ring of the people who swim at Bãi Trước: photos of 2019-06-22 (Flickr) and 2020-04-25 (VnExpress); 0.7 m outside, a tube of 0.2 m, a shiny plastic of one strong color (Vũng Tàu, data/world/drawings/phao_boi.json)."
+				],
+				"materials": {
+					"part_01": {
+						"color": "#ffffff",
+						"roughness": 0.3,
+						"metalness": 0.0
+					}
+				},
+				"nodes": [
+					{
+						"name": "ring",
+						"skill": {
+							"sculpt": {
+								"edits": [
+									{
+										"shape": "ring",
+										"size": [
+											0.25,
+											0.1
+										],
+										"at": [
+											0,
+											0,
+											0.1
+										],
+										"material": "part_01",
+										"color": "#f08a1c",
+										"roughness": 0.3
+									},
+									{
+										"shape": "ring",
+										"size": [
+											0.35,
+											0.006
+										],
+										"at": [
+											0,
+											0,
+											0.1
+										],
+										"mode": "paint",
+										"material": "part_01",
+										"color": "#f6c27a",
+										"blend": 0.002,
+										"levels": [
+											"near"
+										]
+									},
+									{
+										"shape": "ring",
+										"size": [
+											0.15,
+											0.006
+										],
+										"at": [
+											0,
+											0,
+											0.1
+										],
+										"mode": "paint",
+										"material": "part_01",
+										"color": "#f6c27a",
+										"blend": 0.002,
+										"levels": [
+											"near"
+										]
+									},
+									{
+										"shape": "cylinder",
+										"size": [
+											0.012,
+											0.008
+										],
+										"at": [
+											0.0,
+											-0.25,
+											0.2
+										],
+										"material": "part_01",
+										"color": "#f4f0e6",
+										"blend": 0.004,
+										"levels": [
+											"near"
+										]
+									}
+								],
+								"ports": {
+									"hold": {
+										"at": [
+											0,
+											-0.35,
+											0.1
+										],
+										"axis": [
+											1,
+											0,
+											0
+										],
+										"up": [
+											0,
+											0,
+											1
+										]
+									}
+								},
+								"cells": {
+									"near": 0.01,
+									"mid": 0.025,
+									"far": 0.05
+								},
+								"budget": {
+									"near": 3000,
+									"mid": 500,
+									"far": 80
+								}
+							}
+						}
+					}
+				]
+			}
+		}
+	},
+	"sources": [
+		{
+			"url": "https://vnexpress.net/bai-bien-vung-tau-dong-nghit-nguoi-4090193.html",
+			"image": "https://vcdn1-vnexpress.vnecdn.net/2020/04/25/Dang-Khoa-Tam-bien-Vung-Tau-2-3443-9097-1587819462.jpg",
+			"date": "2020-04-25",
+			"license": "all rights reserved",
+			"author": "Trường Hà / VnExpress",
+			"open": false,
+			"file": "pb_vne2.jpg",
+			"shows": "The south part of Bãi Trước full of swimmers at the end of the afternoon: a girl in the water inside a yellow and orange ring with a print, an orange float, yellow rings, a pink ring of a flamingo, a yellow ring of a duck, life jackets. The file is a crop of the girl in the ring."
+		},
+		{
+			"url": "https://www.flickr.com/photos/110569822@N04/48108232968/",
+			"image": "https://live.staticflickr.com/65535/48108232968_ab4f0d0653_b.jpg",
+			"date": "2019-06-22",
+			"license": "all rights reserved",
+			"author": "Flickr user 110569822@N04",
+			"open": false,
+			"file": "pb_fl481.jpg",
+			"shows": "The north part of Bãi Trước from the sand, to the north: piles of swim rings (orange, yellow, pink, and some with prints) by the steps down to the sand. The file is a crop of the piles."
+		}
+	],
+	"sizes": {
+		"outer": {
+			"value": 0.7,
+			"unit": "m",
+			"source": "Photo 0: the ring round the girl is 240 px across (×4 crop) and her head is about 60 px (0.15 m for a child): 0.6 m. The old spec: the yellow ring that a man holds in photo 0 is about 1.4 times the width of his shoulders (0.45 m): 0.65 m to 0.7 m. I use 0.7 m."
+		},
+		"tube": {
+			"value": 0.2,
+			"unit": "m",
+			"source": "Photo 0: the tube of the ring round the girl is about 0.27 of the ring across (65 px of 240 px): 0.19 m on a ring of 0.7 m."
+		},
+		"color": {
+			"value": "#f08a1c (orange); also yellow #f2c230 and pink",
+			"unit": "",
+			"source": "Photo 0: yellow and orange rings; photo 1 (2019): piles of orange and yellow rings, some pink; one color for each ring. A shiny plastic: the light shines on the rings in photo 0."
+		},
+		"seams_and_valve": {
+			"value": "two seams of 1 cm at the outer and the inner equator; a valve of 2.4 cm",
+			"unit": "",
+			"source": "estimate (no source): a common swim ring of PVC; the photos are too small to show them."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "717230fb4f94246d571a52339292faa3",
+			"seen": "A smooth orange torus of 0.7 m by 0.2 m, as the rings of photos 0 and 1. The outline has 16 to 20 corners, and a sharp crease of the light shows on the back of the tube (the cut to 300 triangles). The orange of the render (#b36c14 in the shade of the views) is the orange of the float in photo 0 (#ee7316 in the sun) under the light of the views.",
+			"changed": "Mid budget 500 and cells of 2.5 cm, far budget 80 and cells of 5 cm, so the outline is rounder."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "744b553c0b81b6fdae01bae186dab48a",
+			"seen": "The ring is rounder: the crease of the light on the back is gone. The outline still has about 18 corners, and the hole about 8; at the distance of the mid level (15 m to 40 m) the ring is 20 px to 50 px, so they do not show. Shape, proportions (0.7 m by 0.2 m, a hole of 0.3 m) and the strong orange agree with photos 0 and 1.",
+			"changed": "No change. Next: the near level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "744b553c0b81b6fdae01bae186dab48a",
+			"seen": "A smooth, round torus with the shine of plastic, as the rings of photos 0 and 1; the hole is round. The seam at the outer equator shows as a broken light line (the paint is 1.2 cm wide on cells of 1 cm); the valve is a small bump on the top.",
+			"changed": "No change: I build the near level one time. The seams are an estimate (no source) and small."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "far",
+			"hash": "744b553c0b81b6fdae01bae186dab48a",
+			"seen": "The far level: a ring of about 10 corners with a hole of 5 corners, in 80 triangles, the same orange. At the far distance (40 m to 150 m) the ring is less than 15 px, so the corners do not show.",
+			"changed": "No change."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "744b553c0b81b6fdae01bae186dab48a",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/phao_boi_mid.png). The orange swim ring, as in photos 0 and 1.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "744b553c0b81b6fdae01bae186dab48a",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/phao_boi_far.png). The ring in facets.",
+			"changed": "Nothing."
+		}
+	],
+	"hash": "744b553c0b81b6fdae01bae186dab48a"
+}

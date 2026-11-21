@@ -42,7 +42,9 @@ func run(d: PlaytestDriver) -> void:
 	var run_views: Array = [all_views.slice(0, half), all_views.slice(half), all_views][d.phase - 1]
 	for view: Dictionary in run_views:
 		await d.fly_to(view.eye, view.target)
-		await d.wait_ground(60.0)
+		# The CI of 214344b: on High the ground of a view took more than 60 s
+		# (the runs of one part of CI take about two times longer than here).
+		await d.wait_ground(120.0)
 		await d.wait_frames(6)
 		await d.screenshot("%s_%s" % [view.name, preset])
 		var around: Vector3 = view.get("around", view.eye)

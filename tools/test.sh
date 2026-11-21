@@ -15,12 +15,29 @@ mkdir -p "$ROOT/build"
 touch "$ROOT/build/.gdignore"
 LOG="$ROOT/build/unit-tests.log"
 
+# Report 0026, D-0026-44: the import files in the repository are the files
+# that Godot writes. A short form (as tools/world/fetch.py writes it for a new
+# model) changes at each import, and each play test leaves changed files. The
+# check compares the import files before and after the import.
+imports_state() {
+  git -C "$ROOT" diff -- '*.import' 2>/dev/null | sha256sum
+}
+in_git=false
+git -C "$ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1 && in_git=true
+$in_git && before=$(imports_state)
+
 echo "Import the project."
 "$GODOT" --headless --path "$ROOT" --import >"$ROOT/build/import.log" 2>&1 || {
   cat "$ROOT/build/import.log"
   echo "test.sh: the import failed." >&2
   exit 1
 }
+
+if $in_git && [[ "$(imports_state)" != "$before" ]]; then
+  git -C "$ROOT" status --porcelain -- '*.import' | grep -v '^??' || true
+  echo "test.sh: the import changed import files of the repository. Commit the files that Godot writes." >&2
+  exit 1
+fi
 
 echo "Run the unit tests."
 set +e

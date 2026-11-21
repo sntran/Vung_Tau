@@ -1,0 +1,174 @@
+name: Models of World
+
+# Gets the models of World that are not in assets/world, or that do not agree
+# with their orders, from a clone of World at the commit of the lock, with
+# `mix world.order` (plan 0023, R2 and R4). The factory of World cannot build
+# some orders (in November 2026 it stopped at most orders of a person: "the
+# order needs more memory than the edge has"). The workspace cannot get the
+# packages of World from Hex, so this build runs in CI only. The job commits
+# the files and the lock to the branch that it runs on, with the message
+# "Update the models of World to COMMIT". A push with the workflow token does
+# not start the test workflow: the next push to the branch starts it.
+on:
+  workflow_dispatch:
+    inputs:
+      looks:
+        description: "Drawings (ids, with spaces) whose mid and far looks to build and commit to docs/world/looks/ (report 0026, audit 6)"
+        required: false
+        default: ""
+  push:
+    paths: ["data/world/orders.json", "data/world/lock.json"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: world-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  LANG: C.UTF-8
+  # The tools of World (World .github/workflows/ci.yml).
+  BEAM_COM_VERSION: 0.1.0-rc.7
+  BEAM_COM_SHA256: 203f7395007698462fe18851b90865afac30f647c57eb12407c3e00109d30c54
+
+jobs:
+  models:
+    name: Build the models of World
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Find the models to build
+        id: need
+        run: |
+          commit=$(python -c 'import json; print(json.load(open("data/world/lock.json"))["world"]["commit"])')
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+          if python tools/world/fetch.py --check && [ -z "${{ inputs.looks }}" ]; then
+            echo "build=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Get World at the commit of the lock
+        if: steps.need.outputs.build == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: sntran/World
+          ref: ${{ steps.need.outputs.commit }}
+          path: World
+
+      # beam.com is an Actually Portable Executable: its first lines are a
+      # shell script. The runner can give a program that starts with MZ to
+      # WINE. This rule gives it to /bin/sh.
+      - name: Run APE programs with /bin/sh
+        if: steps.need.outputs.build == 'true'
+        run: sudo sh -c 'echo ":APE:M::MZqFpD::/bin/sh:" > /proc/sys/fs/binfmt_misc/register' || true
+
+      - name: Install beam.com
+        if: steps.need.outputs.build == 'true'
+        run: |
+          mkdir -p "$HOME/bin"
+          cd "$HOME/bin"
+          curl -fsSLO "https://github.com/sntran/BEAM.com/releases/download/v$BEAM_COM_VERSION/beam.com"
+          echo "$BEAM_COM_SHA256  beam.com" | sha256sum -c -
+          chmod +x beam.com
+          for tool in mix.com iex.com; do ln -s beam.com "$tool"; done
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
+      - name: Cache the packages of World
+        if: steps.need.outputs.build == 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            World/deps
+            World/_build
+            ~/.mix
+            ~/.hex
+          key: world-mix-${{ env.BEAM_COM_VERSION }}-${{ hashFiles('World/mix.lock') }}
+          restore-keys: world-mix-${{ env.BEAM_COM_VERSION }}-
+
+      - name: Get the packages of World
+        if: steps.need.outputs.build == 'true'
+        working-directory: World
+        run: |
+          mix.com local.hex --force
+          mix.com local.rebar --force
+          mix.com deps.get
+
+      # A model that World cannot build does not stop the others, and the
+      # job commits the models that it built (report 0026, Q25); the job and
+      # the check of the files stay red until each model has its files.
+      - name: Build the models
+        id: build
+        if: steps.need.outputs.build == 'true'
+        run: python tools/world/fetch.py --source=checkout --world=World --mix=mix.com --keep-going
+
+      - name: Check the models
+        if: always() && steps.need.outputs.build == 'true'
+        run: python tools/world/fetch.py --check
+
+      # Report 0026, D-0026-44: fetch.py writes a short import file for a new
+      # model, and Godot writes it again in the full form at each import. The
+      # job commits the files that Godot writes, so an import changes no file
+      # of the repository (tools/test.sh checks it).
+      - name: Cache Godot
+        if: always() && steps.need.outputs.build == 'true'
+        uses: actions/cache@v4
+        with:
+          path: .tools
+          key: godot-${{ runner.os }}-${{ hashFiles('tools/setup.sh') }}
+
+      - name: Write the import files with Godot
+        if: always() && steps.need.outputs.build == 'true'
+        run: |
+          tools/setup.sh
+          # Godot must not import the clone of World or the files in build/.
+          touch World/.gdignore
+          mkdir -p build && touch build/.gdignore
+          .tools/godot/godot --headless --path . --import > build/import.log 2>&1 || { tail -50 build/import.log; exit 1; }
+
+      # Report 0026, audit 6: the looks of drawings that the factory cannot
+      # build (HTTP 503, not enough memory) and that are not orders of the game
+      # (the status Check): mix world.order in the clone, the views of
+      # tools/world/look.gd next to the open photos.
+      - name: Build the looks
+        if: always() && inputs.looks != ''
+        env:
+          LOOKS: ${{ inputs.looks }}
+        run: |
+          sudo apt-get install -y xvfb > /dev/null || true
+          pip install pillow > /dev/null
+          mkdir -p docs/world/looks
+          for id in $LOOKS; do
+            for level in mid far; do
+              python tools/world/drawings.py look "$id" --level "$level" --world World --mix mix.com || exit 1
+              cp "build/look/${id}_${level}.png" docs/world/looks/
+            done
+          done
+
+      - name: Commit the files
+        if: always() && steps.need.outputs.build == 'true'
+        run: |
+          git add docs/world/looks 2>/dev/null || true
+          git add assets/world data/world/lock.json
+          if git diff --cached --quiet; then
+            echo "The models did not change."
+            exit 0
+          fi
+          git -c user.name="Sơn Trần-Nguyễn" -c user.email=github@sntran.com -c commit.gpgsign=false \
+            commit -m "Update the models of World to ${{ steps.need.outputs.commit }}"
+          # Another workflow can push to the branch at the same time (the models
+          # and the photos after one push): put this commit on top of it.
+          for attempt in 1 2 3 4; do
+            git -c user.name="Sơn Trần-Nguyễn" -c user.email=github@sntran.com -c commit.gpgsign=false \
+              pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            git rebase --abort || true
+            sleep $((attempt * 5))
+          done
+          exit 1

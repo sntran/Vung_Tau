@@ -1,0 +1,287 @@
+{
+	"id": "cay_vien_bon_hoa_do",
+	"what": "cây viền bồn hoa lá đỏ: a piece of 0.5 m of the clipped ring of low plants with red leaves at the edge of a round flower bed of the park of Bãi Trước (the species is not known) (a drawing of edits)",
+	"way": "drawing",
+	"status": "Check",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026: the ring at the edge of the round flower beds of the park (pieces side by side along the ring).",
+	"order": {
+		"blueprint": "drawing",
+		"options": {
+			"drawing": {
+				"name": "cay_vien_bon_hoa_do",
+				"kind": "plant",
+				"sources": [
+					"A piece of 0.5 m of the clipped ring of low plants with dark red leaves at the edge of a round flower bed of the park of Bãi Trước: 0.3 m wide and 0.25 m high, from a photo of 2014 (Commons, trungydang, CC BY 3.0) (Vũng Tàu, data/world/drawings/cay_vien_bon_hoa_do.json)."
+				],
+				"materials": {
+					"part_01": {
+						"color": "#ffffff",
+						"roughness": 0.65,
+						"metalness": 0.0
+					}
+				},
+				"nodes": [
+					{
+						"name": "border",
+						"skill": {
+							"sculpt": {
+								"edits": [
+									{
+										"shape": "round_box",
+										"size": [
+											0.25,
+											0.14,
+											0.1,
+											0.09
+										],
+										"at": [
+											0,
+											0,
+											0.1
+										],
+										"color": "#7a3e28",
+										"material": "part_01",
+										"roughness": 0.65,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.02
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.075
+										],
+										"at": [
+											-0.19,
+											0.03,
+											0.175
+										],
+										"color": "#8e4c30",
+										"blend": 0.05,
+										"repeat": {
+											"count": 3,
+											"move": [
+												0.19,
+												0,
+												0
+											]
+										},
+										"material": "part_01",
+										"roughness": 0.65,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.02
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.07
+										],
+										"at": [
+											-0.095,
+											-0.035,
+											0.17
+										],
+										"color": "#64301f",
+										"blend": 0.05,
+										"repeat": {
+											"count": 2,
+											"move": [
+												0.19,
+												0,
+												0
+											]
+										},
+										"material": "part_01",
+										"roughness": 0.65,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.02
+										}
+									},
+									{
+										"shape": "ball",
+										"size": [
+											0.08
+										],
+										"at": [
+											-0.15,
+											0.09,
+											0.09
+										],
+										"color": "#7a3e28",
+										"blend": 0.05,
+										"repeat": {
+											"count": 3,
+											"move": [
+												0.15,
+												0,
+												0
+											]
+										},
+										"mirror": "y",
+										"material": "part_01",
+										"roughness": 0.65,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.02
+										}
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.3,
+											0.3,
+											0.2
+										],
+										"at": [
+											0,
+											0,
+											-0.2
+										],
+										"mode": "subtract",
+										"material": "part_01",
+										"color": "#4e2618"
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.1,
+											0.3,
+											0.3
+										],
+										"at": [
+											0.35,
+											0,
+											0.1
+										],
+										"mode": "subtract",
+										"material": "part_01",
+										"color": "#64301f",
+										"mirror": "x"
+									},
+									{
+										"shape": "box",
+										"size": [
+											0.3,
+											0.2,
+											0.06
+										],
+										"at": [
+											0,
+											0,
+											0.03
+										],
+										"mode": "paint",
+										"material": "part_01",
+										"color": "#4e2618",
+										"blend": 0.05
+									}
+								],
+								"cells": {
+									"near": 0.008,
+									"mid": 0.03,
+									"far": 0.06
+								},
+								"budget": {
+									"near": 3000,
+									"mid": 300,
+									"far": 40
+								},
+								"bake": {
+									"near": 512
+								}
+							}
+						}
+					}
+				]
+			}
+		}
+	},
+	"sources": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Cong_vien_bai_truoc-Ph%C6%B0%E1%BB%9Dng_1,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio_(1).jpg",
+			"date": "2014-04-06 06:48",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "park_flower_bed_2014.jpg",
+			"shows": "The park in the morning: a round flower bed with a clipped ring of dark red leaves at its edge and low yellow green plants in it, a low square white lamp (0.70 m) beside it, clipped hedges and round clipped bushes, painted cat sculptures."
+		},
+		{
+			"url": "https://www.flickr.com/photos/10598985@N07/26942383027/",
+			"image": "https://live.staticflickr.com/970/26942383027_d1b9b6b131_o.jpg",
+			"date": "2018-03-08",
+			"license": "all rights reserved",
+			"author": "Flickr user 10598985@N07",
+			"open": false,
+			"file": "vien_fl2018.jpg",
+			"shows": "The park in the morning: a flower bed of purple flowers with a low clipped border of small GREEN leaves, not red. The file is a crop of the border."
+		},
+		{
+			"url": "https://www.flickr.com/photos/10598985@N07/27942036338/",
+			"image": "https://live.staticflickr.com/832/27942036338_3886b809c0_h.jpg",
+			"date": "2018-03-08",
+			"license": "all rights reserved",
+			"author": "Flickr user 10598985@N07",
+			"open": false,
+			"file": "flickr_27942036338.jpg",
+			"shows": "The park under frangipani trees: paths of red tiles, granite benches, low square white lamps, lawns with low clipped borders of green leaves; no red border in view."
+		}
+	],
+	"sizes": {
+		"width": {
+			"value": 0.3,
+			"unit": "m",
+			"source": "Photo 0 (2014): the red ring is about half as wide as the low lamp beside the bed is high (0.70 m): 0.3 m."
+		},
+		"height": {
+			"value": 0.25,
+			"unit": "m",
+			"source": "Photo 0 (2014): the ring is about a third of the height of the low lamp (0.70 m): 0.25 m."
+		},
+		"length": {
+			"value": 0.5,
+			"unit": "m",
+			"source": "estimate (no source): one piece of the ring; pieces go side by side."
+		},
+		"colors": {
+			"value": "leaves #7a3e28, #8e4c30 and #64301f on the top, #4e2618 low on the sides",
+			"unit": "",
+			"source": "Photo 0 (2014): dark red brown leaves in a dark morning (the median of the red pixels of the ring is #2c200d where the white lamp is #484c37, so the true color is about three times lighter: a red brown). No photo of 2017 to 2021 shows a red border: the borders of the beds in the photos of 2018 (photos 1 and 2) are green."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "51179d9141f48627954482bbeae1d02a",
+			"seen": "A smooth block of red brown with round ends, as a piece of chocolate. In photo 0 (2014) the ring is a clipped low hedge with a lumpy top and dark red brown leaves; the pieces of a ring must join, so round ends leave gaps.",
+			"changed": "A box with round top edges and flat ends, lumps on its top and its sides, red brown colors #7a3e28, #8e4c30, #64301f and #4e2618 low on the sides."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "4bee101e76ee8a0caeb1ffbf4dae2cda",
+			"seen": "A lumpy low mound 0.5 m long, 0.3 m wide and 0.25 m high, round over its top, flat at its two ends, red brown and darker low on its sides: a piece of the clipped ring of photo 0 (2014). Pieces side by side make a ring with no gaps.",
+			"changed": "No change. Next: the near level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "4bee101e76ee8a0caeb1ffbf4dae2cda",
+			"seen": "The same lumpy mound with flat ends. With the map of the near level the color is lighter and more orange (a terracotta) than at the mid level and than the dark red brown of photo 0, and the leaves are a fine grain only: the piece looks more as a lump of clay than as a clipped hedge of small leaves.",
+			"changed": "No change: I build the near level one time. Before the game uses it (it is Check): darker colors (about #5e2a1c) and a larger scale of the surface of leaves (0.04 m)."
+		}
+	],
+	"hash": "4bee101e76ee8a0caeb1ffbf4dae2cda",
+	"status_note": "Check (report 0026, Q17): only the photo of 2014-04-06 shows the ring of red leaves. No photo of 2017 or later shows it (rule 2), and no photo after 2021 shows it (rule 1). The photos of 2018-03-08 (photos 1 and 2) show low clipped borders of green leaves at the flower beds, not red: the color of the borders in 2019 is not known. Before the game uses it: darker colors (about #5e2a1c) and a larger scale of the surface of leaves (0.04 m), or a green version from the photos of 2018."
+}

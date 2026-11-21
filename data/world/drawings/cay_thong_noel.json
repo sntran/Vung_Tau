@@ -1,0 +1,2170 @@
+{
+	"id": "cay_thong_noel",
+	"what": "cây thông Noel (bách tán, Araucaria heterophylla): the Norfolk pine of the median of Quang Trung and of the south end of the park of Bãi Trước (a drawing of edits)",
+	"way": "drawing",
+	"status": "Source",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": true,
+	"uses": "Plan 0026, R8: the row on the median of Quang Trung, the pines by Cảng vụ, at the south end of the park and along Hạ Long.",
+	"order": {
+		"blueprint": "drawing",
+		"options": {
+			"drawing": {
+				"name": "cay_thong_noel",
+				"kind": "plant",
+				"sources": [
+					"A Norfolk pine (Araucaria heterophylla) of Bãi Trước: a straight trunk to the top, level tiers of five branches every 0.7 m from 2.5 m, a narrow crown of 3.6 m; 14 m high. From photos of 2019 (Flickr), 2020 (VnExpress) and 2021 (Commons) (Vũng Tàu, data/world/drawings/cay_thong_noel.json)."
+				],
+				"materials": {
+					"part_01": {
+						"color": "#ffffff",
+						"roughness": 0.9,
+						"metalness": 0.0
+					},
+					"part_02": {
+						"color": "#ffffff",
+						"roughness": 0.7,
+						"metalness": 0.0
+					}
+				},
+				"nodes": [
+					{
+						"name": "tree",
+						"skill": {
+							"sculpt": {
+								"edits": [
+									{
+										"shape": "cone",
+										"size": [
+											0.16,
+											0.03,
+											7.0
+										],
+										"at": [
+											0,
+											0,
+											7.0
+										],
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.95,
+										"surface": {
+											"kind": "bark",
+											"scale": 0.05
+										}
+									},
+									{
+										"shape": "cone",
+										"size": [
+											0.24,
+											0.16,
+											0.2
+										],
+										"at": [
+											0,
+											0,
+											0.2
+										],
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.95,
+										"blend": 0.1,
+										"surface": {
+											"kind": "bark",
+											"scale": 0.05
+										}
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													0.05,
+													0.0,
+													2.5
+												],
+												[
+													0.9,
+													0.0,
+													2.608
+												],
+												[
+													1.8,
+													0.0,
+													2.896
+												]
+											],
+											"radii": [
+												0.07,
+												0.042,
+												0.012
+											]
+										},
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.9,
+										"blend": 0.04,
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.936,
+											0.36,
+											0.22
+										],
+										"at": [
+											0.99,
+											0.0,
+											2.68
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											-0.0,
+											1.0,
+											0
+										],
+										"material": "part_02",
+										"color": "#2f4a2a",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.576,
+											0.26,
+											0.16
+										],
+										"at": [
+											1.26,
+											0.0,
+											2.476
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											-0.0,
+											1.0,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													-0.0369,
+													0.0338,
+													3.2
+												],
+												[
+													-0.6304,
+													0.5776,
+													3.3026
+												],
+												[
+													-1.2607,
+													1.1553,
+													3.5762
+												]
+											],
+											"radii": [
+												0.0683,
+												0.041,
+												0.012
+											]
+										},
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.9,
+										"blend": 0.04,
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.8892,
+											0.353,
+											0.216
+										],
+										"at": [
+											-0.6934,
+											0.6354,
+											3.371
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											-0.6756,
+											-0.7373,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.5472,
+											0.255,
+											0.157
+										],
+										"at": [
+											-0.8825,
+											0.8087,
+											3.1742
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											-0.6756,
+											-0.7373,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													0.0044,
+													-0.0498,
+													3.9
+												],
+												[
+													0.0706,
+													-0.8069,
+													3.9972
+												],
+												[
+													0.1412,
+													-1.6138,
+													4.2564
+												]
+											],
+											"radii": [
+												0.0665,
+												0.0399,
+												0.012
+											]
+										},
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.9,
+										"blend": 0.04,
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.8424,
+											0.346,
+											0.212
+										],
+										"at": [
+											0.0777,
+											-0.8876,
+											4.062
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0.9962,
+											0.0872,
+											0
+										],
+										"material": "part_02",
+										"color": "#2f4a2a",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.5184,
+											0.25,
+											0.154
+										],
+										"at": [
+											0.0988,
+											-1.1297,
+											3.8724
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0.9962,
+											0.0872,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													0.0304,
+													0.0397,
+													4.6
+												],
+												[
+													0.4657,
+													0.6069,
+													4.6918
+												],
+												[
+													0.9314,
+													1.2138,
+													4.9366
+												]
+											],
+											"radii": [
+												0.0648,
+												0.0389,
+												0.012
+											]
+										},
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.9,
+										"blend": 0.04,
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.7956,
+											0.339,
+											0.208
+										],
+										"at": [
+											0.5123,
+											0.6676,
+											4.753
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											-0.7934,
+											0.6088,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.4896,
+											0.245,
+											0.151
+										],
+										"at": [
+											0.652,
+											0.8497,
+											4.5706
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											-0.7934,
+											0.6088,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													-0.0492,
+													-0.0087,
+													5.3
+												],
+												[
+													-0.7091,
+													-0.125,
+													5.3864
+												],
+												[
+													-1.4181,
+													-0.2501,
+													5.6168
+												]
+											],
+											"radii": [
+												0.063,
+												0.0378,
+												0.012
+											]
+										},
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.9,
+										"blend": 0.04,
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.7488,
+											0.332,
+											0.204
+										],
+										"at": [
+											-0.78,
+											-0.1375,
+											5.444
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0.1736,
+											-0.9848,
+											0
+										],
+										"material": "part_02",
+										"color": "#2f4a2a",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.4608,
+											0.24,
+											0.148
+										],
+										"at": [
+											-0.9927,
+											-0.175,
+											5.2688
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0.1736,
+											-0.9848,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													0.0422,
+													-0.0269,
+													6.0
+												],
+												[
+													0.5693,
+													-0.3627,
+													6.081
+												],
+												[
+													1.1386,
+													-0.7254,
+													6.297
+												]
+											],
+											"radii": [
+												0.0613,
+												0.0368,
+												0.012
+											]
+										},
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.9,
+										"blend": 0.04,
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.702,
+											0.325,
+											0.2
+										],
+										"at": [
+											0.6262,
+											-0.3989,
+											6.135
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0.5373,
+											0.8434,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.432,
+											0.235,
+											0.145
+										],
+										"at": [
+											0.797,
+											-0.5077,
+											5.967
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0.5373,
+											0.8434,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													-0.0129,
+													0.0483,
+													6.7
+												],
+												[
+													-0.1631,
+													0.6085,
+													6.7756
+												],
+												[
+													-0.3261,
+													1.2171,
+													6.9772
+												]
+											],
+											"radii": [
+												0.0595,
+												0.0357,
+												0.012
+											]
+										},
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.9,
+										"blend": 0.04,
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.6552,
+											0.318,
+											0.196
+										],
+										"at": [
+											-0.1794,
+											0.6694,
+											6.826
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											-0.9659,
+											-0.2588,
+											0
+										],
+										"material": "part_02",
+										"color": "#2f4a2a",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.4032,
+											0.23,
+											0.142
+										],
+										"at": [
+											-0.2283,
+											0.8519,
+											6.6652
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											-0.9659,
+											-0.2588,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													-0.0231,
+													-0.0444,
+													7.4
+												],
+												[
+													-0.2701,
+													-0.5189,
+													7.4702
+												],
+												[
+													-0.5402,
+													-1.0378,
+													7.6574
+												]
+											],
+											"radii": [
+												0.0578,
+												0.0347,
+												0.012
+											]
+										},
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.9,
+										"blend": 0.04,
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.6084,
+											0.311,
+											0.192
+										],
+										"at": [
+											-0.2971,
+											-0.5708,
+											7.517
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0.887,
+											-0.4617,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.3744,
+											0.225,
+											0.139
+										],
+										"at": [
+											-0.3782,
+											-0.7265,
+											7.3634
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0.887,
+											-0.4617,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													0.047,
+													0.0171,
+													8.1
+												],
+												[
+													0.5074,
+													0.1847,
+													8.1648
+												],
+												[
+													1.0149,
+													0.3694,
+													8.3376
+												]
+											],
+											"radii": [
+												0.056,
+												0.0336,
+												0.012
+											]
+										},
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.9,
+										"blend": 0.04,
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.5616,
+											0.304,
+											0.188
+										],
+										"at": [
+											0.5582,
+											0.2032,
+											8.208
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											-0.342,
+											0.9397,
+											0
+										],
+										"material": "part_02",
+										"color": "#2f4a2a",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.3456,
+											0.22,
+											0.136
+										],
+										"at": [
+											0.7104,
+											0.2586,
+											8.0616
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											-0.342,
+											0.9397,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													-0.0462,
+													0.0191,
+													8.8
+												],
+												[
+													-0.4573,
+													0.1894,
+													8.8594
+												],
+												[
+													-0.9146,
+													0.3789,
+													9.0178
+												]
+											],
+											"radii": [
+												0.0543,
+												0.0326,
+												0.012
+											]
+										},
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.9,
+										"blend": 0.04,
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.5148,
+											0.297,
+											0.184
+										],
+										"at": [
+											-0.5031,
+											0.2084,
+											8.899
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											-0.3827,
+											-0.9239,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.3168,
+											0.215,
+											0.133
+										],
+										"at": [
+											-0.6402,
+											0.2652,
+											8.7598
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											-0.3827,
+											-0.9239,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													0.0211,
+													-0.0453,
+													9.5
+												],
+												[
+													0.1902,
+													-0.4078,
+													9.554
+												],
+												[
+													0.3804,
+													-0.8157,
+													9.698
+												]
+											],
+											"radii": [
+												0.0525,
+												0.0315,
+												0.012
+											]
+										},
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.9,
+										"blend": 0.04,
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.468,
+											0.29,
+											0.18
+										],
+										"at": [
+											0.2092,
+											-0.4486,
+											9.59
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0.9063,
+											0.4226,
+											0
+										],
+										"material": "part_02",
+										"color": "#2f4a2a",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.288,
+											0.21,
+											0.13
+										],
+										"at": [
+											0.2662,
+											-0.571,
+											9.458
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0.9063,
+											0.4226,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													0.015,
+													0.0477,
+													10.2
+												],
+												[
+													0.1218,
+													0.3863,
+													10.2486
+												],
+												[
+													0.2436,
+													0.7725,
+													10.3782
+												]
+											],
+											"radii": [
+												0.0508,
+												0.0305,
+												0.012
+											]
+										},
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.9,
+										"blend": 0.04,
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.4212,
+											0.283,
+											0.176
+										],
+										"at": [
+											0.134,
+											0.4249,
+											10.281
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											-0.9537,
+											0.3007,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.2592,
+											0.205,
+											0.127
+										],
+										"at": [
+											0.1705,
+											0.5408,
+											10.1562
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											-0.9537,
+											0.3007,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													-0.0433,
+													-0.025,
+													10.9
+												],
+												[
+													-0.3118,
+													-0.18,
+													10.9432
+												],
+												[
+													-0.6235,
+													-0.36,
+													11.0584
+												]
+											],
+											"radii": [
+												0.049,
+												0.0294,
+												0.012
+											]
+										},
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.9,
+										"blend": 0.04,
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.3744,
+											0.276,
+											0.172
+										],
+										"at": [
+											-0.3429,
+											-0.198,
+											10.972
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0.5,
+											-0.866,
+											0
+										],
+										"material": "part_02",
+										"color": "#2f4a2a",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.2304,
+											0.2,
+											0.124
+										],
+										"at": [
+											-0.4365,
+											-0.252,
+											10.8544
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0.5,
+											-0.866,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													0.0488,
+													-0.0108,
+													11.6
+												],
+												[
+													0.3075,
+													-0.0682,
+													11.6378
+												],
+												[
+													0.6151,
+													-0.1364,
+													11.7386
+												]
+											],
+											"radii": [
+												0.0473,
+												0.0284,
+												0.012
+											]
+										},
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.9,
+										"blend": 0.04,
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.3276,
+											0.269,
+											0.168
+										],
+										"at": [
+											0.3383,
+											-0.075,
+											11.663
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0.2164,
+											0.9763,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.2016,
+											0.195,
+											0.121
+										],
+										"at": [
+											0.4305,
+											-0.0954,
+											11.5526
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0.2164,
+											0.9763,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													-0.0287,
+													0.041,
+													12.3
+												],
+												[
+													-0.1549,
+													0.2212,
+													12.3324
+												],
+												[
+													-0.3097,
+													0.4423,
+													12.4188
+												]
+											],
+											"radii": [
+												0.0455,
+												0.0273,
+												0.012
+											]
+										},
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.9,
+										"blend": 0.04,
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.2808,
+											0.262,
+											0.164
+										],
+										"at": [
+											-0.1704,
+											0.2433,
+											12.354
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											-0.8192,
+											-0.5736,
+											0
+										],
+										"material": "part_02",
+										"color": "#2f4a2a",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.1728,
+											0.19,
+											0.118
+										],
+										"at": [
+											-0.2168,
+											0.3096,
+											12.2508
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											-0.8192,
+											-0.5736,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "tube",
+										"size": {
+											"points": [
+												[
+													-0.0065,
+													-0.0496,
+													13.0
+												],
+												[
+													-0.0294,
+													-0.2231,
+													13.027
+												],
+												[
+													-0.0587,
+													-0.4462,
+													13.099
+												]
+											],
+											"radii": [
+												0.0438,
+												0.0263,
+												0.012
+											]
+										},
+										"material": "part_01",
+										"color": "#6e5a48",
+										"roughness": 0.9,
+										"blend": 0.04,
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.234,
+											0.255,
+											0.16
+										],
+										"at": [
+											-0.0323,
+											-0.2454,
+											13.045
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0.9914,
+											-0.1305,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.144,
+											0.185,
+											0.115
+										],
+										"at": [
+											-0.0411,
+											-0.3123,
+											12.949
+										],
+										"axis": [
+											0,
+											0,
+											1
+										],
+										"up": [
+											0.9914,
+											-0.1305,
+											0
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"blend": 0.06,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.06
+										},
+										"repeat": {
+											"count": 5
+										},
+										"levels": [
+											"near",
+											"mid"
+										]
+									},
+									{
+										"shape": "cone",
+										"size": [
+											1.9,
+											0.665,
+											1.1
+										],
+										"at": [
+											0,
+											0,
+											3.5
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"levels": [
+											"far"
+										]
+									},
+									{
+										"shape": "cone",
+										"size": [
+											1.63,
+											0.571,
+											1.1
+										],
+										"at": [
+											0,
+											0,
+											5.7
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"levels": [
+											"far"
+										]
+									},
+									{
+										"shape": "cone",
+										"size": [
+											1.347,
+											0.471,
+											1.1
+										],
+										"at": [
+											0,
+											0,
+											7.9
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"levels": [
+											"far"
+										]
+									},
+									{
+										"shape": "cone",
+										"size": [
+											1.064,
+											0.372,
+											1.1
+										],
+										"at": [
+											0,
+											0,
+											10.1
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"levels": [
+											"far"
+										]
+									},
+									{
+										"shape": "cone",
+										"size": [
+											0.781,
+											0.273,
+											1.1
+										],
+										"at": [
+											0,
+											0,
+											12.3
+										],
+										"material": "part_02",
+										"color": "#263f23",
+										"roughness": 0.7,
+										"levels": [
+											"far"
+										]
+									},
+									{
+										"shape": "ellipsoid",
+										"size": [
+											0.18,
+											0.18,
+											0.45
+										],
+										"at": [
+											0,
+											0,
+											13.6
+										],
+										"material": "part_02",
+										"color": "#2f4a2a",
+										"roughness": 0.7,
+										"blend": 0.05,
+										"surface": {
+											"kind": "leaves",
+											"scale": 0.05
+										}
+									}
+								],
+								"cells": {
+									"near": 0.06,
+									"mid": 0.1,
+									"far": 0.2
+								},
+								"budget": {
+									"near": 8000,
+									"mid": 2000,
+									"far": 400
+								},
+								"bake": {
+									"near": 1024
+								},
+								"dirt": 0.2
+							}
+						}
+					}
+				]
+			}
+		}
+	},
+	"sources": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Vung_Tau,_Viet_Nam_2021.jpg",
+			"date": "2021-01-30",
+			"license": "CC BY-SA 4.0",
+			"author": "Tuong Lam Photos",
+			"open": true,
+			"file": "drone_2021_park.jpg",
+			"shows": "From a drone over the south end of Bãi Trước, to the north: the square of the south end of the park with five Norfolk pines in a row (narrow dark cones with tiers), Norfolk pines on the median and the sidewalks of Quang Trung beside the blue lamp poles, palms, the walk of the sea, the boats, Núi Lớn."
+		},
+		{
+			"url": "https://vnexpress.net/pho-bien-yen-vang-4079788.html",
+			"image": "https://vcdn1-dulich.vnecdn.net/2020/04/05/5-1586053726.jpg",
+			"date": "2020-04-02",
+			"license": "all rights reserved",
+			"author": "Đỗ Tuấn Hùng / VnExpress",
+			"open": false,
+			"file": "vne4079788_5.jpg",
+			"shows": "Quang Trung with no traffic: a row of tall Norfolk pines on the median, each a straight trunk to the top with level tiers of branches and gaps of sky between the tiers, the foliage at the ends of the branches; a dark green lamp post with white globes, a tall light blue mast, curbs of red and white bands."
+		},
+		{
+			"url": "https://www.flickr.com/photos/quitle/47097453092/",
+			"image": "https://live.staticflickr.com/7897/47097453092_85969f7a7e_h.jpg",
+			"date": "2019-02-07",
+			"license": "CC BY-NC-SA 2.0",
+			"author": "quitle (Flickr)",
+			"open": false,
+			"file": "flickr_47097453092.jpg",
+			"shows": "Quang Trung at Tết 2019 from a car: the median is a lawn with a row of Norfolk pines and a curb of red and white bands of about 1 m; balls of lights for Tết; the park and the sea behind. The trunks are bare to the first branches; the foliage is dense and dark green."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Bai_truoc-duong_Ha_long-Ph%C6%B0%E1%BB%9Dng_2,_tp._V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"date": "2014-04-06 09:10",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "shot_s3_2014.jpg",
+			"shows": "Cảng vụ Hàng hải Vũng Tàu (2 Quang Trung) from the junction of Hạ Long: two Norfolk pines by its corner as high as its fourth and fifth floors, narrow cones of tiers to the top."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Duong_Quang_trung,_phuong_1,_Ba_ria_Vung_tau_,_Vietnam_-_panoramio.jpg",
+			"date": "2014-04-06 12:47",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "median_pines_2014.jpg",
+			"shows": "Quang Trung where it splits, to the north: the median with a row of Norfolk pines (tiers of level branches, a narrow crown), low clipped bushes, a curb of red and white bands, a blue lamp pole."
+		}
+	],
+	"sizes": {
+		"height": {
+			"value": 14.0,
+			"unit": "m",
+			"source": "Photo 0 (2021): the pines on the sidewalk in front of the hotel at the south end are about 1.6 times the blue pole beside them (the arms at 10.6 m, the model den_cot_xanh_hai_tay): about 17 m, rough from a view from above. Photo 3 (2014): the two pines by the corner of Cảng vụ reach its fourth and fifth floors (storeys of about 3.5 m): 14 m and 16 m. I use 14 m (the old spec: 14 m ± 2 m)."
+		},
+		"crown_width": {
+			"value": 3.6,
+			"unit": "m",
+			"source": "Photo 2 (2019): the widest tier of the pine in the middle of the median is about 600 px across, at about 150 px for 1 m (the bands of 1 m of the curbs before and behind it): 4 m. Photo 0 (2021): the pines of the square are about a fourth of their height wide. I use 3.6 m (branches of 1.8 m)."
+		},
+		"first_tier": {
+			"value": 2.5,
+			"unit": "m",
+			"source": "Photo 2 (2019): the trunk in the middle of the median is bare for about 315 px over the lawn, at about 150 px for the band of 1 m of the curb: 2.1 m; the old spec: 2.5 m. I use 2.5 m."
+		},
+		"trunk": {
+			"value": "0.32 m at the foot, 0.06 m at the top",
+			"unit": "",
+			"source": "Photo 2 (2019): the trunk in the middle of the median is about 38 px at about 150 px for 1 m: 0.25 m; the old spec: 0.3 m for the grown trees by Cảng vụ. The top: estimate (no source)."
+		},
+		"tiers": {
+			"value": "a tier of 5 level branches every 0.7 m, each turned 137.5 degrees from the tier under it; the foliage is a flat spray along each branch",
+			"unit": "",
+			"source": "Photo 1 (2020): level tiers with gaps of sky between them, the foliage along and at the ends of the branches; photo 0 (2021): narrow cones of tiers. The count of 5 branches: the species (5 to 7 in a tier). The step of 0.7 m: estimate from photo 1 (about 10 tiers over the first 7 m of the crown)."
+		},
+		"colors": {
+			"value": "foliage #2f4a2a and #263f23, bark #6e5a48",
+			"unit": "",
+			"source": "Photos 1 and 2: a dark green foliage; photo 2: a grey brown bark."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "f525ae10ad16c9b4c8904663020f4390",
+			"seen": "A straight trunk with 16 level tiers of 5 branches, a narrow cone 3.4 m wide at 14 m: the form of the Norfolk pines of photos 0 to 4. But each spray is a thin flat leaf, so the tree looks sparse and stiff; in photos 1 and 2 each tier is a thick, soft layer with hanging tufts, and the top third of the crown is still full (photo 0: narrow full cones). The tiers near the top are too small.",
+			"changed": "Thicker sprays (0.44 m to 0.72 m wide, 0.28 m to 0.44 m high), a hanging tuft under the outer part of each branch, and branches of 0.45 m (not 0.35 m) at the top."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "96c0097e46def6c3bfece31fa1fb8163",
+			"seen": "A narrow, full cone of 16 soft tiers on a straight trunk, bare to 2.5 m; 3.6 m wide at its base tier, 14 m high. This is the form of the pines of the square in photo 0 (2021), of the median in photo 2 (2019) and by Cảng vụ in photo 3. The pines of photo 1 (2020) have more gaps of sky between their tiers; the tiers of the model are regular plates and less fluffy than the real ones, but at the mid distance the outline and the tiers agree.",
+			"changed": "No change. Next: the near level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "390d63d74538b06e0705b7befcb24be3",
+			"seen": "Before this look, the near level of order 96c0097e46def6c3bfece31fa1fb8163 (cells of 4 cm, 12000 triangles) stopped the builder three times (HTTP 503), and order fc7a22394a3a86027e31441c289df52b (near cells of 6 cm, 8000 triangles) stopped it at the mid level eight times. This order has no maps at the mid and far levels (the colors of the edits only): the mid level is the same narrow full cone of 16 tiers as before, with the same dark greens; at the mid distance the map of leaves did not show.",
+			"changed": "No change. Next: the near level (cells of 6 cm, 8000 triangles, a map of 1024)."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "far",
+			"hash": "390d63d74538b06e0705b7befcb24be3",
+			"seen": "The far level (cells of 20 cm, 400 triangles) loses most of the sprays: the tree is a trunk with some flat spikes, and the top half is near bare. In photos 0, 1 and 2 a pine far away is a narrow dark cone of tiers. The near level of this order stopped the builder six times (HTTP 503).",
+			"changed": "The tiers are now only at the near and mid levels; the far level has its own crown: 5 stacked cones of foliage, each 2.2 m high, as wide as the tiers at their foot."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "far",
+			"hash": "c6a8912dc9763dbed5a9a1ba1636ef1d",
+			"seen": "The far level is now a narrow dark cone of 5 tiers on a bare trunk, 3.8 m wide at its foot and 14 m high: the form of a pine far away in photos 0 and 3. Its green is darker than the mid level (one dark green, #263f23).",
+			"changed": "No change. Next: the mid level of this order (the tiers at near and mid did not change), then the near level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "c6a8912dc9763dbed5a9a1ba1636ef1d",
+			"seen": "After 7 tries (HTTP 503), the mid level of this order: the same narrow full cone of 16 soft tiers as order 390d63d74538b06e0705b7befcb24be3 (the views are the same), as the pines of photos 0, 2 and 3. The near level of this order stopped the builder four times (HTTP 503), so it is not built: the factory did not build the near level of any of the four orders of this pine (19 tries).",
+			"changed": "No change. The near level waits for the factory."
+		}
+	],
+	"hash": "c6a8912dc9763dbed5a9a1ba1636ef1d",
+	"status_note": "Not in the game (report 0026, Q19: keep one model of the Norfolk pine): the pines of the median and of the park are the tree araucaria of plan 0020, which is nearer to the photos at the mid level (branches with needles and gaps of sky between the tiers; the tiers of this drawing are solid plates). At the far level both are narrow dark cones."
+}

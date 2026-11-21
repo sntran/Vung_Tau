@@ -21,12 +21,18 @@ const SECOND := 0.5
 ## (the shader changes it between the two distances of "scale_m"), and the
 ## distance to which the dense clumps show (0: never). Far away, the sparse
 ## clumps are larger, so that they cover about as much of the hills as all
-## the clumps.
+## the clumps. "height_max" (Low): a clump grows wider, but not higher than this
+## scale (report 0026, D-0026-15: on Low the crowns of 11 m every 32 m stood on
+## the bare hill of S1 as small houses; the photo shows one canopy). Report 0026,
+## D-0026-23 (audit 5): the clumps keep the size of the crowns of the photo of S1
+## (5 m to 12 m) at each distance; the canopy of the ground (shaders/terrain.gdshader,
+## crown_cells()) covers the slope between them with crowns of the same size. The
+## crowns of 25 m to 70 m of before were the dark caps with light ground between them.
 const DETAIL := {
-	"low": {"crown": true, "scale": [2.0, 4.5], "scale_m": [400.0, 1600.0], "dense_m": 0.0},
-	"medium": {"crown": false, "scale": [1.0, 2.4], "scale_m": [900.0, 1500.0], "dense_m": 1000.0},
-	"high": {"crown": false, "scale": [1.0, 2.4], "scale_m": [1300.0, 2000.0], "dense_m": 1500.0},
-	"ultra": {"crown": false, "scale": [1.0, 2.4], "scale_m": [1800.0, 2600.0], "dense_m": 2000.0},
+	"low": {"crown": true, "scale": [1.4, 1.4], "scale_m": [400.0, 1600.0], "dense_m": 0.0, "height_max": 1.8, "sparse_m": 0.0},
+	"medium": {"crown": false, "scale": [0.8, 0.8], "scale_m": [900.0, 1500.0], "dense_m": 1000.0},
+	"high": {"crown": false, "scale": [0.8, 0.8], "scale_m": [1300.0, 2000.0], "dense_m": 1500.0},
+	"ultra": {"crown": false, "scale": [0.8, 0.8], "scale_m": [1800.0, 2600.0], "dense_m": 2000.0},
 }
 
 ## The number of clumps, and the number of sparse clumps.
@@ -76,8 +82,16 @@ func setup(world: VungTau) -> void:
 				if not tiles.has(key):
 					tiles[key] = [[], []]
 				var sparse := i == 0 and row % 2 == 0 and col % 2 == 0
-				var size := rng.randf_range(1.0, 1.5)
+				# Report 0026, D-0026-23: crowns of many sizes, so the far forest is not even mounds.
+				var size := rng.randf_range(0.7, 1.6)
 				var basis := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(size, size * rng.randf_range(0.8, 1.1), size))
+				# Report 0026, D-0026-23: the crown lies on the slope (its up is the
+				# normal of the ground), so the crowns of a hillside are one layer:
+				# a level crown on a steep slope showed its flat lower side from the
+				# sea, with the lit slope between the crowns.
+				var normal := Vector3(-(heights[row * width + col + 1] - heights[row * width + col - 1]) / (2.0 * step), 1.0,
+						-(heights[(row + 1) * width + col] - heights[(row - 1) * width + col]) / (2.0 * step)).normalized()
+				basis = Basis(Quaternion(Vector3.UP, normal)) * basis
 				# The clumps stand a little into the ground: the overview grid is
 				# smoother than the near ground.
 				var y := world.data.overview_height(p.x, p.y) - 1.5
@@ -96,8 +110,13 @@ func set_preset(preset: String) -> void:
 	material.set_shader_parameter("clump_scale", detail.scale[0])
 	material.set_shader_parameter("clump_scale_far", detail.scale[1])
 	material.set_shader_parameter("scale_range", Vector2(detail.scale_m[0], detail.scale_m[1]))
+	material.set_shader_parameter("height_scale_max", float(detail.get("height_max", 100.0)))
 	for instance: MultiMeshInstance3D in _sparse:
 		instance.multimesh.mesh = _crown_mesh if detail.crown else _mesh
+		# Report 0026, D-0026-23 (audit 5): on Low the canopy of the ground gives
+		# the crowns of the far forest; a sparse crown every 32 m stood above it
+		# as a dark blob.
+		instance.visible = float(detail.get("sparse_m", VISIBLE_RANGE)) > 0.0
 	for instance: MultiMeshInstance3D in _dense:
 		instance.visible = float(detail.dense_m) > 0.0
 		instance.visibility_range_end = float(detail.dense_m)
@@ -151,20 +170,22 @@ static func crown_mesh() -> Mesh:
 	var tool := SurfaceTool.new()
 	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
 	# Darker than a crown of a clump: one crown has no shade of the other crowns on it.
-	_crown(tool, Vector3(0.0, 2.2, 0.0), Vector3(2.6, 2.0, 2.6), 0.4, 0.75)
+	# Eight sides: from far, the six sides of a large crown showed (report 0026, D-0026-23).
+	_crown(tool, Vector3(0.0, 2.2, 0.0), Vector3(2.6, 2.0, 2.6), 0.25, 0.9, 8)
 	tool.index()
 	return tool.commit()
 
 
-## A half ellipsoid with a short skirt below it: 6 sides and 2 rings (24 triangles).
-static func _crown(tool: SurfaceTool, center: Vector3, radius: Vector3, low_shade := 0.55, top_shade := 1.0) -> void:
-	const SIDES := 6
+## A half ellipsoid with a short skirt below it: 6 sides and 2 rings (18 triangles: the top band is a fan).
+static func _crown(tool: SurfaceTool, center: Vector3, radius: Vector3, low_shade := 0.55, top_shade := 1.0, sides := 6) -> void:
+	var SIDES := sides
 	const RINGS := 2
 	var rings: Array[PackedVector3Array] = []
 	var normals: Array[PackedVector3Array] = []
 	for r in RINGS + 1:
-		# From 30 degrees below the middle to the top.
-		var angle := lerpf(-PI / 6.0, PI / 2.0, float(r) / RINGS)
+		# From 30 degrees below the middle to the top, with the middle ring at 45
+		# degrees: a round top, not the roof of a house (report 0026, D-0026-15).
+		var angle: float = [-PI / 6.0, PI / 4.0, PI / 2.0][r]
 		var ring := PackedVector3Array()
 		var ring_normals := PackedVector3Array()
 		for s in SIDES:
@@ -178,6 +199,11 @@ static func _crown(tool: SurfaceTool, center: Vector3, radius: Vector3, low_shad
 		for s in SIDES:
 			var n := (s + 1) % SIDES
 			var quad := [[r, s], [r + 1, s], [r + 1, n], [r, s], [r + 1, n], [r, n]]
+			# The top ring (90 degrees) is one point: the first triangle of a quad
+			# of the top band has no area (it drew nothing, and the clumps of Low
+			# were a quarter more triangles: PT-57).
+			if r + 1 == RINGS:
+				quad = [[r, s], [r + 1, n], [r, n]]
 			for corner: Array in quad:
 				var shade := lerpf(low_shade, top_shade, float(corner[0]) / RINGS)
 				tool.set_color(Color(shade, shade, shade))

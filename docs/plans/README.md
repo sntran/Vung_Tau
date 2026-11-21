@@ -41,7 +41,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 | 0020 | [Real trees](0020-real-trees.md) | Built |
 | 0008 | [Known structures](0008-known-structures.md) | In progress |
 | 0009 | [Houses on the lots](0009-houses-on-the-lots.md) | Approved |
-| 0026 | [Showcase: Bãi Trước](0026-showcase-bai-truoc.md) | Built |
+| 0026 | [Showcase: Bãi Trước](0026-showcase-bai-truoc.md) | Built (2026-11-21). Open (report 0026, section 12.5): D-0026-46 to D-0026-48, my review of the sheets (Q29), and R19 (with plan 0021). |
 | 0023 | [Models from World](0023-models-from-world.md) | In progress |
 | 0027 | [The construction is in the game](0027-construction-in-the-game.md) | Approved |
 

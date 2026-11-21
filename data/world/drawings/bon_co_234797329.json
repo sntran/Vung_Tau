@@ -1,0 +1,80 @@
+{
+	"id": "bon_co_234797329",
+	"what": "bồn cỏ: the raised lawn of OpenStreetMap way 234797329 on the walk of the sea of Bãi Trước (D-0026-08)",
+	"way": "blueprint",
+	"status": "Check",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026, R4 and D-0026-08: a raised lawn of the walk of the sea (the planters of data/showcase/bai_truoc.json), at its place in data/world/places/bai_truoc.json.",
+	"order": {
+		"blueprint": {
+			"file": "data/world/blueprints/bon_co_nang.json"
+		},
+		"options": {
+			"half_length": 12.45,
+			"half_width": 2.743,
+			"half_height": 0.225,
+			"height": 0.45,
+			"inner_half_length": 12.2,
+			"inner_half_width": 2.493,
+			"drop": 0.05,
+			"slab": 1.2,
+			"first_joint": -11.4,
+			"joints": 20
+		}
+	},
+	"sources": [
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Voyage_au_Vi%C3%AAt_Nam_-_panoramio_(12).jpg",
+			"date": "2015-03",
+			"license": "CC BY 3.0",
+			"author": "Jean Van Jean",
+			"open": true,
+			"file": "shot_s5_2015.jpg",
+			"shows": "The walk of the sea at dusk: a raised lawn in a border of light granite on the left, the tiles of the walk, lamp poles with warm lights, Quang Trung and a hotel."
+		}
+	],
+	"sizes": {
+		"length": {
+			"value": 24.9,
+			"unit": "m",
+			"source": "The outline of OpenStreetMap way 234797329: the mean of its two long sides."
+		},
+		"width": {
+			"value": 5.49,
+			"unit": "m",
+			"source": "The outline of OpenStreetMap way 234797329: the mean of its two short sides."
+		},
+		"height": {
+			"value": 0.45,
+			"unit": "m",
+			"source": "Photo 0: the man who stands on the walk by the far end of the lawn is about 3.5 times the height of the border near him."
+		},
+		"border": {
+			"value": 0.25,
+			"unit": "m",
+			"source": "Photo 0: the top of the border is about 0.55 times its height wide. 0.55 × 0.45 m: 0.25 m."
+		},
+		"drop": {
+			"value": 0.05,
+			"unit": "m",
+			"source": "Photo 0: the grass is a little under the top of the border; how much: estimate (no source)."
+		},
+		"slab": {
+			"value": 1.2,
+			"unit": "m",
+			"source": "Photo 0: the joints of the near border are about 2.7 times the height of the border apart: 1.2 m."
+		},
+		"colors": {
+			"value": "granite #bdb8ae, joints #8d8980, grass #4d6b33",
+			"unit": "",
+			"source": "Photo 0 is at dusk: the granite is light and smooth, the joints darker; the colors are estimate (no source) against the granite of the curbs in the photos of the park of 2014 (park_paths_2014.jpg)."
+		}
+	},
+	"looks": [],
+	"status_note": "Check (report 0026, Q17): the only photo of the raised lawns is the photo of S5 of 2015-03 (at dusk), and no photo of 2017 or later shows them, so rule 2 does not apply. The search of 2026-11-17: the photo from a drone of 2021-01-30 (drone_2021_park.jpg; I looked at it at 3 840 px) looks to the north from the south end of the park, about 550 m from the raised lawns. At their place, north-west of the end of the median of Quang Trung, the crowns of the trees of the north end of the park and the palms hide the walk between the road and the low wall: no lawn and no border of granite can be seen. Flickr (2017 to 2021: Bãi Trước, the park, Quang Trung), Wikimedia Commons and the photos of 2019 of Tuổi Trẻ found no other photo. The game keeps the stand-in until I decide."
+}

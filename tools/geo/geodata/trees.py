@@ -9,7 +9,7 @@ import math
 import numpy as np
 import shapely
 from shapely import STRtree
-from shapely.geometry import LineString, Point
+from shapely.geometry import LineString, Point, Polygon
 from shapely.prepared import prep
 from scipy.spatial import cKDTree
 
@@ -100,13 +100,21 @@ class _Tops:
 
 
 def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: list, osm_rows: list,
-         coast_road: str, beach_outline, near_point, sample_height, tops=None) -> tuple[dict, dict, dict]:
+         coast_road: str, beach_outline, near_point, sample_height, tops=None, keep_out=None,
+         data_only=None) -> tuple[dict, dict, dict]:
     """The trees for the build folder, the counts for the report, and the
     points of each group (map x, y) for the report.
     parks: park shapes (map). osm_trees: (x, y, tags). osm_rows: (LineString, tags).
     near_point: the map point of the landmark for the parks near it.
     sample_height(x, y): the ground height at map points (arrays).
-    tops: the tree tops of the canopy map (map x, y), or None for the rules alone."""
+    tops: the tree tops of the canopy map (map x, y), or None for the rules alone.
+    keep_out(x, y): True at a map point where a player walks (report 0026,
+    D-0026-35: the palms of the rule coast_roads stood on the walk of Hạ Long):
+    no tree of a rule there. data_only: a map polygon (the showcase) where a
+    tree of a rule stands only on a tree top of the canopy map; the groves give
+    the trees of the photos there. A rule with "photos" (the photos that show its
+    trees in the showcase: the coconut palms of the park of Bãi Trước and the bàng
+    and coconut palms of Quang Trung) puts its trees there too."""
     rng = np.random.default_rng(int(spec.get("seed", 1)))
     street = spec["street"]
     place = _Place(land, beaches, roads, float(street["skip_near_road_m"]))
@@ -119,8 +127,24 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
     snap_m = float(canopy.get("snap_m", 6.0))
     edge_m = float(canopy.get("edge_m", 6.0))
 
-    def add(kind: str, point, source: str) -> None:
+    leans: dict[tuple[str, int], tuple[float, float]] = {}  # (kind, index in found) -> (tilt, direction), degrees
+    # The rules whose photos show their trees in the showcase (PT-53 needs the
+    # coconut palms of Bãi Trước).
+    with_photos = {source for source, photos in (("bai_truoc_road", spec["bai_truoc_road"].get("photos")),
+                                                 ("park_bai_truoc", spec["parks"].get("photos_near"))) if photos}
+
+    def add(kind: str, point, source: str, lean: tuple[float, float] | None = None, on_top: bool = False) -> None:
+        if source != "osm":
+            if keep_out is not None and keep_out(float(point[0]), float(point[1])):
+                counts["kept_off_walks"] = counts.get("kept_off_walks", 0) + 1
+                return
+            if (data_only is not None and not on_top and source not in with_photos
+                    and data_only.contains(Point(float(point[0]), float(point[1])))):
+                counts["no_data_in_showcase"] = counts.get("no_data_in_showcase", 0) + 1
+                return
         found.setdefault(kind, []).append((float(point[0]), float(point[1])))
+        if lean is not None:
+            leans[(kind, len(found[kind]) - 1)] = lean
         groups.setdefault(source, []).append((float(point[0]), float(point[1])))
         counts[source] = counts.get(source, 0) + 1
 
@@ -168,7 +192,7 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
                 # A tree on a sidewalk is on the road surface of its own road.
                 if top >= 0 and place.free(moved, spacing * 0.6, own_road=road if road.sidewalk else None):
                     take(top, source)
-                    add(_pick(mix, rng), moved, source)
+                    add(_pick(mix, rng), moved, source, on_top=True)
                 elif place.free(tree, spacing * 0.6, own_road=road if road.sidewalk else None):
                     add(_pick(mix, rng), tree, source)
 
@@ -192,7 +216,7 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
                 point = on_line + out / distance * offset
             if place.free(point, gap, own_road=road if road.sidewalk else None):
                 take(i, source)
-                add(_pick(mix, rng), point, source)
+                add(_pick(mix, rng), point, source, on_top=True)
 
     coast = spec["coast_roads"]
     bai_truoc = spec["bai_truoc_road"]
@@ -216,6 +240,17 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
 
     park_spec = spec["parks"]
     spacing = float(park_spec["spacing_m"])
+    # Plan 0026, R9: some trees of the parks near the landmark lean (the coconut
+    # palms of the photos of Bãi Trước). Their own random numbers, so the places
+    # of the other trees do not change.
+    lean_spec = park_spec.get("lean_near", {})
+    lean_rng = np.random.default_rng(int(spec.get("seed", 1)) + 7)
+
+    def lean_of(kind: str):
+        if kind not in lean_spec.get("types", []) or lean_rng.uniform() >= float(lean_spec.get("share", 0.0)):
+            return None
+        low, high = lean_spec.get("deg", [5.0, 25.0])
+        return round(float(lean_rng.uniform(low, high)), 1), round(float(lean_rng.uniform(0.0, 360.0)), 1)
     for park in parks:
         near = near_point is not None and park.distance(near_point) <= float(park_spec["near_m"])
         mix = park_spec["mix_near"] if near else park_spec["mix"]
@@ -225,7 +260,7 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
             for i in tree_tops.within(park):
                 if place.free(tree_tops.points[i], spacing * 0.5):
                     take(i, source)
-                    add(_pick(mix, rng), tree_tops.points[i], source)
+                    add(_pick(mix, rng), tree_tops.points[i], source, on_top=True)
             continue
         min_x, min_y, max_x, max_y = park.bounds
         prepared = prep(park)
@@ -237,15 +272,90 @@ def make(spec: dict, roads: list, land, beaches: list, parks: list, osm_trees: l
                 moved, top = snapped(point, source)
                 if top >= 0 and prepared.contains(Point(*moved)) and place.free(moved, spacing * 0.6):
                     take(top, source)
-                    add(_pick(mix, rng), moved, source)
+                    kind = _pick(mix, rng)
+                    add(kind, moved, source, lean_of(kind) if near else None, on_top=True)
                 elif place.free(point, spacing * 0.6):
-                    add(_pick(mix, rng), point, source)
+                    kind = _pick(mix, rng)
+                    add(kind, point, source, lean_of(kind) if near else None)
+
+    for grove in park_spec.get("groves", []):
+        _grove(grove, place, found, leans, counts, groups)
 
     result = {"note": "Made by tools/geo/build.py from data/geo/trees.json and OSM. Do not change by hand. "
-                      "Each point is [X, height, Z] in game coordinates.", "types": {}}
+                      "Each point is [X, height, Z] in game coordinates. A tree that leans has two more "
+                      "values: its tilt and the direction of the tilt (degrees, from +Z to +X).", "types": {}}
     for kind, points in sorted(found.items()):
         xy = np.array(points)
         h = sample_height(xy[:, 0], xy[:, 1])
-        result["types"][kind] = [[round(float(x), 1), round(float(hh), 2), round(-float(y), 1)]
-                                 for (x, y), hh in zip(points, h)]
+        rows = []
+        for index, (point, hh) in enumerate(zip(points, h)):
+            row = [round(float(point[0]), 1), round(float(hh), 2), round(-float(point[1]), 1)]
+            if (kind, index) in leans:
+                row += list(leans[(kind, index)])
+            rows.append(row)
+        result["types"][kind] = rows
     return result, counts, groups
+
+
+def _grove(grove: dict, place, found: dict, leans: dict, counts: dict, groups: dict) -> None:
+    """Report 0026, D-0026-17: a grove of the photo of a shot (S2: the leaning
+    coconut palms). The trees of the other rules in its outline give their place
+    to the trees of the grove: its own mix, spacing, and leans, with its own
+    random numbers, so the trees out of the outline do not change.
+    The outline is in game x, z (map y = -z)."""
+    outline = Polygon([(float(x), -float(z)) for x, z in grove["outline"]])
+    inside = prep(outline)
+    # The trees in the outline go, and the leans of the others keep their trees.
+    for kind in list(found):
+        old_leans = {i: v for (k, i), v in leans.items() if k == kind}
+        for key in [key for key in leans if key[0] == kind]:
+            del leans[key]
+        kept = []
+        for index, point in enumerate(found[kind]):
+            if inside.contains(Point(point)):
+                continue
+            if index in old_leans:
+                leans[(kind, len(kept))] = old_leans[index]
+            kept.append(point)
+        found[kind] = kept
+    for source in list(groups):
+        before = len(groups[source])
+        groups[source] = [q for q in groups[source] if not inside.contains(Point(q))]
+        counts[source] = counts.get(source, 0) - (before - len(groups[source]))
+    # Report 0026, D-0026-24: a grove can give each tree of its photos (kind and
+    # place) in place of a spacing and a mix.
+    for tree in grove.get("trees", []):
+        x, z = float(tree["at"][0]), float(tree["at"][1])
+        found.setdefault(str(tree["kind"]), []).append((x, -z))
+        groups.setdefault("grove", []).append((x, -z))
+        counts["grove"] = counts.get("grove", 0) + 1
+    if "spacing_m" not in grove:
+        return
+    others = [q for points in found.values() for q in points]
+    rng = np.random.default_rng(int(grove.get("seed", 1)))
+    spacing = float(grove["spacing_m"])
+    gap = spacing * float(grove.get("gap", 0.6))
+    lean = grove.get("lean", {})
+    placed: list[tuple[float, float]] = []
+    min_x, min_y, max_x, max_y = outline.bounds
+    for x in np.arange(min_x + spacing / 2, max_x, spacing):
+        for y in np.arange(min_y + spacing / 2, max_y, spacing):
+            jitter = float(grove.get("jitter_m", 1.5))
+            point = np.array([x + rng.uniform(-jitter, jitter), y + rng.uniform(-jitter, jitter)])
+            kind = _pick(grove["mix"], rng)
+            tilt = rng.uniform(*lean.get("deg", [8.0, 30.0]))
+            toward = rng.uniform(0.0, 1.0) < float(lean.get("toward_part", 0.0))
+            direction = rng.normal(float(lean.get("toward_deg", 0.0)), float(lean.get("spread_deg", 45.0))) \
+                if toward else rng.uniform(0.0, 360.0)
+            leans_now = rng.uniform(0.0, 1.0) < float(lean.get("share", 0.0)) and kind in lean.get("types", [])
+            if not inside.contains(Point(point)):
+                continue
+            near = [q for q in others + placed if math.hypot(q[0] - point[0], q[1] - point[1]) < gap]
+            if near or not place.free(point, 0.0):
+                continue
+            found.setdefault(kind, []).append((float(point[0]), float(point[1])))
+            if leans_now:
+                leans[(kind, len(found[kind]) - 1)] = (round(float(tilt), 1), round(float(direction) % 360.0, 1))
+            placed.append((float(point[0]), float(point[1])))
+            groups.setdefault("grove", []).append((float(point[0]), float(point[1])))
+            counts["grove"] = counts.get("grove", 0) + 1

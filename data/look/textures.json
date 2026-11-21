@@ -1,0 +1,26 @@
+{
+	"note": "Plan 0026, R12: the texture sets of the ground and the walls of the showcase of Bãi Trước. Each set is a Poly Haven asset (CC0). tools/look/textures.py gets the maps (diffuse, normal, roughness, 1k) to assets/textures/look/ID/ and writes assets/textures/look/manifest.json; --check compares the files with the manifest (no network). The manifest has the side of each texture on the ground (size_m, from the dimensions of the asset). The choice of each set is a builder choice from the photos of section 3 and the photo from a drone of 2021; I approve it with the shots of PT-72.",
+	"size": "1k",
+	"sets": [
+		{
+			"id": "sidewalk_tiles",
+			"asset": "checkered_pavement_tiles",
+			"uses": "The sidewalks of Quang Trung and Hạ Long: grey and white tiles in a checker pattern (the photo from a drone of 2021-01-30)."
+		},
+		{
+			"id": "walk_slabs",
+			"asset": "mixed_stone_tiles",
+			"uses": "The walk of the sea and the paved squares of the park: slabs of stone (the photos of S5, 2014 and 2015)."
+		},
+		{
+			"id": "granite",
+			"asset": "stone_tile_wall",
+			"uses": "The borders of the paths, the raised lawns, the low wall along the beach, and the sea wall of Hạ Long: granite (the photos of S5, 2014)."
+		},
+		{
+			"id": "plaster",
+			"asset": "white_plaster_02",
+			"uses": "The stand-ins of the buildings that World does not have yet: painted plaster."
+		}
+	]
+}

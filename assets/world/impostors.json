@@ -1,0 +1,44 @@
+{
+	"models": {
+		"bui_cay_tron": {
+			"glb": "2751af3e7ac9dae2425027c55f4277ad56c6110dd7b43c91da669aacdf156694",
+			"materials": "4e33c8ddb7893598165769f9db16ecd13f83d70585e8653e5215ea4941e32e25",
+			"script": "47e3afa47c92f831451c32e9bbc6f8e04f8b69fb10e3006977c57e0d54771aaf",
+			"version": 1,
+			"size": 1.7721,
+			"views": 8,
+			"cell_px": 128,
+			"files": {
+				"bui_cay_tron_impostor.png": "ae024f71d724b63829df329a8d74984f05093b3d7c12948cbd1e26369a9f0e9f",
+				"bui_cay_tron_impostor_normal.png": "18cdd8da84c7ed8e2c2d0a76fca25dacd5d6561f8643ddec3518e7f8b2dc4d2e"
+			}
+		},
+		"cay_hoa_tim_bon_hoa": {
+			"glb": "99ca21c1120840a914d94247d140e02ee9cf7e0cb4ea61f3b1a47e63de6ab10f",
+			"materials": "4e33c8ddb7893598165769f9db16ecd13f83d70585e8653e5215ea4941e32e25",
+			"script": "47e3afa47c92f831451c32e9bbc6f8e04f8b69fb10e3006977c57e0d54771aaf",
+			"version": 1,
+			"size": 0.4284,
+			"views": 8,
+			"cell_px": 128,
+			"files": {
+				"cay_hoa_tim_bon_hoa_impostor.png": "9e4395358901eb980f905937029ad23b5beccc0ec99b63d572640162e393ac3f",
+				"cay_hoa_tim_bon_hoa_impostor_normal.png": "f7acee014078fed75fd0fd40b7cb38110983ce8dd91cb8ad3443f7e790b550c2"
+			}
+		},
+		"scooter_tay_ga_1": {
+			"glb": "c7aaded4ef4a664bdd297404a2fc0e1f708223ef82073ae43fe982693e9fc0ff",
+			"materials": "4e33c8ddb7893598165769f9db16ecd13f83d70585e8653e5215ea4941e32e25",
+			"script": "47e3afa47c92f831451c32e9bbc6f8e04f8b69fb10e3006977c57e0d54771aaf",
+			"version": 1,
+			"size": 2.0002,
+			"views": 8,
+			"cell_px": 128,
+			"files": {
+				"scooter_tay_ga_1_impostor.png": "81424c95000ba7f107530051dc20b895dd8a0a370a2e5148b366096e02139671",
+				"scooter_tay_ga_1_impostor_normal.png": "944b5790891ac97842a9ccc74f41c1041e052e5d171c8e745e1af6b5b869dfb0"
+			}
+		}
+	},
+	"note": "The impostors of the models of World (plan 0023, R8): tools/world/impostors.py makes them."
+}

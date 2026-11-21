@@ -5,6 +5,23 @@ on:
   pull_request:
 
 jobs:
+  identity:
+    # Report 0026, D-0026-43: each commit of the branch (also each merge) has
+    # the identity of CONTRIBUTING.md, as author and as committer.
+    name: Identity of the commits
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check the author and the committer of each commit
+        env:
+          BASE: origin/${{ github.base_ref || 'main' }}
+          TIP: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: tools/ci/check_identity.sh "$BASE" "$TIP"
+
   python:
     name: Voice build tests
     runs-on: ubuntu-latest
@@ -43,6 +60,32 @@ jobs:
       - name: Run the Python tests
         run: python -m pytest -q tools/geo/tests
 
+      # Plan 0026, R12: the texture sets of the showcase agree with their manifest.
+      - name: Check the texture sets of the showcase
+        run: python tools/look/textures.py --check
+
+  world:
+    name: Models of World
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install pytest, numpy, and Pillow
+        run: pip install pytest numpy pillow
+
+      # Plan 0023, R3: the files of assets/world agree with data/world/lock.json and orders.json.
+      - name: Check the models of World
+        run: python tools/world/fetch.py --check
+
+      # R4: the factory and a clone of World at the same commit give the same bytes.
+      - name: Run the Python tests
+        run: python -m pytest -q tools/world/tests
+
   trees:
     name: Tree build check
     runs-on: ubuntu-latest
@@ -67,6 +110,10 @@ jobs:
       - name: Check the tree files
         run: python tools/trees/build.py --check
 
+      # Plan 0023, R8: the impostors of the models of World are what impostors.py makes.
+      - name: Check the impostors of the models of World
+        run: python tools/world/impostors.py --check
+
   unit:
     name: Unit tests
     runs-on: ubuntu-latest
@@ -87,13 +134,17 @@ jobs:
         run: tools/test.sh
 
   playtest:
-    name: Play tests (part ${{ matrix.shard }} of 8)
+    name: Play tests (part ${{ matrix.shard }} of 12)
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    # Part 7 (PT-56 with 51 models on Low and High) took 88 minutes on 2026-11-19
+    # and more than 120 on a slower runner on 2026-11-20.
+    timeout-minutes: 150
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+        # 12 parts: with the showcase of plan 0026, a part of 8 took more than
+        # the 120 minutes of the job (report 0026).
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     steps:
       - uses: actions/checkout@v4
 
@@ -114,7 +165,7 @@ jobs:
         run: tools/setup.sh
 
       - name: Play tests
-        run: tools/playtest.sh --all --shard=${{ matrix.shard }}/8
+        run: tools/playtest.sh --all --shard=${{ matrix.shard }}/12
 
       - name: Upload the play-test output
         if: always()

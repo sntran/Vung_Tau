@@ -1,0 +1,125 @@
+{
+	"id": "quan_dui_boi_nam",
+	"what": "quần đùi bơi nam: a man of Bãi Trước in swim shorts, with no shirt and bare feet (an order of the person blueprint of World that wears the shorts)",
+	"way": "order",
+	"status": "Check",
+	"levels": [
+		"mid",
+		"far"
+	],
+	"impostor": false,
+	"uses": "Plan 0026, R10: the men who swim at Bãi Trước at 17:00, without a shirt, on the sand and in the water.",
+	"order": {
+		"blueprint": "person",
+		"options": {
+			"gender": 1.0,
+			"age": 35,
+			"height": 0.5,
+			"weight": 0.55,
+			"muscle": 0.55,
+			"skin": "young_asian_male",
+			"hair": "short02",
+			"hair_color": "#221e1b",
+			"clothes": [
+				"world_quan_dui"
+			],
+			"clothes_colors": [
+				"#23262b"
+			],
+			"animations": [
+				"walk"
+			]
+		}
+	},
+	"sources": [
+		{
+			"url": "https://tuoitre.vn/vung-tau-sau-30-nam-thanh-lap-thu-ngan-sach-gap-gan-300-lan-20211230155102555.htm",
+			"image": "https://cdn.tuoitre.vn/2021/12/30/logo-du-khach-30-4-2019-20-1640854141848374700459.jpg",
+			"date": "2019-04-30 (in the file name of the photo)",
+			"license": "all rights reserved",
+			"author": "Đông Hà / Tuổi Trẻ",
+			"open": false,
+			"file": "qd_tt.jpg",
+			"shows": "Bãi Trước at the end of the afternoon of a holiday, to the south. A man with no shirt walks on the wet sand in black loose shorts that end a little above the knee; other men in the water in black shorts, some with white stripes at the sides. The file is a crop of the man in black shorts."
+		},
+		{
+			"url": "https://vnexpress.net/bai-bien-vung-tau-dong-nghit-nguoi-4090193.html",
+			"image": "https://vcdn1-vnexpress.vnecdn.net/2020/04/25/Dang-Khoa-Tam-bien-Vung-Tau-2-3443-9097-1587819462.jpg",
+			"date": "2020-04-25",
+			"license": "all rights reserved",
+			"author": "Trường Hà / VnExpress",
+			"open": false,
+			"file": "qd_vne2.jpg",
+			"shows": "The south part of Bãi Trước full of swimmers at the end of the afternoon. Men with no shirt in swim shorts: dark checks, navy, dark green, grey checks; most end at the middle of the thigh. The file is a crop of a man in dark check shorts on the sand."
+		},
+		{
+			"url": "https://vnexpress.net/bai-bien-vung-tau-dong-nghit-nguoi-4090193.html",
+			"image": "https://vcdn1-vnexpress.vnecdn.net/2020/04/25/Dang-Khoa-Tam-Bien-Vung-Tau-1-8303-5847-1587819461.jpg",
+			"date": "2020-04-25",
+			"license": "all rights reserved",
+			"author": "Trường Hà / VnExpress",
+			"open": false,
+			"file": "qd_vne1.jpg",
+			"shows": "Bãi Sau of Vũng Tàu (the other beach of the town, 2 km away) on the same afternoon: many men with no shirt in swim shorts. Black, dark grey and grey check shorts; some end high on the thigh, most at the middle of the thigh. The file is a crop of three men."
+		}
+	],
+	"sizes": {
+		"height_of_person": {
+			"value": 1.65,
+			"unit": "m",
+			"source": "estimate (no source): the person of World with the height 0.5 (a man of 35 years). The sizes of the shorts scale with the body."
+		},
+		"length": {
+			"value": 0.42,
+			"unit": "m",
+			"source": "Photo 0: the man in black shorts is 840 px from his feet to the top of his head (1.65 m); his shorts are 250 px from the waist band to the hem: 0.49 m. Photos 1 and 2: on men of 215 px (1.65 m), shorts of 28 px to 50 px: 0.21 m to 0.38 m. Most shorts end between the middle of the thigh and a little above the knee: 0.35 m to 0.49 m. I use 0.42 m."
+		},
+		"fit": {
+			"value": "loose legs, about 1.3 times the thigh",
+			"unit": "",
+			"source": "Photos 0 and 1: the legs of the shorts stand away from the thigh; how much: estimate (no source)."
+		},
+		"colors": {
+			"value": "#23262b (black); also navy #26324a, dark green #2f4a3a and dark grey checks",
+			"unit": "",
+			"source": "Photo 0: black, some with white stripes; photos 1 and 2: dark checks, navy, dark green, grey checks. One color for each man."
+		},
+		"shirt_and_feet": {
+			"value": "no shirt, bare feet",
+			"unit": "",
+			"source": "Photos 0, 1 and 2: the men in the water and on the wet sand have no shirt and no shoes."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "0640377a2b82c39d5bb1f920402a7fa8",
+			"seen": "The shorts elvs_male_trouser_short_1 in black. At the mid level the shorts are a color on the body. They end a little above the knee, as in photo 0. A bright blue shine from the swatch of the texture is on the front of the shorts; the photos show a flat black.",
+			"changed": "I tried the garment world_quan_dui in the same black."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "fe25bd90f7f969f71912c3113ac71e77",
+			"seen": "world_quan_dui in black: a flat black with no shine, as in photos 0 to 2. From the waist band to the hem the shorts are 113 px of the 452 px of the man (1.65 m): 0.41 m, in the range of the photos (0.35 m to 0.49 m). The hem is a little lower at the back of the knee. The man is thinner than most men in the photos.",
+			"changed": "I keep world_quan_dui (no shine, the length of the photos). I set the weight to 0.55 and the muscle to 0.55, as the men of photos 1 and 2."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "9a1a6fc7c2b7d11c2f35c3eb5ce3ce24",
+			"seen": "world_quan_dui in black on a man with the weight and the muscle 0.55: the body is a little fuller, the shorts are the same: a flat black from the waist to a little above the knee, as in photos 0 to 2. From the side the hem has a step at the back of the knee. At the mid level the shorts are a color on the body, so the loose legs of the photos do not show.",
+			"changed": "No change at the mid level: World has no swim shorts (a tool request). Next: the far level."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "far",
+			"hash": "9a1a6fc7c2b7d11c2f35c3eb5ce3ce24",
+			"seen": "The far body (730 faces): black shorts on a man with no shirt and bare feet, as in photos 0 to 2. The hem follows the faces of the far body: at the front it is at the middle of the thigh (as most shorts of photos 1 and 2), at the back of the leg the black goes down in a point to the knee.",
+			"changed": "No change: the far level of a person makes the hem from its faces. I keep this order (status Check: World has no swim shorts)."
+		}
+	],
+	"hash": "9a1a6fc7c2b7d11c2f35c3eb5ce3ce24",
+	"status_note": "Check. This plan does not need the model (report 0026, Q20): the local people of Bãi Trước swim in shorts and T-shirts, so the swimmers wear the shorts and T-shirts of the person blueprint of World, with the swim rings (phao_boi)."
+}

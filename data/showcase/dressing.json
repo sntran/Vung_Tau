@@ -1,0 +1,229 @@
+{
+	"what": "The dressing of Tết (plan 0026, R19). Each count comes from a row of docs/content/culture-notes.md, section \"The weeks before Tết, 2018 to 2021\", with the same link. All items are Check, and in_game is false: the game does not read this file until I confirm each item (report 0026, Q28 and Q30).",
+	"days_note": "days: the first and the last day of the game (day 1 is 22 January 2019) on which the item stands. The festival opens on the evening of 27 tháng Chạp (day 11); before that its models are in construction.",
+	"items": [
+		{
+			"id": "festival_pigs",
+			"what": "Pig figures (one in a red coat and a red hat, one white with a red tie), about 2 m high",
+			"where": "the gate of the festival from Quang Trung, Công viên Bãi Trước",
+			"count": 2,
+			"count_note": "2 in the photo of the gate; the text of 2019-01-25 gives 5 models of pigs",
+			"days": [
+				11,
+				30
+			],
+			"from": [
+				"https://phunuvietnam.vn/du-khach-nuom-nuop-do-ve-hoi-hoa-xuan-vung-tau-55314.htm",
+				"https://chosaigon24h.vn/hoi-hoa-xuan-vung-tau-2019-don-mung-nam-moi.html"
+			],
+			"status": "Check",
+			"in_game": false
+		},
+		{
+			"id": "festival_coin_base",
+			"what": "A base of 3 large gold coins in a stack, with balls of red, white, and gold",
+			"where": "under the pig figures at the gate from Quang Trung",
+			"count": 1,
+			"count_note": "1 in the photo",
+			"days": [
+				11,
+				30
+			],
+			"from": [
+				"https://phunuvietnam.vn/du-khach-nuom-nuop-do-ve-hoi-hoa-xuan-vung-tau-55314.htm"
+			],
+			"status": "Check",
+			"in_game": false
+		},
+		{
+			"id": "festival_small_pig",
+			"what": "A small pig figure in a bed of red poinsettia",
+			"where": "in the park",
+			"count": 1,
+			"count_note": "1 in the photo",
+			"days": [
+				11,
+				30
+			],
+			"from": [
+				"https://phunuvietnam.vn/du-khach-nuom-nuop-do-ve-hoi-hoa-xuan-vung-tau-55314.htm"
+			],
+			"status": "Check",
+			"in_game": false
+		},
+		{
+			"id": "festival_pyramid",
+			"what": "A pyramid of woven bamboo, about 5 m high, with the words \"Vũng Tàu Xanh\"",
+			"where": "the middle of the park",
+			"count": 1,
+			"count_note": "1 in three photos",
+			"days": [
+				11,
+				30
+			],
+			"from": [
+				"https://phunuvietnam.vn/du-khach-nuom-nuop-do-ve-hoi-hoa-xuan-vung-tau-55314.htm"
+			],
+			"status": "Check",
+			"in_game": false
+		},
+		{
+			"id": "festival_letters",
+			"what": "Large gold letters \"2019 XUÂN KỶ HỢI\" on a pink base",
+			"where": "in front of the pyramid",
+			"count": 1,
+			"count_note": "1 in the photo",
+			"days": [
+				11,
+				30
+			],
+			"from": [
+				"https://phunuvietnam.vn/du-khach-nuom-nuop-do-ve-hoi-hoa-xuan-vung-tau-55314.htm"
+			],
+			"status": "Check",
+			"in_game": false
+		},
+		{
+			"id": "festival_flower_arches",
+			"what": "Arches of pink flowers over a path",
+			"where": "the paths of the park",
+			"count": 2,
+			"count_note": "2 in one photo; the count in the park is not known",
+			"days": [
+				11,
+				30
+			],
+			"from": [
+				"https://phunuvietnam.vn/du-khach-nuom-nuop-do-ve-hoi-hoa-xuan-vung-tau-55314.htm"
+			],
+			"status": "Check",
+			"in_game": false
+		},
+		{
+			"id": "festival_bamboo_arch",
+			"what": "An arch of bamboo strips in the shape of two funnels",
+			"where": "in the park",
+			"count": 1,
+			"count_note": "1 in the photo",
+			"days": [
+				11,
+				30
+			],
+			"from": [
+				"https://phunuvietnam.vn/du-khach-nuom-nuop-do-ve-hoi-hoa-xuan-vung-tau-55314.htm"
+			],
+			"status": "Check",
+			"in_game": false
+		},
+		{
+			"id": "festival_metal_lotus",
+			"what": "Lotus flowers of metal on tall stems",
+			"where": "the beds of the park",
+			"count": 3,
+			"count_note": "3 or more in the photo",
+			"days": [
+				11,
+				30
+			],
+			"from": [
+				"https://phunuvietnam.vn/du-khach-nuom-nuop-do-ve-hoi-hoa-xuan-vung-tau-55314.htm"
+			],
+			"status": "Check",
+			"in_game": false
+		},
+		{
+			"id": "festival_drop_lights",
+			"what": "White lights in the shape of drops that hang from the trees (at night)",
+			"where": "the trees of the park",
+			"count": null,
+			"count_note": "many in the photo; not counted",
+			"days": [
+				11,
+				30
+			],
+			"from": [
+				"https://phunuvietnam.vn/du-khach-nuom-nuop-do-ve-hoi-hoa-xuan-vung-tau-55314.htm"
+			],
+			"status": "Check",
+			"in_game": false
+		},
+		{
+			"id": "banner_chuc_mung",
+			"what": "A red vertical banner with the yellow words \"CHÚC MỪNG NĂM MỚI\" and a red pennant under it",
+			"where": "the blue lamp poles of the walk of the sea side of Quang Trung",
+			"count": null,
+			"count_note": "one on the near pole and more red banners on the poles further along; the number of poles with a banner is not known; seen on 2019-02-08 (day 18); the first day of the banners is not known",
+			"days": null,
+			"from": [
+				"https://phunuvietnam.vn/du-khach-nuom-nuop-do-ve-hoi-hoa-xuan-vung-tau-55314.htm"
+			],
+			"status": "Check",
+			"in_game": false
+		},
+		{
+			"id": "sign_no_stopping",
+			"what": "A red sign on a stand of Công an Phường 1: no stops of more than 3 minutes and no street sellers at the park and the festival",
+			"where": "the road of Quang Trung at the park",
+			"count": 1,
+			"count_note": "1 in the photo",
+			"days": [
+				11,
+				30
+			],
+			"from": [
+				"https://phunuvietnam.vn/du-khach-nuom-nuop-do-ve-hoi-hoa-xuan-vung-tau-55314.htm"
+			],
+			"status": "Check",
+			"in_game": false
+		},
+		{
+			"id": "flower_market_orchids",
+			"what": "Orchids (white, pink, and yellow) in white pots on blue plastic stools, under blue tarps",
+			"where": "a market of Tết flowers; the place in the town is not given",
+			"count": null,
+			"count_note": "not counted",
+			"days": [
+				9,
+				13
+			],
+			"from": [
+				"https://www.youtube.com/watch?v=ClOuSr8qnQU"
+			],
+			"status": "Check",
+			"in_game": false
+		},
+		{
+			"id": "flower_streets",
+			"what": "Streets of Tết flowers",
+			"where": "Lê Lợi, Trần Hưng Đạo, Ba Cu, Lê Hồng Phong; the garden Trưng Vương on Trưng Trắc and Trưng Nhị",
+			"count": 4,
+			"count_note": "4 streets and 1 garden in the text; no photo",
+			"days": [
+				10,
+				30
+			],
+			"from": [
+				"https://chosaigon24h.vn/chuoi-le-hoi-va-su-kien-dip-tet-tai-vung-tau-2019-khong-the-bo-lo.html",
+				"https://chosaigon24h.vn/hoi-hoa-xuan-vung-tau-2019-don-mung-nam-moi.html"
+			],
+			"status": "Check",
+			"in_game": false
+		},
+		{
+			"id": "silk_lanterns",
+			"what": "Red and yellow silk lanterns from a dry branch, with red scrolls of couplets",
+			"where": "in front of old wooden shutters; the place in the town is not given",
+			"count": 8,
+			"count_note": "8 or more in the photo",
+			"days": [
+				12,
+				15
+			],
+			"from": [
+				"https://www.flickr.com/photos/90182221@N02/40126828283/"
+			],
+			"status": "Check",
+			"in_game": false
+		}
+	]
+}

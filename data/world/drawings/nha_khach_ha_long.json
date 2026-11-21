@@ -1,0 +1,650 @@
+{
+	"id": "nha_khach_ha_long",
+	"what": "Nhà khách Hạ Long (khách sạn Hạ Long), the guest house at 102 Hạ Long at the foot of Núi Nhỏ: a white block of 8 storeys with a machine room on its roof and the blue letters HA LONG HOTEL on the edge of its roof",
+	"way": "order",
+	"order": {
+		"blueprint": "building",
+		"options": {
+			"name": "nha_khach_ha_long",
+			"sources": [
+				"Nhà khách Hạ Long (102 Hạ Long), Vũng Tàu. Plan: OpenStreetMap way 235149416 (© OpenStreetMap contributors, ODbL), building:levels 8. Look: a photo of 2021-05-10 (Flickr, Venanzio_KH) and a photo of 2014 (trungydang, Wikimedia Commons, CC BY 3.0)."
+			],
+			"plan": [
+				[
+					21.35,
+					0.0
+				],
+				[
+					0.0,
+					0.0
+				],
+				[
+					0.0,
+					-17.07
+				],
+				[
+					21.35,
+					-17.07
+				]
+			],
+			"storeys": 8,
+			"ground": 3.0,
+			"band": 0.8,
+			"storey": 2.9,
+			"colors": {
+				"wall": "#e8e4df",
+				"trim": "#e8e4df",
+				"band": "#b5b8b8",
+				"glass": "#3d4650",
+				"frame": "#f4f1e4",
+				"letters": "#1c2f6b",
+				"ground": "#a49d92"
+			},
+			"roof": {
+				"kind": "flat",
+				"parapet": 0.8
+			},
+			"fronts": [
+				{
+					"side": 1,
+					"style": "windows",
+					"bays": 6,
+					"inset": 0.8,
+					"window": [
+						1.2,
+						1.4
+					],
+					"bars": 1
+				},
+				{
+					"side": 2,
+					"from": 6.6,
+					"to": 10.2,
+					"style": "windows",
+					"bays": 1,
+					"places": [
+						8.4
+					],
+					"window": [
+						1.1,
+						1.3
+					],
+					"ledges": true
+				},
+				{
+					"side": 3,
+					"style": "windows",
+					"bays": 6,
+					"inset": 0.8,
+					"window": [
+						1.1,
+						1.3
+					]
+				},
+				{
+					"side": 4,
+					"style": "windows",
+					"bays": 4,
+					"inset": 1.0,
+					"window": [
+						1.1,
+						1.3
+					]
+				}
+			],
+			"letters": [
+				{
+					"side": 2,
+					"at": 4.4,
+					"z": 24.599999999999998,
+					"high": 0.6,
+					"text": "HA LONG HOTEL",
+					"out": 0.55
+				}
+			],
+			"apron": 0.6,
+			"age": 0.5,
+			"more": {
+				"than": [
+					{
+						"shape": "box",
+						"size": [
+							11.275,
+							9.135,
+							0.15
+						],
+						"at": [
+							10.675,
+							-8.535,
+							21.0
+						],
+						"color": "#b5b8b8",
+						"mode": "paint",
+						"blend": 0.01,
+						"raise": 0.03,
+						"roughness": 0.8
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.63,
+							0.73,
+							0.25
+						],
+						"at": [
+							0.0,
+							-2.7,
+							22.8
+						],
+						"color": "#f4f1e4",
+						"axis": [
+							-1.0,
+							0.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.015,
+						"raise": 0.015,
+						"roughness": 0.6
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.55,
+							0.65,
+							0.25
+						],
+						"at": [
+							0.0,
+							-2.7,
+							22.8
+						],
+						"color": "#3d4650",
+						"axis": [
+							-1.0,
+							0.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.06,
+						"raise": -0.06,
+						"roughness": 0.1,
+						"metal": 0.2
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.025,
+							0.65,
+							0.25
+						],
+						"at": [
+							0.0,
+							-2.7,
+							22.8
+						],
+						"color": "#f4f1e4",
+						"axis": [
+							-1.0,
+							0.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.006,
+						"roughness": 0.6
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.63,
+							0.73,
+							0.25
+						],
+						"at": [
+							0.0,
+							-4.1,
+							22.8
+						],
+						"color": "#f4f1e4",
+						"axis": [
+							-1.0,
+							0.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.015,
+						"raise": 0.015,
+						"roughness": 0.6
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.55,
+							0.65,
+							0.25
+						],
+						"at": [
+							0.0,
+							-4.1,
+							22.8
+						],
+						"color": "#3d4650",
+						"axis": [
+							-1.0,
+							0.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.06,
+						"raise": -0.06,
+						"roughness": 0.1,
+						"metal": 0.2
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.025,
+							0.65,
+							0.25
+						],
+						"at": [
+							0.0,
+							-4.1,
+							22.8
+						],
+						"color": "#f4f1e4",
+						"axis": [
+							-1.0,
+							0.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.006,
+						"roughness": 0.6
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.63,
+							0.73,
+							0.25
+						],
+						"at": [
+							0.0,
+							-5.8,
+							22.8
+						],
+						"color": "#f4f1e4",
+						"axis": [
+							-1.0,
+							0.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.015,
+						"raise": 0.015,
+						"roughness": 0.6
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.55,
+							0.65,
+							0.25
+						],
+						"at": [
+							0.0,
+							-5.8,
+							22.8
+						],
+						"color": "#3d4650",
+						"axis": [
+							-1.0,
+							0.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.06,
+						"raise": -0.06,
+						"roughness": 0.1,
+						"metal": 0.2
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.025,
+							0.65,
+							0.25
+						],
+						"at": [
+							0.0,
+							-5.8,
+							22.8
+						],
+						"color": "#f4f1e4",
+						"axis": [
+							-1.0,
+							0.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.006,
+						"roughness": 0.6
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.63,
+							0.73,
+							0.25
+						],
+						"at": [
+							0.0,
+							-13.3,
+							22.8
+						],
+						"color": "#f4f1e4",
+						"axis": [
+							-1.0,
+							0.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.015,
+						"raise": 0.015,
+						"roughness": 0.6
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.55,
+							0.65,
+							0.25
+						],
+						"at": [
+							0.0,
+							-13.3,
+							22.8
+						],
+						"color": "#3d4650",
+						"axis": [
+							-1.0,
+							0.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.06,
+						"raise": -0.06,
+						"roughness": 0.1,
+						"metal": 0.2
+					},
+					{
+						"shape": "box",
+						"size": [
+							0.025,
+							0.65,
+							0.25
+						],
+						"at": [
+							0.0,
+							-13.3,
+							22.8
+						],
+						"color": "#f4f1e4",
+						"axis": [
+							-1.0,
+							0.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"mode": "paint",
+						"blend": 0.006,
+						"roughness": 0.6
+					},
+					{
+						"shape": "box",
+						"size": [
+							3.55,
+							1.5,
+							2.5
+						],
+						"at": [
+							3.5,
+							-11.55,
+							25.3
+						],
+						"color": "#e8e4df",
+						"axis": [
+							-1.0,
+							0.0,
+							0
+						],
+						"up": [
+							0,
+							0,
+							1
+						],
+						"roughness": 0.85,
+						"surface": {
+							"kind": "plaster",
+							"scale": 0.04
+						}
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.06,
+							1.75
+						],
+						"at": [
+							2.5,
+							-9.0,
+							28.55
+						],
+						"color": "#9aa0a3",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near"
+						]
+					},
+					{
+						"shape": "cylinder",
+						"size": [
+							0.06,
+							1.4
+						],
+						"at": [
+							2.5,
+							-13.5,
+							28.2
+						],
+						"color": "#9aa0a3",
+						"roughness": 0.5,
+						"metal": 0.6,
+						"levels": [
+							"near"
+						]
+					}
+				]
+			}
+		}
+	},
+	"sources": [
+		{
+			"url": "https://www.flickr.com/photos/venanzio_kh/51180048443/",
+			"image": "https://live.staticflickr.com/65535/51180048443_7881a0bd71_b.jpg",
+			"date": "2021-05-10 (Flickr: date taken)",
+			"license": "all rights reserved",
+			"author": "Venanzio_KH (Flickr)",
+			"open": false,
+			"file": "ha_long_hotel_2021_flickr_51180048443.jpg",
+			"shows": "From the sea wall of Hạ Long, 175 m south of the hotel: its south face almost from the front and its west face from the side. A white block in the shade; a grey band under the top storey; in the top storey three pairs of windows at the west end, one pair in the middle and one pair at the east end; one pair of windows with the boxes of air conditioners at each storey under it; the blue letters HA LONG HOTEL on the edge of the roof over the west half of the south face; a machine room with masts on the roof at the east end. Trees hide the lower storeys."
+		},
+		{
+			"url": "https://commons.wikimedia.org/wiki/File:Ha_Long_ph%C6%B0%E1%BB%9Dng_2,_V%C5%A9ng_T%C3%A0u,_B%C3%A0_R%E1%BB%8Ba_-_V%C5%A9ng_T%C3%A0u,_Vi%E1%BB%87t_Nam_-_panoramio.jpg",
+			"date": "2014-04-06",
+			"license": "CC BY 3.0",
+			"author": "trungydang",
+			"open": true,
+			"file": "nha_khach_ha_long_2014.jpg",
+			"shows": "Hạ Long to the north: the south face of the hotel over the trees on the right, cream with a grey band under the top storey, pairs of windows in the top storey, one pair of windows and the boxes of air conditioners at each storey under it (the same pattern as in 2021)."
+		}
+	],
+	"sizes": {
+		"front": {
+			"value": 21.35,
+			"unit": "m",
+			"source": "The outline of OpenStreetMap (way 235149416): the side on Hạ Long (west) is 21.35 m."
+		},
+		"depth": {
+			"value": 17.07,
+			"unit": "m",
+			"source": "The outline of OpenStreetMap (way 235149416): the south side is 17.07 m."
+		},
+		"storeys": {
+			"value": 8,
+			"unit": "",
+			"source": "OpenStreetMap (way 235149416): building:levels 8. Photo 0 (2021): the top four storeys show over the trees, with the same spacing."
+		},
+		"storey": {
+			"value": 2.9,
+			"unit": "m",
+			"source": "Photo 0 (2021): the south face is 98 px wide for 17.07 m at 16 degrees from the line of sight (6.0 px for 1 m); the rows of windows are 17 px apart (249, 266 and 283 px): 2.9 m."
+		},
+		"top_storey_and_parapet": {
+			"value": 3.7,
+			"unit": "m",
+			"source": "Photo 0 (2021): 22 px from the grey band to the edge of the roof: 3.7 m, so a parapet of 0.8 m over a storey of 2.9 m."
+		},
+		"ground_storey": {
+			"value": 3.0,
+			"unit": "m",
+			"source": "estimate (no source): the trees hide the ground storey in both photos. With the band of 0.8 m, the roof is 24.6 m high."
+		},
+		"windows_south": {
+			"value": "top storey: pairs at 2.7, 4.1, 5.8, 8.4 and 13.3 m from the west corner; other storeys: one pair at 8.4 m with an air conditioner",
+			"unit": "",
+			"source": "Photo 0 (2021): the pairs of the top storey are at 908 to 932 px, 941 to 947 px and 969 to 975 px of the south face (896 to 994 px); photo 1 (2014) shows the same pattern. A pair is 1.1 m wide and 1.3 m high: estimate (no source)."
+		},
+		"windows_west_north_east": {
+			"value": "6, 4 and 6 windows a storey",
+			"unit": "",
+			"source": "estimate (no source): no photo shows these faces from the front."
+		},
+		"machine_room": {
+			"value": "7.1 m along the south face, 3.0 m high, 5 m deep",
+			"unit": "",
+			"source": "Photo 0 (2021): 41 px wide (7.1 m) at the east end of the roof, its top 13 px (2.2 m) over the edge of the roof; its depth is an estimate (no source)."
+		},
+		"letters": {
+			"value": "HA LONG HOTEL, 0.6 m high, 8.6 m long, blue #1c2f6b",
+			"unit": "",
+			"source": "Photo 0 (2021): the letters HA LONG HOTEL stand on the edge of the roof over the west half of the south face; they are 5 px high (0.84 m) and go from 1.0 m to 7.8 m from the west corner (6.8 m); the darkest pixels of the letters in the shade are #02112e to #1d293f. The name is approved (report 0026, Q16; docs/content/culture-notes.md). The order has the letters on side 2 (the south face), with their middle at 4.4 m from the west corner, on the edge of the roof (z 24.6 m), in navy #1c2f6b. The letters of the building blueprint are 1.13 times as wide as they are high, and the letters of the photo 0.62 times: 0.84 m high would give 12 m. So the letters are 0.6 m high and 8.6 m long (0.1 m to 8.7 m from the west corner)."
+		},
+		"colors": {
+			"value": "walls #e8e4df, band #b5b8b8, glass #3d4650, frames #f4f1e4",
+			"unit": "",
+			"source": "Photo 0 (2021): the sunlit strip of the west face is #dad6d3 to #efe2e9 (the south face in the shade is #4d515b); the band is a little darker than the walls in both photos. Glass and frames: photo 1 (2014), dark glass in white frames."
+		}
+	},
+	"looks": [
+		{
+			"date": "2026-11-17",
+			"level": "mid",
+			"hash": "c212572faa567452ece017faba2f4c89",
+			"seen": "A preview in my workspace, not a build of the factory: the factory answers HTTP 503 (memory) when it places this order, so I made the edits of the rule (World.Town.Building, ported to Python) into voxels of 0.15 m and rendered them with tools/world/look.gd (build/look/nha_khach_ha_long_preview_mid.png). Next to photo 0 (2021), the side view is the south face: the band under the top storey, three pairs of windows at the west end of the top storey and one pair at the east end, one pair with an air conditioner at each storey under it, the letters HA LONG HOTEL over the west half, the machine room at the east end. The pattern and the proportions agree with the photo. The west, north and east faces are estimates.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-17",
+			"level": "near",
+			"hash": "c212572faa567452ece017faba2f4c89",
+			"seen": "A preview in my workspace, not a build of the factory: the factory answers HTTP 503 (memory) when it places this order, so I made the edits of the rule (World.Town.Building, ported to Python) into voxels of 0.1 m and rendered them with tools/world/look.gd (build/look/nha_khach_ha_long_preview_near.png). The two masts on the machine room (near only) show; the rest is as at the mid level.",
+			"changed": "Nothing."
+		},
+		{
+			"date": "2026-11-20",
+			"level": "mid",
+			"hash": "7104aed3b6a2a9030c355a6a16106029",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/nha_khach_ha_long_mid.png), next to photo 0 (2021). A white block of 8 storeys on its outline (21.35 m by 17.07 m), the rows of windows of the south and the west face, the pairs of the top storey with the air conditioners, the grey band at the foot, the machine room at the east end of the roof, and the letters HA LONG HOTEL in blue on the edge of the roof over the west half of the south face, as in photo 0.",
+			"changed": "Nothing. (The looks of before were of a preview in my workspace, D-0026-27.)"
+		},
+		{
+			"date": "2026-11-20",
+			"level": "far",
+			"hash": "7104aed3b6a2a9030c355a6a16106029",
+			"seen": "Report 0026, Q25: the files of the lock of World e8754d6 (build/look/nha_khach_ha_long_far.png). The same block, the windows and the letters a little softer, the machine room.",
+			"changed": "Nothing."
+		}
+	],
+	"status": "Source",
+	"levels": [
+		"near",
+		"mid",
+		"far"
+	],
+	"uses": "Plan 0026, R7, Q7: on its OSM outline (way 235149416) by Hạ Long, about 300 m south of Hải Âu (seen from the jetty and the walk of the sea); outside the area of the showcase (D1), it has no place in data/world/places/ yet.",
+	"impostor": false,
+	"hash": "c212572faa567452ece017faba2f4c89",
+	"status_note": "Report 0026, Q25 (2026-11-20): with the lock of World e8754d6 its order is in data/world/orders.json again (the job \"Models of World\" builds it, and its looks are of the files of the lock). Nhà khách Hạ Long stands outside the area of the showcase (D1): it has no place in data/world/places/, so the game does not show it. Before: World 1984a6f did not keep the option size of the blueprint building in the receipt (\"/options/size (not in the receipt)\"), so its order waited; World e8754d6 makes the same rectangle the option plan of the receipt (the front on side 1), so the order has the plan [[21.35, 0], [0, 0], [0, -17.07], [21.35, -17.07]] in place of the size [21.35, 17.07]."
+}

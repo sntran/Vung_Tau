@@ -1,0 +1,341 @@
+{
+	"note": "The place of each model of World in the showcase of Bãi Trước (plan 0026, D3). \"front\" is the middle of the front of the model (x and z of the game), \"facing\" the direction that its front looks to (x and z), and \"front_middle_x\" the x of that point in the model, \"box\" the box of the model in its own frame (x from, x to, z from, z to; the front is at z = 0), \"street\" the street that the front looks to (a model of World has its front at z = 0 and looks to +z in Godot), or \"along\" the walk that a thing with no street of its own is along (a raised lawn). The model stands on the ground at its front. \"ranges\" gives the end of the near, the mid, and the far level for each preset (D6: on Low the near level of a building is its mid level, so the near level has no range). The sources of each place are with it. tools/geo/build.py makes the ground level under the box of each model, at the height of the ground at its front (plan 0009, R8). \"outline\" (x and z of the game) is the outline of the ground to make level, in place of the box, and \"keep_higher\" keeps the ground that is higher than the level, under the model and round it (a model against a hill).",
+	"status": "check",
+	"ranges": {
+		"low": [
+			0.0,
+			300.0,
+			1500.0
+		],
+		"medium": [
+			40.0,
+			400.0,
+			1800.0
+		],
+		"high": [
+			80.0,
+			500.0,
+			2000.0
+		],
+		"ultra": [
+			120.0,
+			600.0,
+			2500.0
+		]
+	},
+	"places": [
+		{
+			"id": "quang_trung_4_10",
+			"front": [
+				116.44,
+				163.88
+			],
+			"facing": [
+				-0.9698,
+				-0.2438
+			],
+			"front_middle_x": 0.0,
+			"survey": [
+				"QT-T02",
+				"QT-T03",
+				"QT-T04"
+			],
+			"source": "The middle of the fronts of the survey rows QT-T02, QT-T03, QT-T04 (World priv/surveys/quang_trung.json, the field at), weighted by their widths, at 11.5 m from the line of the road; the front looks to the nearest point of Quang Trung (way 200554615). The model is 24.3 m wide and the lots 3 of the survey are a little narrower, so the models of the row stand one after the other from Cảng vụ to the north (this one +0.9 m along the street from the survey).",
+			"box": [
+				-12.15,
+				12.15,
+				-20.5,
+				9.18
+			],
+			"street": "Quang Trung"
+		},
+		{
+			"id": "quang_trung_12_18",
+			"front": [
+				121.74,
+				139.23
+			],
+			"facing": [
+				-0.9864,
+				-0.1642
+			],
+			"front_middle_x": 0.0,
+			"survey": [
+				"QT-T05",
+				"QT-T06",
+				"QT-T07",
+				"QT-T08"
+			],
+			"source": "The middle of the fronts of the survey rows QT-T05, QT-T06, QT-T07, QT-T08 (World priv/surveys/quang_trung.json, the field at), weighted by their widths, at 11.5 m from the line of the road; the front looks to the nearest point of Quang Trung (way 200554615). The model is 24.2 m wide and the lots 4 of the survey are a little narrower, so the models of the row stand one after the other from Cảng vụ to the north (this one +2.1 m along the street from the survey).",
+			"box": [
+				-12.1,
+				12.1,
+				-20.5,
+				9.18
+			],
+			"street": "Quang Trung"
+		},
+		{
+			"id": "quang_trung_20_26",
+			"front": [
+				125.58,
+				114.96
+			],
+			"facing": [
+				-0.9901,
+				-0.1406
+			],
+			"front_middle_x": 0.0,
+			"survey": [
+				"QT-T09",
+				"QT-T10",
+				"QT-T11"
+			],
+			"source": "The middle of the fronts of the survey rows QT-T09, QT-T10, QT-T11 (World priv/surveys/quang_trung.json, the field at), weighted by their widths, at 11.5 m from the line of the road; the front looks to the nearest point of Quang Trung (way 200554615). The model is 24.3 m wide and the lots 3 of the survey are a little narrower, so the models of the row stand one after the other from Cảng vụ to the north (this one +2.8 m along the street from the survey).",
+			"box": [
+				-12.15,
+				12.15,
+				-20.5,
+				9.18
+			],
+			"street": "Quang Trung"
+		},
+		{
+			"id": "cang_vu_vung_tau",
+			"front": [
+				109.88,
+				190.32
+			],
+			"facing": [
+				-0.9693,
+				-0.2458
+			],
+			"front_middle_x": -6.68,
+			"survey": [
+				"QT-T01"
+			],
+			"source": "The front of the outline of OpenStreetMap (cang_vu: way 259732719), on the side to Quang Trung; the survey row QT-T01.",
+			"box": [
+				-21.7,
+				8.33,
+				-27.4,
+				2.62
+			],
+			"street": "Quang Trung"
+		},
+		{
+			"id": "khach_san_grand_canh_nam",
+			"front": [
+				129.4,
+				56.96
+			],
+			"facing": [
+				-0.9857,
+				0.1686
+			],
+			"front_middle_x": -18.05,
+			"survey": [
+				"QT-T12"
+			],
+			"source": "The front of the outline of OpenStreetMap (grand_south: way 118946705), on the side to Quang Trung; the survey row QT-T12.",
+			"box": [
+				-40.3,
+				4.2,
+				-20.9,
+				4.2
+			],
+			"street": "Quang Trung",
+			"level_at": [
+				123.77,
+				57.92
+			],
+			"forecourt_m": 2.2,
+			"level_note": "Report 0026, D-0026-22: the level is the sidewalk of Quang Trung in front of the wing (level_at, 8 m from the middle of the road), as for the main block, and the ground is level to the outer edge of the sidewalk (forecourt_m)."
+		},
+		{
+			"id": "khach_san_grand",
+			"front": [
+				154.48,
+				-2.5
+			],
+			"facing": [
+				-0.9782,
+				0.2077
+			],
+			"front_middle_x": -18.6,
+			"survey": [
+				"QT-T13"
+			],
+			"source": "The front of the outline of OpenStreetMap (grand_main: way 118950627), on the side to Quang Trung; the survey row QT-T13.",
+			"box": [
+				-37.8,
+				0.6,
+				-24.6,
+				5.05
+			],
+			"street": "Quang Trung",
+			"level_at": [
+				112.36,
+				6.45
+			],
+			"forecourt_m": 39.5,
+			"level_note": "Report 0026, D-0026-22: the front of the outline is 51 m from the middle of the east road of Quang Trung, on ground 2.2 m over the sidewalk, and a bank of earth went up from the sidewalk to the front. The photo of S4 (2014) shows the fence with the lantern posts on the sidewalk and the garden at the level of the sidewalk. So the level is the ground at level_at (a point of the sidewalk band of Quang Trung in front of the model, 8 m from the middle of the road: at 11 m the bank starts), and the ground is level from the back of the box to forecourt_m in front of it (to the outer edge of the sidewalk, 11.5 m from the middle of the road). level_sides_m: the garden is level 8 m past each side of the box, to the corner of Nguyễn Du (the bank stood there in the shot S4).",
+			"level_sides_m": 8.0
+		},
+		{
+			"id": "bon_co_234797329",
+			"front": [
+				-77.85,
+				-292.75
+			],
+			"facing": [
+				0.6311,
+				0.7757
+			],
+			"front_middle_x": 0.0,
+			"box": [
+				-2.743,
+				2.743,
+				-12.45,
+				12.45
+			],
+			"source": "The outline of OpenStreetMap way 234797329: its middle, and its long side as the facing; the model has its middle at its origin, so its box goes to both sides of the front (data/world/drawings/bon_co_234797329.json, D-0026-08).",
+			"along": "the walk of the sea"
+		},
+		{
+			"id": "bon_co_234797330",
+			"front": [
+				-60.44,
+				-271.51
+			],
+			"facing": [
+				0.6324,
+				0.7747
+			],
+			"front_middle_x": 0.0,
+			"box": [
+				-2.7,
+				2.7,
+				-12.596,
+				12.596
+			],
+			"source": "The outline of OpenStreetMap way 234797330: its middle, and its long side as the facing; the model has its middle at its origin, so its box goes to both sides of the front (data/world/drawings/bon_co_234797330.json, D-0026-08).",
+			"along": "the walk of the sea"
+		},
+		{
+			"id": "khach_san_hai_au",
+			"front": [
+				-207.81,
+				506.3
+			],
+			"facing": [
+				-0.9636,
+				-0.2672
+			],
+			"front_middle_x": -11.65,
+			"forecourt_m": 21.0,
+			"level_at": [
+				-227.18,
+				500.93
+			],
+			"level_note": "Report 0026, D-0026-13: the front of the outline is 32 m from the middle of Hạ Long, on ground 9.8 m over the road, and a bank of earth hid the ground storey. The photos of 2014 show the ground storey with its shops and its porch at the level of the sidewalk of Hạ Long. So the level is the ground at level_at (a point of the sidewalk band of Hạ Long in front of the model, 12 m from the middle of the road: the top of the sidewalk less 3 cm), and the ground is level from the back of the box to forecourt_m in front of it (to the outer edge of the sidewalk, 11 m from the middle of the road). The hill stays at the sides of the forecourt and inside the model.",
+			"box": [
+				-48.1,
+				24.8,
+				-22.8,
+				2.2
+			],
+			"street": "Hạ Long",
+			"source": "The outline of OpenStreetMap way 790529523 (© OpenStreetMap contributors, ODbL): the middle of its front on Hạ Long, and the direction to the road; the model has its front at z = 0 and its canopy 2.2 m in front of it (data/world/drawings/khach_san_hai_au.json). It replaces the stand-in of the same outline. Hẻm 2 Hải Đăng runs along its east wall, inside the box: the cells near another road keep their height (tools/geo/build.py, ROAD_KEEP_M). The front of the model is out of the OSM outline at its two ends (5.9 m and 7.4 m), so the level ground is its box. It stands against the hill (\"keep_higher\"): the ground that is higher than its level stays, and the walls of the model hide the hill inside it.",
+			"keep_higher": true
+		},
+		{
+			"id": "khach_san_buu_dien",
+			"front": [
+				17.32,
+				271.38
+			],
+			"facing": [
+				-0.4516,
+				-0.8922
+			],
+			"front_middle_x": 0.0,
+			"level_at": [
+				15.06,
+				266.92
+			],
+			"level_note": "The front point is on the foot of the hill (the ground of the game: 7.5 m there), but photos of 2023 and 2024 show the ground storey at the level of the forecourt and of Hạ Long (5.6 m to 5.8 m in the ground of the game from 5 m in front of the front to the road). So the level is the ground at level_at, 5 m in front of the middle of the front (5.8 m). forecourt_m: the ground is level from the back of the box to 5 m in front of the front (to level_at), so that the whole front line stands on the ground (PT-71, CI of 308cbc2: with keep_higher, the corner on the side of the hill was 0.87 m over the base).",
+			"box": [
+				-19.06,
+				20.23,
+				-34.9,
+				1.38
+			],
+			"street": "Hạ Long",
+			"keep_higher": true,
+			"source": "The outline of OpenStreetMap way 259750558 (© OpenStreetMap contributors, ODbL): the model has its front at z = 0 through the most forward corner of the outline (the corner B of data/world/drawings/khach_san_buu_dien.json), and its x = 0 at the middle of the outline across the front. The facing is square to Hạ Long (way 200554629) between x -10 and x 47. The model covers the tower and the wing with the pool, as the outline. The ground rises to 12 m at the back of the outline: the hill stays (keep_higher). The low building of way 580493843 east of the wing keeps its stand-in.",
+			"forecourt_m": 5.0
+		},
+		{
+			"id": "cao_oc_sen_bien",
+			"front": [
+				-27.87,
+				335.91
+			],
+			"facing": [
+				-0.4014,
+				-0.9159
+			],
+			"front_middle_x": 0.0,
+			"box": [
+				-19.4,
+				19.17,
+				-47.65,
+				5.4
+			],
+			"street": "Hạ Long",
+			"keep_higher": true,
+			"source": "The outline of OpenStreetMap way 225803467 (© OpenStreetMap contributors, ODbL), a rectangle: the front is the middle of its north-west face, and the facing is square to that face, to Hạ Long (50 m away, behind the hall with the orange roof). The box goes 5.4 m in front of the face for the disc of the tower (at 34 m). In the ground of the game the hill rises from 18.1 m at the front to 35.3 m at the back: the hill stays (keep_higher), and the walls of the model hide it. The photo from a drone of 2021 shows more storeys on the south-east side than this ground leaves: the ground of the game there is a question for me.",
+			"level_note": "The level is the ground at level_at, a point of the sidewalk of Hạ Long 4 m in front of the middle of the front (16.88 m), as for Khách sạn Bưu điện and Hải Âu: the ground storey at the level of the street. forecourt_m: the ground is level to 3 m in front of the front (not the cells of the sidewalk); level_sides_m: and 2.5 m past each side of the box (the box of the model stays the same). PT-71, CI of 308cbc2: at the level of the middle of the front (18.14 m) with keep_higher, the lane at the north-west corner kept higher ground in front of it (0.38 m over the base), and the sidewalk 2 m in front was 0.6 m to 1.0 m lower; the grid of 2 m mixes both into the corners of the front. Now the front is within 0.09 m of the base.",
+			"level_sides_m": 2.5,
+			"level_at": [
+				-29.48,
+				332.25
+			],
+			"forecourt_m": 3.0,
+			"front_above_street_m": 9.4,
+			"front_above_street_source": "The block stands on the slope of the hill, 50 m from Hạ Long, behind the hall with the orange roof and its lane: in the photo of S1 (Commons, trungydang, 2014-04-05, CC BY 3.0) and the photo from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0), its lowest terrace is over the roof of the hall. The ground of the game: 7.5 m at the curb of Hạ Long in front of the middle of its front, 16.88 m at its level (report 0026, D-0026-22).",
+			"view_m": 42.0,
+			"view_source": "Report 0026, D-0026-41: the photo of 2024-03-06 (Commons, Xuanphuocle, CC0, sen_bien_2024.jpg) shows the tower from Hạ Long, up, past the hall with the orange roof. From 25 m in front of it the eye stood next to the hall: the hall covered 46 % of the frame and the tower 15 %. From across the road (50 m to 60 m) the tower covers only 10 % to 15 % of the frame. So the eye is 42 m in front of the tower and 18 m to its side, past the hall (5 m to the side of the line of the front, 19 m wide), and looks square to the front at 16 m over the ground.",
+			"view_side_m": 18.0,
+			"view_target_m": 16.0
+		},
+		{
+			"id": "nha_mai_ngoi_cam",
+			"front": [
+				-39.6,
+				321.8
+			],
+			"facing": [
+				-0.3994,
+				-0.9168
+			],
+			"front_middle_x": 0.0,
+			"box": [
+				-9.6,
+				9.6,
+				-9.6,
+				10.6
+			],
+			"street": "Hạ Long",
+			"level_at": [
+				-49.19,
+				299.8
+			],
+			"forecourt_m": 22.0,
+			"source": "Report 0026, D-0026-27: the outline of OpenStreetMap way 225803473 (© OpenStreetMap contributors, ODbL), a square of 19 m: the model has its origin in the middle of the hall and its porch to +z (the bounds of its files: -9.5 m to 10.5 m), so front is the middle of the outline, and the facing is square to its face to Hạ Long. It replaces the stand-in of the same outline.",
+			"level_note": "The ground of the game rises from 7.8 m at the curb of Hạ Long to 12.9 m in the middle of the hall (the radar heights of the slope), but the photo from a drone of 2021-01-30 (Commons, Tuong Lam Photos, CC BY-SA 4.0, docs/reference/photos/drone_2021_ha_long.jpg) shows the yard of the hall with its parked cars at the level of the road, behind its fence, with the hill behind the hall. So the level is the sidewalk of Hạ Long in front of it (level_at, 8.4 m from the middle of the road), and the ground is level to 2 m before the outer edge of the sidewalk (forecourt_m, from the middle of the hall: the margin of the level ground stays in the sidewalk, and the road keeps its height). The cut of the hill behind it has the slope of the sides of a base. level_sides_m (report 0026, D-0026-36): the photo from a drone of 2021-01-30 shows the yard of the hall at the level of the road on each side of it (a path to the base of the tower on one side, the court with the parked cars on the other), and the game had slopes of the hill 2.5 m past its sides, over its base (a pit): the ground is level 3 m past each side (with 4 m and 6 m, the level reached 6.5 m and 8 m of the outer edge of the sidewalk of Hạ Long at the west corner, 0.6 m lower than the top of the sidewalk: a step, PT-71).",
+			"level_sides_m": 3.0
+		}
+	]
+}
