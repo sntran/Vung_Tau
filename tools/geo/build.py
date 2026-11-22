@@ -392,6 +392,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     # Plan 0008, R2 and D7: the ground under each known place is level, at the
     # lowest point of its outline; the base of the place is 0.1 m over it.
     level_places(grid, config.landmarks, found_by_id)
+    level_approaches(grid, config.landmarks, found_by_id, roads)
     # Report 0026, D-0026-11: the ground under and beside the sidewalks and the
     # walk on the sea wall of the showcase is at their tops.
     showcase_path = ROOT / "data" / "showcase" / "bai_truoc.json"
@@ -671,6 +672,8 @@ COVER_HILLS = {"nui_lon": (1100.0, 20.0), "nui_nho": (700.0, 20.0)}
 # Round a base (plan 0008, R2): the ground climbs at most this grade from the base, in this band.
 BASE_SIDE_GRADE = 0.6
 BASE_SIDE_M = 6.0
+# Report 0009, D-0009-19: the cells past the band of the stairs over which it joins the ground.
+STAIRS_BLEND_CELLS = 2.0
 # The level ground round the box of a model of World (plan 0026, D3).
 LEVEL_MARGIN_M = 2.5
 # Under a model against a hill, the cells within this distance of the edge of
@@ -838,6 +841,45 @@ def level_places(grid, landmarks_config, found_by_id) -> None:
         record["base_height"] = round(lowest + 0.1, 2)
         log(f"{landmark['id']}: the ground under it is level at {lowest:.2f} m ({int(mask.sum())} cells)")
 
+
+
+def level_approaches(grid, landmarks_config, found_by_id, roads) -> None:
+    """Report 0009, D-0009-19: from the top of the stairs of a place to the
+    place, the ground is not higher than the base of the place (a crest of
+    ground on the islet of Hòn Bà hid the lower half of the temple from the
+    stairs). The area is the convex hull of the top end of each way of the
+    stairs (half its width and 1 m round it) and the outline of the place; past
+    it the ground is not higher than a slope of BASE_SIDE_GRADE up from the
+    base, as level_places() cuts round a base. It runs after level_places()
+    (the base) and before cut_stairs() (the stairs follow the new ground)."""
+    by_id = {road.id: road for road in roads}
+    for landmark in landmarks_config:
+        place = landmark.get("place")
+        record = found_by_id.get(landmark["id"])
+        if not place or not record or "base_height" not in record or not record.get("outline"):
+            continue
+        outline = Polygon([(x, -z) for x, z in record["outline"]])
+        middle = outline.centroid
+        level = float(record["base_height"]) - 0.1
+        for way_id in place.get("stairs", []):
+            road = by_id.get(int(way_id))
+            if road is None or road.points is None or len(road.points) < 2:
+                continue
+            ends = [road.points[0], road.points[-1]]
+            top = min(ends, key=lambda p: math.hypot(p[0] - middle.x, p[1] - middle.y))
+            area = shapely.Point(float(top[0]), float(top[1])).buffer(road.width / 2.0 + 1.0).union(outline).convex_hull
+            cells = terrain.rasterize(grid, [area])
+            high = cells & (grid.heights > level)
+            grid.heights[high] = level
+            side = terrain.rasterize(grid, [area.buffer(BASE_SIDE_M)]) & ~cells
+            rows, cols = np.nonzero(side)
+            if rows.size:
+                x = grid.x0 + cols * grid.step
+                z = grid.z0 + rows * grid.step
+                d = shapely.distance(area, shapely.points(x, -z))
+                grid.heights[rows, cols] = np.minimum(grid.heights[rows, cols], level + BASE_SIDE_GRADE * d)
+            log(f"{landmark['id']}: the ground from the top of the stairs {way_id} to the place is at most at its base "
+                f"({level:.2f} m, {int(high.sum())} cells lower)")
 
 
 def beach_wall_lines(areas, roads, buildings, projection, config_path: Path) -> list[list[list[float]]]:
@@ -1080,14 +1122,20 @@ def cut_stairs(grid, landmarks_config, found_by_id, roads) -> None:
             gx, gz = np.meshgrid(grid.x0 + np.arange(c0, c1 + 1) * grid.step, grid.z0 + np.arange(r0, r1 + 1) * grid.step)
             d2 = (gx[..., None] - x) ** 2 + (gz[..., None] - z) ** 2
             nearest = np.argmin(d2, axis=-1)
-            inside = np.take_along_axis(d2, nearest[..., None], axis=-1)[..., 0] <= band * band
+            distance = np.sqrt(np.take_along_axis(d2, nearest[..., None], axis=-1)[..., 0])
+            # Report 0009, D-0009-19: the band joins the ground over STAIRS_BLEND_CELLS
+            # cells past its edge (a hard edge cell by cell had the edge of a saw).
+            blend = grid.step * STAIRS_BLEND_CELLS
+            weight = np.clip((band + blend - distance) / blend, 0.0, 1.0)
+            weight = weight * weight * (3.0 - 2.0 * weight)
             # A cell past an end of the line keeps its ground: the ground after the end joins it.
             for end, before in ((0, 1), (len(x) - 1, len(x) - 2)):
                 out_x, out_z = x[end] - x[before], z[end] - z[before]
                 past = ((gx - x[end]) * out_x + (gz - z[end]) * out_z) > 0.0
-                inside &= ~((nearest == end) & past)
+                weight[(nearest == end) & past] = 0.0
+            inside = weight >= 1.0
             block = grid.heights[r0:r1 + 1, c0:c1 + 1]
-            block[inside] = profile[nearest[inside]]
+            block[:] = block * (1.0 - weight) + profile[nearest] * weight
             change = float(np.max(np.abs(profile - ground)))
             log(f"{landmark['id']}: the ground under the way {way_id} climbs {terrain.MAX_STEPS_GRADE} at most"
                 f" ({int(inside.sum())} cells, {change:.1f} m of change at most)")

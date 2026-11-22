@@ -754,7 +754,12 @@ func _stair_surface(entry: Dictionary, walk: PackedVector3Array, width: float) -
 	if cells > 0:
 		st.generate_normals()
 		var mesh := st.commit()
-		mesh.surface_set_material(0, _material(_color(entry.place, "slopes", SLOPES_COLOR)))
+		# Report 0009, D-0009-19: the material of the ground. The slopes cross the
+		# ground at a small angle; with a color of their own, that line had the
+		# edge of a saw beside the stairs.
+		var ground_material: Material = world._ground_material if world != null and world._ground_material != null \
+				else _material(_color(entry.place, "slopes", SLOPES_COLOR))
+		mesh.surface_set_material(0, ground_material)
 		var instance := MeshInstance3D.new()
 		instance.mesh = mesh
 		instance.name = "StairSlopes"
