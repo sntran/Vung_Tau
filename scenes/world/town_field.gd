@@ -24,6 +24,8 @@ const MARGIN := 200.0
 ## Report 0009, D-0009-14: the boxes of the tall buildings (town/tall.json, 25 m
 ## or more) show to the end of the view of the camera (main.gd) on each preset.
 const TALL_RANGE := 6000.0
+## The tall boxes are in one mesh for each square of this many chunks on a side.
+const TALL_TILE := 4
 const MAX_TASKS := 2
 ## Each chunk has PARTS x PARTS meshes.
 const PARTS := 1
@@ -57,12 +59,15 @@ var _material: StandardMaterial3D
 var _keep_out: Array = []
 ## The roofs on a grid of TOP_CELL m: cell -> [the highest top, the tag of its building].
 var _tops: Dictionary = {}
-## The tall buildings by chunk (town/tall.json), and the ones that are made:
-## key -> {"middles", "boxes", "nodes"}.
+## The tall buildings by square of TALL_TILE chunks (town/tall.json): tile ->
+## {"records", "chunks"}, and the squares that are made: tile -> {"middles", "boxes", "nodes"}.
 var _tall: Dictionary = {}
 var _tall_made: Dictionary = {}
 ## The mean color of the boxes seen from far (index.json): the far town of the ground takes it.
 var far_color := Color(0.5, 0.5, 0.5)
+## The cost of the tall boxes (PT-69): their triangles and their meshes (one draw call each when it shows).
+var tall_triangles := 0
+var tall_meshes := 0
 ## The shade of the street at the foot of a wall (index.json, from data/world/palette.json).
 var foot_shade := 1.0
 var _keep_out_ready := false
@@ -94,8 +99,14 @@ func setup(w: VungTau) -> bool:
 	var tall_path := w.data.root.path_join(FOLDER).path_join("tall.json")
 	var tall: Variant = JSON.parse_string(FileAccess.get_file_as_string(tall_path)) if FileAccess.file_exists(tall_path) else null
 	if tall is Dictionary:
+		# One mesh for each square of TALL_TILE x TALL_TILE chunks (fewer draw calls).
 		for entry: Array in tall.get("chunks", []):
-			_tall[Vector2i(int(entry[0]), int(entry[1]))] = entry[2]
+			var chunk := Vector2i(int(entry[0]), int(entry[1]))
+			var tile := Vector2i(floori(float(chunk.x) / TALL_TILE), floori(float(chunk.y) / TALL_TILE))
+			if not _tall.has(tile):
+				_tall[tile] = {"records": [], "chunks": []}
+			(_tall[tile].records as Array).append_array(entry[2])
+			(_tall[tile].chunks as Array).append(chunk)
 	_material = StandardMaterial3D.new()
 	_material.vertex_color_use_as_albedo = true
 	# The colors of the palette are sRGB (as in sea_objects.gd and roadworks.gd):
@@ -120,7 +131,7 @@ func pending() -> int:
 		if _distance_to(key) < range_end and _state(key) != 2 and _can_make(key):
 			n += 1
 	for key: Vector2i in _tall:
-		if not _tall_made.has(key) and _distance_to(key) < TALL_RANGE and _can_make(key):
+		if not _tall_made.has(key) and _tall_ready(key):
 			n += 1
 	return n
 
@@ -140,16 +151,28 @@ func prepare_at(point: Vector3, radius: float) -> void:
 ## thread: there are about 200 of them).
 func _make_tall() -> void:
 	for key: Vector2i in _tall:
-		if _tall_made.has(key) or not _can_make(key) or _distance_to(key) >= TALL_RANGE:
+		if _tall_made.has(key) or not _tall_ready(key):
 			continue
-		var result := _make(key, _tall[key])
+		var result := _make(key, _tall[key].records, world.data.chunk_size * TALL_TILE)
 		_tall_made[key] = {"middles": result.middles, "boxes": result.boxes, "nodes": []}
 		_tops.merge(result.tops, true)
 		made += int(result.made)
 		left_out += int(result.left_out)
 		triangles += int(result.triangles)
+		tall_triangles += int(result.triangles)
 		for part: Dictionary in result.parts:
 			_tall_made[key].nodes.append(_add_mesh(key, part, TALL_RANGE, "Tall"))
+			tall_meshes += 1
+
+
+## A square of tall boxes is made when each of its chunks can be made, and one is in TALL_RANGE.
+func _tall_ready(key: Vector2i) -> bool:
+	var near := false
+	for chunk: Vector2i in _tall[key].chunks:
+		if not _can_make(chunk):
+			return false
+		near = near or _distance_to(chunk) < TALL_RANGE
+	return near
 
 
 func _process(_delta: float) -> void:
@@ -462,12 +485,12 @@ func _build(key: Vector2i) -> Dictionary:
 
 
 ## The mesh arrays of the boxes of these records of a chunk.
-func _make(key: Vector2i, records: Array) -> Dictionary:
+func _make(key: Vector2i, records: Array, cell_m := 0.0) -> Dictionary:
 	var result := {"key": key, "parts": [], "made": 0, "left_out": 0, "triangles": 0, "middles": PackedVector3Array(),
 			"boxes": PackedFloat32Array(), "tops": {}}
 	# PARTS x PARTS parts of a chunk (one part: four parts of 128 m saved few
-	# triangles for many draw calls in S5 of PT-73).
-	var size := world.data.chunk_size
+	# triangles for many draw calls in S5 of PT-73). cell_m: a larger cell (the tall boxes).
+	var size := cell_m if cell_m > 0.0 else world.data.chunk_size
 	var part_m := size / PARTS
 	var parts := []
 	for i in PARTS * PARTS:
