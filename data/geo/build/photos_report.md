@@ -1,6 +1,6 @@
 # The street photos of Mapillary in the play area
 
-Made by `tools/geo/photos.py report` (plan 0009, R5e) from `data/geo/raw/mapillary.json` (2026-11-21). Do not change by hand.
+Made by `tools/geo/photos.py report` (plan 0009, R5e) from `data/geo/raw/mapillary.json` (2026-11-22). Do not change by hand.
 The images are CC BY-SA 4.0 (the author, Mapillary). The map: `photos_map.png` (red: 2017 to 2021).
 
 25462 images, 74 sequences, 8 authors. 725 images of 2017 to 2021.
@@ -131,3 +131,4 @@ The images are CC BY-SA 4.0 (the author, Mapillary). The map: `photos_map.png` (
 | `r18_near_streets` | R18, R20 | 2022 to 2026 | 38 | 12 |
 | `r19_tet_quang_trung` | R19 | the weeks before Tết | 0 | 0 |
 | `r19_tet_ha_long` | R19 | the weeks before Tết | 0 | 0 |
+| `town_bus_le_hong_phong` | PT-68 bus_le_hong_phong | 2017 to 2021 | 0 | 0 |
