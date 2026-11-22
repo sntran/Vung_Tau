@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import sys
 import urllib.request
+import warnings
 from pathlib import Path
 
 import pytest
@@ -95,17 +96,21 @@ def test_the_two_sources_give_the_same_bytes(tmp_path):
     # When World gives the files of its catalog with no build, the test compares
     # all the levels again.
     compared = 0
+    all_refused = 0
     for model in ORDERS:
         refused: list[tuple[str, str, str]] = []
         from_factory = fetch.factory_files(model, refused=refused)
         from_clone = fetch.checkout_files(model, clone, None)
         for model_id, name, message in refused:
-            print(f"R4: the factory refused {name} of {model['order']['options']['name']} for memory: {message}")
+            # A warning shows in the log of "pytest -q" (a print does not).
+            warnings.warn(f"R4: the factory refused {name} of {model['order']['options']['name']} for memory: {message}")
+            all_refused += 1
         assert set(from_factory) <= set(from_clone)
         assert set(from_clone) - set(from_factory) == {name for _id, name, _m in refused}
         for name in from_factory:
             assert from_factory[name] == from_clone[name], f"{model['order']['options']['name']}: {name} is not the same"
             compared += 1
+    warnings.warn(f"R4: {compared} files of the factory are the same as the files of the clone; the factory refused {all_refused} for memory")
     assert compared > 0, "the factory gave no file"
 
 
