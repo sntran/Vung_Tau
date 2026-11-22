@@ -131,4 +131,4 @@ The images are CC BY-SA 4.0 (the author, Mapillary). The map: `photos_map.png` (
 | `r18_near_streets` | R18, R20 | 2022 to 2026 | 38 | 12 |
 | `r19_tet_quang_trung` | R19 | the weeks before Tết | 0 | 0 |
 | `r19_tet_ha_long` | R19 | the weeks before Tết | 0 | 0 |
-| `town_bus_le_hong_phong` | PT-68 bus_le_hong_phong | 2017 to 2021 | 0 | 0 |
+| `town_bus_le_hong_phong` | PT-68 bus_le_hong_phong | 2014 to 2026 | 18 | 9 |
