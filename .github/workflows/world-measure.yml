@@ -22,13 +22,13 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
-      START_AT: "2026-11-22T00:00:00Z"
+      START_AT: "2026-11-22T01:18:00Z"
       OFFSET: "0"
       # The order (or the edits of an order of EDIT_OF), with "RUN" for a
       # number of VARY plus a part of the id of the run.
       ORDER: '[{"set": "options.storey", "to": "RUN"}]'
       EDIT_OF: "42bab18a507afa6fb1acc46d052f0666"
-      VARY: "3.6"
+      VARY: "3.7"
       LEVEL: mid
       WORLD_SHIFT_HOURS: "0.5"
     steps:
