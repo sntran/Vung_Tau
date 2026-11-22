@@ -4,13 +4,20 @@ extends RefCounted
 # the shore, the player comes to the end, and comes back; the player does not fall
 # from the deck (the height stays at the deck, and the player stays inside its
 # width). Screenshots at the start, at the end, and back. The walk of about
-# 350 m takes more than the time limit of a run, so each way is in two phases:
-# 1 and 2 go out to the end, 3 and 4 come back to the shore.
+# 350 m takes more than the time limit of a run, so it is in parts (RUNS): 1
+# and 2 go out to the end, 3 to 5 come back to the shore (report 0009,
+# D-0009-21: in a part of CI the second half of the way back went over the
+# limit of 180 s of game time for one run, so it is in two runs).
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=10:00
 # phase: --world=vung_tau --start-time=10:00
 # phase: --world=vung_tau --start-time=10:00
 # phase: --world=vung_tau --start-time=10:00
+# phase: --world=vung_tau --start-time=10:00
+
+## For each run: back to the shore (true) or out to the end, and the part of
+## the way from and to (0 to 1).
+const RUNS := [[false, 0.0, 0.5], [false, 0.5, 1.0], [true, 0.0, 0.5], [true, 0.5, 0.75], [true, 0.75, 1.0]]
 
 
 func run(d: PlaytestDriver) -> void:
@@ -28,13 +35,13 @@ func run(d: PlaytestDriver) -> void:
 		if absf(line[i].y - deck) < 0.01 and absf(line[i + 1].y - deck) < 0.01:
 			deck_length += Vector2(line[i + 1].x - line[i].x, line[i + 1].z - line[i].z).length()
 	d.step("the jetty: %.0f m long, %.1f m wide, the deck at %.2f m" % [length, width, deck])
+	var part: Array = RUNS[d.phase - 1]
 	var route := line.duplicate()
-	if d.phase >= 3:
+	if part[0]:
 		route.reverse()
 	d.expect(bool(jetty.get("shore", false)), "the jetty goes on to the shore (Q4)")
-	var half := length / 2.0
-	var from := 1.0 if d.phase % 2 == 1 else half
-	var to := half if d.phase % 2 == 1 else length - 2.0
+	var from := maxf(1.0, float(part[1]) * length)
+	var to := minf(length - 2.0, float(part[2]) * length)
 	var start := PlaytestDriver.route_point(route, from)
 	var ahead := PlaytestDriver.route_point(route, from + 4.0)
 	await d.start_at(start, rad_to_deg(atan2(-(ahead.x - start.x), -(ahead.z - start.z))))
