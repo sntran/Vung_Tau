@@ -423,3 +423,50 @@ On `main` (`d610863`), `soak` run 2 at 2400×1080 put the player in the solid of
 ### 9.6 Status
 
 Phases 1b and 2 are not done: D-0009-22 to D-0009-26, and the work of Q13 and Q14. Phase 3 waits for my look at the views of PT-68 after the corrections.
+
+## 10. Audit 6: the corrections of audit 5, branch at `e4b7ebe` (2026-11-22)
+
+### 10.1 Runs
+
+| Check | Result |
+|---|---|
+| Commits | `cdc3aec` to `e4b7ebe`, all with my identity. |
+| CI of `e4b7ebe` | Test and Export pass. On the way, PT-73 S5 and `parked_rows` went over 300 000 triangles with the mainland at 400 m on Low (now 800 m: S5 has 292 533). |
+| PT-68 run 1 (here) | Passes. From the top of Núi Nhỏ: 1 488 boxes show; Bàu Sen shows; the town 0.60 and 4 % near white (the photo 0.61 and 16 %); 32 towers with a saturation of 0.11 (the photo 0.05); the hills of Long Hải show at 21.6 km; no line at the end of the boxes (0.63 and 0.64). The bus view: 2 boxes nearer than 40 m. |
+| PT-33 run 2 (here) | `nui_lon_south_east` 47 % (passes). `nui_nho_north` 0.59: open under Q11, because with the trees of the hills at the value of the canopy of the photo it is 0.53. The trees of the hills are 0.49 in the game and 0.16 in the photo. |
+| PT-69 run 1 (here) | Low: 228 to 258 draw calls, 123 734 to 156 472 triangles, 728 MB to 736 MB. The tall boxes: 29 meshes, 2 590 triangles. |
+| My stops on Bình Giã and from S3 to chợ Xóm Lưới (here) | Boxes along both streets. At the eye they are the far level, with no shadow and no floor of a street: phase 3 gives these. |
+
+### 10.2 What is correct
+
+- **D-0009-22.** 1 304 boxes from the raster (58.0 ha, a median height of 7.0 m) at the streets, with the source `raster`. The street fronts with a box go up 1 to 13 points on each street; the "neither" column stays, and the rule of Q12 for phase 3 is in plan 0009.
+- **D-0009-23.** The far town has its pattern of roofs and shade again, with no line at the end of the boxes. From the lighthouse the town now has the look of the photo: the lake, the towers along the coast, and the hills of the mainland on the horizon (`docs/town/sheet_nui_nho_top.jpg` on the branch).
+- **D-0009-24.** The towers have the colors of the photos; 4 of 32 in the frame are over a saturation of 0.15.
+- **D-0009-25.** World now gives the files of its catalog with no build (World #83), and the test of R4 writes a level that the factory refuses in the log. It refused none.
+- **D-0009-26.** A cart waits while the player stands in its place, and the soak checks it.
+- **Q14.** The mainland is one mesh with no shadow: 3 840 triangles on Low, 14 572 on High.
+
+### 10.3 Defects
+
+#### D-0009-27: Some boxes of the raster are on roads (low)
+
+953 of the 1 304 outlines of the raster are not valid polygons (an edge goes out and back on itself), and the town makes 472 of them rectangles. With the widths of `roads.json`, 20 boxes of the raster in the town have more than 10 % of their outline on the surface of a road (the most: `raster-745-1537`, 671 m² of 2 703 m²).
+
+- Make each outline a valid polygon before the town simplifies it, and cut the surfaces of the roads after the simplification.
+- A unit test: no box of the raster has more than 10 % of its outline on a road.
+
+#### D-0009-28: A soak run that fails one time and that nobody can repeat (low)
+
+Soak run 8 at 2400×1080 failed one time: the player was 0.25 m over the floor of the hẻm, with no solid near. The builder could not make it again, and the soak now writes the clock and the height 10 frames later. Keep it open until a run gives these facts.
+
+### 10.4 Notes for phase 3 and the later pass of the look
+
+- **The trees of the hills** are three times as bright as the canopy of the photos (0.49 against 0.16). This is the one cause of the open value of PT-33 and of the box `hill` of S1 (Q8, Q11).
+- **The town is a little dull**: 4 % near white against 16 % in the photo, with the same mean value. The near level of phase 3 has its own colors, so look at it again then.
+- **At the eye**, the boxes are walls with no windows, no shade, and no floor of a street between them, and the player goes through them (section 8.6). Phase 3 replaces them near the eye.
+- **Big boxes of the raster**: 123 boxes of the raster are 1 000 m² or more (one of 5 300 m²), each with one height: a row of houses as one block. Phase 3 cuts them into lots.
+- **World plan 0020** (a tint for each copy, a finish with no image, and the surfaces of windows, panels, and corrugated sheets) is for the houses of phase 3. It waits for my approval in World.
+
+### 10.5 Status
+
+Phase 1b and phase 2 are ready for my look at the views of PT-68. D-0009-27 and D-0009-28 are low, and the builder can correct them at the start of phase 3.
