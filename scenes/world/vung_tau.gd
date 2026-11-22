@@ -154,6 +154,8 @@ var showcase: Showcase
 var town: TownField
 ## Report 0009, D-0009-16: the water of the land.
 var inland_water: InlandWater
+## Report 0009, Q14: the land around the play area on the horizon.
+var mainland: MainlandFar
 ## The showcase builds its parts when the view is nearer than this to its area
 ## (m), some in each frame (ms), so that the start of the world does not wait
 ## for them (report 0026, D-0026-12).
@@ -268,6 +270,12 @@ func setup(folder := GeoData.ROOT) -> bool:
 	if not inland_water.setup(self):
 		inland_water.queue_free()
 		inland_water = null
+	mainland = MainlandFar.new()
+	mainland.name = "MainlandFar"
+	add_child(mainland)
+	if not mainland.setup(self):
+		mainland.queue_free()
+		mainland = null
 	return true
 
 
@@ -1510,7 +1518,8 @@ static func _noise_texture(seed_value: int, frequency: float, normal_map: bool) 
 
 func _make_sea() -> void:
 	var plane := PlaneMesh.new()
-	plane.size = Vector2(40000, 40000)
+	# To the coast of the mainland on the horizon (report 0009, Q14: to 32 km).
+	plane.size = Vector2(80000, 80000)
 	plane.material = _sea_material
 	sea = MeshInstance3D.new()
 	sea.name = "Sea"

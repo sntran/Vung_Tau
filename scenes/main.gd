@@ -186,7 +186,8 @@ func _start_vung_tau() -> void:
 	environment = world.environment
 	player.use_navigation = false
 	player.walk_limit = world.can_stand
-	player.camera.far = 6000.0
+	# The land of the mainland on the horizon is 15 km to 32 km away (report 0009, Q14).
+	player.camera.far = 40000.0
 	var start := world.spawn()
 	# The parts of the showcase build in the first frames (report 0026, D-0026-12).
 	world.prepare_at(start.position, 64.0, false)

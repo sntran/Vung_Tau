@@ -94,7 +94,15 @@
 				"max_saturation_gap": 0.08,
 				"max_value_gap": 0.15,
 				"how": "Report 0009, D-0009-24: the lit fronts of six towers of the photo (the twin towers, and four towers left and right of them; the boxes are fractions of the photo), against the buildings of 25 m or more in the frame nearer than 3 km. The limits are builder values."
-			}
+			},
+			"hills": [
+				{
+					"name": "the hills of Long Hải",
+					"lat": 10.4106,
+					"lon": 107.2589,
+					"how": "Report 0009, Q14: the right of the photo has the hills of Long Hải on the horizon; the top of 326 m of the Copernicus DEM (data/geo/raw/mainland.tif), at a bearing of about 67 degrees from the lighthouse."
+				}
+			]
 		},
 		{
 			"id": "nui_lon_top",
@@ -166,7 +174,15 @@
 				}
 			],
 			"over_trees": true,
-			"how": "Report 0009, D-0009-18: from the photo (Nokia Lumia 1020 in the file, 4:3 at 26 mm in 35 mm: 67.3 by 53.1 degrees). The pair of towers at x 0.645 is the pair of 90 m and 91 m (bearing 44 degrees): the heading is 33 degrees, so Núi Lớn (341 degrees) is out of the frame and the water of Bãi Sau is on the right, as in the photo. The horizon is at y 0.615: the pitch is +6.6 degrees."
+			"how": "Report 0009, D-0009-18: from the photo (Nokia Lumia 1020 in the file, 4:3 at 26 mm in 35 mm: 67.3 by 53.1 degrees). The pair of towers at x 0.645 is the pair of 90 m and 91 m (bearing 44 degrees): the heading is 33 degrees, so Núi Lớn (341 degrees) is out of the frame and the water of Bãi Sau is on the right, as in the photo. The horizon is at y 0.615: the pitch is +6.6 degrees.",
+			"hills": [
+				{
+					"name": "Núi Dinh",
+					"lat": 10.5572,
+					"lon": 107.1331,
+					"how": "Report 0009, Q14: the left of the photo has Núi Dinh on the horizon; the top of 515 m of the Copernicus DEM (data/geo/raw/mainland.tif), at a bearing of about 14 degrees from the road."
+				}
+			]
 		},
 		{
 			"id": "bus_le_hong_phong",

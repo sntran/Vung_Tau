@@ -1,0 +1,8 @@
+{
+	"note": "Report 0009, Q14: the land around the play area on the horizon (Long Hải, Núi Dinh, Cần Giờ), a far mesh from the Copernicus DEM. tools/geo/fetch.py --only mainland reads the window (radius_m around the middle of the box, at pixel_arcsec), and tools/geo/build.py makes the grid of grid_m (data/geo/build/mainland.json): the cells out of the box of the play area that have land, with the curve of the earth (refraction: the part of the curve that the air gives back).",
+	"radius_m": 32000,
+	"pixel_arcsec": 3,
+	"grid_m": 400,
+	"refraction": 0.13,
+	"land_m": 0.5
+}

@@ -55,6 +55,8 @@ func run(d: PlaytestDriver) -> void:
 			_compare(d, view)
 		if view.has("towers") and time == "1200":
 			_compare_towers(d, w, camera, view)
+		for hill: Dictionary in view.get("hills", []):
+			_check_hill(d, w, camera, view, hill)
 		if view.get("edge", false):
 			var frame := d.viewport().get_texture().get_image()
 			var edge := edge_values(w, camera, view, frame)
@@ -113,6 +115,10 @@ static func read_views(w: VungTau) -> Array[Dictionary]:
 			target = eye + Vector3(sin(heading) * cos(pitch), sin(pitch), -cos(heading) * cos(pitch)) * 100.0
 		out.append({"id": str(v.id), "eye": eye, "target": target, "fov": float(v.get("fov", 70.0)),
 				"min_boxes": int(v.get("min_boxes", 50)), "edge": bool(v.get("edge", false))})
+		out[-1]["hills"] = []
+		for hill: Dictionary in v.get("hills", []):
+			var at := w.data.projection.to_game(float(hill.lon), float(hill.lat))
+			(out[-1]["hills"] as Array).append({"name": str(hill.name), "x": at.x, "z": at.y})
 		out[-1]["lakes"] = v.get("lakes", [])
 		if v.has("compare") and not v.get("photos", []).is_empty():
 			out[-1]["compare"] = v.compare
@@ -207,7 +213,12 @@ func _compare_towers(d: PlaytestDriver, w: VungTau, camera: Camera3D, view: Dict
 		var top_middle := Vector3(middle.x, lerpf(float(tower.base), float(tower.top), 0.7), middle.y)
 		if camera.global_position.distance_to(top_middle) > float(spec.get("within_m", 3000.0)):
 			continue
-		if not camera.is_position_in_frustum(top_middle) or not w.town.clear_line(camera.global_position, top_middle):
+		# The line to a point in front of the face of the tower (the middle is in its own box).
+		var reach := 0.0
+		for p in ring:
+			reach = maxf(reach, p.distance_to(middle))
+		var front := top_middle + (camera.global_position - top_middle).normalized() * (reach + 1.0)
+		if not camera.is_position_in_frustum(top_middle) or not w.town.clear_line(camera.global_position, front):
 			continue
 		var rect := Rect2()
 		var first := true
@@ -242,6 +253,46 @@ func _compare_towers(d: PlaytestDriver, w: VungTau, camera: Camera3D, view: Dict
 			view.id, g.x, p.x, float(spec.max_saturation_gap)])
 	d.expect(absf(g.y - p.y) <= float(spec.max_value_gap), "%s: the towers have the value of the photo (D-0009-24): %.2f, the photo %.2f (at most %.2f apart)" % [
 			view.id, g.y, p.y, float(spec.max_value_gap)])
+
+
+## Report 0009, Q14: a hill of the mainland of the photo on the horizon: its
+## top is in the frame, no other ground is in front of it (the far mesh has the
+## curve of the earth; its own slopes within HILL_SLOPES_M of the top do not
+## count), and the pixel under the top differs from the sky over it.
+func _check_hill(d: PlaytestDriver, w: VungTau, camera: Camera3D, view: Dictionary, hill: Dictionary) -> void:
+	if not d.expect(w.mainland != null, "%s: the world has the land of the mainland (Q14)" % view.id):
+		return
+	var top := Vector3(float(hill.x), w.mainland.height_at(float(hill.x), float(hill.z)), float(hill.z))
+	var eye := camera.global_position
+	var clear := true
+	var blocked := ""
+	for k in range(1, 200):
+		var p := eye.lerp(top, k / 200.0)
+		var ground := maxf(w.ground_height(p.x, p.z), w.mainland.height_at(p.x, p.z))
+		if p.y < ground - 1.0 and eye.distance_to(p) < eye.distance_to(top) - HILL_SLOPES_M:
+			clear = false
+			blocked = " (ground of %.0f m at %.1f km)" % [ground, eye.distance_to(p) / 1000.0]
+			break
+	var in_frame := camera.is_position_in_frustum(top)
+	var frame := d.viewport().get_texture().get_image()
+	var at := camera.unproject_position(top) * Vector2(frame.get_size()) / camera.get_viewport().get_visible_rect().size
+	var below := Color.BLACK
+	var above := Color.BLACK
+	var contrast := 0.0
+	if in_frame:
+		var x := clampi(int(at.x), 0, frame.get_width() - 1)
+		below = frame.get_pixel(x, clampi(int(at.y) + 3, 0, frame.get_height() - 1))
+		above = frame.get_pixel(x, clampi(int(at.y) - 10, 0, frame.get_height() - 1))
+		contrast = maxf(absf(below.r - above.r), maxf(absf(below.g - above.g), absf(below.b - above.b)))
+	d.step("%s: %s at %.1f km, its top %.0f m (with the curve of the earth): in the frame %s at (%.0f, %.0f), nothing in front of it %s%s, the land under it and the sky over it differ by %.2f" % [
+			view.id, hill.name, eye.distance_to(top) / 1000.0, top.y, in_frame, at.x, at.y, clear, blocked, contrast])
+	d.expect(in_frame and clear and contrast >= MIN_HILL_CONTRAST, "%s: %s of the photo shows on the horizon (Q14)" % [view.id, hill.name])
+
+
+## The least difference of a channel between the land of a far hill and the sky over it.
+const MIN_HILL_CONTRAST := 0.03
+## The slopes of the hill itself (within this distance of its top, m) are not in front of it.
+const HILL_SLOPES_M := 3000.0
 
 
 ## The mean saturation and value of the pixels of the rectangle, and their count (z).

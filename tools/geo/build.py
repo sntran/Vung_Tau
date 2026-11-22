@@ -30,7 +30,7 @@ from geodata import visibility, blocks as blocks_module  # noqa: E402
 from geodata import anchors as anchors_module  # noqa: E402
 from geodata import clearings, coast, homestay, landcover, landmarks, mapdraw, osm, roads as roads_module, terrain  # noqa: E402
 from geodata import roadworks as roadworks_module, sea as sea_module, seafloor, trees as trees_module  # noqa: E402
-from geodata import bareearth, groundreport, inland_water, showcase as showcase_module  # noqa: E402
+from geodata import bareearth, groundreport, inland_water, mainland, showcase as showcase_module  # noqa: E402
 from geodata.config import BUILD, GEO, RAW, ROOT, Config, load_json, write_json  # noqa: E402
 from geodata.projection import Projection, map_to_game  # noqa: E402
 
@@ -430,6 +430,16 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     # Plan 0009, phase 2 (R6): the boxes of the buildings of 2019, on the final ground.
     town_numbers = write_town(grid, raw, out, area, on_water)
     water_numbers = inland_water.write(out / "inland_water.json", inland, water_config)
+    # Report 0009, Q14: the land around the play area on the horizon.
+    mainland_numbers = None
+    if (raw / "mainland.tif").exists():
+        mainland_spec = load_json(geo / "mainland.json")
+        box_game = (grid.x0, grid.z0, grid.x0 + (grid.shape[1] - 1) * grid.step, grid.z0 + (grid.shape[0] - 1) * grid.step)
+        record = mainland.make(raw / "mainland.tif", projection, box_game, mainland_spec, mdt)
+        mainland.write(out / "mainland.json", record, mainland_spec)
+        mainland_numbers = record["numbers"]
+        log(f"mainland: {mainland_numbers['cells']} cells, {mainland_numbers['triangles']} triangles, "
+            f"the highest {mainland_numbers['highest_m']} m")
     rock_mask = terrain.rasterize(grid, [p for r in rocks + land_rocks + [rock_band] + islands if r is not None
                                          for p in polygons_of(r)])
     pebble_mask = terrain.rasterize(grid, [p for r in pebble_shapes + [rock_band] if r is not None
@@ -542,6 +552,8 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     if cover_record is not None:
         cover_record.pop("canopy_values", None)
     world["inland_water"] = {"file": "inland_water.json", "areas": water_numbers["areas"]}
+    if mainland_numbers is not None:
+        world["mainland"] = {"file": "mainland.json", **mainland_numbers}
     write_report(out / "report.md", world, data, roads, block_list, buildings, found, home, problems,
                  town_change, dem_max, raw, rock_cells, out, anchor_list, works, sea_objects, tree_record, tree_counts,
                  cover_record, water_numbers)

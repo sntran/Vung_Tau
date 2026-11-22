@@ -182,6 +182,15 @@
 			"bytes": 130193
 		},
 		{
+			"file": "mainland.tif",
+			"url": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N10_00_E106_00_DEM/Copernicus_DSM_COG_10_N10_00_E106_00_DEM.tif https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N10_00_E107_00_DEM/Copernicus_DSM_COG_10_N10_00_E107_00_DEM.tif",
+			"license": "Copernicus DEM license, © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018",
+			"note": "Report 0009, Q14: 32 km around the middle of the box, the mean of 3 x 3 pixels",
+			"date": "2026-11-22",
+			"sha256": "3eba424ef188e3b117383c768468c1f4e14f1d05f5560ac7585232c8f55523b5",
+			"bytes": 620839
+		},
+		{
 			"file": "osm.pbf",
 			"url": "https://download.geofabrik.de/asia/vietnam-latest.osm.pbf",
 			"license": "ODbL 1.0, © OpenStreetMap contributors",

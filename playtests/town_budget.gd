@@ -40,9 +40,10 @@ func run(d: PlaytestDriver) -> void:
 		var draw_calls := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)
 		var triangles := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME)
 		var memory := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_VIDEO_MEM_USED) / 1048576.0
-		d.step("%s, %s: %d draw calls, %d triangles, %.0f MB of video memory; the town: %d boxes in the frame, %d triangles in all its chunks; the tall boxes (D-0009-14): %d meshes, %d triangles" % [
+		d.step("%s, %s: %d draw calls, %d triangles, %.0f MB of video memory; the town: %d boxes in the frame, %d triangles in all its chunks; the tall boxes (D-0009-14): %d meshes, %d triangles; the mainland (Q14): %d mesh, %d triangles" % [
 				preset, view.id, draw_calls, triangles, memory, Views.boxes_in_frame(w, camera), w.town.triangles,
-				w.town.tall_meshes, w.town.tall_triangles])
+				w.town.tall_meshes, w.town.tall_triangles, 1 if w.mainland != null else 0,
+				w.mainland.triangles if w.mainland != null else 0])
 		if TRIANGLES.has(preset):
 			d.expect(triangles <= int(TRIANGLES[preset]), "%s, %s: at most %d triangles (R10): %d" % [
 					preset, view.id, TRIANGLES[preset], triangles])

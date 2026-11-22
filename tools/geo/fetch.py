@@ -3,7 +3,7 @@
 
 Usage:
   python tools/geo/fetch.py                 Download the OSM data, the DEM, and the textures.
-  python tools/geo/fetch.py --only dem      Download one part: osm, dem, textures, or bare_earth.
+  python tools/geo/fetch.py --only dem      Download one part: osm, dem, textures, bare_earth, or mainland.
 
 The OSM data comes from the Overpass API. If all Overpass servers fail, the
 script downloads the Vietnam extract from Geofabrik and clips it with
@@ -32,7 +32,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from geodata import httpzip, landmarks  # noqa: E402
-from geodata.config import RAW, TEXTURES, Config, load_json, write_json  # noqa: E402
+from geodata.config import GEO, RAW, TEXTURES, Config, load_json, write_json  # noqa: E402
 
 OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter",
             "https://overpass.private.coffee/api/interpreter"]
@@ -131,11 +131,11 @@ def fetch_osm(config: Config, raw: Path) -> dict:
     return {"file": "osm.pbf", "url": source, "license": LICENSES["osm"]}
 
 
-def dem_tiles(bbox) -> list[str]:
+def dem_tiles(bbox, margin: float = DEM_MARGIN_DEG) -> list[str]:
     west, south, east, north = bbox
     names = []
-    for lat in range(math.floor(south - DEM_MARGIN_DEG), math.floor(north + DEM_MARGIN_DEG) + 1):
-        for lon in range(math.floor(west - DEM_MARGIN_DEG), math.floor(east + DEM_MARGIN_DEG) + 1):
+    for lat in range(math.floor(south - margin), math.floor(north + margin) + 1):
+        for lon in range(math.floor(west - margin), math.floor(east + margin) + 1):
             ns = f"N{lat:02d}" if lat >= 0 else f"S{-lat:02d}"
             ew = f"E{lon:03d}" if lon >= 0 else f"W{-lon:03d}"
             names.append(f"Copernicus_DSM_COG_10_{ns}_00_{ew}_00_DEM")
@@ -180,6 +180,40 @@ def fetch_dem(config: Config, raw: Path) -> dict:
         for s in sources:
             s.close()
     return {"file": "dem.tif", "url": " ".join(urls), "license": LICENSES["dem"]}
+
+
+def fetch_mainland(config: Config, raw: Path) -> dict:
+    """Report 0009, Q14: the Copernicus DEM around the play area (data/geo/mainland.json:
+    radius_m around the middle of the box), averaged to pixel_arcsec, to mainland.tif."""
+    import numpy as np
+    import rasterio
+    from rasterio.enums import Resampling
+    spec = load_json(GEO / "mainland.json")
+    west, south, east, north = config.bbox
+    lat, lon = (south + north) / 2.0, (west + east) / 2.0
+    d_lat = float(spec["radius_m"]) / 111_320.0
+    d_lon = d_lat / math.cos(math.radians(lat))
+    box = (lon - d_lon, lat - d_lat, lon + d_lon, lat + d_lat)
+    with tempfile.TemporaryDirectory() as tmp:
+        files, urls = [], []
+        for name in dem_tiles(box, margin=0.0):
+            url = DEM_URL.format(name=name)
+            path = Path(tmp) / f"{name}.tif"
+            download(url, path)
+            files.append(path)
+            urls.append(url)
+        sources = [rasterio.open(f) for f in files]
+        mosaic, transform = merge_on_grid(sources, box)
+        for s in sources:
+            s.close()
+    factor = max(1, int(round(float(spec["pixel_arcsec"]))))
+    rows, cols = mosaic.shape[1] // factor, mosaic.shape[2] // factor
+    data = mosaic[0, :rows * factor, :cols * factor].astype(np.float32)
+    data = data.reshape(rows, factor, cols, factor).mean(axis=(1, 3))
+    _write_window(raw / "mainland.tif", data, transform * transform.scale(factor, factor))
+    return {"file": "mainland.tif", "url": " ".join(urls), "license": LICENSES["dem"],
+            "note": f"Report 0009, Q14: {spec['radius_m'] / 1000:.0f} km around the middle of the box, "
+                    f"the mean of {factor} x {factor} pixels"}
 
 
 def _write_window(path: Path, data, transform) -> None:
@@ -276,7 +310,7 @@ def check_found(config: Config, raw: Path) -> list[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--only", choices=["osm", "dem", "textures", "bare_earth"])
+    parser.add_argument("--only", choices=["osm", "dem", "textures", "bare_earth", "mainland"])
     parser.add_argument("--raw", type=Path, default=RAW)
     args = parser.parse_args()
     config = Config()
@@ -289,7 +323,8 @@ def main() -> int:
     manifest = load_json(manifest_path) if manifest_path.exists() else {"files": []}
     by_file = {f["file"]: f for f in manifest["files"]}
     today = datetime.date.today().isoformat()
-    steps = {"osm": fetch_osm, "dem": fetch_dem, "textures": fetch_textures, "bare_earth": fetch_bare_earth}
+    steps = {"osm": fetch_osm, "dem": fetch_dem, "textures": fetch_textures, "bare_earth": fetch_bare_earth,
+             "mainland": fetch_mainland}
     for name, step in steps.items():
         if args.only and args.only != name:
             continue
@@ -311,7 +346,8 @@ def main() -> int:
     if problems:
         log(f"{len(problems)} problems. build.py writes them in the report.")
         write_json(raw / "fetch_problems.json", {"problems": problems})
-    elif (raw / "fetch_problems.json").exists():
+    elif (raw / "fetch_problems.json").exists() and (not args.only or args.only == "osm"):
+        # Only a fetch that checks the OSM extract knows that its problems are gone.
         (raw / "fetch_problems.json").unlink()
     return 0
 
