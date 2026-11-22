@@ -10,6 +10,11 @@ extends RefCounted
 # After each action, the test waits until the player stops walking (not for a
 # number of frames), so a slow computer makes the same walk (report 0003,
 # D-0003-05). Not more than 40 % of all 200 taps can be impossible.
+# Report 0009, D-0009-26: in run 2 the cart of mía came at its opening hour
+# (10:00) where the player stood (action 36), and the player was in its solid.
+# The last run has a step for it: the player walks to the place of the cart
+# before 10:00, the clock goes to 10:00 (a setup step), and the player is not in
+# a solid; the cart waits, and comes when the player steps to its stand point.
 # phase: --start-time=06:00 --seed=1
 # phase: --seed=1
 # phase: --seed=1
@@ -114,6 +119,8 @@ func run(d: PlaytestDriver) -> void:
 	totals.store_string(str(skipped))
 	totals.close()
 	if d.phase == RUNS:
+		# After the random taps, so that their sequence stays the same.
+		await _cart_comes_where_the_player_stands(d)
 		d.expect(skipped <= TAPS * 2 / 5, "more than 40 %% of the random taps were not possible: %d of %d" % [skipped, TAPS])
 
 
@@ -196,3 +203,42 @@ func _check_body(d: PlaytestDriver, i: int) -> bool:
 		d.fail("action %d: the player left the floor or is in a wall at %s %s, on %s" % [i + 1, p, overlaps, under])
 		return false
 	return true
+
+
+## Report 0009, D-0009-26: a cart comes at its opening hour, also where the
+## player stands. The cart waits while the player is in its place.
+func _cart_comes_where_the_player_stands(d: PlaytestDriver) -> void:
+	var hem: Hem = d.main().hem
+	var cart: Node3D = hem.carts["mia"]
+	var open := int(Content.spot("mia").hours.open)
+	await d.lower_phone()
+	# Setup: the clock before the hour of the cart (as start_at() puts the player).
+	GameState.set_minutes(open - 2)
+	await d.wait_frames(3)
+	while hem.is_baking():
+		await d.wait_frames(1)
+	d.expect(not cart.visible, "the cart of mía is not there before %s" % GameClock.format_time(open))
+	var place := cart.global_position
+	if not await d.walk_toward(place.x, place.z):
+		return
+	await _wait_walk_end(d)
+	d.step("the player stands at %s, in the place of the cart of mía (%.2f, %.2f)" % [d.state().player, place.x, place.z])
+	GameState.set_minutes(open)
+	await d.wait_frames(3)
+	d.expect(d.player_overlaps().is_empty(), "at %s the player is not in a solid: %s" % [
+			GameClock.format_time(open), d.player_overlaps()])
+	d.expect(not cart.visible, "the cart of mía waits while the player stands in its place")
+	await d.look_at_point(place + Vector3(0, 0.8, 0), 6.0, 20.0)
+	await d.wait_frames(3)
+	await d.screenshot("cart_waits")
+	var stand: Vector3 = hem.stand_points["mia"]
+	if not await d.walk_toward(stand.x, stand.z):
+		return
+	await _wait_walk_end(d)
+	GameState.set_minutes(open + 1)
+	await d.wait_frames(3)
+	d.expect(cart.visible, "the cart of mía comes when the player steps away")
+	d.expect(d.player_overlaps().is_empty(), "the player is not in a solid when the cart comes: %s" % [d.player_overlaps()])
+	await d.look_at_point(place + Vector3(0, 0.8, 0), 6.0, 20.0)
+	await d.wait_frames(3)
+	await d.screenshot("cart_comes")

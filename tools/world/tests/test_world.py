@@ -89,12 +89,24 @@ def test_the_two_sources_give_the_same_bytes(tmp_path):
     clone = tmp_path / "World"
     subprocess.run(["git", "clone", "-q", "https://github.com/sntran/World", str(clone)], check=True)
     subprocess.run(["git", "-C", str(clone), "checkout", "-q", commit], check=True)
+    # Report 0009, D-0009-25 and Q13: the factory has a guard of 60 MB on its
+    # memory (World #76), and refuses some levels (HTTP 422). The test compares
+    # the files that the factory gives, and writes each refused file in the log.
+    # When World gives the files of its catalog with no build, the test compares
+    # all the levels again.
+    compared = 0
     for model in ORDERS:
-        from_factory = fetch.factory_files(model)
+        refused: list[tuple[str, str, str]] = []
+        from_factory = fetch.factory_files(model, refused=refused)
         from_clone = fetch.checkout_files(model, clone, None)
-        assert sorted(from_factory) == sorted(from_clone)
+        for model_id, name, message in refused:
+            print(f"R4: the factory refused {name} of {model['order']['options']['name']} for memory: {message}")
+        assert set(from_factory) <= set(from_clone)
+        assert set(from_clone) - set(from_factory) == {name for _id, name, _m in refused}
         for name in from_factory:
             assert from_factory[name] == from_clone[name], f"{model['order']['options']['name']}: {name} is not the same"
+            compared += 1
+    assert compared > 0, "the factory gave no file"
 
 
 def test_a_closed_connection_is_tried_again(monkeypatch):
@@ -192,3 +204,32 @@ def test_keep_going_builds_the_other_models(tmp_path, monkeypatch, capsys):
     written = json.loads(lock.read_text(encoding="utf-8"))["models"]
     assert sorted(written) == ["a", "c"]
     assert "bad" in capsys.readouterr().out
+
+
+def test_a_level_that_the_factory_refuses_for_memory_goes_in_the_list(monkeypatch):
+    """Report 0009, D-0009-25: HTTP 422 for memory on a level is written, not an error."""
+    def fake(url, body=None, timeout=600.0, tries=3):
+        if url.endswith("/orders"):
+            return json.dumps({"hash": "h", "order": {}}).encode("utf-8")
+        if url.endswith("/o/h.glb") or url.endswith("/o/h.receipt.json"):
+            raise fetch.FetchError(f"{url}: HTTP 422: needs more memory than the factory has (60 MB)")
+        return b"bytes of " + url.encode("utf-8")
+    monkeypatch.setattr(fetch, "_http", fake)
+    model = {"id": "m", "order": {}, "levels": ["near", "mid", "far"]}
+    refused: list = []
+    files = fetch.factory_files(model, refused=refused)
+    assert sorted(files) == ["m.far.glb", "m.mid.glb", "m.parts.json"]
+    assert [name for _id, name, _m in refused] == ["m.glb", "m.receipt.json"]
+    # Without the list, the fetch fails as before.
+    with pytest.raises(fetch.FetchError):
+        fetch.factory_files(model)
+
+
+def test_another_error_of_the_factory_is_an_error(monkeypatch):
+    def fake(url, body=None, timeout=600.0, tries=3):
+        if url.endswith("/orders"):
+            return json.dumps({"hash": "h", "order": {}}).encode("utf-8")
+        raise fetch.FetchError(f"{url}: HTTP 500: the builder stopped")
+    monkeypatch.setattr(fetch, "_http", fake)
+    with pytest.raises(fetch.FetchError):
+        fetch.factory_files({"id": "m", "order": {}, "levels": ["mid"]}, refused=[])

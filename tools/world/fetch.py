@@ -91,18 +91,37 @@ def factory_commit(base: str = FACTORY) -> str:
     return str(commit)
 
 
-def factory_files(model: dict, base: str = FACTORY) -> dict[str, bytes]:
-    """The files of an order from the factory, by their names in assets/world/."""
+def _refused_for_memory(error: FetchError) -> bool:
+    """HTTP 422 of the guard of the memory of the factory (World #76, 2026-11-22)."""
+    return "HTTP 422" in str(error) and "memory" in str(error)
+
+
+def factory_files(model: dict, base: str = FACTORY, refused: list | None = None) -> dict[str, bytes]:
+    """The files of an order from the factory, by their names in assets/world/.
+    refused: when given, a file that the factory refuses for memory (HTTP 422)
+    goes in it as (id, name, message), and the other files come (the test of
+    R4, report 0009, D-0009-25); any other error is an error."""
     placed = json.loads(_http(f"{base}/orders", json.dumps(model["order"]).encode("utf-8")))
     hash_ = placed["hash"]
     files: dict[str, bytes] = {}
+
+    def get(name: str, url: str) -> None:
+        try:
+            files[name] = _http(url)
+        except FetchError as error:
+            if refused is None or not _refused_for_memory(error):
+                raise
+            refused.append((model["id"], name, str(error)))
     for level, suffix in wf.LEVEL_SUFFIX.items():
         if level in model["levels"]:
-            files[model["id"] + suffix] = _http(f"{base}/o/{hash_}.{LEVEL_FILES[level]}")
-    files[model["id"] + ".parts.json"] = _http(f"{base}/o/{hash_}.parts.json")
+            get(model["id"] + suffix, f"{base}/o/{hash_}.{LEVEL_FILES[level]}")
+    get(model["id"] + ".parts.json", f"{base}/o/{hash_}.parts.json")
     try:
         files[model["id"] + ".receipt.json"] = _http(f"{base}/o/{hash_}.receipt.json")
     except FetchError as error:
+        if refused is not None and _refused_for_memory(error):
+            refused.append((model["id"], model["id"] + ".receipt.json", str(error)))
+            return files
         if "near" in model["levels"] or "HTTP 503" not in str(error):
             raise
         # The factory makes the receipt from the near level. The near level of a

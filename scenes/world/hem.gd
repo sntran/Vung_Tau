@@ -52,6 +52,11 @@ var npc_stand_points: Dictionary = {}
 ## The focus point of each spot (where the center dot must point).
 var focus_points: Dictionary = {}
 var carts: Dictionary = {}
+## Report 0009, D-0009-26: the position of the player (Main sets it). A cart
+## does not come where the player stands: it waits, and comes at the next
+## update after the player steps away (soak run 2 put the player in the solid
+## of the cart of mía at its opening hour).
+var player_at := Callable()
 var npcs: Dictionary = {}
 var helper: Npc
 ## The TV upstairs at Phở Cô Sáu. It is on after the shop closes (plan 0003, R2).
@@ -648,6 +653,9 @@ func update_time(minutes: int) -> void:
 			_stall_bodies[spot_id][1].collision_layer = 0 if open else Layers.SOLID
 	for spot_id: String in carts:
 		var present := is_present(spot_id, minutes)
+		var body: StaticBody3D = _cart_bodies[spot_id]
+		if present and (_present_key == "" or body.collision_layer == 0) and _stands_in(body):
+			present = false
 		present_key += "1" if present else "0"
 		carts[spot_id].visible = present
 		_cart_areas[spot_id].collision_layer = TOUCH_LAYER if present else 0
@@ -681,6 +689,22 @@ func update_time(minutes: int) -> void:
 		var first := _present_key == ""
 		_present_key = present_key
 		bake_navigation.call_deferred(first)
+
+
+## True when the player stands in a box of the body (with the radius of the player).
+func _stands_in(body: StaticBody3D) -> bool:
+	if not player_at.is_valid():
+		return false
+	var at: Vector3 = player_at.call()
+	for child in body.get_children():
+		var shape := child as CollisionShape3D
+		if shape == null or not shape.shape is BoxShape3D:
+			continue
+		var local := shape.global_transform.affine_inverse() * at
+		var half: Vector3 = (shape.shape as BoxShape3D).size / 2.0
+		if absf(local.x) <= half.x + Player.RADIUS and absf(local.z) <= half.z + Player.RADIUS:
+			return true
+	return false
 
 
 ## Returns all dynamic lights in the hẻm that are on.

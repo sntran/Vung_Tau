@@ -150,6 +150,8 @@ func _ready() -> void:
 		hem.helper.add_child(clack_player)
 		clack_player.position = Vector3(0.3, 1.0, 0.15)
 		hem.clacked.connect(_on_clacked)
+		# Report 0009, D-0009-26: a cart does not come where the player stands.
+		hem.player_at = func() -> Vector3: return player.global_position
 		for npc: Dictionary in Content.npc_list():
 			for field: String in ["chat", "calls"]:
 				if npc.has(field):
