@@ -33,7 +33,7 @@ jobs:
             offset: "0"
             order: '[{"set": "options.storey", "to": "RUN"}]'
             edit_of: "42bab18a507afa6fb1acc46d052f0666"
-            vary: "3.8"
+            vary: "3.9"
           - name: village_house
             offset: "20"
             order: '{"blueprint": "village_house", "options": {"bays": 3, "bay": "RUN"}}'
@@ -46,7 +46,7 @@ jobs:
             vary: "1.8"
     name: request (${{ matrix.name }})
     env:
-      START_AT: "2026-11-22T01:52:00Z"
+      START_AT: "2026-11-22T03:40:00Z"
       OFFSET: ${{ matrix.offset }}
       # The order (or the edits of an order of EDIT_OF), with "RUN" for a
       # number of VARY plus a part of the id of the run.
