@@ -326,3 +326,100 @@ The builder asks if the limits of PT-33, PT-63, and the box `hill` of S1 stay, o
 ### 8.7 Status
 
 Phases 1b and 2 are not done: D-0009-13 to D-0009-21. Phase 3 waits for my look at the views of PT-68 after the corrections.
+
+## 9. Audit 5: the corrections of audit 4, branch at `f521f15` (2026-11-22)
+
+The pictures of this audit are in [`0009/audit-2026-11-22/`](0009/audit-2026-11-22/). The sheets of PT-68 are on the branch in `docs/town/`.
+
+### 9.1 Runs
+
+| Check | Result |
+|---|---|
+| Commits | `e137aac` to `f521f15`, 23 commits, all with my identity. |
+| CI of `f521f15` | 16 of 18 jobs pass. Part 10 fails PT-33 run 2. The job "Models of World" fails: the factory of World answers HTTP 422 for the near level of `scooter_tay_ga_1` (D-0009-25). |
+| CI of `main` at `d610863` (my report, no code) | Part 11 failed `soak` run 2 at 2400×1080: "the player left the floor or is in a wall", in the solid of the cart `Cart_mia` of the test hẻm (D-0009-26). The run of `c88908f` before it passed. |
+| PT-68 run 1 (here) | Passes. 1 334 of 1 776 boxes in the frustum show from the top of Núi Nhỏ; 28 boxes are left out in the whole area. Bàu Sen shows. The town 0.59 and 3 % near white, the photo 0.61 and 16 %. No line at the end of the boxes (0.62 and 0.62). |
+| PT-33 run 2 (here) | The same values as CI: `nui_lon_south_east` 39 % (40 % or more), `nui_nho_north` 0.58 (0.40 to 0.55). |
+| PT-63 run 2 (here) | Passes: 56 % at 50 m. The stairs go up to the temple, and their sides are smooth. |
+| My walk from S3 to chợ Xóm Lưới (here) | The boxes are along Trương Công Định now ([`walk_after.jpg`](0009/audit-2026-11-22/walk_after.jpg)). |
+
+### 9.2 What is correct
+
+- **D-0009-13.** 28 boxes are left out in the whole area of the showcase, not 92. S3 shows 7 boxes behind Cảng vụ, and my walk has houses along the street.
+- **D-0009-14.** The buildings of 25 m or more show to 6 000 m on each preset, for 29 meshes and 2 434 triangles. The two towers of the photo of the lighthouse are in the view. My count of 191 was wrong: I measured the box from its base on the lowest ground, so a box on a slope was too high. The builder counts 166 buildings of 25 m or more, and that is correct.
+- **D-0009-15.** In the frame of the lighthouse the town is 0.59, against 0.61 in the photo.
+- **D-0009-16.** Bàu Sen, Bàu Trũng, and the other water of the land are in the game, flat at their level.
+- **D-0009-17.** Núi Nhỏ takes the choices of Núi Lớn: on 91.9 ha the ground is 3.08 m lower on average. The builder also found pits of up to 90 m from DeltaDTM at the edge of its clip of 30 m. In audit 4 (section 8.2) I wrote that DeltaDTM over 30 m was correct; that was wrong, and this is a good find.
+- **D-0009-18.** Each view has the eye and the direction of its photo. The view from Núi Lớn now has Bạch Dinh, the bay, and Núi Nhỏ as in the photo. The check counts the boxes that show (a ray test).
+- **D-0009-19.** See 9.1.
+- **D-0009-20.** On a profile of 1 km in the town, 27 % of the cells are flat (53 % before). The area of the showcase keeps the ground of phase 1b, because its parts, models, and checks were made on it. I accept this until the later pass of the look of plan 0026, and that pass brings the area to the new filter.
+- **D-0009-21.** Run 4 of PT-62 is two runs.
+- **PT-69:** Low 189 to 257 draw calls, 113 930 to 137 285 triangles, 738 MB to 745 MB; High 327 to 388 draw calls, up to 871 188 triangles, about 1 900 MB.
+
+### 9.3 Defects
+
+#### D-0009-22: The data has no buildings on a large part of the street fronts (high)
+
+In the bus view, 11 boxes show: the boxes stand 20 m to 40 m back from Bình Giã, with open ground between. The photo has a row of shops at the sidewalk. Overture has 8 outlines in 40 m of the eye, so this comes from the data and not from the build ([`bus_view_outlines.png`](0009/audit-2026-11-22/bus_view_outlines.png)).
+
+I measured each main street near chợ Xóm Lưới: each 5 m, on each side, is there a building from 2 m to 14 m past the edge of the road?
+
+| Street | A box of 2019 | No box, but the 2.5D raster of 2019 has a building | Neither |
+|---|---|---|---|
+| Ba Cu | 63 % | 14 % | 23 % |
+| Lê Lai | 59 % | 20 % | 21 % |
+| Xô Viết Nghệ Tĩnh | 54 % | 17 % | 29 % |
+| Phan Chu Trinh | 51 % | 16 % | 32 % |
+| Trương Công Định | 48 % | 21 % | 31 % |
+| Nam Kỳ Khởi Nghĩa | 47 % | 17 % | 36 % |
+| Bình Giã | 44 % | 28 % | 28 % |
+
+A shop street of Vũng Tàu has a house on almost all of its front. Part of the gap is in the data: the groups of cells with a building and no outline (D-0009-04, 98.5 ha) are on the street fronts. The rest has nothing in the data, perhaps under the trees of the street (the photo of the bus view has large trees on each side).
+
+- Phase 2: a box for each group of cells of the 2.5D raster of 2019 with a building and no outline that touches a street, with the height of the raster (`unmatched_2019` keeps only the part of each cell, so the build reads the heights again).
+- The rest of the gap: Q12.
+
+#### D-0009-23: The far town is one flat color (medium)
+
+Past the range of the boxes, the ground shader draws the far town with the mean color of the boxes and no pattern. From the hills it is a grey plain with dark green patches, and the tall boxes stand alone on it ([`far_town_flat.jpg`](0009/audit-2026-11-22/far_town_flat.jpg)).
+
+The two values of PT-33 run 2 come from it. In the view to the north from Núi Nhỏ, the plain has a mean value of 0.66, the brightest part of the land (the boxes 0.63). Its saturation is 0.04, so the town from Núi Lớn has 39 % of its points with a saturation over 0.2.
+
+- The far town keeps a pattern of roofs and shade (the pattern of D-0005-09), with its mean at the mean of the boxes at the edge, so that no line shows.
+- The limits of PT-33 stay.
+
+#### D-0009-24: The towers have the colors of the tube houses (medium)
+
+92 of the 166 tall buildings have a wall with a saturation over 0.15: teal (`#1894A5`), green, blue, and brown. These are the bold colors of the house kit. The towers in the photos are white, cream, grey, or glass. Each tower takes a color of a palette of towers from the photos.
+
+#### D-0009-25: The job "Models of World" fails because of a change in World (medium)
+
+On 2026-11-22 World put a guard of 60 MB on the memory of the factory (World #76). The test `test_the_two_sources_give_the_same_bytes` (R4 of plan 0023) now gets HTTP 422 for the near level of `scooter_tay_ga_1`: "needs more memory than the factory has (60 MB): order its parts list". This model is in the catalog of World, so its files are in `priv/models/` of World, but the factory builds it again. Q13.
+
+#### D-0009-26: The player can be in the solid of the cart of the test hẻm (low)
+
+On `main` (`d610863`), `soak` run 2 at 2400×1080 put the player in the solid of `Cart_mia` (action 36). The run of `c88908f` passed, so it is not each time. A player can be stuck there. Find the action that puts the player there, and add the step to the soak.
+
+### 9.4 Notes
+
+- **The sand bank in the bay** (the view from Núi Lớn). The builder saw a pale bank of sand in the bay that the photo does not have. Check the sea level of the tide at 12:00 on 22 January 2019, and the intertidal heights there against an image of Sentinel-2 at the same tide. The later pass of the look corrects it.
+- **The mainland on the horizon.** The photos from the lighthouse and from the Hải Đăng road have the hills of the mainland on the horizon (Long Hải, Núi Dinh). The game has none. Q14.
+- **The trees of the hills.** From the north of Núi Nhỏ, the ground under the trees is bright grass with the trunks in view, where the photos have a dark canopy. This is the look of the hill of Q8, and it waits for the later pass of the look.
+
+### 9.5 Questions for me
+
+- **Q11.** The limits of PT-33 stay (they come from my photos, D-0005-09), and D-0009-23 is the correction. If a value is still out after it only because of the trees of the hills, does PT-33 run 2 write the value and not fail until the later pass of the look, as Q8? I recommend yes.
+- **Q12.** Where the data has no building on the front of a shop street (21 % to 36 % of the main streets near chợ Xóm Lưới), does phase 3 put a row of tube houses there, with the status Check, and the street photos of Mapillary as the source where they exist? I recommend yes: the streets of the market are the center of the game.
+- **Q13.** For D-0009-25: I ask World for the files of its catalog at a commit with no build (the files of `priv/models/`). Until World does it, does the test of R4 compare only the levels that the factory gives, and write each level that it refuses in the log? I recommend yes.
+- **Q14.** Do the hills of the mainland on the horizon come in phase 2 (a far mesh of the Copernicus DEM, to about 30 km)? I recommend yes: each view from the hills of Vũng Tàu has them.
+
+### 9.5a Answers (2026-11-22)
+
+- **Q11: yes.** The limits of PT-33 stay, and D-0009-23 is the correction. If a value is still out after it only because of the trees of the hills, PT-33 run 2 writes the value and does not fail until the later pass of the look.
+- **Q12: yes.** Where the data has no building on the front of a shop street, phase 3 puts a row of tube houses there, with the status Check, and the street photos of Mapillary as the source where they exist.
+- **Q13: yes.** I ask World for the files of its catalog at a commit with no build. Until World does it, the test of R4 compares only the levels that the factory gives, and writes each level that it refuses in the log.
+- **Q14: yes.** The hills of the mainland on the horizon come in phase 2: a far mesh of the Copernicus DEM, to about 30 km.
+
+### 9.6 Status
+
+Phases 1b and 2 are not done: D-0009-22 to D-0009-26, and the work of Q13 and Q14. Phase 3 waits for my look at the views of PT-68 after the corrections.
