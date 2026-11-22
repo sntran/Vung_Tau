@@ -138,3 +138,27 @@ def test_the_far_color_has_the_shade_of_the_street_at_the_foot_of_the_walls():
     shaded = {**base, "far_fronts": {**lit["far_fronts"], "foot_shade": 0.5}}
     value = lambda p: int(town.make([_box("a", 0, 0, 10, 10, 10.0)], _flat, p, 256.0)[2]["far_color"][1:3], 16)
     assert value(shaded) < value(lit)
+
+
+def test_a_tower_takes_a_color_of_the_towers():
+    """Report 0009, D-0009-24: 92 of the 166 towers had a bold color of the
+    house kit (teal, green, blue, brown). A building of TALL_M or more takes a
+    color of the towers of the photos (white, cream, grey, glass), as its far
+    color: the photos give the color of the whole front, with the windows."""
+    towers = ["#D8D9D6", "#6B838D"]
+    palette = {**PALETTE, "bold_walls": [{"color": "#1894A5"}], "bold_share": 1.0,
+               "towers": {"colors": [{"color": c, "weight": 1.0} for c in towers]}}
+    boxes = [_box(f"t{i}", i * 30, 0, i * 30 + 20, 20, 40.0) for i in range(8)] + [_box("low", 0, 40, 10, 50, 9.0)]
+    chunks, tall, _numbers = town.make(boxes, _flat, palette, 256.0)
+    fronts = {r[4] for rows in tall.values() for r in rows}
+    assert fronts <= set(towers) and len(fronts) == 2
+    assert chunks[(0, 0)][0][4] != "#D8D9D6", "a low house keeps the colors of the house kit"
+
+
+def test_the_colors_of_the_towers_are_not_bold():
+    import json
+    palette = json.loads((Path(__file__).resolve().parents[3] / "data" / "world" / "palette.json").read_text())
+    for c in palette["towers"]["colors"]:
+        r, g, b = (int(c["color"][k:k + 2], 16) / 255.0 for k in (1, 3, 5))
+        saturation = (max(r, g, b) - min(r, g, b)) / max(r, g, b)
+        assert saturation <= 0.25, c

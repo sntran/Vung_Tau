@@ -50,7 +50,51 @@
 			"lakes": [
 				"Hồ Bàu Sen"
 			],
-			"how": "Report 0009, D-0009-18: from the photo (4:3; a phone of 26 mm in 35 mm: 67.3 by 53.1 degrees). The near twin towers (85 m and 87 m of the 2.5D data, about 1 km away, bearings 68.7 and 71.7 degrees) are at x 0.73 of the photo: the heading is 53.1 degrees. With it, Bàu Sen (bearing 47 degrees) is 6 degrees left of the middle, as in the photo. The pair of 90 m and 91 m 2.4 km away (bearing 33 degrees) is the small pair far left in the photo. The horizon is at y 0.27: the pitch is -12.9 degrees."
+			"how": "Report 0009, D-0009-18: from the photo (4:3; a phone of 26 mm in 35 mm: 67.3 by 53.1 degrees). The near twin towers (85 m and 87 m of the 2.5D data, about 1 km away, bearings 68.7 and 71.7 degrees) are at x 0.73 of the photo: the heading is 53.1 degrees. With it, Bàu Sen (bearing 47 degrees) is 6 degrees left of the middle, as in the photo. The pair of 90 m and 91 m 2.4 km away (bearing 33 degrees) is the small pair far left in the photo. The horizon is at y 0.27: the pitch is -12.9 degrees.",
+			"towers": {
+				"photo": [
+					[
+						0.705,
+						0.37,
+						0.725,
+						0.44
+					],
+					[
+						0.755,
+						0.37,
+						0.775,
+						0.44
+					],
+					[
+						0.59,
+						0.34,
+						0.615,
+						0.38
+					],
+					[
+						0.555,
+						0.3,
+						0.57,
+						0.345
+					],
+					[
+						0.89,
+						0.36,
+						0.905,
+						0.39
+					],
+					[
+						0.62,
+						0.32,
+						0.635,
+						0.35
+					]
+				],
+				"within_m": 3000,
+				"max_saturation_gap": 0.08,
+				"max_value_gap": 0.15,
+				"how": "Report 0009, D-0009-24: the lit fronts of six towers of the photo (the twin towers, and four towers left and right of them; the boxes are fractions of the photo), against the buildings of 25 m or more in the frame nearer than 3 km. The limits are builder values."
+			}
 		},
 		{
 			"id": "nui_lon_top",

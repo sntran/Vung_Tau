@@ -273,8 +273,16 @@ void fragment() {
 	for (int k = 0; k < 8; k++) {
 		roof_mean += roof_colors[k] * 0.53 / 8.0;
 	}
+	// Past the range of the boxes: the pattern of roofs and shade (D-0005-09)
+	// with its mean at the mean color of the boxes at the edge, so that no line
+	// shows (report 0009, D-0009-23: one flat color made a grey plain from the
+	// hills). The mean of the pattern: the roofs with their shade, and the
+	// streets (1 - 0.86 * 0.86 of a lot) with the mean of the town texture.
+	vec3 street_mean = textureLod(town_texture, vec2(0.5), 12.0).rgb * 0.55;
+	vec3 pattern_mean = mix(roof_mean, street_mean, 1.0 - 0.86 * 0.86);
+	vec3 far_pattern = lot_color * town_box_color / max(pattern_mean, vec3(0.02));
 	lot_color = mix(lot_color, roof_mean, roof_far_even * smoothstep(roof_even_range.x, roof_even_range.y, camera_distance));
-	lot_color = mix(lot_color, town_box_color, smoothstep(town_box_range - 200.0, town_box_range, camera_distance));
+	lot_color = mix(lot_color, far_pattern, smoothstep(town_box_range - 200.0, town_box_range, camera_distance));
 	lot_color = mix(lot_color, town_crowns, town_tree);
 	float town = town_ground * (1.0 - hill_ground);
 	color = mix(color, lot_color, town * smoothstep(roof_near, roof_far, camera_distance));

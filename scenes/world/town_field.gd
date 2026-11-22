@@ -251,6 +251,20 @@ func _apply_done() -> void:
 
 
 ## The middle of the top of each box that is made (PT-68).
+## Report 0009, D-0009-24: the buildings of TALL_M or more: for each,
+## {"base", "top", "outline" (PackedVector2Array of x, z), "color"}.
+func towers() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for key: Vector2i in _tall:
+		for record: Array in _tall[key].records:
+			var flat: Array = record[6]
+			var ring := PackedVector2Array()
+			for i in range(0, flat.size() - 1, 2):
+				ring.append(Vector2(float(flat[i]), float(flat[i + 1])))
+			out.append({"base": float(record[1]), "top": float(record[2]), "outline": ring, "color": str(record[4])})
+	return out
+
+
 func middles() -> PackedVector3Array:
 	var out := PackedVector3Array()
 	for made_parts: Dictionary in [_chunks, _tall_made]:

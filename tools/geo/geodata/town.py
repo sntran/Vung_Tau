@@ -230,6 +230,11 @@ def make(buildings: list, sample, palette: dict, chunk_m: float) -> tuple[dict, 
             step += 1
         colors_of[index] = wall
         front = front_color(wall, float(b["height"]), palette["far_fronts"]) if "far_fronts" in palette else wall
+        if float(b["height"]) >= TALL_M and "towers" in palette:
+            # Report 0009, D-0009-24: a tower takes a color of the towers of the
+            # photos, as its far color (the photos have the windows in it).
+            towers = palette["towers"]["colors"]
+            front = _pick([c["color"] for c in towers], [float(c["weight"]) for c in towers], _unit(str(b["id"]) + "t"))
         center = polygon.centroid
         key = (math.floor(center.x / chunk_m), math.floor(-center.y / chunk_m))
         record = [str(b["id"])[:12], round(bases[index], 2), round(tops[index], 2), ROOF_KINDS.index(roof),

@@ -53,6 +53,8 @@ func run(d: PlaytestDriver) -> void:
 			_check_lake(d, w, camera, view, lake_name)
 		if view.has("compare") and time == "1200":
 			_compare(d, view)
+		if view.has("towers") and time == "1200":
+			_compare_towers(d, w, camera, view)
 		if view.get("edge", false):
 			var frame := d.viewport().get_texture().get_image()
 			var edge := edge_values(w, camera, view, frame)
@@ -115,6 +117,9 @@ static func read_views(w: VungTau) -> Array[Dictionary]:
 		if v.has("compare") and not v.get("photos", []).is_empty():
 			out[-1]["compare"] = v.compare
 			out[-1]["photo"] = str(v.photos[0].file)
+		if v.has("towers") and not v.get("photos", []).is_empty():
+			out[-1]["towers"] = v.towers
+			out[-1]["photo"] = str(v.photos[0].file)
 	return out
 
 
@@ -176,6 +181,84 @@ func _compare(d: PlaytestDriver, view: Dictionary) -> void:
 	d.expect(game.y - real.y <= float(view.compare.max_white_gap),
 			"%s: the town is not near white (D-0009-15): %.0f %% of its pixels, the photo %.0f %% (at most %.0f points more)" % [
 				view.id, game.y * 100.0, real.y * 100.0, float(view.compare.max_white_gap) * 100.0])
+
+
+## Report 0009, D-0009-24: the towers in the frame against the towers of the
+## photo: the mean saturation and the mean value of their fronts. In the game,
+## each building of TALL_M or more nearer than "within_m", in the frame, with a
+## clear line to the middle of its top part, and at least MIN_TOWER_PX high:
+## the middle of its box on the screen (the middle half across, from 10 % to
+## 60 % down from its top). In the photo, the boxes of "towers.photo".
+const MIN_TOWER_PX := 24.0
+
+
+func _compare_towers(d: PlaytestDriver, w: VungTau, camera: Camera3D, view: Dictionary) -> void:
+	var frame := d.viewport().get_texture().get_image()
+	var photo := Image.load_from_file("res://docs/reference/photos/" + str(view.photo))
+	var spec: Dictionary = view.towers
+	var game := Vector3.ZERO
+	var count := 0
+	var bold := 0
+	for tower: Dictionary in w.town.towers():
+		var ring: PackedVector2Array = tower.outline
+		var middle := Vector2.ZERO
+		for p in ring:
+			middle += p / ring.size()
+		var top_middle := Vector3(middle.x, lerpf(float(tower.base), float(tower.top), 0.7), middle.y)
+		if camera.global_position.distance_to(top_middle) > float(spec.get("within_m", 3000.0)):
+			continue
+		if not camera.is_position_in_frustum(top_middle) or not w.town.clear_line(camera.global_position, top_middle):
+			continue
+		var rect := Rect2()
+		var first := true
+		for p in ring:
+			for y: float in [float(tower.base), float(tower.top)]:
+				var at := camera.unproject_position(Vector3(p.x, y, p.y))
+				rect = Rect2(at, Vector2.ZERO) if first else rect.expand(at)
+				first = false
+		if rect.size.y < MIN_TOWER_PX:
+			continue
+		var inner := Rect2(rect.position + Vector2(rect.size.x * 0.25, rect.size.y * 0.1), Vector2(rect.size.x * 0.5, rect.size.y * 0.5))
+		var look := _sat_value(frame, inner.intersection(Rect2(Vector2.ZERO, frame.get_size())))
+		if look.z == 0.0:
+			continue
+		game += Vector3(look.x, look.y, 1.0)
+		count += 1
+		var c := Color(str(tower.color))
+		bold += 1 if (maxf(c.r, maxf(c.g, c.b)) - minf(c.r, minf(c.g, c.b))) / maxf(maxf(c.r, maxf(c.g, c.b)), 0.001) > 0.15 else 0
+	var real := Vector3.ZERO
+	for box: Array in spec.photo:
+		var r := Rect2(float(box[0]) * photo.get_width(), float(box[1]) * photo.get_height(),
+				(float(box[2]) - float(box[0])) * photo.get_width(), (float(box[3]) - float(box[1])) * photo.get_height())
+		var look := _sat_value(photo, r)
+		real += Vector3(look.x, look.y, 1.0)
+	if not d.expect(count > 0 and real.z > 0.0, "%s: towers in the frame (%d) and in the photo (%d)" % [view.id, count, int(real.z)]):
+		return
+	var g := Vector2(game.x, game.y) / float(count)
+	var p := Vector2(real.x, real.y) / real.z
+	d.step("%s: %d towers in the frame (%d with a color over a saturation of 0.15): the saturation %.2f and the value %.2f; in the photo (%d towers) %.2f and %.2f" % [
+			view.id, count, bold, g.x, g.y, int(real.z), p.x, p.y])
+	d.expect(absf(g.x - p.x) <= float(spec.max_saturation_gap), "%s: the towers have the saturation of the photo (D-0009-24): %.2f, the photo %.2f (at most %.2f apart)" % [
+			view.id, g.x, p.x, float(spec.max_saturation_gap)])
+	d.expect(absf(g.y - p.y) <= float(spec.max_value_gap), "%s: the towers have the value of the photo (D-0009-24): %.2f, the photo %.2f (at most %.2f apart)" % [
+			view.id, g.y, p.y, float(spec.max_value_gap)])
+
+
+## The mean saturation and value of the pixels of the rectangle, and their count (z).
+static func _sat_value(image: Image, rect: Rect2) -> Vector3:
+	var sat := 0.0
+	var value := 0.0
+	var n := 0
+	for y in range(int(rect.position.y), int(rect.end.y)):
+		for x in range(int(rect.position.x), int(rect.end.x)):
+			if x < 0 or y < 0 or x >= image.get_width() or y >= image.get_height():
+				continue
+			var c := image.get_pixel(x, y)
+			var v := maxf(c.r, maxf(c.g, c.b))
+			sat += (v - minf(c.r, minf(c.g, c.b))) / maxf(v, 0.001)
+			value += v
+			n += 1
+	return Vector3(sat / maxf(n, 1.0), value / maxf(n, 1.0), float(n))
 
 
 static func town_look(image: Image, box: Array) -> Vector2:

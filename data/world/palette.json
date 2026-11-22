@@ -332,5 +332,15 @@
 		"note": "Report 0009, D-0009-15: the roof colors of the palette are measured from aerial photos, so they have the light of the sun in them already, and the game lights them again: a far box multiplies its roof color by light (the sRGB values). The value comes from the photo of the view nui_nho_top of PT-68: the town there has the mean value 0.61. With 1.0, the town of the game was 0.75 and 35 % near white; with 0.6 (the upper factor of the far roofs of the ground shader, terrain.gdshader), 0.67 and 18 %; with 0.42, about the value of the photo. PT-33 also found the land of the views from the hills too bright with 0.6 (report 0009, audit 4).",
 		"light": 0.42,
 		"source": "builder, from the photo of the view nui_nho_top of PT-68"
+	},
+	"towers": {
+		"note": "Report 0009, D-0009-24: the colors of the buildings of 25 m or more (town.TALL_M). The towers in the photos are white, cream, grey, or glass, not the bold colors of the tube houses. Each color is the median of a lit face in a photo from far, so it has the windows in it: a tower takes it as its far color, with no dark of the openings (far_fronts).",
+		"colors": [
+			{"name": "white", "color": "#D8D9D6", "weight": 0.3, "source": "town_nui_nho_top_2018.jpg (a tower left of the twin towers); town_nui_lon_2023.jpg (two towers north of Bãi Trước: #D5D4D9, #D6D7D7)"},
+			{"name": "cream", "color": "#EBE4DD", "weight": 0.3, "source": "town_nui_nho_top_2018.jpg (the twin towers: #EBE4DD, #E8E2DD)"},
+			{"name": "grey", "color": "#B1AFAB", "weight": 0.2, "source": "town_nui_nho_top_2018.jpg (a tower at the middle: #B1AFAB, #A9A7A5)"},
+			{"name": "grey_blue", "color": "#ADBACA", "weight": 0.1, "source": "town_nui_lon_2023.jpg (a tower north of Bãi Trước)"},
+			{"name": "glass", "color": "#6B838D", "weight": 0.1, "source": "sen_bien_2024.jpg (the glass of the tower of Cao ốc Sen Biển)"}
+		]
 	}
 }
