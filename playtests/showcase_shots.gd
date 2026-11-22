@@ -126,6 +126,7 @@ func run(d: PlaytestDriver) -> void:
 		camera.fov = float(shot.get("fov", fov))
 		if run_values[0] == "low" and run_values[1] == "1710":
 			_check_view(d, w, camera, shot, eye)
+			_check_town(d, w, camera, shot)
 		ui.visible = false
 		await d.wait_frames(8)
 		_check_look(d, shot, str(run_values[0]), str(run_values[1]))
@@ -135,6 +136,19 @@ func run(d: PlaytestDriver) -> void:
 		d.step("%s (%s): eye (%.1f, %.1f, %.1f), fov %.0f; %s" % [shot.id, shot.name, eye.x, eye.y, eye.z, camera.fov, memory_text()])
 		camera.fov = fov
 	d.fly_end()
+
+
+## Report 0009, D-0009-13: the boxes of the town that show in the frame of a
+## shot with "town" (S3: the boxes behind Cảng vụ along Trương Công Định).
+func _check_town(d: PlaytestDriver, w: VungTau, camera: Camera3D, shot: Dictionary) -> void:
+	if not shot.has("town") or w.town == null:
+		return
+	var f: Array = shot.town.get("frame", [0.0, 0.0, 1.0, 1.0])
+	var within := float(shot.town.get("within_m", TownField.range_end))
+	var seen := w.town.boxes_seen(camera, within, Rect2(f[0], f[1], f[2] - f[0], f[3] - f[1]))
+	d.step("%s: %d boxes of the town nearer than %.0f m show in the part %s of the frame" % [shot.id, seen, within, f])
+	d.expect(seen >= int(shot.town.min_boxes), "%s: the boxes of the town show in the frame (%s): %d, at least %d" % [
+			shot.id, shot.town.how, seen, int(shot.town.min_boxes)])
 
 
 ## The eye of a shot: eye_height over the ground, or over the floor of a known place.
@@ -283,6 +297,16 @@ static func _frame_part(d: PlaytestDriver, w: VungTau, camera: Camera3D, eye: Ve
 	return part
 
 
+## Report 0009, Q8: a box "hill" with "open" writes its values and the result
+## of each check in the log, and does not fail, until the later pass of the
+## look (report 0026, section 12.5).
+func _hill_expect(d: PlaytestDriver, shot: Dictionary, ok: bool, text: String) -> void:
+	if shot.hill.has("open"):
+		d.step("open (%s): %s: %s" % [shot.hill.open, text, "in the limit" if ok else "OUT OF THE LIMIT"])
+	else:
+		d.expect(ok, text)
+
+
 ## D-0026-05 and D-0026-06: the patches of the far hill and the color of the water.
 func _check_look(d: PlaytestDriver, shot: Dictionary, preset: String, time: String) -> void:
 	var frame := d.viewport().get_texture().get_image()
@@ -298,14 +322,14 @@ func _check_look(d: PlaytestDriver, shot: Dictionary, preset: String, time: Stri
 		photo_image.resize(frame.get_width(), int(photo_image.get_height() * float(frame.get_width()) / photo_image.get_width()))
 		var photo := box_stats(photo_image, shot.hill.photo)
 		d.step("%s, %s: the patches of the hill: %.3f (the photo %.3f)" % [shot.id, preset, game.patches, photo.patches])
-		d.expect(float(game.patches) <= float(photo.patches) * HILL_MAX, "%s, %s: the far trees of the hill are not patches: %.3f, at most %.1f times the photo (%.3f)" % [
+		_hill_expect(d, shot, float(game.patches) <= float(photo.patches) * HILL_MAX, "%s, %s: the far trees of the hill are not patches: %.3f, at most %.1f times the photo (%.3f)" % [
 				shot.id, preset, game.patches, HILL_MAX, photo.patches])
 		# D-0026-23: the size of the crowns and of the shade between them, against the photo.
 		var game_length := correlation_length(frame, shot.hill.shot)
 		var photo_length := correlation_length(photo_image, shot.hill.photo)
 		d.step("%s, %s, %s: the autocorrelation length of the hill: %.1f px (the photo %.1f px)" % [
 				shot.id, preset, time, game_length, photo_length])
-		d.expect(game_length <= photo_length * HILL_MAX_LENGTH,
+		_hill_expect(d, shot, game_length <= photo_length * HILL_MAX_LENGTH,
 				"%s, %s, %s: the far forest has crowns of the size of the photo: the autocorrelation length is %.1f px, at most %.1f times the photo (%.1f px)" % [
 					shot.id, preset, time, game_length, HILL_MAX_LENGTH, photo_length])
 		# D-0026-15: the colors, not only the brightness.
@@ -316,13 +340,13 @@ func _check_look(d: PlaytestDriver, shot: Dictionary, preset: String, time: Stri
 		d.step("%s, %s, %s: the hill is #%s (hue %.0f, saturation %.2f, value %.2f); the photo #%s (hue %.0f, saturation %.2f, value %.2f); the color patches %.3f (the photo %.3f)" % [
 				shot.id, preset, time, g.to_html(false), g.h * 360.0, g.s, g.v, f.to_html(false), f.h * 360.0, f.s, f.v,
 				game.color_patches, photo.color_patches])
-		d.expect(hue <= HILL_MAX_HUE and absf(g.s - f.s) <= HILL_MAX_SATURATION and absf(g.v - f.v) <= HILL_MAX_VALUE,
+		_hill_expect(d, shot, hue <= HILL_MAX_HUE and absf(g.s - f.s) <= HILL_MAX_SATURATION and absf(g.v - f.v) <= HILL_MAX_VALUE,
 				"%s, %s, %s: the hill has the color of the photo: the hue %.0f degrees from it (at most %.0f), the saturation %.2f from it (at most %.2f), the value %.2f from it (at most %.2f)" % [
 					shot.id, preset, time, hue, HILL_MAX_HUE, absf(g.s - f.s), HILL_MAX_SATURATION, absf(g.v - f.v), HILL_MAX_VALUE])
-		d.expect(float(game.color_patches) <= float(photo.color_patches) * HILL_MAX,
+		_hill_expect(d, shot, float(game.color_patches) <= float(photo.color_patches) * HILL_MAX,
 				"%s, %s, %s: the hill has no patches of color (pink, teal roofs): %.3f, at most %.1f times the photo (%.3f)" % [
 					shot.id, preset, time, game.color_patches, HILL_MAX, photo.color_patches])
-		d.expect(float(game.color_patches) >= float(photo.color_patches) * HILL_MIN_COLOR_PATCHES,
+		_hill_expect(d, shot, float(game.color_patches) >= float(photo.color_patches) * HILL_MIN_COLOR_PATCHES,
 				"%s, %s, %s: the crowns of the hill have the colors of the photo (yellow green, dark green, dry brown): the color patches %.3f, at least %.1f times the photo (%.3f)" % [
 					shot.id, preset, time, game.color_patches, HILL_MIN_COLOR_PATCHES, photo.color_patches])
 	if shot.has("roof"):

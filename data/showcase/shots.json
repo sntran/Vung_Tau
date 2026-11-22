@@ -84,7 +84,8 @@
 					0.7,
 					0.3
 				],
-				"how": "The forest of Núi Nhỏ right of the tower, with no sky, no leaf of a near palm, and no building in the box: the box of the shot is higher in the frame, as the eye of the game is 16 m from the place of the photo. Plan 0009, R5b (the ground on the grid of Copernicus, 15 m east and south of the old one): the ridge of Núi Nhỏ is lower in the frame, so the box is 0.04 lower, with no sky in it. Plan 0009, phase 2: a villa of the town on the slope stands under the box, so the box is the forest over the villa: the largest box with no sky over it, from x 0.55 to 0.7 as the box of the photo (the tower of Sen Biển is at 0.48 to 0.52). In this box the forest has fewer blocks than the box of the photo (36, not 60), so its color patches change with the box: from 0.023 to 0.029 for the boxes of forest near it (17:10, Low)."
+				"how": "The forest of Núi Nhỏ right of the tower, with no sky, no leaf of a near palm, and no building in the box: the box of the shot is higher in the frame, as the eye of the game is 16 m from the place of the photo. Plan 0009, R5b (the ground on the grid of Copernicus, 15 m east and south of the old one): the ridge of Núi Nhỏ is lower in the frame, so the box is 0.04 lower, with no sky in it. Plan 0009, phase 2: a villa of the town on the slope stands under the box, so the box is the forest over the villa: the largest box with no sky over it, from x 0.55 to 0.7 as the box of the photo (the tower of Sen Biển is at 0.48 to 0.52). In this box the forest has fewer blocks than the box of the photo (36, not 60), so its color patches change with the box: from 0.023 to 0.029 for the boxes of forest near it (17:10, Low).",
+				"open": "report 0009, Q8: until the later pass of the look"
 			},
 			"water": [
 				0.6,
@@ -197,7 +198,18 @@
 				}
 			],
 			"people": 0,
-			"people_how": "The photo shows about ten people on scooters; the moving scooters wait for plan 0018, and no walker of the park is there."
+			"people_how": "The photo shows about ten people on scooters; the moving scooters wait for plan 0018, and no walker of the park is there.",
+			"town": {
+				"min_boxes": 6,
+				"how": "the boxes behind Cảng vụ along Trương Công Định, right of the tower, nearer than 300 m (report 0009, D-0009-13: 4 when the area of the showcase left out each building, 7 now)",
+				"frame": [
+					0.62,
+					0.0,
+					1.0,
+					0.85
+				],
+				"within_m": 300
+			}
 		},
 		{
 			"id": "S4",

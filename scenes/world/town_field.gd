@@ -8,11 +8,13 @@ extends Node3D
 ## range of the preset (RANGES). A wall that a neighbor hides (a row of houses)
 ## draws only its part over the neighbor.
 ##
-## A building that another part of the world already draws is left out: each
-## building in the area of the showcase (plan 0026: its models, its stand-ins,
-## and its details), a model or a stand-in of the showcase out of its area, and
-## a known place (plan 0008, R3). So a chunk that touches the area of the
-## showcase waits for it.
+## A building that another part of the world already draws is left out: a
+## model or a stand-in of the showcase (plan 0026), or a known place (plan
+## 0008, R3), stands in its outline, or these parts and the parts of the
+## showcase that a player walks on (its lawns and its paving) cover more than
+## KEEP_OUT_SHARE of its outline (report 0009, D-0009-13). The other buildings
+## in the area of the showcase keep their boxes. So a chunk that touches the
+## area of the showcase waits for it.
 
 const FOLDER := "town"
 ## The distance (m) to which the boxes of a chunk show, for each preset (R10).
@@ -26,6 +28,13 @@ const MAX_APPLY_PER_FRAME := 2
 const ROOF_TERRACE := 0
 const ROOF_METAL := 1
 const ROOF_TILES := 2
+## The part of an outline that other parts of the world cover when the box is
+## left out (report 0009, D-0009-13).
+const KEEP_OUT_SHARE := 0.3
+## About this number of points measures the cover of an outline.
+const COVER_SAMPLES := 64
+## The cell of the grid of the roofs that the count of the boxes that show uses.
+const TOP_CELL := 4.0
 
 static var range_end: float = RANGES.high
 
@@ -43,6 +52,8 @@ var _tasks := 0
 var _material: StandardMaterial3D
 ## The parts that draw their own buildings: [outline, its box, its middle].
 var _keep_out: Array = []
+## The roofs on a grid of TOP_CELL m: cell -> [the highest top, the tag of its building].
+var _tops: Dictionary = {}
 var _keep_out_ready := false
 var _showcase_area := PackedVector2Array()
 var _focus := Vector3.ZERO
@@ -178,7 +189,8 @@ func middles() -> PackedVector3Array:
 
 func _show(result: Dictionary) -> void:
 	var key: Vector2i = result.key
-	_chunks[key] = {"state": 2, "middles": result.middles, "nodes": []}
+	_chunks[key] = {"state": 2, "middles": result.middles, "boxes": result.boxes, "nodes": []}
+	_tops.merge(result.tops, true)
 	made += int(result.made)
 	left_out += int(result.left_out)
 	triangles += int(result.triangles)
@@ -247,36 +259,145 @@ static func _circle(c: Vector2, r: float) -> PackedVector2Array:
 	return ring
 
 
-## True when a part of the world already draws the building of this outline:
-## its middle is in a kept part, or a kept part has its middle in the outline.
+## True when a part of the world already draws the building of this outline.
 func _kept(ring: PackedVector2Array, middle: Vector2) -> bool:
-	# The area of the showcase draws its own buildings (plan 0026; its details
-	# come later, report 0026, section 12.5): the town is round it.
-	if _showcase_area.size() >= 3 and Geometry2D.is_point_in_polygon(middle, _showcase_area):
-		return true
+	var on_walk := Callable()
+	if world.showcase and _showcase_area.size() >= 3:
+		on_walk = _on_walk
+	return is_left_out(ring, middle, _keep_out, on_walk)
+
+
+## True on a part of the showcase that a player walks on: a lawn, the paving,
+## or a bed of its ground mask (plan 0026, R3).
+func _on_walk(p: Vector2) -> bool:
+	if not Geometry2D.is_point_in_polygon(p, _showcase_area):
+		return false
+	var c := world.showcase.ground_at(p.x, p.y)
+	return c.r > 0.5 or c.g > 0.5 or c.b > 0.5
+
+
+## Report 0009, D-0009-13: a box is left out when a kept part (a model, a
+## stand-in, or a known place: [ring, its box, its middle]) has its middle in
+## the outline, or when the kept parts and the walk (on_walk(point), when it is
+## valid) cover more than KEEP_OUT_SHARE of the outline.
+static func is_left_out(ring: PackedVector2Array, middle: Vector2, keep_out: Array, on_walk := Callable()) -> bool:
 	var box := Rect2(ring[0], Vector2.ZERO)
 	for p in ring:
 		box = box.expand(p)
-	for other: Array in _keep_out:
-		if not (other[1] as Rect2).intersects(box, true):
-			continue
-		if Geometry2D.is_point_in_polygon(middle, other[0]) or Geometry2D.is_point_in_polygon(other[2], ring):
-			return true
-	return false
+	var near := []
+	for other: Array in keep_out:
+		if (other[1] as Rect2).intersects(box, true):
+			if Geometry2D.is_point_in_polygon(other[2], ring):
+				return true
+			near.append(other)
+	if near.is_empty() and not on_walk.is_valid():
+		return false
+	return cover_share(ring, box, near, on_walk) > KEEP_OUT_SHARE
+
+
+## The part of the outline (by about COVER_SAMPLES points on a grid) that the
+## kept parts or the walk cover.
+static func cover_share(ring: PackedVector2Array, box: Rect2, keep_out: Array, on_walk := Callable()) -> float:
+	var step := maxf(sqrt(box.get_area() / COVER_SAMPLES), 0.25)
+	var inside := 0
+	var covered := 0
+	var y := box.position.y + step * 0.5
+	while y < box.end.y:
+		var x := box.position.x + step * 0.5
+		while x < box.end.x:
+			var p := Vector2(x, y)
+			if Geometry2D.is_point_in_polygon(p, ring):
+				inside += 1
+				var hit := on_walk.is_valid() and bool(on_walk.call(p))
+				if not hit:
+					for other: Array in keep_out:
+						if (other[1] as Rect2).has_point(p) and Geometry2D.is_point_in_polygon(p, other[0]):
+							hit = true
+							break
+				if hit:
+					covered += 1
+			x += step
+		y += step
+	return float(covered) / maxf(inside, 1.0)
+
+
+## The cells of the grid of the roofs under an outline (at least the cell of its middle).
+static func _rasterize(ring: PackedVector2Array, middle: Vector2, top: float, tag: int, tops: Dictionary) -> void:
+	var box := Rect2(ring[0], Vector2.ZERO)
+	for p in ring:
+		box = box.expand(p)
+	var cells: Array[Vector2i] = [Vector2i(floori(middle.x / TOP_CELL), floori(middle.y / TOP_CELL))]
+	for cz in range(floori(box.position.y / TOP_CELL), floori(box.end.y / TOP_CELL) + 1):
+		for cx in range(floori(box.position.x / TOP_CELL), floori(box.end.x / TOP_CELL) + 1):
+			if Geometry2D.is_point_in_polygon(Vector2((cx + 0.5) * TOP_CELL, (cz + 0.5) * TOP_CELL), ring):
+				cells.append(Vector2i(cx, cz))
+	for cell in cells:
+		var old: Array = tops.get(cell, [-INF, 0])
+		if top > float(old[0]):
+			tops[cell] = [top, tag]
+
+
+## Report 0009, D-0009-18: the count of the boxes in the frame of the camera,
+## nearer than max_distance, that show: a ray from the eye to the middle of the
+## roof or to the middle of the box does not go under the ground or under the
+## roof of another box (the grid of the roofs). The trees are not in the test.
+## With "frame" (a part of the frame, from 0 to 1), only the boxes whose point
+## that shows is in that part.
+func boxes_seen(camera: Camera3D, max_distance: float, frame := Rect2(0, 0, 1, 1)) -> int:
+	var eye := camera.global_position
+	var size := camera.get_viewport().get_visible_rect().size
+	var n := 0
+	for key: Vector2i in _chunks:
+		var boxes: PackedFloat32Array = _chunks[key].get("boxes", PackedFloat32Array())
+		for i in range(0, boxes.size(), 5):
+			var base := boxes[i + 2]
+			var top := boxes[i + 3]
+			var roof := Vector3(boxes[i], top, boxes[i + 1])
+			if eye.distance_to(roof) > max_distance:
+				continue
+			var middle := Vector3(boxes[i], (base + top) * 0.5, boxes[i + 1])
+			if not (camera.is_position_in_frustum(roof) or camera.is_position_in_frustum(middle)):
+				continue
+			var tag := int(boxes[i + 4])
+			for p: Vector3 in [roof, middle]:
+				if not camera.is_position_in_frustum(p) or not frame.has_point(camera.unproject_position(p) / size):
+					continue
+				if _clear(eye, p, tag):
+					n += 1
+					break
+	return n
+
+
+## True when the ray from the eye to the point stays over the ground and over
+## the roofs of the other boxes.
+func _clear(eye: Vector3, target: Vector3, tag: int) -> bool:
+	var length := eye.distance_to(target)
+	var d := 1.0
+	while d < length - 1.0:
+		var p := eye.lerp(target, d / length)
+		var cell := Vector2i(floori(p.x / TOP_CELL), floori(p.z / TOP_CELL))
+		var roof: Array = _tops.get(cell, [-INF, 0])
+		if int(roof[1]) == tag:
+			pass
+		elif p.y < float(roof[0]) or p.y < world.ground_height(p.x, p.z):
+			return false
+		d += clampf(d * 0.01, 1.0, TOP_CELL)
+	return true
 
 
 ## Runs in a worker thread (or at once in prepare_at()): the mesh arrays of the
 ## boxes of a chunk.
 func _build(key: Vector2i) -> Dictionary:
-	var result := {"key": key, "parts": [], "made": 0, "left_out": 0, "triangles": 0, "middles": PackedVector3Array()}
+	var result := {"key": key, "parts": [], "made": 0, "left_out": 0, "triangles": 0, "middles": PackedVector3Array(),
+			"boxes": PackedFloat32Array(), "tops": {}}
 	var path := world.data.root.path_join(FOLDER).path_join("%d_%d.json" % [key.x, key.y])
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 	if not parsed is Dictionary:
 		return result
-	# Four parts of 128 m: the renderer culls a whole mesh, and a chunk of 256 m
-	# that is only partly in the frame drew all its boxes (S5 of PT-73).
+	# PARTS x PARTS parts of a chunk (one part: four parts of 128 m saved few
+	# triangles for many draw calls in S5 of PT-73).
 	var size := world.data.chunk_size
-	var half := size / 2.0
+	var part_m := size / PARTS
 	var parts := []
 	for i in PARTS * PARTS:
 		parts.append({"verts": PackedVector3Array(), "normals": PackedVector3Array(), "colors": PackedColorArray()})
@@ -293,8 +414,8 @@ func _build(key: Vector2i) -> Dictionary:
 		if _kept(ring, middle):
 			result.left_out += 1
 			continue
-		var px := clampi(int(floor((middle.x - key.x * size) / half)), 0, PARTS - 1)
-		var pz := clampi(int(floor((middle.y - key.y * size) / half)), 0, PARTS - 1)
+		var px := clampi(int(floor((middle.x - key.x * size) / part_m)), 0, PARTS - 1)
+		var pz := clampi(int(floor((middle.y - key.y * size) / part_m)), 0, PARTS - 1)
 		var part: Dictionary = parts[pz * PARTS + px]
 		var verts: PackedVector3Array = part.verts
 		var normals: PackedVector3Array = part.normals
@@ -318,6 +439,12 @@ func _build(key: Vector2i) -> Dictionary:
 		part.colors = colors
 		result.made += 1
 		result.middles.append(Vector3(middle.x, top, middle.y))
+		# 24 bits: a float of 32 bits keeps it exactly.
+		var tag := str(b[0]).hash() & 0xFFFFFF
+		var boxes: PackedFloat32Array = result.boxes
+		boxes.append_array(PackedFloat32Array([middle.x, middle.y, base, top, tag]))
+		result.boxes = boxes
+		_rasterize(ring, middle, top, tag, result.tops)
 	result.parts = []
 	for i in parts.size():
 		var part: Dictionary = parts[i]
@@ -326,7 +453,7 @@ func _build(key: Vector2i) -> Dictionary:
 			continue
 		# The mesh is at the middle of its part: a visibility range is measured
 		# from the origin of the node.
-		var origin := Vector3(key.x * size + (i % PARTS + 0.5) * half, 0.0, key.y * size + (i / PARTS + 0.5) * half)
+		var origin := Vector3(key.x * size + (i % PARTS + 0.5) * part_m, 0.0, key.y * size + (i / PARTS + 0.5) * part_m)
 		for v in verts.size():
 			verts[v] -= origin
 		var arrays := []
