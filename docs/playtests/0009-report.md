@@ -188,3 +188,135 @@ See report 0026, D-0026-43: the merge commit `8990b37`.
 ### 7.4 Status
 
 Phase 1a is done when D-0009-11 and D-0009-12 are corrected. Phase 1b waits for plan 0026 to go to `main`.
+
+## 8. Audit 4: phases 1b and 2, branch at `e3c983a` (2026-11-21)
+
+The pictures of this audit are in [`0009/audit-2026-11-21/`](0009/audit-2026-11-21/). The sheets of PT-68 are on the branch in `docs/town/`.
+
+### 8.1 Runs
+
+| Check | Result |
+|---|---|
+| The merge of plan 0026 | `909901b` on `main`, a merge commit with my identity. The CI of `main` passes. Plan 0026 is "Built" and its status line names D-0026-46 to D-0026-48, Q29, and R19. |
+| CI of `0184ded` | 15 of 18 jobs pass. Parts 5, 7, and 10 fail: PT-72 S1 (the box `hill`), PT-63 run 2, PT-33 run 2. |
+| CI of `e3c983a` | The same three parts fail. Part 5 also fails PT-62 `cau_da_jetty` run 4: "the scenario takes more than 180 seconds", then "2 resources still in use at exit". The report of the builder does not have this (D-0009-21). |
+| PT-68 `town_views` runs 1 and 2 (here) | Pass. The frames are the frames of the sheets. |
+| PT-69 `town_budget` run 1 (here) | Low: 175 to 266 draw calls, 139 853 to 160 697 triangles, 730 MB to 737 MB of video memory. The same numbers as the builder. The report does not give the video memory. |
+| PT-63 run 2 (here) | miếu Hòn Bà from 50 m: 44 %, as in CI. |
+| PT-33 run 2 (here) | The same three values as in CI: 36 %, 0.61, 0.38. |
+| PT-71 run 2 and PT-72 run 2 (here) | PT-71 passes. PT-72 S1 at 12:00 on Low: the saturation 0.06 from the photo, as in CI. |
+| A walk of my own (here, Low, 10:00) | From the corner of S3 to the east along Trương Công Định and Phan Bội Châu to chợ Xóm Lưới: 80 m with the joystick, then five stops with a look ahead, to the left, and to the right ([`walk_s3_to_market.jpg`](0009/audit-2026-11-21/walk_s3_to_market.jpg)). |
+
+### 8.2 What is correct
+
+- **One zero for the land and the sea.** Each height over EGM2008 (Copernicus, GEDTM30, DeltaDTM, the lidar, ATL24) takes away the 1.16 m of DTU22 (`data/geo/ground.json`).
+- **The half pixel.** The builder found that the ground of plans 0005 to 0026 was about 15 m west and north of its place: `rasterio.merge()` put the pixels of Copernicus on the edges of the box, and their centers are on whole arc seconds. At the correct place, the RMSE against the lidar ground goes from 4.50 m to 3.78 m. This is a good find.
+- **The rule of the bare earth.** The choice of a model for each group by the RMSE against the lidar, the report with its maps, and DeltaDTM over 30 m as no data (not the value 30).
+- **The boxes.** 45 324 boxes of `buildings_2019`, with the unseen buildings out, the walls that a neighbor hides, the roofs by the shares of the palette, and the colors read as sRGB. At the views of PT-69 on Low, a frame has at most 160 697 of 300 000 triangles. The range of 1 500 m comes from a measure (S5 had 299 733 triangles with 2 000 m).
+- **The banks next to the hall** (section 6.4) are lower. 5 m behind the front of the hall, the ground at 25 m to 40 m to its sides was 4.5 m to 6.1 m over its level, and now it is 2.0 m to 4.1 m ([`hall_after_1b.jpg`](0009/audit-2026-11-21/hall_after_1b.jpg)). The rest is the slope of Núi Nhỏ, with no level for the lots at the sides of the hall: phase 3 (the lots) does it.
+- **The photos of the views** have open licenses and credits, and the bus view says that it has no photo.
+- The builder did not change a limit to make a check pass, and named each check that fails.
+
+### 8.3 Defects
+
+#### D-0009-13: The area of the showcase leaves out each building, also the buildings that nothing draws (high)
+
+92 buildings of 2019 have their middle in the area of the showcase. The showcase draws 25 of them (16 under a model of World, 9 under a stand-in). The other 67 have no box and no stand-in ([`showcase_area_buildings.png`](0009/audit-2026-11-21/showcase_area_buildings.png), red). Commit `299621d` made this: "The area of the showcase draws its own buildings".
+
+Among the 67 is the street of S3 to chợ Xóm Lưới. On my walk from the corner of S3, the first 80 m of Trương Công Định are empty ground, with Cảng vụ on one side (the walk, top row). This is the empty corner of my decision of report 0026, section 12.5, and phase 2 must correct it.
+
+- Leave out a box only where a model, a stand-in, or a part of the showcase that a player walks on covers it (for example, more than 30 % of its outline). Else the box stays.
+- A unit test: a building in the area with no model and no stand-in has a box. PT-72 S3 shows the boxes behind Cảng vụ.
+
+#### D-0009-14: From Núi Nhỏ, the town stops at 1 500 m (high)
+
+On Low the boxes stop at 1 500 m. Behind that line the ground pattern is a plain of pink brown, and the line shows (`docs/town/sheet_nui_nho_top.jpg`). The photo from the lighthouse shows the town to the coast of Bãi Sau, with its towers.
+
+- In the direction of the frame of the lighthouse are 55 buildings of 45 m or more. 53 of them are farther than 1 500 m. Two of them are side by side in the middle of the frame, 90 m and 91 m high, 2.4 km away: the two towers of the photo.
+- The towers are what make this view Vũng Tàu, and the lighthouse is on the hill of the homestay.
+
+Correction:
+
+- Each tall building (for example, 25 m or more: 191 in the whole area) shows to the end of the far range on each preset. Give the cost in PT-69.
+- The far pattern of the town has the mean color of the boxes at its edge, so that no line shows. (Or a far level of the boxes, by blocks.)
+
+#### D-0009-15: The boxes are too bright (medium)
+
+The walls of the boxes have the colors of the paint of the palette: a mean value of 0.81, and 54 % are over 0.8. In the frame of the lighthouse at 12:00 the pixels of the town have a mean value of 0.73, against 0.60 in the photo, and 45 % are near white, against 18 % in the photo.
+
+From far, a front is not its paint only: it has windows, balconies, shade, and the open ground floor of the shops. The photo also has many trees between the houses.
+
+This is also a part of PT-33 run 2. In the view to the north from Núi Nhỏ, the boxes have a mean value of 0.78 and the far pattern 0.64 (the limit of the land is 0.40 to 0.55). So the report is not correct that the boxes do not cause these values.
+
+- The far color of a wall is the mean of its front (with a share of dark for the windows and the ground floor).
+- PT-68 compares the town of `nui_nho_top` with its photo: the mean value and the share of near white.
+
+#### D-0009-16: Bàu Sen is not in the game (medium)
+
+The photo from the lighthouse has the lake of Bàu Sen in the middle of the town. The game has no water on the land, and no plan has it (Bàu Sen, Bàu Trũng). The water areas of OpenStreetMap (`natural=water`) can be flat water at their level. Q9 asks where it goes.
+
+#### D-0009-17: Núi Nhỏ keeps the model of the surface (medium)
+
+ICESat-2 has 3 bins of ground on Núi Nhỏ, so each group of Núi Nhỏ keeps Copernicus, with the tops of its trees. On Núi Nhỏ (the cells over 20 m, in 700 m of its point), GEDTM30 is 3.1 m lower than Copernicus on average, and 10 % of the cells are 7.1 m lower or more. On Núi Lớn it is 3.9 m lower, and there the lidar chose GEDTM30.
+
+The homestay, its hẻm, and the villas of phase 3 are on Núi Nhỏ, and the game puts its own trees on it. So the trees are two times in the hill.
+
+- A group with fewer than 30 points takes the choice of the same land cover on the nearest zone with enough points (here Núi Lớn), and the report says so.
+
+#### D-0009-18: Three views of PT-68 do not have the camera of their photo (medium)
+
+- **Núi Lớn.** The photo is from the cable car over Bạch Dinh, to the south-east. The eye of the game is on the flat top, in a clearing, and the trees of its edge hide the town. The check counts 612 boxes "in the frame", because it counts the boxes in the frustum, also the boxes that do not show.
+- **The Hải Đăng road.** The heading is 10°. From the eye, Núi Lớn is at 341°, so it is on the left of the frame. The photo does not have Núi Lớn, and it has the water of Bãi Sau on the right: its heading is about 30° to 45°.
+- **The bus view** has no photo. The workflow "Street photos" (Mapillary, CC BY-SA 4.0) runs in CI and can make a contact sheet for this point.
+
+Correction:
+
+- The eye and the direction of each view come from its photo, as in the shots of plan 0026.
+- The check counts the boxes that show (a ray or a depth test), not the boxes in the frustum.
+
+#### D-0009-19: A crest of ground hides miếu Hòn Bà (medium)
+
+The islet of Hòn Bà has an area of about 5 450 m² (about 80 m across). That is less than three cells of the 30 m DEM, so its shape is not data. From 50 m on the stairs, the stairs go up to a crest of ground and rocks, and the temple is behind it: the crest hides its lower half ([`mieu_hon_ba_50m.jpg`](0009/audit-2026-11-21/mieu_hon_ba_50m.jpg)). The ground of the islet moved 15 m with the half pixel, so the crest is now between the stairs and the temple.
+
+- Keep the limit of 50 %.
+- The ground from the top of the stairs to the temple is not higher than the base of the temple (as `level_places()` and `cut_stairs()` do for the other places).
+- The sand at the sides of the stairs has the edge of a saw. Make it smooth.
+
+#### D-0009-20: Square terraces in the ground of the town (low)
+
+`terrain.remove_buildings()` (an opening with a square window, plan 0005) still runs after the bare earth. GEDTM30 has no buildings, so the opening only cuts each hump into a flat square.
+
+On a profile of 1 km through the town north of chợ Xóm Lưới, 45 % of the cells are flat to 5 mm, with slopes of 1 m to 3 m between the squares ([`town_ground_squares.png`](0009/audit-2026-11-21/town_ground_squares.png)). Phase 3 puts the lots and the hẻm on this ground.
+
+- No opening where the bare earth is used, or a round window that keeps the slope.
+
+#### D-0009-21: A red part that the report does not have (low)
+
+On the CI of `e3c983a`, part 5 also failed PT-62 (`cau_da_jetty` run 4, more than 180 s). The report said "I expect the same result". On `main` the same test took 838 s and passed; on the branch it took 851 s. So run 4 is near its limit.
+
+- Split run 4 in two runs.
+- The report names each part that fails.
+
+### 8.4 The question of the builder: the limits
+
+The builder asks if the limits of PT-33, PT-63, and the box `hill` of S1 stay, or if new limits come for the new ground. What I recommend:
+
+- **PT-33: the limits stay.** They come from my photos (D-0005-09). D-0009-14 and D-0009-15 are the look of the town from the hills, and that look is the review of phase 2. Run PT-33 again after them.
+- **PT-63: the limit stays.** D-0009-19 is in the ground of phase 1b.
+- **PT-72, the box `hill` of S1:** this is the look of the hill, and it waits for the later pass of the look (report 0026, section 12.5). The values change near the limits from run to run (6 of 8 runs pass). Q8 asks what to do until then.
+
+### 8.5 Questions for me
+
+- **Q8.** Until the later pass of the look, does PT-72 stop the check of the box `hill` of S1 (it writes its values in the log, and the plan names it as open)? I recommend yes: the box is noisy, the photo of S1 is from 2014, and the villa of 2019 in the old box may be newer.
+- **Q9.** Does the water of the land (Bàu Sen, Bàu Trũng, D-0009-16) come in phase 2 now? I recommend yes: it is small, and the view from the lighthouse needs it.
+- **Q10.** The builder proposes the limits of the draw calls of PT-69: Low 600, High 2 000, as PT-73. R10 says that I approve them. Phase 3 adds the near houses, with up to 6 materials each (R7a).
+
+### 8.6 Notes for phase 3
+
+- In phase 2 the boxes show from 0 m, with no collision, so on my walk I went through them. This is not a defect of phase 2: the near and mid levels come in phase 3 (R6), and then the far level starts after the mid range.
+- With the town, S5 of PT-73 has 281 874 of 300 000 triangles on Low. Phase 3 has little room there.
+- On the walk, the hẻm near chợ Xóm Lưới (Nguyễn Công Trứ, 3.5 m) has no road surface, and the ground between the boxes is bare earth. The hẻm and the lots of phase 3 give the floors.
+
+### 8.7 Status
+
+Phases 1b and 2 are not done: D-0009-13 to D-0009-21, and Q8 to Q10. Phase 3 waits.
