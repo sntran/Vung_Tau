@@ -128,17 +128,32 @@
 			"id": "bus_le_hong_phong",
 			"name": "The bus view of plan 0010: Lê Hồng Phong near Ngã Năm, toward Núi Lớn",
 			"eye": [
-				10.354,
-				107.0905
+				10.3540843,
+				107.0904931
 			],
 			"eye_height": 2.6,
-			"heading": 279.6,
-			"pitch": 2.0,
+			"heading": 252.2,
+			"pitch": 0.0,
 			"fov": 50.0,
 			"min_boxes": 10,
 			"photo": null,
-			"photo_note": "No open photo of 2017 to 2021 or of another year shows this view on Wikimedia Commons and Flickr (2026-11-21). Report 0009, D-0009-18: its point is in the workflow \"Street photos\" (data/showcase/photo_points.json, town_bus_le_hong_phong); a street photo of Mapillary (CC BY-SA 4.0) from its contact sheet comes here when one shows the view.",
-			"min_boxes_note": "Report 0009, D-0009-18: a view from a street shows the houses of the street: the boxes behind them do not show (17 at 12:00)."
+			"min_boxes_note": "Report 0009, D-0009-18: a view from a street shows the houses of the street: the boxes behind them do not show (17 at 12:00).",
+			"eye_note": "Report 0009, D-0009-18: the street photo of Mapillary: its direction (252.2 degrees, computed), and its place (10.3541546, 107.090463, computed) moved 8.6 m to the line of the street there (Bình Giã of OpenStreetMap; the computed place of an image can be some meters off); at 2.6 m over the street, a window of the bus of plan 0010 (the photo is from a car). The index has no field of view: the view keeps 50 degrees.",
+			"photos": [
+				{
+					"url": "https://www.mapillary.com/app/?pKey=1021584743138012",
+					"mapillary": "1021584743138012",
+					"date": "2025-01-31",
+					"license": "CC BY-SA 4.0",
+					"author": "sg_front_1, Mapillary",
+					"open": true,
+					"file": "town_bus_le_hong_phong_2025.jpg",
+					"title": "Lê Hồng Phong, Mapillary 1021584743138012",
+					"shows": "Lê Hồng Phong to the west-south-west: the street with its trees, the shops, and the houses of three to five storeys. From 2025, not 2019: the street, not its houses of 2019. The copy is the tile of the contact sheet docs/reference/mapillary/sheet_town_bus_le_hong_phong_1.jpg (tools/geo/privacy.py blurred it).",
+					"place": "10.3541546, 107.090463 (the computed place of Mapillary)",
+					"direction": "252 degrees"
+				}
+			]
 		}
 	]
 }
