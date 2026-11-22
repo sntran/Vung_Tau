@@ -233,3 +233,20 @@ def test_a_hill_with_few_lidar_points_takes_the_choice_of_the_nearest_hill():
     # The low land keeps its own choice, and with no positions a group with few points keeps Copernicus.
     assert choice["low_land/tree"]["model"] == bareearth.COPERNICUS
     assert bareearth.choose(result, 30)["nui_nho/tree"]["model"] == bareearth.COPERNICUS
+
+
+def test_a_model_changes_no_cell_where_it_has_no_data():
+    """Report 0009, audit 4: DeltaDTM has no data over its clip (30 m). The ramp
+    at the edge of the cells that use it went on into those cells with a copied
+    difference, and made round pits on Núi Nhỏ. A model changes no cell with no
+    data, and its weight goes to zero toward them."""
+    truth = _ground()
+    forest = _forest()
+    cop = truth + np.where(forest, 5.0, 0.0).astype(np.float32)
+    # The model: the truth, with no data over 25 m (a clip), and one wrong cell of 3 m high on the slope.
+    model = np.where(truth < 25.0, truth, np.nan).astype(np.float32)
+    _t, _f, _r, _c, heights, applied = _setup({"deltadtm": model}, cop)
+    clipped = ~np.isfinite(model)
+    assert np.allclose(heights[clipped], cop[clipped]), "no change where the model has no data"
+    assert (heights < cop - 1.0).any(), "the model is used where it has data"
+    assert float(np.max(np.abs(applied["weight"][clipped]))) == 0.0

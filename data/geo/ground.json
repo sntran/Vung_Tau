@@ -9,7 +9,9 @@
 		},
 		"deltadtm": {
 			"file": "deltadtm.tif",
-			"name": "DeltaDTM v1.1"
+			"name": "DeltaDTM v1.1",
+			"valid_under_m": 30.0,
+			"valid_note": "Report 0009, audit 4: DeltaDTM is clipped at 30 m; a cell of it counts only where Copernicus is under 30 m (on Núi Nhỏ it had values under its clip on slopes of 100 m)."
 		}
 	},
 	"min_points": 30,

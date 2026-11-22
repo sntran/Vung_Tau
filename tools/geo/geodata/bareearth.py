@@ -213,6 +213,13 @@ def apply(heights: np.ndarray, models: dict, classes: np.ndarray, zones: np.ndar
             continue
         distance = ndimage.distance_transform_edt(~used).astype(np.float64) * step
         weight = _ramp(distance, blend)
+        # Report 0009, audit 4: no change where the model has no data (DeltaDTM
+        # over its clip), and the weight goes to zero toward those cells: a
+        # copied difference there made round pits on Núi Nhỏ.
+        if not valid.all():
+            to_no_data = ndimage.distance_transform_edt(valid).astype(np.float64) * step
+            weight *= 1.0 - _ramp(to_no_data, blend)
+            weight[~valid] = 0.0
         weight[keep] = 0.0
         total += weight * diff
         weights += weight

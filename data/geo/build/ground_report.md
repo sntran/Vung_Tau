@@ -91,8 +91,8 @@ The difference is the model minus the lidar (m).
 ## The change
 
 - GEDTM30 v1.2: 626.2 ha, a mean change of -4.36 m.
-- DeltaDTM v1.1: 8.1 ha, a mean change of -23.04 m.
-- All: 1329.7 ha change by more than 0.05 m (a mean of -2.83 m); the most lowered cell 90.49 m, the most raised 9.75 m.
+- DeltaDTM v1.1: 4.6 ha, a mean change of -14.52 m.
+- All: 1326.5 ha change by more than 0.05 m (a mean of -2.42 m); the most lowered cell 22.93 m, the most raised 10.78 m.
 
 ![The change of the ground](ground_change.png)
 
@@ -106,7 +106,7 @@ The mean height of the land in a circle of the place (m): Copernicus over EGM200
 |---|---:|---:|---:|---:|
 | The beach of Bãi Trước | 4.47 | 3.31 | 2.63 | -1.84 |
 | The hall with the orange roof | 7.65 | 6.49 | 6.02 | -1.64 |
-| Cao ốc Sen Biển | 13.01 | 11.85 | 11.61 | -1.40 |
+| Cao ốc Sen Biển | 13.01 | 11.85 | 11.69 | -1.32 |
 | The Grand Hotel | 8.09 | 6.93 | 6.65 | -1.44 |
 
 ## Bãi Trước and Núi Nhỏ, each model

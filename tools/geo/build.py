@@ -696,6 +696,7 @@ def bare_earth(grid, raw: Path, out: Path, settings: dict, projection, config: C
     for name, path in files.items():
         # Cubic, as the DEM (D7): a bilinear sample of 30 m cells makes facets on the slopes.
         models[name] = bareearth.msl(terrain.load_raster(grid, path, projection, terrain.Resampling.cubic), mdt)
+
     classes = np.nan_to_num(terrain.load_raster(grid, raw / "worldcover.tif", projection, terrain.Resampling.nearest),
                             nan=0.0).astype(np.uint8)
     canopy = terrain.load_raster(grid, raw / "canopy.tif", projection, terrain.Resampling.max)
@@ -716,7 +717,15 @@ def bare_earth(grid, raw: Path, out: Path, settings: dict, projection, config: C
     choice = bareearth.choose(result, int(settings["min_points"]), {h: tuple(v["position"]) for h, v in hills.items()})
     before = grid.heights.copy()
     keep = bareearth.coast_keep(land, grid.step, float(settings["coast_band_m"]))
-    applied = bareearth.apply(grid.heights, models, class_cells, zones, zone_names, choice, keep, grid.step,
+    # Report 0009, audit 4: a model of the low land (DeltaDTM, clipped at 30 m) is not used where
+    # Copernicus is over its clip: there its values are not the ground (round pits on Núi Nhỏ).
+    # The comparison above keeps all the points, so that each model has the same points.
+    used_models = dict(models)
+    for name in files:
+        under = settings["models"][name].get("valid_under_m")
+        if under is not None:
+            used_models[name] = np.where(models[bareearth.COPERNICUS] > float(under), np.nan, models[name])
+    applied = bareearth.apply(grid.heights, used_models, class_cells, zones, zone_names, choice, keep, grid.step,
                               float(settings["min_difference_m"]), float(settings["difference_mean_m"]),
                               float(settings["blend_m"]))
     log(f"bare earth: {applied['numbers']['changed_ha']} ha change, a mean of {applied['numbers']['mean_change_m']:+.2f} m")
