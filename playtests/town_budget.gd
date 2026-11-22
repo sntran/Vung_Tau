@@ -2,8 +2,8 @@ extends RefCounted
 # PT-69 town_budget (plan 0009, phase 2, R10). The draw calls, the triangles,
 # and the video memory at the views of PT-68 (data/geo/town_views.json) at
 # 18:00, on Low and on High (Forward+, as PT-73). R10: Low has at most 300 000
-# triangles at each view. The draw calls go to the log; the builder proposes
-# their limits, and I approve them. High measures the views in two runs.
+# triangles at each view. The draw calls: at most 600 on Low and 2 000 on
+# High, as PT-73 (report 0009, Q10). High measures the views in two runs.
 # sizes: 1280x720
 # phase: --world=vung_tau --renderer=forward_plus --quality=low --start-time=18:00
 # phase: --world=vung_tau --renderer=forward_plus --quality=high --start-time=18:00
@@ -11,6 +11,8 @@ extends RefCounted
 
 const Views := preload("res://playtests/town_views.gd")
 const TRIANGLES := {"low": 300000}
+## Report 0009, Q10.
+const DRAW_CALLS := {"low": 600, "high": 2000}
 ## For each run: the preset, and the first and the last view (from 0).
 const RUNS := [["low", 0, 3], ["high", 0, 1], ["high", 2, 3]]
 
@@ -43,6 +45,8 @@ func run(d: PlaytestDriver) -> void:
 		if TRIANGLES.has(preset):
 			d.expect(triangles <= int(TRIANGLES[preset]), "%s, %s: at most %d triangles (R10): %d" % [
 					preset, view.id, TRIANGLES[preset], triangles])
+		d.expect(draw_calls <= int(DRAW_CALLS[preset]), "%s, %s: at most %d draw calls (Q10): %d" % [
+				preset, view.id, DRAW_CALLS[preset], draw_calls])
 		await d.screenshot("%s_%s" % [view.id, preset])
 	camera.fov = fov
 	d.fly_end()
