@@ -17,9 +17,9 @@ Made by `tools/geo/lidar.py`. Do not change by hand.
 - seed gedi02a a36c84e: 2019 188
 - seed gedi02a 7d32458: 2019 384, 2021 74, 2022 23, 2023 416, 2024 72, 2025 153
 
-## lidar fetch (2026-11-21 21:44 UTC)
+## lidar fetch (2026-11-22 16:58 UTC)
 
-- sliderule 5.8.1, 2018-10-14T00:00:00Z to 2026-11-21T00:00:00Z
+- sliderule 5.8.1, 2018-10-14T00:00:00Z to 2026-11-22T00:00:00Z
 - atl08 2026: 4919 rows (it had 4919)
 - atl03_ground 2026: 95798 rows (it had 95798)
 - atl03_roof 2026: 11909 rows (it had 11909)
@@ -28,11 +28,11 @@ Made by `tools/geo/lidar.py`. Do not change by hand.
 - gedi02a 2020: 0 rows; the file of the last good run stays (None rows)
 - gedi02a 2026: 0 rows; the file of the last good run stays (None rows)
 
-## lidar tracks (2026-11-21 21:45 UTC)
+## lidar tracks (2026-11-22 16:59 UTC)
 
 - the short form: 44185 bins of 20 m from 957089 photons (2215 KB, data/geo/build/lidar_tracks.json)
 
-## lidar report (2026-11-21 21:45 UTC)
+## lidar report (2026-11-22 16:59 UTC)
 
 
 ## The points in the store (the head of the branch)

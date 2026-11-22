@@ -1,6 +1,6 @@
-## lidar fetch (2026-11-21 21:44 UTC)
+## lidar fetch (2026-11-22 16:58 UTC)
 
-- sliderule 5.8.1, 2018-10-14T00:00:00Z to 2026-11-21T00:00:00Z
+- sliderule 5.8.1, 2018-10-14T00:00:00Z to 2026-11-22T00:00:00Z
 - atl08 2026: 4919 rows (it had 4919)
 - atl03_ground 2026: 95798 rows (it had 95798)
 - atl03_roof 2026: 11909 rows (it had 11909)
