@@ -63,6 +63,8 @@ var _tall: Dictionary = {}
 var _tall_made: Dictionary = {}
 ## The mean color of the boxes seen from far (index.json): the far town of the ground takes it.
 var far_color := Color(0.5, 0.5, 0.5)
+## The shade of the street at the foot of a wall (index.json, from data/world/palette.json).
+var foot_shade := 1.0
 var _keep_out_ready := false
 var _showcase_area := PackedVector2Array()
 var _focus := Vector3.ZERO
@@ -88,6 +90,7 @@ func setup(w: VungTau) -> bool:
 	for entry: Array in index.get("chunks", []):
 		counts[Vector2i(int(entry[0]), int(entry[1]))] = int(entry[2])
 	far_color = Color(str(index.get("far_color", "#808080")))
+	foot_shade = float(index.get("foot_shade", 1.0))
 	var tall_path := w.data.root.path_join(FOLDER).path_join("tall.json")
 	var tall: Variant = JSON.parse_string(FileAccess.get_file_as_string(tall_path)) if FileAccess.file_exists(tall_path) else null
 	if tall is Dictionary:
@@ -494,7 +497,7 @@ func _make(key: Vector2i, records: Array) -> Dictionary:
 		var wall := Color(str(b[4]))
 		var roof_color := Color(str(b[5]))
 		var hidden: Array = b[7]
-		_walls(ring, hidden, base, top, wall, verts, normals, colors)
+		_walls(ring, hidden, base, top, wall, verts, normals, colors, foot_shade)
 		match roof:
 			ROOF_TILES:
 				_hip(ring, top, float(b[8]) if b.size() > 8 else 1.5, roof_color, verts, normals, colors)
@@ -538,7 +541,7 @@ func _make(key: Vector2i, records: Array) -> Dictionary:
 ## (x, z = -north) it is clockwise seen from above. The front of a face has its
 ## corners clockwise seen from outside (AGENTS.md, section 5f).
 static func _walls(ring: PackedVector2Array, hidden: Array, base: float, top: float, color: Color,
-		verts: PackedVector3Array, normals: PackedVector3Array, colors: PackedColorArray) -> void:
+		verts: PackedVector3Array, normals: PackedVector3Array, colors: PackedColorArray, foot_shade := 1.0) -> void:
 	var n := ring.size()
 	for e in n:
 		var a := ring[e]
@@ -554,8 +557,12 @@ static func _walls(ring: PackedVector2Array, hidden: Array, base: float, top: fl
 		var a1 := Vector3(a.x, top, a.y)
 		var c0 := Vector3(c.x, bottom, c.y)
 		var c1 := Vector3(c.x, top, c.y)
-		_tri(a0, a1, c1, normal, color, verts, normals, colors)
-		_tri(a0, c1, c0, normal, color, verts, normals, colors)
+		# The shade of the street at the foot of a wall from the street (not over a neighbor).
+		var foot := color * Color(foot_shade, foot_shade, foot_shade, 1.0) if bottom <= base + 0.05 else color
+		for p: Array in [[a0, foot], [a1, color], [c1, color], [a0, foot], [c1, color], [c0, foot]]:
+			verts.append(p[0])
+			normals.append(normal)
+			colors.append(p[1])
 
 
 static func _tri(p: Vector3, q: Vector3, r: Vector3, normal: Vector3, color: Color,

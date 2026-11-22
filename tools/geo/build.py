@@ -796,7 +796,8 @@ def write_town(grid, raw: Path, out: Path, area: dict, on_water=None) -> dict | 
         buildings = dry
     palette = load_json(ROOT / "data" / "world" / "palette.json")
     chunks, tall, numbers = town.make(buildings, lambda x, z: grid.sample(x, z), palette, float(area["chunk_size_m"]))
-    numbers["written"] = town.write(out / "town", chunks, float(area["chunk_size_m"]), tall, numbers["far_color"])
+    numbers["written"] = town.write(out / "town", chunks, float(area["chunk_size_m"]), tall, numbers["far_color"],
+                                    numbers["foot_shade"])
     index = load_json(out / "town" / "index.json")
     write_json(out / "town" / "index.json", index | {"numbers": numbers})
     log(f"town: {numbers['written']} boxes in {numbers['chunks']} chunks ({numbers['tall']} tall), far color {numbers['far_color']}, roofs {numbers['roofs']}, "

@@ -1,7 +1,8 @@
 {
 	"note": "Made by tools/geo/build.py (plan 0009, phase 2): the boxes of the buildings of 2019 in each chunk. Outlines: Overture Maps (ODbL); heights: Open Buildings 2.5D Temporal (CC BY 4.0).",
 	"chunk_m": 256.0,
-	"far_color": "#918B86",
+	"far_color": "#73726D",
+	"foot_shade": 0.46,
 	"tall": 166,
 	"chunks": [
 		[
@@ -3182,7 +3183,8 @@
 			"metal": 0.555,
 			"terrace": 0.385
 		},
-		"far_color": "#918B86",
+		"far_color": "#73726D",
+		"foot_shade": 0.46,
 		"written": 45123
 	}
 }

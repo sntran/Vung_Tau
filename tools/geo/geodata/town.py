@@ -19,7 +19,9 @@ For each building the build gives:
   ("far_fronts" of data/world/palette.json, front_color()). The roof colors of
   the palette are measured from aerial photos with the light of the sun in
   them, so a far roof takes "far_roofs" (the factor of the far roofs of the
-  ground shader).
+  ground shader). A wall from the street is darker at its foot ("foot_shade":
+  the shade of the street, as the far roofs of the ground shader of plan 0005,
+  0.46), and about 30 % of the walls are bold, as in the house kit (D-0004-09).
 The buildings with no first year (buildings_unseen, Check) are not in the
 store of buildings_2019, so they are not here.
 
@@ -145,6 +147,11 @@ def make(buildings: list, sample, palette: dict, chunk_m: float) -> tuple[dict, 
     # haze of the house kit (R10a), and a far level has the haze of the scene.
     wall_colors = [w.get("measured", w["color"]) for w in walls]
     wall_weights = [float(w["weight"]) for w in walls]
+    # The bold walls (one color each; a two-color front from far is its main color).
+    bold_colors = list(dict.fromkeys(w["color"] for w in palette.get("bold_walls", [])))
+    bold_share = float(palette.get("bold_share", 0.0))
+    # The shade of the street at the foot of a wall (1 at its top).
+    foot_shade = float(palette.get("far_fronts", {}).get("foot_shade", 1.0))
     metal = palette["metal_roofs"]["colors"]
     terraces = palette["terraces"]["colors"]
     tiles = palette["roof_tiles"]["colors"]
@@ -209,11 +216,17 @@ def make(buildings: list, sample, palette: dict, chunk_m: float) -> tuple[dict, 
         if "far_roofs" in palette:
             roof_color = _scaled(roof_color, float(palette["far_roofs"]["light"]))
         # D8: not the color of a touching neighbor that has its color already.
+        # A share of the walls is bold, as the house kit of plan 0004 (D-0004-09).
         taken = {colors_of[j] for j in neighbors if j in colors_of}
-        wall = _pick(wall_colors, wall_weights, _unit(str(b["id"]) + "w"))
+        choices = wall_colors
+        if bold_colors and _unit(str(b["id"]) + "b") < bold_share:
+            choices = bold_colors
+            wall = bold_colors[int(_unit(str(b["id"]) + "w") * len(bold_colors)) % len(bold_colors)]
+        else:
+            wall = _pick(wall_colors, wall_weights, _unit(str(b["id"]) + "w"))
         step = 0
-        while wall in taken and step < len(wall_colors):
-            wall = wall_colors[(wall_colors.index(wall) + 1) % len(wall_colors)]
+        while wall in taken and step < len(choices):
+            wall = choices[(choices.index(wall) + 1) % len(choices)]
             step += 1
         colors_of[index] = wall
         front = front_color(wall, float(b["height"]), palette["far_fronts"]) if "far_fronts" in palette else wall
@@ -227,22 +240,28 @@ def make(buildings: list, sample, palette: dict, chunk_m: float) -> tuple[dict, 
         (tall if float(b["height"]) >= TALL_M else chunks).setdefault(key, []).append(record)
         # The far color: the roof by its area, and the half of the walls that faces the eye.
         wall_area = 0.0
+        wall_light = 0.0
         for e in range(n):
             a, c = coords[e], coords[(e + 1) % n]
-            wall_area += float(np.hypot(*(np.array(c) - np.array(a)))) * max(tops[index] - max(bases[index], hidden[e]), 0.0)
-        far_sum += _linear(roof_color) * area + _linear(front) * wall_area * 0.5
+            part = float(np.hypot(*(np.array(c) - np.array(a)))) * max(tops[index] - max(bases[index], hidden[e]), 0.0)
+            wall_area += part
+            # A wall from the street has the shade at its foot; a wall over a neighbor has not.
+            wall_light += part * ((foot_shade + 1.0) / 2.0 if hidden[e] <= bases[index] + 0.05 else 1.0)
+        far_sum += _linear(roof_color) * area + _linear(front) * wall_light * 0.5
         far_weight += area + wall_area * 0.5
     numbers["chunks"] = len(chunks)
     numbers["tall"] = sum(len(r) for r in tall.values())
     numbers["roof_shares"] = {k: round(v, 3) for k, v in shares.items()}
     numbers["far_color"] = _srgb_hex(far_sum / max(far_weight, 1e-9))
+    numbers["foot_shade"] = foot_shade
     return chunks, tall, numbers
 
 
 COLUMNS = ["id", "base", "top", "roof", "wall", "roof_color", "outline", "hidden", "tile_rise"]
 
 
-def write(folder: Path, chunks: dict, chunk_m: float, tall: dict | None = None, far_color: str = "#808080") -> int:
+def write(folder: Path, chunks: dict, chunk_m: float, tall: dict | None = None, far_color: str = "#808080",
+          foot_shade: float = 1.0) -> int:
     """One file for each chunk (town/CX_CZ.json), the tall buildings
     (town/tall.json, by chunk), and town/index.json."""
     folder.mkdir(parents=True, exist_ok=True)
@@ -255,7 +274,7 @@ def write(folder: Path, chunks: dict, chunk_m: float, tall: dict | None = None, 
         (folder / f"{cx}_{cz}.json").write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     index = {"note": "Made by tools/geo/build.py (plan 0009, phase 2): the boxes of the buildings of 2019 in each "
                      "chunk. Outlines: Overture Maps (ODbL); heights: Open Buildings 2.5D Temporal (CC BY 4.0).",
-             "chunk_m": chunk_m, "far_color": far_color, "tall": sum(len(r) for r in tall.values()),
+             "chunk_m": chunk_m, "far_color": far_color, "foot_shade": foot_shade, "tall": sum(len(r) for r in tall.values()),
              "chunks": sorted([[cx, cz, len(r)] for (cx, cz), r in chunks.items()])}
     (folder / "index.json").write_text(json.dumps(index, separators=(",", ":")), encoding="utf-8")
     return sum(len(r) for r in chunks.values()) + sum(len(r) for r in tall.values())

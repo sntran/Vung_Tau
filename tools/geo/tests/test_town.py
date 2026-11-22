@@ -114,3 +114,27 @@ def test_a_far_roof_takes_the_light_of_the_palette():
                "terraces": {"colors": [{"color": "#CCCCCC", "weight": 1.0}]}}
     chunks, _tall, _numbers = town.make([_box("a", 0, 0, 10, 10, 9.0)], _flat, palette, 256.0)
     assert chunks[(0, 0)][0][5] == "#666666"
+
+
+def test_a_share_of_the_walls_is_bold():
+    """Report 0009, audit 4 (PT-33): the house kit of plan 0004 makes about 30 %
+    of the walls bold (D-0004-09); the boxes too."""
+    palette = {**PALETTE, "bold_share": 0.3, "bold_walls": [{"color": "#06ACC0"}, {"color": "#F0D98A"}],
+               "far_fronts": {"dark": "#000000", "upper_openings": 0.0, "ground_openings": 0.0, "storey_m": 3.0}}
+    houses = [_box(f"h{i}", 20 * (i % 20), 20 * (i // 20), 20 * (i % 20) + 8, 20 * (i // 20) + 8) for i in range(400)]
+    chunks, _tall, _ = town.make(houses, _flat, palette, 1024.0)
+    walls = [r[4] for records in chunks.values() for r in records]
+    bold = sum(1 for w in walls if w in ("#06ACC0", "#F0D98A")) / len(walls)
+    assert 0.24 < bold < 0.36
+
+
+def test_the_far_color_has_the_shade_of_the_street_at_the_foot_of_the_walls():
+    """Report 0009, audit 4 (PT-33): the walls of the boxes are darker at their
+    foot (foot_shade), so the far color of the ground is darker too."""
+    base = {**PALETTE, "walls": [{"color": "#FFFFFF", "weight": 1.0}],
+            "terraces": {"colors": [{"color": "#FFFFFF", "weight": 1.0}]},
+            "roof_tiles": {"colors": ["#FFFFFF"], "share": 0.0}, "metal_roofs": {"colors": [{"color": "#FFFFFF", "weight": 0.0}]}}
+    lit = {**base, "far_fronts": {"dark": "#000000", "upper_openings": 0.0, "ground_openings": 0.0, "storey_m": 3.0}}
+    shaded = {**base, "far_fronts": {**lit["far_fronts"], "foot_shade": 0.5}}
+    value = lambda p: int(town.make([_box("a", 0, 0, 10, 10, 10.0)], _flat, p, 256.0)[2]["far_color"][1:3], 16)
+    assert value(shaded) < value(lit)
