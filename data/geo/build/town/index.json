@@ -1,8 +1,8 @@
 {
 	"note": "Made by tools/geo/build.py (plan 0009, phase 2): the boxes of the buildings of 2019 in each chunk. Outlines: Overture Maps (ODbL); heights: Open Buildings 2.5D Temporal (CC BY 4.0).",
 	"chunk_m": 256.0,
-	"far_color": "#908A86",
-	"tall": 168,
+	"far_color": "#908B86",
+	"tall": 166,
 	"chunks": [
 		[
 			-9,
@@ -987,7 +987,7 @@
 		[
 			3,
 			-3,
-			168
+			167
 		],
 		[
 			3,
@@ -1112,22 +1112,22 @@
 		[
 			4,
 			-6,
-			190
+			182
 		],
 		[
 			4,
 			-5,
-			131
+			130
 		],
 		[
 			4,
 			-4,
-			138
+			136
 		],
 		[
 			4,
 			-3,
-			80
+			55
 		],
 		[
 			4,
@@ -1272,27 +1272,27 @@
 		[
 			5,
 			-3,
-			125
+			123
 		],
 		[
 			5,
 			-2,
-			124
+			47
 		],
 		[
 			5,
 			-1,
-			61
+			48
 		],
 		[
 			5,
 			0,
-			57
+			50
 		],
 		[
 			5,
 			1,
-			37
+			34
 		],
 		[
 			5,
@@ -1422,17 +1422,17 @@
 		[
 			6,
 			0,
-			78
+			53
 		],
 		[
 			6,
 			1,
-			41
+			15
 		],
 		[
 			6,
 			2,
-			70
+			69
 		],
 		[
 			6,
@@ -1557,12 +1557,12 @@
 		[
 			7,
 			1,
-			73
+			67
 		],
 		[
 			7,
 			2,
-			50
+			48
 		],
 		[
 			7,
@@ -3166,23 +3166,23 @@
 		]
 	],
 	"numbers": {
-		"buildings": 45324,
+		"buildings": 45123,
 		"left_out_small": 0,
 		"roofs": {
-			"terrace": 18016,
-			"metal": 25278,
-			"tiles": 2030
+			"terrace": 17934,
+			"metal": 25168,
+			"tiles": 2021
 		},
-		"hidden_walls": 9105,
-		"walls": 209503,
+		"hidden_walls": 9057,
+		"walls": 208523,
 		"chunks": 632,
-		"tall": 168,
+		"tall": 166,
 		"roof_shares": {
 			"tiles": 0.06,
 			"metal": 0.555,
 			"terrace": 0.385
 		},
-		"far_color": "#908A86",
-		"written": 45324
+		"far_color": "#908B86",
+		"written": 45123
 	}
 }

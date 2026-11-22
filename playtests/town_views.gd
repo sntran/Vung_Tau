@@ -47,6 +47,8 @@ func run(d: PlaytestDriver) -> void:
 				view.id, in_frame, int(view.get("min_boxes", 50))])
 		await d.screenshot("%s_%s" % [view.id, time])
 		d.expect_not_flat("%s at %s" % [view.id, time])
+		for lake_name: String in view.get("lakes", []):
+			_check_lake(d, w, camera, view, lake_name)
 		if view.has("compare") and time == "1200":
 			_compare(d, view)
 		if view.get("edge", false):
@@ -102,6 +104,7 @@ static func read_views(w: VungTau) -> Array[Dictionary]:
 			target = eye + Vector3(sin(heading) * cos(pitch), sin(pitch), -cos(heading) * cos(pitch)) * 100.0
 		out.append({"id": str(v.id), "eye": eye, "target": target, "fov": float(v.get("fov", 70.0)),
 				"min_boxes": int(v.get("min_boxes", 50)), "edge": bool(v.get("edge", false))})
+		out[-1]["lakes"] = v.get("lakes", [])
 		if v.has("compare") and not v.get("photos", []).is_empty():
 			out[-1]["compare"] = v.compare
 			out[-1]["photo"] = str(v.photos[0].file)
@@ -183,3 +186,20 @@ static func town_look(image: Image, box: Array) -> Vector2:
 				white += 1
 			n += 1
 	return Vector2(total / maxf(n, 1.0), float(white) / maxf(n, 1.0))
+
+
+## Report 0009, D-0009-16: the water of the land in the photo shows in the
+## frame: the middle of the area is in the frame, and the ray to it stays over
+## the ground and over the roofs of the boxes.
+func _check_lake(d: PlaytestDriver, w: VungTau, camera: Camera3D, view: Dictionary, lake_name: String) -> void:
+	if not d.expect(w.inland_water != null, "%s: the world has the water of the land" % view.id):
+		return
+	var lake := w.inland_water.area_named(lake_name)
+	if not d.expect(not lake.is_empty(), "%s: %s is in the water of the land" % [view.id, lake_name]):
+		return
+	var middle: Vector3 = lake.middle + Vector3(0.0, 0.2, 0.0)
+	var in_frame := camera.is_position_in_frustum(middle)
+	var clear := w.town.clear_line(camera.global_position, middle)
+	d.step("%s: %s at %.0f m, level %.2f m: in the frame %s, nothing in front of it %s" % [
+			view.id, lake_name, camera.global_position.distance_to(middle), float(lake.level), in_frame, clear])
+	d.expect(in_frame and clear, "%s: %s shows in the frame (D-0009-16)" % [view.id, lake_name])

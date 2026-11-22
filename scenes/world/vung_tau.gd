@@ -152,6 +152,8 @@ var exercise: MorningExercise
 var showcase: Showcase
 ## Plan 0009, phase 2: the boxes of the buildings of the town.
 var town: TownField
+## Report 0009, D-0009-16: the water of the land.
+var inland_water: InlandWater
 ## The showcase builds its parts when the view is nearer than this to its area
 ## (m), some in each frame (ms), so that the start of the world does not wait
 ## for them (report 0026, D-0026-12).
@@ -260,6 +262,12 @@ func setup(folder := GeoData.ROOT) -> bool:
 	if not town.setup(self):
 		town.queue_free()
 		town = null
+	inland_water = InlandWater.new()
+	inland_water.name = "InlandWater"
+	add_child(inland_water)
+	if not inland_water.setup(self):
+		inland_water.queue_free()
+		inland_water = null
 	return true
 
 

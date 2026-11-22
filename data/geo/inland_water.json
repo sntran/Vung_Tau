@@ -1,0 +1,8 @@
+{
+	"note": "Report 0009, D-0009-16: the water of the land (tools/geo/geodata/inland_water.py). min_area_m2: the smallest water area of OpenStreetMap that the game has. depth_m: the ground in the outline goes this far under the level. color and roughness: the material of the water in the game (VungTau.inland_water): a dark green grey with a smooth surface, so that the sky shows in it, as in the photo of the view nui_nho_top of PT-68 (Bàu Sen is #7E8991 there, through 2 km of haze).",
+	"min_area_m2": 200,
+	"depth_m": 1.0,
+	"color": "#2F3C38",
+	"roughness": 0.08,
+	"source": "builder, check"
+}

@@ -423,6 +423,12 @@ func boxes_seen(camera: Camera3D, max_distance: float, frame := Rect2(0, 0, 1, 1
 
 
 ## True when the ray from the eye to the point stays over the ground and over
+## the roofs of the boxes (PT-68: the water of the land shows).
+func clear_line(eye: Vector3, target: Vector3) -> bool:
+	return _clear(eye, target, -1)
+
+
+## True when the ray from the eye to the point stays over the ground and over
 ## the roofs of the other boxes.
 func _clear(eye: Vector3, target: Vector3, tag: int) -> bool:
 	var length := eye.distance_to(target)

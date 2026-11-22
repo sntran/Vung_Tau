@@ -29,7 +29,7 @@ from geodata import visibility, blocks as blocks_module  # noqa: E402
 from geodata import anchors as anchors_module  # noqa: E402
 from geodata import clearings, coast, homestay, landcover, landmarks, mapdraw, osm, roads as roads_module, terrain  # noqa: E402
 from geodata import roadworks as roadworks_module, sea as sea_module, seafloor, trees as trees_module  # noqa: E402
-from geodata import bareearth, groundreport, showcase as showcase_module  # noqa: E402
+from geodata import bareearth, groundreport, inland_water, showcase as showcase_module  # noqa: E402
 from geodata.config import BUILD, GEO, RAW, ROOT, Config, load_json, write_json  # noqa: E402
 from geodata.projection import Projection, map_to_game  # noqa: E402
 
@@ -132,7 +132,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
         if any(a.tags.get(k) == v for k, v in WOOD_TAGS):
             woods.append(shape)
         if a.tags.get("natural") == "water" or "water" in a.tags:
-            water.append(shape)
+            water.append((f"{a.kind}/{a.id}", a.tags, shape))
         if a.tags.get("natural") in SEA_ROCK_TAGS:
             rocks.append(shape)
         if a.tags.get("natural") in LAND_ROCK_TAGS:
@@ -189,6 +189,8 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     ground_config = load_json(geo / "ground.json")
     mdt = float(ground_config["mean_dynamic_topography_m"])
     grid.heights -= mdt
+    # Report 0009, D-0009-16: Copernicus over the mean sea level, for the level of the water of the land.
+    copernicus = grid.heights.copy()
     dem_max = float(grid.heights.max())
     building_mask = terrain.rasterize(grid, buildings)
     town_mask = building_mask | terrain.rasterize(grid, [p for _k, s in landuse for p in polygons_of(s)])
@@ -267,6 +269,15 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     terrain.flatten_roads(grid, roads, ROAD_POINT_STEP_M)
     for road in roads:
         road.heights = grid.sample(road.points[:, 0], -road.points[:, 1]).tolist()
+    # Report 0009, D-0009-16: the water of the land, flat at its level; a road keeps its ground.
+    water_config = load_json(geo / "inland_water.json")
+    inland = inland_water.areas(water, land, float(water_config["min_area_m2"]))
+    inland_water.levels(grid, copernicus, inland, terrain.rasterize)
+    road_cells = terrain.rasterize(grid, [shapely.LineString(r.points).buffer(r.width / 2.0) for r in roads
+                                          if r.points is not None and len(r.points) >= 2])
+    water_cells = inland_water.cut(grid, inland, float(water_config["depth_m"]), terrain.rasterize, road_cells)
+    on_water = inland_water.contains(inland)
+    log(f"water of the land: {len(inland)} areas, {water_cells} cells under their level")
     log("ground done")
 
     found = landmarks.find_all(config, data, projection, grid)
@@ -306,6 +317,8 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     # The known places of plan 0008 (R5).
     places += clearings.known_place_shapes(config.landmarks, found_by_id, roads,
                                            float(config.clearings.get("known_places_margin_m", 3.0)))
+    # No trees and no bushes on the water of the land (D-0009-16).
+    places += [a["polygon"] for a in inland]
     place_mask = terrain.rasterize(grid, [p for shape in places for p in polygons_of(shape)])
     road_mask = terrain.rasterize(grid, clearings.road_shapes(roads, config.clearings))
     canopy = None
@@ -346,6 +359,11 @@ def build(raw: Path, out: Path, geo: Path) -> int:
                 return 0 <= row < walk_mask.shape[0] and 0 <= col < walk_mask.shape[1] and bool(walk_mask[row, col])
             if len(showcase_data.get("outline", [])) >= 3:
                 data_only = shapely.Polygon([(float(x), -float(z)) for x, z in showcase_data["outline"]])
+        walk_keep_out = keep_out
+
+        def keep_out(x: float, y: float) -> bool:
+            # D-0009-16: no tree of a rule on the water of the land.
+            return on_water(x, y) or (walk_keep_out is not None and walk_keep_out(x, y))
         tree_record, tree_counts, tree_groups = trees_module.make(
             config.trees, roads, land, beaches, parks, osm_trees, osm_rows, home.get("coast_road", ""), beach_outline,
             near_point, lambda x, y: grid.sample(np.asarray(x), -np.asarray(y)), tops, keep_out, data_only)
@@ -396,7 +414,8 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     for png in (out / "height").glob("*.png"):
         write_keep_import(png)
     # Plan 0009, phase 2 (R6): the boxes of the buildings of 2019, on the final ground.
-    town_numbers = write_town(grid, raw, out, area)
+    town_numbers = write_town(grid, raw, out, area, on_water)
+    water_numbers = inland_water.write(out / "inland_water.json", inland, water_config)
     rock_mask = terrain.rasterize(grid, [p for r in rocks + land_rocks + [rock_band] + islands if r is not None
                                          for p in polygons_of(r)])
     pebble_mask = terrain.rasterize(grid, [p for r in pebble_shapes + [rock_band] if r is not None
@@ -508,9 +527,10 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     write_json(out / "anchors.json", {"anchors": [{k: v for k, v in a.items() if k != "map"} for a in anchor_list]})
     if cover_record is not None:
         cover_record.pop("canopy_values", None)
+    world["inland_water"] = {"file": "inland_water.json", "areas": water_numbers["areas"]}
     write_report(out / "report.md", world, data, roads, block_list, buildings, found, home, problems,
                  town_change, dem_max, raw, rock_cells, out, anchor_list, works, sea_objects, tree_record, tree_counts,
-                 cover_record)
+                 cover_record, water_numbers)
     log(f"done in {time.time() - started:.0f} s")
     return 0
 
@@ -732,7 +752,7 @@ def bare_earth(grid, raw: Path, out: Path, settings: dict, projection, config: C
             "choice": {g: c["model"] for g, c in choice.items()}, "write": write}
 
 
-def write_town(grid, raw: Path, out: Path, area: dict) -> dict | None:
+def write_town(grid, raw: Path, out: Path, area: dict, on_water=None) -> dict | None:
     """Plan 0009, phase 2 (R6, R10): data/geo/build/town/ (geodata/town.py) from
     buildings_2019 of the store of the release. None when the store is not there."""
     manifest_path = raw / "buildings" / "manifest.json"
@@ -744,6 +764,15 @@ def write_town(grid, raw: Path, out: Path, area: dict) -> dict | None:
     if "buildings_2019" not in store.get("files", {}):
         return None
     buildings = geostore.get(store, "buildings_2019")["buildings"]
+    if on_water is not None:
+        # D-0009-16: no box on the water of the land (an outline whose middle is on it).
+        dry = []
+        for b in buildings:
+            middle = shapely.Polygon(b["outline"]).representative_point() if len(b["outline"]) >= 3 else None
+            if middle is None or not on_water(middle.x, middle.y):
+                dry.append(b)
+        log(f"town: {len(buildings) - len(dry)} buildings on the water of the land are out")
+        buildings = dry
     palette = load_json(ROOT / "data" / "world" / "palette.json")
     chunks, tall, numbers = town.make(buildings, lambda x, z: grid.sample(x, z), palette, float(area["chunk_size_m"]))
     numbers["written"] = town.write(out / "town", chunks, float(area["chunk_size_m"]), tall, numbers["far_color"])
@@ -1186,7 +1215,7 @@ def homestay_record(home: dict) -> dict:
 
 def write_report(path, world, data, roads, block_list, buildings, found, home, problems, town_change, dem_max, raw,
                  rock_cells=0, out=None, anchor_list=None, works=None, sea_objects=None, tree_record=None,
-                 tree_counts=None, cover_record=None):
+                 tree_counts=None, cover_record=None, water_numbers=None):
     manifest = load_json(raw / "manifest.json") if (raw / "manifest.json").exists() else {"files": []}
     lines = ["# Geodata report", "", f"Made by `tools/geo/build.py` on {datetime.date.today().isoformat()}.", ""]
     lines += ["## Extents", "", "| Item | Value |", "|---|---|",
@@ -1202,6 +1231,14 @@ def write_report(path, world, data, roads, block_list, buildings, found, home, p
     for r in roads:
         counts.setdefault(r.type, []).append(r)
     total = sum(r.length for r in roads)
+    if water_numbers is not None:
+        lines += ["## The water of the land (report 0009, D-0009-16)", "",
+                  f"{water_numbers['areas']} water areas of OpenStreetMap on the land ({water_numbers['area_m2'] / 1e4:.1f} ha), "
+                  "flat at their level: the median of Copernicus in the outline, over the mean sea level "
+                  "(`inland_water.json`). The ground goes 1 m under the level, not under a road. No tree and no box "
+                  "of the town stands on the water.", "", "| Name | Area (m²) | Level (m) |", "|---|---|---|"]
+        lines += [f"| {name} | {area_m2} | {level:+.2f} |" for name, area_m2, level in water_numbers["named"]]
+        lines.append("")
     lines += ["## Roads", "", f"Total road length: {total / 1000:.1f} km. Roads with a width tag: "
               f"{sum(1 for r in roads if r.width_source == 'tag')} of {len(roads)}. Hẻm: {sum(1 for r in roads if r.hem)}.", "",
               "| Type | Roads | Length (km) |", "|---|---|---|"]

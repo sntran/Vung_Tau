@@ -15,6 +15,22 @@ Made by `tools/geo/build.py` on 2026-11-22.
 | Highest DEM sample | 248.6 m |
 | Mean height change in towns (buildings removed) | 0.16 m |
 
+## The water of the land (report 0009, D-0009-16)
+
+176 water areas of OpenStreetMap on the land (331.9 ha), flat at their level: the median of Copernicus in the outline, over the mean sea level (`inland_water.json`). The ground goes 1 m under the level, not under a road. No tree and no box of the town stands on the water.
+
+| Name | Area (m²) | Level (m) |
+|---|---|---|
+| Rạch Bến Đình | 338169 | +1.35 |
+| Hồ Bàu Sen | 173930 | +1.84 |
+| Hồ Bàu Trũng | 88132 | +0.84 |
+| Ao cá Phường 2 | 15619 | +3.39 |
+| Hồ Rạch Bà | 12724 | +0.92 |
+| Hồ Mây Hạ | 6471 | +229.80 |
+| Hồ Á Châu | 5306 | +5.00 |
+| Hồ Á Châu | 5284 | +3.27 |
+| Hồ Mây Thượng | 2001 | +236.90 |
+
 ## Roads
 
 Total road length: 692.3 km. Roads with a width tag: 9 of 4124. Hẻm: 2366.
@@ -101,27 +117,27 @@ None.
 ## Trees (R12a)
 
 - araucaria: 6
-- bang: 1904
-- casuarina: 3369
-- coconut: 856
-- flame: 1627
-- frangipani: 778
-- shade: 3571
-- tall_shade: 183
-- From: bai_truoc_road 75, bai_truoc_road_snapped 8, coast_roads 3803, coast_roads_snapped 314, grove 37, kept_off_walks 15, named_roads 497, named_roads_snapped 107, no_data_in_showcase 153, osm 385, park_bai_truoc 289, park_bai_truoc_snapped 68, parks 1384, parks_snapped 1384, street 5824, street_snapped 5824.
+- bang: 1926
+- casuarina: 3415
+- coconut: 841
+- flame: 1651
+- frangipani: 777
+- shade: 3597
+- tall_shade: 188
+- From: bai_truoc_road 79, bai_truoc_road_snapped 8, coast_roads 3823, coast_roads_snapped 306, grove 37, kept_off_walks 9, named_roads 499, named_roads_snapped 112, no_data_in_showcase 152, osm 385, park_bai_truoc 303, park_bai_truoc_snapped 63, parks 1397, parks_snapped 1397, street 5878, street_snapped 5878.
 
 ## Land cover and trees (report 0005, D-0005-09; plan 0020, D8)
 
 - Sources: ESA WorldCover 2021 v200 (10 m classes) and Meta and WRI High Resolution Canopy Height Maps (v1) (about 1 m, kept on a grid of 2.0 m with the highest value). Both CC BY 4.0.
 - The canopy images over the play area are from 2019.42 to 2019.83 (decimal years, mean 2019.73).
 - A canopy of 3 m or more is a tree, and a canopy of 0.6 m to 3 m in tree cover is a bush (WorldCover has almost no shrubland here). Grassland and bare ground show the ground (R10a). The built-up and the cropland classes keep the rules of the town and of `trees.json`.
-- 86883 trees on the open land, with a mean height of 6.8 m and a mean crown radius of 4.5 m (`canopy_trees.json`, R10a). A tree stands on the highest canopy first, then on the lower canopy, at a spacing of 0.9 of its height (5 m to 12 m): the map has one height top for each group of crowns. The crown of a tree is the canopy that is nearer to it than to another tree.
-- No trees and no bushes on 273.6 ha of paved places and platforms (the OSM areas and the landmarks of `data/geo/clearings.json`), and no tree trunks on the roads and the paths (report 0020, D-0020-01).
+- 86250 trees on the open land, with a mean height of 6.9 m and a mean crown radius of 4.5 m (`canopy_trees.json`, R10a). A tree stands on the highest canopy first, then on the lower canopy, at a spacing of 0.9 of its height (5 m to 12 m): the map has one height top for each group of crowns. The crown of a tree is the canopy that is nearer to it than to another tree.
+- No trees and no bushes on 603.6 ha of paved places and platforms (the OSM areas and the landmarks of `data/geo/clearings.json`), and no tree trunks on the roads and the paths (report 0020, D-0020-01).
 
 | Hill | Area (km²) | Tree cover | Bushes | Grass | Bare | Trees | WorldCover classes |
 |---|---|---|---|---|---|---|---|
-| Núi Lớn | 2.27 | 74 % | 7 % | 8 % | 0 % | 15597 | tree cover 89 %, built-up 10 %, grassland 1 %, bare or sparse 0 %, water 0 % |
-| Núi Nhỏ | 0.90 | 76 % | 8 % | 6 % | 0 % | 6806 | tree cover 93 %, built-up 6 %, grassland 1 %, bare or sparse 0 % |
+| Núi Lớn | 2.27 | 74 % | 7 % | 8 % | 0 % | 15669 | tree cover 89 %, built-up 10 %, grassland 1 %, bare or sparse 0 %, water 0 % |
+| Núi Nhỏ | 0.90 | 76 % | 8 % | 6 % | 0 % | 6778 | tree cover 93 %, built-up 6 %, grassland 1 %, bare or sparse 0 % |
 
 The hills: the land within 1.1 km of the top of Núi Lớn and 0.7 km of the top of Núi Nhỏ, higher than 20 m.
 
@@ -137,14 +153,14 @@ The street and park trees and the canopy map (report 0020, D-0020-03): on the ro
 
 | Group | Trees | Moved to a tree top | Not in the map |
 |---|---|---|---|
-| Quang Trung (Bãi Trước) | 75 | 11 % | 95 % |
-| Thùy Vân, Hạ Long, Trần Phú | 3803 | 8 % | 71 % |
+| Quang Trung (Bãi Trước) | 79 | 10 % | 92 % |
+| Thùy Vân, Hạ Long, Trần Phú | 3823 | 8 % | 71 % |
 | grove | 37 | 0 % | 27 % |
-| Trần Hưng Đạo, Ba Cu | 497 | 22 % | 35 % |
+| Trần Hưng Đạo, Ba Cu | 499 | 22 % | 34 % |
 | The trees of OSM | 385 | 0 % | 36 % |
-| The park of Bãi Trước | 289 | 24 % | 21 % |
-| The other parks | 1384 | 100 % | 0 % |
-| The other main roads | 5824 | 100 % | 0 % |
+| The park of Bãi Trước | 303 | 21 % | 20 % |
+| The other parks | 1397 | 100 % | 0 % |
+| The other main roads | 5878 | 100 % | 0 % |
 
 ## Town anchors (R6a)
 

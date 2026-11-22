@@ -46,7 +46,10 @@
 				"max_value_gap": 0.08,
 				"max_white_gap": 0.1,
 				"how": "Report 0009, D-0009-15: the town between the trees of the hill and the sea, in the frame and in the photo. The limits are builder values: the mean value within 0.08 of the photo, and at most 10 points more of near white pixels."
-			}
+			},
+			"lakes": [
+				"Hồ Bàu Sen"
+			]
 		},
 		{
 			"id": "nui_lon_top",
