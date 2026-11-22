@@ -100,7 +100,7 @@ func run(d: PlaytestDriver) -> void:
 			await d.drag(start, start + Vector2(rng.randf_range(-150, 150), rng.randf_range(-60, 60)), 0.2)
 			counts.look += 1
 		await _wait_walk_end(d)
-		if not _check_body(d, i):
+		if not await _check_body(d, i):
 			break
 		if (i + 1) % 25 == 0:
 			await d.screenshot("tap_%03d" % (i + 1))
@@ -200,7 +200,13 @@ func _check_body(d: PlaytestDriver, i: int) -> bool:
 		probe.transform = Transform3D(Basis(), p + Vector3(0, Player.HEIGHT / 2.0, 0))
 		for hit: Dictionary in space.intersect_shape(probe):
 			under += ", near %s" % (hit.collider as Node).get_path()
-		d.fail("action %d: the player left the floor or is in a wall at %s %s, on %s" % [i + 1, p, overlaps, under])
+		# The facts for the next look: the clock, and the height some physics
+		# frames later (a lift that falls back, or a floor under the player).
+		var time := GameClock.format_time(GameState.minutes)
+		for k in 10:
+			await d.main().get_tree().physics_frame
+		d.fail("action %d at %s: the player left the floor or is in a wall at %s %s, on %s; 10 physics frames later at %s" % [
+				i + 1, time, p, overlaps, under, d.state().player])
 		return false
 	return true
 
