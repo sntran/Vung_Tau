@@ -13,7 +13,7 @@ Made by `tools/geo/build.py` on 2026-11-22.
 | Origin | 10.34368307° N, 107.07404669° E (UTM 48N 727110 E, 1144150 N) |
 | Height chunks | 960 (756 with land) |
 | Highest DEM sample | 248.6 m |
-| Mean height change in towns (buildings removed) | 0.02 m |
+| Mean height change in towns (buildings removed) | 0.10 m |
 
 ## The water of the land (report 0009, D-0009-16)
 
@@ -62,29 +62,29 @@ Total road length: 692.3 km. Roads with a width tag: 9 of 4124. Hẻm: 2366.
 
 | Landmark | Found | OSM | Position (game X, Z) | Height (m) | Note |
 |---|---|---|---|---|---|
-| Bãi Trước | yes | way/220821647 | -2.55, -1.31 | 1.2 | 3 candidates, 347.9 m from the hint |
+| Bãi Trước | yes | way/220821647 | -2.55, -1.31 | 1.47 | 3 candidates, 347.9 m from the hint |
 | Bãi Sau | yes | way/234800751 | 2463.57, 115.52 | -0.96 | 5 candidates, 391.9 m from the hint |
-| Bãi Dâu | yes | way/895756059 | -1377.16, -2753.98 | 1.19 | 3 candidates, 435.3 m from the hint |
-| Mũi Nghinh Phong | yes | node/2435353682 | 1076.55, 2561.69 | 1.36 | 1 candidates, 85.4 m from the hint |
+| Bãi Dâu | yes | way/895756059 | -1377.16, -2753.98 | 1.41 | 3 candidates, 435.3 m from the hint |
+| Mũi Nghinh Phong | yes | node/2435353682 | 1076.55, 2561.69 | 2.96 | 1 candidates, 85.4 m from the hint |
 | Núi Lớn | yes | node/2452682527 | -649.2, -1712.32 | 233.7 | 1 candidates, 188.9 m from the hint |
-| Núi Nhỏ | yes | node/-1 | 374.1, 1035.7 | 175.02 | 1 candidates, 0.0 m from the hint |
+| Núi Nhỏ | yes | node/-1 | 374.1, 1035.7 | 174.98 | 1 candidates, 0.0 m from the hint |
 | Tượng Chúa Kitô Vua | yes | way/235008112 | 1159.87, 1893.39 | 137.97 | 1 candidates, 83.3 m from the hint |
-| Hải đăng Vũng Tàu | yes | way/229301316 | 402.21, 1056.5 | 173.43 | 1 candidates, 21.8 m from the hint |
-| Bạch Dinh | yes | way/220753354 | -596.69, -776.93 | 26.76 | 1 candidates, 259.6 m from the hint |
+| Hải đăng Vũng Tàu | yes | way/229301316 | 402.21, 1056.5 | 173.44 | 1 candidates, 21.8 m from the hint |
+| Bạch Dinh | yes | way/220753354 | -596.69, -776.93 | 26.79 | 1 candidates, 259.6 m from the hint |
 | Tượng Đức Mẹ Bãi Dâu | yes | way/790529433 | -1290.64, -3064.05 | 57.27 | 2 candidates, 7.3 m from the hint |
 | Miếu Hòn Bà | yes | way/221906193 | 1677.76, 2174.06 | 10.02 | 8 candidates, 8.4 m from the hint |
 | Chùa Tam Bảo | yes | way/792193852 | -749.18, -1275.61 | 99.84 | 1 candidates, 5.1 m from the hint |
 | Vi Ba | yes | way/35923559 | -722.46, -1106.78 | 70.87 | 5 candidates, 299.0 m from the hint |
 | Hải Đăng | yes | way/35923584 | 332.79, 1014.55 | 162.08 | 3 candidates, 125.2 m from the hint |
 | Bến xe Vũng Tàu | yes | way/220891652 | 1418.58, -757.78 | 5.09 | 2 candidates, 7.3 m from the hint |
-| Chợ Vũng Tàu | yes | way/215166910 | 1299.74, -509.85 | 9.83 | 1 candidates, 785.3 m from the hint |
+| Chợ Vũng Tàu | yes | way/215166910 | 1299.74, -509.85 | 8.36 | 1 candidates, 785.3 m from the hint |
 | Chợ Xóm Lưới | yes | node/2649575440 | 224.65, 242.56 | 6.48 | 1 candidates, 3.1 m from the hint |
 | Chợ Phường 1 | yes | way/259528309 | 159.09, -708.46 | 7.34 | 1 candidates, 5.2 m from the hint |
-| Vòng xoay Đài tưởng niệm Liệt sĩ | yes | way/975192902 | 1953.62, -562.5 | 9.7 | 8 candidates, 811.8 m from the hint |
+| Vòng xoay Đài tưởng niệm Liệt sĩ | yes | way/975192902 | 1953.62, -562.5 | 8.88 | 8 candidates, 811.8 m from the hint |
 | Ngã Năm | yes | node/3144051066 | 1178.71, -1254.11 | 6.34 | 1 candidates, 5.8 m from the hint |
 | Cầu Đá cổ | yes | way/286293879 | -502.58, 448.48 | -4.0 | 1 candidates, 133.4 m from the hint |
-| Nhà thờ Vũng Tàu | yes | way/791795169 | 362.37, -272.07 | 9.23 | 1 candidates, 13.7 m from the hint |
-| Tượng Trần Hưng Đạo | yes | way/235156180 | 360.93, 141.55 | 6.11 | 1 candidates, 4.1 m from the hint |
+| Nhà thờ Vũng Tàu | yes | way/791795169 | 362.37, -272.07 | 8.42 | 1 candidates, 13.7 m from the hint |
+| Tượng Trần Hưng Đạo | yes | way/235156180 | 360.93, 141.55 | 6.07 | 1 candidates, 4.1 m from the hint |
 
 ## Homestay hẻm
 
@@ -117,14 +117,14 @@ None.
 ## Trees (R12a)
 
 - araucaria: 6
-- bang: 1926
-- casuarina: 3415
-- coconut: 841
-- flame: 1651
+- bang: 1930
+- casuarina: 3414
+- coconut: 832
+- flame: 1648
 - frangipani: 777
-- shade: 3597
+- shade: 3593
 - tall_shade: 188
-- From: bai_truoc_road 79, bai_truoc_road_snapped 8, coast_roads 3823, coast_roads_snapped 306, grove 37, kept_off_walks 9, named_roads 499, named_roads_snapped 112, no_data_in_showcase 152, osm 385, park_bai_truoc 303, park_bai_truoc_snapped 63, parks 1397, parks_snapped 1397, street 5878, street_snapped 5878.
+- From: bai_truoc_road 79, bai_truoc_road_snapped 8, coast_roads 3823, coast_roads_snapped 306, grove 37, kept_off_walks 10, named_roads 499, named_roads_snapped 112, no_data_in_showcase 152, osm 385, park_bai_truoc 299, park_bai_truoc_snapped 63, parks 1388, parks_snapped 1388, street 5878, street_snapped 5878.
 
 ## Land cover and trees (report 0005, D-0005-09; plan 0020, D8)
 
@@ -158,8 +158,8 @@ The street and park trees and the canopy map (report 0020, D-0020-03): on the ro
 | grove | 37 | 0 % | 27 % |
 | Trần Hưng Đạo, Ba Cu | 499 | 22 % | 34 % |
 | The trees of OSM | 385 | 0 % | 36 % |
-| The park of Bãi Trước | 303 | 21 % | 20 % |
-| The other parks | 1397 | 100 % | 0 % |
+| The park of Bãi Trước | 299 | 21 % | 19 % |
+| The other parks | 1388 | 100 % | 0 % |
 | The other main roads | 5878 | 100 % | 0 % |
 
 ## Town anchors (R6a)

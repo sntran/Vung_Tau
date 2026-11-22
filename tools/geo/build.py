@@ -204,11 +204,11 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     bare_weight = ground_stats.pop("weight") if ground_stats is not None else None
     square = terrain.square_opening(grid, town_mask, island_mask)
     town_change = terrain.remove_buildings(grid, town_mask, island_mask, bare_weight)
+    land_mask = terrain.rasterize(grid, polygons_of(land))
     town_profile = None
     if ground_stats is not None and "town_profile" in ground_config:
         town_profile = groundreport.town_profile(grid, square, ground_config["town_profile"], found_landmark_point(
-            config, data, projection, ground_config["town_profile"]["landmark"]))
-    land_mask = terrain.rasterize(grid, polygons_of(land))
+            config, data, projection, ground_config["town_profile"]["landmark"]), land_mask)
     beach_mask = terrain.rasterize(grid, [p for b in beaches for p in polygons_of(b)]) & land_mask
     terrain.shape_coast(grid, land_mask, beach_mask)
     terrain.roughen_islands(grid, island_mask & land_mask)

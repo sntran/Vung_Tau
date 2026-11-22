@@ -164,10 +164,16 @@ def report(result: dict, choice: dict, applied: dict, zone_names: list, hills: d
     return "\n".join(lines) + "\n"
 
 
-def town_profile(grid, before: np.ndarray, config: dict, point) -> dict:
+# The town profile counts the land more than this from the sea (m).
+SHORE_M = 30.0
+
+
+def town_profile(grid, before: np.ndarray, config: dict, point, land: np.ndarray | None = None) -> dict:
     """Report 0009, D-0009-20: a profile of the ground of the town from west to
     east, north_m north of a landmark, length_m long: the filter of plans 0005
-    to 0026 (before) and the filter now (after, with the bare earth)."""
+    to 0026 (before) and the filter now (after, with the bare earth). The
+    numbers are for the land more than SHORE_M from the sea (land: the land
+    mask of the grid): the bank at the coastline is not a step of the town."""
     x0, y0 = point
     y = y0 + float(config["north_m"])
     xs = np.arange(x0 - config["length_m"] / 2.0, x0 + config["length_m"] / 2.0, grid.step)
@@ -176,11 +182,20 @@ def town_profile(grid, before: np.ndarray, config: dict, point) -> dict:
     copy = type(grid)(grid.x0, grid.z0, grid.step, before.astype(np.float32))
     old = copy.sample(xs, zs)
 
+    inland = np.ones(len(xs) - 1, dtype=bool)
+    if land is not None:
+        from scipy import ndimage
+        far = ndimage.distance_transform_edt(land) * grid.step > SHORE_M
+        rows = np.clip(np.round((zs - grid.z0) / grid.step).astype(int), 0, land.shape[0] - 1)
+        cols = np.clip(np.round((xs - grid.x0) / grid.step).astype(int), 0, land.shape[1] - 1)
+        cell = far[rows, cols]
+        inland = cell[:-1] & cell[1:]
+
     def flat(values):
-        return float((np.abs(np.diff(values)) < 0.005).mean())
+        return float((np.abs(np.diff(values))[inland] < 0.005).mean())
 
     def largest_step(values):
-        return float(np.abs(np.diff(values)).max())
+        return float(np.abs(np.diff(values))[inland].max())
     return {"config": config, "x": xs, "z": float(-y), "before": old, "after": after,
             "flat_before": flat(old), "flat_after": flat(after),
             "step_before": largest_step(old), "step_after": largest_step(after)}
@@ -209,7 +224,9 @@ def write_town_profile(out, profile: dict) -> None:
             f"(game z {profile['z']:.0f}). Before, the filter of the buildings of plans 0005 to 0026 opened the "
             "ground with a flat square window: it cut each hump of the ground into a flat square, with steps "
             "between the squares. Now the filter does not change the bare earth (GEDTM30 and DeltaDTM have no "
-            "buildings), and elsewhere it opens with a round cone of 15 %, so a slope up to 15 % stays.", "",
+            "buildings), and elsewhere it opens with a flat round window: a slope of the ground stays, a bank "
+            "keeps its edge, and a hump smaller than the window gets a round flat top.", "",
+            f"The numbers are for the land more than {SHORE_M:.0f} m from the sea.", "",
             "| | Before | After |", "|---|---:|---:|",
             f"| Cells flat to 5 mm with the next cell | {profile['flat_before'] * 100:.0f} % | {profile['flat_after'] * 100:.0f} % |",
             f"| The largest step between two cells (m) | {profile['step_before']:.2f} | {profile['step_after']:.2f} |",

@@ -38,12 +38,17 @@ def _along(line: LineString, spacing: float, jitter: float, rng: np.random.Gener
         distance += spacing
 
 
+# Report 0009, PT-53: a tree keeps this distance from the sand of a beach (m).
+BEACH_GAP_M = 1.0
+
+
 class _Place:
     """Checks that a point is free: on land, not on a beach, not on a road, and not too near another tree."""
 
     def __init__(self, land, beaches, roads, near_road: float):
         self.land = prep(land)
-        self.beach = prep(shapely.union_all(beaches)) if beaches else None
+        # The edge of the sand is in the beach of the game (PT-53), so a tree keeps BEACH_GAP_M from it.
+        self.beach = prep(shapely.union_all(beaches).buffer(BEACH_GAP_M)) if beaches else None
         with_points = [r for r in roads if len(r.points) >= 2]
         self.road_ids = [id(r) for r in with_points]
         surfaces = blocks_module.road_surfaces(with_points)

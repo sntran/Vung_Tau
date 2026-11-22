@@ -5,7 +5,7 @@
 	"eyes": {
 		"bai_truoc_beach": [
 			-2.55,
-			2.8,
+			3.07,
 			-1.31
 		],
 		"bai_sau_south": [
@@ -45,7 +45,7 @@
 				172.06,
 				1056.5
 			],
-			"seen": 0.5
+			"seen": 0.6
 		},
 		{
 			"eye": "bai_sau_south",
