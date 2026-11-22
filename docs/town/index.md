@@ -9,11 +9,11 @@ Made by `tools/town/sheets.py` from the screenshots of `tools/playtest.sh town_v
 - The eye: The gallery of the lighthouse (the photo is from it; the ground at its foot has trees round it).
 - The photo: [View of Vung Tau from Vung Tau lighthouse (August 3, 2018) (43913500872).jpg](https://commons.wikimedia.org/wiki/File:View_of_Vung_Tau_from_Vung_Tau_lighthouse_(August_3,_2018)_(43913500872).jpg), Damian Vo, CC BY-SA 2.0, 2018-08-03. The town from the gallery of the lighthouse on Núi Nhỏ, looking north-east: roofs below, Bàu Sen lake, the twin towers, the coast of Bãi Sau, and the hills of Long Hải far away.
 
-## The top of Núi Lớn
+## The cable car of Núi Lớn, over Bạch Dinh
 
 ![nui_lon_top](sheet_nui_lon_top.jpg)
 
-- The eye: The top of Núi Lớn (the peak of OpenStreetMap), over the trees and the edge of the top, as the view nui_lon_south_east of PT-33 (12 m over the top and 18 m more), looking at Bãi Trước with Núi Nhỏ behind it: the direction of the photo from the cable car. The geotag of the photo of 2011 (looking east) is on the flat top, where the trees and the edge hide the town.
+- The eye: Report 0009, D-0009-18: the photo is from the cable car over Bạch Dinh, so the eye is on the line of the cable car of OpenStreetMap (way 236681315), 241 m west of Bạch Dinh, at 66.2 m over the mean sea level.
 - The photo: [Nhìn toàn cảnh TP.VŨNG TÀU từ Cáp treo Vũng Tàu.jpg](https://commons.wikimedia.org/wiki/File:Nh%C3%ACn_to%C3%A0n_c%E1%BA%A3nh_TP.V%C5%A8NG_T%C3%80U_t%E1%BB%AB_C%C3%A1p_treo_V%C5%A9ng_T%C3%A0u.jpg), Luci nguyễn, CC BY-SA 4.0, 2023-08-25. From the cable car on the south-west side of Núi Lớn, looking south-east: Bạch Dinh below, Trần Phú road, the bay of Bãi Trước with boats, and Núi Nhỏ at the end of the bay.
 
 ## The Hải Đăng road
@@ -27,4 +27,5 @@ Made by `tools/town/sheets.py` from the screenshots of `tools/playtest.sh town_v
 
 ![bus_le_hong_phong](sheet_bus_le_hong_phong.jpg)
 
-- No open photo of 2017 to 2021 or of another year shows this view (searched on Wikimedia Commons and Flickr, 2026-11-21); Mapillary cannot be reached from the workspace.
+- The eye: Report 0009, D-0009-18: the street photo of Mapillary: its direction (252.2 degrees, computed), and its place (10.3541546, 107.090463, computed) moved 8.6 m to the line of the street there (Bình Giã of OpenStreetMap; the computed place of an image can be some meters off); at 2.6 m over the street, a window of the bus of plan 0010 (the photo is from a car). The index has no field of view: the view keeps 50 degrees.
+- The photo: [Lê Hồng Phong, Mapillary 1021584743138012](https://www.mapillary.com/app/?pKey=1021584743138012), sg_front_1, Mapillary, CC BY-SA 4.0, 2025-01-31. Lê Hồng Phong to the west-south-west: the street with its trees, the shops, and the houses of three to five storeys. From 2025, not 2019: the street, not its houses of 2019. The copy is the tile of the contact sheet docs/reference/mapillary/sheet_town_bus_le_hong_phong_1.jpg (tools/geo/privacy.py blurred it).

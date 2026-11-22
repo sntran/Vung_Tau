@@ -105,7 +105,11 @@ def report(result: dict, choice: dict, applied: dict, zone_names: list, hills: d
         f"(`lidar_tracks.json`) on the land of the box.",
         f"- **The rule.** For each group (a hill or the low land, and a class of the land cover), the model with "
         f"the smallest RMSE against the lidar ground. A group with fewer than {settings['min_points']} lidar points "
-        f"keeps Copernicus. The build uses the model where it differs from Copernicus by more than "
+        f"takes the choice of the same land cover on the nearest hill with enough points (report 0009, "
+        f"D-0009-17: Núi Nhỏ has 3 points; the table of the choices gives the hill), and keeps Copernicus only "
+        f"when no hill has enough points. A model is used only where it has data (DeltaDTM under its clip of "
+        f"30 m). The filter of the buildings does not change the bare earth (D-0009-20). "
+        f"The build uses the model where it differs from Copernicus by more than "
         f"{settings['min_difference_m']:.1f} m on average (the mean over {settings['difference_mean_m']:.0f} m), "
         f"with a smooth change to Copernicus over {settings['blend_m']:.0f} m at the edge. The sea of the coastline "
         "(below the line of the high water) keeps the heights of plan 0005 (R8g).",
