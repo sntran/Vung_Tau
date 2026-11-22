@@ -205,6 +205,11 @@ func _check_body(d: PlaytestDriver, i: int) -> bool:
 	return true
 
 
+## The half sizes of the solid of a cart of the hẻm (Hem._build_cart()).
+const CART_HALF_WIDTH := 0.7
+const CART_HALF_DEPTH := 0.375
+
+
 ## Report 0009, D-0009-26: a cart comes at its opening hour, also where the
 ## player stands. The cart waits while the player is in its place.
 func _cart_comes_where_the_player_stands(d: PlaytestDriver) -> void:
@@ -219,10 +224,16 @@ func _cart_comes_where_the_player_stands(d: PlaytestDriver) -> void:
 		await d.wait_frames(1)
 	d.expect(not cart.visible, "the cart of mía is not there before %s" % GameClock.format_time(open))
 	var place := cart.global_position
-	if not await d.walk_toward(place.x, place.z):
+	# A point in the box of the cart near its front: the step of the house is
+	# behind the cart, and in CI the player stopped 0.6 m short of the middle.
+	if not await d.walk_toward(place.x, place.z + CART_HALF_DEPTH - 0.05):
 		return
 	await _wait_walk_end(d)
-	d.step("the player stands at %s, in the place of the cart of mía (%.2f, %.2f)" % [d.state().player, place.x, place.z])
+	var at: Vector3 = d.state().player
+	d.step("the player stands at %s, in the place of the cart of mía (%.2f, %.2f)" % [at, place.x, place.z])
+	if not d.expect(absf(at.x - place.x) <= CART_HALF_WIDTH + Player.RADIUS and absf(at.z - place.z) <= CART_HALF_DEPTH + Player.RADIUS,
+			"the player stands where the solid of the cart comes (%.2f, %.2f from its middle)" % [at.x - place.x, at.z - place.z]):
+		return
 	GameState.set_minutes(open)
 	await d.wait_frames(3)
 	d.expect(d.player_overlaps().is_empty(), "at %s the player is not in a solid: %s" % [

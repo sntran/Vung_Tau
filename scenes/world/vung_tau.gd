@@ -174,6 +174,8 @@ var _far_tiles: Dictionary = {}  # Vector2i -> MeshInstance3D
 var _far_strides: Dictionary = {}  # Vector2i -> the grid step of the tile now, in overview samples
 ## The preset of the far clumps of the hill trees now.
 var _canopy_preset := ""
+## The preset of the mesh of the mainland now (report 0009, Q14).
+var _mainland_preset := ""
 var _done: Array = []
 var _mutex := Mutex.new()
 var _tasks := 0
@@ -645,6 +647,9 @@ func _process(delta: float) -> void:
 	if canopy and _canopy_preset != ground_preset:
 		_canopy_preset = ground_preset
 		canopy.set_preset(ground_preset)
+	if mainland and _mainland_preset != ground_preset:
+		_mainland_preset = ground_preset
+		mainland.set_preset(ground_preset)
 	if _boulder_preset != ground_preset:
 		_boulder_preset = ground_preset
 		for key: Vector2i in _chunks:
