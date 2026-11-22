@@ -318,5 +318,18 @@
 				"source": "builder"
 			}
 		]
+	},
+	"far_fronts": {
+		"note": "Report 0009, D-0009-15: the color of a wall of the far boxes of the town (tools/geo/geodata/town.py) is the mean of its front from far: the paint, with the dark of its openings. A storey over the ground floor has the share upper_openings of dark: the window of the house kit of plan 0004 (tube_house.gd: 0.5 times the width of the house, from 0.9 m to 2.4 m, in a storey of 3.2 m) is 23 %, and the shade of the balconies about 5 %. The ground floor (one storey of storey_m) has the share ground_openings: the open front of a shop is 2.6 m high across the front (81 % of the storey), and about half of the ground floors of the town are shops. dark is the glass and the room behind it, and the inside of an open shop, seen from far (builder, check).",
+		"dark": "#2E2B28",
+		"upper_openings": 0.28,
+		"ground_openings": 0.4,
+		"storey_m": 3.2,
+		"source": "builder, from the house kit of plan 0004; check against the photos of PT-68"
+	},
+	"far_roofs": {
+		"note": "Report 0009, D-0009-15: the roof colors of the palette are measured from aerial photos, so they have the light of the sun in them already, and the game lights them again: a far box multiplies its roof color by light (the sRGB values), as the far roofs of the ground shader do (terrain.gdshader: 0.46 to 0.6, plan 0005, D-0005-09). With 0.6, the town of the view nui_nho_top of PT-68 at 12:00 has the mean value 0.68 and 19 % near white (its photo 0.61 and 16 %); with 1.0, 0.75 and 35 %.",
+		"light": 0.6,
+		"source": "builder, the factor of the far roofs of the ground shader"
 	}
 }

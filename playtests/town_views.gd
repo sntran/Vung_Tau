@@ -47,6 +47,8 @@ func run(d: PlaytestDriver) -> void:
 				view.id, in_frame, int(view.get("min_boxes", 50))])
 		await d.screenshot("%s_%s" % [view.id, time])
 		d.expect_not_flat("%s at %s" % [view.id, time])
+		if view.has("compare") and time == "1200":
+			_compare(d, view)
 		if view.get("edge", false):
 			var frame := d.viewport().get_texture().get_image()
 			var edge := edge_values(w, camera, view, frame)
@@ -100,6 +102,9 @@ static func read_views(w: VungTau) -> Array[Dictionary]:
 			target = eye + Vector3(sin(heading) * cos(pitch), sin(pitch), -cos(heading) * cos(pitch)) * 100.0
 		out.append({"id": str(v.id), "eye": eye, "target": target, "fov": float(v.get("fov", 70.0)),
 				"min_boxes": int(v.get("min_boxes", 50)), "edge": bool(v.get("edge", false))})
+		if v.has("compare") and not v.get("photos", []).is_empty():
+			out[-1]["compare"] = v.compare
+			out[-1]["photo"] = str(v.photos[0].file)
 	return out
 
 
@@ -140,3 +145,41 @@ static func _mean_value(frame: Image, top: float, bottom: float) -> float:
 			total += maxf(c.r, maxf(c.g, c.b))
 			n += 1
 	return total / maxf(n, 1.0)
+
+
+## Report 0009, D-0009-15: the town in the frame against the town in its
+## photo (the boxes of "compare"): the mean value (the brightest channel) and
+## the share of the pixels that are near white (a value over 0.8 and a
+## saturation under 0.2).
+func _compare(d: PlaytestDriver, view: Dictionary) -> void:
+	var frame := d.viewport().get_texture().get_image()
+	var photo := Image.load_from_file("res://docs/reference/photos/" + str(view.photo))
+	if not d.expect(photo != null, "%s: the photo %s is in docs/reference/photos/" % [view.id, view.photo]):
+		return
+	var game := town_look(frame, view.compare.game)
+	var real := town_look(photo, view.compare.photo)
+	d.step("%s: the town in the frame has the mean value %.2f and %.0f %% near white; in the photo %.2f and %.0f %%" % [
+			view.id, game.x, game.y * 100.0, real.x, real.y * 100.0])
+	d.expect(absf(game.x - real.x) <= float(view.compare.max_value_gap),
+			"%s: the town has the brightness of the photo (D-0009-15): the mean value %.2f, the photo %.2f (at most %.2f apart)" % [
+				view.id, game.x, real.x, float(view.compare.max_value_gap)])
+	d.expect(game.y - real.y <= float(view.compare.max_white_gap),
+			"%s: the town is not near white (D-0009-15): %.0f %% of its pixels, the photo %.0f %% (at most %.0f points more)" % [
+				view.id, game.y * 100.0, real.y * 100.0, float(view.compare.max_white_gap) * 100.0])
+
+
+static func town_look(image: Image, box: Array) -> Vector2:
+	var total := 0.0
+	var white := 0
+	var n := 0
+	var step := maxi(1, image.get_width() / 640)
+	for y in range(int(float(box[1]) * image.get_height()), int(float(box[3]) * image.get_height()), step):
+		for x in range(int(float(box[0]) * image.get_width()), int(float(box[2]) * image.get_width()), step):
+			var c := image.get_pixel(x, y)
+			var value := maxf(c.r, maxf(c.g, c.b))
+			var saturation := (value - minf(c.r, minf(c.g, c.b))) / maxf(value, 0.001)
+			total += value
+			if value > 0.8 and saturation < 0.2:
+				white += 1
+			n += 1
+	return Vector2(total / maxf(n, 1.0), float(white) / maxf(n, 1.0))

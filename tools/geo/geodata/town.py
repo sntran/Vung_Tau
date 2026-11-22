@@ -12,8 +12,14 @@ For each building the build gives:
   houses with shared walls draws only the parts over the neighbor, R4, W17);
 - the roof: a flat terrace, a metal roof, or tiles (a hip roof), by the shares
   of the palette of plan 0004 (R10a, R10c) and the id of the building (D4);
-- the colors of the wall and of the roof (D8: a wall does not have the color of
-  a touching neighbor).
+- the colors of the wall and of the roof (D8: a wall does not have the paint of
+  a touching neighbor). Report 0009, D-0009-15: the color of a wall is the mean
+  of its front from far: its paint, with the dark of the windows and the
+  balconies of each storey and of the open ground floor of the shops
+  ("far_fronts" of data/world/palette.json, front_color()). The roof colors of
+  the palette are measured from aerial photos with the light of the sun in
+  them, so a far roof takes "far_roofs" (the factor of the far roofs of the
+  ground shader).
 The buildings with no first year (buildings_unseen, Check) are not in the
 store of buildings_2019, so they are not here.
 
@@ -114,6 +120,21 @@ def _srgb_hex(linear: np.ndarray) -> str:
     return "#" + "".join(f"{int(round(v * 255)):02X}" for v in c)
 
 
+def _scaled(color: str, factor: float) -> str:
+    """The sRGB values of a color times a factor (D-0009-15: the light of the sun in a measured roof color)."""
+    return "#" + "".join(f"{min(255, int(round(int(color[i:i + 2], 16) * factor))):02X}" for i in (1, 3, 5))
+
+
+def front_color(paint: str, height: float, fronts: dict) -> str:
+    """The mean color of a front of this height from far (D-0009-15): the paint,
+    with the share of the dark of the openings, in linear light. The ground
+    floor (one storey) has the share of the open shops, the other storeys the
+    share of the windows and the balconies."""
+    ground = min(1.0, float(fronts["storey_m"]) / max(height, 0.1))
+    share = float(fronts["upper_openings"]) * (1.0 - ground) + float(fronts["ground_openings"]) * ground
+    return _srgb_hex(_linear(paint) * (1.0 - share) + _linear(fronts["dark"]) * share)
+
+
 def make(buildings: list, sample, palette: dict, chunk_m: float) -> tuple[dict, dict, dict]:
     """The records of each chunk {(cx, cz): [record]}, the records of the tall
     buildings by chunk, and the numbers for the report. sample(x, z) gives the
@@ -185,6 +206,8 @@ def make(buildings: list, sample, palette: dict, chunk_m: float) -> tuple[dict, 
             roof = "terrace"
             roof_color = _pick([c["color"] for c in terraces], [float(c["weight"]) for c in terraces], _unit(str(b["id"]) + "r"))
         numbers["roofs"][roof] += 1
+        if "far_roofs" in palette:
+            roof_color = _scaled(roof_color, float(palette["far_roofs"]["light"]))
         # D8: not the color of a touching neighbor that has its color already.
         taken = {colors_of[j] for j in neighbors if j in colors_of}
         wall = _pick(wall_colors, wall_weights, _unit(str(b["id"]) + "w"))
@@ -193,10 +216,11 @@ def make(buildings: list, sample, palette: dict, chunk_m: float) -> tuple[dict, 
             wall = wall_colors[(wall_colors.index(wall) + 1) % len(wall_colors)]
             step += 1
         colors_of[index] = wall
+        front = front_color(wall, float(b["height"]), palette["far_fronts"]) if "far_fronts" in palette else wall
         center = polygon.centroid
         key = (math.floor(center.x / chunk_m), math.floor(-center.y / chunk_m))
         record = [str(b["id"])[:12], round(bases[index], 2), round(tops[index], 2), ROOF_KINDS.index(roof),
-                  wall, roof_color, [round(v, 2) for x, y in coords for v in (x, -y)],
+                  front, roof_color, [round(v, 2) for x, y in coords for v in (x, -y)],
                   [round(h, 2) for h in hidden]]
         if roof == "tiles":
             record.append(round(min(width * 0.5 * TILE_PITCH, 3.0), 2))
@@ -206,7 +230,7 @@ def make(buildings: list, sample, palette: dict, chunk_m: float) -> tuple[dict, 
         for e in range(n):
             a, c = coords[e], coords[(e + 1) % n]
             wall_area += float(np.hypot(*(np.array(c) - np.array(a)))) * max(tops[index] - max(bases[index], hidden[e]), 0.0)
-        far_sum += _linear(roof_color) * area + _linear(wall) * wall_area * 0.5
+        far_sum += _linear(roof_color) * area + _linear(front) * wall_area * 0.5
         far_weight += area + wall_area * 0.5
     numbers["chunks"] = len(chunks)
     numbers["tall"] = sum(len(r) for r in tall.values())

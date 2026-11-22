@@ -11,6 +11,7 @@ from geodata import town  # noqa: E402
 
 PALETTE = {
     "walls": [{"color": "#AAAAAA", "weight": 0.5}, {"color": "#BBBBBB", "weight": 0.5}],
+    "far_fronts": {"dark": "#202020", "upper_openings": 0.25, "ground_openings": 0.5, "storey_m": 3.0},
     "roof_tiles": {"colors": ["#D39B83"], "share": 0.06},
     "metal_roofs": {"colors": [{"color": "#5C3E30", "weight": 0.1}]},
     "terraces": {"colors": [{"color": "#CBCAC0", "weight": 0.3}]},
@@ -92,3 +93,24 @@ def test_the_far_color_is_the_mean_of_the_roofs_and_the_walls():
     value = int(numbers["far_color"][1:3], 16)
     # A roof of 100 m2 (white) and the half of 400 m2 of walls (black) that faces the eye.
     assert 0 < value < 255
+
+
+def test_the_far_color_of_a_wall_has_the_dark_of_its_openings():
+    """Report 0009, D-0009-15: from far a front is its paint with the dark of its
+    windows, and a low house has more of the dark of its open ground floor."""
+    paint = "#C8C8C8"
+    low = town.front_color(paint, 3.0, PALETTE["far_fronts"])
+    high = town.front_color(paint, 30.0, PALETTE["far_fronts"])
+    value = lambda c: int(c[1:3], 16)
+    assert value(low) < value(high) < value(paint)
+    chunks, _tall, _numbers = town.make([_box("a", 0, 0, 10, 10, 9.0)], _flat, PALETTE, 256.0)
+    assert chunks[(0, 0)][0][4] not in ("#AAAAAA", "#BBBBBB")
+
+
+def test_a_far_roof_takes_the_light_of_the_palette():
+    """Report 0009, D-0009-15: the measured roof colors have the light of the sun in them."""
+    palette = {**PALETTE, "far_roofs": {"light": 0.5}, "roof_tiles": {"colors": ["#D39B83"], "share": 0.0},
+               "metal_roofs": {"colors": [{"color": "#5C3E30", "weight": 0.0}]},
+               "terraces": {"colors": [{"color": "#CCCCCC", "weight": 1.0}]}}
+    chunks, _tall, _numbers = town.make([_box("a", 0, 0, 10, 10, 9.0)], _flat, palette, 256.0)
+    assert chunks[(0, 0)][0][5] == "#666666"
