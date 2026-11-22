@@ -983,16 +983,6 @@ func _to_parts_space() -> Transform3D:
 ## Moves the shutter. A house that is not a shop has no shutter. A closed or
 ## half open shutter stops the player. With "animate", the shutter rolls in
 ## SHUTTER_SECONDS (R7).
-## Report 0009, audit 5 (the soak in CI): the player is in the way of the
-## shutter: in its door (its box grown by `radius`), or behind it in the shop.
-func in_shutter_way(at: Vector3, radius: float) -> bool:
-	if _shutter_shape == null:
-		return false
-	var local := _shutter_shape.global_transform.affine_inverse() * at
-	var half: Vector3 = (_shutter_shape.shape as BoxShape3D).size / 2.0
-	return absf(local.x) <= half.x + radius and local.z <= half.z + radius
-
-
 func set_shutter(value: Shutter, animate := false) -> void:
 	var changed := value != shutter
 	shutter = value

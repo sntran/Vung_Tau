@@ -642,29 +642,15 @@ func update_time(minutes: int) -> void:
 			for rule: Dictionary in spot.get("shutter_half", []):
 				if GameClock.in_range(rule, minutes):
 					shutter = TubeHouse.Shutter.HALF
-		# Report 0009, audit 5: a shutter that closes during the game waits while
-		# the player stands in its door or in the shop (in CI the soak stood in
-		# the door of the phở at 10:30, and the solid of the shutter pushed the
-		# player up). As the carts (D-0009-26).
-		var here: Vector3 = player_at.call() if player_at.is_valid() else Vector3.INF
-		if _present_key != "" and house.shutter == TubeHouse.Shutter.OPEN and shutter != TubeHouse.Shutter.OPEN \
-				and house.in_shutter_way(here, Player.RADIUS):
-			shutter = TubeHouse.Shutter.OPEN
 		# The shutter rolls when it changes during the game (R7), not at the start.
 		house.set_shutter(shutter, _present_key != "")
 		house.set_glow(dark and (open or spot.hours == null))
 		_spot_lights[spot_id].visible = dark and (open or spot.hours == null)
 		if _stall_open.has(spot_id):
-			# The stools of a stall that change (open or closed) wait while the
-			# player stands where their solid comes.
-			var stall_open := open
-			var coming: StaticBody3D = _stall_bodies[spot_id][0 if open else 1]
-			if _present_key != "" and coming.collision_layer == 0 and _stands_in(coming):
-				stall_open = not open
-			_stall_open[spot_id].visible = stall_open
-			_stall_closed[spot_id].visible = not stall_open
-			_stall_bodies[spot_id][0].collision_layer = Layers.SOLID if stall_open else 0
-			_stall_bodies[spot_id][1].collision_layer = 0 if stall_open else Layers.SOLID
+			_stall_open[spot_id].visible = open
+			_stall_closed[spot_id].visible = not open
+			_stall_bodies[spot_id][0].collision_layer = Layers.SOLID if open else 0
+			_stall_bodies[spot_id][1].collision_layer = 0 if open else Layers.SOLID
 	for spot_id: String in carts:
 		var present := is_present(spot_id, minutes)
 		var body: StaticBody3D = _cart_bodies[spot_id]
