@@ -4,7 +4,7 @@
 |---|---|
 | Status | Approved (2026-11-20) |
 | Branch | `feat/0027-construction-in-the-game` |
-| Depends on | 0023 (models from World). World steps W24 to W28 (section 5: done in World on 2026-11-20, `main` at `0a467e6`). World step W29 (section 5: open, added 2026-11-21). |
+| Depends on | 0023 (models from World). World steps W24 to W28 (section 5: done in World on 2026-11-20, `main` at `0a467e6`). World step W29 (section 5: done in World on 2026-11-21, `297fa8f`; the keys of a job of CI and of the site agree at `0d193f5`). |
 | Changes | 0023 (D1, R2, R3, R5: a model is its parts, not one GLB for each level), 0026 (D5, `docs/world-models.md`: the loop of look and edit). |
 
 ## 1. Goal
@@ -41,6 +41,7 @@ Why now (report 0026, section 3): the edge of World answers 503 for each buildin
 - **R6.** Hải Âu is the first model: its parts come from the factory, and the game glues them. The time from an edit of Hải Âu to its new mid level is at most 5 minutes.
 - **R6a.** The first lock of parts takes no file that the old Previews of World could change: World checks the objects of its bucket written from 2026-11-18 20:10 UTC to 2026-11-21 (World `docs/factory.md`, "The listeners of the VM") before that lock. Until World says that the check is done, take the files from a clone of World or from a build in CI, not from the factory.
   - Changed (2026-11-21): the check of World (run 44924224179) put 111 objects in `quarantine/`, and 67 objects wait for a log. It also found that the key of a part changes with the folder of the build (W29). So the first lock of parts takes only keys that World made after W29 is on its site, with the commit of World of that time. No key of the window can be in such a lock. Until W29, a lock of parts from a clone or from CI has other keys than the factory, so do not make one. The whole files (`/o/HASH.LEVEL.glb`) are the same in each folder, and the lock of plan 0023 stays as it is.
+  - Changed (2026-11-22): W29 is done (World `297fa8f`), and World ended the check of its bucket (World #71, 2026-11-22). So the first lock of parts can take each key that World made from `0d193f5` on.
 - **R7.** When each order of `data/world/orders.json` comes as parts, the job "Models of World" (`mix world.order` in CI) builds only what World does not give as parts yet.
 
 ## 5. What Vũng Tàu needs from World
