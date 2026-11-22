@@ -230,6 +230,12 @@ func _cart_comes_where_the_player_stands(d: PlaytestDriver) -> void:
 		await d.wait_frames(1)
 	d.expect(not cart.visible, "the cart of mía is not there before %s" % GameClock.format_time(open))
 	var place := cart.global_position
+	# Setup: the random taps end at another place on each computer (in CI at
+	# 2400x1080, on the beach), so the step starts in the hẻm, 3 m from the cart.
+	var player: Player = d.main().player
+	player.global_position = Vector3(place.x - 3.0, 0.01, 0.2)
+	player.velocity = Vector3.ZERO
+	await d.wait_frames(5)
 	# A point in the box of the cart near its front: the step of the house is
 	# behind the cart, and in CI the player stopped 0.6 m short of the middle.
 	if not await d.walk_toward(place.x, place.z + CART_HALF_DEPTH - 0.05):
