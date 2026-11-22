@@ -189,8 +189,13 @@ def _round_opening(heights: np.ndarray, step: float) -> np.ndarray:
     such a hump (a slope of 0.15) also kept a cone over each building (0.15
     times its half width: 1.5 m to 2.4 m over a block of 20 m to 30 m: the
     places of PT-71 stood in pits), and it cut each bank (the walk of Bãi Trước
-    came 0.77 m lower, and the sea covered the steps of PT-77)."""
-    radius = URBAN_FILTER_M / 2.0 / step
+    came 0.77 m lower, and the sea covered the steps of PT-77). The round
+    window has the area of the square window of plans 0005 to 0026: a round
+    window of URBAN_FILTER_M fits in more blocks than the square, and kept a
+    plateau of a block 0.97 m higher next to the Grand Cảnh Nam (PT-71); a
+    round window that holds the square (its diagonal) cut the strip of land
+    of the walk of Bãi Trước 1.6 m lower (PT-77)."""
+    radius = (int(URBAN_FILTER_M / step) | 1) / math.sqrt(math.pi)
     n = int(np.ceil(radius))
     rows, cols = np.mgrid[-n:n + 1, -n:n + 1]
     return ndimage.grey_opening(heights, footprint=rows ** 2 + cols ** 2 <= radius ** 2).astype(np.float32)
@@ -211,7 +216,8 @@ def square_opening(grid: Grid, town: np.ndarray, keep: np.ndarray | None = None)
 
 
 def remove_buildings(grid: Grid, town: np.ndarray, keep: np.ndarray | None = None,
-                     bare: np.ndarray | None = None) -> float:
+                     bare: np.ndarray | None = None, under: np.ndarray | None = None,
+                     old: np.ndarray | None = None) -> float:
     """The DEM is a surface model: it has the tops of buildings and trees. An
     opening filter removes shapes that are smaller than URBAN_FILTER_M, with a
     flat round window that keeps the slope of the ground (_round_opening();
@@ -220,9 +226,22 @@ def remove_buildings(grid: Grid, town: np.ndarray, keep: np.ndarray | None = Non
     changes the towns and the low ground, but not the hills, not the cells in
     keep (small islands such as Hòn Bà: they are smaller than the filter, so
     the filter makes them flat), and not the bare earth (bare: its weight, 0 to
-    1; GEDTM30 and DeltaDTM have no buildings). Returns the mean change in
-    meters where the filter changes the ground fully."""
-    opened = _round_opening(grid.heights, grid.step)
+    1; GEDTM30 and DeltaDTM have no buildings). under: the heights of the
+    surface model before the bare earth blends in: the filter works on them,
+    so where the weight of the bare earth is between 0 and 1, the ground is the
+    blend of the bare earth and the surface model with no building (a filter
+    of the blend left a quarter of a building where the weight was 0.5: the
+    Grand Cảnh Nam stood in a pit, PT-71). old: 0 to 1, where the ground is
+    the ground of phase 1b (the square window of square_opening() on the
+    heights, also on the bare earth): the area of the showcase of plan 0026,
+    whose parts, models, and checks were made on that ground (the round window
+    moved the sand at the openings of the low wall over the limits of PT-77).
+    Returns the mean change in meters where the filter changes the ground
+    fully."""
+    if old is not None and old.any():
+        phase_1b = square_opening(grid, town, keep)
+    source = grid.heights if under is None else under
+    opened = _round_opening(source, grid.step)
     density = ndimage.gaussian_filter(town.astype(np.float32), sigma=20.0 / grid.step)
     low = np.clip((LOW_GROUND_TOP_M - opened) / LOW_GROUND_BLEND_M, 0.0, 1.0)
     weight = np.maximum(np.clip(density * 3.0, 0.0, 1.0), low)
@@ -230,8 +249,10 @@ def remove_buildings(grid: Grid, town: np.ndarray, keep: np.ndarray | None = Non
         weight[keep] = 0.0
     if bare is not None:
         weight *= np.clip(1.0 - bare, 0.0, 1.0)
-    change = (grid.heights - opened) * weight
+    change = (source - opened) * weight
     grid.heights -= change
+    if old is not None and old.any():
+        grid.heights += (phase_1b - grid.heights) * np.clip(old, 0.0, 1.0)
     full = weight > 0.99
     return float(change[full].mean()) if full.any() else 0.0
 

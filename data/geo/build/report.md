@@ -13,7 +13,7 @@ Made by `tools/geo/build.py` on 2026-11-22.
 | Origin | 10.34368307° N, 107.07404669° E (UTM 48N 727110 E, 1144150 N) |
 | Height chunks | 960 (756 with land) |
 | Highest DEM sample | 248.6 m |
-| Mean height change in towns (buildings removed) | 0.10 m |
+| Mean height change in towns (buildings removed) | 0.11 m |
 
 ## The water of the land (report 0009, D-0009-16)
 
@@ -65,26 +65,26 @@ Total road length: 692.3 km. Roads with a width tag: 9 of 4124. Hẻm: 2366.
 | Bãi Trước | yes | way/220821647 | -2.55, -1.31 | 1.47 | 3 candidates, 347.9 m from the hint |
 | Bãi Sau | yes | way/234800751 | 2463.57, 115.52 | -0.96 | 5 candidates, 391.9 m from the hint |
 | Bãi Dâu | yes | way/895756059 | -1377.16, -2753.98 | 1.41 | 3 candidates, 435.3 m from the hint |
-| Mũi Nghinh Phong | yes | node/2435353682 | 1076.55, 2561.69 | 2.96 | 1 candidates, 85.4 m from the hint |
+| Mũi Nghinh Phong | yes | node/2435353682 | 1076.55, 2561.69 | 2.8 | 1 candidates, 85.4 m from the hint |
 | Núi Lớn | yes | node/2452682527 | -649.2, -1712.32 | 233.7 | 1 candidates, 188.9 m from the hint |
-| Núi Nhỏ | yes | node/-1 | 374.1, 1035.7 | 174.98 | 1 candidates, 0.0 m from the hint |
+| Núi Nhỏ | yes | node/-1 | 374.1, 1035.7 | 175.01 | 1 candidates, 0.0 m from the hint |
 | Tượng Chúa Kitô Vua | yes | way/235008112 | 1159.87, 1893.39 | 137.97 | 1 candidates, 83.3 m from the hint |
-| Hải đăng Vũng Tàu | yes | way/229301316 | 402.21, 1056.5 | 173.44 | 1 candidates, 21.8 m from the hint |
-| Bạch Dinh | yes | way/220753354 | -596.69, -776.93 | 26.79 | 1 candidates, 259.6 m from the hint |
+| Hải đăng Vũng Tàu | yes | way/229301316 | 402.21, 1056.5 | 173.42 | 1 candidates, 21.8 m from the hint |
+| Bạch Dinh | yes | way/220753354 | -596.69, -776.93 | 26.71 | 1 candidates, 259.6 m from the hint |
 | Tượng Đức Mẹ Bãi Dâu | yes | way/790529433 | -1290.64, -3064.05 | 57.27 | 2 candidates, 7.3 m from the hint |
 | Miếu Hòn Bà | yes | way/221906193 | 1677.76, 2174.06 | 10.02 | 8 candidates, 8.4 m from the hint |
 | Chùa Tam Bảo | yes | way/792193852 | -749.18, -1275.61 | 99.84 | 1 candidates, 5.1 m from the hint |
 | Vi Ba | yes | way/35923559 | -722.46, -1106.78 | 70.87 | 5 candidates, 299.0 m from the hint |
 | Hải Đăng | yes | way/35923584 | 332.79, 1014.55 | 162.08 | 3 candidates, 125.2 m from the hint |
 | Bến xe Vũng Tàu | yes | way/220891652 | 1418.58, -757.78 | 5.09 | 2 candidates, 7.3 m from the hint |
-| Chợ Vũng Tàu | yes | way/215166910 | 1299.74, -509.85 | 8.36 | 1 candidates, 785.3 m from the hint |
-| Chợ Xóm Lưới | yes | node/2649575440 | 224.65, 242.56 | 6.48 | 1 candidates, 3.1 m from the hint |
+| Chợ Vũng Tàu | yes | way/215166910 | 1299.74, -509.85 | 8.33 | 1 candidates, 785.3 m from the hint |
+| Chợ Xóm Lưới | yes | node/2649575440 | 224.65, 242.56 | 6.47 | 1 candidates, 3.1 m from the hint |
 | Chợ Phường 1 | yes | way/259528309 | 159.09, -708.46 | 7.34 | 1 candidates, 5.2 m from the hint |
-| Vòng xoay Đài tưởng niệm Liệt sĩ | yes | way/975192902 | 1953.62, -562.5 | 8.88 | 8 candidates, 811.8 m from the hint |
+| Vòng xoay Đài tưởng niệm Liệt sĩ | yes | way/975192902 | 1953.62, -562.5 | 8.6 | 8 candidates, 811.8 m from the hint |
 | Ngã Năm | yes | node/3144051066 | 1178.71, -1254.11 | 6.34 | 1 candidates, 5.8 m from the hint |
 | Cầu Đá cổ | yes | way/286293879 | -502.58, 448.48 | -4.0 | 1 candidates, 133.4 m from the hint |
-| Nhà thờ Vũng Tàu | yes | way/791795169 | 362.37, -272.07 | 8.42 | 1 candidates, 13.7 m from the hint |
-| Tượng Trần Hưng Đạo | yes | way/235156180 | 360.93, 141.55 | 6.07 | 1 candidates, 4.1 m from the hint |
+| Nhà thờ Vũng Tàu | yes | way/791795169 | 362.37, -272.07 | 9.0 | 1 candidates, 13.7 m from the hint |
+| Tượng Trần Hưng Đạo | yes | way/235156180 | 360.93, 141.55 | 6.05 | 1 candidates, 4.1 m from the hint |
 
 ## Homestay hẻm
 
@@ -136,7 +136,7 @@ None.
 
 | Hill | Area (km²) | Tree cover | Bushes | Grass | Bare | Trees | WorldCover classes |
 |---|---|---|---|---|---|---|---|
-| Núi Lớn | 2.28 | 74 % | 7 % | 8 % | 0 % | 15761 | tree cover 89 %, built-up 10 %, grassland 1 %, bare or sparse 0 %, water 0 % |
+| Núi Lớn | 2.28 | 74 % | 7 % | 8 % | 0 % | 15762 | tree cover 89 %, built-up 10 %, grassland 1 %, bare or sparse 0 %, water 0 % |
 | Núi Nhỏ | 0.88 | 78 % | 8 % | 6 % | 0 % | 6706 | tree cover 94 %, built-up 5 %, grassland 1 %, bare or sparse 0 % |
 
 The hills: the land within 1.1 km of the top of Núi Lớn and 0.7 km of the top of Núi Nhỏ, higher than 20 m.

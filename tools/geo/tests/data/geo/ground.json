@@ -70,8 +70,8 @@
 	"town_profile": {
 		"landmark": "cho_xom_luoi",
 		"name": "chợ Xóm Lưới",
-		"north_m": 300,
+		"north_m": 700,
 		"length_m": 1000,
-		"note": "Report 0009, D-0009-20: the profile of the town ground in ground_report.md (the town north of chợ Xóm Lưới, as in the audit)."
+		"note": "Report 0009, D-0009-20: the profile of the town ground in ground_report.md (the town north of chợ Xóm Lưới, as in the audit). At 300 m north, 460 m of the line was in the area of the showcase, which keeps the ground of phase 1b, and its west end was the sea; at 700 m north the line is in the town, out of the showcase and its blend of 60 m."
 	}
 }

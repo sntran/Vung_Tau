@@ -351,6 +351,20 @@ def test_the_filter_of_the_buildings_keeps_the_slope_with_no_square_terraces():
     assert np.all(grid.heights <= heights + 1e-4), "the filter never raises the ground"
 
 
+def test_the_round_window_takes_away_a_block_as_the_square_did():
+    """Report 0009, PT-71: a round block of 66 m (a round window of 60 m fits
+    in it, and kept it as a plateau) goes, as with the square window of plans
+    0005 to 0026 (the round window has the area of the square)."""
+    n = 151
+    rows, cols = np.indices((n, n))
+    heights = np.full((n, n), 5.0, dtype=np.float32)
+    heights[(rows - 75) ** 2 + (cols - 75) ** 2 <= 16.5 ** 2] += 3.0
+    town = np.ones((n, n), dtype=bool)
+    grid = terrain.Grid(0.0, 0.0, 2.0, heights.copy())
+    terrain.remove_buildings(grid, town)
+    assert grid.heights[75, 75] == pytest.approx(5.0, abs=0.01)
+
+
 def test_the_filter_of_the_buildings_keeps_the_edge_of_a_bank():
     """Report 0009, D-0009-20: a wide terrace with a bank of 2 m down to the
     sand keeps its edge (a cone cut the edge, and the walk of Bãi Trước came
@@ -374,6 +388,23 @@ def test_the_filter_of_the_buildings_does_not_change_the_bare_earth():
     grid = terrain.Grid(0.0, 0.0, 2.0, heights.copy())
     terrain.remove_buildings(grid, town, None, bare)
     assert np.allclose(grid.heights, heights)
+
+
+def test_the_filter_takes_the_whole_building_out_where_the_bare_earth_blends_in():
+    """Report 0009, PT-71: where the weight of the bare earth is 0.5 (its edge
+    of 60 m), the filter of the blend took away half of the building of the
+    surface model, so a quarter of it stayed (the Grand Cảnh Nam stood in a
+    pit). The filter works on Copernicus (under), then the bare earth blends in."""
+    n = 101
+    flat = np.full((n, n), 5.0, dtype=np.float32)
+    surface = flat.copy()
+    surface[45:56, 45:56] += 10.0
+    bare_model = np.full((n, n), 4.0, dtype=np.float32)
+    weight = np.full((n, n), 0.5, dtype=np.float32)
+    blend = bare_model * weight + surface * (1.0 - weight)
+    grid = terrain.Grid(0.0, 0.0, 2.0, blend.copy())
+    terrain.remove_buildings(grid, np.ones((n, n), dtype=bool), None, weight, surface)
+    assert grid.heights[50, 50] == pytest.approx(4.5, abs=0.01), "the blend of the bare earth and the ground"
 
 
 def test_outside_of_a_sharp_bend_is_flat():
@@ -870,3 +901,23 @@ def test_no_tree_stands_on_the_edge_of_the_sand():
     assert not place.free(np.array([0.0, 10.0]), 1.0), "on the edge of the sand"
     assert not place.free(np.array([-0.5, 20.0]), 1.0), "less than BEACH_GAP_M from the sand"
     assert place.free(np.array([-trees.BEACH_GAP_M - 0.1, 30.0]), 1.0)
+
+
+def test_the_showcase_keeps_the_filter_of_phase_1b():
+    """Report 0009, D-0009-20: the parts, models, and checks of the showcase of
+    plan 0026 were made on the ground of phase 1b (the square window, also on
+    the bare earth). In the area of the showcase (old: 1) the ground is that
+    ground; outside it (old: 0) the new filter."""
+    n = 101
+    rows, cols = np.indices((n, n))
+    surface = (5.0 + 3.0 * np.exp(-(((rows - 50) * 2.0) ** 2 + ((cols - 50) * 2.0) ** 2) / (2 * 12.0 ** 2))
+               ).astype(np.float32)
+    town = np.ones((n, n), dtype=bool)
+    bare = np.full((n, n), 1.0, dtype=np.float32)
+    before = terrain.square_opening(terrain.Grid(0.0, 0.0, 2.0, surface.copy()), town)
+    inside = terrain.Grid(0.0, 0.0, 2.0, surface.copy())
+    terrain.remove_buildings(inside, town, None, bare, surface, np.ones((n, n), dtype=np.float32))
+    assert np.allclose(inside.heights, before, atol=1e-4)
+    outside = terrain.Grid(0.0, 0.0, 2.0, surface.copy())
+    terrain.remove_buildings(outside, town, None, bare, surface, np.zeros((n, n), dtype=np.float32))
+    assert np.allclose(outside.heights, surface, atol=1e-4), "no filter on the bare earth"

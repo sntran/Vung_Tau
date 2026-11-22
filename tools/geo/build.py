@@ -21,6 +21,7 @@ from pathlib import Path
 import numpy as np
 import shapely
 import shapely.ops
+from scipy import ndimage
 from shapely.geometry import Polygon
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -202,8 +203,11 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     island_mask = terrain.rasterize(grid, [p.buffer(ISLAND_MARGIN_M) for p in islands])
     # Report 0009, D-0009-20: no filter where the bare earth is used, and a round window that keeps the slope.
     bare_weight = ground_stats.pop("weight") if ground_stats is not None else None
-    square = terrain.square_opening(grid, town_mask, island_mask)
-    town_change = terrain.remove_buildings(grid, town_mask, island_mask, bare_weight)
+    # The "before" of the town profile: the filter of plans 0005 to 0026 on Copernicus.
+    square = terrain.square_opening(terrain.Grid(grid.x0, grid.z0, grid.step, copernicus.copy()), town_mask,
+                                    island_mask)
+    town_change = terrain.remove_buildings(grid, town_mask, island_mask, bare_weight, copernicus,
+                                           showcase_weight(grid))
     land_mask = terrain.rasterize(grid, polygons_of(land))
     town_profile = None
     if ground_stats is not None and "town_profile" in ground_config:
@@ -780,6 +784,25 @@ def found_landmark_point(config, data, projection, landmark_id: str):
     lon, lat = found["lonlat"] if found else (landmark["hint"]["lon"], landmark["hint"]["lat"])
     x, y = projection.to_map(np.array([lon]), np.array([lat]))
     return float(x[0]), float(y[0])
+
+
+# Report 0009, D-0009-20: the ground of phase 1b in the area of the showcase, with a blend of this width (m) at its edge.
+SHOWCASE_BLEND_M = 60.0
+
+
+def showcase_weight(grid) -> np.ndarray | None:
+    """1 in the outline of the showcase of plan 0026 (data/showcase/bai_truoc.json),
+    0 SHOWCASE_BLEND_M past it: there the ground keeps the filter of phase 1b
+    (terrain.remove_buildings(), old)."""
+    path = ROOT / "data" / "showcase" / "bai_truoc.json"
+    if not path.exists():
+        return None
+    outline = load_json(path).get("outline", [])
+    if len(outline) < 3:
+        return None
+    inside = terrain.rasterize(grid, [shapely.Polygon([(float(x), -float(z)) for x, z in outline])])
+    distance = ndimage.distance_transform_edt(~inside) * grid.step
+    return np.clip(1.0 - distance / SHOWCASE_BLEND_M, 0.0, 1.0).astype(np.float32)
 
 
 def write_town(grid, raw: Path, out: Path, area: dict, on_water=None) -> dict | None:
