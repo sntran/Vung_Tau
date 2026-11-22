@@ -21,14 +21,38 @@ jobs:
   request:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    # Three orders at the same time, 20 s apart, as three projects did in
+    # the measure of 2026-11-21: the edit of Hải Âu, a village house (as
+    # Tre), and a fridge (as DIY). Each job is a job of this repository,
+    # with the ID token of its job.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: hai_au
+            offset: "0"
+            order: '[{"set": "options.storey", "to": "RUN"}]'
+            edit_of: "42bab18a507afa6fb1acc46d052f0666"
+            vary: "3.8"
+          - name: village_house
+            offset: "20"
+            order: '{"blueprint": "village_house", "options": {"bays": 3, "bay": "RUN"}}'
+            edit_of: ""
+            vary: "2.4"
+          - name: fridge
+            offset: "40"
+            order: '{"blueprint": "appliance", "options": {"kind": "fridge", "size": [0.7, 0.68, "RUN"]}}'
+            edit_of: ""
+            vary: "1.8"
+    name: request (${{ matrix.name }})
     env:
-      START_AT: "2026-11-22T01:18:00Z"
-      OFFSET: "0"
+      START_AT: "2026-11-22T01:52:00Z"
+      OFFSET: ${{ matrix.offset }}
       # The order (or the edits of an order of EDIT_OF), with "RUN" for a
       # number of VARY plus a part of the id of the run.
-      ORDER: '[{"set": "options.storey", "to": "RUN"}]'
-      EDIT_OF: "42bab18a507afa6fb1acc46d052f0666"
-      VARY: "3.7"
+      ORDER: ${{ matrix.order }}
+      EDIT_OF: ${{ matrix.edit_of }}
+      VARY: ${{ matrix.vary }}
       LEVEL: mid
       WORLD_SHIFT_HOURS: "0.5"
     steps:
