@@ -311,6 +311,12 @@ The builder asks if the limits of PT-33, PT-63, and the box `hill` of S1 stay, o
 - **Q9.** Does the water of the land (Bàu Sen, Bàu Trũng, D-0009-16) come in phase 2 now? I recommend yes: it is small, and the view from the lighthouse needs it.
 - **Q10.** The builder proposes the limits of the draw calls of PT-69: Low 600, High 2 000, as PT-73. R10 says that I approve them. Phase 3 adds the near houses, with up to 6 materials each (R7a).
 
+### 8.5a Answers (2026-11-21)
+
+- **Q8: yes.** Until the later pass of the look, PT-72 does not fail on the box `hill` of S1. It writes its values in the log, and the plan names the check as open.
+- **Q9: yes.** The water of the land (D-0009-16) comes in phase 2 now.
+- **Q10: yes.** The limits of the draw calls of PT-69 are Low 600 and High 2 000.
+
 ### 8.6 Notes for phase 3
 
 - In phase 2 the boxes show from 0 m, with no collision, so on my walk I went through them. This is not a defect of phase 2: the near and mid levels come in phase 3 (R6), and then the far level starts after the mid range.
@@ -319,4 +325,4 @@ The builder asks if the limits of PT-33, PT-63, and the box `hill` of S1 stay, o
 
 ### 8.7 Status
 
-Phases 1b and 2 are not done: D-0009-13 to D-0009-21, and Q8 to Q10. Phase 3 waits.
+Phases 1b and 2 are not done: D-0009-13 to D-0009-21. Phase 3 waits for my look at the views of PT-68 after the corrections.
