@@ -21,6 +21,9 @@ const FOLDER := "town"
 const RANGES := {"low": 1500.0, "medium": 3500.0, "high": 5000.0, "ultra": 6000.0}
 ## A chunk is made when the view is this much nearer than its range.
 const MARGIN := 200.0
+## Report 0009, D-0009-14: the boxes of the tall buildings (town/tall.json, 25 m
+## or more) show to the end of the view of the camera (main.gd) on each preset.
+const TALL_RANGE := 6000.0
 const MAX_TASKS := 2
 ## Each chunk has PARTS x PARTS meshes.
 const PARTS := 1
@@ -54,6 +57,12 @@ var _material: StandardMaterial3D
 var _keep_out: Array = []
 ## The roofs on a grid of TOP_CELL m: cell -> [the highest top, the tag of its building].
 var _tops: Dictionary = {}
+## The tall buildings by chunk (town/tall.json), and the ones that are made:
+## key -> {"middles", "boxes", "nodes"}.
+var _tall: Dictionary = {}
+var _tall_made: Dictionary = {}
+## The mean color of the boxes seen from far (index.json): the far town of the ground takes it.
+var far_color := Color(0.5, 0.5, 0.5)
 var _keep_out_ready := false
 var _showcase_area := PackedVector2Array()
 var _focus := Vector3.ZERO
@@ -78,13 +87,27 @@ func setup(w: VungTau) -> bool:
 		return false
 	for entry: Array in index.get("chunks", []):
 		counts[Vector2i(int(entry[0]), int(entry[1]))] = int(entry[2])
+	far_color = Color(str(index.get("far_color", "#808080")))
+	var tall_path := w.data.root.path_join(FOLDER).path_join("tall.json")
+	var tall: Variant = JSON.parse_string(FileAccess.get_file_as_string(tall_path)) if FileAccess.file_exists(tall_path) else null
+	if tall is Dictionary:
+		for entry: Array in tall.get("chunks", []):
+			_tall[Vector2i(int(entry[0]), int(entry[1]))] = entry[2]
 	_material = StandardMaterial3D.new()
 	_material.vertex_color_use_as_albedo = true
 	# The colors of the palette are sRGB (as in sea_objects.gd and roadworks.gd):
 	# read as linear colors, each wall shows almost white.
 	_material.vertex_color_is_srgb = true
 	_material.roughness = 0.92
+	_set_ground()
 	return true
+
+
+## The far town of the ground shader: the mean color of the boxes past their range.
+func _set_ground() -> void:
+	if world and world._ground_material:
+		world._ground_material.set_shader_parameter("town_box_color", far_color)
+		world._ground_material.set_shader_parameter("town_box_range", range_end)
 
 
 ## The chunks of the boxes in the range that are not made yet (is_settled()).
@@ -92,6 +115,9 @@ func pending() -> int:
 	var n := 0
 	for key: Vector2i in counts:
 		if _distance_to(key) < range_end and _state(key) != 2 and _can_make(key):
+			n += 1
+	for key: Vector2i in _tall:
+		if not _tall_made.has(key) and _distance_to(key) < TALL_RANGE and _can_make(key):
 			n += 1
 	return n
 
@@ -104,6 +130,23 @@ func prepare_at(point: Vector3, radius: float) -> void:
 		if _distance_to(key) < minf(radius, range_end) and _state(key) == 0 and _can_make(key):
 			_chunks[key] = {"state": 1}
 			_show(_build(key))
+	_make_tall()
+
+
+## Makes the boxes of the tall buildings that can be made (on the main
+## thread: there are about 200 of them).
+func _make_tall() -> void:
+	for key: Vector2i in _tall:
+		if _tall_made.has(key) or not _can_make(key) or _distance_to(key) >= TALL_RANGE:
+			continue
+		var result := _make(key, _tall[key])
+		_tall_made[key] = {"middles": result.middles, "boxes": result.boxes, "nodes": []}
+		_tops.merge(result.tops, true)
+		made += int(result.made)
+		left_out += int(result.left_out)
+		triangles += int(result.triangles)
+		for part: Dictionary in result.parts:
+			_tall_made[key].nodes.append(_add_mesh(key, part, TALL_RANGE, "Tall"))
 
 
 func _process(_delta: float) -> void:
@@ -116,6 +159,8 @@ func _process(_delta: float) -> void:
 		_read_keep_out()
 	if _applied_range != range_end:
 		apply_range()
+	if _keep_out_ready and _tall_made.size() < _tall.size():
+		_make_tall()
 	_start_tasks()
 	_apply_done()
 
@@ -182,8 +227,9 @@ func _apply_done() -> void:
 ## The middle of the top of each box that is made (PT-68).
 func middles() -> PackedVector3Array:
 	var out := PackedVector3Array()
-	for key: Vector2i in _chunks:
-		out.append_array(_chunks[key].get("middles", PackedVector3Array()))
+	for made_parts: Dictionary in [_chunks, _tall_made]:
+		for key: Vector2i in made_parts:
+			out.append_array(made_parts[key].get("middles", PackedVector3Array()))
 	return out
 
 
@@ -195,26 +241,31 @@ func _show(result: Dictionary) -> void:
 	left_out += int(result.left_out)
 	triangles += int(result.triangles)
 	for part: Dictionary in result.parts:
-		var mesh := ArrayMesh.new()
-		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, part.arrays)
-		mesh.surface_set_material(0, _material)
-		var node := MeshInstance3D.new()
-		node.name = "Town_%d_%d_%d" % [key.x, key.y, _chunks[key].nodes.size()]
-		node.mesh = mesh
-		node.position = part.origin
-		node.visibility_range_end = range_end
-		node.visibility_range_end_margin = MARGIN * 0.5
-		node.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_DISABLED
-		# A far level casts no shadow (R10).
-		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		add_child(node)
-		_chunks[key].nodes.append(node)
+		_chunks[key].nodes.append(_add_mesh(key, part, range_end, "Town"))
 	_applied_range = range_end
+
+
+func _add_mesh(key: Vector2i, part: Dictionary, end: float, prefix: String) -> MeshInstance3D:
+	var mesh := ArrayMesh.new()
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, part.arrays)
+	mesh.surface_set_material(0, _material)
+	var node := MeshInstance3D.new()
+	node.name = "%s_%d_%d_%d" % [prefix, key.x, key.y, get_child_count()]
+	node.mesh = mesh
+	node.position = part.origin
+	node.visibility_range_end = end
+	node.visibility_range_end_margin = MARGIN * 0.5
+	node.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_DISABLED
+	# A far level casts no shadow (R10).
+	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(node)
+	return node
 
 
 ## Sets the range of the chunks that are made (after a change of preset).
 func apply_range() -> void:
 	_applied_range = range_end
+	_set_ground()
 	for key: Vector2i in _chunks:
 		for node: MeshInstance3D in _chunks[key].get("nodes", []):
 			node.visibility_range_end = range_end
@@ -347,8 +398,11 @@ func boxes_seen(camera: Camera3D, max_distance: float, frame := Rect2(0, 0, 1, 1
 	var eye := camera.global_position
 	var size := camera.get_viewport().get_visible_rect().size
 	var n := 0
-	for key: Vector2i in _chunks:
-		var boxes: PackedFloat32Array = _chunks[key].get("boxes", PackedFloat32Array())
+	var all_boxes: Array[PackedFloat32Array] = []
+	for made_parts: Dictionary in [_chunks, _tall_made]:
+		for key: Vector2i in made_parts:
+			all_boxes.append(made_parts[key].get("boxes", PackedFloat32Array()))
+	for boxes: PackedFloat32Array in all_boxes:
 		for i in range(0, boxes.size(), 5):
 			var base := boxes[i + 2]
 			var top := boxes[i + 3]
@@ -388,12 +442,15 @@ func _clear(eye: Vector3, target: Vector3, tag: int) -> bool:
 ## Runs in a worker thread (or at once in prepare_at()): the mesh arrays of the
 ## boxes of a chunk.
 func _build(key: Vector2i) -> Dictionary:
-	var result := {"key": key, "parts": [], "made": 0, "left_out": 0, "triangles": 0, "middles": PackedVector3Array(),
-			"boxes": PackedFloat32Array(), "tops": {}}
 	var path := world.data.root.path_join(FOLDER).path_join("%d_%d.json" % [key.x, key.y])
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
-	if not parsed is Dictionary:
-		return result
+	return _make(key, parsed.get("buildings", []) if parsed is Dictionary else [])
+
+
+## The mesh arrays of the boxes of these records of a chunk.
+func _make(key: Vector2i, records: Array) -> Dictionary:
+	var result := {"key": key, "parts": [], "made": 0, "left_out": 0, "triangles": 0, "middles": PackedVector3Array(),
+			"boxes": PackedFloat32Array(), "tops": {}}
 	# PARTS x PARTS parts of a chunk (one part: four parts of 128 m saved few
 	# triangles for many draw calls in S5 of PT-73).
 	var size := world.data.chunk_size
@@ -401,7 +458,7 @@ func _build(key: Vector2i) -> Dictionary:
 	var parts := []
 	for i in PARTS * PARTS:
 		parts.append({"verts": PackedVector3Array(), "normals": PackedVector3Array(), "colors": PackedColorArray()})
-	for b: Array in parsed.get("buildings", []):
+	for b: Array in records:
 		var flat: Array = b[6]
 		var ring := PackedVector2Array()
 		for i in range(0, flat.size(), 2):

@@ -28,7 +28,8 @@
 					"place": "the lighthouse (the geotag of the file is in the town, 1 km north: not used)",
 					"direction": "north-east, 30 to 40 degrees"
 				}
-			]
+			],
+			"edge": true
 		},
 		{
 			"id": "nui_lon_top",

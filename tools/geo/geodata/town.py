@@ -16,6 +16,13 @@ For each building the build gives:
   a touching neighbor).
 The buildings with no first year (buildings_unseen, Check) are not in the
 store of buildings_2019, so they are not here.
+
+Report 0009, D-0009-14: a building of TALL_M or more is in town/tall.json, not
+in its chunk: the game shows it to the end of the far range on each preset.
+index.json has "far_color", the mean color of the boxes seen from far (each
+roof by its area, and the half of each wall that is not hidden that faces the
+eye): the far pattern of the town on the ground takes it past the range of
+the boxes, so that no line shows there.
 """
 
 from __future__ import annotations
@@ -41,6 +48,8 @@ TILE_PITCH = 0.55
 TILE_MAX_AREA_M2 = 250.0
 TILE_MAX_HEIGHT_M = 9.0
 ROOF_KINDS = ("terrace", "metal", "tiles")
+# Report 0009, D-0009-14: the towers show to the end of the far range.
+TALL_M = 25.0
 
 
 def _unit(seed: str) -> float:
@@ -94,9 +103,21 @@ def _rect_axes(polygon: Polygon) -> tuple[float, float]:
     return float(min(a, b)), float(max(a, b))
 
 
-def make(buildings: list, sample, palette: dict, chunk_m: float) -> tuple[dict, dict]:
-    """The records of each chunk {(cx, cz): [record]} and the numbers for the report.
-    sample(x, z) gives the height of the ground at game points (arrays)."""
+def _linear(color: str) -> np.ndarray:
+    c = np.array([int(color[i:i + 2], 16) for i in (1, 3, 5)], dtype=np.float64) / 255.0
+    return np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
+
+
+def _srgb_hex(linear: np.ndarray) -> str:
+    c = np.clip(linear, 0.0, 1.0)
+    c = np.where(c <= 0.0031308, c * 12.92, 1.055 * c ** (1 / 2.4) - 0.055)
+    return "#" + "".join(f"{int(round(v * 255)):02X}" for v in c)
+
+
+def make(buildings: list, sample, palette: dict, chunk_m: float) -> tuple[dict, dict, dict]:
+    """The records of each chunk {(cx, cz): [record]}, the records of the tall
+    buildings by chunk, and the numbers for the report. sample(x, z) gives the
+    height of the ground at game points (arrays)."""
     shares = roof_shares(palette)
     walls = palette["walls"]
     # The measured colors: the colors of the palette are 10 % lighter for the
@@ -126,7 +147,10 @@ def make(buildings: list, sample, palette: dict, chunk_m: float) -> tuple[dict, 
         bases.append(float(ground.min()) - BASE_SINK_M)
         tops.append(float(np.median(ground)) + float(b["height"]))
     chunks: dict = {}
+    tall: dict = {}
     colors_of: dict = {}
+    far_sum = np.zeros(3)
+    far_weight = 0.0
     for index, (b, polygon) in enumerate(items):
         coords = np.array(polygon.exterior.coords)[:-1]
         n = len(coords)
@@ -176,23 +200,38 @@ def make(buildings: list, sample, palette: dict, chunk_m: float) -> tuple[dict, 
                   [round(h, 2) for h in hidden]]
         if roof == "tiles":
             record.append(round(min(width * 0.5 * TILE_PITCH, 3.0), 2))
-        chunks.setdefault(key, []).append(record)
+        (tall if float(b["height"]) >= TALL_M else chunks).setdefault(key, []).append(record)
+        # The far color: the roof by its area, and the half of the walls that faces the eye.
+        wall_area = 0.0
+        for e in range(n):
+            a, c = coords[e], coords[(e + 1) % n]
+            wall_area += float(np.hypot(*(np.array(c) - np.array(a)))) * max(tops[index] - max(bases[index], hidden[e]), 0.0)
+        far_sum += _linear(roof_color) * area + _linear(wall) * wall_area * 0.5
+        far_weight += area + wall_area * 0.5
     numbers["chunks"] = len(chunks)
+    numbers["tall"] = sum(len(r) for r in tall.values())
     numbers["roof_shares"] = {k: round(v, 3) for k, v in shares.items()}
-    return chunks, numbers
+    numbers["far_color"] = _srgb_hex(far_sum / max(far_weight, 1e-9))
+    return chunks, tall, numbers
 
 
 COLUMNS = ["id", "base", "top", "roof", "wall", "roof_color", "outline", "hidden", "tile_rise"]
 
 
-def write(folder: Path, chunks: dict, chunk_m: float) -> int:
-    """One file for each chunk: town/CX_CZ.json."""
+def write(folder: Path, chunks: dict, chunk_m: float, tall: dict | None = None, far_color: str = "#808080") -> int:
+    """One file for each chunk (town/CX_CZ.json), the tall buildings
+    (town/tall.json, by chunk), and town/index.json."""
     folder.mkdir(parents=True, exist_ok=True)
+    tall = tall or {}
+    data = {"chunk_m": chunk_m, "columns": COLUMNS, "roofs": list(ROOF_KINDS), "tall_m": TALL_M,
+            "chunks": sorted([[cx, cz, records] for (cx, cz), records in tall.items()], key=lambda c: (c[0], c[1]))}
+    (folder / "tall.json").write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     for (cx, cz), records in chunks.items():
         data = {"chunk_m": chunk_m, "columns": COLUMNS, "roofs": list(ROOF_KINDS), "buildings": records}
         (folder / f"{cx}_{cz}.json").write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     index = {"note": "Made by tools/geo/build.py (plan 0009, phase 2): the boxes of the buildings of 2019 in each "
                      "chunk. Outlines: Overture Maps (ODbL); heights: Open Buildings 2.5D Temporal (CC BY 4.0).",
-             "chunk_m": chunk_m, "chunks": sorted([[cx, cz, len(r)] for (cx, cz), r in chunks.items()])}
+             "chunk_m": chunk_m, "far_color": far_color, "tall": sum(len(r) for r in tall.values()),
+             "chunks": sorted([[cx, cz, len(r)] for (cx, cz), r in chunks.items()])}
     (folder / "index.json").write_text(json.dumps(index, separators=(",", ":")), encoding="utf-8")
-    return sum(len(r) for r in chunks.values())
+    return sum(len(r) for r in chunks.values()) + sum(len(r) for r in tall.values())

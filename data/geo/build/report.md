@@ -1,6 +1,6 @@
 # Geodata report
 
-Made by `tools/geo/build.py` on 2026-11-21.
+Made by `tools/geo/build.py` on 2026-11-22.
 
 ## Extents
 

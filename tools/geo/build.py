@@ -745,11 +745,11 @@ def write_town(grid, raw: Path, out: Path, area: dict) -> dict | None:
         return None
     buildings = geostore.get(store, "buildings_2019")["buildings"]
     palette = load_json(ROOT / "data" / "world" / "palette.json")
-    chunks, numbers = town.make(buildings, lambda x, z: grid.sample(x, z), palette, float(area["chunk_size_m"]))
-    numbers["written"] = town.write(out / "town", chunks, float(area["chunk_size_m"]))
+    chunks, tall, numbers = town.make(buildings, lambda x, z: grid.sample(x, z), palette, float(area["chunk_size_m"]))
+    numbers["written"] = town.write(out / "town", chunks, float(area["chunk_size_m"]), tall, numbers["far_color"])
     index = load_json(out / "town" / "index.json")
     write_json(out / "town" / "index.json", index | {"numbers": numbers})
-    log(f"town: {numbers['written']} boxes in {numbers['chunks']} chunks, roofs {numbers['roofs']}, "
+    log(f"town: {numbers['written']} boxes in {numbers['chunks']} chunks ({numbers['tall']} tall), far color {numbers['far_color']}, roofs {numbers['roofs']}, "
         f"{numbers['hidden_walls']} of {numbers['walls']} walls hidden by a neighbor")
     return numbers
 

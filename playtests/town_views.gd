@@ -14,6 +14,11 @@ extends RefCounted
 # phase: --world=vung_tau --renderer=forward_plus --quality=low --start-time=18:00
 
 const VIEWS := "res://data/geo/town_views.json"
+## Report 0009, D-0009-14: the bands of the frame in front of and past the end
+## of the range of the boxes (m from it), and the most that their mean values
+## (the brightest channel) are apart.
+const EDGE_BAND := Vector2(50.0, 250.0)
+const EDGE_MAX := 0.06
 
 
 func run(d: PlaytestDriver) -> void:
@@ -42,6 +47,13 @@ func run(d: PlaytestDriver) -> void:
 				view.id, in_frame, int(view.get("min_boxes", 50))])
 		await d.screenshot("%s_%s" % [view.id, time])
 		d.expect_not_flat("%s at %s" % [view.id, time])
+		if view.get("edge", false):
+			var frame := d.viewport().get_texture().get_image()
+			var edge := edge_values(w, camera, view, frame)
+			d.step("%s at %s: the mean value of the frame %.0f m to %.0f m in front of the end of the range of the boxes %.2f, past it %.2f" % [
+					view.id, time, EDGE_BAND.y, EDGE_BAND.x, edge.x, edge.y])
+			d.expect(absf(edge.x - edge.y) <= EDGE_MAX, "%s at %s: no line at the end of the range of the boxes (D-0009-14): the mean values %.2f and %.2f, at most %.2f apart" % [
+					view.id, time, edge.x, edge.y, EDGE_MAX])
 	camera.fov = fov
 	d.fly_end()
 
@@ -87,7 +99,7 @@ static func read_views(w: VungTau) -> Array[Dictionary]:
 			# The north is -z, the east +x.
 			target = eye + Vector3(sin(heading) * cos(pitch), sin(pitch), -cos(heading) * cos(pitch)) * 100.0
 		out.append({"id": str(v.id), "eye": eye, "target": target, "fov": float(v.get("fov", 70.0)),
-				"min_boxes": int(v.get("min_boxes", 50))})
+				"min_boxes": int(v.get("min_boxes", 50)), "edge": bool(v.get("edge", false))})
 	return out
 
 
@@ -98,3 +110,33 @@ static func boxes_in_frame(w: VungTau, camera: Camera3D) -> int:
 		if camera.is_position_in_frustum(middle) and camera.global_position.distance_to(middle) < TownField.range_end:
 			n += 1
 	return n
+
+
+## Report 0009, D-0009-14: the mean value (the brightest channel) of the rows of
+## the frame where the ground in the direction of the view is EDGE_BAND m in
+## front of the end of the range of the boxes, and past it (the middle 70 % of
+## the columns).
+static func edge_values(w: VungTau, camera: Camera3D, view: Dictionary, frame: Image) -> Vector2:
+	var direction: Vector3 = view.target - view.eye
+	direction.y = 0.0
+	direction = direction.normalized()
+	var rows: Array[float] = []
+	for d in [TownField.range_end - EDGE_BAND.y, TownField.range_end - EDGE_BAND.x,
+			TownField.range_end + EDGE_BAND.x, TownField.range_end + EDGE_BAND.y]:
+		var p: Vector3 = view.eye + direction * d
+		p.y = w.ground_height(p.x, p.z)
+		rows.append(camera.unproject_position(p).y * frame.get_height() / camera.get_viewport().get_visible_rect().size.y)
+	return Vector2(_mean_value(frame, rows[1], rows[0]), _mean_value(frame, rows[3], rows[2]))
+
+
+static func _mean_value(frame: Image, top: float, bottom: float) -> float:
+	var total := 0.0
+	var n := 0
+	var y0 := clampi(int(minf(top, bottom)), 0, frame.get_height() - 1)
+	var y1 := clampi(int(maxf(top, bottom)), y0 + 1, frame.get_height())
+	for y in range(y0, y1):
+		for x in range(int(frame.get_width() * 0.15), int(frame.get_width() * 0.85), 2):
+			var c := frame.get_pixel(x, y)
+			total += maxf(c.r, maxf(c.g, c.b))
+			n += 1
+	return total / maxf(n, 1.0)

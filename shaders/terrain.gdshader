@@ -63,6 +63,10 @@ uniform float roof_far = 220.0;
 // and teal roofs made patches on the slope of Núi Nhỏ from the beach).
 uniform vec2 roof_even_range = vec2(250.0, 600.0);
 uniform float roof_far_even = 0.8;
+// Report 0009, D-0009-14: past the range of the boxes of the town (TownField
+// sets it), the far town has the mean color of the boxes, so that no line shows.
+uniform vec3 town_box_color : source_color = vec3(0.5);
+uniform float town_box_range = 1.0e9;
 // The air between the eye and the far land (report 0026, D-0026-15): from
 // far_haze_range.x to .y m, far_haze of the color of the land goes to
 // far_haze_color (the far forest of the photo of S1 is a pale blue green). The
@@ -270,6 +274,7 @@ void fragment() {
 		roof_mean += roof_colors[k] * 0.53 / 8.0;
 	}
 	lot_color = mix(lot_color, roof_mean, roof_far_even * smoothstep(roof_even_range.x, roof_even_range.y, camera_distance));
+	lot_color = mix(lot_color, town_box_color, smoothstep(town_box_range - 200.0, town_box_range, camera_distance));
 	lot_color = mix(lot_color, town_crowns, town_tree);
 	float town = town_ground * (1.0 - hill_ground);
 	color = mix(color, lot_color, town * smoothstep(roof_near, roof_far, camera_distance));
