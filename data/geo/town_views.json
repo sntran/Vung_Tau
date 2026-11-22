@@ -195,7 +195,7 @@
 			"heading": 252.2,
 			"pitch": 0.0,
 			"fov": 50.0,
-			"min_boxes": 10,
+			"min_boxes": 6,
 			"photo": null,
 			"min_boxes_note": "Report 0009, D-0009-18: a view from a street shows the houses of the street: the boxes behind them do not show (17 at 12:00).",
 			"eye_note": "Report 0009, D-0009-18: the street photo of Mapillary: its direction (252.2 degrees, computed), and its place (10.3541546, 107.090463, computed) moved 8.6 m to the line of the street there (Bình Giã of OpenStreetMap; the computed place of an image can be some meters off); at 2.6 m over the street, a window of the bus of plan 0010 (the photo is from a car). The index has no field of view: the view keeps 50 degrees.",
@@ -213,7 +213,12 @@
 					"place": "10.3541546, 107.090463 (the computed place of Mapillary)",
 					"direction": "252 degrees"
 				}
-			]
+			],
+			"near_boxes": {
+				"within_m": 40,
+				"min": 2,
+				"how": "Report 0009, D-0009-22: the photo has a row of shops at the sidewalk on each side of the street. The boxes of the raster (the groups of the 2.5D raster of 2019 with no outline at a street) stand there now, so at least 2 boxes nearer than 40 m show. They hide the far boxes: in all 7 show, not the 11 over the open ground of audit 4 (min_boxes was 10, a builder value)."
+			}
 		}
 	]
 }

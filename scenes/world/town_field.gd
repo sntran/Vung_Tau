@@ -154,7 +154,7 @@ func _make_tall() -> void:
 		if _tall_made.has(key) or not _tall_ready(key):
 			continue
 		var result := _make(key, _tall[key].records, world.data.chunk_size * TALL_TILE)
-		_tall_made[key] = {"middles": result.middles, "boxes": result.boxes, "nodes": []}
+		_tall_made[key] = {"middles": result.middles, "boxes": result.boxes, "rings": result.rings, "nodes": []}
 		_tops.merge(result.tops, true)
 		made += int(result.made)
 		left_out += int(result.left_out)
@@ -275,7 +275,7 @@ func middles() -> PackedVector3Array:
 
 func _show(result: Dictionary) -> void:
 	var key: Vector2i = result.key
-	_chunks[key] = {"state": 2, "middles": result.middles, "boxes": result.boxes, "nodes": []}
+	_chunks[key] = {"state": 2, "middles": result.middles, "boxes": result.boxes, "rings": result.rings, "nodes": []}
 	_tops.merge(result.tops, true)
 	made += int(result.made)
 	left_out += int(result.left_out)
@@ -434,6 +434,13 @@ static func _rasterize(ring: PackedVector2Array, middle: Vector2, top: float, ta
 ## roof of another box (the grid of the roofs). The trees are not in the test.
 ## With "frame" (a part of the frame, from 0 to 1), only the boxes whose point
 ## that shows is in that part.
+## The numbers of each box in the array "boxes" of a chunk: the middle (x, z), the base, the top, the tag, and the reach.
+const BOX_STRIDE := 6
+## boxes_seen(): the points in front of the faces, out from the wall and over the base (m).
+const FACE_OUT_M := 2.5
+const FACE_UP_M := 2.0
+
+
 func boxes_seen(camera: Camera3D, max_distance: float, frame := Rect2(0, 0, 1, 1)) -> int:
 	var eye := camera.global_position
 	var size := camera.get_viewport().get_visible_rect().size
@@ -442,24 +449,42 @@ func boxes_seen(camera: Camera3D, max_distance: float, frame := Rect2(0, 0, 1, 1
 	var tall_end := maxf(max_distance, TALL_RANGE) if max_distance >= range_end else max_distance
 	var all_boxes: Array = []
 	for key: Vector2i in _chunks:
-		all_boxes.append([_chunks[key].get("boxes", PackedFloat32Array()), max_distance])
+		all_boxes.append([_chunks[key].get("boxes", PackedFloat32Array()), max_distance, _chunks[key].get("rings", [])])
 	for key: Vector2i in _tall_made:
-		all_boxes.append([_tall_made[key].get("boxes", PackedFloat32Array()), tall_end])
+		all_boxes.append([_tall_made[key].get("boxes", PackedFloat32Array()), tall_end, _tall_made[key].get("rings", [])])
 	for entry: Array in all_boxes:
 		var boxes: PackedFloat32Array = entry[0]
 		var end: float = entry[1]
-		for i in range(0, boxes.size(), 5):
+		var rings: Array = entry[2]
+		for i in range(0, boxes.size(), BOX_STRIDE):
 			var base := boxes[i + 2]
 			var top := boxes[i + 3]
 			var roof := Vector3(boxes[i], top, boxes[i + 1])
-			if eye.distance_to(roof) > end:
+			if eye.distance_to(roof) > end + boxes[i + 5]:
 				continue
 			var middle := Vector3(boxes[i], (base + top) * 0.5, boxes[i + 1])
-			if not (camera.is_position_in_frustum(roof) or camera.is_position_in_frustum(middle)):
-				continue
+			# Report 0009, D-0009-22: points in front of each face (FACE_OUT_M out
+			# from the middle and the ends of each wall, FACE_UP_M over the base):
+			# along a street of boxes, the middle of a box at the street is behind
+			# the roofs of its neighbors, though its front fills a part of the frame.
+			var points: Array[Vector3] = [roof, middle]
+			var ring: PackedVector2Array = rings[i / BOX_STRIDE] if i / BOX_STRIDE < rings.size() else PackedVector2Array()
+			var y := base + minf(FACE_UP_M, (top - base) * 0.5)
+			for e in ring.size() - 1:
+				var a := ring[e]
+				var b := ring[e + 1]
+				var along := b - a
+				if along.length() < 1.0:
+					continue
+				var out := Vector2(along.y, -along.x).normalized()
+				if out.dot(Vector2(middle.x, middle.z) - a) > 0.0:
+					out = -out
+				for f: float in [0.15, 0.5, 0.85]:
+					var at := a.lerp(b, f) + out * FACE_OUT_M
+					points.append(Vector3(at.x, y, at.y))
 			var tag := int(boxes[i + 4])
-			for p: Vector3 in [roof, middle]:
-				if not camera.is_position_in_frustum(p) or not frame.has_point(camera.unproject_position(p) / size):
+			for p: Vector3 in points:
+				if eye.distance_to(p) > end or not camera.is_position_in_frustum(p) or not frame.has_point(camera.unproject_position(p) / size):
 					continue
 				if _clear(eye, p, tag):
 					n += 1
@@ -501,7 +526,7 @@ func _build(key: Vector2i) -> Dictionary:
 ## The mesh arrays of the boxes of these records of a chunk.
 func _make(key: Vector2i, records: Array, cell_m := 0.0) -> Dictionary:
 	var result := {"key": key, "parts": [], "made": 0, "left_out": 0, "triangles": 0, "middles": PackedVector3Array(),
-			"boxes": PackedFloat32Array(), "tops": {}}
+			"boxes": PackedFloat32Array(), "rings": [], "tops": {}}
 	# PARTS x PARTS parts of a chunk (one part: four parts of 128 m saved few
 	# triangles for many draw calls in S5 of PT-73). cell_m: a larger cell (the tall boxes).
 	var size := cell_m if cell_m > 0.0 else world.data.chunk_size
@@ -549,8 +574,13 @@ func _make(key: Vector2i, records: Array, cell_m := 0.0) -> Dictionary:
 		result.middles.append(Vector3(middle.x, top, middle.y))
 		# 24 bits: a float of 32 bits keeps it exactly.
 		var tag := str(b[0]).hash() & 0xFFFFFF
+		# The reach of the outline from its middle (boxes_seen(): the face toward the eye).
+		var reach := 0.0
+		for p in ring:
+			reach = maxf(reach, p.distance_to(middle))
 		var boxes: PackedFloat32Array = result.boxes
-		boxes.append_array(PackedFloat32Array([middle.x, middle.y, base, top, tag]))
+		boxes.append_array(PackedFloat32Array([middle.x, middle.y, base, top, tag, reach]))
+		(result.rings as Array).append(ring)
 		result.boxes = boxes
 		_rasterize(ring, middle, top, tag, result.tops)
 	result.parts = []

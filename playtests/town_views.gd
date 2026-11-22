@@ -47,6 +47,13 @@ func run(d: PlaytestDriver) -> void:
 				view.id, time, seen, boxes_in_frame(w, camera), w.town.made, w.town.left_out])
 		d.expect(seen >= int(view.get("min_boxes", 50)), "%s: the town shows in the frame: %d boxes (at least %d)" % [
 				view.id, seen, int(view.get("min_boxes", 50))])
+		if view.has("near_boxes"):
+			# Report 0009, D-0009-22: the shops at the street (the boxes of the raster).
+			var near: Dictionary = view.near_boxes
+			var near_seen := w.town.boxes_seen(camera, float(near.within_m))
+			d.step("%s at %s: %d boxes nearer than %.0f m show" % [view.id, time, near_seen, float(near.within_m)])
+			d.expect(near_seen >= int(near.min), "%s: the boxes at the street show: %d nearer than %.0f m (at least %d)" % [
+					view.id, near_seen, float(near.within_m), int(near.min)])
 		await d.screenshot("%s_%s" % [view.id, time])
 		d.expect_not_flat("%s at %s" % [view.id, time])
 		for lake_name: String in view.get("lakes", []):
@@ -115,6 +122,8 @@ static func read_views(w: VungTau) -> Array[Dictionary]:
 			target = eye + Vector3(sin(heading) * cos(pitch), sin(pitch), -cos(heading) * cos(pitch)) * 100.0
 		out.append({"id": str(v.id), "eye": eye, "target": target, "fov": float(v.get("fov", 70.0)),
 				"min_boxes": int(v.get("min_boxes", 50)), "edge": bool(v.get("edge", false))})
+		if v.has("near_boxes"):
+			out[-1]["near_boxes"] = v.near_boxes
 		out[-1]["hills"] = []
 		for hill: Dictionary in v.get("hills", []):
 			var at := w.data.projection.to_game(float(hill.lon), float(hill.lat))

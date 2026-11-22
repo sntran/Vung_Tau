@@ -191,3 +191,19 @@ The median 2.5D height for each number of storeys of OpenStreetMap: 1: 7.3 m (2)
 - R5d: 155 buildings of OpenStreetMap on 2019-01-22 not in the 2.5D data of 2019; 1152 outlines of OpenStreetMap of today in the 2.5D data of 2019 and not in OpenStreetMap on 2019-01-22; 1 buildings with a start_date after 2019
 - the checks of the heights: 3D-GloBFP 32948; GHS-BUILT-H 3663; building:levels of OpenStreetMap 40; ATL03 roof photons, 2.5D to 40 m 2067; ATL03 roof photons, towers (2.5D over 40 m) 18
 
+<!-- street fronts (D-0009-22) -->
+## The street fronts (report 0009, D-0009-22)
+
+For each street, each 5 m, on each side: a building from 2 m to 14 m past the edge of the road (as section 9.3 of report 0009). Before: the boxes of the outlines of 2019. After: also the boxes of the groups of the 2.5D raster of 2019 with no outline that touch a street (`raster_2019.json`, the source "raster").
+
+| Street | Points | Before: a box of 2019 | Before: no box, the raster has a building | Before: neither | After: a box (2019 or raster) | After: no box, the raster has a building | After: neither |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Ba Cu | 618 | 62 % | 15 % | 23 % | 66 % | 11 % | 23 % |
+| Lê Lai | 346 | 60 % | 18 % | 22 % | 67 % | 12 % | 22 % |
+| Xô Viết Nghệ Tĩnh | 600 | 56 % | 15 % | 29 % | 62 % | 9 % | 29 % |
+| Phan Chu Trinh | 688 | 52 % | 16 % | 32 % | 53 % | 14 % | 32 % |
+| Trương Công Định | 1730 | 47 % | 21 % | 32 % | 54 % | 14 % | 32 % |
+| Nam Kỳ Khởi Nghĩa | 458 | 47 % | 14 % | 40 % | 52 % | 9 % | 40 % |
+| Bình Giã | 614 | 42 % | 23 % | 35 % | 55 % | 10 % | 35 % |
+
+<!-- end of the street fronts -->

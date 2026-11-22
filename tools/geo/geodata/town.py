@@ -237,7 +237,10 @@ def make(buildings: list, sample, palette: dict, chunk_m: float) -> tuple[dict, 
             front = _pick([c["color"] for c in towers], [float(c["weight"]) for c in towers], _unit(str(b["id"]) + "t"))
         center = polygon.centroid
         key = (math.floor(center.x / chunk_m), math.floor(-center.y / chunk_m))
-        record = [str(b["id"])[:12], round(bases[index], 2), round(tops[index], 2), ROOF_KINDS.index(roof),
+        # The id (12 characters; a box of the raster keeps its whole id, "raster-ROW-COLUMN": the game tags
+        # each box by its id, and the start of the ids of the raster is the same).
+        box_id = str(b["id"]) if str(b["id"]).startswith("raster-") else str(b["id"])[:12]
+        record = [box_id, round(bases[index], 2), round(tops[index], 2), ROOF_KINDS.index(roof),
                   front, roof_color, [round(v, 2) for x, y in coords for v in (x, -y)],
                   [round(h, 2) for h in hidden]]
         if roof == "tiles":
@@ -278,7 +281,10 @@ def write(folder: Path, chunks: dict, chunk_m: float, tall: dict | None = None, 
         data = {"chunk_m": chunk_m, "columns": COLUMNS, "roofs": list(ROOF_KINDS), "buildings": records}
         (folder / f"{cx}_{cz}.json").write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     index = {"note": "Made by tools/geo/build.py (plan 0009, phase 2): the boxes of the buildings of 2019 in each "
-                     "chunk. Outlines: Overture Maps (ODbL); heights: Open Buildings 2.5D Temporal (CC BY 4.0).",
+                     "chunk. Outlines: Overture Maps (ODbL); heights: Open Buildings 2.5D Temporal (CC BY 4.0). A box whose "
+                     "id starts with \"raster-\" has the source raster: a group of cells of the 2.5D raster of 2019 with a "
+                     "building and no outline that touches a street (report 0009, D-0009-22; data/geo/raw/buildings/"
+                     "raster_2019.json).",
              "chunk_m": chunk_m, "far_color": far_color, "foot_shade": foot_shade, "tall": sum(len(r) for r in tall.values()),
              "chunks": sorted([[cx, cz, len(r)] for (cx, cz), r in chunks.items()])}
     (folder / "index.json").write_text(json.dumps(index, separators=(",", ":")), encoding="utf-8")

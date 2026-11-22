@@ -163,6 +163,7 @@ Each source of the data of this plan, also the ones that the plan does not use, 
    - Changed (2026-11-21): this phase comes right after phase 1b, for the whole play area. A part of the town alone makes the comparisons with the photos hard (report 0026, section 12.5). The builder stops after this phase, and I look at the views of PT-68 before phase 3.
 3. The houses of World, near and mid (R7, R8, R9), one kind at a time: the tube house first.
    - Changed (2026-11-21): first the streets between Bãi Trước and chợ Xóm Lưới (for example the road to the market at the corner of the shot S3 of plan 0026), then the rest of the town by its distance from them.
+   - Changed (2026-11-22, report 0009, Q12): where the data has no building on the front of a shop street (no outline and no box of the raster of D-0009-22 from 2 m to 14 m past the edge of the road), the builder puts a row of tube houses with the status "Check". The source of their look is the street photos of Mapillary (R5e) where they exist. The boxes of the raster (the source `raster`, the ids `raster-ROW-COLUMN`) are the first places for the tube houses of this phase.
 4. The real hẻm and the homestay (R11).
 5. The streets near chợ Xóm Lưới (R12, R13), then the night (R14).
 

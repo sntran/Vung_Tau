@@ -81,6 +81,9 @@ jobs:
           python tools/geo/lidar.py report
           python tools/geo/buildings.py build
 
+      - name: The boxes of the 2.5D raster at the streets (report 0009, D-0009-22)
+        run: python tools/geo/buildings.py raster
+
       - name: Keep the reports of a run that stopped
         if: failure()
         uses: actions/upload-artifact@v4

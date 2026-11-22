@@ -159,3 +159,47 @@ def test_the_roof_photons_are_of_a_high_signal_confidence():
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     import lidar
     assert lidar.parms_for("atl03_roof", "2025-01-01T00:00:00Z", "2026-01-01T00:00:00Z")["cnf"] == 4
+
+
+def test_a_group_of_cells_touches_a_street_near_the_edge_of_its_surface():
+    """Report 0009, D-0009-22: a group of the raster with no outline gets a box
+    when it is at most STREET_TOUCH_M from the edge of a street; an alley or a
+    footway is not a street."""
+    import shapely
+    roads = [{"type": "residential", "width": 8.0, "points": [[0.0, 0.0, 0.0], [100.0, 0.0, 0.0]]},
+             {"type": "footway", "width": 2.0, "points": [[0.0, 0.0, 50.0], [100.0, 0.0, 50.0]]}]
+    streets = buildings.street_lines(roads)
+    assert len(streets) == 1
+    cell = 5.0
+    center_of = {(0, 0): (50.0, 4.0 + buildings.STREET_TOUCH_M + 2.5 - 0.5), (0, 1): (55.0, 4.0 + buildings.STREET_TOUCH_M + 2.5 - 0.5)}
+    near = buildings.group_polygon([(0, 0), (0, 1)], center_of, cell)
+    assert near.area == 50.0
+    assert buildings.touches_street(near, streets)
+    far = shapely.box(40.0, 30.0, 50.0, 40.0)
+    assert not buildings.touches_street(far, streets)
+    on_footway = shapely.box(40.0, 52.0, 50.0, 57.0)
+    assert not buildings.touches_street(on_footway, streets)
+
+
+def test_the_street_fronts_count_each_point_once_by_its_kind():
+    """Report 0009, D-0009-22: each 5 m, each side, the first kind in the band of 2 m to 14 m past the edge."""
+    import shapely
+    roads = [{"name": "A", "type": "residential", "width": 6.0, "points": [[0.0, 0.0, 0.0], [100.0, 0.0, 0.0]]}]
+    box = [shapely.box(0.0, 5.0, 50.0, 15.0)]  # north side, first half
+    raster_box = [shapely.box(50.0, 5.0, 100.0, 15.0)]  # north side, second half
+    cells = [shapely.box(0.0, -15.0, 30.0, -5.0)]  # south side, first 30 m
+    fronts = buildings.street_fronts(roads, ["A"], box, raster_box, cells)["A"]
+    assert fronts == {"box": 10, "raster_box": 10, "raster_cell": 6, "none": 14}
+    table = "\n".join(buildings.fronts_table({"A": fronts}))
+    assert "| A | 40 | 25 % | 40 % | 35 % | 50 % | 15 % | 35 % |" in table
+
+
+def test_a_box_of_the_raster_is_not_on_a_road():
+    """Report 0009, D-0009-22: the part of a group on the surface of a road goes."""
+    import shapely
+    roads = [{"type": "residential", "width": 8.0, "points": [[0.0, 0.0, 0.0], [100.0, 0.0, 0.0]]}]
+    surfaces = buildings.road_surfaces(roads)
+    group = shapely.box(40.0, 2.0, 60.0, 14.0)  # 2 m on the road (its edge at 4 m)
+    rest = buildings.off_roads(group, surfaces)
+    assert rest.bounds[1] == 4.0 and rest.area == 200.0
+    assert buildings.off_roads(shapely.box(40.0, -3.0, 60.0, 3.0), surfaces) is None

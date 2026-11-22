@@ -829,6 +829,15 @@ def write_town(grid, raw: Path, out: Path, area: dict, on_water=None) -> dict | 
     if "buildings_2019" not in store.get("files", {}):
         return None
     buildings = geostore.get(store, "buildings_2019")["buildings"]
+    # Report 0009, D-0009-22: the boxes of the groups of the 2.5D raster of 2019
+    # with no outline that touch a street (tools/geo/buildings.py raster). Their
+    # id starts with "raster-" (the source "raster": phase 3 knows them).
+    raster_path = raw / "buildings" / "raster_2019.json"
+    raster_count = 0
+    if raster_path.exists():
+        raster = load_json(raster_path)["buildings"]
+        buildings = buildings + raster
+        raster_count = len(raster)
     if on_water is not None:
         # D-0009-16: no box on the water of the land (an outline whose middle is on it).
         dry = []
@@ -840,6 +849,7 @@ def write_town(grid, raw: Path, out: Path, area: dict, on_water=None) -> dict | 
         buildings = dry
     palette = load_json(ROOT / "data" / "world" / "palette.json")
     chunks, tall, numbers = town.make(buildings, lambda x, z: grid.sample(x, z), palette, float(area["chunk_size_m"]))
+    numbers["raster"] = raster_count
     numbers["written"] = town.write(out / "town", chunks, float(area["chunk_size_m"]), tall, numbers["far_color"],
                                     numbers["foot_shade"])
     index = load_json(out / "town" / "index.json")

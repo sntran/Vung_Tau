@@ -649,6 +649,44 @@ def groups_of_cells(building, distance, min_distance: float = GROUP_DISTANCE_M, 
     return groups
 
 
+def no_outline_groups(manifest: dict, polygons: list, temporal: dict) -> dict | None:
+    """D-0009-04: the groups of the cells of unmatched_2019 (the map of 2019 of
+    the 2.5D raster with a building and no outline) that are more than half
+    building, at least GROUP_DISTANCE_M from an outline, with at least
+    GROUP_CELLS cells. Returns the groups (cells (row, column), largest first),
+    the middle of each cell in the coordinates of the game (center_of, with the
+    shift of 2019), the cell size, the mask "building", and the grid of the store."""
+    import numpy as np
+    import shapely
+    if "unmatched_2019" not in manifest.get("files", {}):
+        return None
+    grid = geostore.get(manifest, "unmatched_2019")
+    shape = tuple(grid["shape"])
+    part = np.zeros(shape, dtype=float)
+    for r, c, v in grid["cells"]:
+        part[r, c] = v / 100.0
+    cell = float(grid["cell_m"])
+    proj = projection()
+    shift = temporal.get("shifts", {}).get("2019", [0.0, 0.0, 0.0])
+    building = part > 0.5
+    distance = np.full(shape, np.inf)
+    idx = np.argwhere(building)
+    # The middle of each cell in the coordinates of the game, with the shift of 2019 (D-0009-01 of temporal).
+    east = grid["west"] + (idx[:, 1] + 0.5) * cell - float(shift[1])
+    north = grid["north"] - (idx[:, 0] + 0.5) * cell + float(shift[0])
+    lon, lat = utm_to_lonlat(east, north, grid["crs"])
+    gx, gz = proj.to_game(lon, lat)
+    tree = shapely.STRtree(polygons)
+    squares = [shapely.box(x - cell / 2, z - cell / 2, x + cell / 2, z + cell / 2) for x, z in zip(gx, gz)]
+    nearest = tree.query_nearest(squares, return_distance=True, all_matches=False)
+    for (square_index, _poly_index), d in zip(nearest[0].T, nearest[1]):
+        r, c = idx[square_index]
+        distance[r, c] = d
+    groups = groups_of_cells(building, distance)
+    center_of = {tuple(i): (x, z) for i, x, z in zip(map(tuple, idx), gx, gz)}
+    return {"groups": groups, "center_of": center_of, "cell": cell, "building": building, "grid": grid, "shift": shift}
+
+
 def draw_map(path: Path, layers: list, title: str, crop: tuple | None = None, size: int = 1400) -> None:
     """A PNG map of polygons in the coordinates of the game: layers are
     (polygons as flat lists, the fill color, the name). The left half is the
@@ -742,31 +780,9 @@ def part_build(notes: Notes) -> None:
 
     # D-0009-04: the groups of cells with a building and no outline.
     group_flats, group_cells, group_area = [], 0, 0.0
-    if "unmatched_2019" in manifest.get("files", {}):
-        grid = geostore.get(manifest, "unmatched_2019")
-        shape = tuple(grid["shape"])
-        part = np.zeros(shape, dtype=float)
-        for r, c, v in grid["cells"]:
-            part[r, c] = v / 100.0
-        cell = float(grid["cell_m"])
-        proj = projection()
-        shift = temporal.get("shifts", {}).get("2019", [0.0, 0.0, 0.0])
-        building = part > 0.5
-        distance = np.full(shape, np.inf)
-        idx = np.argwhere(building)
-        # The middle of each cell in the coordinates of the game, with the shift of 2019 (D-0009-01 of temporal).
-        east = grid["west"] + (idx[:, 1] + 0.5) * cell - float(shift[1])
-        north = grid["north"] - (idx[:, 0] + 0.5) * cell + float(shift[0])
-        lon, lat = utm_to_lonlat(east, north, grid["crs"])
-        gx, gz = proj.to_game(lon, lat)
-        tree = shapely.STRtree(polygons)
-        squares = [shapely.box(x - cell / 2, z - cell / 2, x + cell / 2, z + cell / 2) for x, z in zip(gx, gz)]
-        nearest = tree.query_nearest(squares, return_distance=True, all_matches=False)
-        for (square_index, _poly_index), d in zip(nearest[0].T, nearest[1]):
-            r, c = idx[square_index]
-            distance[r, c] = d
-        groups = groups_of_cells(building, distance)
-        center_of = {tuple(i): (x, z) for i, x, z in zip(map(tuple, idx), gx, gz)}
+    found_groups = no_outline_groups(manifest, polygons, temporal)
+    if found_groups is not None:
+        groups, center_of, cell, building = (found_groups[k] for k in ("groups", "center_of", "cell", "building"))
         for g in groups:
             group_cells += len(g)
             for rc in g:
@@ -814,6 +830,9 @@ def part_build(notes: Notes) -> None:
     notes.save()
     lines += [(RAW / "build.md").read_text(encoding="utf-8")]
     REPORT.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # D-0009-22: the street fronts of the part raster stay in the report.
+    if RASTER_FILE.exists():
+        put_fronts_in_report(fronts_table(json.loads(RASTER_FILE.read_text(encoding="utf-8")).get("fronts", {})))
 
 
 def utm_to_lonlat(east, north, crs: str):
@@ -1016,7 +1035,260 @@ def height_checks(notes: Notes, manifest: dict, rows: list, polygons: list, resu
     return out + [""]
 
 
-PARTS = {"outlines": part_outlines, "temporal": part_temporal, "osm2019": part_osm2019, "checks": part_checks, "build": part_build}
+# Report 0009, D-0009-22: the roads that are streets (not the service roads,
+# the alleys, the footways, and the paths), and the distance from the edge of
+# a street within which a group of cells touches it (m: a sidewalk and a shop
+# front; a builder value).
+STREET_TYPES = {"primary", "secondary", "tertiary", "residential", "unclassified", "living_street"}
+STREET_TOUCH_M = 8.0
+RASTER_FILE = RAW / "raster_2019.json"
+
+
+def street_lines(roads: list) -> list:
+    """The streets of roads.json as (LineString in x, z of the game, half width)."""
+    import shapely
+    out = []
+    for road in roads:
+        if road.get("type") in STREET_TYPES and len(road.get("points", [])) >= 2:
+            out.append((shapely.LineString([(p[0], p[2]) for p in road["points"]]), float(road.get("width", 6.0)) / 2.0))
+    return out
+
+
+def touches_street(polygon, streets: list, tree=None) -> bool:
+    """D-0009-22: a polygon touches a street when a part of it is at most
+    STREET_TOUCH_M from the edge of the surface of a street."""
+    candidates = range(len(streets)) if tree is None else tree.query(polygon.buffer(STREET_TOUCH_M + 20.0))
+    for i in candidates:
+        line, half = streets[i]
+        if polygon.distance(line) <= half + STREET_TOUCH_M:
+            return True
+    return False
+
+
+def road_surfaces(roads: list) -> list:
+    """The surfaces of all roads of roads.json (each road its width), in x, z of the game."""
+    import shapely
+    return [shapely.LineString([(p[0], p[2]) for p in road["points"]]).buffer(float(road.get("width", 4.0)) / 2.0, cap_style="flat")
+            for road in roads if len(road.get("points", [])) >= 2]
+
+
+def off_roads(polygon, surfaces: list, tree=None, min_area_m2: float = 50.0):
+    """D-0009-22: the part of a polygon that is not on a road surface (the
+    largest piece), or None when less than min_area_m2 stays. A cell of the
+    raster with a shop at the edge of the street can reach over the road."""
+    import shapely
+    near = [surfaces[i] for i in (tree.query(polygon) if tree is not None else range(len(surfaces)))]
+    rest = polygon.difference(shapely.union_all(near)) if near else polygon
+    if rest.is_empty:
+        return None
+    if rest.geom_type != "Polygon":
+        rest = max((g for g in getattr(rest, "geoms", []) if g.geom_type == "Polygon"), key=lambda g: g.area, default=None)
+    return rest if rest is not None and rest.area >= min_area_m2 else None
+
+
+def group_polygon(cells: list, center_of: dict, cell: float):
+    """The outline of a group of cells (the union of its squares), in x, z of the game."""
+    import shapely
+    squares = [shapely.box(center_of[rc][0] - cell / 2, center_of[rc][1] - cell / 2, center_of[rc][0] + cell / 2,
+                           center_of[rc][1] + cell / 2) for rc in cells]
+    union = shapely.union_all(squares)
+    if union.geom_type == "MultiPolygon":
+        union = max(union.geoms, key=lambda g: g.area)
+    return union
+
+
+# Report 0009, D-0009-22 (section 9.3 of the report): the streets of the table
+# of the street fronts, the step along a street, and the band past the edge of
+# the road where a building is on the front (m).
+FRONT_STREETS = ["Ba Cu", "Lê Lai", "Xô Viết Nghệ Tĩnh", "Phan Chu Trinh", "Trương Công Định", "Nam Kỳ Khởi Nghĩa", "Bình Giã"]
+FRONT_STEP_M = 5.0
+FRONT_BAND_M = (2.0, 14.0)
+
+
+def street_fronts(roads: list, names: list, boxes: list, raster_boxes: list, raster_cells: list) -> dict:
+    """D-0009-22: for each street, each FRONT_STEP_M along it, on each side: is
+    there a box of 2019 (an outline), a box of the raster (D-0009-22), no box but
+    a cell of the 2.5D raster of 2019 with a building, or none, from
+    FRONT_BAND_M[0] to FRONT_BAND_M[1] past the edge of the road? The polygons
+    are in x, z of the game. Returns, for each street, the number of points of
+    each kind (box, raster_box, raster_cell, none)."""
+    import numpy as np
+    import shapely
+    trees = [shapely.STRtree(g) if g else None for g in (boxes, raster_boxes, raster_cells)]
+    result = {}
+    for name in names:
+        counts = {"box": 0, "raster_box": 0, "raster_cell": 0, "none": 0}
+        for road in roads:
+            if road.get("name") != name or len(road.get("points", [])) < 2:
+                continue
+            half = float(road.get("width", 6.0)) / 2.0
+            line = shapely.LineString([(p[0], p[2]) for p in road["points"]])
+            for distance in np.arange(FRONT_STEP_M / 2.0, line.length, FRONT_STEP_M):
+                a = line.interpolate(max(0.0, distance - 0.5))
+                b = line.interpolate(min(line.length, distance + 0.5))
+                direction = np.array([b.x - a.x, b.y - a.y])
+                if not np.linalg.norm(direction):
+                    continue
+                direction /= np.linalg.norm(direction)
+                normal = np.array([-direction[1], direction[0]])
+                at = line.interpolate(distance)
+                for side in (-1.0, 1.0):
+                    p0 = np.array([at.x, at.y]) + normal * side * (half + FRONT_BAND_M[0])
+                    p1 = np.array([at.x, at.y]) + normal * side * (half + FRONT_BAND_M[1])
+                    band = shapely.LineString([p0, p1])
+                    kind = "none"
+                    for key, tree in zip(("box", "raster_box", "raster_cell"), trees):
+                        if tree is not None and len(tree.query(band, predicate="intersects")):
+                            kind = key
+                            break
+                    counts[kind] += 1
+        result[name] = counts
+    return result
+
+
+def fronts_table(fronts: dict) -> list[str]:
+    """The table of the street fronts, before (the boxes of 2019) and after (with the boxes of the raster)."""
+    lines = ["## The street fronts (report 0009, D-0009-22)", "",
+             f"For each street, each {FRONT_STEP_M:.0f} m, on each side: a building from {FRONT_BAND_M[0]:.0f} m to "
+             f"{FRONT_BAND_M[1]:.0f} m past the edge of the road (as section 9.3 of report 0009). Before: the boxes of the "
+             "outlines of 2019. After: also the boxes of the groups of the 2.5D raster of 2019 with no outline that touch a "
+             "street (`raster_2019.json`, the source \"raster\").", "",
+             "| Street | Points | Before: a box of 2019 | Before: no box, the raster has a building | Before: neither "
+             "| After: a box (2019 or raster) | After: no box, the raster has a building | After: neither |",
+             "|---|---:|---:|---:|---:|---:|---:|---:|"]
+    for name, c in fronts.items():
+        n = max(sum(c.values()), 1)
+        pct = {k: 100.0 * v / n for k, v in c.items()}
+        lines.append(f"| {name} | {sum(c.values())} | {pct['box']:.0f} % | {pct['raster_box'] + pct['raster_cell']:.0f} % "
+                     f"| {pct['none']:.0f} % | {pct['box'] + pct['raster_box']:.0f} % | {pct['raster_cell']:.0f} % "
+                     f"| {pct['none']:.0f} % |")
+    return lines + [""]
+
+
+FRONTS_START = "<!-- street fronts (D-0009-22) -->"
+FRONTS_END = "<!-- end of the street fronts -->"
+
+
+def put_fronts_in_report(lines: list[str]) -> None:
+    """The section of the street fronts in buildings_report.md, between its markers."""
+    text = REPORT.read_text(encoding="utf-8") if REPORT.exists() else ""
+    section = "\n".join([FRONTS_START] + lines + [FRONTS_END])
+    if FRONTS_START in text and FRONTS_END in text:
+        head, rest = text.split(FRONTS_START, 1)
+        text = head + section + rest.split(FRONTS_END, 1)[1]
+    else:
+        text = text.rstrip("\n") + "\n\n" + section + "\n"
+    REPORT.write_text(text, encoding="utf-8")
+
+
+def part_raster(notes: Notes) -> None:
+    """Report 0009, D-0009-22: a box for each group of D-0009-04 (cells of the
+    2.5D raster of 2019 with a building and no outline) that touches a street,
+    with the height of the raster of 2019. unmatched_2019 keeps only the part of
+    each cell, so this part reads the heights again: the median building_height
+    of the pixels with a building (building_presence over PRESENCE) in the cells
+    of the group. Writes raster_2019.json (data/geo/raw/buildings/); the geo
+    build puts these boxes in the town with the source "raster"."""
+    import numpy as np
+    import rasterio
+    import shapely
+    from rasterio.features import rasterize
+    from rasterio.warp import transform_bounds
+    from rasterio.windows import Window, from_bounds
+    manifest = geostore.load(MANIFEST)
+    rows = outlines()
+    polygons = [shapely.Polygon(list(zip(flat[0::2], flat[1::2]))) for _oid, _s, _h, _f, flat in rows]
+    temporal = geostore.get(manifest, "temporal")
+    found = no_outline_groups(manifest, polygons, temporal)
+    if found is None:
+        raise SystemExit("D-0009-22: the store has no unmatched_2019")
+    groups, center_of, cell, grid = found["groups"], found["center_of"], found["cell"], found["grid"]
+    roads = json.loads((BUILD / "roads.json").read_text(encoding="utf-8"))["roads"]
+    streets = street_lines(roads)
+    tree = shapely.STRtree([line for line, _half in streets])
+    surfaces = road_surfaces(roads)
+    surface_tree = shapely.STRtree(surfaces)
+    kept = []
+    for g in groups:
+        polygon = group_polygon(g, center_of, cell)
+        if touches_street(polygon, streets, tree):
+            rest = off_roads(polygon, surfaces, surface_tree)
+            if rest is not None:
+                kept.append((g, rest))
+    notes.add(f"D-0009-22: {len(kept)} of {len(groups)} groups touch a street (at most {STREET_TOUCH_M:.0f} m from its edge)")
+    # The tiles of 2019 of the 2.5D raster.
+    box = bbox()
+    epsg = utm_epsg(box)
+    area = transform_bounds("EPSG:4326", f"EPSG:{epsg}", box["west"], box["south"], box["east"], box["north"])
+    _, items = gcs_list("v1/manifests/", None, 60)
+    names = sorted(i["name"] for i in items if f"_EPSG_{epsg}_" in i["name"] and re.search(r"_2019_[0-9]{2}_[0-9]{2}\.json$", i["name"]))
+    tiles = []
+    for name in names:
+        tiles.extend(manifest_tiles(json.loads(get(GCS_FILE.format(bucket=TEMPORAL_BUCKET, name=name), timeout=300)), area))
+    notes.add(f"D-0009-22: {len(tiles)} tiles of 2019")
+    west, north = float(grid["west"]), float(grid["north"])
+    result = []
+    sources = {}
+    try:
+        for g, polygon in kept:
+            rr = [rc[0] for rc in g]
+            cc = [rc[1] for rc in g]
+            left, right = west + min(cc) * cell, west + (max(cc) + 1) * cell
+            top, bottom = north - min(rr) * cell, north - (max(rr) + 1) * cell
+            middle = ((left + right) / 2.0, (top + bottom) / 2.0)
+            name = next((n for n, (l, b, r, t) in tiles if l <= middle[0] < r and b <= middle[1] < t), None)
+            if name is None:
+                continue
+            if name not in sources:
+                sources[name] = rasterio.open("/vsicurl/" + GCS_FILE.format(bucket=TEMPORAL_BUCKET, name=name))
+            src = sources[name]
+            bands = [str(d or "").lower() for d in src.descriptions]
+            presence_band = bands.index("building_presence") + 1 if "building_presence" in bands else 3
+            height_band = bands.index("building_height") + 1 if "building_height" in bands else 2
+            window = from_bounds(left, bottom, right, top, src.transform).round_offsets().round_lengths()
+            # A group at the edge of a tile: the part in the tile.
+            window = window.intersection(Window(0, 0, src.width, src.height))
+            transform = src.window_transform(window)
+            shape = (int(window.height), int(window.width))
+            squares = [shapely.box(west + c * cell, north - (r + 1) * cell, west + (c + 1) * cell, north - r * cell) for r, c in g]
+            mask = rasterize(((sq, 1) for sq in squares), out_shape=shape, transform=transform, fill=0, dtype="uint8") > 0
+            presence = src.read(presence_band, window=window)
+            height = src.read(height_band, window=window)
+            take = mask & (presence > PRESENCE) & (height > -90.0)
+            if take.sum() < MIN_PIXELS:
+                continue
+            ring = shapely.Polygon(polygon.exterior.coords).simplify(0.1)
+            result.append({"id": f"raster-{g[0][0]}-{g[0][1]}", "source": "raster", "cells": len(g), "pixels": int(take.sum()),
+                           "height": round(float(np.median(height[take])), 1), "first_year": 2019,
+                           "outline": [[round(x, 2), round(z, 2)] for x, z in ring.exterior.coords]})
+    finally:
+        for src in sources.values():
+            src.close()
+    # The street fronts, before and after (section 9.3 of report 0009).
+    boxes_2019 = [shapely.Polygon(b["outline"]) for b in geostore.get(manifest, "buildings_2019")["buildings"]
+                  if len(b["outline"]) >= 4]
+    raster_polys = [shapely.Polygon(r["outline"]) for r in result]
+    cells = [shapely.box(x - cell / 2, z - cell / 2, x + cell / 2, z + cell / 2)
+             for rc, (x, z) in center_of.items() if found["building"][rc]]
+    fronts = street_fronts(roads, FRONT_STREETS, boxes_2019, raster_polys, cells)
+    put_fronts_in_report(fronts_table(fronts))
+    notes.add("D-0009-22: the street fronts: " + "; ".join(
+        f"{name} {c['box']}/{c['raster_box']}/{c['raster_cell']}/{c['none']}" for name, c in fronts.items()))
+    heights = np.array([r["height"] for r in result]) if result else np.zeros(1)
+    notes.add(f"D-0009-22: {len(result)} boxes of the raster, {sum(r['cells'] for r in result) * cell * cell / 1e4:.1f} ha; "
+              f"the heights: median {np.median(heights):.1f} m, 90 % under {np.percentile(heights, 90):.1f} m")
+    RASTER_FILE.write_text(json.dumps({
+        "note": "Made by tools/geo/buildings.py raster (report 0009, D-0009-22): a box for each group of cells of the 2.5D "
+                "raster of 2019 with a building and no outline (D-0009-04) that touches a street (at most street_touch_m from "
+                "the edge of its surface), with the median building_height of the pixels of the group with a building. The "
+                "outline is in x, z of the game (with the shift of 2019). The source of these boxes is \"raster\" (phase 3 "
+                "knows them). Open Buildings 2.5D Temporal: CC BY 4.0 (Google).",
+        "street_types": sorted(STREET_TYPES), "street_touch_m": STREET_TOUCH_M, "cell_m": cell, "presence": PRESENCE,
+        "fronts": fronts, "buildings": result}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+
+
+PARTS = {"outlines": part_outlines, "temporal": part_temporal, "osm2019": part_osm2019, "checks": part_checks, "build": part_build,
+         "raster": part_raster}
 
 
 def main() -> int:
