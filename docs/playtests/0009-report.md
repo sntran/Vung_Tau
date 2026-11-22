@@ -413,6 +413,13 @@ On `main` (`d610863`), `soak` run 2 at 2400×1080 put the player in the solid of
 - **Q13.** For D-0009-25: I ask World for the files of its catalog at a commit with no build (the files of `priv/models/`). Until World does it, does the test of R4 compare only the levels that the factory gives, and write each level that it refuses in the log? I recommend yes.
 - **Q14.** Do the hills of the mainland on the horizon come in phase 2 (a far mesh of the Copernicus DEM, to about 30 km)? I recommend yes: each view from the hills of Vũng Tàu has them.
 
+### 9.5a Answers (2026-11-22)
+
+- **Q11: yes.** The limits of PT-33 stay, and D-0009-23 is the correction. If a value is still out after it only because of the trees of the hills, PT-33 run 2 writes the value and does not fail until the later pass of the look.
+- **Q12: yes.** Where the data has no building on the front of a shop street, phase 3 puts a row of tube houses there, with the status Check, and the street photos of Mapillary as the source where they exist.
+- **Q13: yes.** I ask World for the files of its catalog at a commit with no build. Until World does it, the test of R4 compares only the levels that the factory gives, and writes each level that it refuses in the log.
+- **Q14: yes.** The hills of the mainland on the horizon come in phase 2: a far mesh of the Copernicus DEM, to about 30 km.
+
 ### 9.6 Status
 
-Phases 1b and 2 are not done: D-0009-22 to D-0009-26, and Q11 to Q14. Phase 3 waits.
+Phases 1b and 2 are not done: D-0009-22 to D-0009-26, and the work of Q13 and Q14. Phase 3 waits for my look at the views of PT-68 after the corrections.
