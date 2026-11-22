@@ -121,6 +121,7 @@ func run(d: PlaytestDriver) -> void:
 	if d.phase == RUNS:
 		# After the random taps, so that their sequence stays the same.
 		await _cart_comes_where_the_player_stands(d)
+		await _shutter_waits_for_the_player(d)
 		d.expect(skipped <= TAPS * 2 / 5, "more than 40 %% of the random taps were not possible: %d of %d" % [skipped, TAPS])
 
 
@@ -253,3 +254,40 @@ func _cart_comes_where_the_player_stands(d: PlaytestDriver) -> void:
 	await d.look_at_point(place + Vector3(0, 0.8, 0), 6.0, 20.0)
 	await d.wait_frames(3)
 	await d.screenshot("cart_comes")
+
+
+## Report 0009, audit 5: in CI (2400x1080, run 8, action 152) the player
+## stood in the door of the phở of cô Sáu when its shutter came down at 10:30
+## (the half shutter): its solid pushed the player 0.26 m up. A shutter waits
+## while the player stands in its door, and comes down when the player goes.
+func _shutter_waits_for_the_player(d: PlaytestDriver) -> void:
+	var hem: Hem = d.main().hem
+	var house: TubeHouse = hem.houses[hem._spot_lots["pho"]]
+	var close := int(Content.spot("pho").hours.close)
+	# Setup: the clock before the shop closes.
+	GameState.set_minutes(close - 2)
+	await d.wait_frames(3)
+	var door := Vector3(float(hem.lot_x[hem._spot_lots["pho"]]) - 1.2, 0.0, -hem.hem_width / 2.0 + 0.1)
+	if not await d.walk_toward(door.x, door.z):
+		return
+	await _wait_walk_end(d)
+	var at: Vector3 = d.state().player
+	d.step("the player stands at %s, in the door of the phở (%.2f, %.2f)" % [at, door.x, door.z])
+	if not d.expect(house.in_shutter_way(at, Player.RADIUS), "the player stands in the way of the shutter of the phở"):
+		return
+	GameState.set_minutes(close)
+	await d.wait_frames(5)
+	at = d.state().player
+	d.expect(d.player_overlaps().is_empty() and at.y < 0.15, "at %s the player in the door is not in a solid and not pushed up: %s %s" % [
+			GameClock.format_time(close), at, d.player_overlaps()])
+	d.expect(house.shutter == TubeHouse.Shutter.OPEN, "the shutter of the phở waits while the player stands in its door")
+	await d.screenshot("shutter_waits")
+	var away := Vector3(door.x, 0.0, 0.2)
+	if not await d.walk_toward(away.x, away.z):
+		return
+	await _wait_walk_end(d)
+	GameState.set_minutes(close + 1)
+	await d.wait_frames(5)
+	d.expect(house.shutter != TubeHouse.Shutter.OPEN, "the shutter of the phở comes down when the player steps away")
+	d.expect(d.player_overlaps().is_empty(), "the player is not in a solid when the shutter comes down: %s" % [d.player_overlaps()])
+	await d.screenshot("shutter_down")
