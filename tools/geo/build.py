@@ -701,7 +701,7 @@ def bare_earth(grid, raw: Path, out: Path, settings: dict, projection, config: C
     ix, iz, ig = columns.index("x"), columns.index("z"), columns.index("ground")
     points = np.array([[b[ix], b[iz], b[ig] - mdt] for b in bins["bins"] if b[ig] is not None], dtype=np.float64)
     result = bareearth.compare(models, points, class_cells, zones, zone_names, grid.x0, grid.z0, grid.step)
-    choice = bareearth.choose(result, int(settings["min_points"]))
+    choice = bareearth.choose(result, int(settings["min_points"]), {h: tuple(v["position"]) for h, v in hills.items()})
     before = grid.heights.copy()
     keep = bareearth.coast_keep(land, grid.step, float(settings["coast_band_m"]))
     applied = bareearth.apply(grid.heights, models, class_cells, zones, zone_names, choice, keep, grid.step,

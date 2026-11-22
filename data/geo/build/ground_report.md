@@ -83,16 +83,16 @@ The difference is the model minus the lidar (m).
 | Núi Lớn, bushes | 56 | 9.56 | 9.49 | 5.57 | GEDTM30 v1.2 | the smallest RMSE (9.49 m) |
 | Núi Lớn, town | 77 | 8.58 | 8.55 | 3.37 | DeltaDTM v1.1 | the smallest RMSE (3.37 m) |
 | Núi Lớn, bare ground and grass | 73 | 6.73 | 7.75 | 7.54 | Copernicus GLO-30 | the smallest RMSE (6.73 m) |
-| Núi Nhỏ, tree cover | 0 |  |  |  | Copernicus GLO-30 | 0 lidar points (fewer than 30) |
-| Núi Nhỏ, bushes | 0 |  |  |  | Copernicus GLO-30 | 0 lidar points (fewer than 30) |
-| Núi Nhỏ, town | 3 | 2.27 | 2.66 | 59.93 | Copernicus GLO-30 | 3 lidar points (fewer than 30) |
-| Núi Nhỏ, bare ground and grass | 0 |  |  |  | Copernicus GLO-30 | 0 lidar points (fewer than 30) |
+| Núi Nhỏ, tree cover | 0 |  |  |  | GEDTM30 v1.2 | 0 lidar points (fewer than 30): the choice of nui_lon/tree, the nearest hill with enough points (the smallest RMSE (8.06 m)) |
+| Núi Nhỏ, bushes | 0 |  |  |  | GEDTM30 v1.2 | 0 lidar points (fewer than 30): the choice of nui_lon/bush, the nearest hill with enough points (the smallest RMSE (9.49 m)) |
+| Núi Nhỏ, town | 3 | 2.27 | 2.66 | 59.93 | DeltaDTM v1.1 | 3 lidar points (fewer than 30): the choice of nui_lon/town, the nearest hill with enough points (the smallest RMSE (3.37 m)) |
+| Núi Nhỏ, bare ground and grass | 0 |  |  |  | Copernicus GLO-30 | 0 lidar points (fewer than 30): the choice of nui_lon/open, the nearest hill with enough points (the smallest RMSE (6.73 m)) |
 
 ## The change
 
-- GEDTM30 v1.2: 573.0 ha, a mean change of -4.33 m.
-- DeltaDTM v1.1: 2.3 ha, a mean change of -9.58 m.
-- All: 1251.5 ha change by more than 0.05 m (a mean of -2.38 m); the most lowered cell 22.93 m, the most raised 9.75 m.
+- GEDTM30 v1.2: 626.2 ha, a mean change of -4.36 m.
+- DeltaDTM v1.1: 8.1 ha, a mean change of -23.04 m.
+- All: 1329.7 ha change by more than 0.05 m (a mean of -2.83 m); the most lowered cell 90.49 m, the most raised 9.75 m.
 
 ![The change of the ground](ground_change.png)
 
@@ -106,7 +106,7 @@ The mean height of the land in a circle of the place (m): Copernicus over EGM200
 |---|---:|---:|---:|---:|
 | The beach of Bãi Trước | 4.47 | 3.31 | 2.85 | -1.62 |
 | The hall with the orange roof | 7.65 | 6.49 | 6.06 | -1.59 |
-| Cao ốc Sen Biển | 13.01 | 11.85 | 11.51 | -1.50 |
+| Cao ốc Sen Biển | 13.01 | 11.85 | 11.40 | -1.61 |
 | The Grand Hotel | 8.09 | 6.93 | 5.60 | -2.49 |
 
 ## Bãi Trước and Núi Nhỏ, each model

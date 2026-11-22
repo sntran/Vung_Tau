@@ -8,8 +8,10 @@ checks the three models:
 1. compare() gives, for each model, the mean difference and the RMSE against
    the lidar ground, by land cover and on each hill.
 2. choose() takes, for each group (a hill or the low land, and a class of
-   the land cover), the model with the smallest RMSE. A group with fewer
-   than min_points lidar points keeps Copernicus.
+   the land cover), the model with the smallest RMSE. A group of a hill with
+   fewer than min_points lidar points takes the choice of the same class on
+   the nearest hill with enough points (report 0009, D-0009-17: Núi Nhỏ has 3
+   points and takes the choices of Núi Lớn); with no such hill, Copernicus.
 3. apply() uses that model where it differs from Copernicus by more than
    min_difference_m on average (a mean over difference_mean_m), with a smooth
    change to Copernicus over blend_m at the edge. Elsewhere Copernicus stays.
@@ -21,6 +23,8 @@ take away the mean dynamic topography (msl()).
 """
 
 from __future__ import annotations
+
+import math
 
 import numpy as np
 from scipy import ndimage
@@ -114,14 +118,17 @@ def compare(models: dict, points: np.ndarray, classes: np.ndarray, zones: np.nda
     return out
 
 
-def choose(result: dict, min_points: int) -> dict:
-    """For each group, the model with the smallest RMSE; Copernicus when the
-    group has fewer than min_points lidar points with Copernicus."""
+def choose(result: dict, min_points: int, positions: dict | None = None) -> dict:
+    """For each group, the model with the smallest RMSE. Report 0009,
+    D-0009-17: a group of a hill with fewer than min_points lidar points takes
+    the choice of the same class on the nearest other hill (positions: hill ->
+    game x, z) that has enough points; with no such hill, Copernicus."""
     choice = {}
     groups = result["by_model"][COPERNICUS]["group"]
+    few = []
     for group, cop in groups.items():
         if cop["n"] < min_points:
-            choice[group] = {"model": COPERNICUS, "why": f"{cop['n']} lidar points (fewer than {min_points})"}
+            few.append(group)
             continue
         best, best_rmse = COPERNICUS, cop["rmse"]
         for name, by in result["by_model"].items():
@@ -129,6 +136,21 @@ def choose(result: dict, min_points: int) -> dict:
             if g["n"] >= min_points and g["rmse"] is not None and g["rmse"] < best_rmse:
                 best, best_rmse = name, g["rmse"]
         choice[group] = {"model": best, "why": f"the smallest RMSE ({best_rmse:.2f} m)"}
+    for group in few:
+        zone, klass = group.split("/")
+        n = groups[group]["n"]
+        near = None
+        if positions and zone in positions:
+            others = [(math.dist(positions[zone], positions[z]), z) for z in positions
+                      if z != zone and f"{z}/{klass}" in choice]
+            near = min(others)[1] if others else None
+        if near is None:
+            choice[group] = {"model": COPERNICUS, "why": f"{n} lidar points (fewer than {min_points})"}
+        else:
+            source = choice[f"{near}/{klass}"]
+            choice[group] = {"model": source["model"], "from": f"{near}/{klass}",
+                             "why": f"{n} lidar points (fewer than {min_points}): the choice of {near}/{klass}, "
+                                    f"the nearest hill with enough points ({source['why']})"}
     return choice
 
 

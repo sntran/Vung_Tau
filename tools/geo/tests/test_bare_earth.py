@@ -211,3 +211,25 @@ def test_the_band_of_the_coast_keeps_copernicus():
     band = land.copy()
     band[:, 20 + 14:] = False  # the land within 30 m of the sea (the cells at 2 m to 28 m)
     assert np.array_equal(heights[band], cop[band])
+
+
+def test_a_hill_with_few_lidar_points_takes_the_choice_of_the_nearest_hill():
+    """Report 0009, D-0009-17: Núi Nhỏ has 3 lidar points; its tree cover takes
+    the choice of the tree cover of the nearest hill with enough points (Núi
+    Lớn), not Copernicus."""
+    def stats(n, rmse):
+        return {"n": n, "rmse": rmse, "mean": 0.0}
+    groups_cop = {"low_land/tree": stats(100, 4.0), "nui_lon/tree": stats(200, 8.0), "nui_nho/tree": stats(3, 9.0),
+                  "far_hill/tree": stats(300, 2.0)}
+    groups_ged = {"low_land/tree": stats(100, 5.0), "nui_lon/tree": stats(200, 3.0), "nui_nho/tree": stats(3, 1.0),
+                  "far_hill/tree": stats(300, 6.0)}
+    result = {"by_model": {bareearth.COPERNICUS: {"group": groups_cop}, "gedtm30": {"group": groups_ged}}}
+    positions = {"nui_lon": (0.0, 0.0), "nui_nho": (1000.0, 2000.0), "far_hill": (9000.0, 9000.0)}
+    choice = bareearth.choose(result, 30, positions)
+    assert choice["nui_lon/tree"]["model"] == "gedtm30"
+    assert choice["nui_nho/tree"]["model"] == "gedtm30"
+    assert choice["nui_nho/tree"]["from"] == "nui_lon/tree"
+    assert "nui_lon" in choice["nui_nho/tree"]["why"]
+    # The low land keeps its own choice, and with no positions a group with few points keeps Copernicus.
+    assert choice["low_land/tree"]["model"] == bareearth.COPERNICUS
+    assert bareearth.choose(result, 30)["nui_nho/tree"]["model"] == bareearth.COPERNICUS
