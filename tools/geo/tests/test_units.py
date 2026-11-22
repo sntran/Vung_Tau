@@ -314,12 +314,56 @@ def test_small_island_keeps_its_height():
     no_town = np.zeros((n, n), dtype=bool)
     grid = terrain.Grid(0.0, 0.0, 2.0, heights.copy())
     terrain.remove_buildings(grid, no_town)
-    assert grid.heights[50, 50] == pytest.approx(2.0, abs=0.01), "low ground: the hump goes"
+    # Low ground: the hump of 12 m goes; a cone of KEEP_SLOPE of its half width stays (D-0009-20).
+    assert grid.heights[50, 50] < 2.0 + terrain.KEEP_SLOPE * 12.0 + 0.1, "low ground: the hump goes"
     grid = terrain.Grid(0.0, 0.0, 2.0, heights.copy())
     keep = np.zeros((n, n), dtype=bool)
     keep[40:61, 40:61] = True
     terrain.remove_buildings(grid, no_town, keep)
     assert grid.heights[50, 50] == pytest.approx(12.0), "the island keeps its height"
+
+
+def _sloped_town():
+    """A slope of 5 % and a hump, with a building of 8 m every 24 m (cells of 2 m)."""
+    n = 151
+    rows, cols = np.indices((n, n))
+    # A slope of 5 %, and a hump of the ground (3 m high, about 15 m wide: smaller
+    # than the window of the filter, with slopes under 15 %).
+    hump = 3.0 * np.exp(-(((rows - 75) * 2.0) ** 2 + ((cols - 75) * 2.0) ** 2) / (2 * 15.0 ** 2))
+    ground = (cols * 2.0 * 0.05 + hump).astype(np.float32) + 5.0
+    heights = ground.copy()
+    for r0 in range(10, n - 10, 12):
+        for c0 in range(10, n - 10, 12):
+            heights[r0:r0 + 5, c0:c0 + 5] += 8.0
+    return ground, heights
+
+
+def test_the_filter_of_the_buildings_keeps_the_slope_with_no_square_terraces():
+    """Report 0009, D-0009-20: the opening cut each hump into a flat square, with
+    steps between the squares. The ground of the town keeps its slope."""
+    ground, heights = _sloped_town()
+    town = np.ones(heights.shape, dtype=bool)
+    grid = terrain.Grid(0.0, 0.0, 2.0, heights.copy())
+    terrain.remove_buildings(grid, town)
+    inner = (slice(30, 120), slice(30, 120))
+    # The hump keeps its top (a flat opening cut it to a square terrace), and the
+    # place of each building is near the ground.
+    assert grid.heights[75, 75] > ground[75, 75] - 0.5
+    assert np.abs(grid.heights[inner] - ground[inner]).max() < 1.0
+    # No flat runs: along a row, the steps of the slope (0.1 m a cell) stay.
+    steps = np.diff(grid.heights[inner], axis=1)
+    assert (np.abs(steps) < 0.005).mean() < 0.05
+    assert np.all(grid.heights <= heights + 1e-4), "the filter never raises the ground"
+
+
+def test_the_filter_of_the_buildings_does_not_change_the_bare_earth():
+    """Report 0009, D-0009-20: GEDTM30 and DeltaDTM have no buildings, so no opening where they are used."""
+    _ground, heights = _sloped_town()
+    town = np.ones(heights.shape, dtype=bool)
+    bare = np.ones(heights.shape, dtype=np.float32)
+    grid = terrain.Grid(0.0, 0.0, 2.0, heights.copy())
+    terrain.remove_buildings(grid, town, None, bare)
+    assert np.allclose(grid.heights, heights)
 
 
 def test_outside_of_a_sharp_bend_is_flat():

@@ -64,5 +64,12 @@
 			"world_place": "khach_san_grand",
 			"radius_m": 60.0
 		}
-	]
+	],
+	"town_profile": {
+		"landmark": "cho_xom_luoi",
+		"name": "chợ Xóm Lưới",
+		"north_m": 300,
+		"length_m": 1000,
+		"note": "Report 0009, D-0009-20: the profile of the town ground in ground_report.md (the town north of chợ Xóm Lưới, as in the audit)."
+	}
 }

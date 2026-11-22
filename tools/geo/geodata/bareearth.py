@@ -226,7 +226,10 @@ def apply(heights: np.ndarray, models: dict, classes: np.ndarray, zones: np.ndar
     numbers["mean_change_m"] = round(float(change[changed].mean()), 2) if changed.any() else 0.0
     numbers["largest_lowering_m"] = round(float(-change.min()), 2) if change.size else 0.0
     numbers["largest_raising_m"] = round(float(change.max()), 2) if change.size else 0.0
-    return {"numbers": numbers, "change": change.astype(np.float32)}
+    # Report 0009, D-0009-20: the weight of the bare earth in each cell (0 to 1).
+    used = np.minimum(weights, 1.0)
+    used[keep] = 0.0
+    return {"numbers": numbers, "change": change.astype(np.float32), "weight": used.astype(np.float32)}
 
 
 def cell_steps(heights: np.ndarray, area: np.ndarray) -> float:

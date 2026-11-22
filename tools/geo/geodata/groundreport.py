@@ -162,3 +162,57 @@ def report(result: dict, choice: dict, applied: dict, zone_names: list, hills: d
         if key in maps:
             lines += [f"![{key}]({maps[key]})", ""]
     return "\n".join(lines) + "\n"
+
+
+def town_profile(grid, before: np.ndarray, config: dict, point) -> dict:
+    """Report 0009, D-0009-20: a profile of the ground of the town from west to
+    east, north_m north of a landmark, length_m long: the filter of plans 0005
+    to 0026 (before) and the filter now (after, with the bare earth)."""
+    x0, y0 = point
+    y = y0 + float(config["north_m"])
+    xs = np.arange(x0 - config["length_m"] / 2.0, x0 + config["length_m"] / 2.0, grid.step)
+    zs = np.full_like(xs, -y)
+    after = grid.sample(xs, zs)
+    copy = type(grid)(grid.x0, grid.z0, grid.step, before.astype(np.float32))
+    old = copy.sample(xs, zs)
+
+    def flat(values):
+        return float((np.abs(np.diff(values)) < 0.005).mean())
+
+    def largest_step(values):
+        return float(np.abs(np.diff(values)).max())
+    return {"config": config, "x": xs, "z": float(-y), "before": old, "after": after,
+            "flat_before": flat(old), "flat_after": flat(after),
+            "step_before": largest_step(old), "step_after": largest_step(after)}
+
+
+def write_town_profile(out, profile: dict) -> None:
+    """The picture of the profile (town_profile.png) and its part of ground_report.md."""
+    from PIL import Image, ImageDraw
+    width, height, pad = 900, 300, 30
+    values = np.concatenate([profile["before"], profile["after"]])
+    low, high = float(values.min()) - 0.5, float(values.max()) + 0.5
+    image = Image.new("RGB", (width, height), (250, 250, 250))
+    draw = ImageDraw.Draw(image)
+    n = len(profile["x"])
+    for key, color in (("before", (200, 40, 40)), ("after", (30, 90, 200))):
+        points = [(pad + i * (width - 2 * pad) / max(n - 1, 1),
+                   height - pad - (v - low) / (high - low) * (height - 2 * pad)) for i, v in enumerate(profile[key])]
+        draw.line(points, fill=color, width=2)
+    draw.text((pad, 6), f"Red: before (a square window). Blue: after (the bare earth, and a round window). "
+                        f"{low:.1f} m to {high:.1f} m, {profile['config']['length_m']:.0f} m across", fill=(0, 0, 0))
+    image.save(out / "town_profile.png")
+    (out / "town_profile.png.import").write_text("[remap]\n\nimporter=\"keep\"\n", encoding="utf-8")
+    c = profile["config"]
+    text = ["", "## The profile of the town (report 0009, D-0009-20)", "",
+            f"A line of {c['length_m']:.0f} m from west to east, {c['north_m']:.0f} m north of {c['name']} "
+            f"(game z {profile['z']:.0f}). Before, the filter of the buildings of plans 0005 to 0026 opened the "
+            "ground with a flat square window: it cut each hump of the ground into a flat square, with steps "
+            "between the squares. Now the filter does not change the bare earth (GEDTM30 and DeltaDTM have no "
+            "buildings), and elsewhere it opens with a round cone of 15 %, so a slope up to 15 % stays.", "",
+            "| | Before | After |", "|---|---:|---:|",
+            f"| Cells flat to 5 mm with the next cell | {profile['flat_before'] * 100:.0f} % | {profile['flat_after'] * 100:.0f} % |",
+            f"| The largest step between two cells (m) | {profile['step_before']:.2f} | {profile['step_after']:.2f} |",
+            "", "![town profile](town_profile.png)", ""]
+    with open(out / "ground_report.md", "a", encoding="utf-8") as f:
+        f.write("\n".join(text))

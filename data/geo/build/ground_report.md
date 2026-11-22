@@ -104,10 +104,10 @@ The mean height of the land in a circle of the place (m): Copernicus over EGM200
 
 | Place | Copernicus over EGM2008 | Copernicus over the mean sea level | The ground of the game | Change |
 |---|---:|---:|---:|---:|
-| The beach of Bãi Trước | 4.47 | 3.31 | 2.85 | -1.62 |
-| The hall with the orange roof | 7.65 | 6.49 | 6.06 | -1.59 |
-| Cao ốc Sen Biển | 13.01 | 11.85 | 11.40 | -1.61 |
-| The Grand Hotel | 8.09 | 6.93 | 5.60 | -2.49 |
+| The beach of Bãi Trước | 4.47 | 3.31 | 2.63 | -1.84 |
+| The hall with the orange roof | 7.65 | 6.49 | 6.02 | -1.64 |
+| Cao ốc Sen Biển | 13.01 | 11.85 | 11.61 | -1.40 |
+| The Grand Hotel | 8.09 | 6.93 | 6.65 | -1.44 |
 
 ## Bãi Trước and Núi Nhỏ, each model
 
@@ -115,3 +115,14 @@ The mean height of the land in a circle of the place (m): Copernicus over EGM200
 
 ![nui_nho](ground_models_nui_nho.png)
 
+
+## The profile of the town (report 0009, D-0009-20)
+
+A line of 1000 m from west to east, 300 m north of chợ Xóm Lưới (game z -57). Before, the filter of the buildings of plans 0005 to 0026 opened the ground with a flat square window: it cut each hump of the ground into a flat square, with steps between the squares. Now the filter does not change the bare earth (GEDTM30 and DeltaDTM have no buildings), and elsewhere it opens with a round cone of 15 %, so a slope up to 15 % stays.
+
+| | Before | After |
+|---|---:|---:|
+| Cells flat to 5 mm with the next cell | 77 % | 29 % |
+| The largest step between two cells (m) | 1.55 | 0.32 |
+
+![town profile](town_profile.png)

@@ -200,7 +200,14 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     # Small islands keep the heights of the DEM: the filter would make them flat.
     islands = [p for p in polygons_of(land) if p.area < ISLAND_MAX_M2]
     island_mask = terrain.rasterize(grid, [p.buffer(ISLAND_MARGIN_M) for p in islands])
-    town_change = terrain.remove_buildings(grid, town_mask, island_mask)
+    # Report 0009, D-0009-20: no filter where the bare earth is used, and a round window that keeps the slope.
+    bare_weight = ground_stats.pop("weight") if ground_stats is not None else None
+    square = terrain.square_opening(grid, town_mask, island_mask)
+    town_change = terrain.remove_buildings(grid, town_mask, island_mask, bare_weight)
+    town_profile = None
+    if ground_stats is not None and "town_profile" in ground_config:
+        town_profile = groundreport.town_profile(grid, square, ground_config["town_profile"], found_landmark_point(
+            config, data, projection, ground_config["town_profile"]["landmark"]))
     land_mask = terrain.rasterize(grid, polygons_of(land))
     beach_mask = terrain.rasterize(grid, [p for b in beaches for p in polygons_of(b)]) & land_mask
     terrain.shape_coast(grid, land_mask, beach_mask)
@@ -380,6 +387,8 @@ def build(raw: Path, out: Path, geo: Path) -> int:
         (out / name).write_bytes(content)
     if ground_stats is not None:
         ground_stats.pop("write")(out)
+        if town_profile is not None:
+            groundreport.write_town_profile(out, town_profile)
     # Plan 0008, R2 and D7: the ground under each known place is level, at the
     # lowest point of its outline; the base of the place is 0.1 m over it.
     level_places(grid, config.landmarks, found_by_id)
@@ -749,7 +758,16 @@ def bare_earth(grid, raw: Path, out: Path, settings: dict, projection, config: C
             groundreport.report(result, choice, applied, zone_names, hills, {k: m["name"] for k, m in settings["models"].items()},
                                 report_settings, places, maps), encoding="utf-8")
     return {"mdt_m": mdt, "changed_ha": applied["numbers"]["changed_ha"],
-            "choice": {g: c["model"] for g, c in choice.items()}, "write": write}
+            "choice": {g: c["model"] for g, c in choice.items()}, "write": write, "weight": applied["weight"]}
+
+
+def found_landmark_point(config, data, projection, landmark_id: str):
+    """The map point (x, y) of a landmark of landmarks.json, before the build finds all of them."""
+    landmark = next(l for l in config.landmarks if l["id"] == landmark_id)
+    found = landmarks.choose(landmark, landmarks.candidates(landmark, data))
+    lon, lat = found["lonlat"] if found else (landmark["hint"]["lon"], landmark["hint"]["lat"])
+    x, y = projection.to_map(np.array([lon]), np.array([lat]))
+    return float(x[0]), float(y[0])
 
 
 def write_town(grid, raw: Path, out: Path, area: dict, on_water=None) -> dict | None:

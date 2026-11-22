@@ -85,6 +85,9 @@ ROAD_SIDE_M = 6.0
 NATURAL_ROADS = {"path", "track"}
 # The size of the filter that removes buildings and trees from the surface model in towns.
 URBAN_FILTER_M = 60.0
+# Report 0009, D-0009-20: the slope of the cone of the filter of the buildings
+# (a slope of the ground up to this stays).
+KEEP_SLOPE = 0.15
 # Below LOW_GROUND_TOP_M - LOW_GROUND_BLEND_M, the filter changes the ground fully. Above
 # LOW_GROUND_TOP_M, it changes only the towns.
 LOW_GROUND_TOP_M = 25.0
@@ -180,14 +183,39 @@ def rasterize(grid: Grid, geometries, value: int = 1) -> np.ndarray:
                               dtype=np.uint8, all_touched=False).astype(bool)
 
 
-def remove_buildings(grid: Grid, town: np.ndarray, keep: np.ndarray | None = None) -> float:
-    """The DEM is a surface model: it has the tops of buildings and trees. An
-    opening filter (a minimum, then a maximum) removes shapes that are smaller
-    than URBAN_FILTER_M. A slope stays as it is. The filter changes the towns
-    and the low ground, but not the hills, and not the cells in keep (small
-    islands such as Hòn Bà: they are smaller than the filter, so the filter
-    makes them flat). Returns the mean change in meters where the filter
-    changes the ground fully."""
+def _cone_opening(heights: np.ndarray, step: float, radius_m: float, slope: float) -> np.ndarray:
+    """A grey opening with a round cone (a slope of "slope" from its middle,
+    radius_m wide): radius_m / step steps of a 3 x 3 cone. A slope of the ground
+    up to "slope" stays as it is; a wall (a building) goes, and a hump smaller
+    than the window keeps its shape, with no flat top (report 0009, D-0009-20)."""
+    rise = [(dr, dc, slope * step * float(np.hypot(dr, dc))) for dr in (-1, 0, 1) for dc in (-1, 0, 1)
+            if dr or dc]
+
+    def one(values: np.ndarray, erode: bool) -> np.ndarray:
+        padded = np.pad(values, 1, mode="edge")
+        out = values.copy()
+        rows, cols = values.shape
+        for dr, dc, r in rise:
+            shifted = padded[1 + dr:1 + dr + rows, 1 + dc:1 + dc + cols]
+            if erode:
+                np.minimum(out, shifted + r, out=out)
+            else:
+                np.maximum(out, shifted - r, out=out)
+        return out
+
+    n = max(1, int(round(radius_m / step)))
+    out = heights.astype(np.float32, copy=True)
+    for _ in range(n):
+        out = one(out, True)
+    for _ in range(n):
+        out = one(out, False)
+    return np.minimum(out, heights)
+
+
+def square_opening(grid: Grid, town: np.ndarray, keep: np.ndarray | None = None) -> np.ndarray:
+    """The heights of the filter of plans 0005 to 0026 (a flat square window),
+    on a copy: the "before" of the profile of the town of the ground report
+    (report 0009, D-0009-20)."""
     size = int(URBAN_FILTER_M / grid.step) | 1
     opened = ndimage.maximum_filter(ndimage.minimum_filter(grid.heights, size=size), size=size)
     density = ndimage.gaussian_filter(town.astype(np.float32), sigma=20.0 / grid.step)
@@ -195,6 +223,29 @@ def remove_buildings(grid: Grid, town: np.ndarray, keep: np.ndarray | None = Non
     weight = np.maximum(np.clip(density * 3.0, 0.0, 1.0), low)
     if keep is not None:
         weight[keep] = 0.0
+    return grid.heights - (grid.heights - opened) * weight
+
+
+def remove_buildings(grid: Grid, town: np.ndarray, keep: np.ndarray | None = None,
+                     bare: np.ndarray | None = None) -> float:
+    """The DEM is a surface model: it has the tops of buildings and trees. An
+    opening filter removes shapes that are smaller than URBAN_FILTER_M, with a
+    round window that keeps the slope of the ground up to KEEP_SLOPE (report
+    0009, D-0009-20: a flat square window cut each hump of the ground into a
+    flat square, with steps of 1 m to 3 m between the squares). The filter
+    changes the towns and the low ground, but not the hills, not the cells in
+    keep (small islands such as Hòn Bà: they are smaller than the filter, so
+    the filter makes them flat), and not the bare earth (bare: its weight, 0 to
+    1; GEDTM30 and DeltaDTM have no buildings). Returns the mean change in
+    meters where the filter changes the ground fully."""
+    opened = _cone_opening(grid.heights, grid.step, URBAN_FILTER_M / 2.0, KEEP_SLOPE)
+    density = ndimage.gaussian_filter(town.astype(np.float32), sigma=20.0 / grid.step)
+    low = np.clip((LOW_GROUND_TOP_M - opened) / LOW_GROUND_BLEND_M, 0.0, 1.0)
+    weight = np.maximum(np.clip(density * 3.0, 0.0, 1.0), low)
+    if keep is not None:
+        weight[keep] = 0.0
+    if bare is not None:
+        weight *= np.clip(1.0 - bare, 0.0, 1.0)
     change = (grid.heights - opened) * weight
     grid.heights -= change
     full = weight > 0.99
