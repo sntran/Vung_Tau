@@ -9,9 +9,9 @@
 				107.0775
 			],
 			"eye_height": 16.0,
-			"heading": 35.0,
-			"pitch": -12.0,
-			"fov": 50.0,
+			"heading": 53.1,
+			"pitch": -12.9,
+			"fov": 53.1,
 			"min_boxes": 200,
 			"eye_note": "The gallery of the lighthouse (the photo is from it; the ground at its foot has trees round it).",
 			"photos": [
@@ -26,7 +26,7 @@
 					"shows": "The town from the gallery of the lighthouse on Núi Nhỏ, looking north-east: roofs below, Bàu Sen lake, the twin towers, the coast of Bãi Sau, and the hills of Long Hải far away.",
 					"title": "View of Vung Tau from Vung Tau lighthouse (August 3, 2018) (43913500872).jpg",
 					"place": "the lighthouse (the geotag of the file is in the town, 1 km north: not used)",
-					"direction": "north-east, 30 to 40 degrees"
+					"direction": "north-east, 53 degrees (the near twin towers and Bàu Sen)"
 				}
 			],
 			"edge": true,
@@ -49,17 +49,16 @@
 			},
 			"lakes": [
 				"Hồ Bàu Sen"
-			]
+			],
+			"how": "Report 0009, D-0009-18: from the photo (4:3; a phone of 26 mm in 35 mm: 67.3 by 53.1 degrees). The near twin towers (85 m and 87 m of the 2.5D data, about 1 km away, bearings 68.7 and 71.7 degrees) are at x 0.73 of the photo: the heading is 53.1 degrees. With it, Bàu Sen (bearing 47 degrees) is 6 degrees left of the middle, as in the photo. The pair of 90 m and 91 m 2.4 km away (bearing 33 degrees) is the small pair far left in the photo. The horizon is at y 0.27: the pitch is -12.9 degrees."
 		},
 		{
 			"id": "nui_lon_top",
-			"name": "The top of Núi Lớn",
+			"name": "The cable car of Núi Lớn, over Bạch Dinh",
 			"eye_height": 30.0,
-			"fov": 50.0,
-			"min_boxes": 200,
-			"eye_note": "The top of Núi Lớn (the peak of OpenStreetMap), over the trees and the edge of the top, as the view nui_lon_south_east of PT-33 (12 m over the top and 18 m more), looking at Bãi Trước with Núi Nhỏ behind it: the direction of the photo from the cable car. The geotag of the photo of 2011 (looking east) is on the flat top, where the trees and the edge hide the town.",
-			"eye_landmark": "nui_lon",
-			"aim_landmark": "bai_truoc",
+			"fov": 44.4,
+			"min_boxes": 50,
+			"eye_note": "Report 0009, D-0009-18: the photo is from the cable car over Bạch Dinh, so the eye is on the line of the cable car of OpenStreetMap (way 236681315), 241 m west of Bạch Dinh, at 66.2 m over the mean sea level.",
 			"photos": [
 				{
 					"url": "https://commons.wikimedia.org/wiki/File:Nh%C3%ACn_to%C3%A0n_c%E1%BA%A3nh_TP.V%C5%A8NG_T%C3%80U_t%E1%BB%AB_C%C3%A1p_treo_V%C5%A9ng_T%C3%A0u.jpg",
@@ -84,7 +83,15 @@
 					"date": "2011-09-03",
 					"direction": "east"
 				}
-			]
+			],
+			"eye": [
+				10.352417,
+				107.067239
+			],
+			"eye_y": 66.2,
+			"heading": 153.6,
+			"pitch": -6.5,
+			"how": "From the photo (16:9; a phone: 71.9 by 44.4 degrees): Bạch Dinh is at x 0.33, y 0.57, the lighthouse on Núi Nhỏ at x 0.46, and the horizon at y 0.36. On the line of the cable car, the point where the lighthouse is 10.5 degrees right of Bạch Dinh is the eye; the heading puts the lighthouse at x 0.46 (153.6 degrees), the horizon gives the pitch (-6.5 degrees), and Bạch Dinh 9.8 degrees under the horizon gives the height (its roof about 8 m over its base)."
 		},
 		{
 			"id": "hai_dang_road",
@@ -94,9 +101,9 @@
 				107.074204
 			],
 			"eye_height": 3.0,
-			"heading": 10.0,
-			"pitch": -6.0,
-			"fov": 50.0,
+			"heading": 33.0,
+			"pitch": 6.6,
+			"fov": 53.1,
 			"min_boxes": 200,
 			"eye_note": "The point of the Hải Đăng road nearest to the geotag of the photo (12 m from it: the geotag is on a lot beside the road, where a building stands), 1 m over the highest tree of the canopy map within 8 m (as PT-33): the photo is from the railing, over the tree tops of the slope below the road.",
 			"photos": [
@@ -114,7 +121,8 @@
 					"direction": "north to north-north-east"
 				}
 			],
-			"over_trees": true
+			"over_trees": true,
+			"how": "Report 0009, D-0009-18: from the photo (Nokia Lumia 1020 in the file, 4:3 at 26 mm in 35 mm: 67.3 by 53.1 degrees). The pair of towers at x 0.645 is the pair of 90 m and 91 m (bearing 44 degrees): the heading is 33 degrees, so Núi Lớn (341 degrees) is out of the frame and the water of Bãi Sau is on the right, as in the photo. The horizon is at y 0.615: the pitch is +6.6 degrees."
 		},
 		{
 			"id": "bus_le_hong_phong",
@@ -127,9 +135,10 @@
 			"heading": 279.6,
 			"pitch": 2.0,
 			"fov": 50.0,
-			"min_boxes": 50,
+			"min_boxes": 10,
 			"photo": null,
-			"photo_note": "No open photo of 2017 to 2021 or of another year shows this view (searched on Wikimedia Commons and Flickr, 2026-11-21); Mapillary cannot be reached from the workspace."
+			"photo_note": "No open photo of 2017 to 2021 or of another year shows this view on Wikimedia Commons and Flickr (2026-11-21). Report 0009, D-0009-18: its point is in the workflow \"Street photos\" (data/showcase/photo_points.json, town_bus_le_hong_phong); a street photo of Mapillary (CC BY-SA 4.0) from its contact sheet comes here when one shows the view.",
+			"min_boxes_note": "Report 0009, D-0009-18: a view from a street shows the houses of the street: the boxes behind them do not show (17 at 12:00)."
 		}
 	]
 }

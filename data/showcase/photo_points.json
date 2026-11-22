@@ -351,6 +351,22 @@
 					"2026-02-17"
 				]
 			]
+		},
+		{
+			"id": "town_bus_le_hong_phong",
+			"for": [
+				"PT-68 bus_le_hong_phong"
+			],
+			"about": "Report 0009, D-0009-18: the bus view of plan 0010 on Lê Hồng Phong (10.3540, 107.0905), looking west (279.6 degrees) along the street: an open street photo for the view of PT-68.",
+			"at": [
+				1794.9,
+				-1153.2
+			],
+			"radius_m": 80,
+			"look": [
+				280
+			],
+			"max": 12
 		}
 	],
 	"rule1_years": {

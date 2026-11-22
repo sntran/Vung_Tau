@@ -398,16 +398,21 @@ func boxes_seen(camera: Camera3D, max_distance: float, frame := Rect2(0, 0, 1, 1
 	var eye := camera.global_position
 	var size := camera.get_viewport().get_visible_rect().size
 	var n := 0
-	var all_boxes: Array[PackedFloat32Array] = []
-	for made_parts: Dictionary in [_chunks, _tall_made]:
-		for key: Vector2i in made_parts:
-			all_boxes.append(made_parts[key].get("boxes", PackedFloat32Array()))
-	for boxes: PackedFloat32Array in all_boxes:
+	# The tall boxes show to TALL_RANGE: with the range of the preset (or more), they count to it.
+	var tall_end := maxf(max_distance, TALL_RANGE) if max_distance >= range_end else max_distance
+	var all_boxes: Array = []
+	for key: Vector2i in _chunks:
+		all_boxes.append([_chunks[key].get("boxes", PackedFloat32Array()), max_distance])
+	for key: Vector2i in _tall_made:
+		all_boxes.append([_tall_made[key].get("boxes", PackedFloat32Array()), tall_end])
+	for entry: Array in all_boxes:
+		var boxes: PackedFloat32Array = entry[0]
+		var end: float = entry[1]
 		for i in range(0, boxes.size(), 5):
 			var base := boxes[i + 2]
 			var top := boxes[i + 3]
 			var roof := Vector3(boxes[i], top, boxes[i + 1])
-			if eye.distance_to(roof) > max_distance:
+			if eye.distance_to(roof) > end:
 				continue
 			var middle := Vector3(boxes[i], (base + top) * 0.5, boxes[i + 1])
 			if not (camera.is_position_in_frustum(roof) or camera.is_position_in_frustum(middle)):

@@ -7,8 +7,9 @@ extends RefCounted
 # tools/town/sheets.py puts each view next to its photo in docs/town/). The
 # architect looks at the views. The checks: the boxes of the town in the range
 # of the preset are made before the screenshot, the frame is not one flat color,
-# and the boxes of the town are in the frame (a view of the town with no
-# building is a broken view).
+# and the boxes of the town show in the frame (a ray test against the ground
+# and the roofs, report 0009, D-0009-18: a view of the town with no building is
+# a broken view).
 # sizes: 1280x720
 # phase: --world=vung_tau --renderer=forward_plus --quality=low --start-time=12:00
 # phase: --world=vung_tau --renderer=forward_plus --quality=low --start-time=18:00
@@ -40,11 +41,12 @@ func run(d: PlaytestDriver) -> void:
 		await d.wait_frames(8)
 		d.expect(w.town.pending() == 0, "%s: each chunk of the town in the range (%.0f m) is made: %d are not" % [
 				view.id, TownField.range_end, w.town.pending()])
-		var in_frame := boxes_in_frame(w, camera)
-		d.step("%s at %s: %d boxes of the town in the frame (%d made, %d left out: a model, a stand-in, or a known place draws them)" % [
-				view.id, time, in_frame, w.town.made, w.town.left_out])
-		d.expect(in_frame >= int(view.get("min_boxes", 50)), "%s: the town is in the frame: %d boxes (at least %d)" % [
-				view.id, in_frame, int(view.get("min_boxes", 50))])
+		# Report 0009, D-0009-18: the boxes that show (a ray test), not the boxes in the frustum.
+		var seen := w.town.boxes_seen(camera, TownField.range_end)
+		d.step("%s at %s: %d boxes of the town show in the frame, %d in the frustum (%d made, %d left out: a model, a stand-in, or a known place draws them)" % [
+				view.id, time, seen, boxes_in_frame(w, camera), w.town.made, w.town.left_out])
+		d.expect(seen >= int(view.get("min_boxes", 50)), "%s: the town shows in the frame: %d boxes (at least %d)" % [
+				view.id, seen, int(view.get("min_boxes", 50))])
 		await d.screenshot("%s_%s" % [view.id, time])
 		d.expect_not_flat("%s at %s" % [view.id, time])
 		for lake_name: String in view.get("lakes", []):
@@ -62,9 +64,11 @@ func run(d: PlaytestDriver) -> void:
 	d.fly_end()
 
 
-## The views: the eye (a point in degrees, at a height over the ground), the
-## direction of the view (heading in degrees from the north to the east, pitch
-## in degrees up), and the field of view of the photo.
+## The views: the eye (a point in degrees, at a height over the ground, or at
+## eye_y over the mean sea level), the direction of the view (heading in
+## degrees from the north to the east, pitch in degrees up), and the vertical
+## field of view of the photo (report 0009, D-0009-18: from the photo, as the
+## shots of plan 0026).
 static func read_views(w: VungTau) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(VIEWS))
@@ -83,6 +87,9 @@ static func read_views(w: VungTau) -> Array[Dictionary]:
 			eye = Vector3(p.x, 0.0, p.y)
 		w.prepare_at(eye, 64.0)
 		eye.y = w.ground_height(eye.x, eye.z) + float(v.get("eye_height", 1.6))
+		if v.has("eye_y"):
+			# An eye in the air (the cabin of the cable car), m over the mean sea level.
+			eye.y = float(v.eye_y)
 		if v.get("over_trees", false):
 			# As PT-33: 1 m over the highest tree of the canopy map within 8 m (the
 			# photo is from a railing over the tree tops of the slope).
