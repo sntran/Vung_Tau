@@ -44,7 +44,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 | 0026 | [Showcase: Bãi Trước](0026-showcase-bai-truoc.md) | Built (2026-11-21). Open (report 0026, section 12.5): D-0026-46 to D-0026-48, my review of the sheets (Q29), and R19 (with plan 0021). |
 | 0023 | [Models from World](0023-models-from-world.md) | In progress |
 | 0027 | [The construction is in the game](0027-construction-in-the-game.md) | Approved |
-| 0018 | [The scooter, part 1: ride, the real clock, and the controls on a touch screen](0018-scooter.md) | Approved |
+| 0018 | [The scooter, part 1: ride, the real clock, and the controls on a touch screen](0018-scooter.md) | Built (2026-11-23) |
 
 ## Proposed order of the next plans
 
