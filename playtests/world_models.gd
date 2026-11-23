@@ -41,6 +41,10 @@ extends RefCounted
 # phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
+# phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=high --renderer=forward_plus
@@ -85,7 +89,7 @@ const OUTLINE_DIFFERENCE := 0.06
 const SHEET_CELL := Vector2i(320, 180)
 ## The models of one phase, and the phases of one preset.
 const GROUP_SIZE := 2
-const GROUPS := 26
+const GROUPS := 28
 
 
 func run(d: PlaytestDriver) -> void:
