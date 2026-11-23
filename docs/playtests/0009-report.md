@@ -470,3 +470,14 @@ Soak run 8 at 2400×1080 failed one time: the player was 0.25 m over the floor o
 ### 10.5 Status
 
 Phase 1b and phase 2 are ready for my look at the views of PT-68. D-0009-27 and D-0009-28 are low, and the builder can correct them at the start of phase 3.
+
+### 10.5a My decisions (2026-11-22)
+
+- **Phase 3 starts now.** First D-0009-27 and D-0009-28. Then the houses of World, near and mid (R7 to R9), on the streets between Bãi Trước and chợ Xóm Lưới, with the rule of Q12 for the street fronts.
+- **I approve World plan 0020**, with two additions that World writes in the plan when it sets its status:
+  - **The profile of `corrugated` (D10).** A sheet has `round` ribs or `square` ribs. Most metal roofs in Vietnam have square ribs (sheets of 5, 9, or 11 ribs on a width of 1 070 mm), not only the round ribs of 76 mm and 18 mm ([Tôn thép Hoàng Phúc](https://www.tonthephoangphuc.com/cac-loai-song-ton-pho-bien), status Source). The profile, the pitch, and the depth of each roof come from its photos.
+  - **`_FINISH` in Godot (D6).** Godot 4.7.2 reads `COLOR_0` with its alpha, but no attribute whose name starts with an underscore: its glTF import reads only `POSITION`, `NORMAL`, `TANGENT`, `TEXCOORD_0` to `TEXCOORD_7`, `COLOR_0`, `JOINTS_0`, `JOINTS_1`, `WEIGHTS_0`, and `WEIGHTS_1` (`modules/gltf/gltf_document.cpp` at `4.7.2-stable`). So a new open question with its answer: World writes `_FINISH` as the glTF format says, and Vũng Tàu reads it in its import, as it reads `_COLOR_0` (Q3).
+- **What Vũng Tàu does for plan 0020, in phase 3:**
+  - The plugin `addons/gpu_instancing/` reads `_COLOR_0` (the tint of each copy) when step 1 of World plan 0020 is on `main` of World.
+  - The import gives `_FINISH` to Godot, and the materials of `data/world/materials.json` read the roughness, the metal, and the glow from it, and the occlusion from the alpha of `COLOR_0`. No material uses the alpha of `COLOR_0` for transparency.
+  - Note: the import of Godot makes each mesh again (`SurfaceTool.index()`), so the order of the points changes. A plugin cannot add the values of `_FINISH` after the import. It must give them to Godot in `_import_preflight` (after the accessors, before the meshes), for example as `TEXCOORD_2` and `TEXCOORD_3`, which Godot puts in `CUSTOM0`.
