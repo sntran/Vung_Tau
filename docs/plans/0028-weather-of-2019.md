@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft |
+| Status | Approved (2026-11-23) |
 | Branch | `feat/0028-weather`, made from the newest branch of the town when the work starts (plan 0018 after it is Built, else plan 0009). |
 | Depends on | 0005 (the sun and the sky of the real date), 0018 (the clock at the speed of real time), 0020 (the wind in the trees), 0026 (the grading of each hour, the sea). |
 | Changes | 0005 (the sky gets clouds), 0026 (`data/look/grading.json`: the haze follows the humidity). |

@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft |
+| Status | Approved (2026-11-23) |
 | Branch | `feat/0030-phone`, made from the newest branch of the town when the work starts. |
 | Depends on | 0003 (the phone and its apps), 0018 (the clock, the touch controls, the scooter), 0028 (the weather of the hour, for the app Weather). |
 | Changes | 0003 (the button "Phone", the home screen, the name of the app Listen), AGENTS.md section 5a. |
@@ -56,3 +56,4 @@ The picture `0030/phone_mockup.jpg` shows the idea: the icon and the joystick at
 ## 7. Open questions
 
 - **Q1.** The date line in Vietnamese and in English, or only in English, as on the phone of an American? (I answer.)
+  - **My answer (2026-11-23):** in English and in Vietnamese, as in D2.
