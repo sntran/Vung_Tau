@@ -54,6 +54,11 @@ var _chunks: Dictionary = {}  # Vector2i -> {"state": 0 none, 1 busy, 2 done, "n
 var _done: Array = []
 var _mutex := Mutex.new()
 var _tasks := 0
+## The ids of the tasks of the worker threads that are not waited for yet. A
+## task that runs when the game quits read the freed world ("Bad address
+## index" at the end of a run of tree_budget in CI), so the field waits for
+## its tasks when it leaves the tree.
+var _task_ids: Array[int] = []
 var _material: StandardMaterial3D
 ## The parts that draw their own buildings: [outline, its box, its middle].
 var _keep_out: Array = []
@@ -216,6 +221,14 @@ func _can_make(key: Vector2i) -> bool:
 
 
 func _start_tasks() -> void:
+	# Each task must be waited for once (WorkerThreadPool): the done tasks now.
+	var running: Array[int] = []
+	for id in _task_ids:
+		if WorkerThreadPool.is_task_completed(id):
+			WorkerThreadPool.wait_for_task_completion(id)
+		else:
+			running.append(id)
+	_task_ids = running
 	while _tasks < MAX_TASKS:
 		var best := Vector2i.ZERO
 		var best_distance := INF
@@ -230,7 +243,13 @@ func _start_tasks() -> void:
 			return
 		_chunks[best] = {"state": 1}
 		_tasks += 1
-		WorkerThreadPool.add_task(_task.bind(best), false, "town chunk")
+		_task_ids.append(WorkerThreadPool.add_task(_task.bind(best), false, "town chunk"))
+
+
+func _exit_tree() -> void:
+	for id in _task_ids:
+		WorkerThreadPool.wait_for_task_completion(id)
+	_task_ids.clear()
 
 
 func _task(key: Vector2i) -> void:
