@@ -32,6 +32,8 @@ const HELPER_SPEED := 0.9
 const NAV_CELL := 0.15
 
 var hem_width := 2.8
+## Plan 0018, R4: the parked scooters of World of the test street (the player can ride them).
+var scooters: Array[WorldModel] = []
 ## The places across the hẻm, from its width (plan 0004, R11a): the carts on
 ## the street in front of the steps, and where the player stands.
 var cart_z := -0.68
@@ -450,6 +452,9 @@ func _add_scooter(body: StaticBody3D, wall: Vector3, rng: RandomNumberGenerator)
 	# The body of the scooter, 0.45 m wide: the handlebars (0.68 m) are above the hips.
 	var shape := Greybox.solid_shape(body, Vector3(0.45, 1.1, 1.8), scooter.position + Vector3(0, 0.55, 0))
 	shape.basis = scooter.basis
+	# Plan 0018, R4: the player can ride it.
+	scooter.set_meta("solid", shape)
+	scooters.append(scooter)
 
 
 ## Concrete poles with thick, sagging bundles of many cables along the hẻm and

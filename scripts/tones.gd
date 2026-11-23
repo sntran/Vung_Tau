@@ -138,3 +138,83 @@ static func machine(seconds := 6.0) -> AudioStreamWAV:
 	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
 	stream.loop_end = count
 	return stream
+
+
+## Plan 0018, R7: the engine of a small scooter at idle, a loop of one second.
+## A single cylinder of four strokes fires 25 times each second at idle; the
+## exhaust is a pulse at each firing, with the rattle of the belt (noise).
+## The game changes the pitch of the loop with the speed. Made in code: no
+## recording with a CC0 or CC BY licence was reachable in the workspace.
+static func scooter_engine() -> AudioStreamWAV:
+	var count := MIX_RATE
+	var samples := PackedFloat32Array()
+	samples.resize(count)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 18
+	var rattle := 0.0
+	var body := 0.0
+	for i in count:
+		var t := float(i) / MIX_RATE
+		# 25 firings in the loop: a whole number, so that the loop has no click.
+		var phase := fmod(t * 25.0, 1.0)
+		var pulse := exp(-9.0 * phase) * (1.0 + 0.15 * sin(TAU * 3.0 * t))
+		rattle += (rng.randf_range(-1.0, 1.0) - rattle) * 0.3
+		body += (pulse - body) * 0.2
+		samples[i] = body * 1.4 + 0.35 * sin(TAU * 50.0 * t) * pulse + rattle * 0.12 - 0.3
+	return _loop(samples)
+
+
+## Plan 0018, R7: the start of the engine: the starter, then the first firings.
+static func scooter_start() -> AudioStreamWAV:
+	var seconds := 1.1
+	var count := int(seconds * MIX_RATE)
+	var samples := PackedFloat32Array()
+	samples.resize(count)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 19
+	var phase := 0.0
+	for i in count:
+		var t := float(i) / MIX_RATE
+		var value := 0.0
+		if t < 0.45:
+			# The starter motor: a whine that goes up.
+			value = 0.25 * sin(TAU * (160.0 + 120.0 * t) * t) + 0.08 * rng.randf_range(-1.0, 1.0)
+		else:
+			# The engine catches: the firings get faster to the idle.
+			phase = fmod(phase + lerpf(12.0, 25.0, clampf((t - 0.45) / 0.4, 0.0, 1.0)) / MIX_RATE, 1.0)
+			value = 0.9 * exp(-9.0 * phase) - 0.25 + 0.1 * rng.randf_range(-1.0, 1.0)
+		samples[i] = value * minf(1.0, (seconds - t) / 0.1)
+	return _sound(samples)
+
+
+## Plan 0018, R7: the bump of a scooter into a wall: a low thud and a click.
+static func scooter_bump() -> AudioStreamWAV:
+	var count := int(0.35 * MIX_RATE)
+	var samples := PackedFloat32Array()
+	samples.resize(count)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 20
+	for i in count:
+		var t := float(i) / MIX_RATE
+		samples[i] = 0.9 * sin(TAU * 75.0 * t) * exp(-14.0 * t) + 0.4 * rng.randf_range(-1.0, 1.0) * exp(-60.0 * t)
+	return _sound(samples)
+
+
+static func _sound(samples: PackedFloat32Array) -> AudioStreamWAV:
+	var data := PackedByteArray()
+	data.resize(samples.size() * 2)
+	for i in samples.size():
+		data.encode_s16(i * 2, int(clampf(samples[i] * 0.6, -1.0, 1.0) * 32767.0))
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = MIX_RATE
+	stream.stereo = false
+	stream.data = data
+	return stream
+
+
+static func _loop(samples: PackedFloat32Array) -> AudioStreamWAV:
+	var stream := _sound(samples)
+	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	stream.loop_end = samples.size()
+	return stream

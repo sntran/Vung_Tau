@@ -120,6 +120,12 @@ func _process(delta: float) -> void:
 	_main.player.look(-look.x * speed, -look.y * speed * invert)
 
 
+## Plan 0018, D8: the right trigger (the throttle) less the left trigger (the brake), -1 to 1.
+func triggers() -> float:
+	var value := Input.get_joy_axis(_pad_device, JOY_AXIS_TRIGGER_RIGHT) - Input.get_joy_axis(_pad_device, JOY_AXIS_TRIGGER_LEFT)
+	return value if absf(value) > STICK_DEADZONE else 0.0
+
+
 ## The left stick of the gamepad: x is to the right, y is forward.
 func move_stick() -> Vector2:
 	var stick := _stick(JOY_AXIS_LEFT_X, JOY_AXIS_LEFT_Y)

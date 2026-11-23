@@ -20,6 +20,24 @@
 			"caption": "[tiếng máy xúc]",
 			"range_m": 40.0,
 			"status": "check"
+		},
+		"scooter_start": {
+			"caption": "[xe máy nổ máy]",
+			"range_m": 0.0,
+			"status": "confirmed",
+			"note": "Plan 0018, R7: the start of the engine of the scooter that the player rides. Made in code (Tones.scooter_start())."
+		},
+		"scooter_engine": {
+			"caption": "[xe máy chạy]",
+			"range_m": 0.0,
+			"status": "confirmed",
+			"note": "Plan 0018, R7: the engine while the player rides; its pitch follows the speed. Made in code (Tones.scooter_engine())."
+		},
+		"scooter_bump": {
+			"caption": "[cộp]",
+			"range_m": 0.0,
+			"status": "confirmed",
+			"note": "Plan 0018, R7: the scooter hits a wall or a stop. Made in code (Tones.scooter_bump())."
 		}
 	}
 }

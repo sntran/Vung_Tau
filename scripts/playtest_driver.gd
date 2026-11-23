@@ -879,6 +879,13 @@ func player_overlaps() -> Array:
 	var query := PhysicsShapeQueryParameters3D.new()
 	query.shape = capsule
 	query.transform = Transform3D(Basis(), player.global_position + Vector3(0, Player.HEIGHT / 2.0, 0))
+	if player.is_riding():
+		# Plan 0018: the capsule along the scooter (a little smaller than the body).
+		capsule.radius = Player.RIDE_RADIUS - 0.02
+		capsule.height = Player.RIDE_LENGTH - 0.04
+		query.transform = player.global_transform * Transform3D(Basis(Vector3.RIGHT, PI / 2.0),
+				Vector3(0, Player.RIDE_RADIUS + 0.03, -Player.RIDE_EYE_BACK))
+	query.exclude = [player.get_rid()]
 	query.collision_mask = Layers.SOLID | Layers.MOVING
 	var hits := player.get_world_3d().direct_space_state.intersect_shape(query, 8)
 	var names := []
@@ -1004,6 +1011,21 @@ func state() -> Dictionary:
 		"clock_s": GameState.minutes * 60.0 + GameState.seconds,
 		"frame_s": Playtest.frame_s,
 		"clock_running": GameState.clock_running,
+		# Plan 0018: the scooter.
+		"riding": player.is_riding(),
+		"speed_kmh": player.ride_speed_kmh(),
+		"heading": player.ride.heading if player.is_riding() else 0.0,
+		"steer": player.ride.steer if player.is_riding() else 0.0,
+		"lean": player.ride.lean if player.is_riding() else 0.0,
+		"head_offset": player.head_offset,
+		"ground_pitch": player.ground_pitch,
+		"bumps": m.riding.bumps if m.riding != null else 0,
+		"touch_mode": m.touch_mode,
+		"stick_visible": m.joystick.visible,
+		"stick_resting": m.joystick.resting,
+		"stick_center": m.joystick.center,
+		"stick_rect": Rect2(m.joystick.center - Vector2.ONE * Joystick.RADIUS, Vector2.ONE * Joystick.RADIUS * 2.0) if m.joystick.visible else Rect2(),
+
 		"lights_in_view": m.lights_in_view(),
 		"view_settled": _view_settled(m),
 		"yaw": player.yaw + player.gyro_yaw,
@@ -1436,11 +1458,130 @@ func _follow(lines: Array[PackedVector3Array], line: int, index: int, step: int,
 	return result
 
 
+## The length of a route on the ground (x, z).
+static func route_length(route: PackedVector3Array) -> float:
+	return _length(route)
+
+
 static func _length(line: PackedVector3Array) -> float:
 	var total := 0.0
 	for i in range(1, line.size()):
 		total += Vector2(line[i].x - line[i - 1].x, line[i].z - line[i - 1].z).length()
 	return total
+
+
+## Plan 0018, R10: rides the route on the scooter with the joystick (real
+## input: one touch on the left half, its drag point moves in each frame), as
+## stick_along() walks one. The drag up is the throttle, down the brake, and
+## to the sides the handlebars. The handlebars turn to a point ahead on the
+## route (the pure pursuit of a two-wheeler: the turn that takes the wheelbase
+## to the point), and the speed is the speed asked, less in a turn (at most
+## 3 m/s² to the side) and, with "stop", less near the end (a brake of 3 m/s²).
+## "check" runs in each frame. Returns true when the scooter is within 1 m of
+## the distance "to" along the route. An agent that tests the town uses it to
+## go far fast.
+func ride_along(route: PackedVector3Array, to: float, speed_kmh := 40.0, check := Callable(),
+		stop := false, max_s := 170.0) -> bool:
+	if not state().riding:
+		fail("ride_along: the player does not ride a scooter")
+		return false
+	var hook := func() -> void:
+		if check.is_valid():
+			check.call()
+	_tree.process_frame.connect(hook)
+	var start := await _free_point("stick")
+	var s_start := to_screen(start)
+	var press := InputEventScreenTouch.new()
+	press.index = 0
+	press.position = s_start
+	press.pressed = true
+	Input.parse_input_event(press)
+	await wait_frames(1)
+	var last := s_start
+	var timer := _tree.create_timer(max_s, false, true)
+	var best := route_distance(route, state().player)
+	var still_s := 0.0
+	var frame_before: float = Playtest.frame_s
+	var reached := false
+	while true:
+		var s := state()
+		if not s.riding:
+			fail("ride_along: the player got off the scooter")
+			break
+		var pos: Vector3 = s.player
+		var here := route_distance(route, pos)
+		if here >= to - 1.0:
+			reached = true
+			break
+		var v: float = s.speed_kmh / 3.6
+		var front := Basis(Vector3.UP, deg_to_rad(s.heading)) * Vector3(0, 0, -1)
+		var right := front.cross(Vector3.UP)
+		var ahead := clampf(v * 1.2, 5.0, 16.0)
+		var target := route_point(route, minf(here + ahead, to + 2.0))
+		var flat := Vector3(target.x - pos.x, 0.0, target.z - pos.z)
+		var alpha := atan2(flat.dot(right), flat.dot(front))
+		var curvature := 2.0 * sin(alpha) / maxf(flat.length(), 1.0)
+		var steer := rad_to_deg(atan(ScooterMotion.WHEELBASE * curvature))
+		var max_steer := lerpf(ScooterMotion.STEER_SLOW, ScooterMotion.STEER_FAST, clampf(absf(v) / ScooterMotion.TOP_SPEED, 0.0, 1.0))
+		var steer_input := clampf(steer / max_steer, -1.0, 1.0)
+		# The speed: less in the turns of the next 25 m, and near the end with "stop".
+		var want := speed_kmh / 3.6
+		var bend := _route_bend(route, here, minf(here + 25.0, to))
+		if bend > 0.001:
+			want = minf(want, sqrt(3.0 / bend))
+		if stop:
+			want = minf(want, sqrt(2.0 * 3.0 * maxf(to - here, 0.0)))
+		var throttle := clampf((want - v) * 0.8, -1.0, 1.0)
+		var knob := Vector2(steer_input, -throttle).limit_length(1.0)
+		var at := to_screen(start + knob * Joystick.RADIUS)
+		var drag := InputEventScreenDrag.new()
+		drag.index = 0
+		drag.position = at
+		drag.relative = at - last
+		drag.screen_relative = drag.relative
+		Input.parse_input_event(drag)
+		last = at
+		await wait_frames(1)
+		# A stop: no progress along the route for 4 s of game time.
+		var frame_now: float = Playtest.frame_s
+		if here > best + 0.3:
+			best = here
+			still_s = 0.0
+		else:
+			still_s += frame_now - frame_before
+		frame_before = frame_now
+		if still_s > 4.0:
+			fail("ride_along: the scooter does not go on along the route at %.0f m: it stands at %s" % [here, pos])
+			await screenshot("ride_stops")
+			break
+		if timer.time_left <= 0.0:
+			fail("ride_along: the ride takes more than %.0f s" % max_s)
+			break
+	var release := InputEventScreenTouch.new()
+	release.index = 0
+	release.position = last
+	release.pressed = false
+	Input.parse_input_event(release)
+	await wait_frames(1)
+	_tree.process_frame.disconnect(hook)
+	return reached
+
+
+## The turn of the route between two distances: the change of its direction
+## (rad) for each meter, the largest of its parts of 5 m.
+static func _route_bend(route: PackedVector3Array, from: float, to: float) -> float:
+	var most := 0.0
+	var d := from
+	while d + 5.0 <= to:
+		var a := route_point(route, d)
+		var b := route_point(route, d + 2.5)
+		var c := route_point(route, d + 5.0)
+		var one := Vector2(b.x - a.x, b.z - a.z)
+		var two := Vector2(c.x - b.x, c.z - b.z)
+		if one.length() > 0.1 and two.length() > 0.1:
+			most = maxf(most, absf(one.angle_to(two)) / 2.5)
+		d += 2.5
+	return most
 
 
 ## The point of the route at the distance from its start.

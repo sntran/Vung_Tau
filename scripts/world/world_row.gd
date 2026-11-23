@@ -40,7 +40,31 @@ var cells: Array[Dictionary] = []
 
 ## Puts a model in the row. "at" is in the frame of the row.
 func add(model_id: String, at: Transform3D, paint := WorldMaterials.DEFAULT_PAINT, pose := {}) -> void:
-	_items.append({"id": model_id, "at": at, "paint": paint, "pose": pose})
+	_items.append({"id": model_id, "at": at, "paint": paint, "pose": pose, "index": _items.size(), "slots": []})
+
+
+## Plan 0018, R4: the models of the row with this id, each {"index", "at"
+## (in the world), "paint", "pose", "hidden"}.
+func items_of(model_id: String) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for item: Dictionary in _items:
+		if item.id == model_id:
+			out.append({"index": item.index, "at": global_transform * (item.at as Transform3D),
+					"paint": item.paint, "pose": item.pose, "hidden": item.get("hidden", false)})
+	return out
+
+
+## Plan 0018, R4: hides a model of the row (a scooter that the player rides)
+## or shows it again. Each MultiMesh of its cell gives it a transform of size 0.
+func set_hidden(index: int, hidden: bool) -> void:
+	if index < 0 or index >= _items.size():
+		return
+	var item: Dictionary = _items[index]
+	item.hidden = hidden
+	for slot: Array in item.slots:
+		var multimesh: MultiMesh = slot[0]
+		var t: Transform3D = slot[2]
+		multimesh.set_instance_transform(slot[1], Transform3D(Basis().scaled(Vector3.ZERO), t.origin) if hidden else t)
 
 
 ## The number of models in the row.
@@ -99,14 +123,17 @@ func _build_cell(key: Vector2i, items: Array) -> void:
 				var batch_key := "%s/%s/%s/%s" % [level, item.id, material_set, template.level(level).get_path_to(m)]
 				if not batches.has(batch_key):
 					batches[batch_key] = {"level": level, "mesh": _row_mesh(batch_key, m, material_set),
-							"transforms": [], "colors": []}
+							"transforms": [], "colors": [], "items": []}
 				batches[batch_key].transforms.append(local_at * template._global_of(m))
 				batches[batch_key].colors.append(item.paint)
+				batches[batch_key].items.append(item)
 	for batch_key: String in batches:
 		var batch: Dictionary = batches[batch_key]
 		var node := _multimesh_node(batch.mesh, batch.transforms, batch.colors)
 		node.name = batch_key.replace("/", "_")
 		cell.add_child(node)
+		for i in batch.items.size():
+			(batch.items[i].slots as Array).append([node.multimesh, i, batch.transforms[i]])
 		# The far level of a model with no impostor takes the range of the cards.
 		entry["impostor" if batch.level == "far" else batch.level].append(node)
 	# The impostor: one card for each model.
@@ -130,6 +157,8 @@ func _build_cell(key: Vector2i, items: Array) -> void:
 			transforms.append(Transform3D(item.at.basis, item.at.origin - center))
 			colors.append(item.paint)
 		var card := _multimesh_node(quad, transforms, colors)
+		for i in by_model[model_id].size():
+			(by_model[model_id][i].slots as Array).append([card.multimesh, i, transforms[i]])
 		card.name = "impostor_" + model_id
 		card.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		cell.add_child(card)

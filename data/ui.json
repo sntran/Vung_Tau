@@ -148,5 +148,14 @@
 		"ultra": "Ultra"
 	},
 	"settings_fullscreen": "Fullscreen",
-	"settings_mouse": "Mouse speed: {value}"
+	"settings_mouse": "Mouse speed: {value}",
+	"scooter_ride": {
+		"vi": "Lên xe",
+		"en": "Ride"
+	},
+	"scooter_get_off": {
+		"vi": "Xuống xe",
+		"en": "Get off"
+	},
+	"scooter_too_fast": "Slow down to get off."
 }

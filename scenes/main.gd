@@ -89,6 +89,11 @@ var phone_voice: AudioStreamPlayer
 var clack_player: AudioStreamPlayer3D
 ## Mouse look, keys, and the gamepad on a computer (plan 0004).
 var desktop: DesktopControls
+## Plan 0018: the scooters (get on, get off, the sounds).
+var riding: Riding
+## Plan 0018, D7: true when the last input was a touch. Then the joystick shows
+## at its rest place; an input of the mouse or the keyboard hides it.
+var touch_mode := DisplayServer.is_touchscreen_available() or OS.has_feature("mobile")
 
 ## The touches and the mouse press: id -> {start, last, time, zone, active}.
 var _touches: Dictionary = {}
@@ -165,6 +170,9 @@ func _ready() -> void:
 				if npc.has(field):
 					_chat_left[npc.id] = randf_range(2.0, 6.0)
 		player.place(GameState.player_pos, GameState.yaw, GameState.pitch)
+	riding = Riding.new(self)
+	add_child(riding)
+	riding.setup()
 	_apply_settings()
 	_layout()
 	_apply_time(GameState.minutes)
@@ -232,6 +240,7 @@ func _process(delta: float) -> void:
 		_web_settled_ms = Time.get_ticks_msec()
 		JavaScriptBridge.eval("window.vungTau.settledMs = %d" % _web_settled_ms, true)
 	_layout()
+	_update_rest_stick()
 	_read_keys()
 	_read_gyro(delta)
 	_update_focus()
@@ -266,6 +275,9 @@ func _read_keys() -> void:
 	if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT):
 		keys.x -= 1.0
 	keys += desktop.move_stick()
+	# Plan 0018, D8: on a scooter the right trigger is the throttle and the left trigger the brake.
+	if player.is_riding():
+		keys.y += desktop.triggers()
 	var was_moving := player.move_input.length() > 0.0
 	player.move_input = keys.limit_length(1.0)
 	if was_moving and keys == Vector2.ZERO:
@@ -286,6 +298,17 @@ func center_view() -> void:
 	player.gyro_yaw = 0.0
 	player.gyro_pitch = 0.0
 	player.target_pitch = 0.0
+
+
+## Plan 0018, D7: the kind of the last input. A touch shows the joystick at its
+## rest place; a key, a click of a real mouse, or a gamepad button hides it.
+func _input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch or event is InputEventScreenDrag:
+		touch_mode = true
+	elif (event is InputEventKey and event.pressed) or event is InputEventJoypadButton:
+		touch_mode = false
+	elif event is InputEventMouseButton and event.pressed and event.device != InputEvent.DEVICE_ID_EMULATION:
+		touch_mode = false
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -450,13 +473,18 @@ func _on_arrived() -> void:
 
 ## Finds the focus: the touchable object nearest to the center dot, at 3 m or less.
 func _update_focus() -> void:
+	# Plan 0018, D7: while the player rides, the action button is "Get off".
+	if player.is_riding():
+		focus_id = "ride"
+		focus_verb = Riding.verb("scooter_get_off")
+		center_dot.set_active(false)
+		action_button.visible = true
+		action_button.text = focus_verb
+		return
 	var best := ""
 	var best_angle := FOCUS_ANGLE
 	if hem == null:
-		focus_id = ""
-		focus_verb = ""
-		center_dot.set_active(false)
-		action_button.visible = false
+		_focus_scooter("")
 		return
 	var eye := player.eye_position()
 	var forward := player.view_forward()
@@ -479,9 +507,20 @@ func _update_focus() -> void:
 		if angle < best_angle:
 			best_angle = angle
 			best = "npc." + npc_id
+	_focus_scooter(best)
+
+
+## The focus, or a parked scooter that the player looks at within 2 m when
+## nothing else has the focus (plan 0018, R4: the action "Ride").
+func _focus_scooter(best: String) -> void:
 	focus_id = best
 	focus_verb = _verb_for(best)
-	center_dot.set_active(best != "")
+	if best == "" and riding != null:
+		var scooter := riding.looked_at()
+		if scooter >= 0:
+			focus_id = "scooter.%d" % scooter
+			focus_verb = Riding.verb("scooter_ride")
+	center_dot.set_active(focus_id != "")
 	action_button.visible = focus_verb != ""
 	action_button.text = focus_verb
 
@@ -514,6 +553,14 @@ func _on_action() -> void:
 	if focus_id == "":
 		return
 	_stop_walk()
+	# Plan 0018: get off, or get on the scooter in the focus.
+	if focus_id == "ride":
+		riding.get_off()
+		return
+	if focus_id.begins_with("scooter."):
+		riding.ride(int(focus_id.get_slice(".", 1)))
+		_update_focus()
+		return
 	if try_action(focus_id):
 		return
 	var parts := focus_id.split(".")
@@ -1216,6 +1263,21 @@ func _layout_subtitles(view: Vector2) -> void:
 	var x := clampf((left + right) / 2.0 - width / 2.0, left, maxf(left, right - width))
 	subtitles.size = Vector2(width, 0)
 	subtitles.position = Vector2(x, bottom - subtitles.size.y)
+
+
+## Plan 0018, D7: the joystick at its rest place while no thumb holds it.
+func _update_rest_stick() -> void:
+	if _stick_id != null:
+		return
+	if touch_mode:
+		joystick.show_rest(stick_rest())
+	elif joystick.visible:
+		joystick.hide_stick()
+
+
+## The rest place of the joystick: the middle of the joystick zone (D7).
+func stick_rest() -> Vector2:
+	return stick_zone().get_center()
 
 
 # --- Values for the play tests ---------------------------------------------

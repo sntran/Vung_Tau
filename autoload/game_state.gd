@@ -63,7 +63,8 @@ func _ready() -> void:
 
 ## Plan 0009, R16: on the web the URL of the page gives the arguments:
 ## world=hem (the test street; the Vũng Tàu world is the default there),
-## start=ID (data/geo/starts.json), and debug.
+## start=ID (data/geo/starts.json), debug, and ride (plan 0018, R8: the game
+## starts on the scooter of the start).
 static var _web_args := PackedStringArray()
 static var _web_read := false
 
@@ -87,6 +88,8 @@ static func web_args() -> PackedStringArray:
 				_web_args.append("--start=%s" % value)
 			"debug":
 				_web_args.append("--debug")
+			"ride":
+				_web_args.append("--ride")
 	_web_args.append("--world=%s" % world)
 	return _web_args
 
@@ -94,6 +97,14 @@ static func web_args() -> PackedStringArray:
 ## All the arguments: the command line, and on the web the URL of the page.
 static func all_args() -> PackedStringArray:
 	return OS.get_cmdline_user_args() + OS.get_cmdline_args() + web_args()
+
+
+## True when the arguments have "--name" (or "--name=value").
+static func has_arg(arg_name: String) -> bool:
+	for arg in all_args():
+		if arg == "--" + arg_name or arg.begins_with("--%s=" % arg_name):
+			return true
+	return false
 
 
 ## Returns the value of a command line argument "--name=value", or "" when it is not there.
