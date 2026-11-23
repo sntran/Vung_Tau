@@ -1,0 +1,9 @@
+{
+	"note": "Plan 0009, R16: the start points of the web build (the URL parameter start=ID). A start stands on the point of a road nearest to its landmark (landmark, and road: the name of the road, else any street), or on the middle of a road (road only), and faces the landmark or the way of the road. The game reads them with --start=ID too.",
+	"starts": [
+		{"id": "hem", "name": "The homestay hẻm (Hẻm 2 Hải Đăng)", "road": "Hẻm 2 Hải Đăng"},
+		{"id": "bai_truoc", "name": "Bãi Trước", "landmark": "bai_truoc", "road": "Quang Trung"},
+		{"id": "cho_xom_luoi", "name": "Chợ Xóm Lưới", "landmark": "cho_xom_luoi"},
+		{"id": "truong_cong_dinh", "name": "Trương Công Định (phase 3)", "landmark": "cho_xom_luoi", "road": "Trương Công Định"}
+	]
+}

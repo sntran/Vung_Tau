@@ -1,0 +1,17 @@
+// Plan 0009, R16. The account comes from CLOUDFLARE_ACCOUNT_ID, the token from
+// CLOUDFLARE_API_TOKEN of the workspace: this file has no secret.
+{
+  "name": "vung-tau",
+  "main": "worker.js",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  "preview_urls": true,
+  "assets": {
+    "directory": "../../build/web-assets",
+    "binding": "ASSETS",
+    "run_worker_first": ["/b/*"]
+  },
+  "r2_buckets": [
+    { "binding": "BUILDS", "bucket_name": "vung-tau" }
+  ]
+}

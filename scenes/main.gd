@@ -57,6 +57,8 @@ var lens_line := ""
 var new_card := false
 ## "hem" (plans 0001 to 0003), or "vung_tau" (plan 0005) with --world=vung_tau.
 var world_name := "hem"
+## Plan 0009, R16: the time (ms) when the ground of the start was ready, on the web.
+var _web_settled_ms := -1
 ## The real ground of Vũng Tàu, or null in the hẻm world.
 var vung_tau: VungTau = null
 ## The time from the start of the engine to the end of the draw of the first
@@ -138,7 +140,10 @@ func _ready() -> void:
 	AudioServer.set_bus_mute(0, not GameState.sound)
 	RenderingServer.frame_post_draw.connect(func() -> void:
 		if first_frame_ms < 0:
-			first_frame_ms = Time.get_ticks_msec(), CONNECT_ONE_SHOT)
+			first_frame_ms = Time.get_ticks_msec()
+			# Plan 0009, R16: the page knows the first frame of the world.
+			if OS.has_feature("web"):
+				JavaScriptBridge.eval("window.vungTau = {world: '%s', firstFrameMs: %d}" % [world_name, first_frame_ms], true), CONNECT_ONE_SHOT)
 	if GameState.arg_value("world") == "vung_tau":
 		_start_vung_tau()
 	if vung_tau == null:
@@ -188,7 +193,7 @@ func _start_vung_tau() -> void:
 	player.walk_limit = world.can_stand
 	# The land of the mainland on the horizon is 15 km to 32 km away (report 0009, Q14).
 	player.camera.far = 40000.0
-	var start := world.spawn()
+	var start := world.spawn(GameState.arg_value("start"))
 	# The parts of the showcase build in the first frames (report 0026, D-0026-12).
 	world.prepare_at(start.position, 64.0, false)
 	player.place(start.position, start.yaw)
@@ -212,6 +217,10 @@ func stop_sounds() -> void:
 
 
 func _process(delta: float) -> void:
+	# Plan 0009, R16: the page knows when the ground of the start is ready.
+	if _web_settled_ms < 0 and vung_tau != null and OS.has_feature("web") and first_frame_ms >= 0 and vung_tau.is_settled():
+		_web_settled_ms = Time.get_ticks_msec()
+		JavaScriptBridge.eval("window.vungTau.settledMs = %d" % _web_settled_ms, true)
 	_layout()
 	_read_keys()
 	_read_gyro(delta)
@@ -1252,7 +1261,7 @@ func _make_debug_overlay() -> void:
 	debug_overlay.add_theme_color_override("font_outline_color", Color.BLACK)
 	debug_overlay.add_theme_constant_override("outline_size", 6)
 	debug_overlay.add_theme_font_size_override("font_size", 18)
-	debug_overlay.visible = OS.get_cmdline_user_args().has("--debug")
+	debug_overlay.visible = GameState.all_args().has("--debug")
 	debug_overlay.position = Vector2(12, 8)
 	ui_root.add_child(debug_overlay)
 

@@ -56,10 +56,45 @@ func _ready() -> void:
 		set_settings({"quality": Quality.default_preset()})
 
 
+## Plan 0009, R16: on the web the URL of the page gives the arguments:
+## world=hem (the test street; the Vũng Tàu world is the default there),
+## start=ID (data/geo/starts.json), and debug.
+static var _web_args := PackedStringArray()
+static var _web_read := false
+
+
+static func web_args() -> PackedStringArray:
+	if _web_read:
+		return _web_args
+	_web_read = true
+	if not OS.has_feature("web"):
+		return _web_args
+	var query := str(JavaScriptBridge.eval("window.location.search", true))
+	var world := "vung_tau"
+	for pair: String in query.trim_prefix("?").split("&", false):
+		var parts := pair.split("=", true, 1)
+		var key := parts[0].uri_decode()
+		var value := parts[1].uri_decode() if parts.size() > 1 else ""
+		match key:
+			"world":
+				world = "hem" if value == "hem" else "vung_tau"
+			"start":
+				_web_args.append("--start=%s" % value)
+			"debug":
+				_web_args.append("--debug")
+	_web_args.append("--world=%s" % world)
+	return _web_args
+
+
+## All the arguments: the command line, and on the web the URL of the page.
+static func all_args() -> PackedStringArray:
+	return OS.get_cmdline_user_args() + OS.get_cmdline_args() + web_args()
+
+
 ## Returns the value of a command line argument "--name=value", or "" when it is not there.
 static func arg_value(arg_name: String) -> String:
 	var prefix := "--%s=" % arg_name
-	for arg in OS.get_cmdline_user_args() + OS.get_cmdline_args():
+	for arg in all_args():
 		if arg.begins_with(prefix):
 			return arg.substr(prefix.length())
 	return ""

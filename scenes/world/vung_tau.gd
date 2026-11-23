@@ -415,7 +415,14 @@ func road_at(point: Vector3) -> Dictionary:
 
 
 ## The start point of the player: on the coast road near Bãi Trước, facing the beach.
-func spawn() -> Dictionary:
+## The start point: a start of data/geo/starts.json (plan 0009, R16), else
+## the point of the coast road nearest to the middle of the box.
+func spawn(start_id := "") -> Dictionary:
+	if start_id != "":
+		var start := start_point(start_id)
+		if not start.is_empty():
+			return start
+		push_warning("VungTau: no start %s in data/geo/starts.json" % start_id)
 	var coast: String = data.homestay.get("coast_road", "")
 	var best := Vector3.ZERO
 	var best_distance := INF
@@ -433,6 +440,61 @@ func spawn() -> Dictionary:
 		look = Vector2(beach.position[0], beach.position[1])
 	var to := look - Vector2(best.x, best.z)
 	var yaw := rad_to_deg(atan2(-to.x, -to.y)) if to.length() > 1.0 else 0.0
+	best.y = ground_height(best.x, best.z) + 0.05
+	return {"position": best, "yaw": yaw}
+
+
+## The roads that a start can stand on.
+const START_ROAD_TYPES := ["primary", "secondary", "tertiary", "residential", "unclassified",
+		"living_street", "pedestrian", "service", "alley"]
+
+
+## A start of data/geo/starts.json: on the nearest point of its road (or of
+## any street) to its landmark, facing the landmark; or on the middle of its
+## road, facing along the road. {} when the start or its parts are not there.
+func start_point(start_id: String) -> Dictionary:
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/geo/starts.json"))
+	if not parsed is Dictionary:
+		return {}
+	var start: Dictionary = {}
+	for record: Dictionary in parsed.get("starts", []):
+		if record.id == start_id:
+			start = record
+	if start.is_empty():
+		return {}
+	var road_name: String = start.get("road", "")
+	var target := Vector2.INF
+	if start.has("landmark"):
+		var mark := data.landmark(start.landmark)
+		if mark.is_empty():
+			return {}
+		target = Vector2(mark.position[0], mark.position[1])
+	var best := Vector3.INF
+	var best_distance := INF
+	var ahead := Vector3.ZERO
+	for road: Dictionary in data.roads:
+		if road_name != "" and road.name != road_name:
+			continue
+		if road_name == "" and not START_ROAD_TYPES.has(road.type):
+			continue
+		var points: Array = road.points
+		if target == Vector2.INF:
+			# The middle of the road.
+			var i := points.size() / 2
+			var p: Array = points[i]
+			var q: Array = points[mini(i + 1, points.size() - 1)]
+			best = Vector3(p[0], p[1], p[2])
+			ahead = Vector3(q[0], q[1], q[2])
+			break
+		for p: Array in points:
+			var d := target.distance_to(Vector2(p[0], p[2]))
+			if d < best_distance:
+				best_distance = d
+				best = Vector3(p[0], p[1], p[2])
+	if best == Vector3.INF:
+		return {}
+	var to := (target - Vector2(best.x, best.z)) if target != Vector2.INF else Vector2(ahead.x - best.x, ahead.z - best.z)
+	var yaw := rad_to_deg(atan2(-to.x, -to.y)) if to.length() > 0.5 else 0.0
 	best.y = ground_height(best.x, best.z) + 0.05
 	return {"position": best, "yaw": yaw}
 
@@ -1638,7 +1700,7 @@ func _make_markers() -> void:
 		label.fixed_size = true
 		label.pixel_size = 0.0006
 		label.set_meta("test_id", "marker." + str(record.id))
-		label.visible = OS.get_cmdline_user_args().has("--debug")
+		label.visible = GameState.all_args().has("--debug")
 		markers.append(label)
 		var pos: Array = record.position
 		var height := float(record.get("height", data.overview_height(pos[0], pos[1])))

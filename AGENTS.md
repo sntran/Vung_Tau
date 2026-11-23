@@ -124,6 +124,7 @@ Verified in the development workspace (Linux, 2 CPUs, no GPU, no Vulkan):
 - A visibility range is for a node. A `MultiMeshInstance3D` shows or hides all its instances at one distance. So a row of models of World (`WorldRow`) is in cells of 6 m.
 - The public bucket of Overture Maps (`overturemaps-us-west-2.s3.us-west-2.amazonaws.com`) answered from the workspace on 2026-11-17 (plan 0009, D2: not on 2026-11-05). The S3 list API (`?list-type=2`) gives the files of a release, and DuckDB reads the parquet files over HTTPS with `http_proxy` and `ca_cert_file` set. An `s3://` URL fails with 403: the proxy adds credentials to it.
 - Godot 4.7.2, the Mobile renderer, with an empty shader cache (each part of CI, and the first start on a computer): the game can stop for good (all threads wait, no CPU use; the CI of `308cbc2`, report 0026). A thread that needs a shader whose variants still compile (`ShaderRD::version_get_shader()`) waits for them while it holds the global `SceneShaderForwardMobile::singleton_mutex`; each pipeline task of the worker threads (`_create_pipeline`) takes that mutex first, and the compile tasks wait behind the pipeline tasks in the queue. With the 4 worker threads of 4 CPUs, a load of models of World near the showcase stopped 3 of 4 runs (gdb on the stopped process: `gdb -p PID -batch -ex "thread apply all bt"`). `project.godot` sets `threading/worker_pool/max_threads=16`: 9 of 9 runs with an empty cache passed. To test with an empty cache, delete `shader_cache` and `vulkan` in `~/.local/share/godot/app_userdata/Vũng Tàu/` before the run.
+- The web build on Cloudflare (plan 0009, R16, 2026-11-23): `wrangler` 4.166.0 reaches the account from the workspace (through the proxy). A static asset of a Worker is at most 25 MiB, and `wrangler r2 object put` takes at most 300 MiB (314 572 800 bytes; the pack of the branch is 321 MB). `tools/web/deploy.sh` puts a file of more than 250 MiB in R2 in parts (`index.pck.part0`, `index.pck.part1`), and `tools/web/worker.js` gives the parts as one file (`FixedLengthStream`, the whole length). The page takes the two large files from `b/COMMIT/` (the `executable` and `mainPack` of `GODOT_CONFIG`), so a cache time of one year never gives an old file. A Worker needs one deploy (`wrangler deploy`) before `wrangler versions upload --preview-alias` works. The web engine has no occlusion culling (`use_occlusion_culling.web=false`: else it writes an error in the console). Headless Chromium draws WebGL 2 with SwiftShader (`--use-angle=swiftshader --enable-unsafe-swiftshader`). The page hides its status box with `visibility: hidden`.
 - An Ogg stream that still plays when Godot quits is not freed ("resources still in use at exit"). The play-test system stops the voices some frames before it quits (`stop_sounds()` in `scenes/main.gd`).
 
 Commands that work:
@@ -204,6 +205,18 @@ tools/look_on_mac.sh
 # The texture sets of the showcase (plan 0026, R12): data/look/textures.json to assets/textures/look/
 python tools/look/textures.py
 python tools/look/textures.py --check   # no network (CI)
+
+# The web build on Cloudflare (plan 0009, R16). The workspace has CLOUDFLARE_API_TOKEN and
+# CLOUDFLARE_ACCOUNT_ID; the repository has no secret of Cloudflare. Only the Worker vung-tau
+# and its R2 bucket vung-tau change (World is on the same account).
+tools/web/deploy.sh               # main: https://vung-tau.fifo.workers.dev
+                                  # a branch: https://BRANCH-vung-tau.fifo.workers.dev (feat/0009-houses-on-the-lots:
+                                  # https://feat-0009-houses-on-the-lots-vung-tau.fifo.workers.dev)
+SKIP_EXPORT=1 tools/web/deploy.sh # deploy build/web as it is
+BRANCH=main tools/web/deploy.sh   # in a worktree with no branch (detached)
+node tools/web/check.js "URL?start=bai_truoc" OUT   # Chromium: the first frame of the world, screenshots, times, memory, errors
+# The URL parameters: world=hem (the test street; the Vũng Tàu world is the default), start=ID
+# (data/geo/starts.json: hem, bai_truoc, cho_xom_luoi, truong_cong_dinh), debug (the debug screen).
 
 # Exports (they need the export templates)
 godot --headless --path . --export-release "Web" build/web/index.html
