@@ -2,7 +2,7 @@
 	"models": {
 		"bui_cay_tron": {
 			"glb": "2751af3e7ac9dae2425027c55f4277ad56c6110dd7b43c91da669aacdf156694",
-			"materials": "4e33c8ddb7893598165769f9db16ecd13f83d70585e8653e5215ea4941e32e25",
+			"materials": "322f29ab8d5f64e732cfe4d308b795dccc9c3ce9e1ac28e100dc2122e4390dce",
 			"script": "47e3afa47c92f831451c32e9bbc6f8e04f8b69fb10e3006977c57e0d54771aaf",
 			"version": 1,
 			"size": 1.7721,
@@ -15,7 +15,7 @@
 		},
 		"cay_hoa_tim_bon_hoa": {
 			"glb": "99ca21c1120840a914d94247d140e02ee9cf7e0cb4ea61f3b1a47e63de6ab10f",
-			"materials": "4e33c8ddb7893598165769f9db16ecd13f83d70585e8653e5215ea4941e32e25",
+			"materials": "322f29ab8d5f64e732cfe4d308b795dccc9c3ce9e1ac28e100dc2122e4390dce",
 			"script": "47e3afa47c92f831451c32e9bbc6f8e04f8b69fb10e3006977c57e0d54771aaf",
 			"version": 1,
 			"size": 0.4284,
@@ -28,7 +28,7 @@
 		},
 		"scooter_tay_ga_1": {
 			"glb": "c7aaded4ef4a664bdd297404a2fc0e1f708223ef82073ae43fe982693e9fc0ff",
-			"materials": "4e33c8ddb7893598165769f9db16ecd13f83d70585e8653e5215ea4941e32e25",
+			"materials": "322f29ab8d5f64e732cfe4d308b795dccc9c3ce9e1ac28e100dc2122e4390dce",
 			"script": "47e3afa47c92f831451c32e9bbc6f8e04f8b69fb10e3006977c57e0d54771aaf",
 			"version": 1,
 			"size": 2.0002,
