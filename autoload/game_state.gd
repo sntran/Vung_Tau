@@ -40,6 +40,8 @@ var seconds := 0.0
 ## False until the world of the start is ready: the clock does not move while
 ## the game waits for a load at its start (plan 0018, R1). Main sets it.
 var clock_running := false
+## A play test can hold the clock at its time (PlaytestDriver.hold_clock()).
+var clock_held := false
 ## All meters walked in this run of the game. Play tests read this value. The
 ## walk does not move the clock (plan 0018, D6).
 var walked_total_m := 0.0
@@ -233,7 +235,7 @@ func add_walk(meters: float) -> void:
 ## hidden browser tab, an app in the background), and Engine.time_scale speeds
 ## it up (PlaytestDriver.set_time_scale()). The clock stops at 23:59.
 func _process(delta: float) -> void:
-	if clock_running:
+	if clock_running and not clock_held:
 		advance(delta)
 
 

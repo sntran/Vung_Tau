@@ -45,11 +45,14 @@ const GRIP_ROOM := 6.0
 const HEAD_LIMIT := 100.0
 ## The head comes back to the front this long after the last look, when the scooter moves (D3).
 const HEAD_RETURN_S := 1.0
-## A scooter rides up a curb or a ramp of this height or less (D5: 15 cm).
-const RIDE_STEP := 0.16
+## A scooter rides up a curb or a ramp of this height or less (D5: 15 cm). A
+## road has no collision of its own: the floor under it is the ground, and
+## the surface of the road is RoadBuilder.LIFT over it. So a curb of 15 cm
+## (RoadBuilder.CURB) is 19 cm over the floor of the road.
+const RIDE_STEP := RoadBuilder.CURB + RoadBuilder.LIFT + 0.01
 ## A drop of more than this in front of the wheels stops the scooter (stairs,
-## a wall over the sand).
-const RIDE_DROP := 0.2
+## a wall over the sand). A curb down to a road is 19 cm.
+const RIDE_DROP := 0.22
 ## The capsule along the scooter: its radius and its length.
 const RIDE_RADIUS := 0.33
 const RIDE_LENGTH := 1.9

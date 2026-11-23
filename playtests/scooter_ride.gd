@@ -37,6 +37,9 @@ const TOP_KMH := 40.0
 const AFTER_TURN := 60.0
 ## Run 2: the point on Hạ Long at Cầu Đá (x, z); the walk on the sea wall is to its west.
 const PORT_POINT := Vector2(-211.0, 449.0)
+## Run 2: the ride across the edge of the sidewalk of Quang Trung (x, z).
+const CURB_FROM := Vector3(99.5, 0.0, 60.0)
+const CURB_TO := Vector3(91.0, 0.0, 60.0)
 ## The two roads of Quang Trung (one for each way).
 const QUANG_TRUNG := [1558591261, 200554615]
 
@@ -274,25 +277,24 @@ func _run_2(d: PlaytestDriver) -> void:
 	else:
 		d.expect(false, "the full brake stops the scooter")
 	await d.screenshot("brake_stop")
-	# The curb: to the right, up the edge of the sidewalk of Quang Trung (about 0.16 m).
+	# The curb: a setup step puts the rider on Quang Trung at (99.5, 60) to
+	# the west, to the sidewalk of the park (the showcase): its curb is 15 cm
+	# over the surface of the road, 19 cm over the ground under the road (the
+	# way from the stop of the brake changed with the frame rate).
+	await d.start_at(CURB_FROM, 90.0)
+	await d.wait_frames(5)
 	s = d.state()
 	var here: Vector3 = s.player
+	# The rise from the road where the scooter stands now (across the road the
+	# ground is level here: 5.14 m to 5.15 m from x 99.5 to 93.75).
 	var road_y: float = here.y
-	var front := Basis(Vector3.UP, deg_to_rad(s.heading)) * Vector3(0, 0, -1)
-	var right := front.cross(Vector3.UP).normalized()
-	# To the right until the scooter stands on the sidewalk: 0.1 m over the
-	# road next to it (the point of Quang Trung at the same distance along it).
-	var rise := func() -> float:
-		var at: Vector3 = d.state().player
-		return at.y - PlaytestDriver.route_point(road, PlaytestDriver.route_distance(road, at)).y
-	var on_sidewalk := func() -> bool: return rise.call() > 0.1
-	# This way passes between the lamp poles of the sidewalk.
-	var onto := PackedVector3Array([here, here + front * 3.0 + right * 2.0, here + front * 6.0 + right * 8.0])
+	var rise := func() -> float: return float(d.state().player.y) - road_y
+	var on_sidewalk := func() -> bool: return rise.call() > 0.12
+	var onto := PackedVector3Array([here, Vector3(CURB_TO.x, here.y, CURB_TO.z)])
 	var bumps_before: int = s.bumps
 	await d.ride_along(onto, PlaytestDriver.route_length(onto) - 0.5, 8.0, checker, false, 30.0, on_sidewalk)
 	await d.hold_stick(Vector2(0, 1), 1.5)
 	s = d.state()
-	road_y = s.player.y - float(rise.call())
 	d.step("on the sidewalk: %s, %.2f m over the road" % [s.player, s.player.y - road_y])
 	d.expect(s.player.y > road_y + 0.1, "the scooter rides up the curb onto the sidewalk: %.2f m up (D5)" % (s.player.y - road_y))
 	d.expect(s.riding and s.bumps == bumps_before, "the curb does not stop the scooter")

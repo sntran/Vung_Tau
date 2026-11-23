@@ -66,7 +66,9 @@ static func check_buttons_take_touches(d: PlaytestDriver, shot: String) -> void:
 		var end := start + Vector2(0, rect.size.y / 2.0 + 30.0)
 		await d.drag(d.to_screen(start), d.to_screen(end), 0.3)
 		var after := d.state()
-		d.expect(not after.joystick_visible and absf(wrapf(float(after.yaw) - yaw, -180.0, 180.0)) < 0.5,
+		# Plan 0018, D7: the joystick at its rest place is not a joystick under the thumb.
+		var stick_held: bool = after.joystick_visible and not after.stick_resting
+		d.expect(not stick_held and absf(wrapf(float(after.yaw) - yaw, -180.0, 180.0)) < 0.5,
 				"%s: a drag that starts on the button %s starts the joystick or turns the view" % [shot, item.test_id])
 		if after.app != d.state().app:
 			d.fail("%s: a drag on %s opened %s" % [shot, item.test_id, after.app])

@@ -42,6 +42,10 @@ const POLE_CLEAR := 1.5
 
 
 func run(d: PlaytestDriver) -> void:
+	# Plan 0018, R2: the people of the showcase that show come from the minute;
+	# the clock stays at the time of the run, so that the set of the walkers is
+	# the same in each run (a walker stood in opening 4 when the clock ran).
+	d.hold_clock()
 	var w := d.world()
 	if not d.expect(w != null and w.showcase != null, "the Vũng Tàu world has the showcase"):
 		return

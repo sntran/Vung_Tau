@@ -1380,6 +1380,12 @@ func set_time_scale(scale: float) -> void:
 	Engine.time_scale = scale
 
 
+## Plan 0018, R2: a setup step for a play test that needs the world of one
+## minute (the clock runs with the frames): the clock stays at its time.
+func hold_clock() -> void:
+	GameState.clock_held = true
+
+
 ## A setup step at the start of a phase: puts the player at the point, makes
 ## the ground there, and waits until it is ready. It is the same kind of step
 ## as --start-time: a long walk in phases starts where the last phase stopped.
