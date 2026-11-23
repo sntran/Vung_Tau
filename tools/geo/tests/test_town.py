@@ -162,3 +162,61 @@ def test_the_colors_of_the_towers_are_not_bold():
         r, g, b = (int(c["color"][k:k + 2], 16) / 255.0 for k in (1, 3, 5))
         saturation = (max(r, g, b) - min(r, g, b)) / max(r, g, b)
         assert saturation <= 0.25, c
+
+
+def test_no_box_of_the_raster_stands_on_a_road():
+    """Report 0009, D-0009-27: in the built town, no box of the raster (its
+    outline as the town keeps it) has more than 10 % of its area on the surface
+    of a road (roads.json with the width of each road)."""
+    import glob
+    import json
+    import shapely
+    from shapely import STRtree
+    import buildings as tool
+    build = Path(__file__).resolve().parents[3] / "data" / "geo" / "build"
+    surfaces = tool.road_surfaces(json.loads((build / "roads.json").read_text(encoding="utf-8"))["roads"])
+    tree = STRtree(surfaces)
+    on_roads = []
+    count = 0
+    for path in glob.glob(str(build / "town" / "*.json")):
+        if path.endswith("index.json"):
+            continue
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
+        # A chunk file has "buildings"; tall.json has "chunks": [cx, cz, [records]].
+        records = data["buildings"] if "buildings" in data else [r for chunk in data.get("chunks", []) for r in chunk[2]]
+        for record in records:
+            if not str(record[0]).startswith("raster-"):
+                continue
+            count += 1
+            flat = record[6]
+            polygon = shapely.Polygon(list(zip(flat[0::2], flat[1::2]))).buffer(0)
+            near = [surfaces[i] for i in tree.query(polygon)]
+            share = polygon.intersection(shapely.union_all(near)).area / polygon.area if near else 0.0
+            if share > 0.10:
+                on_roads.append((record[0], round(share, 2), round(polygon.area)))
+    assert count > 1000, f"the town has {count} boxes of the raster"
+    assert not on_roads, f"{len(on_roads)} boxes of the raster stand on a road: {sorted(on_roads, key=lambda r: -r[1])[:8]}"
+
+
+def test_an_outline_that_goes_out_and_back_is_a_valid_polygon():
+    """Report 0009, D-0009-27: two squares of the raster that touch at a
+    corner, and a spike out and back: the outline keeps the area of the larger
+    square, with no spike, and is not the rectangle around both."""
+    ring = [(0, 0), (10, 0), (10, 10), (20, 10), (20, 14), (10, 10), (0, 10), (0, 0)]
+    polygon = town.outline_of([(x, -y) for x, y in ring])
+    assert polygon is not None and polygon.is_valid
+    assert abs(polygon.area - 100.0) < 1.0
+    spike = [(0, 0), (10, 0), (10, 5), (25, 5), (10, 5.001), (10, 10), (0, 10), (0, 0)]
+    polygon = town.outline_of([(x, -y) for x, y in spike])
+    assert polygon is not None and polygon.is_valid
+    assert polygon.bounds[2] <= 10.5 and abs(polygon.area - 100.0) < 1.0
+
+
+def test_the_road_cut_comes_after_the_simplification():
+    """Report 0009, D-0009-27: a box of the raster loses the part on a road
+    after its outline is simplified, so the simplification cannot put it back."""
+    import shapely
+    road = shapely.box(-5, 8, 30, 20)
+    polygon = town.outline_of([(0, 0), (20, 0), (20, -15), (0, -15)], cut=lambda p: p.difference(road))
+    assert polygon is not None and polygon.intersection(road).area < 1.0
+    assert abs(polygon.area - 160.0) < 2.0

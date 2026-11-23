@@ -428,7 +428,7 @@ def build(raw: Path, out: Path, geo: Path) -> int:
     for png in (out / "height").glob("*.png"):
         write_keep_import(png)
     # Plan 0009, phase 2 (R6): the boxes of the buildings of 2019, on the final ground.
-    town_numbers = write_town(grid, raw, out, area, on_water)
+    town_numbers = write_town(grid, raw, out, area, on_water, roads)
     water_numbers = inland_water.write(out / "inland_water.json", inland, water_config)
     # Report 0009, Q14: the land around the play area on the horizon.
     mainland_numbers = None
@@ -817,7 +817,22 @@ def showcase_weight(grid) -> np.ndarray | None:
     return np.clip(1.0 - distance / SHOWCASE_BLEND_M, 0.0, 1.0).astype(np.float32)
 
 
-def write_town(grid, raw: Path, out: Path, area: dict, on_water=None) -> dict | None:
+def road_cut_of(roads: list):
+    """Report 0009, D-0009-27: a function that takes the surfaces of the roads
+    (each road its width) away from a polygon in map coordinates (x, -z)."""
+    from shapely.strtree import STRtree
+    # The points of a Road are in map coordinates (x, -z), as the outlines of the town.
+    surfaces = [shapely.LineString(r.points).buffer(float(r.width) / 2.0, cap_style="flat")
+                for r in roads if r.points is not None and len(r.points) >= 2]
+    tree = STRtree(surfaces)
+
+    def cut(polygon):
+        near = [surfaces[i] for i in tree.query(polygon)]
+        return polygon.difference(shapely.union_all(near)) if near else polygon
+    return cut
+
+
+def write_town(grid, raw: Path, out: Path, area: dict, on_water=None, roads=None) -> dict | None:
     """Plan 0009, phase 2 (R6, R10): data/geo/build/town/ (geodata/town.py) from
     buildings_2019 of the store of the release. None when the store is not there."""
     manifest_path = raw / "buildings" / "manifest.json"
@@ -848,7 +863,8 @@ def write_town(grid, raw: Path, out: Path, area: dict, on_water=None) -> dict | 
         log(f"town: {len(buildings) - len(dry)} buildings on the water of the land are out")
         buildings = dry
     palette = load_json(ROOT / "data" / "world" / "palette.json")
-    chunks, tall, numbers = town.make(buildings, lambda x, z: grid.sample(x, z), palette, float(area["chunk_size_m"]))
+    chunks, tall, numbers = town.make(buildings, lambda x, z: grid.sample(x, z), palette, float(area["chunk_size_m"]),
+                                      road_cut_of(roads) if roads else None)
     numbers["raster"] = raster_count
     numbers["written"] = town.write(out / "town", chunks, float(area["chunk_size_m"]), tall, numbers["far_color"],
                                     numbers["foot_shade"])

@@ -47,7 +47,12 @@ from shapely.geometry.polygon import orient
 from shapely.strtree import STRtree
 
 SIMPLIFY_M = 0.6
+# Report 0009, D-0009-27: a part of an outline narrower than two times this
+# (a spike that goes out and back) is not a part of the building.
+SLIVER_M = 0.05
 MAX_POINTS = 12
+# Report 0009, D-0009-27: a box of the raster after the cut of the roads.
+CUT_MAX_POINTS = 24
 MIN_AREA_M2 = 8.0
 BASE_SINK_M = 0.3
 NEIGHBOR_GAP_M = 0.6
@@ -86,20 +91,80 @@ def roof_shares(palette: dict) -> dict:
     return {"tiles": tiles, "metal": rest * metal / (metal + terrace), "terrace": rest * terrace / (metal + terrace)}
 
 
-def outline_of(points) -> Polygon | None:
-    """The outline of a building as a clean polygon in map coordinates (x, -z),
-    simplified; None when it is too small."""
-    ring = [(float(x), -float(z)) for x, z in points]
-    polygon = Polygon(ring).buffer(0)
-    if polygon.geom_type == "MultiPolygon":
-        polygon = max(polygon.geoms, key=lambda g: g.area)
-    if polygon.is_empty or polygon.area < MIN_AREA_M2:
+def _largest_polygon(geometry) -> Polygon | None:
+    """The largest polygon of a geometry (a valid polygon, a multipolygon, or a
+    collection with lines), with no holes; None when it has no area."""
+    if geometry is None or geometry.is_empty:
         return None
-    simple = polygon.simplify(SIMPLIFY_M, preserve_topology=True)
-    if simple.is_empty or not simple.is_valid or simple.area < MIN_AREA_M2:
+    parts = [geometry] if geometry.geom_type == "Polygon" else [
+        g for g in getattr(geometry, "geoms", []) if g.geom_type in ("Polygon", "MultiPolygon")]
+    polygons = []
+    for part in parts:
+        polygons.extend([part] if part.geom_type == "Polygon" else list(part.geoms))
+    if not polygons:
+        return None
+    return Polygon(max(polygons, key=lambda g: g.area).exterior.coords)
+
+
+def valid_polygon(ring) -> Polygon | None:
+    """Report 0009, D-0009-27: a ring as a valid polygon. An outline of the
+    raster can go out and back on itself (two cells that touch at a corner, or
+    a spike of the cut of a road): make_valid() keeps its area, and the largest
+    polygon of the result stays (the lines of the spikes go)."""
+    polygon = Polygon(ring)
+    if not polygon.is_valid:
+        polygon = _largest_polygon(shapely.make_valid(polygon))
+    if polygon is None:
+        return None
+    # A spike of no width (or of a few mm) goes: in by SLIVER_M, then out by
+    # SLIVER_M, with square corners.
+    opened = polygon.buffer(-SLIVER_M, join_style="mitre").buffer(SLIVER_M, join_style="mitre")
+    return _largest_polygon(opened) if not opened.is_empty else polygon
+
+
+def _simplified(polygon: Polygon) -> Polygon | None:
+    """The outline simplified to SIMPLIFY_M, with at most MAX_POINTS points: a
+    larger tolerance when it has more points. None when no valid outline comes."""
+    for tolerance in (SIMPLIFY_M, 1.0, 1.5, 2.0, 3.0, 4.0):
+        simple = polygon.simplify(tolerance, preserve_topology=True)
+        if not simple.is_valid:
+            simple = _largest_polygon(shapely.make_valid(simple))
+        if simple is None or simple.is_empty or simple.area < MIN_AREA_M2:
+            return None
+        if len(simple.exterior.coords) - 1 <= MAX_POINTS:
+            return simple
+    return None
+
+
+def outline_of(points, cut=None) -> Polygon | None:
+    """The outline of a building as a clean polygon in map coordinates (x, -z),
+    simplified; None when it is too small. The outline is a valid polygon
+    before the simplification (D-0009-27). cut(polygon) (map coordinates) takes
+    away a part after the simplification (the surfaces of the roads, for a box
+    of the raster); the result is simplified again."""
+    ring = [(float(x), -float(z)) for x, z in points]
+    polygon = valid_polygon(ring)
+    if polygon is None or polygon.is_empty or polygon.area < MIN_AREA_M2:
+        return None
+    simple = _simplified(polygon)
+    if simple is None:
         simple = polygon.minimum_rotated_rectangle
-    if len(simple.exterior.coords) - 1 > MAX_POINTS:
-        simple = polygon.minimum_rotated_rectangle
+    if cut is not None:
+        # The simplification can move an edge back onto the road (up to its
+        # tolerance): cut again until the road takes less than 1 % of the area.
+        for _round in range(3):
+            rest = _largest_polygon(cut(simple))
+            if rest is None or rest.area < MIN_AREA_M2:
+                return None
+            if rest.area > simple.area * 0.99:
+                break
+            # A larger tolerance would move the cut edge back onto the road: a
+            # cut box keeps up to CUT_MAX_POINTS points at SIMPLIFY_M.
+            simple = rest.simplify(SIMPLIFY_M, preserve_topology=True)
+            if not simple.is_valid or len(simple.exterior.coords) - 1 > CUT_MAX_POINTS:
+                simple = _simplified(rest)
+            if simple is None:
+                return None
     return orient(Polygon(list(simple.exterior.coords)), sign=1.0)
 
 
@@ -137,10 +202,12 @@ def front_color(paint: str, height: float, fronts: dict) -> str:
     return _srgb_hex(_linear(paint) * (1.0 - share) + _linear(fronts["dark"]) * share)
 
 
-def make(buildings: list, sample, palette: dict, chunk_m: float) -> tuple[dict, dict, dict]:
+def make(buildings: list, sample, palette: dict, chunk_m: float, road_cut=None) -> tuple[dict, dict, dict]:
     """The records of each chunk {(cx, cz): [record]}, the records of the tall
     buildings by chunk, and the numbers for the report. sample(x, z) gives the
-    height of the ground at game points (arrays)."""
+    height of the ground at game points (arrays). road_cut(polygon) takes the
+    surfaces of the roads away from a box of the raster (map coordinates x, -z;
+    D-0009-27), after the simplification of its outline."""
     shares = roof_shares(palette)
     walls = palette["walls"]
     # The measured colors: the colors of the palette are 10 % lighter for the
@@ -157,7 +224,8 @@ def make(buildings: list, sample, palette: dict, chunk_m: float) -> tuple[dict, 
     tiles = palette["roof_tiles"]["colors"]
     items = []
     for b in buildings:
-        polygon = outline_of(b["outline"])
+        raster = str(b["id"]).startswith("raster-")
+        polygon = outline_of(b["outline"], road_cut if raster else None)
         if polygon is None or not b.get("height"):
             continue
         items.append((b, polygon))
