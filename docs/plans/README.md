@@ -44,6 +44,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 | 0026 | [Showcase: Bãi Trước](0026-showcase-bai-truoc.md) | Built (2026-11-21). Open (report 0026, section 12.5): D-0026-46 to D-0026-48, my review of the sheets (Q29), and R19 (with plan 0021). |
 | 0023 | [Models from World](0023-models-from-world.md) | In progress |
 | 0027 | [The construction is in the game](0027-construction-in-the-game.md) | Approved |
+| 0018 | [The scooter, part 1: ride, the real clock, and the controls on a touch screen](0018-scooter.md) | Approved |
 
 ## Proposed order of the next plans
 
@@ -70,6 +71,6 @@ The order can change. A number is only a name: plans 0020 to 0023 were added aft
 | 0016 | Hòn Bà at low tide | Check the tide, walk the rock path to Miếu Hòn Bà, and come back before the sea covers it. Locals warn the player about the time. |
 | 0017 | Afternoon on the Vi Ba road | Jog or ride up Núi Lớn in the afternoon. Stop at Chùa Tam Bảo to watch the monkeys (and keep your bag closed). At the top, eat sữa chua and trứng lòng đào. |
 | 0024 | The cable car to Hồ Mây | Ride the cable car from Trần Phú up Núi Lớn to Hồ Mây, the park and resort on the top, and see Bãi Trước and the town from above. The facts and the 2019 state are in the culture notes (section Vũng Tàu). |
-| 0018 | Scooter | Wear a helmet and ride along the coast in the evening, and up the Vi Ba road. |
+| 0018 | [Scooter](0018-scooter.md) | Part 1 (Approved, 2026-11-23): ride any scooter that is parked in the street, the clock at the speed of real time, and the joystick that shows on a touch screen. Later parts: rent the scooter of the homestay from cô Nga, wear a helmet, pay for parking, and traffic. Ride along the coast in the evening, and up the Vi Ba road. |
 | 0022 | The homestay garden | A small farming game on the terraces behind the homestay: small terraced rice fields (like ruộng bậc thang, but smaller), vegetables and herbs, five fruit trees (mãng cầu, đu đủ, chuối, xoài, dừa), a small fish pond, and a few animals (chickens and pigs). The player plants, waters, picks, and feeds the animals and the fish with Bà Tư, and the food goes to the family meals and the Tết tray. |
 | 0019 | Release | Signed desktop builds (Windows, macOS, Linux), signed Android and iOS builds, store pages, privacy text. |
