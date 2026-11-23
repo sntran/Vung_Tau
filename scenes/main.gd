@@ -65,6 +65,9 @@ var vung_tau: VungTau = null
 ## frame (ms), or -1 (report 0026, D-0026-12: PT-37 checks the start of the
 ## Vũng Tàu world).
 var first_frame_ms := -1
+## Plan 0018, R1: the longest wait for the ground of the start before the clock runs.
+const CLOCK_WAIT_S := 60.0
+var _clock_wait := 0.0
 ## The time of the build of the Vũng Tàu world, from the load of its scene to
 ## its first chunks (ms), or -1.
 var world_build_ms := -1
@@ -217,6 +220,13 @@ func stop_sounds() -> void:
 
 
 func _process(delta: float) -> void:
+	# Plan 0018, R1: the clock runs from the first frame of the world, and in
+	# the Vũng Tàu world when the ground of the start is ready (or after
+	# CLOCK_WAIT_S of frames, so that a world that never settles does not stop it).
+	if not GameState.clock_running and first_frame_ms >= 0:
+		_clock_wait += delta
+		if vung_tau == null or vung_tau.is_settled() or _clock_wait > CLOCK_WAIT_S:
+			GameState.clock_running = true
 	# Plan 0009, R16: the page knows when the ground of the start is ready.
 	if _web_settled_ms < 0 and vung_tau != null and OS.has_feature("web") and first_frame_ms >= 0 and vung_tau.is_settled():
 		_web_settled_ms = Time.get_ticks_msec()

@@ -13,8 +13,6 @@ const WAKE_MINUTES := 345
 const LATE_MINUTES := 1410
 ## At the homestay door, the player looks along the hẻm toward Bãi Trước (+X).
 const HOME_YAW := -90.0
-## Walking: 1 game minute for each 8 m.
-const METERS_PER_MINUTE := 8.0
 
 
 ## Returns the time as text, for example "6:00" or "18:30".

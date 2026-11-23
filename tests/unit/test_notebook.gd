@@ -36,14 +36,52 @@ func test_learn_unknown_card_does_nothing() -> void:
 	assert_eq(state.cards.size(), 0)
 
 
-func test_walk_moves_the_clock() -> void:
-	state.add_walk(7.9)
-	assert_eq(state.minutes, 360, "7.9 m is less than one minute")
-	state.add_walk(0.1)
-	assert_eq(state.minutes, 361, "8 m is one minute")
-	state.add_walk(20.0)
-	assert_eq(state.minutes, 363, "20 m more is two minutes and 4 m left over")
-	assert_almost_eq(state.walk_m, 4.0, 0.001)
+## Plan 0018, R1 (D6): one second of the frames is one second of the clock.
+func test_frames_move_the_clock() -> void:
+	for i in 59 * 60:
+		state.advance(1.0 / 60.0)
+	assert_eq(state.minutes, 360, "59 s of frames are less than one minute")
+	for i in 60:
+		state.advance(1.0 / 60.0)
+	assert_eq(state.minutes, 361, "60 s of frames give 1 minute")
+	assert_almost_eq(state.seconds, 0.0, 0.01)
+	state.advance(150.0)
+	assert_eq(state.minutes, 363, "150 s more are two minutes and 30 s")
+	assert_almost_eq(state.seconds, 30.0, 0.01)
+
+
+func test_the_clock_runs_with_the_frames_only_when_it_runs() -> void:
+	state.clock_running = false
+	await wait_frames(10)
+	assert_eq(state.seconds, 0.0, "the clock does not move while the world loads at the start")
+	state.clock_running = true
+	await wait_frames(10)
+	assert_gt(state.seconds, 0.0, "the frames move the clock")
+
+
+func test_a_walk_does_not_move_the_clock() -> void:
+	state.add_walk(100.0)
+	assert_eq(state.minutes, 360, "a walk of 100 m gives no minute")
+	assert_almost_eq(state.walked_total_m, 100.0, 0.001, "the play tests still read the walked meters")
+
+
+func test_a_time_cost_a_wait_and_the_sleep_still_move_the_clock() -> void:
+	state.add_minutes(15)
+	assert_eq(state.minutes, 375, "an action with a time cost of 15 minutes")
+	state.advance(20.0)
+	state.wait_until(600)
+	assert_eq(state.minutes, 600, "a wait of the Clock app")
+	assert_eq(state.seconds, 0.0, "a wait starts the minute at 0 s")
+	state.sleep_until_morning()
+	assert_eq(state.minutes, 345, "the sleep")
+
+
+func test_frames_stop_at_the_last_minute() -> void:
+	state.set_minutes(1438)
+	state.advance(200.0)
+	assert_eq(state.minutes, 1439, "the clock stops at 23:59 until the player sleeps")
+	state.advance(200.0)
+	assert_eq(state.minutes, 1439)
 
 
 func test_clock_stops_at_last_minute() -> void:

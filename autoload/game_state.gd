@@ -34,9 +34,14 @@ var phrases: Array[Dictionary] = []
 var messages: Array[Dictionary] = []
 ## The number of messages that the player has not read.
 var unread := 0
-## Meters walked since the last full game minute.
-var walk_m := 0.0
-## All meters walked in this run of the game. Play tests read this value.
+## The seconds of the clock in the current minute (plan 0018, R1: the clock
+## moves by the time of the frames, D6).
+var seconds := 0.0
+## False until the world of the start is ready: the clock does not move while
+## the game waits for a load at its start (plan 0018, R1). Main sets it.
+var clock_running := false
+## All meters walked in this run of the game. Play tests read this value. The
+## walk does not move the clock (plan 0018, D6).
 var walked_total_m := 0.0
 var save_path := DEFAULT_SAVE_PATH
 
@@ -110,7 +115,7 @@ func new_game() -> void:
 	yaw = GameClock.HOME_YAW
 	pitch = 0.0
 	settings = SaveFormat.DEFAULT_SETTINGS.duplicate()
-	walk_m = 0.0
+	seconds = 0.0
 	# Cô Nga introduces herself in her first message, so the player knows her from the start.
 	met = ["nga"]
 	phrases = []
@@ -130,7 +135,7 @@ func load_game() -> bool:
 		return false
 	day = data.day
 	minutes = data.minutes
-	walk_m = data.walk_m
+	seconds = data.seconds
 	flags = data.flags
 	sound = data.sound
 	player_pos = data.player
@@ -150,7 +155,7 @@ func load_game() -> bool:
 
 func to_dict() -> Dictionary:
 	return {
-		"day": day, "minutes": minutes, "walk_m": walk_m, "cards": cards,
+		"day": day, "minutes": minutes, "seconds": seconds, "cards": cards,
 		"flags": flags, "sound": sound, "player": player_pos, "yaw": yaw, "pitch": pitch,
 		"settings": settings, "met": met, "phrases": phrases, "messages": messages, "unread": unread,
 	}
@@ -201,18 +206,35 @@ func add_minutes(amount: int) -> void:
 ## Moves the clock forward to the time, when the time is later than now.
 func wait_until(target: int) -> void:
 	if target > minutes:
+		seconds = 0.0
 		set_minutes(target)
 
 
-## Adds walked meters. Each 8 m moves the clock forward 1 minute.
+## Counts walked meters for the play tests. A walk does not move the clock
+## (plan 0018, D6: the clock runs at the speed of real time).
 func add_walk(meters: float) -> void:
-	if meters <= 0.0:
+	if meters > 0.0:
+		walked_total_m += meters
+
+
+## Plan 0018, R1 (D6): one second of the frames is one second of the clock. The
+## time of the frames is the game time: it stops when the game does not run (a
+## hidden browser tab, an app in the background), and Engine.time_scale speeds
+## it up (PlaytestDriver.set_time_scale()). The clock stops at 23:59.
+func _process(delta: float) -> void:
+	if clock_running:
+		advance(delta)
+
+
+## Moves the clock by the seconds.
+func advance(delta: float) -> void:
+	if delta <= 0.0 or minutes >= GameClock.LAST_MINUTE:
 		return
-	walked_total_m += meters
-	walk_m += meters
-	var whole := int(floor(walk_m / GameClock.METERS_PER_MINUTE))
-	if whole > 0:
-		walk_m -= whole * GameClock.METERS_PER_MINUTE
+	seconds += delta
+	# A sum of frame times stops a little under a whole minute (59.99999 s).
+	if seconds >= 60.0 - 0.0001:
+		var whole := int(floor((seconds + 0.0001) / 60.0))
+		seconds = maxf(seconds - whole * 60.0, 0.0)
 		add_minutes(whole)
 
 
@@ -220,7 +242,7 @@ func add_walk(meters: float) -> void:
 func sleep_until_morning() -> void:
 	day += 1
 	minutes = GameClock.WAKE_MINUTES
-	walk_m = 0.0
+	seconds = 0.0
 	player_pos = HOME_DOOR
 	yaw = GameClock.HOME_YAW
 	pitch = 0.0

@@ -11,7 +11,7 @@ func after_each() -> void:
 
 func _state() -> Dictionary:
 	return {
-		"day": 3, "minutes": 725, "walk_m": 2.5, "cards": ["anSang", "coc"],
+		"day": 3, "minutes": 725, "seconds": 42.5, "cards": ["anSang", "coc"],
 		"flags": {"intro_done": true}, "sound": false, "player": Vector3(13.25, 0, -0.6),
 		"yaw": 35.5, "pitch": -12.0,
 		"settings": {"look_sensitivity": 1.5, "invert_y": true, "gyro": false, "fov": 80.0, "tap_walk": false,
@@ -26,7 +26,7 @@ func test_round_trip() -> void:
 	var data := SaveFormat.from_json(SaveFormat.to_json(_state()))
 	assert_eq(data.day, 3)
 	assert_eq(data.minutes, 725)
-	assert_almost_eq(data.walk_m, 2.5, 0.001)
+	assert_almost_eq(data.seconds, 42.5, 0.001, "the seconds of the clock are saved (plan 0018, R1)")
 	assert_eq(data.cards, ["anSang", "coc"] as Array[String])
 	assert_eq(data.flags, {"intro_done": true})
 	assert_eq(data.sound, false)

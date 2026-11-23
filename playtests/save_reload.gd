@@ -61,7 +61,10 @@ func _reload(d: PlaytestDriver) -> void:
 	var s := d.state()
 	d.expect(s.cards == expected.cards, "after the restart the cards are %s, not %s" % [s.cards, expected.cards])
 	d.expect(s.day == int(expected.day), "after the restart the day is %d" % s.day)
-	d.expect(s.time == int(expected.time), "after the restart the time is %s, not %s" % [s.time_text,
+	# Plan 0018, R1 and R2: the clock runs with the frames, before the quit and
+	# after the start, so the time is the same minute or the next one.
+	d.expect(s.time == int(expected.time) or s.time == int(expected.time) + 1,
+			"after the restart the time is %s, not %s or a minute later" % [s.time_text,
 			GameClock.format_time(int(expected.time))])
 	var miss := Vector2(s.player.x - expected.x, s.player.z - expected.z).length()
 	d.expect(miss < 0.05, "after the restart the player is %.3f m from the old position" % miss)

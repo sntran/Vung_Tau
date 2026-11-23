@@ -1000,6 +1000,10 @@ func state() -> Dictionary:
 		"subtitle_rect": m.subtitles.get_global_rect() if m.subtitles.visible else Rect2(),
 		"stick_zone": m.stick_zone(),
 		"walked_total_m": GameState.walked_total_m,
+		# Plan 0018, R1: the clock in seconds, and the time of the frames of the run.
+		"clock_s": GameState.minutes * 60.0 + GameState.seconds,
+		"frame_s": Playtest.frame_s,
+		"clock_running": GameState.clock_running,
 		"lights_in_view": m.lights_in_view(),
 		"view_settled": _view_settled(m),
 		"yaw": player.yaw + player.gyro_yaw,

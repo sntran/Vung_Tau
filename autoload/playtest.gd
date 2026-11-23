@@ -108,6 +108,7 @@ func _run() -> void:
 ## more in the same time. A SceneTreeTimer with ignore_time_scale counts the
 ## real time, which is longer than the game time at a low frame rate.
 func _process(delta: float) -> void:
+	frame_s += delta
 	if not _limit_on or _finished:
 		return
 	_limit_time += delta / maxf(Engine.time_scale, 0.001)
@@ -119,6 +120,9 @@ func _process(delta: float) -> void:
 
 var _limit_on := false
 var _limit_time := 0.0
+## Plan 0018, R1: the time of the frames since the start (with Engine.time_scale,
+## as the clock counts it).
+var frame_s := 0.0
 
 
 var _finished := false
