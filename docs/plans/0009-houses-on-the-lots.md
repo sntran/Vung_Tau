@@ -155,6 +155,16 @@ Each source of the data of this plan, also the ones that the plan does not use, 
 - **R14.** Lights at night: some windows are lit, with a chance that depends on the hour. Shops keep their lamps with a short range (`Hem.SHOP_LIGHT_RANGE`, plan 0004). The street lamps turn on at dusk.
 - **R15.** Credits: the page of credits and `assets/CREDITS.md` have the data sources and their licenses.
 
+### The web build for my tests
+
+- **R16.** Added (2026-11-22, my decision): I play the work of each phase in a browser. This is the first step of phase 3.
+  - The web build of `main` goes to a Worker of Cloudflare, `vung-tau` (its `workers.dev` URL). The web build of each push to a branch `feat/...` goes to a preview URL of its own, from the name of the branch. The page on GitHub Pages stays as it is.
+  - The page starts the Vũng Tàu world (`--world=vung_tau`). URL parameters choose the test street (`world=hem`), a start point from a short list (the homestay hẻm, Bãi Trước, chợ Xóm Lưới, and the streets of phase 3, each on a street or a sidewalk), and the debug screen (`debug`).
+  - The limits of Cloudflare (2026-11-22): a static asset is at most 25 MiB, and `wrangler r2 object put` takes at most 315 MB. The web build of `main` on 2026-11-22 (run 45078868225) has `index.pck` of 307 MB and `index.wasm` of 39.5 MB. So the two large files go as parts of less than 25 MiB, and the Worker gives each one as one file. If the Worker cannot give a file of this size in its limits, the large files go to R2 with the S3 API (multipart uploads).
+  - The workflow uses two secrets of this repository, `CLOUDFLARE_API_TOKEN` (made from the template "Edit Cloudflare Workers", for my account only) and `CLOUDFLARE_ACCOUNT_ID`. I add them. The log prints no secret, token, header, or body. The R2 way needs more secrets: ask me before you use it.
+  - After each deploy, a job opens the URL in Chromium (Playwright) with the Vũng Tàu world. It waits for the first frame of the world, and keeps a screenshot, the time of the load, and the memory of the page as an artifact. It fails on each script error or engine error in the console.
+  - If the Vũng Tàu world does not start in Chromium, stop and tell me what you measured (the memory, the time, and the error). Do not change the world for the web without my approval.
+
 ## 5. Phases
 
 1. The data pipeline and its report (R1 to R5e). I look at the maps in the report, and at the hills before and after R5b.
@@ -183,6 +193,7 @@ Each source of the data of this plan, also the ones that the plan does not use, 
 | 2 | From the tops of the hills, I see the real roofs of the town, and no building that was not there in 2019. |
 | 3 | I walk the hẻm, and I know it. |
 | 4 | The budget of R10 holds on Low. |
+| 5 | The web build of the branch starts the Vũng Tàu world at its preview URL (R16). |
 
 ## 8. Open questions
 
