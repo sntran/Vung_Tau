@@ -461,7 +461,7 @@ const START_ROAD_TYPES := ["primary", "secondary", "tertiary", "residential", "u
 
 ## A start of data/geo/starts.json: on the nearest point of its road (or of
 ## any street) to its landmark, facing the landmark; or on the middle of its
-## road, facing along the road. {} when the start or its parts are not there.
+## road (or of its OSM way), facing along the road. {} when the start or its parts are not there.
 func start_point(start_id: String) -> Dictionary:
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/geo/starts.json"))
 	if not parsed is Dictionary:
@@ -473,6 +473,7 @@ func start_point(start_id: String) -> Dictionary:
 	if start.is_empty():
 		return {}
 	var road_name: String = start.get("road", "")
+	var way := int(start.get("way", 0))
 	var target := Vector2.INF
 	if start.has("landmark"):
 		var mark := data.landmark(start.landmark)
@@ -484,6 +485,8 @@ func start_point(start_id: String) -> Dictionary:
 	var ahead := Vector3.ZERO
 	for road: Dictionary in data.roads:
 		if road_name != "" and road.name != road_name:
+			continue
+		if way != 0 and int(road.id) != way:
 			continue
 		if road_name == "" and not START_ROAD_TYPES.has(road.type):
 			continue
