@@ -4,12 +4,20 @@ extends RefCounted
 # path of 0.9 m or more (the player capsule and a margin) goes across the
 # carts, the stools, and the people. Then walk the full hẻm with the joystick
 # only, from the homestay to the beach road, on this free path. The player
-# does not stop on the way.
+# does not stop on the way. Each time has two runs: the walk to the middle of
+# the hẻm, and the walk from there to the beach road (a run of the whole walk
+# took 163 s of the limit of 180 s at 3 frames each second, and more on a slow
+# CI computer). The second run puts the player where the first run stops.
 # sizes: 1280x720 2400x1080
 # phase: --start-time=06:00
+# phase: --start-time=06:00 --fresh-save
+# phase: --start-time=07:00 --fresh-save
 # phase: --start-time=07:00 --fresh-save
 # phase: --start-time=12:00 --fresh-save
+# phase: --start-time=12:00 --fresh-save
 # phase: --start-time=18:00 --fresh-save
+# phase: --start-time=18:00 --fresh-save
+# phase: --start-time=20:30 --fresh-save
 # phase: --start-time=20:30 --fresh-save
 
 ## The free width that the player needs: the capsule and a margin.
@@ -63,9 +71,26 @@ func run(d: PlaytestDriver) -> void:
 		last_x = point_x
 	turns.append(Vector3(points[points.size() - 1], 0, walk_z))
 	d.step("the walk turns at %s" % [turns.map(func(t: Vector3) -> String: return "(%.2f, %.2f)" % [t.x, t.z])])
-	await d.stick_straight(Vector3(float(points[0]), 0, (first.x + first.y) / 2.0))
-	var from: Vector3 = d.state().player
-	for target: Vector3 in turns:
+	# The odd runs walk to the last turn before the middle of the hẻm, the even
+	# runs from that turn to the beach road.
+	var middle := (hem.start_x + hem.end_x) / 2.0
+	var split := 0
+	while split < turns.size() - 1 and turns[split].x < middle:
+		split += 1
+	var second_half := d.phase % 2 == 0
+	var from: Vector3
+	if second_half:
+		# Setup: the player stands where the first run of this time stops.
+		var start := turns[split - 1] if split > 0 else Vector3(float(points[0]), 0, (first.x + first.y) / 2.0)
+		d.main().player.place(Vector3(start.x, 0.01, start.z), d.main().player.yaw)
+		await d.wait_frames(5)
+		d.step("the second half of the walk starts at (%.2f, %.2f)" % [start.x, start.z])
+		from = start
+	else:
+		await d.stick_straight(Vector3(float(points[0]), 0, (first.x + first.y) / 2.0))
+		from = d.state().player
+	var part := turns.slice(split) if second_half else turns.slice(0, split)
+	for target: Vector3 in part:
 		await d.stick_straight(target)
 		var at: Vector3 = d.state().player
 		# A stop before the point is a blocked path. A walk a little past the
@@ -79,6 +104,10 @@ func run(d: PlaytestDriver) -> void:
 			await d.screenshot("blocked")
 			return
 		from = target
+	if not second_half:
+		d.step("the first half of the walk ends at %s" % d.state().player)
+		await d.screenshot("hem_middle")
+		return
 	await d.stick_to(Vector3(hem.end_x + 1.5, 0, 0))
 	d.expect(d.state().player.x > hem.end_x, "the player walks out of the hẻm to the beach road")
 	await d.screenshot("hem_end")

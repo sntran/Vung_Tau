@@ -137,7 +137,9 @@ func _finish() -> void:
 			data = old
 	var passed := driver.failures.is_empty()
 	data.phases.append({"phase": driver.phase, "result": "pass" if passed else "fail",
-			"failures": driver.failures, "steps": driver.steps})
+			"failures": driver.failures, "steps": driver.steps,
+			# The game time of the run against TIME_LIMIT_S: the margin of a slow computer.
+			"game_s": snappedf(_limit_time, 0.1)})
 	data.result = "pass"
 	for item: Dictionary in data.phases:
 		if item.result != "pass":
