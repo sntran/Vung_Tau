@@ -262,7 +262,9 @@ func _cart_comes_where_the_player_stands(d: PlaytestDriver) -> void:
 		return
 	await _wait_walk_end(d)
 	d.step("the player stands at %s, away from the cart of mía" % d.state().player)
-	GameState.set_minutes(open + 1)
+	# Plan 0018, R2: the clock runs with the frames, so it can be at open + 1
+	# already: the next minute from now gives the update of the hẻm.
+	GameState.set_minutes(maxi(open + 1, GameState.minutes + 1))
 	await d.wait_frames(3)
 	d.expect(cart.visible, "the cart of mía comes when the player steps away")
 	d.expect(d.player_overlaps().is_empty(), "the player is not in a solid when the cart comes: %s" % [d.player_overlaps()])
