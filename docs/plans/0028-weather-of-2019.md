@@ -54,3 +54,4 @@ Each hour of each day of the game has the weather that Vũng Tàu had in that ho
 ## 7. Open questions
 
 - **Q1.** If no hour of the game days has rain in the data, do I want one rainy afternoon anyway? (I answer.)
+  - **My answer (2026-11-23):** yes. If the data has no rain in the days of the game, one afternoon of a cloudy day gets a shower anyway, and `data/weather/2019.json` marks those hours as mine, not as data.

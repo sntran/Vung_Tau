@@ -5,14 +5,14 @@
 | Status | Draft |
 | Branch | `feat/0029-map`. The pilot (R1 to R4) can start from the branch of plan 0009 now; the whole map waits for the houses of phase 3 of plan 0009 (D9). |
 | Depends on | 0003 (the apps of the phone), 0009 (the town, the houses, and R16: the web build on Cloudflare), 0018 (the scooter on the map). |
-| Changes | 0003 (the phone gets the app Bản đồ, the map). |
+| Changes | 0030 (the app Maps gets the illustrated map in place of its plain map). |
 
 ## 1. Goal
 
 An illustrated map of Vũng Tàu in 2019, drawn from the game's own 3D town, in the way of [Small SF](https://smallsf.com/about): a view from above at 45°, cut into tiles, and each tile drawn again by an image model in one style. It has two uses:
 
 - a web page on Cloudflare where anyone can drag and zoom the town;
-- the app Bản đồ (the map) on the player's phone, with the place of the player.
+- the app Maps on the player's phone (plan 0030), with the place of the player.
 
 ## 2. Out of scope
 
@@ -32,8 +32,8 @@ An illustrated map of Vũng Tàu in 2019, drawn from the game's own 3D town, in 
 | D6 | The seams: each join between two tiles takes the path of least difference (often along a street or a roof line), and blends over 14 px on each side. | The way of Small SF. |
 | D7 | The check of each drawn tile against its render: the roads, the coastline, and the outlines of the big buildings must stay where they are, and no building may stand on a road or on the water. A tile that fails is drawn again (at most three times), then it goes on a list for my review. | An image model makes up things; the map shows real places. |
 | D8 | The names on the map come from `data/geo/landmarks.json`, in Vietnamese with all the diacritics. | Design rule "Real words". |
-| D9 | The pilot first: a square of 3 × 3 tiles at Bãi Trước, one tile of Núi Nhỏ, one tile of the boxes of the town, and one tile of the sea, in two styles (painted, as Small SF; pixel art, as [Isometric NYC](https://www.oxen.ai/blog/isometric-nyc)). I choose the style and the direction. The whole map comes after the houses of phase 3 are on the streets near Bãi Trước and chợ Xóm Lưới. | Less is made up when the 3D source has the houses. |
-| D10 | Two outputs: the whole map as a deep-zoom pyramid in the R2 bucket of `vung-tau`, with a viewer (OpenSeadragon) at a path of the Worker; and a smaller pyramid in the game (at most 25 MB) for the app Bản đồ. | The web build is already 321 MB (plan 0009, R16). |
+| D9 | The pilot first: a square of 3 × 3 tiles at Bãi Trước, one tile of Núi Nhỏ, one tile of the boxes of the town, and one tile of the sea, in three styles: painted, as Small SF; pixel art, as [Isometric NYC](https://www.oxen.ai/blog/isometric-nyc); and an illustrated render of the game itself with no image model (flat colors, outlines, and soft shade in the shaders of the render). I choose the style and the direction. The whole map comes after the houses of phase 3 are on the streets near Bãi Trước and chợ Xóm Lưới. | Less is made up when the 3D source has the houses. The third style costs nothing, makes up nothing, and can be made again each time the town changes; an image model costs money for each new drawing. |
+| D10 | Two outputs: the whole map as a deep-zoom pyramid in the R2 bucket of `vung-tau`, with a viewer (OpenSeadragon) at a path of the Worker; and a smaller pyramid in the game (at most 25 MB) for the app Maps. | The web build is already 321 MB (plan 0009, R16). |
 
 ## 4. Requirements
 
@@ -42,12 +42,12 @@ An illustrated map of Vũng Tàu in 2019, drawn from the game's own 3D town, in 
 - **R3.** The seams of D6, and the pyramid of D10.
 - **R4.** The checks of D7, with a sheet of each tile next to its render for my review (`docs/map/`).
 - **R5.** The web page: the viewer, the deploy to the Worker `vung-tau`, the credits (the image model, OpenStreetMap under the ODbL, the data of the town), and a link to the game.
-- **R6.** The app Bản đồ on the phone: drag and zoom with a finger or the mouse, the dot of the player, the scooter that the player rode last (plan 0018), and the names of the places. Its light follows the hour (a tint at night).
+- **R6.** The app Maps of plan 0030 shows the illustrated map in place of its plain map, with the same dot of the player, the scooter that the player rode last (plan 0018), and the names of the places. Its light follows the hour (a tint at night).
 - **R7.** AGENTS.md, section 5: the commands, the limits, and the URL of the map.
 
 ## 5. Play-test scenarios
 
-- **PT-83 `map_app`.** At 2400 × 1080, 720 × 1280, and 1280 × 720: the player opens Bản đồ, drags and zooms with real touches and with the mouse, closes it, walks 50 m, and opens it again: the dot moved by 50 m on the map. Screenshots of each state, in the day and at night.
+- **PT-83 `map_app`.** At 2400 × 1080, 720 × 1280, and 1280 × 720: the player opens Maps, drags and zooms with real touches and with the mouse, closes it, walks 50 m, and opens it again: the dot moved by 50 m on the map. Screenshots of each state, in the day and at night.
 
 ## 6. Acceptance criteria
 
@@ -60,3 +60,4 @@ An illustrated map of Vũng Tàu in 2019, drawn from the game's own 3D town, in 
 ## 7. Open questions
 
 - **Q1.** Which image model, and what cost limit? (I answer after the pilot.)
+  - Note (2026-11-23): Claude cannot draw the tiles. It does not make images ([Claude Help Center](https://support.claude.com/en/articles/9002504-can-claude-produce-images)). It can write the tools, and it can look at each drawn tile next to its render for the review of D7.

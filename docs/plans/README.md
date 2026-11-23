@@ -47,6 +47,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 | 0018 | [The scooter, part 1: ride, the real clock, and the controls on a touch screen](0018-scooter.md) | Approved |
 | 0028 | [The weather of 2019](0028-weather-of-2019.md) | Draft |
 | 0029 | [Small Vũng Tàu: the illustrated map](0029-small-vung-tau.md) | Draft |
+| 0030 | [The phone looks and works like a real phone](0030-the-phone.md) | Draft |
 
 ## Proposed order of the next plans
 
