@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft |
+| Status | Approved (2026-11-23) |
 | Branch | `feat/0018-scooter`, made from `feat/0009-houses-on-the-lots` (the rides need the town of plan 0009). It merges after plan 0009. |
 | Depends on | 0002 (first-person walking), 0004 (the desktop controls), 0005 (the ground and the roads), 0009 (the town and the streets), 0023 (the scooter of World and the parked rows). |
 | Changes | 0001 (R10: the clock), 0002 (the time cost of walking; the floating joystick), AGENTS.md section 5 ("View and controls"). |
@@ -77,3 +77,4 @@ These come in later parts of this plan, each with its own approval:
 ## 7. Open questions
 
 - **Q1.** In the first person on a scooter, the body of the rider does not show (no hands on the handlebars). Is that enough for now? (I answer.)
+  - **My answer (2026-11-23):** yes. The player sees no body of their own when they walk, so no hands on the handlebars fits.
