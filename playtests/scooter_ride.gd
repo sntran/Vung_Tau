@@ -265,12 +265,19 @@ func _run_2(d: PlaytestDriver) -> void:
 	var road_y: float = here.y
 	var front := Basis(Vector3.UP, deg_to_rad(s.heading)) * Vector3(0, 0, -1)
 	var right := front.cross(Vector3.UP).normalized()
+	# To the right until the scooter stands on the sidewalk: 0.1 m over the
+	# road next to it (the point of Quang Trung at the same distance along it).
+	var rise := func() -> float:
+		var at: Vector3 = d.state().player
+		return at.y - PlaytestDriver.route_point(road, PlaytestDriver.route_distance(road, at)).y
+	var on_sidewalk := func() -> bool: return rise.call() > 0.1
+	# This way passes between the lamp poles of the sidewalk.
 	var onto := PackedVector3Array([here, here + front * 3.0 + right * 2.0, here + front * 6.0 + right * 8.0])
 	var bumps_before: int = s.bumps
-	await d.ride_along(onto, PlaytestDriver.route_length(onto) - 0.5, 8.0, checker, true, 30.0)
+	await d.ride_along(onto, PlaytestDriver.route_length(onto) - 0.5, 8.0, checker, false, 30.0, on_sidewalk)
+	await d.hold_stick(Vector2(0, 1), 1.5)
 	s = d.state()
-	# The road next to the scooter: the point of Quang Trung at the same distance along it.
-	road_y = PlaytestDriver.route_point(road, PlaytestDriver.route_distance(road, s.player)).y
+	road_y = s.player.y - float(rise.call())
 	d.step("on the sidewalk: %s, %.2f m over the road" % [s.player, s.player.y - road_y])
 	d.expect(s.player.y > road_y + 0.1, "the scooter rides up the curb onto the sidewalk: %.2f m up (D5)" % (s.player.y - road_y))
 	d.expect(s.riding and s.bumps == bumps_before, "the curb does not stop the scooter")

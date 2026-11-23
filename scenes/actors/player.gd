@@ -35,8 +35,12 @@ const RIDE_EYE := 1.45
 ## The point of the scooter of World under the eye: its distance behind the
 ## middle of the scooter (the model has its front to +Z).
 const RIDE_EYE_BACK := 0.5
-## The view looks this much down on a scooter, so that the handlebars show.
+## The view looks at least this much down on a scooter; more on a wide
+## screen, so that the handlebars show (ride_pitch()).
 const RIDE_PITCH := -10.0
+## The grips of the handlebars: their angle under the eye (degrees), and the room under them in the view.
+const GRIP_ANGLE := 28.0
+const GRIP_ROOM := 6.0
 ## The head turns at most this much to each side on a scooter (D3).
 const HEAD_LIMIT := 100.0
 ## The head comes back to the front this long after the last look, when the scooter moves (D3).
@@ -188,8 +192,8 @@ func start_ride(model: WorldModel, at: Transform3D) -> void:
 	head_offset = 0.0
 	yaw = heading
 	target_yaw = heading
-	target_pitch = RIDE_PITCH
-	pitch = RIDE_PITCH
+	target_pitch = ride_pitch()
+	pitch = target_pitch
 	ground_pitch = 0.0
 	_look_idle = 0.0
 	_apply_view()
@@ -230,6 +234,15 @@ func end_ride() -> Dictionary:
 			break
 	place(Vector3(spot.x, global_position.y + 0.05, spot.z), heading, 0.0)
 	return {"model": model, "transform": at}
+
+
+## The pitch of the view on a scooter (D3): the grips of the handlebars show
+## at the bottom of the view at each aspect of the screen. The camera keeps
+## the horizontal field of view, so a wide screen sees less up and down.
+func ride_pitch() -> float:
+	var size := get_viewport().get_visible_rect().size if is_inside_tree() else Vector2(16, 9)
+	var half := rad_to_deg(atan(tan(deg_to_rad(camera.fov / 2.0)) * size.y / maxf(size.x, 1.0)))
+	return clampf(-(GRIP_ANGLE - half + GRIP_ROOM), -25.0, RIDE_PITCH)
 
 
 ## The speed of the scooter in km/h, or 0.
@@ -556,7 +569,7 @@ func _ride_view(delta: float) -> void:
 	_look_idle += delta
 	if _look_idle > HEAD_RETURN_S and absf(ride.speed) > 0.5:
 		head_offset = move_toward(head_offset, 0.0, 120.0 * delta)
-		target_pitch = move_toward(target_pitch, RIDE_PITCH, 60.0 * delta)
+		target_pitch = move_toward(target_pitch, ride_pitch(), 60.0 * delta)
 	var max_step := MAX_TURN_SPEED * delta
 	pitch += clampf((target_pitch - pitch) * minf(1.0, 18.0 * delta), -max_step, max_step)
 	yaw = ride.heading + head_offset

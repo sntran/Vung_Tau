@@ -1478,10 +1478,10 @@ static func _length(line: PackedVector3Array) -> float:
 ## to the point), and the speed is the speed asked, less in a turn (at most
 ## 3 m/s² to the side) and, with "stop", less near the end (a brake of 3 m/s²).
 ## "check" runs in each frame. Returns true when the scooter is within 1 m of
-## the distance "to" along the route. An agent that tests the town uses it to
+## the distance "to" along the route, or when "until" returns true. An agent that tests the town uses it to
 ## go far fast.
 func ride_along(route: PackedVector3Array, to: float, speed_kmh := 40.0, check := Callable(),
-		stop := false, max_s := 170.0) -> bool:
+		stop := false, max_s := 170.0, until := Callable()) -> bool:
 	if not state().riding:
 		fail("ride_along: the player does not ride a scooter")
 		return false
@@ -1510,7 +1510,7 @@ func ride_along(route: PackedVector3Array, to: float, speed_kmh := 40.0, check :
 			break
 		var pos: Vector3 = s.player
 		var here := route_distance(route, pos)
-		if here >= to - 1.0:
+		if here >= to - 1.0 or (until.is_valid() and until.call()):
 			reached = true
 			break
 		var v: float = s.speed_kmh / 3.6

@@ -107,7 +107,7 @@ tools/
 
 - **R9.** The clock counts minutes from midnight (0 to 1439) and the day number. The new game starts on day 1 at 06:00.
 - **R10.** Time moves forward only by player actions:
-  - Walking: 1 game minute for each 8 m walked.
+  - Walking: 1 game minute for each 8 m walked. (Changed by plan 0018, D6, R1: the clock runs at the speed of real time, by the time of the frames, and a walk does not move it.)
   - Each action in the data has its own time cost.
   - The clock sheet: "Wait one hour", "Wait until 11:00", "Wait until 15:00", "Wait until 18:30", "Wait until 20:30". Show only the times that are later than now.
   - "Sleep until morning": day + 1, time 05:45, the player stands at the homestay door.

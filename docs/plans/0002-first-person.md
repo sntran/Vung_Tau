@@ -26,7 +26,7 @@ These decisions replace decisions D3, D4, and D5 of plan 0001.
 |---|---|---|
 | D1 | First-person camera at an eye height of 1.6 m. The player body is not visible. | The player must walk around as in real life. |
 | D2 | Landscape is the main layout. Base viewport 1280 × 720, stretch mode `canvas_items`, aspect `expand`. Phones lock the screen to landscape. The web build works with all window shapes. | A first-person view needs width. A portrait view shows a narrow street and makes the player turn more. |
-| D3 | Move with a floating joystick on the left half of the screen. The joystick appears where the thumb touches. | Standard control for mobile 3D games. |
+| D3 | Move with a floating joystick on the left half of the screen. The joystick appears where the thumb touches. (Plan 0018, D7: on a touch screen it also shows at its rest place in the bottom left, light.) | Standard control for mobile 3D games. |
 | D4 | Look with a drag on the right half of the screen. | Standard control for mobile 3D games. Players prefer two touch controls to tilt controls for aim in a study of a mobile game ([Teather et al. 2017](https://yorku.ca/mack/ec2017.html)). |
 | D5 | Look by moving the phone (gyroscope) is also available. It is on by default on phones with a gyroscope. A setting turns it off. A button centers the view. | In a study of a first-person tablet game, players with little game experience enjoyed motion look more. With motion look, the gap in performance between new and experienced players went away ([Kniestedt et al. 2018](https://research.utwente.nl/en/publications/including-non-gamers-a-case-study-comparing-touch-and-motion-inpu/)). Our players are adults who often do not play games. |
 | D6 | Tap to walk. A short tap on the ground, a spot, or a person within 15 m makes the player walk there. A tap on a spot or a person also opens the talk panel at the end of the walk. | Players who do not play games can move without the joystick, as in a map app. |
@@ -35,7 +35,7 @@ These decisions replace decisions D3, D4, and D5 of plan 0001.
 | D9 | Sensor data (gyroscope) is input. Play tests can send sensor data through the play-test driver. | Rule R33 of plan 0001 permits input only. The gyroscope is input. |
 | D10 | Use the Mobile renderer (Vulkan) on Android and iOS. This replaces decision D2 of plan 0001. The web build stays on the Compatibility renderer, because Godot web exports support only that renderer. | The Mobile renderer gives better light on phones. It now renders in the development workspace with the Mesa software Vulkan driver (lavapipe), so the play tests can still take screenshots. Verified with Godot 4.7.2: "Vulkan 1.4.318 - Forward Mobile - Using Device: llvmpipe". |
 
-The time cost of walking does not change: 1 game minute for each 8 m.
+The time cost of walking does not change: 1 game minute for each 8 m. (Changed by plan 0018, D6: a walk does not move the clock; the clock runs at the speed of real time.)
 
 ## 4. Requirements
 
@@ -102,7 +102,7 @@ Change the scenarios of plan 0001 to use first-person input. Remove PT-02 `walk_
 
 Run all scenarios at 1280×720 and 2400×1080. PT-17 also runs at 1920×1080 and 720×1280.
 
-- **PT-11 `fp_walk`.** From the homestay door, walk to Bãi Trước with the joystick and look drags only. Then walk back with tap to walk only. At each lot, check the position (±1 m) and save a screenshot at eye height. Check that the clock moved forward the correct number of minutes for the distance.
+- **PT-11 `fp_walk`.** From the homestay door, walk to Bãi Trước with the joystick and look drags only. Then walk back with tap to walk only. At each lot, check the position (±1 m) and save a screenshot at eye height. Check that the clock moved forward the correct number of minutes for the distance. (Plan 0018, R2: the clock moved by the time of the frames, not by the distance.)
 - **PT-12 `fp_collision`.** Push into each house wall, each cart, each palm tree, and the beach wall for 3 s. After each push, the capsule must not intersect a collision shape. The player must stay on the floor. Look at a wall from 0.3 m. The screenshot must not show the inside of the wall.
 - **PT-13 `fp_tap_walk`.** Tap a spot that is 10 m away. The player arrives and the talk panel opens with the correct line ID. Tap a spot that is 25 m away. The player walks 15 m toward it and stops. Tap the ground. Start a joystick touch during a tap walk. The tap walk stops.
 - **PT-14 `fp_focus`.** Look at Bà Tư from 2 m. The action button shows "Talk". Tap it. The greeting line shows, and Bà Tư faces the player. Look away. The action button hides.
