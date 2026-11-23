@@ -17,7 +17,9 @@ extends RefCounted
 # in about 4 s and 30 to 10 km/h in about 1.4 s (counted in physics steps,
 # so the same at 3 frames each second as at 60); the scooter never goes into a
 # solid thing, the sand, or the water; the clock moves by the time of the
-# frames, not by the distance; the longest frame and the count of the frames
+# frames, not by the distance; the budget of plan 0009 on Low with the
+# scooter in the view (at most 600 draw calls and 300 000 triangles); the
+# longest frame and the count of the frames
 # longer than three times the median frame along the ride (R9: the limit comes
 # after the first measure), also in out/frames.json.
 # sizes: 1280x720
@@ -163,6 +165,7 @@ func _run_1(d: PlaytestDriver) -> void:
 		return
 	d.expect(s.action_verb == Riding.verb("scooter_get_off"), "on the scooter the action button is \"Get off\" (D7): \"%s\"" % s.action_verb)
 	await d.screenshot("on_seat")
+	await _budget(d, "on the seat at the start")
 	var clock_start := d.state()
 	# The ride: Quang Trung, Hạ Long, the junction, the port.
 	var route := _route(d, s.player)
@@ -174,6 +177,7 @@ func _run_1(d: PlaytestDriver) -> void:
 	d.expect(ok, "the scooter rides Quang Trung and Hạ Long to the junction")
 	s = d.state()
 	await d.screenshot("hai_long_at_speed")
+	await _budget(d, "on Hạ Long at the top speed")
 	d.step("at %.1f km/h at %s" % [s.speed_kmh, s.player])
 	_lean_max = 0.0
 	# In the turn: the screenshot with the lean, where the route turns most.
@@ -205,6 +209,17 @@ func _run_1(d: PlaytestDriver) -> void:
 	var clock: float = end.clock_s - clock_start.clock_s
 	var frames: float = end.frame_s - clock_start.frame_s
 	d.expect(absf(clock - frames) <= 1.5, "the clock moved %.1f s in %.1f s of frames on a ride of %.0f m (R1)" % [clock, frames, length])
+
+
+## Plan 0018, acceptance 3: the budget of plan 0009 (R10, Q10) on Low with the
+## scooter in the view: at most 600 draw calls and 300 000 triangles.
+func _budget(d: PlaytestDriver, where: String) -> void:
+	await d.wait_frames(2)
+	var draw_calls := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)
+	var triangles := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME)
+	d.step("%s: %d draw calls, %d triangles" % [where, draw_calls, triangles])
+	d.expect(draw_calls <= 600, "%s: at most 600 draw calls on Low with the scooter (plan 0009, Q10): %d" % [where, draw_calls])
+	d.expect(triangles <= 300000, "%s: at most 300 000 triangles on Low with the scooter (plan 0009, R10): %d" % [where, triangles])
 
 
 func _report(d: PlaytestDriver) -> void:
