@@ -157,14 +157,32 @@ static func _row_mesh(key: String, node: MeshInstance3D, set_name := "") -> Mesh
 	if _meshes.has(key):
 		return _meshes[key]
 	var mesh := node.mesh.duplicate() as Mesh
+	var painted: Array[int] = []
 	for i in mesh.get_surface_count():
 		var material := node.get_surface_override_material(i)
 		if material is StandardMaterial3D and material.resource_name != "" \
 				and WorldMaterials.shared().is_paint(material.resource_name, set_name):
 			material = row_paint_material(material as StandardMaterial3D)
+			painted.append(i)
 		mesh.surface_set_material(i, material)
+	# A house of World (the set "house") has vertex colors that are not its
+	# paint: the painted surfaces drop them, so the paint of each copy shows.
+	if set_name == "house" and not painted.is_empty() and mesh is ArrayMesh:
+		mesh = _without_colors(mesh as ArrayMesh, painted)
 	_meshes[key] = mesh
 	return mesh
+
+
+## The mesh with no vertex colors on the surfaces of the list.
+static func _without_colors(mesh: ArrayMesh, surfaces: Array[int]) -> ArrayMesh:
+	var out := ArrayMesh.new()
+	for i in mesh.get_surface_count():
+		var arrays := mesh.surface_get_arrays(i)
+		if surfaces.has(i):
+			arrays[Mesh.ARRAY_COLOR] = null
+		out.add_surface_from_arrays(mesh.surface_get_primitive_type(i), arrays)
+		out.surface_set_material(i, mesh.surface_get_material(i))
+	return out
 
 
 ## The paint material of a row: white, times the color of each instance.

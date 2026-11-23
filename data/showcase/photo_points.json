@@ -371,6 +371,116 @@
 				2014,
 				2026
 			]
+		},
+		{
+			"id": "tcd_000",
+			"for": [
+				"Plan 0009, phase 3",
+				"PT-79 street_houses"
+			],
+			"about": "Trương Công Định, 0 m from Quang Trung at Cảng vụ toward chợ Xóm Lưới: the fronts of the street on both sides, for the look of the tube houses of the first street (the lots of Q12 have the status Check, and their source is these photos).",
+			"at": [
+				83.1,
+				206.2
+			],
+			"radius_m": 30,
+			"look": [
+				123,
+				303
+			],
+			"max": 8,
+			"years": [
+				2014,
+				2026
+			]
+		},
+		{
+			"id": "tcd_050",
+			"for": [
+				"Plan 0009, phase 3",
+				"PT-79 street_houses"
+			],
+			"about": "Trương Công Định, 50 m from Quang Trung at Cảng vụ toward chợ Xóm Lưới: the fronts of the street on both sides, for the look of the tube houses of the first street (the lots of Q12 have the status Check, and their source is these photos).",
+			"at": [
+				130.1,
+				215.2
+			],
+			"radius_m": 30,
+			"look": [
+				80,
+				260
+			],
+			"max": 8,
+			"years": [
+				2014,
+				2026
+			]
+		},
+		{
+			"id": "tcd_100",
+			"for": [
+				"Plan 0009, phase 3",
+				"PT-79 street_houses"
+			],
+			"about": "Trương Công Định, 100 m from Quang Trung at Cảng vụ toward chợ Xóm Lưới: the fronts of the street on both sides, for the look of the tube houses of the first street (the lots of Q12 have the status Check, and their source is these photos).",
+			"at": [
+				177.6,
+				201.5
+			],
+			"radius_m": 30,
+			"look": [
+				61,
+				241
+			],
+			"max": 8,
+			"years": [
+				2014,
+				2026
+			]
+		},
+		{
+			"id": "tcd_150",
+			"for": [
+				"Plan 0009, phase 3",
+				"PT-79 street_houses"
+			],
+			"about": "Trương Công Định, 150 m from Quang Trung at Cảng vụ toward chợ Xóm Lưới: the fronts of the street on both sides, for the look of the tube houses of the first street (the lots of Q12 have the status Check, and their source is these photos).",
+			"at": [
+				221.4,
+				177.3
+			],
+			"radius_m": 30,
+			"look": [
+				61,
+				241
+			],
+			"max": 8,
+			"years": [
+				2014,
+				2026
+			]
+		},
+		{
+			"id": "tcd_200",
+			"for": [
+				"Plan 0009, phase 3",
+				"PT-79 street_houses"
+			],
+			"about": "Trương Công Định, 200 m from Quang Trung at Cảng vụ toward chợ Xóm Lưới: the fronts of the street on both sides, for the look of the tube houses of the first street (the lots of Q12 have the status Check, and their source is these photos).",
+			"at": [
+				264.4,
+				151.8
+			],
+			"radius_m": 30,
+			"look": [
+				59,
+				239
+			],
+			"max": 8,
+			"years": [
+				2014,
+				2026
+			]
 		}
 	],
 	"rule1_years": {

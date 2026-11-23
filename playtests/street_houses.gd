@@ -10,14 +10,17 @@ extends RefCounted
 # front; the frame is not one flat color; the budget of PT-69 holds (Low: at
 # most 600 draw calls and 300 000 triangles). Screenshots along the street
 # and at the fronts, at the places of the street photos of Mapillary.
+# The right side is in two runs: each run is shorter than 180 s of game time.
+# phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
 
-const SIDES := ["left", "right"]
+## Each run: the side, the places of its screenshots (m from the start of the
+## side), and the walk into a front at its end.
+const RUNS := [["left", [0.0, 50.0, 100.0], true], ["right", [0.0, 50.0, 100.0], false],
+		["right", [150.0, 200.0], true]]
 ## The sidewalk: this far from the fronts toward the street (m).
 const SIDEWALK_M := 1.2
-## The places of the screenshots along the side (m from its start).
-const SHOTS_M := [0.0, 50.0, 100.0, 150.0, 200.0]
 const LIMITS := {"draw_calls": 600, "triangles": 300000}
 
 
@@ -29,7 +32,9 @@ func run(d: PlaytestDriver) -> void:
 	var parsed: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(w.data.root.path_join(StreetHouses.FILE)))
 	d.expect(houses.houses.size() == parsed.houses.size() and houses.skipped == 0,
 			"each house of the file is built: %d of %d (skipped %d)" % [houses.houses.size(), parsed.houses.size(), houses.skipped])
-	var side: String = SIDES[d.phase - 1]
+	var run_values: Array = RUNS[d.phase - 1]
+	var side: String = run_values[0]
+	var shots: Array = run_values[1]
 	var lots: Array[Dictionary] = []
 	for house in houses.houses:
 		if house.side == side:
@@ -42,18 +47,20 @@ func run(d: PlaytestDriver) -> void:
 		return
 	var route := _sidewalk(lots)
 	var length := d.route_distance(route, route[route.size() - 1])
-	var ahead := route[mini(4, route.size() - 1)]
-	await d.start_at(route[0], rad_to_deg(atan2(-(ahead.x - route[0].x), -(ahead.z - route[0].z))))
+	# Setup: the run starts at its first place on the sidewalk.
+	var first := d.route_point(route, minf(float(shots[0]), length))
+	var ahead := d.route_point(route, minf(float(shots[0]) + 10.0, length))
+	await d.start_at(first, rad_to_deg(atan2(-(ahead.x - first.x), -(ahead.z - first.z))))
 	var inside := [""]
 	var watch := func() -> void:
 		var p: Vector3 = d.state().player
 		var i := houses.house_at(p.x, p.z)
 		if i >= 0 and inside[0] == "":
 			inside[0] = "%s at (%.1f, %.1f)" % [houses.houses[i].id, p.x, p.z]
-	for at: float in SHOTS_M:
+	for at: float in shots:
 		if at > length:
 			break
-		if at > 0.0:
+		if at > float(shots[0]):
 			await d.stick_along(route, at, watch, 10.0, true)
 		var here: Vector3 = d.state().player
 		var along := d.route_point(route, minf(d.route_distance(route, here) + 25.0, length))
@@ -62,13 +69,16 @@ func run(d: PlaytestDriver) -> void:
 		await d.screenshot("%s_%03d_along" % [side, int(at)])
 		d.expect_not_flat("%s at %d m, along the street" % [side, int(at)])
 		_budget(d, "%s at %d m" % [side, int(at)])
-		# The fronts: the nearest house of the side.
-		var nearest := _nearest(lots, here)
-		await d.look_at_point(Vector3(nearest.front[0], float(nearest.base) + 4.0, nearest.front[1]), 6.0, 20.0)
+		# The fronts: a house of the side 12 m ahead, at an angle.
+		var ahead_point := d.route_point(route, minf(d.route_distance(route, here) + 12.0, length))
+		var nearest := _nearest(lots, ahead_point)
+		await d.look_at_point(Vector3(nearest.front[0], float(nearest.base) + 3.0, nearest.front[1]), 6.0, 20.0)
 		await d.screenshot("%s_%03d_front" % [side, int(at)])
 		d.step("%s at %d m: the front of %s (%s, %s, %s)" % [side, int(at), nearest.id, nearest.model, nearest.status,
 				", ".join(nearest.get("photos", [])) if nearest.has("photos") else "no photo"])
 	d.expect(inside[0] == "", "the player on the sidewalk is never in a lot: %s" % inside[0])
+	if not run_values[2]:
+		return
 	# Walk into a front: the house stops the player at its front.
 	var target := _nearest(lots, d.state().player)
 	var door := Vector3(target.front[0], float(target.base), target.front[1])
@@ -85,6 +95,9 @@ func run(d: PlaytestDriver) -> void:
 	var stop: Vector3 = d.state().player
 	var past := (Vector2(stop.x, stop.z) - Vector2(door.x, door.z)).dot((Vector2(into.x, into.z) - Vector2(door.x, door.z)).normalized())
 	d.step("a walk into the front of %s stops %.2f m past its front (at %s)" % [target.id, past, stop])
+	# The screenshot along the fronts, from where the walk stopped.
+	var along_front := Vector3(stop.x, stop.y, stop.z) + Vector3(-(into.z - door.z), 0.0, into.x - door.x).normalized() * 20.0
+	await d.look_at_point(along_front + Vector3(0, 1.4, 0), 6.0, 20.0)
 	await d.screenshot("%s_into_front" % side)
 	d.expect(past > -1.0 and past < 0.3 and houses.house_at(stop.x, stop.z) < 0,
 			"the house %s stops the player at its front: %.2f m past it (the player came to it)" % [target.id, past])
