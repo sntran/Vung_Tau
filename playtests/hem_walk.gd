@@ -71,17 +71,25 @@ func run(d: PlaytestDriver) -> void:
 		last_x = point_x
 	turns.append(Vector3(points[points.size() - 1], 0, walk_z))
 	d.step("the walk turns at %s" % [turns.map(func(t: Vector3) -> String: return "(%.2f, %.2f)" % [t.x, t.z])])
-	# The odd runs walk to the last turn before the middle of the hẻm, the even
-	# runs from that turn to the beach road.
+	# The odd runs walk to the middle of the hẻm, the even runs from there to
+	# the beach road. The middle is a point on the straight walk to the first
+	# turn past it.
 	var middle := (hem.start_x + hem.end_x) / 2.0
+	var last_turn := Vector3(float(points[0]), 0, (first.x + first.y) / 2.0)
 	var split := 0
 	while split < turns.size() - 1 and turns[split].x < middle:
+		last_turn = turns[split]
 		split += 1
+	var after: Vector3 = turns[split]
+	if after.x > middle and last_turn.x < middle:
+		var z := lerpf(last_turn.z, after.z, (middle - last_turn.x) / (after.x - last_turn.x))
+		turns.insert(split, Vector3(middle, 0, z))
+	split += 1
 	var second_half := d.phase % 2 == 0
 	var from: Vector3
 	if second_half:
 		# Setup: the player stands where the first run of this time stops.
-		var start := turns[split - 1] if split > 0 else Vector3(float(points[0]), 0, (first.x + first.y) / 2.0)
+		var start: Vector3 = turns[split - 1]
 		d.main().player.place(Vector3(start.x, 0.01, start.z), d.main().player.yaw)
 		await d.wait_frames(5)
 		d.step("the second half of the walk starts at (%.2f, %.2f)" % [start.x, start.z])
