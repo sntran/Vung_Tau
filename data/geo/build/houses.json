@@ -1,0 +1,3004 @@
+{
+	"note": "Plan 0009, phase 3 (geodata/street_houses.py): the houses of World on the lots of the streets of data/geo/streets.json. Each house: the lot (outline, front, width, depth), the model and its scale, the yaw (its front faces the street), the base (the ground at the front), the source (box: a box of the town, status Source; q12: a free front, status Check, with the nearest street photos of Mapillary), and the boxes of the town that it replaces.",
+	"streets": [
+		{
+			"id": "truong_cong_dinh_1",
+			"name": "Trương Công Định",
+			"ways": [
+				1423071605,
+				270016704
+			],
+			"length_m": 238.9,
+			"width_m": 10.0,
+			"houses": 63
+		}
+	],
+	"models": [
+		"nha_ong_4x16",
+		"nha_ong_5x20",
+		"nha_ong_cu_4x18"
+	],
+	"houses": [
+		{
+			"id": "truong_cong_dinh_1-left-3f0f6f71-f95-0",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_cu_4x18",
+			"x": 158.82,
+			"z": 197.64,
+			"front": [
+				160.06,
+				204.45
+			],
+			"yaw": 10.32,
+			"width": 4.05,
+			"depth": 8.0,
+			"scale": [
+				0.964,
+				1.0,
+				0.75
+			],
+			"height": 7.54,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"3f0f6f71-f95"
+			],
+			"outline": [
+				[
+					158.09,
+					204.8
+				],
+				[
+					162.05,
+					204.09
+				],
+				[
+					160.62,
+					196.21
+				],
+				[
+					156.67,
+					196.93
+				]
+			],
+			"base": 4.03
+		},
+		{
+			"id": "truong_cong_dinh_1-left-723e9990-2f5-0",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_5x20",
+			"x": 162.99,
+			"z": 194.93,
+			"front": [
+				166.66,
+				201.6
+			],
+			"yaw": 28.79,
+			"width": 5.77,
+			"depth": 13.48,
+			"scale": [
+				1.154,
+				1.0,
+				0.75
+			],
+			"height": 10.65,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"723e9990-2f5"
+			],
+			"outline": [
+				[
+					164.12,
+					203.0
+				],
+				[
+					169.18,
+					200.21
+				],
+				[
+					162.66,
+					188.41
+				],
+				[
+					157.58,
+					191.21
+				]
+			],
+			"base": 4.03
+		},
+		{
+			"id": "truong_cong_dinh_1-left-72034626-f8e-1",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_cu_4x18",
+			"x": 171.67,
+			"z": 188.65,
+			"front": [
+				175.99,
+				196.45
+			],
+			"yaw": 28.98,
+			"width": 4.44,
+			"depth": 17.84,
+			"scale": [
+				1.056,
+				1.0,
+				0.967
+			],
+			"height": 7.65,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"72034626-f8e"
+			],
+			"outline": [
+				[
+					174.05,
+					197.52
+				],
+				[
+					177.93,
+					195.37
+				],
+				[
+					169.29,
+					179.77
+				],
+				[
+					165.43,
+					181.91
+				]
+			],
+			"base": 4.63
+		},
+		{
+			"id": "truong_cong_dinh_1-left-72034626-f8e-2",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_cu_4x18",
+			"x": 175.57,
+			"z": 186.49,
+			"front": [
+				179.88,
+				194.3
+			],
+			"yaw": 28.91,
+			"width": 4.44,
+			"depth": 17.84,
+			"scale": [
+				1.056,
+				1.0,
+				0.967
+			],
+			"height": 7.65,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"72034626-f8e"
+			],
+			"outline": [
+				[
+					177.93,
+					195.37
+				],
+				[
+					181.82,
+					193.22
+				],
+				[
+					173.2,
+					177.61
+				],
+				[
+					169.29,
+					179.77
+				]
+			],
+			"base": 4.97
+		},
+		{
+			"id": "truong_cong_dinh_1-left-875d4cbe-334-0",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_5x20",
+			"x": 241.79,
+			"z": 150.47,
+			"front": [
+				245.71,
+				157.0
+			],
+			"yaw": 30.99,
+			"width": 5.58,
+			"depth": 8.0,
+			"scale": [
+				1.116,
+				1.0,
+				0.75
+			],
+			"height": 5.76,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"875d4cbe-334"
+			],
+			"outline": [
+				[
+					243.32,
+					158.43
+				],
+				[
+					248.09,
+					155.56
+				],
+				[
+					243.96,
+					148.72
+				],
+				[
+					239.2,
+					151.58
+				]
+			],
+			"base": 7.18
+		},
+		{
+			"id": "truong_cong_dinh_1-left-780f6b7d-bf0-0",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_5x20",
+			"x": 244.95,
+			"z": 145.79,
+			"front": [
+				250.11,
+				154.35
+			],
+			"yaw": 31.07,
+			"width": 4.69,
+			"depth": 20.0,
+			"scale": [
+				0.938,
+				1.0,
+				0.985
+			],
+			"height": 9.43,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"780f6b7d-bf0"
+			],
+			"outline": [
+				[
+					248.09,
+					155.56
+				],
+				[
+					252.12,
+					153.14
+				],
+				[
+					241.83,
+					135.99
+				],
+				[
+					237.76,
+					138.44
+				]
+			],
+			"base": 7.0
+		},
+		{
+			"id": "truong_cong_dinh_1-left-780f6b7d-bf0-1",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_5x20",
+			"x": 248.99,
+			"z": 143.36,
+			"front": [
+				254.13,
+				151.93
+			],
+			"yaw": 30.99,
+			"width": 4.69,
+			"depth": 20.0,
+			"scale": [
+				0.938,
+				1.0,
+				0.985
+			],
+			"height": 9.43,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"780f6b7d-bf0"
+			],
+			"outline": [
+				[
+					252.12,
+					153.14
+				],
+				[
+					256.15,
+					150.72
+				],
+				[
+					245.85,
+					133.58
+				],
+				[
+					241.83,
+					135.99
+				]
+			],
+			"base": 6.88
+		},
+		{
+			"id": "truong_cong_dinh_1-left-780f6b7d-bf0-2",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_5x20",
+			"x": 252.98,
+			"z": 140.96,
+			"front": [
+				258.14,
+				149.52
+			],
+			"yaw": 31.11,
+			"width": 4.69,
+			"depth": 20.0,
+			"scale": [
+				0.938,
+				1.0,
+				0.985
+			],
+			"height": 9.43,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"780f6b7d-bf0"
+			],
+			"outline": [
+				[
+					256.15,
+					150.72
+				],
+				[
+					260.15,
+					148.31
+				],
+				[
+					249.82,
+					131.18
+				],
+				[
+					245.85,
+					133.58
+				]
+			],
+			"base": 6.83
+		},
+		{
+			"id": "truong_cong_dinh_1-left-780f6b7d-bf0-3",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_5x20",
+			"x": 257.01,
+			"z": 138.53,
+			"front": [
+				262.17,
+				147.09
+			],
+			"yaw": 31.06,
+			"width": 4.69,
+			"depth": 20.0,
+			"scale": [
+				0.938,
+				1.0,
+				0.985
+			],
+			"height": 9.43,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"780f6b7d-bf0"
+			],
+			"outline": [
+				[
+					260.15,
+					148.31
+				],
+				[
+					264.17,
+					145.89
+				],
+				[
+					253.84,
+					128.76
+				],
+				[
+					249.82,
+					131.18
+				]
+			],
+			"base": 6.87
+		},
+		{
+			"id": "truong_cong_dinh_1-left-q12-1130",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_cu_4x18",
+			"x": 180.01,
+			"z": 185.09,
+			"front": [
+				183.87,
+				192.1
+			],
+			"yaw": 28.79,
+			"width": 4.0,
+			"depth": 16.0,
+			"scale": [
+				0.952,
+				1.0,
+				0.867
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					182.11,
+					193.07
+				],
+				[
+					185.61,
+					191.14
+				],
+				[
+					177.88,
+					177.14
+				],
+				[
+					174.39,
+					179.05
+				]
+			],
+			"photos": [
+				"915646093418786",
+				"1249414799435943",
+				"918139569858790"
+			],
+			"base": 5.3
+		},
+		{
+			"id": "truong_cong_dinh_1-left-q12-1250",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_cu_4x18",
+			"x": 190.49,
+			"z": 179.3,
+			"front": [
+				194.36,
+				186.3
+			],
+			"yaw": 28.91,
+			"width": 4.0,
+			"depth": 16.0,
+			"scale": [
+				0.952,
+				1.0,
+				0.867
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					192.61,
+					187.27
+				],
+				[
+					196.11,
+					185.34
+				],
+				[
+					188.36,
+					171.34
+				],
+				[
+					184.87,
+					173.26
+				]
+			],
+			"photos": [
+				"940292651278503",
+				"1293149185451490",
+				"915646093418786"
+			],
+			"base": 6.14
+		},
+		{
+			"id": "truong_cong_dinh_1-left-q12-1290",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_4x16",
+			"x": 193.98,
+			"z": 177.37,
+			"front": [
+				197.85,
+				184.37
+			],
+			"yaw": 28.98,
+			"width": 4.0,
+			"depth": 16.0,
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					196.11,
+					185.34
+				],
+				[
+					199.62,
+					183.39
+				],
+				[
+					191.91,
+					169.37
+				],
+				[
+					188.36,
+					171.34
+				]
+			],
+			"photos": [
+				"1293149185451490",
+				"940292651278503",
+				"560071789955675"
+			],
+			"base": 6.36
+		},
+		{
+			"id": "truong_cong_dinh_1-left-q12-1420",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_5x20",
+			"x": 205.8,
+			"z": 170.84,
+			"front": [
+				209.68,
+				177.84
+			],
+			"yaw": 28.94,
+			"width": 5.0,
+			"depth": 16.0,
+			"scale": [
+				1.0,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					207.49,
+					179.06
+				],
+				[
+					211.87,
+					176.63
+				],
+				[
+					204.13,
+					162.63
+				],
+				[
+					199.73,
+					165.06
+				]
+			],
+			"photos": [
+				"2543992715795311",
+				"896120189158412",
+				"1293149185451490"
+			],
+			"base": 6.91
+		},
+		{
+			"id": "truong_cong_dinh_1-left-q12-1470",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_5x20",
+			"x": 210.19,
+			"z": 168.42,
+			"front": [
+				214.05,
+				175.42
+			],
+			"yaw": 28.91,
+			"width": 5.0,
+			"depth": 16.0,
+			"scale": [
+				1.0,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					211.87,
+					176.63
+				],
+				[
+					216.24,
+					174.22
+				],
+				[
+					208.51,
+					160.21
+				],
+				[
+					204.13,
+					162.63
+				]
+			],
+			"photos": [
+				"896120189158412",
+				"2543992715795311",
+				"1089787569259586"
+			],
+			"base": 7.1
+		},
+		{
+			"id": "truong_cong_dinh_1-left-q12-1570",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_4x16",
+			"x": 218.5,
+			"z": 163.83,
+			"front": [
+				222.37,
+				170.83
+			],
+			"yaw": 28.91,
+			"width": 4.0,
+			"depth": 16.0,
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					220.62,
+					171.8
+				],
+				[
+					224.12,
+					169.87
+				],
+				[
+					216.39,
+					155.86
+				],
+				[
+					212.89,
+					157.8
+				]
+			],
+			"photos": [
+				"1089787569259586",
+				"896120189158412",
+				"1172430647677317"
+			],
+			"base": 7.37
+		},
+		{
+			"id": "truong_cong_dinh_1-left-q12-1610",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_5x20",
+			"x": 222.44,
+			"z": 161.66,
+			"front": [
+				226.31,
+				168.66
+			],
+			"yaw": 28.91,
+			"width": 5.0,
+			"depth": 16.0,
+			"scale": [
+				1.0,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					224.12,
+					169.87
+				],
+				[
+					228.3,
+					167.48
+				],
+				[
+					220.06,
+					153.77
+				],
+				[
+					216.39,
+					155.86
+				]
+			],
+			"photos": [
+				"1172430647677317",
+				"1089787569259586",
+				"1112220700421393"
+			],
+			"base": 7.44
+		},
+		{
+			"id": "truong_cong_dinh_1-left-q12-1660",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_cu_4x18",
+			"x": 225.87,
+			"z": 159.61,
+			"front": [
+				230.01,
+				166.46
+			],
+			"yaw": 31.1,
+			"width": 4.0,
+			"depth": 16.0,
+			"scale": [
+				0.952,
+				1.0,
+				0.867
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					228.3,
+					167.48
+				],
+				[
+					231.71,
+					165.43
+				],
+				[
+					223.42,
+					151.74
+				],
+				[
+					220.06,
+					153.77
+				]
+			],
+			"photos": [
+				"1172430647677317",
+				"1643899013144544",
+				"1089787569259586"
+			],
+			"base": 7.47
+		},
+		{
+			"id": "truong_cong_dinh_1-left-q12-1750",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_4x16",
+			"x": 233.58,
+			"z": 154.96,
+			"front": [
+				237.71,
+				161.81
+			],
+			"yaw": 31.11,
+			"width": 4.0,
+			"depth": 16.0,
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					236.01,
+					162.84
+				],
+				[
+					239.42,
+					160.78
+				],
+				[
+					231.16,
+					147.08
+				],
+				[
+					227.77,
+					149.12
+				]
+			],
+			"photos": [
+				"1643899013144544",
+				"578763194656912",
+				"1172430647677317"
+			],
+			"base": 7.42
+		},
+		{
+			"id": "truong_cong_dinh_1-left-q12-1790",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_5x20",
+			"x": 237.24,
+			"z": 152.75,
+			"front": [
+				241.36,
+				159.61
+			],
+			"yaw": 30.99,
+			"width": 4.5,
+			"depth": 16.0,
+			"scale": [
+				0.9,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					239.42,
+					160.78
+				],
+				[
+					243.29,
+					158.45
+				],
+				[
+					235.05,
+					144.74
+				],
+				[
+					231.16,
+					147.08
+				]
+			],
+			"photos": [
+				"578763194656912",
+				"1643899013144544",
+				"552444554094970"
+			],
+			"base": 7.34
+		},
+		{
+			"id": "truong_cong_dinh_1-left-q12-2085",
+			"street": "truong_cong_dinh_1",
+			"side": "left",
+			"model": "nha_ong_cu_4x18",
+			"x": 262.28,
+			"z": 137.68,
+			"front": [
+				266.41,
+				144.53
+			],
+			"yaw": 31.11,
+			"width": 4.0,
+			"depth": 16.0,
+			"scale": [
+				0.952,
+				1.0,
+				0.867
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					264.7,
+					145.57
+				],
+				[
+					268.14,
+					143.5
+				],
+				[
+					259.9,
+					129.78
+				],
+				[
+					256.43,
+					131.87
+				]
+			],
+			"photos": [
+				"1586302025374869",
+				"665459506304377",
+				"1501640177221298"
+			],
+			"base": 6.97
+		},
+		{
+			"id": "truong_cong_dinh_1-right-3c1fec5c-433-0",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 208.63,
+			"z": 198.99,
+			"front": [
+				204.97,
+				192.32
+			],
+			"yaw": -151.21,
+			"width": 5.26,
+			"depth": 15.18,
+			"scale": [
+				1.051,
+				1.0,
+				0.75
+			],
+			"height": 8.66,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"3c1fec5c-433"
+			],
+			"outline": [
+				[
+					202.68,
+					193.59
+				],
+				[
+					207.27,
+					191.06
+				],
+				[
+					214.58,
+					204.36
+				],
+				[
+					210.03,
+					206.86
+				]
+			],
+			"base": 6.46
+		},
+		{
+			"id": "truong_cong_dinh_1-right-52ea130c-515-0",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 226.04,
+			"z": 189.38,
+			"front": [
+				222.36,
+				182.72
+			],
+			"yaw": -151.14,
+			"width": 5.24,
+			"depth": 15.03,
+			"scale": [
+				1.047,
+				1.0,
+				0.75
+			],
+			"height": 7.58,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"52ea130c-515"
+			],
+			"outline": [
+				[
+					220.08,
+					183.98
+				],
+				[
+					224.66,
+					181.45
+				],
+				[
+					231.91,
+					194.61
+				],
+				[
+					227.34,
+					197.13
+				]
+			],
+			"base": 7.21
+		},
+		{
+			"id": "truong_cong_dinh_1-right-9cf1bb02-2e8-0",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_cu_4x18",
+			"x": 233.43,
+			"z": 187.53,
+			"front": [
+				228.81,
+				179.16
+			],
+			"yaw": -151.09,
+			"width": 4.22,
+			"depth": 19.11,
+			"scale": [
+				1.004,
+				1.0,
+				1.036
+			],
+			"height": 10.19,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"9cf1bb02-2e8"
+			],
+			"outline": [
+				[
+					226.96,
+					180.18
+				],
+				[
+					230.65,
+					178.14
+				],
+				[
+					239.89,
+					194.87
+				],
+				[
+					236.2,
+					196.91
+				]
+			],
+			"base": 7.4
+		},
+		{
+			"id": "truong_cong_dinh_1-right-9cf1bb02-2e8-1",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_4x16",
+			"x": 237.56,
+			"z": 185.2,
+			"front": [
+				232.64,
+				177.01
+			],
+			"yaw": -149.01,
+			"width": 4.22,
+			"depth": 19.11,
+			"scale": [
+				1.054,
+				1.0,
+				1.195
+			],
+			"height": 10.19,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"9cf1bb02-2e8"
+			],
+			"outline": [
+				[
+					230.65,
+					178.14
+				],
+				[
+					234.45,
+					175.92
+				],
+				[
+					244.29,
+					192.3
+				],
+				[
+					239.89,
+					194.87
+				]
+			],
+			"base": 7.45
+		},
+		{
+			"id": "truong_cong_dinh_1-right-6789be2e-076-0",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 243.54,
+			"z": 181.05,
+			"front": [
+				238.86,
+				173.26
+			],
+			"yaw": -148.94,
+			"width": 4.54,
+			"depth": 18.18,
+			"scale": [
+				0.909,
+				1.0,
+				0.896
+			],
+			"height": 16.85,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"6789be2e-076"
+			],
+			"outline": [
+				[
+					236.92,
+					174.43
+				],
+				[
+					240.8,
+					172.09
+				],
+				[
+					250.16,
+					187.68
+				],
+				[
+					246.34,
+					189.98
+				]
+			],
+			"base": 7.46
+		},
+		{
+			"id": "truong_cong_dinh_1-right-6789be2e-076-1",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 247.45,
+			"z": 178.7,
+			"front": [
+				242.75,
+				170.92
+			],
+			"yaw": -148.89,
+			"width": 4.54,
+			"depth": 18.18,
+			"scale": [
+				0.909,
+				1.0,
+				0.896
+			],
+			"height": 16.85,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"6789be2e-076"
+			],
+			"outline": [
+				[
+					240.8,
+					172.09
+				],
+				[
+					244.7,
+					169.74
+				],
+				[
+					254.09,
+					185.31
+				],
+				[
+					250.16,
+					187.68
+				]
+			],
+			"base": 7.43
+		},
+		{
+			"id": "truong_cong_dinh_1-right-6789be2e-076-2",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 251.31,
+			"z": 176.37,
+			"front": [
+				246.63,
+				168.58
+			],
+			"yaw": -149.01,
+			"width": 4.54,
+			"depth": 18.18,
+			"scale": [
+				0.909,
+				1.0,
+				0.896
+			],
+			"height": 16.85,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"6789be2e-076"
+			],
+			"outline": [
+				[
+					244.7,
+					169.74
+				],
+				[
+					248.58,
+					167.41
+				],
+				[
+					257.94,
+					182.99
+				],
+				[
+					254.09,
+					185.31
+				]
+			],
+			"base": 7.3
+		},
+		{
+			"id": "truong_cong_dinh_1-right-6789be2e-076-3",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 255.21,
+			"z": 174.03,
+			"front": [
+				250.53,
+				166.24
+			],
+			"yaw": -149.01,
+			"width": 4.54,
+			"depth": 18.18,
+			"scale": [
+				0.909,
+				1.0,
+				0.896
+			],
+			"height": 16.85,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"6789be2e-076"
+			],
+			"outline": [
+				[
+					248.58,
+					167.41
+				],
+				[
+					252.48,
+					165.06
+				],
+				[
+					261.87,
+					180.63
+				],
+				[
+					257.94,
+					182.99
+				]
+			],
+			"base": 7.19
+		},
+		{
+			"id": "truong_cong_dinh_1-right-6789be2e-076-4",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 259.13,
+			"z": 171.67,
+			"front": [
+				254.43,
+				163.89
+			],
+			"yaw": -148.89,
+			"width": 4.54,
+			"depth": 18.18,
+			"scale": [
+				0.909,
+				1.0,
+				0.896
+			],
+			"height": 16.85,
+			"source": "box",
+			"status": "Source",
+			"replaces": [
+				"6789be2e-076"
+			],
+			"outline": [
+				[
+					252.48,
+					165.06
+				],
+				[
+					256.36,
+					162.72
+				],
+				[
+					265.72,
+					178.31
+				],
+				[
+					261.87,
+					180.63
+				]
+			],
+			"base": 7.04
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-174",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_cu_4x18",
+			"x": 89.14,
+			"z": 225.32,
+			"front": [
+				92.95,
+				218.29
+			],
+			"yaw": 151.58,
+			"width": 4.1,
+			"depth": 16.0,
+			"scale": [
+				0.976,
+				1.0,
+				0.867
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					91.15,
+					217.31
+				],
+				[
+					94.75,
+					219.26
+				],
+				[
+					87.14,
+					233.33
+				],
+				[
+					83.53,
+					231.38
+				]
+			],
+			"photos": [
+				"1792059494931187",
+				"3957838341161647",
+				"603391462018271"
+			],
+			"base": 1.99
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-215",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_4x16",
+			"x": 97.06,
+			"z": 228.49,
+			"front": [
+				98.3,
+				220.59
+			],
+			"yaw": 171.11,
+			"width": 4.1,
+			"depth": 16.0,
+			"scale": [
+				1.025,
+				1.0,
+				1.0
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					94.75,
+					219.26
+				],
+				[
+					100.33,
+					220.91
+				],
+				[
+					97.85,
+					236.71
+				],
+				[
+					87.14,
+					233.33
+				]
+			],
+			"photos": [
+				"3957838341161647",
+				"2592940117560805",
+				"537377422395420"
+			],
+			"base": 2.33
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-256",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_cu_4x18",
+			"x": 101.07,
+			"z": 229.13,
+			"front": [
+				102.33,
+				221.23
+			],
+			"yaw": 170.91,
+			"width": 4.1,
+			"depth": 16.0,
+			"scale": [
+				0.976,
+				1.0,
+				0.867
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					100.33,
+					220.91
+				],
+				[
+					104.36,
+					221.55
+				],
+				[
+					101.83,
+					237.35
+				],
+				[
+					97.85,
+					236.71
+				]
+			],
+			"photos": [
+				"2592940117560805",
+				"1494073214633708",
+				"537377422395420"
+			],
+			"base": 2.73
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-297",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 105.61,
+			"z": 229.85,
+			"front": [
+				106.87,
+				221.95
+			],
+			"yaw": 170.91,
+			"width": 5.1,
+			"depth": 16.0,
+			"scale": [
+				1.02,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					104.36,
+					221.55
+				],
+				[
+					109.39,
+					222.36
+				],
+				[
+					106.86,
+					238.15
+				],
+				[
+					101.83,
+					237.35
+				]
+			],
+			"photos": [
+				"1494073214633708",
+				"2369751173373132",
+				"2592940117560805"
+			],
+			"base": 3.18
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-348",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_4x16",
+			"x": 110.16,
+			"z": 230.58,
+			"front": [
+				111.42,
+				222.68
+			],
+			"yaw": 170.94,
+			"width": 4.1,
+			"depth": 16.0,
+			"scale": [
+				1.025,
+				1.0,
+				1.0
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					109.39,
+					222.36
+				],
+				[
+					113.51,
+					223.01
+				],
+				[
+					111.18,
+					238.84
+				],
+				[
+					106.86,
+					238.15
+				]
+			],
+			"photos": [
+				"2369751173373132",
+				"1494073214633708",
+				"582801894229232"
+			],
+			"base": 3.42
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-389",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_cu_4x18",
+			"x": 118.65,
+			"z": 230.64,
+			"front": [
+				117.21,
+				222.77
+			],
+			"yaw": -169.68,
+			"width": 4.1,
+			"depth": 16.0,
+			"scale": [
+				0.976,
+				1.0,
+				0.867
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					113.51,
+					223.01
+				],
+				[
+					119.23,
+					222.41
+				],
+				[
+					122.08,
+					238.15
+				],
+				[
+					111.18,
+					238.84
+				]
+			],
+			"photos": [
+				"1869514180122516",
+				"2369751173373132",
+				"9014976021858401"
+			],
+			"base": 3.48
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-563",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 136.26,
+			"z": 227.45,
+			"front": [
+				134.83,
+				219.58
+			],
+			"yaw": -169.68,
+			"width": 5.1,
+			"depth": 16.0,
+			"scale": [
+				1.02,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					132.32,
+					220.04
+				],
+				[
+					137.34,
+					219.13
+				],
+				[
+					140.2,
+					234.87
+				],
+				[
+					135.18,
+					235.78
+				]
+			],
+			"photos": [
+				"1002957378262376",
+				"1975130529621532",
+				"933122495401786"
+			],
+			"base": 3.72
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-614",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_4x16",
+			"x": 140.75,
+			"z": 226.64,
+			"front": [
+				139.34,
+				218.76
+			],
+			"yaw": -169.83,
+			"width": 4.1,
+			"depth": 16.0,
+			"scale": [
+				1.025,
+				1.0,
+				1.0
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					137.34,
+					219.13
+				],
+				[
+					141.36,
+					218.4
+				],
+				[
+					144.18,
+					234.15
+				],
+				[
+					140.2,
+					234.87
+				]
+			],
+			"photos": [
+				"1002957378262376",
+				"923331576376729",
+				"1975130529621532"
+			],
+			"base": 3.77
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-655",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_4x16",
+			"x": 144.82,
+			"z": 225.91,
+			"front": [
+				143.39,
+				218.03
+			],
+			"yaw": -169.68,
+			"width": 4.1,
+			"depth": 16.0,
+			"scale": [
+				1.025,
+				1.0,
+				1.0
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					141.36,
+					218.4
+				],
+				[
+					145.4,
+					217.67
+				],
+				[
+					148.27,
+					233.41
+				],
+				[
+					144.18,
+					234.15
+				]
+			],
+			"photos": [
+				"923331576376729",
+				"1002957378262376",
+				"472302052010148"
+			],
+			"base": 3.82
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-696",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_cu_4x18",
+			"x": 148.82,
+			"z": 225.18,
+			"front": [
+				147.41,
+				217.31
+			],
+			"yaw": -169.83,
+			"width": 4.1,
+			"depth": 16.0,
+			"scale": [
+				0.976,
+				1.0,
+				0.867
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					145.4,
+					217.67
+				],
+				[
+					149.43,
+					216.94
+				],
+				[
+					152.26,
+					232.69
+				],
+				[
+					148.27,
+					233.41
+				]
+			],
+			"photos": [
+				"923331576376729",
+				"472302052010148",
+				"1762298067913473"
+			],
+			"base": 3.87
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-737",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_cu_4x18",
+			"x": 152.89,
+			"z": 224.45,
+			"front": [
+				151.46,
+				216.58
+			],
+			"yaw": -169.68,
+			"width": 4.1,
+			"depth": 16.0,
+			"scale": [
+				0.976,
+				1.0,
+				0.867
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					149.43,
+					216.94
+				],
+				[
+					153.47,
+					216.21
+				],
+				[
+					156.34,
+					231.95
+				],
+				[
+					152.26,
+					232.69
+				]
+			],
+			"photos": [
+				"472302052010148",
+				"537894202382408",
+				"923331576376729"
+			],
+			"base": 3.92
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-778",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_4x16",
+			"x": 156.92,
+			"z": 223.71,
+			"front": [
+				155.49,
+				215.84
+			],
+			"yaw": -169.68,
+			"width": 4.1,
+			"depth": 16.0,
+			"scale": [
+				1.025,
+				1.0,
+				1.0
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					153.47,
+					216.21
+				],
+				[
+					157.5,
+					215.48
+				],
+				[
+					160.34,
+					231.22
+				],
+				[
+					156.34,
+					231.95
+				]
+			],
+			"photos": [
+				"537894202382408",
+				"472302052010148",
+				"1059918602550288"
+			],
+			"base": 3.98
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-819",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_4x16",
+			"x": 160.92,
+			"z": 222.99,
+			"front": [
+				159.51,
+				215.11
+			],
+			"yaw": -169.83,
+			"width": 4.1,
+			"depth": 16.0,
+			"scale": [
+				1.025,
+				1.0,
+				1.0
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					157.5,
+					215.48
+				],
+				[
+					161.54,
+					214.75
+				],
+				[
+					164.4,
+					230.49
+				],
+				[
+					160.34,
+					231.22
+				]
+			],
+			"photos": [
+				"537894202382408",
+				"1059918602550288",
+				"472302052010148"
+			],
+			"base": 3.94
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-942",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_cu_4x18",
+			"x": 176.31,
+			"z": 217.29,
+			"front": [
+				172.46,
+				210.28
+			],
+			"yaw": -151.21,
+			"width": 4.1,
+			"depth": 16.0,
+			"scale": [
+				0.976,
+				1.0,
+				0.867
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					170.66,
+					211.27
+				],
+				[
+					174.27,
+					209.28
+				],
+				[
+					182.0,
+					223.29
+				],
+				[
+					178.37,
+					225.29
+				]
+			],
+			"photos": [
+				"415069238338448",
+				"586338740480968",
+				"1531369634248476"
+			],
+			"base": 3.94
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-983",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_4x16",
+			"x": 179.93,
+			"z": 215.3,
+			"front": [
+				176.06,
+				208.29
+			],
+			"yaw": -151.09,
+			"width": 4.1,
+			"depth": 16.0,
+			"scale": [
+				1.025,
+				1.0,
+				1.0
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					174.27,
+					209.28
+				],
+				[
+					177.85,
+					207.3
+				],
+				[
+					185.59,
+					221.31
+				],
+				[
+					182.0,
+					223.29
+				]
+			],
+			"photos": [
+				"586338740480968",
+				"415069238338448",
+				"1062669482261523"
+			],
+			"base": 4.21
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-1024",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 183.96,
+			"z": 213.07,
+			"front": [
+				180.09,
+				206.07
+			],
+			"yaw": -151.06,
+			"width": 5.1,
+			"depth": 16.0,
+			"scale": [
+				1.02,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					177.85,
+					207.3
+				],
+				[
+					182.32,
+					204.83
+				],
+				[
+					190.08,
+					218.83
+				],
+				[
+					185.59,
+					221.31
+				]
+			],
+			"photos": [
+				"586338740480968",
+				"417991488054828",
+				"1062669482261523"
+			],
+			"base": 4.54
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-1075",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_cu_4x18",
+			"x": 187.98,
+			"z": 210.84,
+			"front": [
+				184.11,
+				203.84
+			],
+			"yaw": -151.09,
+			"width": 4.1,
+			"depth": 16.0,
+			"scale": [
+				0.976,
+				1.0,
+				0.867
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					182.32,
+					204.83
+				],
+				[
+					185.91,
+					202.85
+				],
+				[
+					193.64,
+					216.86
+				],
+				[
+					190.08,
+					218.83
+				]
+			],
+			"photos": [
+				"417991488054828",
+				"918139569858790",
+				"586338740480968"
+			],
+			"base": 4.9
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-1116",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 191.98,
+			"z": 208.64,
+			"front": [
+				188.13,
+				201.62
+			],
+			"yaw": -151.21,
+			"width": 5.1,
+			"depth": 16.0,
+			"scale": [
+				1.02,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					185.91,
+					202.85
+				],
+				[
+					190.37,
+					200.39
+				],
+				[
+					198.09,
+					214.41
+				],
+				[
+					193.64,
+					216.86
+				]
+			],
+			"photos": [
+				"918139569858790",
+				"417991488054828",
+				"1249414799435943"
+			],
+			"base": 5.24
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-1167",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 196.49,
+			"z": 206.15,
+			"front": [
+				192.61,
+				199.15
+			],
+			"yaw": -151.02,
+			"width": 5.1,
+			"depth": 16.0,
+			"scale": [
+				1.02,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					190.37,
+					200.39
+				],
+				[
+					194.84,
+					197.92
+				],
+				[
+					202.57,
+					211.93
+				],
+				[
+					198.09,
+					214.41
+				]
+			],
+			"photos": [
+				"918139569858790",
+				"884647363745824",
+				"915646093418786"
+			],
+			"base": 5.61
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-1218",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_cu_4x18",
+			"x": 200.5,
+			"z": 203.93,
+			"front": [
+				196.63,
+				196.93
+			],
+			"yaw": -151.09,
+			"width": 4.1,
+			"depth": 16.0,
+			"scale": [
+				0.976,
+				1.0,
+				0.867
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					194.84,
+					197.92
+				],
+				[
+					198.42,
+					195.94
+				],
+				[
+					206.16,
+					209.94
+				],
+				[
+					202.57,
+					211.93
+				]
+			],
+			"photos": [
+				"884647363745824",
+				"560071789955675",
+				"918139569858790"
+			],
+			"base": 5.94
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-1259",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 204.53,
+			"z": 201.71,
+			"front": [
+				200.66,
+				194.71
+			],
+			"yaw": -151.07,
+			"width": 5.1,
+			"depth": 16.0,
+			"scale": [
+				1.02,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					198.42,
+					195.94
+				],
+				[
+					202.89,
+					193.47
+				],
+				[
+					210.65,
+					207.46
+				],
+				[
+					206.16,
+					209.94
+				]
+			],
+			"photos": [
+				"560071789955675",
+				"884647363745824",
+				"1284982959182503"
+			],
+			"base": 6.22
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-1365",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 213.76,
+			"z": 196.61,
+			"front": [
+				209.89,
+				189.61
+			],
+			"yaw": -151.09,
+			"width": 5.0,
+			"depth": 16.0,
+			"scale": [
+				1.0,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					207.7,
+					190.82
+				],
+				[
+					212.09,
+					188.4
+				],
+				[
+					219.84,
+					202.39
+				],
+				[
+					215.42,
+					204.84
+				]
+			],
+			"photos": [
+				"1284982959182503",
+				"1319955572305125",
+				"560071789955675"
+			],
+			"base": 6.7
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-1415",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_cu_4x18",
+			"x": 217.71,
+			"z": 194.43,
+			"front": [
+				213.84,
+				187.43
+			],
+			"yaw": -151.02,
+			"width": 4.0,
+			"depth": 16.0,
+			"scale": [
+				0.952,
+				1.0,
+				0.867
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					212.09,
+					188.4
+				],
+				[
+					215.58,
+					186.46
+				],
+				[
+					223.32,
+					200.47
+				],
+				[
+					219.84,
+					202.39
+				]
+			],
+			"photos": [
+				"1319955572305125",
+				"1284982959182503",
+				"2589497154576548"
+			],
+			"base": 6.87
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-1455",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 221.64,
+			"z": 192.26,
+			"front": [
+				217.77,
+				185.25
+			],
+			"yaw": -151.09,
+			"width": 5.0,
+			"depth": 16.0,
+			"scale": [
+				1.0,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					215.58,
+					186.46
+				],
+				[
+					219.96,
+					184.04
+				],
+				[
+					227.69,
+					198.05
+				],
+				[
+					223.32,
+					200.47
+				]
+			],
+			"photos": [
+				"1319955572305125",
+				"2589497154576548",
+				"1284982959182503"
+			],
+			"base": 7.04
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-1930",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_cu_4x18",
+			"x": 262.62,
+			"z": 168.3,
+			"front": [
+				258.5,
+				161.44
+			],
+			"yaw": -149.01,
+			"width": 4.0,
+			"depth": 16.0,
+			"scale": [
+				0.952,
+				1.0,
+				0.867
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					256.79,
+					162.47
+				],
+				[
+					260.21,
+					160.41
+				],
+				[
+					268.45,
+					174.13
+				],
+				[
+					265.02,
+					176.19
+				]
+			],
+			"photos": [
+				"923920675835964",
+				"8507818686004374",
+				"1177474840638302"
+			],
+			"base": 6.91
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-1970",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 266.49,
+			"z": 165.97,
+			"front": [
+				262.36,
+				159.12
+			],
+			"yaw": -148.95,
+			"width": 5.0,
+			"depth": 16.0,
+			"scale": [
+				1.0,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					260.21,
+					160.41
+				],
+				[
+					264.51,
+					157.83
+				],
+				[
+					272.78,
+					171.52
+				],
+				[
+					268.45,
+					174.13
+				]
+			],
+			"photos": [
+				"1177474840638302",
+				"923920675835964",
+				"1271883350608422"
+			],
+			"base": 6.84
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-2020",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 270.77,
+			"z": 163.39,
+			"front": [
+				266.64,
+				156.54
+			],
+			"yaw": -148.94,
+			"width": 5.0,
+			"depth": 16.0,
+			"scale": [
+				1.0,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					264.51,
+					157.83
+				],
+				[
+					268.79,
+					155.25
+				],
+				[
+					277.04,
+					168.95
+				],
+				[
+					272.78,
+					171.52
+				]
+			],
+			"photos": [
+				"1271883350608422",
+				"1177474840638302",
+				"1501640177221298"
+			],
+			"base": 6.85
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-2070",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 275.06,
+			"z": 160.8,
+			"front": [
+				270.93,
+				153.95
+			],
+			"yaw": -148.89,
+			"width": 5.0,
+			"depth": 16.0,
+			"scale": [
+				1.0,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					268.79,
+					155.25
+				],
+				[
+					273.06,
+					152.67
+				],
+				[
+					281.3,
+					166.38
+				],
+				[
+					277.04,
+					168.95
+				]
+			],
+			"photos": [
+				"1271883350608422",
+				"1247376853182756",
+				"1177474840638302"
+			],
+			"base": 6.95
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-2120",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 279.32,
+			"z": 158.24,
+			"front": [
+				275.21,
+				151.38
+			],
+			"yaw": -149.01,
+			"width": 5.0,
+			"depth": 16.0,
+			"scale": [
+				1.0,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					273.06,
+					152.67
+				],
+				[
+					277.35,
+					150.09
+				],
+				[
+					285.59,
+					163.81
+				],
+				[
+					281.3,
+					166.38
+				]
+			],
+			"photos": [
+				"1247376853182756",
+				"961330396024587",
+				"1271883350608422"
+			],
+			"base": 7.06
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-2170",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_4x16",
+			"x": 283.19,
+			"z": 155.92,
+			"front": [
+				279.07,
+				149.06
+			],
+			"yaw": -148.98,
+			"width": 4.0,
+			"depth": 16.0,
+			"scale": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					277.35,
+					150.09
+				],
+				[
+					280.79,
+					148.03
+				],
+				[
+					289.05,
+					161.72
+				],
+				[
+					285.59,
+					163.81
+				]
+			],
+			"photos": [
+				"961330396024587",
+				"1247376853182756",
+				"946311544032432"
+			],
+			"base": 7.14
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-2210",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_cu_4x18",
+			"x": 286.62,
+			"z": 153.85,
+			"front": [
+				282.49,
+				146.99
+			],
+			"yaw": -148.93,
+			"width": 4.0,
+			"depth": 16.0,
+			"scale": [
+				0.952,
+				1.0,
+				0.867
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					280.79,
+					148.03
+				],
+				[
+					284.2,
+					145.97
+				],
+				[
+					292.44,
+					159.68
+				],
+				[
+					289.05,
+					161.72
+				]
+			],
+			"photos": [
+				"946311544032432",
+				"961330396024587",
+				"559950136977533"
+			],
+			"base": 7.18
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-2250",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_cu_4x18",
+			"x": 290.05,
+			"z": 151.79,
+			"front": [
+				285.92,
+				144.94
+			],
+			"yaw": -148.96,
+			"width": 4.0,
+			"depth": 16.0,
+			"scale": [
+				0.952,
+				1.0,
+				0.867
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					284.2,
+					145.97
+				],
+				[
+					287.64,
+					143.9
+				],
+				[
+					295.91,
+					157.6
+				],
+				[
+					292.44,
+					159.68
+				]
+			],
+			"photos": [
+				"559950136977533",
+				"946311544032432",
+				"1724804584974359"
+			],
+			"base": 7.2
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-2290",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 293.89,
+			"z": 149.47,
+			"front": [
+				289.77,
+				142.61
+			],
+			"yaw": -149.0,
+			"width": 5.0,
+			"depth": 16.0,
+			"scale": [
+				1.0,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					287.64,
+					143.9
+				],
+				[
+					291.91,
+					141.33
+				],
+				[
+					300.15,
+					155.04
+				],
+				[
+					295.91,
+					157.6
+				]
+			],
+			"photos": [
+				"1724804584974359",
+				"559950136977533",
+				"546563714674454"
+			],
+			"base": 7.21
+		},
+		{
+			"id": "truong_cong_dinh_1-right-q12-2340",
+			"street": "truong_cong_dinh_1",
+			"side": "right",
+			"model": "nha_ong_5x20",
+			"x": 297.98,
+			"z": 147.02,
+			"front": [
+				293.85,
+				140.16
+			],
+			"yaw": -148.94,
+			"width": 4.5,
+			"depth": 16.0,
+			"scale": [
+				0.9,
+				1.0,
+				0.788
+			],
+			"height": 0.0,
+			"source": "q12",
+			"status": "Check",
+			"replaces": [],
+			"outline": [
+				[
+					291.91,
+					141.33
+				],
+				[
+					295.77,
+					139.0
+				],
+				[
+					304.03,
+					152.71
+				],
+				[
+					300.15,
+					155.04
+				]
+			],
+			"photos": [
+				"1724804584974359",
+				"2511605632364231",
+				"536519356034338"
+			],
+			"base": 7.21
+		}
+	],
+	"replaced": [
+		"3c1fec5c-433",
+		"3f0f6f71-f95",
+		"52ea130c-515",
+		"6789be2e-076",
+		"72034626-f8e",
+		"723e9990-2f5",
+		"780f6b7d-bf0",
+		"875d4cbe-334",
+		"9cf1bb02-2e8"
+	]
+}

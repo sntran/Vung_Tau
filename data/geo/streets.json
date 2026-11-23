@@ -1,0 +1,11 @@
+{
+	"note": "Plan 0009, phase 3 (R7 to R9): the streets with the houses of World, in the order of the work (between Bãi Trước and chợ Xóm Lưới first). ways: the OSM ways of the street in data/geo/build/roads.json. tools/geo/build.py (geodata/street_houses.py) puts the lots and the houses of each street in data/geo/build/houses.json.",
+	"streets": [
+		{
+			"id": "truong_cong_dinh_1",
+			"name": "Trương Công Định",
+			"about": "From Quang Trung at Cảng vụ (the corner of S3 of plan 0026) to the east, toward chợ Xóm Lưới: about 240 m.",
+			"ways": [1423071605, 270016704]
+		}
+	]
+}

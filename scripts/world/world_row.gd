@@ -26,6 +26,9 @@ static var _templates: Dictionary = {}  # model -> WorldModel, not in a tree
 ## The size of a cell (m): larger cells give fewer draw calls (a row of the
 ## pieces of a wall).
 var cell_size := CELL
+## The set of materials of the models of the row ("house": the houses of plan
+## 0009, R7a).
+var material_set := ""
 ## The ranges of the levels for each preset (preset name -> Vector3), over
 ## WorldModel.ranges. A near range of 0 hides the near level (the pieces of a
 ## wall on Low, as the buildings of plan 0026, D6).
@@ -78,7 +81,7 @@ func _build_cell(key: Vector2i, items: Array) -> void:
 	# For each level and each mesh node: the transform of each model.
 	var batches := {}  # "level/model/node" -> {"mesh", "transforms", "colors"}
 	for item: Dictionary in items:
-		var template := _template(item.id)
+		var template := _template(item.id, material_set)
 		if template == null:
 			continue
 		template.set_pose(_rest_pose(template))
@@ -93,9 +96,9 @@ func _build_cell(key: Vector2i, items: Array) -> void:
 				continue
 			for node in level_node.find_children("*", "MeshInstance3D", true, false):
 				var m := node as MeshInstance3D
-				var batch_key := "%s/%s/%s" % [level, item.id, template.level(level).get_path_to(m)]
+				var batch_key := "%s/%s/%s/%s" % [level, item.id, material_set, template.level(level).get_path_to(m)]
 				if not batches.has(batch_key):
-					batches[batch_key] = {"level": level, "mesh": _row_mesh(batch_key, m),
+					batches[batch_key] = {"level": level, "mesh": _row_mesh(batch_key, m, material_set),
 							"transforms": [], "colors": []}
 				batches[batch_key].transforms.append(local_at * template._global_of(m))
 				batches[batch_key].colors.append(item.paint)
@@ -141,22 +144,23 @@ static func _rest_pose(template: WorldModel) -> Dictionary:
 	return pose
 
 
-static func _template(model_id: String) -> WorldModel:
-	if not _templates.has(model_id):
-		_templates[model_id] = WorldModel.make(model_id)
-	return _templates[model_id]
+static func _template(model_id: String, set_name := "") -> WorldModel:
+	var key := model_id + "/" + set_name
+	if not _templates.has(key):
+		_templates[key] = WorldModel.make(model_id, WorldMaterials.DEFAULT_PAINT, set_name)
+	return _templates[key]
 
 
 ## The mesh of a node of a template with the materials of the game for a
 ## MultiMesh: the paint takes the color of each instance.
-static func _row_mesh(key: String, node: MeshInstance3D) -> Mesh:
+static func _row_mesh(key: String, node: MeshInstance3D, set_name := "") -> Mesh:
 	if _meshes.has(key):
 		return _meshes[key]
 	var mesh := node.mesh.duplicate() as Mesh
 	for i in mesh.get_surface_count():
 		var material := node.get_surface_override_material(i)
 		if material is StandardMaterial3D and material.resource_name != "" \
-				and WorldMaterials.shared().is_paint(material.resource_name):
+				and WorldMaterials.shared().is_paint(material.resource_name, set_name):
 			material = row_paint_material(material as StandardMaterial3D)
 		mesh.surface_set_material(i, material)
 	_meshes[key] = mesh

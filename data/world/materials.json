@@ -429,6 +429,7 @@
 		"materials": {
 			"house_walls": {
 				"color": "#E0D8C6",
+				"paint": true,
 				"roughness": 0.9,
 				"metallic": 0.0,
 				"note": "plaster and brick_ong. Plan 0009 gives it the plaster shader of plan 0004."

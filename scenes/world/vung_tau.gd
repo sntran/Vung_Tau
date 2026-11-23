@@ -154,6 +154,8 @@ var showcase: Showcase
 var town: TownField
 ## Report 0009, D-0009-16: the water of the land.
 var inland_water: InlandWater
+## Plan 0009, phase 3: the houses of World on the streets.
+var houses: StreetHouses
 ## Report 0009, Q14: the land around the play area on the horizon.
 var mainland: MainlandFar
 ## The showcase builds its parts when the view is nearer than this to its area
@@ -260,6 +262,14 @@ func setup(folder := GeoData.ROOT) -> bool:
 	showcase.name = "Showcase"
 	add_child(showcase)
 	showcase.setup(self)
+	# Plan 0009, phase 3: the houses of World on the streets, before the town
+	# (the town leaves out its boxes under their lots).
+	houses = StreetHouses.new()
+	houses.name = "StreetHouses"
+	add_child(houses)
+	if not houses.setup(self):
+		houses.queue_free()
+		houses = null
 	town = TownField.new()
 	town.name = "Town"
 	add_child(town)

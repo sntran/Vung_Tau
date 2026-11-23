@@ -43815,6 +43815,57 @@
 			"uses": "Plan 0026, R7, Q7: on its OSM outline (way 235149416) by Hạ Long, about 300 m south of Hải Âu (seen from the jetty and the walk of the sea); outside the area of the showcase (D1), it has no place in data/world/places/ yet.",
 			"drawing": "data/world/drawings/nha_khach_ha_long.json",
 			"catalog": null
+		},
+		{
+			"id": "nha_ong_4x16",
+			"order": {
+				"blueprint": "catalog",
+				"options": {
+					"name": "nha_ong_4x16"
+				}
+			},
+			"levels": [
+				"near",
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0009, phase 3 (R7): a tube house of 4 m by 16 m of World (blueprint tube_house), on the lots of the streets between Bãi Trước and chợ Xóm Lưới.",
+			"catalog": "H1"
+		},
+		{
+			"id": "nha_ong_5x20",
+			"order": {
+				"blueprint": "catalog",
+				"options": {
+					"name": "nha_ong_5x20"
+				}
+			},
+			"levels": [
+				"near",
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0009, phase 3 (R7): a tube house of 5 m by 20 m of World (blueprint tube_house), on the lots of the streets between Bãi Trước and chợ Xóm Lưới.",
+			"catalog": "H1"
+		},
+		{
+			"id": "nha_ong_cu_4x18",
+			"order": {
+				"blueprint": "catalog",
+				"options": {
+					"name": "nha_ong_cu_4x18"
+				}
+			},
+			"levels": [
+				"near",
+				"mid",
+				"far"
+			],
+			"impostor": false,
+			"uses": "Plan 0009, phase 3 (R7): an old tube house of 4 m by 18 m of World (blueprint tube_house), on the lots of the streets between Bãi Trước and chợ Xóm Lưới.",
+			"catalog": "H1"
 		}
 	]
 }

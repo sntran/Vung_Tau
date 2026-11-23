@@ -34,7 +34,8 @@ function rssByType() {
     result.loadMs = Date.now() - t0;
     // The signal of the game (R16), or for a build before R16 the hidden status box of the loader.
     await page.waitForFunction(() => (window.vungTau && window.vungTau.firstFrameMs >= 0) ||
-        (document.getElementById('status') && getComputedStyle(document.getElementById('status')).visibility === 'hidden'),
+        // The loader of Godot 4.7 removes its status box when the engine starts.
+        !document.getElementById('status') || getComputedStyle(document.getElementById('status')).visibility === 'hidden',
         null, { timeout: 1200000, polling: 500 });
     result.firstFrameMs = Date.now() - t0;
     result.signal = await page.evaluate(() => window.vungTau ? 'game' : 'loader (a build before R16)');

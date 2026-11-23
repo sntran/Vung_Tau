@@ -896,6 +896,10 @@ func _vertical_sign() -> void:
 ## A box occluder inside the house (R13): the house hides what is behind it,
 ## so the renderer does not draw it.
 func _build_occluder() -> void:
+	# The web engine has no occlusion culling (plan 0009, R16: an occluder
+	# there writes an error in the console).
+	if not ProjectSettings.get_setting("rendering/occlusion_culling/use_occlusion_culling", false):
+		return
 	var occluder := OccluderInstance3D.new()
 	occluder.name = "Occluder"
 	var box := BoxOccluder3D.new()

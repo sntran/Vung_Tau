@@ -520,6 +520,11 @@ def build(raw: Path, out: Path, geo: Path) -> int:
         for b in beach_records]}, None)
     paved = paved_paths(roads, parks)
     write_json(out / "roads.json", {"roads": [road_record(r, r.id in paved) for r in roads]}, None)
+    # Plan 0009, phase 3: the houses of World on the streets of data/geo/streets.json.
+    house_numbers = write_houses(out, raw, geo, projection, grid, on_water)
+    if house_numbers is not None:
+        log(f"houses: {house_numbers['houses']} on {house_numbers['streets']} streets "
+            f"({house_numbers['check']} of Q12, status Check), {house_numbers['replaced']} boxes of the town replaced")
     write_json(out / "blocks.json", {"blocks": [
         dict(id=i, buildings=b["buildings"], has_buildings=b["buildings"] > 0, landuse=b["landuse"],
              area_m2=round(b["polygon"].area, 1), **blocks_module.polygon_to_game(b["polygon"]))
@@ -830,6 +835,69 @@ def road_cut_of(roads: list):
         near = [surfaces[i] for i in tree.query(polygon)]
         return polygon.difference(shapely.union_all(near)) if near else polygon
     return cut
+
+
+def write_houses(out: Path, raw: Path, geo: Path, projection, grid, on_water=None) -> dict | None:
+    """Plan 0009, phase 3 (R7 to R9): data/geo/build/houses.json, the lots and
+    the houses of World of the streets of data/geo/streets.json
+    (geodata/street_houses.py), on the boxes of the town and on the free
+    fronts (Q12). None when there is no street or no town."""
+    from geodata import street_houses
+    streets_path = geo / "streets.json"
+    if not streets_path.exists() or not (out / "town" / "index.json").exists():
+        return None
+    roads = load_json(out / "roads.json")["roads"]
+    boxes = []
+    for path in sorted((out / "town").glob("*.json")):
+        if path.name == "index.json":
+            continue
+        data = load_json(path)
+        records = data["buildings"] if "buildings" in data else [r for chunk in data.get("chunks", []) for r in chunk[2]]
+        for r in records:
+            boxes.append({"id": r[0], "ring": list(zip(r[6][0::2], r[6][1::2])), "height": r[2] - r[1], "base": r[1]})
+    # The models of World of the showcase stand on their places: no lot there.
+    blocked = []
+    for path in sorted((ROOT / "data" / "world" / "places").glob("*.json")):
+        for p in load_json(path).get("places", []):
+            if "box" not in p or "front" not in p:
+                continue
+            fx, fz = p["front"]
+            ax, az = p["facing"]
+            x0, x1, z0, z1 = p["box"]
+            blocked.append(shapely.Polygon([(fx - az * x + ax * z, fz + ax * x + az * z)
+                                            for x, z in [(x0, z0), (x1, z0), (x1, z1), (x0, z1)]]))
+    photos = []
+    index_path = raw / "mapillary.json"
+    if index_path.exists():
+        index = load_json(index_path)
+        col = {c: i for i, c in enumerate(index["columns"])}
+        for im in index["images"]:
+            x, z = projection.to_game(im[col["lon"]], im[col["lat"]])
+            photos.append((im[col["id"]], x, z, im[col["date"]]))
+    houses = []
+    replaced = []
+    streets = []
+    for street in load_json(streets_path)["streets"]:
+        result = street_houses.houses_of_street(street, roads, boxes, blocked, photos)
+        for house in result["houses"]:
+            if on_water is not None and on_water(house["x"], house["z"]):
+                continue
+            # The base: the ground at the middle of the front (the step from the sidewalk is in the model).
+            house["base"] = round(float(grid.sample(np.array([house["front"][0]]), np.array([house["front"][1]]))[0]), 2)
+            houses.append(house)
+        replaced.extend(result["replaced"])
+        streets.append({"id": street["id"], "name": street["name"], "ways": street["ways"], "length_m": result["length_m"],
+                        "width_m": result["width_m"], "houses": len(result["houses"])})
+    models = sorted({h["model"] for h in houses})
+    write_json(out / "houses.json", {
+        "note": "Plan 0009, phase 3 (geodata/street_houses.py): the houses of World on the lots of the streets of "
+                "data/geo/streets.json. Each house: the lot (outline, front, width, depth), the model and its scale, the "
+                "yaw (its front faces the street), the base (the ground at the front), the source (box: a box of the town, "
+                "status Source; q12: a free front, status Check, with the nearest street photos of Mapillary), and the "
+                "boxes of the town that it replaces.",
+        "streets": streets, "models": models, "houses": houses, "replaced": sorted(set(replaced))})
+    return {"streets": len(streets), "houses": len(houses), "check": sum(1 for h in houses if h["status"] == "Check"),
+            "replaced": len(set(replaced))}
 
 
 def write_town(grid, raw: Path, out: Path, area: dict, on_water=None, roads=None) -> dict | None:

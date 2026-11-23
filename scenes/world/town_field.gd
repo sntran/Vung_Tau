@@ -325,6 +325,10 @@ func _read_keep_out() -> void:
 				ring = _circle(Vector2(record.position[0], record.position[1]), float(entry.get("radius", 15.0)))
 			if ring.size() >= 3:
 				rings.append(ring)
+	# Plan 0009, phase 3: the lots of the houses of World.
+	if world.houses:
+		for ring in world.houses.footprints:
+			rings.append(ring)
 	if world.showcase and world.showcase.is_built():
 		for entry: Dictionary in world.showcase.models:
 			rings.append(entry.footprint)
