@@ -64,7 +64,18 @@ func set_hidden(index: int, hidden: bool) -> void:
 	for slot: Array in item.slots:
 		var multimesh: MultiMesh = slot[0]
 		var t: Transform3D = slot[2]
-		multimesh.set_instance_transform(slot[1], Transform3D(Basis().scaled(Vector3.ZERO), t.origin) if hidden else t)
+		if hidden:
+			t = Transform3D(Basis().scaled(Vector3.ZERO), t.origin)
+		# The buffer, as _multimesh_node(): the headless renderer does not keep
+		# set_instance_transform() (AGENTS.md, section 5).
+		var buffer := multimesh.buffer
+		var at := 16 * int(slot[1])
+		for row in 3:
+			buffer[at + 4 * row] = t.basis.x[row]
+			buffer[at + 4 * row + 1] = t.basis.y[row]
+			buffer[at + 4 * row + 2] = t.basis.z[row]
+			buffer[at + 4 * row + 3] = t.origin[row]
+		multimesh.buffer = buffer
 
 
 ## The number of models in the row.
