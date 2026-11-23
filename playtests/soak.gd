@@ -125,8 +125,11 @@ func run(d: PlaytestDriver) -> void:
 
 
 ## Waits until the player stops walking, but not more than WALK_WAIT_S of game time.
+## The timer counts physics time, as the walk does: a slow computer runs at most
+## 16 physics steps in a frame (project.godot), so a timer of frame time ended before the walk
+## (CI part 11 of a8f0032 ran at half the speed, and the cart of mía did not come).
 func _wait_walk_end(d: PlaytestDriver) -> void:
-	var timer := d.main().get_tree().create_timer(WALK_WAIT_S)
+	var timer := d.main().get_tree().create_timer(WALK_WAIT_S, true, true)
 	while d.state().walking and timer.time_left > 0.0:
 		await d.wait_frames(1)
 
@@ -258,6 +261,7 @@ func _cart_comes_where_the_player_stands(d: PlaytestDriver) -> void:
 	if not await d.walk_toward(stand.x, stand.z):
 		return
 	await _wait_walk_end(d)
+	d.step("the player stands at %s, away from the cart of mía" % d.state().player)
 	GameState.set_minutes(open + 1)
 	await d.wait_frames(3)
 	d.expect(cart.visible, "the cart of mía comes when the player steps away")

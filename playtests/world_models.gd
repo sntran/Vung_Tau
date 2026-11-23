@@ -15,6 +15,7 @@ extends RefCounted
 # of GROUP_SIZE models, so that a phase takes less than the time limit under
 # lavapipe.
 # sizes: 1280x720
+# shard: alone
 # phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus
 # phase: --world=vung_tau --start-time=12:00 --quality=low --renderer=forward_plus

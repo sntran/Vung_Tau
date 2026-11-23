@@ -19,6 +19,10 @@
 #   # compatibility: 1280x720              With --all, also one run at this size
 #                                          with the Compatibility renderer (the
 #                                          renderer of the web build).
+#   # shard: alone                         With --shard, each run of this
+#                                          scenario has a part of its own (a
+#                                          scenario that takes as much time as
+#                                          a part).
 #   # phase: ARGS                          One run with these arguments. Each
 #                                          phase line is one run, in order.
 #                                          The runs use the same save file.
@@ -234,14 +238,35 @@ for scenario in "${scenarios[@]}"; do
   fi
 done
 
-# A shard I/N takes the runs I, I + N, I + 2N, and so on.
+# A shard I/N: each run of a scenario with the header "# shard: alone" has a
+# part of its own (the last parts), and the other parts take the other runs in
+# turn (with M parts for them: the runs I, I + M, I + 2M, and so on).
 if [[ -n "$shard" ]]; then
   part="${shard%%/*}"
   parts="${shard##*/}"
+  alone=()
+  shared=()
+  for run in "${runs[@]}"; do
+    if grep -qE '^# shard: alone' "$ROOT/playtests/${run%%:*}.gd"; then
+      alone+=("$run")
+    else
+      shared+=("$run")
+    fi
+  done
+  rest=$((parts - ${#alone[@]}))
+  if (( rest < 1 )); then
+    echo "There are ${#alone[@]} runs with \"# shard: alone\" and only $parts parts." >&2
+    exit 2
+  fi
   selected=()
-  for i in "${!runs[@]}"; do
-    if (( i % parts == part - 1 )); then
-      selected+=("${runs[$i]}")
+  for i in "${!alone[@]}"; do
+    if (( part == rest + 1 + i )); then
+      selected+=("${alone[$i]}")
+    fi
+  done
+  for i in "${!shared[@]}"; do
+    if (( part <= rest && i % rest == part - 1 )); then
+      selected+=("${shared[$i]}")
     fi
   done
   runs=("${selected[@]}")
