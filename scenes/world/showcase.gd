@@ -2629,3 +2629,22 @@ class _Mesh:
 		result[Mesh.ARRAY_TEX_UV] = uvs
 		result[Mesh.ARRAY_TEX_UV2] = flags
 		return result
+
+
+## True when the point is on the steps of an opening of the low wall of the
+## beach: from the wall to the foot of the steps on the sand, in the width of
+## the opening (plan 0018, D5: a scooter does not go down stairs).
+func on_steps(point: Vector3) -> bool:
+	for opening: Dictionary in wall_openings:
+		if not bool(opening.get("steps", false)):
+			continue
+		var at: Vector3 = opening.at
+		var sand: Vector3 = opening.sand
+		var along: Vector3 = opening.along
+		var foot: Vector3 = opening.get("foot", at)
+		var rel := Vector3(point.x - at.x, 0.0, point.z - at.z)
+		var out := rel.dot(sand)
+		if absf(rel.dot(along)) <= float(opening.half) and out >= -0.3 \
+				and out <= Vector3(foot.x - at.x, 0.0, foot.z - at.z).dot(sand) + 0.3:
+			return true
+	return false

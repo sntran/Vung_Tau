@@ -90,7 +90,7 @@ var _stuck_time := 0.0
 var ride: ScooterMotion = null
 ## The scooter of World under the player while the player rides.
 var ride_model: WorldModel = null
-## When it is set, a scooter cannot go to a point where ride_limit.call(point, from) is false (the water, the sand).
+## When it is set, a scooter cannot go to a point where ride_limit.call(point, from) is false (the water, the sand, the stairs).
 var ride_limit: Callable
 ## While true, a scooter that stands does not start (the world near it is not
 ## ready yet: report 0018, D-0018-03). A scooter that moves goes on.
@@ -309,11 +309,16 @@ func _ride_physics(delta: float) -> void:
 		velocity.z = 0.0
 		wanted = Vector3.ZERO
 	move_and_slide()
-	var limited: bool = ride_limit.is_valid() and not ride_limit.call(global_position, start)
+	# D5: the water, the sand, and the stairs, at the leading wheel (the front
+	# wheel, or the rear wheel when the scooter goes back), so that the
+	# scooter stops before it goes there (report 0018, D-0018-04).
+	var lead := ride.forward() * (AXLE if ride.speed >= 0.0 else -AXLE) + ride.forward() * RIDE_EYE_BACK
+	var limited: bool = ride_limit.is_valid() and not ride_limit.call(global_position + lead, start + lead)
 	if limited:
 		global_position = Vector3(start.x, global_position.y, start.z)
+		# The bump and its caption; not the caption of a walk into the water
+		# ("blocked"), which showed at the sand and the stairs (report 0018).
 		_hit()
-		blocked.emit()
 	elif wanted.length() > 0.0001 and is_on_wall():
 		var moved := Vector3(global_position.x - start.x, 0, global_position.z - start.z)
 		# A curb or a ramp goes up at each angle: also at a small angle, where the
@@ -392,7 +397,8 @@ func _try_ride_step(motion: Vector3) -> void:
 	var ahead := ride_middle() + Vector3(motion.x, 0.0, motion.z).normalized() * (AXLE + 0.75)
 	if _floor_under(ahead, global_position.y + 2.0 * RIDE_STEP + 0.3) > global_position.y + RIDE_STEP + 0.1:
 		return
-	if ride_limit.is_valid() and not ride_limit.call(global_position + motion, global_position):
+	var lead := ride.forward() * (AXLE + RIDE_EYE_BACK)
+	if ride_limit.is_valid() and not ride_limit.call(global_position + motion + lead, global_position + lead):
 		return
 	var before_y := global_position.y
 	global_position += up + motion

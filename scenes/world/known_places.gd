@@ -1202,3 +1202,18 @@ static func configs_note(path := CONFIG) -> String:
 func lens_card(eye: Vector3, forward: Vector3) -> Dictionary:
 	var id := place_in_view(eye, forward)
 	return card(id) if id != "" else {}
+
+
+## True when the point is on stairs: within the width of a line of stairs
+## (plan 0018, D5: a scooter does not go up or down stairs).
+func stairs_at(point: Vector3) -> bool:
+	var at := Vector2(point.x, point.z)
+	for entry: Dictionary in stairs:
+		var walk: PackedVector3Array = entry.points
+		var half := float(entry.get("width", 2.0)) / 2.0
+		for i in walk.size() - 1:
+			var a := Vector2(walk[i].x, walk[i].z)
+			var b := Vector2(walk[i + 1].x, walk[i + 1].z)
+			if Geometry2D.get_closest_point_to_segment(at, a, b).distance_to(at) <= half:
+				return true
+	return false

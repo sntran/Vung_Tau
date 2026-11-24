@@ -9,7 +9,8 @@ extends Node3D
 const FILE := "inland_water.json"
 const TILE_M := 1024.0
 
-## Each area: {"name", "level", "middle" (Vector3, at the level)}.
+## Each area: {"name", "level", "middle" (Vector3, at the level), "box"
+## (Rect2 on x, z), "triangles" (PackedVector2Array, three points each)}.
 var areas: Array[Dictionary] = []
 
 
@@ -31,17 +32,23 @@ func setup(w: VungTau) -> bool:
 		var level := float(area.level)
 		var flat: Array = area.triangles
 		var middle := Vector2.ZERO
+		var flat_points := PackedVector2Array()
+		var box := Rect2()
 		for i in range(0, flat.size() - 5, 6):
 			var corners := PackedVector3Array()
 			for k in 3:
 				corners.append(Vector3(float(flat[i + 2 * k]), level, float(flat[i + 2 * k + 1])))
 				middle += Vector2(corners[k].x, corners[k].z) * 2.0 / flat.size()
+				var corner := Vector2(corners[k].x, corners[k].z)
+				flat_points.append(corner)
+				box = Rect2(corner, Vector2.ZERO) if flat_points.size() == 1 else box.expand(corner)
 			# The tile of the first corner of the triangle.
 			var key := Vector2i(floori(corners[0].x / TILE_M), floori(corners[0].z / TILE_M))
 			var verts: PackedVector3Array = tiles.get(key, PackedVector3Array())
 			verts.append_array(corners)
 			tiles[key] = verts
-		areas.append({"name": str(area.get("name", "")), "level": level, "middle": Vector3(middle.x, level, middle.y)})
+		areas.append({"name": str(area.get("name", "")), "level": level, "middle": Vector3(middle.x, level, middle.y),
+				"box": box, "triangles": flat_points})
 	for key: Vector2i in tiles:
 		var verts: PackedVector3Array = tiles[key]
 		var origin := Vector3((key.x + 0.5) * TILE_M, 0.0, (key.y + 0.5) * TILE_M)
@@ -71,3 +78,17 @@ func area_named(area_name: String) -> Dictionary:
 		if area.name == area_name:
 			return area
 	return {}
+
+
+## The level of the water at a point, or -INF where no area of water is
+## (plan 0018, D5: a scooter does not go into the water).
+func level_at(x: float, z: float) -> float:
+	var at := Vector2(x, z)
+	for area: Dictionary in areas:
+		if not (area.box as Rect2).has_point(at):
+			continue
+		var t: PackedVector2Array = area.triangles
+		for i in range(0, t.size() - 2, 3):
+			if Geometry2D.point_is_inside_triangle(at, t[i], t[i + 1], t[i + 2]):
+				return float(area.level)
+	return -INF

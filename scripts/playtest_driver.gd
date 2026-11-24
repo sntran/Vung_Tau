@@ -1521,10 +1521,11 @@ static func _length(line: PackedVector3Array) -> float:
 ## to the point), and the speed is the speed asked, less in a turn (at most
 ## 3 m/s² to the side) and, with "stop", less near the end (a brake of 3 m/s²).
 ## "check" runs in each frame. Returns true when the scooter is within 1 m of
-## the distance "to" along the route, or when "until" returns true. An agent that tests the town uses it to
-## go far fast.
+## the distance "to" along the route, or when "until" returns true. With
+## "shot", the screenshot of that name is taken then, before the thumb lets
+## go of the stick. A play test of the town can use it to go far fast.
 func ride_along(route: PackedVector3Array, to: float, speed_kmh := 40.0, check := Callable(),
-		stop := false, max_s := 170.0, until := Callable()) -> bool:
+		stop := false, max_s := 170.0, until := Callable(), shot := "") -> bool:
 	if not state().riding:
 		fail("ride_along: the player does not ride a scooter")
 		return false
@@ -1555,6 +1556,10 @@ func ride_along(route: PackedVector3Array, to: float, speed_kmh := 40.0, check :
 		var here := route_distance(route, pos)
 		if here >= to - 1.0 or (until.is_valid() and until.call()):
 			reached = true
+			if shot != "":
+				# The screenshot while the thumb still holds the stick (a turn
+				# shows its lean: report 0018, D-0018-04).
+				await screenshot(shot)
 			break
 		var v: float = s.speed_kmh / 3.6
 		var front := Basis(Vector3.UP, deg_to_rad(s.heading)) * Vector3(0, 0, -1)

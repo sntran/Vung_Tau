@@ -26,6 +26,7 @@ extends RefCounted
 # phase: --world=vung_tau --start=bai_truoc --start-time=17:00 --quality=low
 # phase: --world=vung_tau --start=bai_truoc --start-time=17:05 --quality=low --ride
 # phase: --world=vung_tau --start=bai_truoc --start-time=17:10 --quality=low --ride
+# phase: --world=vung_tau --start=bai_truoc --start-time=17:15 --quality=low --ride
 
 ## The roads of the ride (OSM ways): Quang Trung to the south, Hạ Long to the
 ## west and its last part to the junction at Cầu Đá, and Hạ Long from the
@@ -78,8 +79,10 @@ func run(d: PlaytestDriver) -> void:
 		await _run_1(d)
 	elif d.phase == 2:
 		await _run_2(d)
-	else:
+	elif d.phase == 3:
 		await _run_3(d)
+	else:
+		await _run_4(d)
 
 
 ## The roads of the data by id: their points, in order, from "from" on.
@@ -193,27 +196,28 @@ func _run_1(d: PlaytestDriver) -> void:
 	d.step("the route: %.0f m" % length)
 	var junction := PlaytestDriver.route_distance(route, _road_points(d, HA_LONG_SOUTH)[0])
 	var checker := _check.bind(d)
-	var ok := await d.ride_along(route, junction - 25.0, TOP_KMH, checker)
+	# The top speed to 60 m before the junction: then the rider slows to 20 km/h
+	# for the turn (D4: a street corner needs 20 km/h or less).
+	var ok := await d.ride_along(route, junction - 60.0, TOP_KMH, checker)
 	d.expect(ok, "the scooter rides Quang Trung and Hạ Long to the junction")
 	s = d.state()
 	await d.screenshot("hai_long_at_speed")
 	await _budget(d, "on Hạ Long at the top speed")
 	d.step("at %.1f km/h at %s" % [s.speed_kmh, s.player])
 	_lean_max = 0.0
-	# In the turn: the screenshot with the lean, where the route turns most.
-	var most := junction
-	var most_bend := 0.0
-	var at := junction - 20.0
-	while at < junction + 30.0:
-		var bend := PlaytestDriver._route_bend(route, at, at + 5.0)
-		if bend > most_bend:
-			most_bend = bend
-			most = at + 2.5
-		at += 1.0
-	await d.ride_along(route, most, 20.0, checker)
-	s = d.state()
-	d.step("in the turn: %.1f km/h, lean %.1f°, steer %.1f°" % [s.speed_kmh, s.lean, s.steer])
-	await d.screenshot("turn_lean")
+	# In the turn at the junction, at 20 km/h: the screenshot while the stick
+	# holds the turn, at the first lean of 3° or more (report 0018, D-0018-04).
+	var in_turn := {}
+	var leaning := func() -> bool:
+		var now := d.state()
+		if absf(float(now.lean)) < 3.0 or float(now.speed_kmh) > 25.0:
+			return false
+		in_turn.merge(now, true)
+		return true
+	await d.ride_along(route, junction + AFTER_TURN, 20.0, checker, false, 170.0, leaning, "turn_lean")
+	if d.expect(not in_turn.is_empty(), "the scooter leans 3° or more in the turn (D3)"):
+		d.step("in the turn, at the screenshot: %.1f km/h, lean %.1f°, steer %.1f°" % [in_turn.speed_kmh, in_turn.lean, in_turn.steer])
+		d.expect(absf(float(in_turn.steer)) >= 1.0, "the screenshot of the turn is taken while the handlebars turn: %.1f°" % in_turn.steer)
 	ok = await d.ride_along(route, junction + AFTER_TURN, 20.0, checker, true)
 	d.expect(ok, "the scooter turns at the junction at Cầu Đá to the south on Hạ Long")
 	d.step("the largest lean in the turn: %.1f°" % _lean_max)
@@ -477,3 +481,119 @@ func _curb_ride(d: PlaytestDriver, points: Array, kmh: float, label: String) -> 
 			"%s: after the curb the scooter rides %.1f m on along the sidewalk (at least %.0f m), and does not fall back to the road" % [
 			label, float(up.on), ON_SIDEWALK])
 	await d.screenshot("on_sidewalk_%s" % label)
+
+
+## Run 4 (report 0018, D-0018-04): the paths where a scooter must stop.
+## "Get off" at more than 2 km/h: the player stays on, and the caption says to
+## slow down (D9). A ride into the sand (an opening of the low wall of the
+## beach with no steps: the sand is near the height of the walk), down stairs
+## (an opening with steps down to the sand), and into the water (Hồ Mây
+## Thượng on Núi Lớn, from the road next to it): each stops the scooter with
+## the bump and no error, before it goes there (D5).
+func _run_4(d: PlaytestDriver) -> void:
+	if not d.expect(d.state().riding, "with --ride the game starts on the scooter of the start (R8)"):
+		return
+	var w := d.world()
+	await d.wait_showcase()
+	# Get off at a speed.
+	await d.hold_stick(Vector2(0, -1), 3.0)
+	var s := d.state()
+	var kmh: float = s.speed_kmh
+	await d.tap_id("action")
+	await d.wait_frames(3)
+	s = d.state()
+	var slow_down := Content.ui_text("scooter_too_fast")
+	d.expect(kmh > 2.0 and s.riding, "\"Get off\" at %.1f km/h does not get the player off (D9)" % kmh)
+	d.expect(str(d.subtitle()).contains(slow_down), "the caption says \"%s\": %s" % [slow_down, d.subtitle()])
+	await d.screenshot("get_off_at_speed")
+	await d.hold_stick(Vector2(0, 1), 3.0)
+	# The sand and the stairs: two openings of the low wall of the beach.
+	var sand_opening := {}
+	var steps_opening := {}
+	for opening: Dictionary in w.showcase.wall_openings:
+		var sand: Vector3 = opening.get("sand", Vector3.ZERO)
+		var out: Vector3 = opening.at + sand * 4.5
+		if sand == Vector3.ZERO or w.surface_at(out.x, out.z).r < 0.5:
+			continue
+		if not bool(opening.get("steps", false)) and sand_opening.is_empty():
+			sand_opening = opening
+		elif bool(opening.get("steps", false)) and steps_opening.is_empty():
+			steps_opening = opening
+	if d.expect(not sand_opening.is_empty(), "an opening of the low wall has the sand near the height of the walk"):
+		await _ride_into(d, sand_opening.at - sand_opening.sand * 4.0, sand_opening.sand, "sand")
+	if d.expect(not steps_opening.is_empty(), "an opening of the low wall has steps down to the sand"):
+		await _ride_into(d, steps_opening.at - steps_opening.sand * 4.0, steps_opening.sand, "stairs")
+	# The water: the road next to Hồ Mây Thượng, to the middle of the lake.
+	var lake: Dictionary = w.inland_water.area_named("Hồ Mây Thượng") if w.inland_water != null else {}
+	if d.expect(not lake.is_empty(), "the lake Hồ Mây Thượng is in the world"):
+		var middle: Vector3 = lake.middle
+		var near := Vector3.INF
+		for road: Dictionary in w.data.roads:
+			for p: Array in road.points:
+				var q := Vector3(p[0], p[1], p[2])
+				if Vector2(q.x - middle.x, q.z - middle.z).length() < Vector2(near.x - middle.x, near.z - middle.z).length():
+					near = q
+		var to := Vector3(middle.x - near.x, 0.0, middle.z - near.z).normalized()
+		await _ride_into(d, near, to, "water", float(lake.level))
+	d.expect(_overlaps.is_empty(), "the scooter never goes into a solid thing: %s" % [_overlaps])
+
+
+## From "from", rides to the direction at half throttle for at most 10 s. The
+## scooter must stop with the bump before it goes onto the sand, down the
+## stairs, or into the water: the front wheel is not there, and the scooter
+## stands where it stopped.
+func _ride_into(d: PlaytestDriver, from: Vector3, direction: Vector3, what: String, water_level := -INF) -> void:
+	var w := d.world()
+	await d.start_at(from, rad_to_deg(atan2(-direction.x, -direction.z)))
+	await d.wait_frames(5)
+	var player: Player = d.main().player
+	var s := d.state()
+	var start_y: float = s.player.y
+	var bumps_before: int = s.bumps
+	var front_on := {"sand": false, "water": false, "lowest": INF}
+	var watch := func() -> void:
+		_check(d)
+		var p := player.global_position
+		front_on.lowest = minf(float(front_on.lowest), p.y)
+		var front := player.ride_middle() + player.ride.forward() * Player.AXLE
+		if _on_sand(player, w, front):
+			front_on.sand = true
+		if water_level > -INF and w.ground_height(front.x, front.z) < water_level - 0.05:
+			front_on.water = true
+	var tree := d.main().get_tree()
+	tree.physics_frame.connect(watch)
+	await d.hold_stick(Vector2(0, -0.5), 10.0)
+	tree.physics_frame.disconnect(watch)
+	s = d.state()
+	var moved := Vector2(s.player.x - from.x, s.player.z - from.z).length()
+	var lowest := float(front_on.lowest)
+	d.step("%s: from %s to %s, %.1f m, %.1f km/h, %d bumps, the lowest %.2f m (the start %.2f m), the front on the sand %s, in the water %s" % [
+			what, from, s.player, moved, s.speed_kmh, s.bumps - bumps_before, lowest, start_y, front_on.sand, front_on.water])
+	d.expect(s.bumps > bumps_before, "%s: the scooter stops with the bump (D5)" % what)
+	d.expect(absf(s.speed_kmh) < 1.0 and moved < 12.0, "%s: the scooter stands where it stopped: %.1f km/h, %.1f m" % [what, s.speed_kmh, moved])
+	match what:
+		"sand":
+			d.expect(not front_on.sand, "sand: the front wheel never goes onto the sand (D5)")
+		"stairs":
+			d.expect(lowest > start_y - 0.25, "stairs: the scooter does not go down the stairs: the lowest %.2f m, the walk %.2f m (D5)" % [lowest, start_y])
+		"water":
+			d.expect(not front_on.water, "water: the front wheel never goes into the water (D5)")
+	await d.screenshot("stopped_at_%s" % what)
+
+
+## True when the point is on the sand: VungTau.sand_at() (the coarse surface
+## mask, less the paving and the lawns of the showcase), on the height map of
+## the ground (a road or a part of the showcase is not sand).
+func _on_sand(player: Player, w: VungTau, point: Vector3) -> bool:
+	if not w.sand_at(point.x, point.z):
+		return false
+	var query := PhysicsRayQueryParameters3D.create(point + Vector3(0, 1.0, 0), point - Vector3(0, 2.0, 0), Layers.FLOOR)
+	query.exclude = [player.get_rid()]
+	var hit := player.get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		return false
+	var body := hit.collider as CollisionObject3D
+	if body == null:
+		return false
+	var shape := body.shape_owner_get_shape(body.shape_find_owner(int(hit.shape)), 0)
+	return shape is HeightMapShape3D

@@ -743,6 +743,33 @@ func _process(delta: float) -> void:
 	_apply_done()
 
 
+## True when the point is on stairs: the stairs of the known places and the
+## steps in the openings of the low wall of the beach (plan 0018, D5).
+func on_stairs(point: Vector3) -> bool:
+	if places != null and places.stairs_at(point):
+		return true
+	return showcase != null and showcase.on_steps(point)
+
+
+## The level of the water of the land at a point, or -INF (plan 0018, D5).
+func inland_level_at(x: float, z: float) -> float:
+	return inland_water.level_at(x, z) if inland_water != null else -INF
+
+
+## True when the sand of the surface mask is at the point and the fine mask
+## of the showcase has no paving, lawn, or bed there (the walk of the sea
+## next to the beach is on cells of sand of the coarse mask: report 0018,
+## D-0018-04).
+func sand_at(x: float, z: float) -> bool:
+	if surface_at(x, z).r < 0.5:
+		return false
+	if showcase != null:
+		var fine := showcase.ground_at(x, z)
+		if fine.r >= 0.5 or fine.g >= 0.5 or fine.b >= 0.5:
+			return false
+	return true
+
+
 ## True while the showcase near the point is not built yet: its parts come
 ## in steps after the first frame (plan 0018, report 0018, D-0018-03: a
 ## scooter waits for them).
