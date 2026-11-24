@@ -70,6 +70,9 @@ var _brake_kmh := 0.0
 
 
 func run(d: PlaytestDriver) -> void:
+	if d.phase == 2:
+		# Before the ground and the showcase are ready (report 0018, D-0018-03).
+		await _first_push(d)
 	await d.wait_ground(120.0)
 	if d.phase == 1:
 		await _run_1(d)
@@ -265,11 +268,44 @@ func _report(d: PlaytestDriver) -> void:
 		file.close()
 
 
+## Run 2 starts here, at the first frame of the run (report 0018, D-0018-03):
+## the first screenshot before the first push. While the showcase near the
+## start is not built (its sidewalks, the median, the plants of the park), a
+## push does not move the scooter, and a caption says to wait. Then the
+## scooter rides.
+func _first_push(d: PlaytestDriver) -> void:
+	var s := d.state()
+	if not d.expect(s.riding, "with --ride the game starts on the scooter of the start (R8)"):
+		return
+	var w := d.world()
+	var pending: bool = w != null and w.showcase != null and not w.showcase.is_built()
+	d.step("at the first frame of the run the showcase is built: %s" % (not pending))
+	await d.screenshot("ride_at_start")
+	if pending:
+		var from: Vector3 = s.player
+		await d.hold_stick(Vector2(0, -1), 1.0)
+		s = d.state()
+		var moved := Vector2(s.player.x - from.x, s.player.z - from.z).length()
+		var still_pending: bool = not w.showcase.is_built()
+		d.step("a push of 1 s before the showcase is built: %.2f m, %.1f km/h (the showcase is built now: %s)" % [
+				moved, s.speed_kmh, not still_pending])
+		if still_pending:
+			d.expect(moved < 0.2 and s.speed_kmh < 1.0,
+					"the scooter does not move before the showcase near the start is built (D-0018-03): %.2f m, %.1f km/h" % [moved, s.speed_kmh])
+			var caption: Dictionary = d.subtitle()
+			var wait_text := Content.ui_text("scooter_wait")
+			d.expect(wait_text != "" and str(caption).contains(wait_text), "a caption says to wait: %s" % [caption])
+			await d.screenshot("wait_for_showcase")
+	await d.wait_until(func() -> bool: return w == null or w.showcase == null or w.showcase.is_built(), 120.0,
+			"the showcase near the start is built")
+	d.step("the showcase near the start is built %.1f s of game time after the start of the run" % Playtest.frame_s)
+
+
 func _run_2(d: PlaytestDriver) -> void:
 	var s := d.state()
 	if not d.expect(s.riding, "with --ride the game starts on the scooter of the start (R8)"):
 		return
-	await d.screenshot("ride_at_start")
+	await d.screenshot("ride_when_built")
 	var checker := _check.bind(d)
 	# The brake on the straight Quang Trung: up to 30 km/h, then the full brake.
 	var road := _carriageway(d, s)

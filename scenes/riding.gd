@@ -14,6 +14,8 @@ const START_AHEAD := 4.0
 const ENGINE_PITCH := Vector2(1.0, 2.6)
 ## The caption of the engine shows again after this time (s) while the player rides.
 const ENGINE_CAPTION_S := 8.0
+## The caption "wait" shows again after this time (s) while the player pushes (D-0018-03).
+const WAIT_CAPTION_S := 3.0
 
 var scooters: Scooters
 var engine: AudioStreamPlayer
@@ -25,6 +27,7 @@ var paint := WorldMaterials.DEFAULT_PAINT
 var bumps := 0
 var _main: Node
 var _caption_left := 0.0
+var _wait_caption_left := 0.0
 
 
 func _init(main: Node) -> void:
@@ -182,6 +185,13 @@ func _process(delta: float) -> void:
 	var player: Player = _main.player
 	if not player.is_riding():
 		return
+	# D-0018-03: a scooter does not start before the showcase near it is built.
+	var world: VungTau = _main.vung_tau
+	player.ride_hold = world != null and world.showcase_pending(player.global_position)
+	_wait_caption_left -= delta
+	if player.ride_hold and player.move_input.length() > 0.3 and _wait_caption_left <= 0.0:
+		_main.subtitles.show_caption(Content.ui_text("scooter_wait"))
+		_wait_caption_left = WAIT_CAPTION_S
 	var part := clampf(absf(player.ride.speed) / ScooterMotion.TOP_SPEED, 0.0, 1.0)
 	engine.pitch_scale = lerpf(ENGINE_PITCH.x, ENGINE_PITCH.y, part)
 	engine.volume_db = lerpf(-10.0, -3.0, part)

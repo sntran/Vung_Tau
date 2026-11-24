@@ -743,6 +743,13 @@ func _process(delta: float) -> void:
 	_apply_done()
 
 
+## True while the showcase near the point is not built yet: its parts come
+## in steps after the first frame (plan 0018, report 0018, D-0018-03: a
+## scooter waits for them).
+func showcase_pending(point: Vector3) -> bool:
+	return _showcase_wanted(point)
+
+
 ## True when the showcase has parts to build and the point is near its area.
 func _showcase_wanted(point: Vector3) -> bool:
 	return showcase != null and not showcase.is_built() and showcase.distance_to(point) < SHOWCASE_NEAR_M

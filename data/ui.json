@@ -157,5 +157,6 @@
 		"vi": "Xuống xe",
 		"en": "Get off"
 	},
-	"scooter_too_fast": "Slow down to get off."
+	"scooter_too_fast": "Slow down to get off.",
+	"scooter_wait": "The street is not ready yet. Wait a moment."
 }

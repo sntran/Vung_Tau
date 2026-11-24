@@ -92,6 +92,9 @@ var ride: ScooterMotion = null
 var ride_model: WorldModel = null
 ## When it is set, a scooter cannot go to a point where ride_limit.call(point, from) is false (the water, the sand).
 var ride_limit: Callable
+## While true, a scooter that stands does not start (the world near it is not
+## ready yet: report 0018, D-0018-03). A scooter that moves goes on.
+var ride_hold := false
 ## The turn of the head from the front of the scooter, in degrees (D3).
 var head_offset := 0.0
 ## The pitch of the ground under the two wheels, in degrees (R5).
@@ -286,7 +289,10 @@ func ride_middle() -> Vector3:
 
 func _ride_physics(delta: float) -> void:
 	var start := global_position
-	ride.step(delta, maxf(move_input.y, 0.0), maxf(-move_input.y, 0.0), move_input.x)
+	var input := move_input
+	if ride_hold and absf(ride.speed) < 0.05:
+		input = Vector2.ZERO
+	ride.step(delta, maxf(input.y, 0.0), maxf(-input.y, 0.0), input.x)
 	rotation = Vector3(0, deg_to_rad(ride.heading), 0)
 	var v := ride.velocity()
 	velocity.x = v.x
