@@ -171,7 +171,7 @@ func get_off() -> bool:
 	if not player.is_riding():
 		return false
 	if player.ride_speed_kmh() >= GET_OFF_KMH:
-		_main.subtitles.show_caption(Content.ui_text("scooter_too_fast"))
+		_say(Content.ui_text("scooter_too_fast"))
 		return false
 	var left := player.end_ride()
 	engine.stop()
@@ -189,6 +189,14 @@ func _show_caption(sound_id: String) -> void:
 	_main.subtitles.show_caption(Content.sound(sound_id).get("caption", ""))
 
 
+## A message of the scooter ("Slow down to get off."): the caption of the
+## engine does not replace it while it shows (at 3 frames each second it did,
+## in the frame after the tap).
+func _say(text: String) -> void:
+	_main.subtitles.show_caption(text)
+	_caption_left = maxf(_caption_left, Subtitles.CAPTION_SECONDS)
+
+
 func _process(delta: float) -> void:
 	var player: Player = _main.player
 	if not player.is_riding():
@@ -198,7 +206,7 @@ func _process(delta: float) -> void:
 	player.ride_hold = world != null and world.showcase_pending(player.global_position)
 	_wait_caption_left -= delta
 	if player.ride_hold and player.move_input.length() > 0.3 and _wait_caption_left <= 0.0:
-		_main.subtitles.show_caption(Content.ui_text("scooter_wait"))
+		_say(Content.ui_text("scooter_wait"))
 		_wait_caption_left = WAIT_CAPTION_S
 	var part := clampf(absf(player.ride.speed) / ScooterMotion.TOP_SPEED, 0.0, 1.0)
 	engine.pitch_scale = lerpf(ENGINE_PITCH.x, ENGINE_PITCH.y, part)
