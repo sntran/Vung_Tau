@@ -9,7 +9,10 @@ extends RefCounted
 # center dot, or the action button. A touch drag walks the player. On the
 # scooter of the start, the drag up rides, down brakes, and to the sides
 # turns; the button "Get off" takes the place of the action button and gets
-# the player off. After an input of the mouse the joystick goes away, and
+# the player off. While the player rides, the button is not in the middle
+# third of the view (the box of the middle third of the width and of the
+# height, around the center dot: the road ahead; report 0018, D-0018-02), at
+# each size, and a tap at a speed gives "Slow down to get off". After an input of the mouse the joystick goes away, and
 # after a touch it comes back. A screenshot of each state.
 # sizes: 2400x1080 720x1280 1280x720
 # phase: --world=vung_tau --start=bai_truoc --start-time=12:00 --quality=low
@@ -74,6 +77,18 @@ func run(d: PlaytestDriver) -> void:
 	await _hold_and_shoot(d, Vector2(0, -1), 3.0, "drag_up_rides")
 	s = d.state()
 	d.expect(s.speed_kmh > 8.0, "the drag up rides: %.1f km/h" % s.speed_kmh)
+	# "Get off" at a speed: the player stays on, and the caption says to slow down (D9).
+	var moving_kmh: float = s.speed_kmh
+	await d.tap_id("action")
+	await d.wait_frames(3)
+	s = d.state()
+	var caption: Dictionary = d.subtitle()
+	var slow_down := Content.ui_text("scooter_too_fast")
+	d.expect(s.riding, "a tap on \"Get off\" at %.1f km/h does not get the player off (D9)" % moving_kmh)
+	d.expect(str(caption.get("text", caption.get("vi", ""))).contains(slow_down) or str(caption).contains(slow_down),
+			"a tap on \"Get off\" at a speed shows \"%s\": %s" % [slow_down, caption])
+	_check_room(d, "get_off_at_speed")
+	await d.screenshot("get_off_at_speed")
 	# To the side turns.
 	var heading: float = s.heading
 	await _hold_and_shoot(d, Vector2(0.8, -0.6), 1.5, "drag_right_turns")
@@ -164,6 +179,17 @@ func _check_room(d: PlaytestDriver, where: String) -> void:
 			"the action button": m.action_button.get_global_rect() if m.action_button.visible else Rect2()}
 	if s.phone_up:
 		others["the phone"] = s.phone_rect
+	# D-0018-02: on the scooter, "Get off" is out of the middle third of the view.
+	if s.riding and m.action_button.visible:
+		var view: Vector2 = m.ui_root.get_viewport_rect().size
+		var middle := Rect2(view / 3.0, view / 3.0)
+		var button: Rect2 = m.action_button.get_global_rect()
+		d.expect(not button.intersects(middle), "%s: \"Get off\" %s is not in the middle third of the view %s, at %.1f km/h (D-0018-02)" % [
+				where, button, middle, s.speed_kmh])
+		d.expect(not button.intersects(s.subtitle_rect) or s.subtitle_rect.size == Vector2.ZERO,
+				"%s: \"Get off\" %s does not cover the subtitles %s" % [where, button, s.subtitle_rect])
+		d.expect(not button.intersects(s.phone_button_rect), "%s: \"Get off\" %s does not cover the phone button %s" % [
+				where, button, s.phone_button_rect])
 	for name: String in others:
 		var r: Rect2 = others[name]
 		if r.size == Vector2.ZERO:

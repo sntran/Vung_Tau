@@ -81,6 +81,8 @@ var debug_overlay: Label
 @onready var joystick: Joystick = $UI/Root/Joystick
 @onready var center_dot: CenterDot = $UI/Root/CenterDot
 @onready var action_button: Button = $UI/Root/ActionButton
+## True while the action button is at its place for the scooter (D-0018-02).
+var _action_on_scooter := false
 @onready var ting_player: AudioStreamPlayer = $Sounds/Ting
 var subtitles: Subtitles
 var phone: Phone
@@ -480,7 +482,9 @@ func _update_focus() -> void:
 		center_dot.set_active(false)
 		action_button.visible = true
 		action_button.text = focus_verb
+		_place_action_button(true)
 		return
+	_place_action_button(false)
 	var best := ""
 	var best_angle := FOCUS_ANGLE
 	if hem == null:
@@ -1234,12 +1238,35 @@ func _layout() -> void:
 	var view := ui_root.get_viewport_rect().size
 	var center := view / 2.0
 	center_dot.position = center - center_dot.size / 2.0
-	action_button.size = ACTION_SIZE
-	action_button.position = Vector2(center.x - ACTION_SIZE.x / 2.0, center.y + 80.0)
+	_place_action_button(player != null and player.is_riding(), true)
 	joystick.position = Vector2.ZERO
 	joystick.size = view
 	phone.layout(view)
 	_layout_subtitles(view)
+
+
+## The place of the action button: below the center dot, or on the scooter
+## (plan 0018, D7) at the right, above the phone button, out of the middle
+## third of the view, which shows the road ahead (report 0018, D-0018-02).
+## It stays there at each speed, so that it does not move under the thumb.
+func _place_action_button(on_scooter: bool, force := false) -> void:
+	# Off the scooter the place changes only with the size of the view (_layout()).
+	if not on_scooter and not _action_on_scooter and not force:
+		return
+	var view := ui_root.get_viewport_rect().size
+	action_button.size = ACTION_SIZE
+	var size := action_button.get_combined_minimum_size().max(ACTION_SIZE)
+	action_button.size = size
+	var before := action_button.position
+	if on_scooter:
+		var button: Control = phone.button
+		action_button.position = Vector2(button.position.x + button.size.x - size.x,
+				button.position.y - size.y - Phone.MARGIN)
+	else:
+		action_button.position = Vector2(view.x / 2.0 - size.x / 2.0, view.y / 2.0 + 80.0)
+	if on_scooter != _action_on_scooter or action_button.position != before:
+		_action_on_scooter = on_scooter
+		_layout_subtitles(view)
 
 
 func _layout_subtitles(view: Vector2) -> void:
@@ -1255,11 +1282,16 @@ func _layout_subtitles(view: Vector2) -> void:
 	var left := stick.end.x + SUBTITLE_MARGIN
 	var right := phone.button.position.x - SUBTITLE_MARGIN
 	var bottom := view.y - SUBTITLE_MARGIN
+	# On the scooter, "Get off" is above the phone button (D-0018-02).
+	var top_right := phone.button.position.y
+	if _action_on_scooter:
+		right = minf(right, action_button.position.x - SUBTITLE_MARGIN)
+		top_right = action_button.position.y
 	if right - left < width:
 		# Else above the joystick zone and the phone button, at the left of the phone.
 		left = SUBTITLE_MARGIN
 		right = (phone_left if phone.up else view.x) - SUBTITLE_MARGIN
-		bottom = minf(stick.position.y, phone.button.position.y) - SUBTITLE_MARGIN
+		bottom = minf(stick.position.y, top_right) - SUBTITLE_MARGIN
 	var x := clampf((left + right) / 2.0 - width / 2.0, left, maxf(left, right - width))
 	subtitles.size = Vector2(width, 0)
 	subtitles.position = Vector2(x, bottom - subtitles.size.y)
