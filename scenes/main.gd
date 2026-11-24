@@ -1255,15 +1255,15 @@ func _place_action_button(on_scooter: bool, force := false) -> void:
 		return
 	var view := ui_root.get_viewport_rect().size
 	action_button.size = ACTION_SIZE
-	var size := action_button.get_combined_minimum_size().max(ACTION_SIZE)
-	action_button.size = size
 	var before := action_button.position
 	if on_scooter:
+		var size := action_button.get_combined_minimum_size().max(ACTION_SIZE)
+		action_button.size = size
 		var button: Control = phone.button
 		action_button.position = Vector2(button.position.x + button.size.x - size.x,
 				button.position.y - size.y - Phone.MARGIN)
 	else:
-		action_button.position = Vector2(view.x / 2.0 - size.x / 2.0, view.y / 2.0 + 80.0)
+		action_button.position = Vector2(view.x / 2.0 - ACTION_SIZE.x / 2.0, view.y / 2.0 + 80.0)
 	if on_scooter != _action_on_scooter or action_button.position != before:
 		_action_on_scooter = on_scooter
 		_layout_subtitles(view)
