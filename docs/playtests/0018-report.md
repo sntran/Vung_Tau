@@ -87,9 +87,10 @@ D4 gives the turn of the handlebars from 35° when slow to 8° at the top speed.
 ## 6. Questions for me
 
 - **Q1.** The change of D4 in section 4: yes or no?
+  - **My answer (2026-11-23):** yes. Plan 0018 has the change (D4, R5).
 - **Q2.** The sounds of the engine are tones made in code. Is that good for now, or do I want a recording (CC0 or CC BY) of a 50 cm³ moped? I can find candidates, and I download the file if the workspace cannot reach it.
 - **Q3.** The limit of R9: after my ride on the web build.
 
 ## 7. Status
 
-Plan 0018 stays Built until the builder corrects D-0018-01 to D-0018-04 (and D4, if I approve the change). Then I ride the web build of the branch (acceptance 2).
+Plan 0018 stays Built until the builder corrects D-0018-01 to D-0018-04 and makes the change of D4. Then I ride the web build of the branch (acceptance 2).
