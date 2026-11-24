@@ -176,8 +176,45 @@ func _point_on_path(points: Array[Vector2], distance: float) -> Vector2:
 	return points[points.size() - 1]
 
 
+## The middle of each grip in the frame of the scooter (the front to +Z): the
+## near level of scooter_tay_ga_1 has the ends of its grips at x ±0.34 m,
+## 1.04 m up, 0.19 m in front of its middle.
+const GRIPS := [Vector3(-0.28, 1.04, 0.19), Vector3(0.28, 1.04, 0.19)]
+
+
+## On a scooter: the grips of the handlebars in viewport coordinates, or an
+## empty array when the player does not ride. D3: the grips show at the
+## bottom of the view.
+func grips_on_screen() -> Array[Vector2]:
+	var result: Array[Vector2] = []
+	var player: Player = main().player
+	if player.ride_model == null:
+		return result
+	var camera := player.camera
+	for grip: Vector3 in GRIPS:
+		var point := player.ride_model.global_transform * grip
+		if camera.is_position_behind(point):
+			continue
+		result.append(camera.unproject_position(point))
+	return result
+
+
+## True when both ends of the handlebars are in the view (D3).
+func grips_in_view() -> bool:
+	var grips := grips_on_screen()
+	if grips.size() < 2:
+		return false
+	var rect := Rect2(Vector2.ZERO, viewport().get_visible_rect().size)
+	for g: Vector2 in grips:
+		if not rect.has_point(g):
+			return false
+	return true
+
+
 ## Touches a point on the left half, drags in the direction, holds, then
-## releases (plan 0002, R26). A direction of length 1 is full speed.
+## releases (plan 0002, R26). A direction of length 1 is full speed. On the
+## screen, up is -y: Vector2(0, -1) walks forward (on a scooter: the throttle),
+## and Vector2(0, 1) walks back (on a scooter: the brake).
 func hold_stick(direction: Vector2, seconds: float) -> void:
 	var start := await _free_point("stick")
 	var radius := Joystick.RADIUS
@@ -1528,7 +1565,7 @@ func ride_along(route: PackedVector3Array, to: float, speed_kmh := 40.0, check :
 		var alpha := atan2(flat.dot(right), flat.dot(front))
 		var curvature := 2.0 * sin(alpha) / maxf(flat.length(), 1.0)
 		var steer := rad_to_deg(atan(ScooterMotion.WHEELBASE * curvature))
-		var max_steer := lerpf(ScooterMotion.STEER_SLOW, ScooterMotion.STEER_FAST, clampf(absf(v) / ScooterMotion.TOP_SPEED, 0.0, 1.0))
+		var max_steer := ScooterMotion.max_steer_at(v)
 		var steer_input := clampf(steer / max_steer, -1.0, 1.0)
 		# The speed: less in the turns of the next 25 m, and near the end with "stop".
 		var want := speed_kmh / 3.6

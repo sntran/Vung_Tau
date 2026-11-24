@@ -58,6 +58,11 @@ const RIDE_RADIUS := 0.33
 const RIDE_LENGTH := 1.9
 ## The distance from the middle of the scooter to each axle (m).
 const AXLE := 0.63
+## After a step up, the scooter keeps its height for at most this distance (m)
+## until a floor is under it (report 0018, D-0018-01).
+const CLIMB_MAX := 1.2
+## The view and the model follow a step up in this time (s), not in one frame.
+const STEP_VIEW_S := 0.15
 
 ## The joystick or key input: x is to the right, y is forward. The length is 1 or less.
 var move_input := Vector2.ZERO
@@ -92,6 +97,10 @@ var head_offset := 0.0
 ## The pitch of the ground under the two wheels, in degrees (R5).
 var ground_pitch := 0.0
 var _look_idle := 0.0
+## While more than 0: the scooter climbs a curb (the distance that is left, m).
+var _climb := 0.0
+## The view and the model are this far under the body after a step up (m, 0 or less).
+var _step_view := 0.0
 var _walk_shape: CollisionShape3D
 var _ride_shape: CollisionShape3D
 
@@ -158,6 +167,10 @@ func place(point: Vector3, view_yaw: float, view_pitch := 0.0) -> void:
 		ride.heading = view_yaw
 		ride.speed = 0.0
 		head_offset = 0.0
+		# On the seat the view looks down to the handlebars (D3; report 0018, D-0018-01).
+		target_pitch = ride_pitch() + view_pitch
+		pitch = target_pitch
+		_end_climb()
 	_apply_view()
 
 
@@ -199,7 +212,16 @@ func start_ride(model: WorldModel, at: Transform3D) -> void:
 	pitch = target_pitch
 	ground_pitch = 0.0
 	_look_idle = 0.0
+	_end_climb()
 	_apply_view()
+
+
+## Stops a climb at once (a new place, get on, get off).
+func _end_climb() -> void:
+	_climb = 0.0
+	_step_view = 0.0
+	if ride != null:
+		floor_snap_length = RIDE_STEP + 0.1
 
 
 ## Gets off (D9): returns the scooter model and its transform in the world
@@ -207,7 +229,9 @@ func start_ride(model: WorldModel, at: Transform3D) -> void:
 func end_ride() -> Dictionary:
 	if ride == null:
 		return {}
+	_end_climb()
 	var model := ride_model
+	model.position = Vector3(0, 0, -RIDE_EYE_BACK)
 	var at := model.global_transform
 	# The model leans and follows the ground: it stands up straight on its stand.
 	var front := ride.forward()
@@ -267,7 +291,7 @@ func _ride_physics(delta: float) -> void:
 	var v := ride.velocity()
 	velocity.x = v.x
 	velocity.z = v.z
-	if is_on_floor():
+	if is_on_floor() or _climb > 0.0:
 		velocity.y = 0.0
 	else:
 		velocity.y -= GRAVITY * delta
@@ -286,20 +310,24 @@ func _ride_physics(delta: float) -> void:
 		blocked.emit()
 	elif wanted.length() > 0.0001 and is_on_wall():
 		var moved := Vector3(global_position.x - start.x, 0, global_position.z - start.z)
+		# A curb or a ramp goes up at each angle: also at a small angle, where the
+		# scooter slid along it (report 0018, D-0018-01).
+		var stepped_up := false
+		if _wall_is_step():
+			var before_y := global_position.y
+			_try_ride_step(wanted - moved)
+			stepped_up = global_position.y > before_y + 0.01
 		# A hit: the scooter goes into a wall at more than 30° from its face, or
 		# stops (D5). Along a wall (a smaller angle) it slides.
 		var into := _into_wall(wanted.normalized()) > 0.5 or moved.length() < wanted.length() * 0.5
-		if into and _wall_is_step():
-			var before_y := global_position.y
-			_try_ride_step(wanted - moved)
-			if global_position.y > before_y + 0.01:
-				into = false
-		if into:
+		if into and not stepped_up:
 			_hit()
 			velocity.x = 0.0
 			velocity.z = 0.0
-	_update_ground_pitch()
 	var rode := Vector2(global_position.x - start.x, global_position.z - start.z).length()
+	if _climb > 0.0:
+		_climb_on(rode)
+	_update_ground_pitch()
 	if rode > 0.0001:
 		stepped.emit(rode)
 
@@ -360,8 +388,40 @@ func _try_ride_step(motion: Vector3) -> void:
 		return
 	if ride_limit.is_valid() and not ride_limit.call(global_position + motion, global_position):
 		return
+	var before_y := global_position.y
 	global_position += up + motion
-	apply_floor_snap()
+	if _floor_ahead_of_step():
+		apply_floor_snap()
+	else:
+		# The round front of the capsule is still over the edge: at a low speed the
+		# step of one frame is a few cm, and a snap down puts it on the edge again
+		# (the scooter stuck across the curb, report 0018, D-0018-01). It keeps its
+		# height until a floor is under it.
+		_climb = CLIMB_MAX
+		floor_snap_length = 0.0
+	_step_view -= global_position.y - before_y
+
+
+## True when the round end of the capsule in front (in the direction of the
+## motion) is over a floor near the height of the body: the top of the curb,
+## not the road under its edge. Then a snap down puts the scooter on the curb.
+func _floor_ahead_of_step() -> bool:
+	var direction := ride.forward() * (1.0 if ride.speed >= 0.0 else -1.0)
+	var end := ride_middle() + direction * (RIDE_LENGTH / 2.0 - RIDE_RADIUS)
+	var floor_y := _floor_under(end, global_position.y + 0.3)
+	return floor_y >= global_position.y - RIDE_STEP + 0.03
+
+
+## The climb of a curb: on until a floor is under the body, then down onto it.
+## A climb ends also after CLIMB_MAX, or when the scooter goes back.
+func _climb_on(rode: float) -> void:
+	_climb -= rode
+	if _floor_ahead_of_step() or _climb <= 0.0 or ride.speed < 0.0:
+		_climb = 0.0
+		floor_snap_length = RIDE_STEP + 0.1
+		var before_y := global_position.y
+		apply_floor_snap()
+		_step_view -= global_position.y - before_y
 
 
 ## R5: the pitch of the scooter from the ground under its two wheels.
@@ -577,7 +637,17 @@ func _ride_view(delta: float) -> void:
 	pitch += clampf((target_pitch - pitch) * minf(1.0, 18.0 * delta), -max_step, max_step)
 	yaw = ride.heading + head_offset
 	target_yaw = yaw
+	# A step up: the view and the model come up in STEP_VIEW_S, not in one frame.
+	_step_view = clampf(move_toward(_step_view, 0.0, (RIDE_STEP / STEP_VIEW_S) * delta), -2.0 * RIDE_STEP, 2.0 * RIDE_STEP)
+	head.position = Vector3(0, RIDE_EYE + _step_view, 0)
 	if ride_model != null:
+		# The rider and the scooter are one body: the pitch of the ground turns the
+		# model about the eye, as it turns the view, so that the handlebars keep
+		# their place in the view (D3; on a curb the pitch is about 9°, and a turn
+		# about the base of the model put the grips under the view, D-0018-01).
+		var pivot := Vector3(0, RIDE_EYE + _step_view, 0)
+		var base := Vector3(0, _step_view, -RIDE_EYE_BACK)
+		ride_model.position = pivot + Basis(Vector3.RIGHT, deg_to_rad(ground_pitch)) * (base - pivot)
 		ride_model.set_pose({"fork": -ride.steer, "front_wheel": ride.wheel_turn, "rear_wheel": ride.wheel_turn})
 		# Turned by PI: the pitch and the lean of the model have the other sign.
 		ride_model.rotation = Vector3(deg_to_rad(-ground_pitch), PI, deg_to_rad(ride.lean))

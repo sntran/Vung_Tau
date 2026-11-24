@@ -25,6 +25,7 @@ extends RefCounted
 # sizes: 1280x720
 # phase: --world=vung_tau --start=bai_truoc --start-time=17:00 --quality=low
 # phase: --world=vung_tau --start=bai_truoc --start-time=17:05 --quality=low --ride
+# phase: --world=vung_tau --start=bai_truoc --start-time=17:10 --quality=low --ride
 
 ## The roads of the ride (OSM ways): Quang Trung to the south, Hạ Long to the
 ## west and its last part to the junction at Cầu Đá, and Hạ Long from the
@@ -40,6 +41,17 @@ const PORT_POINT := Vector2(-211.0, 449.0)
 ## Run 2: the ride across the edge of the sidewalk of Quang Trung (x, z).
 const CURB_FROM := Vector3(99.5, 0.0, 60.0)
 const CURB_TO := Vector3(91.0, 0.0, 60.0)
+## Run 3 (report 0018, D-0018-01): the curb of the sidewalk of the park on
+## Quang Trung (15 cm over the road; the sidewalk is 2.5 m wide, from x 94.75
+## to x 97.25 at z 60). At 3 km/h: from the road to the west, straight up the
+## curb, then to the north along the sidewalk. At 20 km/h: from the road to
+## the north, up the curb at a small angle, then along the sidewalk.
+const CURB_SLOW := [Vector3(102.0, 0.0, 60.0), Vector3(96.2, 0.0, 60.0), Vector3(96.6, 0.0, 64.0),
+		Vector3(97.2, 0.0, 69.0), Vector3(97.6, 0.0, 73.0)]
+const CURB_FAST := [Vector3(99.8, 0.0, 30.0), Vector3(95.9, 0.0, 58.0), Vector3(96.6, 0.0, 64.0),
+		Vector3(97.3, 0.0, 70.0), Vector3(97.8, 0.0, 76.0)]
+## After the curb, the scooter rides at least this far on the sidewalk (m).
+const ON_SIDEWALK := 5.0
 ## The two roads of Quang Trung (one for each way).
 const QUANG_TRUNG := [1558591261, 200554615]
 
@@ -61,8 +73,10 @@ func run(d: PlaytestDriver) -> void:
 	await d.wait_ground(120.0)
 	if d.phase == 1:
 		await _run_1(d)
-	else:
+	elif d.phase == 2:
 		await _run_2(d)
+	else:
+		await _run_3(d)
 
 
 ## The roads of the data by id: their points, in order, from "from" on.
@@ -347,3 +361,83 @@ func _run_2(d: PlaytestDriver) -> void:
 	await d.screenshot("ride_again")
 	d.expect(_overlaps.is_empty(), "the scooter never goes into a solid thing: %s" % [_overlaps])
 	d.expect(_bad_ground.is_empty(), "the scooter never goes onto the sand or into the water: %s" % [_bad_ground])
+
+
+## Run 3 (report 0018, D-0018-01): a scooter rides up a curb of 15 cm at each
+## speed from 2 km/h to 40 km/h, and rides on. Up the curb of the park at
+## 3 km/h and at 20 km/h, then 5 m on along the sidewalk, with no bump. A
+## screenshot on the curb, with the handlebars in the view.
+func _run_3(d: PlaytestDriver) -> void:
+	if not d.expect(d.state().riding, "with --ride the game starts on the scooter of the start (R8)"):
+		return
+	await _curb_ride(d, CURB_SLOW, 3.0, "slow")
+	await _curb_ride(d, CURB_FAST, 20.0, "fast")
+	d.expect(_overlaps.is_empty(), "the scooter never goes into a solid thing: %s" % [_overlaps])
+	d.expect(_bad_ground.is_empty(), "the scooter never goes onto the sand or into the water: %s" % [_bad_ground])
+
+
+func _curb_ride(d: PlaytestDriver, points: Array, kmh: float, label: String) -> void:
+	var first: Vector3 = points[0]
+	var to: Vector3 = points[1]
+	# A setup step: the rider on the road, the front to the second point.
+	await d.start_at(first, rad_to_deg(atan2(-(to.x - first.x), -(to.z - first.z))))
+	await d.wait_showcase()
+	await d.wait_frames(5)
+	var s := d.state()
+	var road_y: float = s.player.y
+	var bumps_before: int = s.bumps
+	var route := PackedVector3Array()
+	for p: Vector3 in points:
+		route.append(Vector3(p.x, road_y, p.z))
+	# The floor under the middle of the scooter: the sidewalk is a part of the
+	# showcase; a road has no collision of its own (its floor is the ground).
+	var player: Player = d.main().player
+	var on_sidewalk := func() -> bool:
+		var middle := player.ride_middle()
+		var query := PhysicsRayQueryParameters3D.create(middle + Vector3(0, 1.0, 0), middle - Vector3(0, 1.0, 0), Layers.FLOOR)
+		query.exclude = [player.get_rid()]
+		var hit := player.get_world_3d().direct_space_state.intersect_ray(query)
+		return not hit.is_empty() and (hit.collider as Node).name == "ShowcaseBody"
+	var bumps_at: Array = []
+	var on_bump := func() -> void: bumps_at.append(player.global_position)
+	player.bumped.connect(on_bump)
+	# Each frame: the speed where the scooter goes up, and the way on the sidewalk after it.
+	var up := {"kmh": -1.0, "at": Vector3.ZERO, "on": 0.0, "last": Vector3.ZERO, "off": 0}
+	var watch := func() -> void:
+		_check(d)
+		var now := d.state()
+		var on: bool = on_sidewalk.call()
+		if float(up.kmh) < 0.0 and on:
+			up.kmh = now.speed_kmh
+			up.at = now.player
+			up.last = now.player
+		elif float(up.kmh) >= 0.0:
+			var p: Vector3 = now.player
+			if on:
+				up.on = float(up.on) + Vector2(p.x - up.last.x, p.z - up.last.z).length()
+			elif float(up.on) < ON_SIDEWALK:
+				up.off = int(up.off) + 1
+			up.last = p
+	var length := PlaytestDriver.route_length(route)
+	await d.ride_along(route, length, kmh, watch, false, 60.0, on_sidewalk)
+	# On the curb: the screenshot with the handlebars in the view.
+	s = d.state()
+	d.step("%s: on the curb at %.1f km/h at %s, the view pitch %.1f° (on the seat %.1f°)" % [
+			label, s.speed_kmh, s.player, player.pitch, player.ride_pitch()])
+	d.expect(absf(player.pitch - player.ride_pitch()) <= 2.0,
+			"%s: the view on the seat looks down to the handlebars on the curb: pitch %.1f°, not %.1f° (D3)" % [label, player.pitch, player.ride_pitch()])
+	d.expect(d.grips_in_view(), "%s: the handlebars are in the view on the curb (D3): the grips at %s, the ground pitch %.1f°" % [
+			label, d.grips_on_screen(), player.ground_pitch])
+	await d.screenshot("curb_%s" % label)
+	await d.ride_along(route, length, kmh, watch, true, 60.0)
+	player.bumped.disconnect(on_bump)
+	s = d.state()
+	d.step("%s: up the curb at %.1f km/h at %s; then %.1f m on the sidewalk (%d frames off it before 5 m); at the end %s; bumps at %s" % [
+			label, float(up.kmh), up.at, float(up.on), int(up.off), s.player, bumps_at])
+	d.expect(float(up.kmh) >= kmh * 0.6 and float(up.kmh) <= kmh * 1.4,
+			"%s: the scooter goes up the curb at about %.0f km/h: %.1f km/h" % [label, kmh, float(up.kmh)])
+	d.expect(s.bumps == bumps_before, "%s: no bump at the curb (D5, D-0018-01): %d" % [label, s.bumps - bumps_before])
+	d.expect(float(up.on) >= ON_SIDEWALK and int(up.off) == 0,
+			"%s: after the curb the scooter rides %.1f m on along the sidewalk (at least %.0f m), and does not fall back to the road" % [
+			label, float(up.on), ON_SIDEWALK])
+	await d.screenshot("on_sidewalk_%s" % label)

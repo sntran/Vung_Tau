@@ -18,9 +18,12 @@ const BRAKE := 4.0
 const COAST := 0.4
 ## Back with the feet, when the scooter stands and the player holds the brake (D8).
 const PUSH_BACK := 0.5
-## The turn of the handlebars at a low speed and at the top speed (D4), in degrees.
+## The largest turn of the handlebars (D4), in degrees.
 const STEER_SLOW := 35.0
-const STEER_FAST := 8.0
+## D4 (changed 2026-11-23): the turn of the handlebars gives at most this
+## side acceleration (m/s², about 0.35 g) at the speed now: about 30° at
+## 10 km/h, 8° at 20 km/h, and 2° at 40 km/h.
+const SIDE_ACCELERATION := 3.5
 ## The handlebars turn not faster than this, in degrees each second.
 const STEER_RATE := 90.0
 ## The distance between the axles (m): the scooter of World, a Honda Vision 110.
@@ -60,8 +63,9 @@ func step(dt: float, throttle: float, brake: float, steer_input: float) -> void:
 	else:
 		speed = move_toward(speed, 0.0, COAST * dt)
 	speed = clampf(speed, -PUSH_BACK, TOP_SPEED)
-	var target := clampf(steer_input, -1.0, 1.0) * max_steer()
-	steer = move_toward(steer, target, STEER_RATE * dt)
+	var limit := max_steer()
+	var target := clampf(steer_input, -1.0, 1.0) * limit
+	steer = clampf(move_toward(steer, target, STEER_RATE * dt), -limit, limit)
 	var turn_rate := yaw_rate()
 	# A turn to the right makes the heading smaller (Player.yaw turns to the left).
 	heading -= rad_to_deg(turn_rate) * dt
@@ -71,9 +75,19 @@ func step(dt: float, throttle: float, brake: float, steer_input: float) -> void:
 	wheel_turn = fmod(wheel_turn + rad_to_deg(speed * dt / 0.25), 360.0)
 
 
-## The largest turn of the handlebars at the speed now (D4): 35° when slow, 8° at the top speed.
+## The largest turn of the handlebars at the speed now (D4).
 func max_steer() -> float:
-	return lerpf(STEER_SLOW, STEER_FAST, clampf(absf(speed) / TOP_SPEED, 0.0, 1.0))
+	return max_steer_at(speed)
+
+
+## The largest turn of the handlebars at a speed (m/s): at most STEER_SLOW,
+## and at most the turn that gives SIDE_ACCELERATION. The side acceleration
+## is speed² / radius, and the radius is WHEELBASE / tan(steer).
+static func max_steer_at(at_speed: float) -> float:
+	var v2 := at_speed * at_speed
+	if v2 < 0.0001:
+		return STEER_SLOW
+	return minf(STEER_SLOW, rad_to_deg(atan(SIDE_ACCELERATION * WHEELBASE / v2)))
 
 
 ## The turn rate (rad/s): more than 0 turns to the right.

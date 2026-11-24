@@ -34,13 +34,46 @@ func test_the_turn_of_the_handlebars_gets_smaller_with_the_speed() -> void:
 	var motion := ScooterMotion.new()
 	assert_almost_eq(motion.max_steer(), 35.0, 0.001, "35° when the scooter stands")
 	motion.speed = ScooterMotion.TOP_SPEED
-	assert_almost_eq(motion.max_steer(), 8.0, 0.001, "8° at the top speed (D4)")
+	assert_almost_eq(motion.max_steer(), 2.0, 0.1, "about 2° at the top speed (D4)")
 	motion.speed = 5.0
 	motion.steer = 0.0
 	_run(motion, 2.0, 0.0, 0.0, 1.0)
 	assert_almost_eq(motion.steer, motion.max_steer(), 0.5, "full right gives the largest turn")
 	assert_almost_eq(motion.turn_radius(), ScooterMotion.WHEELBASE / tan(deg_to_rad(motion.steer)), 0.001,
 			"the turn radius comes from the wheelbase")
+
+
+## R5 (D4, changed 2026-11-23): the full turn at 5, 10, 20, 30, and 40 km/h
+## gives a side acceleration of at most 3.5 m/s². The turn of the handlebars
+## is at most 35°: about 30° at 10 km/h, 8° at 20 km/h, 2° at 40 km/h.
+func test_the_full_turn_gives_at_most_3_5_m_s2_to_the_side() -> void:
+	var expected := {5.0: 35.0, 10.0: 29.7, 20.0: 8.1, 30.0: 3.6, 40.0: 2.0}
+	for kmh: float in expected:
+		for side: float in [1.0, -1.0]:
+			var motion := ScooterMotion.new()
+			motion.speed = kmh / 3.6
+			var most := 0.0
+			# The full turn, with the throttle that keeps the speed.
+			for i in 120:
+				var throttle := 1.0 if motion.speed < kmh / 3.6 else 0.0
+				motion.step(STEP, throttle, 0.0, side)
+				most = maxf(most, _side_acceleration(motion))
+			assert_lte(most, ScooterMotion.SIDE_ACCELERATION + 0.01,
+					"%.0f km/h, side %+.0f: %.2f m/s² to the side (R5)" % [kmh, side, most])
+			assert_almost_eq(absf(motion.steer), float(expected[kmh]), 0.3,
+					"%.0f km/h: the full turn of the handlebars %.1f°" % [kmh, motion.steer])
+			assert_lte(absf(motion.steer), ScooterMotion.STEER_SLOW + 0.001, "at most 35°")
+	# A turn held while the scooter speeds up: the turn gets smaller with the speed.
+	var motion := ScooterMotion.new()
+	motion.speed = 2.0
+	for i in 600:
+		motion.step(STEP, 1.0, 0.0, 1.0)
+		assert_lte(_side_acceleration(motion), ScooterMotion.SIDE_ACCELERATION + 0.01,
+				"a held turn while the speed goes up: %.1f km/h" % motion.speed_kmh())
+
+
+static func _side_acceleration(motion: ScooterMotion) -> float:
+	return absf(motion.speed * motion.yaw_rate())
 
 
 func test_a_turn_to_the_right_leans_to_the_right_at_most_8_degrees() -> void:
