@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft |
+| Status | Approved (2026-11-25) |
 | Branch | `feat/0031-web-load`, made from `feat/0018-scooter` (the newest branch of the town). |
 | Depends on | 0009 (R16: the web build on Cloudflare, and its measures), 0018 (the ride that needs the world at once), 0023 (the files of the models of World). |
 | Changes | 0009 (R16: the files of the web build and the deploy), 0004 (the quality presets of the web build), AGENTS.md section 5 (the web build). |
@@ -40,12 +40,12 @@ On 2026-11-25 I opened the web build of plan 0018 on my computer. The loading sc
 | D7 | Step 4, the loading screen. The page shows a picture of the game, the name "Vũng Tàu", and the part of the load that is done, not the default screen of Godot. In the game, the player can move when the ground, the roads, and the parts within 150 m of the start are ready. The rest comes while the player moves, with no frame longer than the limit of plan 0018 (R9). | A player who sees the progress waits with more patience, and a player who can move does not wait. |
 | D8 | The files of each build have their hash in their name, and the cache time is one year (as now for the pack). A new build downloads only the packs that changed. | The second visit starts fast. |
 | D9 | The people (93.4 MB) are the largest part after the buildings. The builder measures what a far level as a card, or pictures that the people share, saves. A change in World is a request to World that I approve. | Each person has pictures of its own, of about 0.85 MB. |
-| D10 | The targets, on a phone with 5G (Q1), with the measure of D3 at 25 Mbit/s: at most 40 MB over the network before the first frame (13 s of download); the first frame of the world at most 20 s after the page opens; the player can ride at most 40 s after the page opens; with the cache, at most 15 s. The memory of the page at the first frame: at most 700 MB, and the heap of the engine at most 400 MB (Q3: on an iPhone, a page of WebAssembly can count on about 300 MB to 500 MB only, [WebKit bug 269777](https://bugs.webkit.org/show_bug.cgi?id=269777) of 2024). The builder tells me after step 1 and step 2 if a target is out of reach. After each step I open the page on my phone and tell the builder what I see: the workspace has no phone. | A target makes each step a pass or a fail. Now the page has 1.13 GB to 1.25 GB at the first frame. |
+| D10 | The targets, on a phone with 5G (Q1), with the measure of D3 at 25 Mbit/s: at most 40 MB over the network before the first frame (13 s of download); the first frame of the world at most 20 s after the page opens; the player can ride at most 40 s after the page opens; with the cache, at most 15 s. The memory of the page at the first frame: at most 700 MB. My phone is an Android phone (Q3). An iPhone is not a target now: there a page of WebAssembly can count on about 300 MB to 500 MB only ([WebKit bug 269777](https://bugs.webkit.org/show_bug.cgi?id=269777) of 2024), so the builder also gives the heap of the engine in each measure. The builder tells me after step 1 and step 2 if a target is out of reach. After each step I open the page on my phone and tell the builder what I see: the workspace has no phone. | A target makes each step a pass or a fail. Now the page has 1.13 GB to 1.25 GB at the first frame. |
 
 ## 5. Requirements
 
 - **R1.** `tools/web/check.js` gives the measures of D3, with the limits on the network, and writes them to `docs/web/load.md` (a table for each step, before and after).
-- **R2.** The web preset of the export keeps out the files of D4. A unit test or a check of the export fails when a near level of a building or a file of `data/geo/raw` is in the web pack. The web build offers only the quality presets whose files it has (Q2).
+- **R2.** The web preset of the export keeps out the files of D4. A unit test or a check of the export fails when a near level of a building or a file of `data/geo/raw` is in the web pack. On each preset of the web build, a building of World shows its mid level also from near (Q2).
 - **R3.** The compact form of the build data of D4, with no change of what the game reads on a computer. The time of the start of the world on a computer does not get longer (PT-37).
 - **R4.** The test of D5, with its result in `docs/web/load.md`. Then the packs of D5, the list of the packs with their areas in data (`data/web/packs.json`), and the load of a pack while the game runs, with no stop of the game longer than the limit of plan 0018 (R9).
 - **R5.** The threads of D6, with the headers in `tools/web/worker.js`.
@@ -73,5 +73,8 @@ On 2026-11-25 I opened the web build of plan 0018 on my computer. The loading sc
 - **Q1.** Which computer, which phone, and which connection are the reference for the targets of D10? (I answer.)
   - **My answer (2026-11-25):** my phone. I test there most of the time. My connection at home is fiber, but the page must be fast with 5G.
 - **Q2.** On the web, a building of World shows its mid level also from near, on each preset. Is that good for the web build? (I answer. If not, the near levels are a pack of their own that only Medium and High get.)
+  - **My answer (2026-11-25):** yes, that is good for now. The web pack has no near level of a building.
 - **Q3.** Is my phone an iPhone or an Android phone? (I answer.) Chrome on Android gives a page much more memory than Safari on an iPhone, so the answer sets the memory target of D10.
+  - **My answer (2026-11-25):** an Android phone, a Pixel 10, with Chrome.
 - **Q4.** Do I also want the app on my phone for my tests (the Android build of CI as a file, or the iOS build with TestFlight, which needs a paid Apple Developer account)? (I answer.) An app starts from its own files in some seconds and uses the Mobile renderer, but I must get each new build.
+  - **My answer (2026-11-25):** the web only, for now.
