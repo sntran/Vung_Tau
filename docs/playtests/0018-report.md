@@ -129,6 +129,16 @@ The branch at `e288998` (the corrections `c660919` to `bf5c096`). The pictures a
 - Q2 (the sounds) and Q3 (the limit of R9) of section 6.
 - The words of the new caption `scooter_wait` in `data/ui.json`: "The street is not ready yet. Wait a moment."
 
-## 8. Status
+## 8. My ride on the web build (2026-11-25)
 
-The builder corrected D-0018-01 to D-0018-04 and made the change of D4. Plan 0018 stays Built until my ride on the web build (acceptance 2). Then it is Done.
+I rode the web build of `bf5c096` at `?start=bai_truoc&ride`. Acceptance 2 does not pass yet.
+
+| What I found | What follows |
+|---|---|
+| The turn was hard to make. I did not find how to slow down. | The brake is the stick down, and nothing on the screen says so. A scooter with no throttle slows at 0.4 m/s² (28 s from the top speed to a stop), and at 40 km/h the limit of D4 gives a curve of 35 m. Plan 0018 has the proposed changes D10 (the stick gives the speed, and the engine slows the scooter), D11 (a stick held hard to a side makes the turn tight), and D12 (a hint on the first rides). |
+| The loading screen of Godot took about one minute, and then I could not ride, because the world was not ready. | Plan 0031 (Draft): the web build loads in steps. |
+| I did not know the roads, and I did not know where I was. | The roads are those of OpenStreetMap. Out of the showcase, the town is boxes with no fronts and no signs; only Trương Công Định has houses. Plan 0018 has the proposed change D13 (the name of the road on the screen). The app Maps of plan 0030 (approved) shows where the player is. The houses of phase 3 of plan 0009 make a street look as I know it. |
+
+## 9. Status
+
+The builder corrected D-0018-01 to D-0018-04 and made the change of D4. Plan 0018 stays Built: after my ride, the changes D10 to D13 wait for my approval. After the builder makes them, I ride again (acceptance 2).
