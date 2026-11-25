@@ -463,7 +463,7 @@ const START_ROAD_TYPES := ["primary", "secondary", "tertiary", "residential", "u
 ## any street) to its landmark, facing the landmark; or on the middle of its
 ## road (or of its OSM way), facing along the road. {} when the start or its parts are not there.
 func start_point(start_id: String) -> Dictionary:
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/geo/starts.json"))
+	var parsed: Variant = JSON.parse_string(GeoData.read_text("res://data/geo/starts.json"))
 	if not parsed is Dictionary:
 		return {}
 	var start: Dictionary = {}
@@ -1394,18 +1394,18 @@ func _extra_types() -> Array:
 func _read_cover() -> void:
 	var cover: Dictionary = data.world.get("cover", {})
 	var cover_path := data.root.path_join(str(cover.get("file", "cover.png")))
-	if not FileAccess.file_exists(cover_path):
+	if not GeoData.has_file(cover_path):
 		push_warning("VungTau: no %s. Run tools/geo/landcover.py and tools/geo/build.py." % cover_path)
 		return
 	_cover_image = Image.new()
 	_cover_image.load_png_from_buffer(FileAccess.get_file_as_bytes(cover_path))
 	_canopy_place = cover.get("canopy", {})
 	var canopy_path := data.root.path_join(str(_canopy_place.get("file", "canopy.png")))
-	if FileAccess.file_exists(canopy_path):
+	if GeoData.has_file(canopy_path):
 		_canopy_image = Image.new()
 		_canopy_image.load_png_from_buffer(FileAccess.get_file_as_bytes(canopy_path))
 	var trees_path := data.root.path_join(str(cover.get("trees", "canopy_trees.json")))
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(trees_path)) if FileAccess.file_exists(trees_path) else null
+	var parsed: Variant = JSON.parse_string(GeoData.read_text(trees_path)) if GeoData.has_file(trees_path) else null
 	if not parsed is Dictionary:
 		push_warning("VungTau: no tree tops in %s." % trees_path)
 		return
@@ -1482,7 +1482,7 @@ func _make_environment() -> void:
 
 func _make_materials() -> void:
 	var mask_path := data.root.path_join("surface.png")
-	if FileAccess.file_exists(mask_path):
+	if GeoData.has_file(mask_path):
 		_surface_image = Image.new()
 		_surface_image.load_png_from_buffer(FileAccess.get_file_as_bytes(mask_path))
 	var mask_texture: Texture2D = ImageTexture.create_from_image(_surface_image) if _surface_image else null
@@ -1499,7 +1499,7 @@ func _make_materials() -> void:
 	_ground_material.set_shader_parameter("surface_mask", mask_texture)
 	var rock_path := data.root.path_join(str(data.surface.get("rock", "rock.png")))
 	var rock_texture: Texture2D = null
-	if FileAccess.file_exists(rock_path):
+	if GeoData.has_file(rock_path):
 		_rock_image = Image.new()
 		_rock_image.load_png_from_buffer(FileAccess.get_file_as_bytes(rock_path))
 		rock_texture = ImageTexture.create_from_image(_rock_image)
@@ -1570,7 +1570,7 @@ func _make_materials() -> void:
 static func roof_colors() -> Array[Color]:
 	var result: Array[Color] = []
 	var file := "res://data/world/palette.json"
-	var palette: Variant = JSON.parse_string(FileAccess.get_file_as_string(file)) if FileAccess.file_exists(file) else null
+	var palette: Variant = JSON.parse_string(GeoData.read_text(file)) if GeoData.has_file(file) else null
 	if palette is Dictionary:
 		for hex: String in (palette.roof_tiles.colors as Array).slice(0, 2):
 			result.append(Color(hex))

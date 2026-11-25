@@ -16,9 +16,9 @@ var areas: Array[Dictionary] = []
 
 func setup(w: VungTau) -> bool:
 	var path := w.data.root.path_join(FILE)
-	if not FileAccess.file_exists(path):
+	if not GeoData.has_file(path):
 		return false
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var parsed: Variant = JSON.parse_string(GeoData.read_text(path))
 	if not parsed is Dictionary:
 		push_error("InlandWater: %s cannot be read." % path)
 		return false

@@ -91,9 +91,9 @@ func setup(w: VungTau) -> bool:
 	if w.showcase:
 		_showcase_area = w.showcase.outline
 	var path := w.data.root.path_join(FOLDER).path_join("index.json")
-	if not FileAccess.file_exists(path):
+	if not GeoData.has_file(path):
 		return false
-	var index: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var index: Variant = JSON.parse_string(GeoData.read_text(path))
 	if not index is Dictionary:
 		push_error("TownField: %s cannot be read." % path)
 		return false
@@ -102,7 +102,7 @@ func setup(w: VungTau) -> bool:
 	far_color = Color(str(index.get("far_color", "#808080")))
 	foot_shade = float(index.get("foot_shade", 1.0))
 	var tall_path := w.data.root.path_join(FOLDER).path_join("tall.json")
-	var tall: Variant = JSON.parse_string(FileAccess.get_file_as_string(tall_path)) if FileAccess.file_exists(tall_path) else null
+	var tall: Variant = JSON.parse_string(GeoData.read_text(tall_path)) if GeoData.has_file(tall_path) else null
 	if tall is Dictionary:
 		# One mesh for each square of TALL_TILE x TALL_TILE chunks (fewer draw calls).
 		for entry: Array in tall.get("chunks", []):
@@ -542,7 +542,7 @@ func _clear(eye: Vector3, target: Vector3, tag: int) -> bool:
 ## boxes of a chunk.
 func _build(key: Vector2i) -> Dictionary:
 	var path := world.data.root.path_join(FOLDER).path_join("%d_%d.json" % [key.x, key.y])
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var parsed: Variant = JSON.parse_string(GeoData.read_text(path))
 	return _make(key, parsed.get("buildings", []) if parsed is Dictionary else [])
 
 

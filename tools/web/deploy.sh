@@ -16,14 +16,23 @@ BRANCH="${BRANCH:-$(git rev-parse --abbrev-ref HEAD)}"
 WEB="$ROOT/build/web"
 ASSETS="$ROOT/build/web-assets"
 if [[ "${SKIP_EXPORT:-}" != "1" ]]; then
+  # Plan 0031, D4: the filters of the preset Web and the gzip copies of the build data.
+  python3 tools/web/prepare.py
   rm -rf "$WEB"; mkdir -p "$WEB"
   .tools/godot/godot --headless --path . --export-release "Web" "$WEB/index.html"
 fi
+# Plan 0031, R2: no near level of a building and no raw data in the web pack.
+python3 tools/web/check_pack.py "$WEB/index.pck"
+# Plan 0031, D5: the test pack of a second pack (?packtest): the near level of
+# a building, which the main pack leaves out.
+.tools/godot/godot --headless --path . -s tools/web/make_pack.gd -- "$WEB/packtest.pck" res://assets/world/nha_mai_ngoi_cam.glb
+# Plan 0031, D4: the Brotli copies of the large files.
+node tools/web/compress.js "$WEB"/*.pck "$WEB/index.wasm"
 # The small files are static assets; the page takes the large files from b/BUILD/.
 rm -rf "$ASSETS"; mkdir -p "$ASSETS"
 for file in "$WEB"/*; do
   case "$(basename "$file")" in
-    index.pck|index.wasm) ;;
+    *.pck|index.wasm|*.br) ;;
     *) cp "$file" "$ASSETS/" ;;
   esac
 done
@@ -50,7 +59,7 @@ $WRANGLER r2 bucket list | grep -q "^name: *vung-tau$" || $WRANGLER r2 bucket cr
 # of 250 MiB (NAME.part0, NAME.part1, ...), and the Worker gives them as one file.
 PART_BYTES=262144000
 PARTS="$ROOT/build/web-parts"
-for name in index.pck index.wasm; do
+for name in index.pck index.wasm $(cd "$WEB" && ls *.pck | grep -v '^index.pck$'); do
   type="application/octet-stream"; [[ "$name" == *.wasm ]] && type="application/wasm"
   if (( $(stat -c %s "$WEB/$name") > PART_BYTES )); then
     rm -rf "$PARTS"; mkdir -p "$PARTS"
@@ -61,6 +70,10 @@ for name in index.pck index.wasm; do
     rm -rf "$PARTS"
   else
     $WRANGLER r2 object put "vung-tau/builds/$BUILD/$name" --file "$WEB/$name" --content-type "$type" --remote
+  fi
+  # The Brotli copy (plan 0031, D4): the Worker gives it to a browser that takes "br".
+  if [[ -f "$WEB/$name.br" ]] && (( $(stat -c %s "$WEB/$name.br") <= PART_BYTES )); then
+    $WRANGLER r2 object put "vung-tau/builds/$BUILD/$name.br" --file "$WEB/$name.br" --content-type "$type" --remote
   fi
 done
 if [[ "$BRANCH" == "main" ]]; then

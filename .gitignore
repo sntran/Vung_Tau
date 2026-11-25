@@ -21,3 +21,5 @@ __pycache__/
 /data/geo/raw/buildings/temporal.json
 /data/geo/raw/buildings/temporal_2019_unmatched.tif
 /data/geo/build/buildings_2019.json
+/data/geo/build/**/*.json.gz
+/data/geo/build/*.json.gz

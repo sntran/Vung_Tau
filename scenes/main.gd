@@ -180,7 +180,10 @@ func _ready() -> void:
 			first_frame_ms = Time.get_ticks_msec()
 			# Plan 0009, R16: the page knows the first frame of the world.
 			if OS.has_feature("web"):
-				JavaScriptBridge.eval("window.vungTau = {world: '%s', firstFrameMs: %d}" % [world_name, first_frame_ms], true), CONNECT_ONE_SHOT)
+				JavaScriptBridge.eval("window.vungTau = {world: '%s', firstFrameMs: %d}" % [world_name, first_frame_ms], true)
+			# Plan 0031, D5: the test of a second pack, after the first frame.
+			if GameState.has_arg("packtest"):
+				add_child.call_deferred(WebPackTest.new()), CONNECT_ONE_SHOT)
 	if GameState.arg_value("world") == "vung_tau":
 		_start_vung_tau()
 	if vung_tau == null:

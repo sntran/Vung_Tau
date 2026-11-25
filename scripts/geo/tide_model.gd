@@ -20,9 +20,9 @@ var ridge_top := 0.0
 
 ## Reads the file. Returns null when it is not there.
 static func open(path := PATH) -> TideModel:
-	if not FileAccess.file_exists(path):
+	if not GeoData.has_file(path):
 		return null
-	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var data: Variant = JSON.parse_string(GeoData.read_text(path))
 	if not data is Dictionary:
 		return null
 	var model := TideModel.new()

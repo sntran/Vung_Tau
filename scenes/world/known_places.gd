@@ -76,7 +76,7 @@ var _materials: Dictionary = {}
 
 ## The place records of data/geo/landmarks.json, by id.
 static func configs(path := CONFIG) -> Dictionary:
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var parsed: Variant = JSON.parse_string(GeoData.read_text(path))
 	var result := {}
 	if parsed is Dictionary:
 		for entry: Dictionary in parsed.get("landmarks", []):
@@ -1193,7 +1193,7 @@ static var _note := ""
 ## The note of a stand-in in the Lens card (D3a): "stand_in_note" of the file.
 static func configs_note(path := CONFIG) -> String:
 	if _note == "":
-		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+		var parsed: Variant = JSON.parse_string(GeoData.read_text(path))
 		_note = str(parsed.get("stand_in_note", "")) if parsed is Dictionary else ""
 	return _note
 

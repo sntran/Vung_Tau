@@ -17,9 +17,9 @@ static func lean(tilt: float, toward: float) -> Basis:
 
 ## Reads the trees into the field. Returns false when the file is not there.
 func setup(path: String, field: TreeField) -> bool:
-	if not FileAccess.file_exists(path):
+	if not GeoData.has_file(path):
 		return false
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var parsed: Variant = JSON.parse_string(GeoData.read_text(path))
 	if not parsed is Dictionary:
 		return false
 	var types: Dictionary = parsed.get("types", {})

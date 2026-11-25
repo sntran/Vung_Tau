@@ -44,14 +44,14 @@ var _material: StandardMaterial3D
 
 func setup(w: VungTau) -> bool:
 	var path := w.data.root.path_join(FILE)
-	if not FileAccess.file_exists(path):
+	if not GeoData.has_file(path):
 		return false
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var parsed: Variant = JSON.parse_string(GeoData.read_text(path))
 	if not parsed is Dictionary:
 		push_error("StreetHouses: %s cannot be read." % path)
 		return false
 	streets = parsed.get("streets", [])
-	var palette: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/world/palette.json"))
+	var palette: Variant = JSON.parse_string(GeoData.read_text("res://data/world/palette.json"))
 	var walls: Array = palette.get("walls", []) if palette is Dictionary else []
 	# The ground floor and the top of each model over the lowest point of its mid level.
 	var sizes := {}

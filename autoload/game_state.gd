@@ -92,6 +92,9 @@ static func web_args() -> PackedStringArray:
 				_web_args.append("--debug")
 			"ride":
 				_web_args.append("--ride")
+			"packtest":
+				# Plan 0031, D5: the test of a second pack (scripts/web/pack_test.gd).
+				_web_args.append("--packtest")
 	_web_args.append("--world=%s" % world)
 	return _web_args
 

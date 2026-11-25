@@ -38,7 +38,7 @@ const CACHE_SIZE := 64
 ## Returns null when the folder has no world.json (the geodata workflow did not run).
 static func open(folder := ROOT) -> GeoData:
 	var path := folder.path_join("world.json")
-	if not FileAccess.file_exists(path):
+	if not has_file(path):
 		return null
 	var data := GeoData.new()
 	data.root = folder
@@ -67,10 +67,27 @@ static func open(folder := ROOT) -> GeoData:
 
 
 static func _read_json(path: String) -> Dictionary:
-	if not FileAccess.file_exists(path):
+	if not has_file(path):
 		return {}
-	var value: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var value: Variant = JSON.parse_string(read_text(path))
 	return value if value is Dictionary else {}
+
+
+## Plan 0031, D4: the web pack has the JSON of the build as gzip copies
+## (PATH.gz, about five times smaller); a computer has the JSON. True when the
+## file or its copy is in the game.
+static func has_file(path: String) -> bool:
+	return FileAccess.file_exists(path) or FileAccess.file_exists(path + ".gz")
+
+
+## The text of the file, or of its gzip copy (PATH.gz), or "".
+static func read_text(path: String) -> String:
+	if FileAccess.file_exists(path):
+		return FileAccess.get_file_as_string(path)
+	if FileAccess.file_exists(path + ".gz"):
+		var packed := FileAccess.get_file_as_bytes(path + ".gz")
+		return packed.decompress_dynamic(-1, FileAccess.COMPRESSION_GZIP).get_string_from_utf8()
+	return ""
 
 
 ## The chunk that has the game point.

@@ -1,4 +1,4 @@
-// Plan 0009, R16: the web build on Cloudflare. The page and its small files
+// Plan 0009, R16, and plan 0031, D4: the web build on Cloudflare. The page and its small files
 // are static assets of this Worker. The page asks for b/BUILD/index.pck and
 // b/BUILD/index.wasm (BUILD: the commit of the build), and the Worker gives
 // them from the R2 bucket (builds/BUILD/...), with their MIME types and a long
@@ -25,6 +25,10 @@ export default {
       return env.ASSETS.fetch(request);
     }
     const [, build, name] = match;
+    // Plan 0031, D5: the other packs of the build (the test pack, the packs of the areas).
+    if (!(name in R2_FILES) && /^[a-z0-9_]+\.pck$/.test(name)) {
+      R2_FILES[name] = "application/octet-stream";
+    }
     if (!(name in R2_FILES)) {
       // A small file of the build (an audio worklet): a static asset.
       return env.ASSETS.fetch(new Request(new URL(`/${name}`, url), request));
@@ -36,6 +40,18 @@ export default {
     const headers = new Headers();
     headers.set("Content-Type", R2_FILES[name]);
     headers.set("Cache-Control", "public, max-age=31536000, immutable");
+    headers.set("Vary", "Accept-Encoding");
+    // Plan 0031, D4: the Brotli copy (NAME.br) to a browser that takes it.
+    // "manual": the body is already encoded, and Cloudflare sends it as it is.
+    if ((request.headers.get("Accept-Encoding") || "").includes("br")) {
+      const encoded = await env.BUILDS.get(`${key}.br`);
+      if (encoded !== null) {
+        headers.set("Content-Encoding", "br");
+        headers.set("Content-Length", String(encoded.size));
+        headers.set("ETag", `"${build}-${name}-br"`);
+        return new Response(request.method === "HEAD" ? null : encoded.body, { headers, encodeBody: "manual" });
+      }
+    }
     const object = await env.BUILDS.get(key);
     if (object !== null) {
       headers.set("Content-Length", String(object.size));

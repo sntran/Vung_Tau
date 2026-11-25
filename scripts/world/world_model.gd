@@ -19,6 +19,8 @@ const ROOT := "res://assets/world/"
 const ORDERS := "res://data/world/orders.json"
 const LEVELS: Array[String] = ["near", "mid", "far"]
 const SUFFIX := {"near": ".glb", "mid": ".mid.glb", "far": ".far.glb"}
+## The levels of each id with a file (levels_of()).
+static var _levels_cache := {}
 ## The end of the near level, the mid level, and the far level, for each
 ## preset (R8: on Low, the near level to 15 m and the mid level to 40 m).
 const RANGES := {
@@ -88,11 +90,22 @@ static func ids() -> Array[String]:
 	return result
 
 
-## The levels of an id that the game uses.
+## The levels of an id that the game uses: the levels of its order whose file
+## is in the game. Plan 0031, D4: the web pack has no near level of a
+## building, and there the mid level shows also from near (Q2). On a computer
+## each file is there.
 static func levels_of(model_id: String) -> Array[String]:
+	if _levels_cache.has(model_id):
+		return _levels_cache[model_id]
 	var result: Array[String] = []
-	for level: String in order(model_id).get("levels", ["near"]):
+	var wanted: Array = order(model_id).get("levels", ["near"])
+	for level: String in wanted:
+		if wanted.size() > 1 and not ResourceLoader.exists(ROOT + model_id + SUFFIX[level]):
+			continue
 		result.append(level)
+	if result.is_empty() and not wanted.is_empty():
+		result.append(str(wanted[0]))
+	_levels_cache[model_id] = result
 	return result
 
 

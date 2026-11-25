@@ -34,7 +34,7 @@ var material_set := ""
 ## wall on Low, as the buildings of plan 0026, D6).
 var custom_ranges: Dictionary = {}
 var _items: Array[Dictionary] = []
-## The cells: {"near": [MultiMeshInstance3D], "mid": [...], "impostor": [...]}.
+## The cells: {"near": [MultiMeshInstance3D], "mid": [...], "mid_whole": [...], "impostor": [...]}.
 var cells: Array[Dictionary] = []
 
 
@@ -112,7 +112,9 @@ func _build_cell(key: Vector2i, items: Array) -> void:
 	center /= float(items.size())
 	cell.position = center
 	add_child(cell)
-	var entry := {"near": [], "mid": [], "impostor": [], "node": cell}
+	# "mid_whole": the mid level of a model with no near file (plan 0031, D4:
+	# the web pack has no near level of a building), from 0 m.
+	var entry := {"near": [], "mid": [], "mid_whole": [], "impostor": [], "node": cell}
 	# For each level and each mesh node: the transform of each model.
 	var batches := {}  # "level/model/node" -> {"mesh", "transforms", "colors"}
 	for item: Dictionary in items:
@@ -134,7 +136,7 @@ func _build_cell(key: Vector2i, items: Array) -> void:
 				var batch_key := "%s/%s/%s/%s" % [level, item.id, material_set, template.level(level).get_path_to(m)]
 				if not batches.has(batch_key):
 					batches[batch_key] = {"level": level, "mesh": _row_mesh(batch_key, m, material_set),
-							"transforms": [], "colors": [], "items": []}
+							"transforms": [], "colors": [], "items": [], "whole": level == "mid" and template.level("near") == null}
 				batches[batch_key].transforms.append(local_at * template._global_of(m))
 				batches[batch_key].colors.append(item.paint)
 				batches[batch_key].items.append(item)
@@ -146,7 +148,7 @@ func _build_cell(key: Vector2i, items: Array) -> void:
 		for i in batch.items.size():
 			(batch.items[i].slots as Array).append([node.multimesh, i, batch.transforms[i]])
 		# The far level of a model with no impostor takes the range of the cards.
-		entry["impostor" if batch.level == "far" else batch.level].append(node)
+		entry["impostor" if batch.level == "far" else ("mid_whole" if batch.whole else batch.level)].append(node)
 	# The impostor: one card for each model.
 	var by_model := {}
 	for item: Dictionary in items:
@@ -295,6 +297,7 @@ func apply_ranges() -> void:
 	for entry in cells:
 		_set_range(entry.near, 0.0, r.x)
 		_set_range(entry.mid, r.x, r.y)
+		_set_range(entry.mid_whole, 0.0, r.y)
 		_set_range(entry.impostor, r.y, r.z)
 
 

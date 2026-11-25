@@ -182,7 +182,7 @@ var _materials: Dictionary = {}
 
 func setup(w: VungTau, path := CONFIG) -> bool:
 	world = w
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var parsed: Variant = JSON.parse_string(GeoData.read_text(path))
 	if not parsed is Dictionary:
 		push_error("Showcase: cannot read %s." % path)
 		return false
@@ -277,7 +277,7 @@ func build_all() -> void:
 
 
 func _add_people() -> void:
-	if not FileAccess.file_exists(ShowcasePeople.PATH):
+	if not GeoData.has_file(ShowcasePeople.PATH):
 		return
 	people = ShowcasePeople.new()
 	people.name = "People"
@@ -322,16 +322,16 @@ func contains(x: float, z: float) -> bool:
 ## the raised lawns of the walk of the sea, and the low wall of granite along
 ## the beach, from data/geo/build/showcase.json (tools/geo/build.py).
 func _ground(path: String) -> void:
-	if not FileAccess.file_exists(path):
+	if not GeoData.has_file(path):
 		push_warning("Showcase: %s is not there. Run tools/geo/build.py." % path)
 		return
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var parsed: Variant = JSON.parse_string(GeoData.read_text(path))
 	if not parsed is Dictionary:
 		push_error("Showcase: cannot read %s." % path)
 		return
 	var info: Dictionary = parsed.get("ground", {})
 	var file: String = world.data.root.path_join(str(info.get("file", "")))
-	if not info.is_empty() and FileAccess.file_exists(file):
+	if not info.is_empty() and GeoData.has_file(file):
 		ground_mask = Image.new()
 		ground_mask.load_png_from_buffer(FileAccess.get_file_as_bytes(file))
 		ground_step = float(info.get("step", 0.5))
@@ -1319,7 +1319,7 @@ static func _limit_grade(line: PackedVector3Array, values: PackedFloat32Array, g
 
 ## R7: a stand-in for each building of OSM in the area: its outline and its storeys.
 func _stand_ins(cfg: Dictionary) -> void:
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(BUILDINGS))
+	var parsed: Variant = JSON.parse_string(GeoData.read_text(BUILDINGS))
 	if not parsed is Dictionary:
 		return
 	var storey := float(cfg.get("storey_m", 3.3))
@@ -1372,9 +1372,9 @@ func _stand_ins(cfg: Dictionary) -> void:
 ## storeys from a photo; the others stay in footprints_check with the reason.
 func _footprint_stand_ins(cfg: Dictionary) -> void:
 	var known: Dictionary = cfg.get("footprints", {})
-	if known.is_empty() or not FileAccess.file_exists(FOOTPRINTS):
+	if known.is_empty() or not GeoData.has_file(FOOTPRINTS):
 		return
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(FOOTPRINTS))
+	var parsed: Variant = JSON.parse_string(GeoData.read_text(FOOTPRINTS))
 	if not parsed is Dictionary:
 		return
 	var storey := float(cfg.get("storey_m", 3.3))
@@ -1450,9 +1450,9 @@ func _band(a: Vector2, b: Vector2, half: float) -> PackedVector2Array:
 
 ## R7, D3: the models of World at their places, with the ranges of D6.
 func _place_steps(path: String) -> void:
-	if not FileAccess.file_exists(path):
+	if not GeoData.has_file(path):
 		return
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var parsed: Variant = JSON.parse_string(GeoData.read_text(path))
 	if not parsed is Dictionary:
 		push_error("Showcase: cannot read %s." % path)
 		return
@@ -2579,7 +2579,7 @@ func _textured(cfg: Dictionary) -> ShaderMaterial:
 
 ## The texture sets of assets/textures/look/manifest.json (tools/look/textures.py).
 func _texture_sets() -> Dictionary:
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(TEXTURES.path_join("manifest.json")))
+	var parsed: Variant = JSON.parse_string(GeoData.read_text(TEXTURES.path_join("manifest.json")))
 	return parsed.get("sets", {}) if parsed is Dictionary else {}
 
 

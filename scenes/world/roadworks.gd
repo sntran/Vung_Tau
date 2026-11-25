@@ -25,9 +25,9 @@ var _hours: Array[int] = []
 
 ## Builds the first roadworks of the file. Returns false when there is none.
 func setup(path: String) -> bool:
-	if not FileAccess.file_exists(path):
+	if not GeoData.has_file(path):
 		return false
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var parsed: Variant = JSON.parse_string(GeoData.read_text(path))
 	if not parsed is Dictionary or (parsed.get("roadworks", []) as Array).is_empty():
 		return false
 	record = parsed.roadworks[0]
