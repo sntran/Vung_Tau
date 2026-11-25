@@ -661,19 +661,19 @@ func _run_5(d: PlaytestDriver) -> void:
 		trace.max_kmh = maxf(float(trace.max_kmh), now.speed_kmh)
 		if player.move_input.y < -0.05:
 			trace.braked = true
-		if now.road_name != "" and (trace.names.is_empty() or trace.names[-1] != now.road_name):
-			trace.names.append(now.road_name)
+		if now.road_sign != "" and (trace.names.is_empty() or trace.names[-1] != now.road_sign):
+			trace.names.append(now.road_sign)
 		var middle := player.ride_middle()
 		if not _near_road(w, middle, 2.5) and _on_ground(player, middle) and trace.off.size() < 5:
 			trace.off.append(middle)
 	# The name of the road shows when the scooter starts on it, and when it comes onto Nguyễn Trãi.
-	var on_qt := func() -> bool: return d.state().road_name == "Quang Trung"
+	var on_qt := func() -> bool: return d.state().road_sign == "Quang Trung"
 	await d.ride_along(route, turn_at - 20.0, TOP_KMH, watch, false, 120.0, on_qt, "road_quang_trung", true)
-	d.expect(d.state().road_name == "Quang Trung", "the name \"Quang Trung\" shows when the scooter rides on it (D13)")
-	var on_nt := func() -> bool: return d.state().road_name == NGUYEN_TRAI
+	d.expect(d.state().road_sign == "Quang Trung", "the name \"Quang Trung\" shows when the scooter rides on it (D13)")
+	var on_nt := func() -> bool: return d.state().road_sign == NGUYEN_TRAI
 	await d.ride_along(route, turn_at + LET_GO_AT, TOP_KMH, watch, false, 120.0, on_nt, "road_nguyen_trai", true)
 	s = d.state()
-	d.expect(s.road_name == NGUYEN_TRAI, "the name \"%s\" shows when the scooter comes onto it (D13): \"%s\"" % [NGUYEN_TRAI, s.road_name])
+	d.expect(s.road_sign == NGUYEN_TRAI, "the name \"%s\" shows when the scooter comes onto it (D13): \"%s\"" % [NGUYEN_TRAI, s.road_sign])
 	var ok := await d.ride_along(route, turn_at + LET_GO_AT, 30.0, watch, false, 120.0, Callable(), "", true)
 	s = d.state()
 	d.step("the turn into Nguyễn Trãi: the top %.1f km/h, %d bumps, off the roads at %s, the names %s, the brake used %s" % [
