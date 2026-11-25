@@ -91,6 +91,54 @@ D4 gives the turn of the handlebars from 35° when slow to 8° at the top speed.
 - **Q2.** The sounds of the engine are tones made in code. Is that good for now, or do I want a recording (CC0 or CC BY) of a 50 cm³ moped? I can find candidates, and I download the file if the workspace cannot reach it.
 - **Q3.** The limit of R9: after my ride on the web build.
 
-## 7. Status
+## 7. Audit 2 (2026-11-25)
 
-Plan 0018 stays Built until the builder corrects D-0018-01 to D-0018-04 and makes the change of D4. Then I ride the web build of the branch (acceptance 2).
+The branch at `e288998` (the corrections `c660919` to `bf5c096`). The pictures are in [`0018/audit-2026-11-25/`](0018/audit-2026-11-25/).
+
+### 7.1 Runs
+
+| Check | Result |
+|---|---|
+| CI of `e288998` | Pass: Test (run 416) and Export (run 223). |
+| Unit tests | Pass: 148 tests, 4 744 asserts. |
+| PT-80 `scooter_ride`, 1280 × 720 | Pass, in its four runs. R9 in the workspace: 330 frames, median 290 ms, the longest 1 667 ms, 1 long frame. |
+| PT-81 `touch_controls` | Pass at 1280 × 720 (67 s), 2400 × 1080 (199 s), and 720 × 1280 (105 s). |
+| My scenarios (not in the repository) | Section 7.2. |
+| The web build of the branch | Not checked: the workspace cannot reach `workers.dev`. |
+
+### 7.2 The defects
+
+| Defect | Result | What I did |
+|---|---|---|
+| D-0018-01, the curb at a low speed | Corrected | PT-80 run 3 rides up the curb at 2.4 km/h and at 19.6 km/h, then 12 m to 14 m on the sidewalk with no bump, and the handlebars are in the view. In my ride, in pushes of 0.3 s (1.6 km/h to 1.7 km/h at most), the scooter went up the curb at z 60 m and at z 35 m and 8 m on, with no bump. It went up at an angle of 30° to the curb, and it went up and down again at 3.6 km/h, with no bump. |
+| D-0018-02, the place of "Get off" | Corrected | The button is at the right, above the phone button, at 1280 × 720, 2400 × 1080, and 720 × 1280. The road ahead is free (`corrections.jpg`). The middle third of the width and of the height, as the builder read it, is what I meant. |
+| D-0018-03, `--ride` before the showcase | Corrected | A push of 2 s at the first frames moved the scooter 0.00 m. The hold ended 15.5 s after the first frames, and then the scooter rode. |
+| D-0018-04, the paths with no step | Corrected | PT-80 run 4: "Get off" at a speed, the sand, the steps of an opening, and the lake each stop the scooter with the bump before the front wheel is there. The screenshot of the turn shows the stick held and the lean. |
+| D4 and R5 (changed) | Done | In my ride at 39 km/h, a turn of the stick of 0.7 for 1 s turned the scooter by 17.7°, with a side acceleration of 2.50 m/s² at most (0.7 of 3.5 m/s²) and the handlebars at 1.7°. In audit 1 the full stick for 0.6 s turned it by 95°. |
+
+### 7.3 Notes
+
+- **The screenshot `get_off_at_speed` of PT-81 at 2400 × 1080 and 720 × 1280 shows no caption.** The check of the text passes, but at these sizes in the workspace the caption (1.6 s) is gone before the screenshot. The caption does show on the screen at both sizes: my screenshot one frame after the tap has it (`slow_down_caption.jpg`). Take the screenshot in the first frame after the tap. This does not block the plan.
+- **A hit at a speed stops the scooter at once (D5).** In my ride the scooter went into the end of the median of Quang Trung at about 39 km/h and stood, with the bump. That is the rule of part 1.
+- **The wait at the start.** With `?ride` the scooter stands for about 15 s to 18 s in the workspace until the showcase is built, and the caption "The street is not ready yet. Wait a moment." shows at each push. On a slow phone the wait can be longer. I look at it in my ride.
+- **The ground over the road** (section 5) shows again in the pictures of PT-81 at Quang Trung. It stays with plan 0009.
+
+### 7.4 What is open
+
+- **My ride on the web build** (acceptance 2): https://feat-0018-scooter-vung-tau.fifo.workers.dev/?start=bai_truoc&ride
+- Q2 (the sounds) and Q3 (the limit of R9) of section 6.
+- The words of the new caption `scooter_wait` in `data/ui.json`: "The street is not ready yet. Wait a moment."
+
+## 8. My ride on the web build (2026-11-25)
+
+I rode the web build of `bf5c096` at `?start=bai_truoc&ride`. Acceptance 2 does not pass yet.
+
+| What I found | What follows |
+|---|---|
+| The turn was hard to make. I did not find how to slow down. | The brake is the stick down, and nothing on the screen says so. A scooter with no throttle slows at 0.4 m/s² (28 s from the top speed to a stop), and at 40 km/h the limit of D4 gives a curve of 35 m. Plan 0018 has the changes D10 (the stick gives the speed, and the engine slows the scooter), D11 (a stick held hard to a side makes the turn tight), and D12 (a hint on the first rides). |
+| The loading screen of Godot took about one minute, and then I could not ride, because the world was not ready. | Plan 0031 (approved on 2026-11-25): the web build loads in steps. |
+| I did not know the roads, and I did not know where I was. | I looked at a map of the roads of the game around Bãi Trước (2026-11-25): the layout is right. I did not know the place from the boxes and the roads that are not finished (report 0009, D-0009-29). The roads are those of OpenStreetMap. Out of the showcase, the town is boxes with no fronts and no signs; only Trương Công Định has houses. Plan 0018 has the change D13 (the name of the road on the screen). The app Maps of plan 0030 (approved) shows where the player is. The houses of phase 3 of plan 0009 make a street look as I know it. |
+
+## 9. Status
+
+The builder corrected D-0018-01 to D-0018-04 and made the change of D4. Plan 0018 stays Built. I approved the changes D10 to D13 on 2026-11-25. After the builder makes them, I ride again on my phone (acceptance 2).
