@@ -46,11 +46,18 @@ def main():
     cfg = json.loads((ROOT / "data/web/web.json").read_text(encoding="utf-8"))
     files = files_of(pck)
     bad = []
+    packs_path = ROOT / "data/web/packs.json"
+    pack_sources = set()
+    if packs_path.exists():
+        for pack in json.loads(packs_path.read_text(encoding="utf-8")).get("packs", []):
+            pack_sources.update(f.removeprefix("res://").split("/")[-1] for f in pack["files"])
     parts = collections.Counter()
     for name, size in files:
         level = re.match(r"\.godot/imported/([^/]+?)\.(mid\.|far\.)?glb-", name)
         if level and not level.group(2) and level.group(1) in cfg["buildings"]:
             bad.append(f"the near level of the building {level.group(1)}: {name}")
+        if level and f"{level.group(1)}.{level.group(2) or ''}glb" in pack_sources:
+            bad.append(f"a file of a pack of plan 0031 (D5) in the main pack: {name}")
         if any(fnmatch.fnmatch(name, pattern) for pattern in cfg["left_out"] + cfg["gzip"]):
             bad.append(f"a file that the web pack leaves out: {name}")
         if level:

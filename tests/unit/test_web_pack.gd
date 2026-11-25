@@ -70,3 +70,48 @@ func test_the_game_reads_a_gzip_copy() -> void:
 	assert_true(GeoData.has_file("res://tests/data/web/sample.json"), "has_file() finds the copy")
 	assert_false(GeoData.has_file("res://tests/data/web/none.json"))
 	assert_eq(GeoData.read_text(WEB), FileAccess.get_file_as_string(WEB), "a JSON file reads as it is")
+
+
+## D5 (step 2): each file of a pack of data/web/packs.json is a resource of
+## the project, and the preset Web leaves it out of the main pack.
+func test_the_files_of_the_packs_are_out_of_the_main_pack() -> void:
+	var filters := _web_filters()
+	var packs: Dictionary = WebPacks.entries()
+	assert_true(packs.has("people"), "data/web/packs.json has the pack people")
+	for pack_id: String in packs:
+		var files: Array = packs[pack_id].files
+		assert_gt(files.size(), 0, "the pack %s has files" % pack_id)
+		for file: String in files:
+			assert_true(ResourceLoader.exists(file), "the file %s of the pack %s is in the project" % [file, pack_id])
+			assert_true(_matches(file.trim_prefix("res://"), filters.exclude), "the file %s is out of the main pack" % file)
+
+
+## R4: the people of the showcase and of the morning exercise come in the pack
+## people, with their mid and far levels, and its area has the showcase.
+func test_the_people_are_in_their_pack() -> void:
+	var files: Array = WebPacks.entries().people.files
+	var ids: Array = []
+	for group: Dictionary in JSON.parse_string(FileAccess.get_file_as_string(MorningExercise.PATH)).groups:
+		ids.append(group.leader)
+		ids.append_array(group.people)
+	var people: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(ShowcasePeople.PATH))
+	for kind: String in ["walkers", "sitters", "swimmers"]:
+		ids.append_array(people[kind].models)
+	for id: String in ids:
+		if not (id.begins_with("aerobics_") or id.begins_with("walker_") or id.begins_with("sitter_") or id.begins_with("swimmer_")):
+			continue
+		for level: String in ["mid", "far"]:
+			assert_has(files, "%s%s.%s.glb" % [WorldModel.ROOT, id, level], "the %s level of %s is in the pack people" % [level, id])
+	var area: Array = WebPacks.entries().people.area
+	var outline: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/showcase/bai_truoc.json")).outline
+	for p: Array in outline:
+		assert_true(float(p[0]) >= float(area[0]) and float(p[0]) <= float(area[2]) and float(p[1]) >= float(area[1]) and float(p[1]) <= float(area[3]),
+				"the point %s of the showcase is in the area of the pack people" % [p])
+
+
+## On a computer (one whole pack) no pack waits.
+func test_no_pack_waits_on_a_computer() -> void:
+	assert_false(WebPacks.waiting("people"))
+	var called := [false]
+	WebPacks.when_ready("people", func() -> void: called[0] = true)
+	assert_true(called[0], "when_ready() calls at once")

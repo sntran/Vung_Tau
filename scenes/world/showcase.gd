@@ -279,10 +279,17 @@ func build_all() -> void:
 func _add_people() -> void:
 	if not GeoData.has_file(ShowcasePeople.PATH):
 		return
+	# Plan 0031, D5: on the web the people come in a pack of their own, when the
+	# player is near; the showcase is there before them.
+	if WebPacks.waiting("people"):
+		WebPacks.when_ready("people", _add_people)
+		return
 	people = ShowcasePeople.new()
 	people.name = "People"
 	add_child(people)
 	people.setup(world, self)
+	if _built and _minutes >= 0:
+		people.update_time(_minutes)
 
 
 ## The clock time: the people of the hour (R10).

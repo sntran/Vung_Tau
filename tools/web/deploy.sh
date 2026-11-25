@@ -20,6 +20,11 @@ if [[ "${SKIP_EXPORT:-}" != "1" ]]; then
   python3 tools/web/prepare.py
   rm -rf "$WEB"; mkdir -p "$WEB"
   .tools/godot/godot --headless --path . --export-release "Web" "$WEB/index.html"
+  # Plan 0031, D5: the packs of data/web/packs.json, which the game gets while it runs.
+  python3 tools/web/prepare.py --packs | sed -n 's/^PACK //p' | while read -r id files; do
+    # shellcheck disable=SC2086
+    .tools/godot/godot --headless --path . -s tools/web/make_pack.gd -- "$WEB/$id.pck" $files
+  done
 fi
 # Plan 0031, R2: no near level of a building and no raw data in the web pack.
 python3 tools/web/check_pack.py "$WEB/index.pck"

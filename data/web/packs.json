@@ -1,0 +1,58 @@
+{
+	"note": "Plan 0031, D5 (step 2): the packs of the web build that the game gets while it runs. The main pack (index.pck) is the start pack: the code, the screens, the ground and the roads, and what shows near the start points. Each pack here has its files (resources of the project: tools/web/make_pack.gd puts each with its import), and its area (x0, z0, x1, z1 of the game) with the distance near_m around it: the game gets the pack when the player comes nearer (scripts/web/web_packs.gd), and the things of the pack show when it is there. tools/web/prepare.py leaves these files out of the main pack. The desktop builds keep one whole pack.",
+	"packs": [
+		{
+			"id": "people",
+			"note": "The people of World (the walkers, the sitters, and the swimmers of the showcase, and the aerobics group of the morning exercise): their mid and far levels, about 93 MB. Their area is the showcase of Bãi Trước (data/showcase/bai_truoc.json, outline).",
+			"area": [
+				-650,
+				-365,
+				205,
+				570
+			],
+			"near_m": 300,
+			"files": [
+				"res://assets/world/aerobics_leader.mid.glb",
+				"res://assets/world/aerobics_leader.far.glb",
+				"res://assets/world/aerobics_1.mid.glb",
+				"res://assets/world/aerobics_1.far.glb",
+				"res://assets/world/aerobics_2.mid.glb",
+				"res://assets/world/aerobics_2.far.glb",
+				"res://assets/world/aerobics_3.mid.glb",
+				"res://assets/world/aerobics_3.far.glb",
+				"res://assets/world/aerobics_4.mid.glb",
+				"res://assets/world/aerobics_4.far.glb",
+				"res://assets/world/aerobics_5.mid.glb",
+				"res://assets/world/aerobics_5.far.glb",
+				"res://assets/world/aerobics_6.mid.glb",
+				"res://assets/world/aerobics_6.far.glb",
+				"res://assets/world/walker_1.mid.glb",
+				"res://assets/world/walker_1.far.glb",
+				"res://assets/world/walker_2.mid.glb",
+				"res://assets/world/walker_2.far.glb",
+				"res://assets/world/walker_3.mid.glb",
+				"res://assets/world/walker_3.far.glb",
+				"res://assets/world/walker_4.mid.glb",
+				"res://assets/world/walker_4.far.glb",
+				"res://assets/world/walker_5.mid.glb",
+				"res://assets/world/walker_5.far.glb",
+				"res://assets/world/walker_6.mid.glb",
+				"res://assets/world/walker_6.far.glb",
+				"res://assets/world/sitter_1.mid.glb",
+				"res://assets/world/sitter_1.far.glb",
+				"res://assets/world/sitter_2.mid.glb",
+				"res://assets/world/sitter_2.far.glb",
+				"res://assets/world/sitter_3.mid.glb",
+				"res://assets/world/sitter_3.far.glb",
+				"res://assets/world/swimmer_1.mid.glb",
+				"res://assets/world/swimmer_1.far.glb",
+				"res://assets/world/swimmer_2.mid.glb",
+				"res://assets/world/swimmer_2.far.glb",
+				"res://assets/world/swimmer_3.mid.glb",
+				"res://assets/world/swimmer_3.far.glb",
+				"res://assets/world/swimmer_4.mid.glb",
+				"res://assets/world/swimmer_4.far.glb"
+			]
+		}
+	]
+}

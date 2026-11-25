@@ -184,6 +184,9 @@ func _ready() -> void:
 			# Plan 0031, D5: the test of a second pack, after the first frame.
 			if GameState.has_arg("packtest"):
 				add_child.call_deferred(WebPackTest.new()), CONNECT_ONE_SHOT)
+	# Plan 0031, D5: the packs of the web build that come while the game runs.
+	if OS.has_feature("web"):
+		add_child(WebPacks.new(player))
 	if GameState.arg_value("world") == "vung_tau":
 		_start_vung_tau()
 	if vung_tau == null:

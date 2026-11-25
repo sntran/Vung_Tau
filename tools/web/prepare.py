@@ -25,9 +25,20 @@ def config():
     return json.loads((ROOT / "data/web/web.json").read_text(encoding="utf-8"))
 
 
+def packs():
+    """Plan 0031, D5: the packs of data/web/packs.json."""
+    path = ROOT / "data/web/packs.json"
+    return json.loads(path.read_text(encoding="utf-8")).get("packs", []) if path.exists() else []
+
+
+def pack_files():
+    """The files of the packs, as paths of the project (with no res://)."""
+    return [f.removeprefix("res://") for pack in packs() for f in pack["files"]]
+
+
 def filters(cfg):
     include = BASE_INCLUDE + [g + ".gz" for g in cfg["gzip"]]
-    exclude = BASE_EXCLUDE + cfg["left_out"] + cfg["gzip"] + [f"assets/world/{b}.glb" for b in cfg["buildings"]]
+    exclude = BASE_EXCLUDE + cfg["left_out"] + cfg["gzip"] + [f"assets/world/{b}.glb" for b in cfg["buildings"]] + pack_files()
     return ", ".join(include), ", ".join(exclude)
 
 
@@ -70,7 +81,11 @@ def main():
         print("The preset Web agrees with data/web/web.json.")
         return
     path.write_text(text[:match.start(1)] + new + text[match.end(1):], encoding="utf-8")
-    print(f"The preset Web: {len(cfg['buildings'])} near levels and {len(cfg['left_out'])} patterns out; {gzip_copies(cfg)} gzip copies.")
+    print(f"The preset Web: {len(cfg['buildings'])} near levels, {len(cfg['left_out'])} patterns, and {len(pack_files())} files of packs out; {gzip_copies(cfg)} gzip copies.")
+    if "--packs" in sys.argv:
+        # One line for each pack: the id and its files (tools/web/deploy.sh makes them).
+        for pack in packs():
+            print("PACK " + pack["id"] + " " + " ".join(pack["files"]))
 
 
 if __name__ == "__main__":

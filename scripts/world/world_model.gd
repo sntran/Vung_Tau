@@ -109,6 +109,12 @@ static func levels_of(model_id: String) -> Array[String]:
 	return result
 
 
+## Forgets the levels of levels_of(): a pack of the web build (plan 0031, D5)
+## brings files that were not there.
+static func forget_levels() -> void:
+	_levels_cache.clear()
+
+
 ## The scene of a level of a model, loaded one time.
 static func scene(model_id: String, level: String) -> PackedScene:
 	release_dropped()

@@ -88,6 +88,9 @@ func _add_group(world: VungTau, entry: Dictionary) -> void:
 
 ## Shows the groups at their times, with their bodies.
 func update_time(minutes: int) -> void:
+	# Plan 0031, D5: on the web the people come in a pack of their own.
+	if WebPacks.waiting("people"):
+		return
 	for entry: Dictionary in _waiting.duplicate():
 		if minutes >= minutes_of(str(entry.get("from", "05:00"))) and minutes < minutes_of(str(entry.get("to", "06:30"))):
 			_waiting.erase(entry)
