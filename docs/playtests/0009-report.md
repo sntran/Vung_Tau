@@ -459,6 +459,12 @@ Phases 1b and 2 are not done: D-0009-22 to D-0009-26, and the work of Q13 and Q1
 
 Soak run 8 at 2400×1080 failed one time: the player was 0.25 m over the floor of the hẻm, with no solid near. The builder could not make it again, and the soak now writes the clock and the height 10 frames later. Keep it open until a run gives these facts.
 
+#### D-0009-29: Bands of ground show over the road (medium; added 2026-11-25)
+
+On Quang Trung at the junctions south of the start `bai_truoc`, and on Hạ Long near the junction at Cầu Đá, a band of light brown ground shows across the asphalt, and the edge of a road ends in bare ground where a sidewalk stops. The screenshots of PT-80 and PT-81 of plan 0018 show it (`0018/audit-2026-11-25/slow_down_caption.jpg`, the left picture; `0018/audit-2026-11-23/get_off_button.jpg`). In my ride of 2026-11-25 the roads looked not finished, and with the boxes of the town I did not know the place, though the layout of the roads is right.
+
+The correction, in phase 3: no ground shows on the surface of a road or of a junction (a check along each road of the streets of phase 3, as PT-74 run 5 does between the two roads of Quang Trung), and a sidewalk that stops at a junction ends with a curb, not with bare ground.
+
 ### 10.4 Notes for phase 3 and the later pass of the look
 
 - **The trees of the hills** are three times as bright as the canopy of the photos (0.49 against 0.16). This is the one cause of the open value of PT-33 and of the box `hill` of S1 (Q8, Q11).
