@@ -66,6 +66,9 @@ const STEP_VIEW_S := 0.15
 
 ## The joystick or key input: x is to the right, y is forward. The length is 1 or less.
 var move_input := Vector2.ZERO
+## True when move_input comes from the keys (plan 0018, D11: on a scooter the
+## tight turn starts after 0.4 s of A or D held).
+var move_from_keys := false
 ## True during a tap walk.
 var walking := false
 ## False in a world without a navigation mesh: a tap walk then goes straight to the point.
@@ -292,7 +295,7 @@ func _ride_physics(delta: float) -> void:
 	var input := move_input
 	if ride_hold and absf(ride.speed) < 0.05:
 		input = Vector2.ZERO
-	ride.step(delta, maxf(input.y, 0.0), maxf(-input.y, 0.0), input.x)
+	ride.step(delta, maxf(input.y, 0.0), maxf(-input.y, 0.0), input.x, move_from_keys)
 	rotation = Vector3(0, deg_to_rad(ride.heading), 0)
 	var v := ride.velocity()
 	velocity.x = v.x

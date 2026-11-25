@@ -14,6 +14,8 @@ const START_AHEAD := 4.0
 const ENGINE_PITCH := Vector2(1.0, 2.6)
 ## The caption of the engine shows again after this time (s) while the player rides.
 const ENGINE_CAPTION_S := 8.0
+## D12: the hint shows on this many first rides.
+const HINT_RIDES := 3
 ## The caption "wait" shows again after this time (s) while the player pushes (D-0018-03).
 const WAIT_CAPTION_S := 3.0
 
@@ -159,6 +161,11 @@ func ride(index: int) -> void:
 		return
 	paint = taken.paint
 	_main.player.start_ride(taken.model, taken.at)
+	# D12: the hint on the first rides.
+	var rides := int(GameState.flags.get("scooter_rides", 0)) + 1
+	GameState.flags["scooter_rides"] = rides
+	if rides <= HINT_RIDES:
+		_main.start_ride_hint()
 	start_sound.play()
 	_show_caption("scooter_start")
 	_caption_left = 1.5

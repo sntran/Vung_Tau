@@ -158,5 +158,8 @@
 		"en": "Get off"
 	},
 	"scooter_too_fast": "Slow down to get off.",
-	"scooter_wait": "The street is not ready yet. Wait a moment."
+	"scooter_wait": "The street is not ready yet. Wait a moment.",
+	"scooter_hint_touch": "Stick up: go · down: brake · to the sides: turn",
+	"scooter_hint_keys": "W go · S brake · A D turn · E get off",
+	"scooter_hint_gamepad": "RT go · LT brake · left stick turn · A get off"
 }

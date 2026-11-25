@@ -14,8 +14,16 @@ const TOP_SPEED := 40.0 / 3.6
 const ACCELERATION := TOP_SPEED / 8.0
 ## The brake: about 4 m/s² (D2).
 const BRAKE := 4.0
-## With no throttle and no brake, the scooter slows by this (m/s²).
-const COAST := 0.4
+## D10: when the rider wants less speed than now, or lets go, the engine
+## slows the scooter by this (m/s²): from 40 km/h to 20 km/h in 3.7 s.
+const ENGINE_SLOW := 1.5
+## D11: the stick held hard to a side (TIGHT_FROM to 1.0 of its sideways part)
+## lowers the speed that the scooter keeps from the top speed to TIGHT_SPEED,
+## at TIGHT_SLOW at most. With the keys, after KEY_TIGHT_S of the key held.
+const TIGHT_FROM := 0.8
+const TIGHT_SPEED := 12.0 / 3.6
+const TIGHT_SLOW := 2.5
+const KEY_TIGHT_S := 0.4
 ## Back with the feet, when the scooter stands and the player holds the brake (D8).
 const PUSH_BACK := 0.5
 ## The largest turn of the handlebars (D4), in degrees.
@@ -42,26 +50,35 @@ var steer := 0.0
 var lean := 0.0
 ## The turn of the wheels, in degrees (for the joints of World).
 var wheel_turn := 0.0
+## How long a key has held the turn hard to a side (s), for D11.
+var _key_hard_s := 0.0
 
 
-## One step of "dt" seconds. "throttle" and "brake" are 0 to 1; "steer_input"
-## is -1 (left) to 1 (right).
-func step(dt: float, throttle: float, brake: float, steer_input: float) -> void:
+## One step of "dt" seconds. "throttle" is the part of the stick that is up
+## (0 to 1), "brake" the part that is down (0 to 1); "steer_input" is -1 (left)
+## to 1 (right). "keys": the input comes from keys (D11: the tight turn after
+## KEY_TIGHT_S).
+func step(dt: float, throttle: float, brake: float, steer_input: float, keys := false) -> void:
 	throttle = clampf(throttle, 0.0, 1.0)
 	brake = clampf(brake, 0.0, 1.0)
+	steer_input = clampf(steer_input, -1.0, 1.0)
+	var cap := tight_speed(absf(steer_input), dt, keys)
 	if brake > 0.01:
 		if speed > 0.01:
 			speed = maxf(speed - BRAKE * brake * dt, 0.0)
 		elif throttle <= 0.01:
 			# The scooter stands: the feet push it back slowly (D8).
 			speed = -PUSH_BACK * brake
-	elif throttle > 0.01:
-		if speed < 0.0:
-			speed = minf(speed + BRAKE * dt, 0.0)
-		else:
-			speed = minf(speed + ACCELERATION * throttle * dt, TOP_SPEED)
+	elif speed < 0.0:
+		speed = minf(speed + BRAKE * dt, 0.0)
 	else:
-		speed = move_toward(speed, 0.0, COAST * dt)
+		# D10: the stick gives the speed that the rider wants; D11: a tight turn keeps less.
+		var target := minf(throttle * TOP_SPEED, cap)
+		if speed < target:
+			speed = minf(speed + ACCELERATION * dt, target)
+		elif speed > target:
+			var slow := TIGHT_SLOW if speed > cap else ENGINE_SLOW
+			speed = maxf(speed - slow * dt, target)
 	speed = clampf(speed, -PUSH_BACK, TOP_SPEED)
 	var limit := max_steer()
 	var target := clampf(steer_input, -1.0, 1.0) * limit
@@ -73,6 +90,20 @@ func step(dt: float, throttle: float, brake: float, steer_input: float) -> void:
 	lean = move_toward(lean, lean_target, 30.0 * dt)
 	# The wheels: about 0.25 m of radius.
 	wheel_turn = fmod(wheel_turn + rad_to_deg(speed * dt / 0.25), 360.0)
+
+
+## D11: the speed that the scooter keeps for the sideways part of the stick
+## (0 to 1): the top speed to TIGHT_FROM, then down to TIGHT_SPEED at 1.0.
+## With the keys, only after KEY_TIGHT_S of the key held.
+func tight_speed(side: float, dt := 0.0, keys := false) -> float:
+	var part := clampf((side - TIGHT_FROM) / (1.0 - TIGHT_FROM), 0.0, 1.0)
+	if keys:
+		_key_hard_s = _key_hard_s + dt if side >= TIGHT_FROM else 0.0
+		if _key_hard_s < KEY_TIGHT_S:
+			part = 0.0
+	else:
+		_key_hard_s = 0.0
+	return lerpf(TOP_SPEED, TIGHT_SPEED, part)
 
 
 ## The largest turn of the handlebars at the speed now (D4).

@@ -19,6 +19,9 @@ extends RefCounted
 # phase: --start-time=12:00 --quality=low --renderer=compatibility
 
 
+## As Main.RIDE_HINT_S: the hint of the first rides shows 6 s at most (D12).
+const RIDE_HINT_S := 6.0
+
 func run(d: PlaytestDriver) -> void:
 	# Run 1 at 2400x1080 and 720x1280 (Mobile), run 2 at 1280x720 (Compatibility).
 	var web_size := d.main().get_window().size == Vector2i(1280, 720)
@@ -73,14 +76,31 @@ func run(d: PlaytestDriver) -> void:
 	d.expect(s.action_verb == Riding.verb("scooter_get_off"), "on the scooter the button is \"Get off\": \"%s\"" % s.action_verb)
 	_check_room(d, "riding")
 	await d.screenshot("get_off_button")
+	# D12, R13: on the first ride the hint shows by the joystick; it goes away
+	# when the rider has used each direction (up, a side, down), or after 6 s.
+	var hint := Content.ui_text("scooter_hint_touch")
+	var on_at: float = Playtest.frame_s
+	d.expect(hint != "" and s.hint_text == hint, "on the first ride the hint shows: \"%s\" (D12)" % s.hint_text)
+	_check_room(d, "ride_hint")
+	await d.screenshot("ride_hint")
+	for step: Vector2 in [Vector2(0, -1), Vector2(1, 0)]:
+		await _hold_and_shoot(d, step, 0.3, "")
+		var shown: bool = d.state().hint_text == hint
+		var seconds: float = Playtest.frame_s - on_at
+		d.step("after the push %s: the hint shows %s, %.1f s after the rider got on" % [step, shown, seconds])
+		d.expect(shown or seconds >= RIDE_HINT_S, "before each direction is used and before 6 s, the hint still shows (%.1f s)" % seconds)
+	await _hold_and_shoot(d, Vector2(0, 1), 0.3, "")
+	s = d.state()
+	d.expect(s.hint_text == "", "after up, a side, and down, the hint goes away (D12): \"%s\"" % s.hint_text)
 	# Up rides.
 	await _hold_and_shoot(d, Vector2(0, -1), 3.0, "drag_up_rides")
 	s = d.state()
 	d.expect(s.speed_kmh > 8.0, "the drag up rides: %.1f km/h" % s.speed_kmh)
 	# "Get off" at a speed: the player stays on, and the caption says to slow down (D9).
+	# The screenshot in the first frame after the tap (report 0018, section 7.3).
 	var moving_kmh: float = s.speed_kmh
 	await d.tap_id("action")
-	await d.wait_frames(3)
+	await d.screenshot("get_off_at_speed")
 	s = d.state()
 	var caption: Dictionary = d.subtitle()
 	var slow_down := Content.ui_text("scooter_too_fast")
@@ -88,7 +108,6 @@ func run(d: PlaytestDriver) -> void:
 	d.expect(str(caption.get("text", caption.get("vi", ""))).contains(slow_down) or str(caption).contains(slow_down),
 			"a tap on \"Get off\" at a speed shows \"%s\": %s" % [slow_down, caption])
 	_check_room(d, "get_off_at_speed")
-	await d.screenshot("get_off_at_speed")
 	# To the side turns.
 	var heading: float = s.heading
 	await _hold_and_shoot(d, Vector2(0.8, -0.6), 1.5, "drag_right_turns")
@@ -152,7 +171,7 @@ func _hold_and_shoot(d: PlaytestDriver, direction: Vector2, seconds: float, shot
 		await d.wait_frames(1)
 		if timer == null:
 			timer = d.main().get_tree().create_timer(seconds, false, true)
-		elif not shot_taken and timer.time_left < seconds / 2.0:
+		elif shot != "" and not shot_taken and timer.time_left < seconds / 2.0:
 			shot_taken = true
 			var s := d.state()
 			d.expect(s.stick_visible and not s.stick_resting, "%s: the joystick is under the thumb" % shot)
@@ -179,6 +198,20 @@ func _check_room(d: PlaytestDriver, where: String) -> void:
 			"the action button": m.action_button.get_global_rect() if m.action_button.visible else Rect2()}
 	if s.phone_up:
 		others["the phone"] = s.phone_rect
+	# R13, R14: the hint and the name of the road are clear of the other things.
+	for label: String in ["hint", "road_name"]:
+		var r: Rect2 = s["%s_rect" % label]
+		if r.size == Vector2.ZERO:
+			continue
+		var blocks := {"the joystick": stick, "the phone button": s.phone_button_rect, "the subtitles": s.subtitle_rect,
+				"the action button": m.action_button.get_global_rect() if m.action_button.visible else Rect2(),
+				"the center dot": m.center_dot.get_global_rect()}
+		for other: String in blocks:
+			var o: Rect2 = blocks[other]
+			if o.size != Vector2.ZERO:
+				d.expect(not r.intersects(o), "%s: the %s %s is clear of %s %s (R13, R14)" % [where, label.replace("_", " "), r, other, o])
+		var view: Vector2 = m.ui_root.get_viewport_rect().size
+		d.expect(Rect2(Vector2.ZERO, view).encloses(r), "%s: the %s %s is on the screen %s" % [where, label.replace("_", " "), r, view])
 	# D-0018-02: on the scooter, "Get off" is out of the middle third of the view.
 	if s.riding and m.action_button.visible:
 		var view: Vector2 = m.ui_root.get_viewport_rect().size

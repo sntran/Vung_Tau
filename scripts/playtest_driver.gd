@@ -1062,6 +1062,11 @@ func state() -> Dictionary:
 		"stick_resting": m.joystick.resting,
 		"stick_center": m.joystick.center,
 		"stick_rect": Rect2(m.joystick.center - Vector2.ONE * Joystick.RADIUS, Vector2.ONE * Joystick.RADIUS * 2.0) if m.joystick.visible else Rect2(),
+		# Plan 0018, D12 and D13: the hint of the first rides and the name of the road.
+		"hint_text": m.ride_hint_text(),
+		"hint_rect": m.ride_hint_rect(),
+		"road_name": m.road_name_text(),
+		"road_name_rect": m.road_name_rect(),
 
 		"lights_in_view": m.lights_in_view(),
 		"view_settled": _view_settled(m),
@@ -1513,19 +1518,27 @@ static func _length(line: PackedVector3Array) -> float:
 	return total
 
 
+## ride_along() with "stick_only": the up part of the stick in a tight turn.
+const STICK_ONLY_TURN_UP := 0.3
+
+
 ## Plan 0018, R10: rides the route on the scooter with the joystick (real
 ## input: one touch on the left half, its drag point moves in each frame), as
-## stick_along() walks one. The drag up is the throttle, down the brake, and
-## to the sides the handlebars. The handlebars turn to a point ahead on the
-## route (the pure pursuit of a two-wheeler: the turn that takes the wheelbase
-## to the point), and the speed is the speed asked, less in a turn (at most
-## 3 m/s² to the side) and, with "stop", less near the end (a brake of 3 m/s²).
+## stick_along() walks one. The part of the drag that is up is the speed that
+## the rider wants (D10), down is the brake, and to the sides the handlebars.
+## The handlebars turn to a point ahead on the route (the pure pursuit of a
+## two-wheeler: the turn that takes the wheelbase to the point), and the speed
+## is the speed asked, less in a turn (at most 3 m/s² to the side) and, with
+## "stop", less near the end (a slowing of 3 m/s²); the brake only when the
+## engine (1.5 m/s²) does not slow the scooter enough.
 ## "check" runs in each frame. Returns true when the scooter is within 1 m of
 ## the distance "to" along the route, or when "until" returns true. With
 ## "shot", the screenshot of that name is taken then, before the thumb lets
-## go of the stick. A play test of the town can use it to go far fast.
+## go of the stick. With "stick_only" (plan 0018, D10, D11): no brake; the
+## stick up gives the speed, and hard to the side makes a turn tight. A play
+## test of the town can use it to go far fast.
 func ride_along(route: PackedVector3Array, to: float, speed_kmh := 40.0, check := Callable(),
-		stop := false, max_s := 170.0, until := Callable(), shot := "") -> bool:
+		stop := false, max_s := 170.0, until := Callable(), shot := "", stick_only := false) -> bool:
 	if not state().riding:
 		fail("ride_along: the player does not ride a scooter")
 		return false
@@ -1574,13 +1587,34 @@ func ride_along(route: PackedVector3Array, to: float, speed_kmh := 40.0, check :
 		var steer_input := clampf(steer / max_steer, -1.0, 1.0)
 		# The speed: less in the turns of the next 25 m, and near the end with "stop".
 		var want := speed_kmh / 3.6
-		var bend := _route_bend(route, here, minf(here + 25.0, to))
-		if bend > 0.001:
-			want = minf(want, sqrt(3.0 / bend))
-		if stop:
-			want = minf(want, sqrt(2.0 * 3.0 * maxf(to - here, 0.0)))
-		var throttle := clampf((want - v) * 0.8, -1.0, 1.0)
-		var knob := Vector2(steer_input, -throttle).limit_length(1.0)
+		var knob: Vector2
+		if stick_only:
+			# Plan 0018, D10, D11: up for the speed, then hard to the side for a
+			# turn that the speed now cannot make; no brake.
+			if absf(steer_input) >= ScooterMotion.TIGHT_FROM:
+				knob = Vector2(signf(steer_input), -STICK_ONLY_TURN_UP).normalized()
+			else:
+				knob = Vector2(steer_input, -want / ScooterMotion.TOP_SPEED).limit_length(1.0)
+		else:
+			var bend := _route_bend(route, here, minf(here + 25.0, to))
+			if bend > 0.001:
+				want = minf(want, sqrt(3.0 / bend))
+			if stop:
+				want = minf(want, sqrt(2.0 * 3.0 * maxf(to - here, 0.0)))
+			# D10: the up part of the stick is the speed that the rider wants; the
+			# engine slows the scooter at 1.5 m/s². The brake (down) only when the
+			# scooter must slow more than the engine does.
+			var up := clampf(want / ScooterMotion.TOP_SPEED, 0.0, 1.0)
+			var y := -up
+			if v > want + 1.5:
+				y = clampf((v - want) * 0.5, 0.0, 1.0)
+			# Under 0.8 to the side: the tight turn of D11 is for a turn that the
+			# speed now cannot make.
+			if absf(steer_input) < 1.0:
+				steer_input = clampf(steer_input, -0.79, 0.79)
+			knob = Vector2(steer_input, y)
+			if knob.length() > 1.0:
+				knob = knob.normalized()
 		var at := to_screen(start + knob * Joystick.RADIUS)
 		var drag := InputEventScreenDrag.new()
 		drag.index = 0

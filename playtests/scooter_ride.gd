@@ -27,6 +27,7 @@ extends RefCounted
 # phase: --world=vung_tau --start=bai_truoc --start-time=17:05 --quality=low --ride
 # phase: --world=vung_tau --start=bai_truoc --start-time=17:10 --quality=low --ride
 # phase: --world=vung_tau --start=bai_truoc --start-time=17:15 --quality=low --ride
+# phase: --world=vung_tau --start=bai_truoc --start-time=17:20 --quality=low --ride
 
 ## The roads of the ride (OSM ways): Quang Trung to the south, Hạ Long to the
 ## west and its last part to the junction at Cầu Đá, and Hạ Long from the
@@ -53,6 +54,11 @@ const CURB_FAST := [Vector3(99.8, 0.0, 30.0), Vector3(95.9, 0.0, 58.0), Vector3(
 		Vector3(97.3, 0.0, 70.0), Vector3(97.8, 0.0, 76.0)]
 ## After the curb, the scooter rides at least this far on the sidewalk (m).
 const ON_SIDEWALK := 5.0
+## Run 5 (plan 0018, D10, D11, D13): Nguyễn Trãi, the road to the east from
+## Quang Trung south of the start of Bãi Trước.
+const NGUYEN_TRAI := "Nguyễn Trãi"
+## After the turn the rider lets go on Nguyễn Trãi this far from Quang Trung (m).
+const LET_GO_AT := 45.0
 ## The two roads of Quang Trung (one for each way).
 const QUANG_TRUNG := [1558591261, 200554615]
 
@@ -81,8 +87,10 @@ func run(d: PlaytestDriver) -> void:
 		await _run_2(d)
 	elif d.phase == 3:
 		await _run_3(d)
-	else:
+	elif d.phase == 4:
 		await _run_4(d)
+	else:
+		await _run_5(d)
 
 
 ## The roads of the data by id: their points, in order, from "from" on.
@@ -597,3 +605,118 @@ func _on_sand(player: Player, w: VungTau, point: Vector3) -> bool:
 		return false
 	var shape := body.shape_owner_get_shape(body.shape_find_owner(int(hit.shape)), 0)
 	return shape is HeightMapShape3D
+
+
+## Run 5 (plan 0018, D10, D11, D13): from the start of Bãi Trước, south on
+## Quang Trung at the top speed, then left into Nguyễn Trãi with the stick only
+## (up, then hard to the side; no brake). The scooter stays on the roads, with
+## no bump. On Nguyễn Trãi the rider lets go, and the engine slows the scooter
+## at 1.5 m/s². The name of each road shows when the scooter comes onto it,
+## with a screenshot of each.
+func _run_5(d: PlaytestDriver) -> void:
+	var s := d.state()
+	if not d.expect(s.riding, "with --ride the game starts on the scooter of the start (R8)"):
+		return
+	var w := d.world()
+	d.expect(s.hint_text == Content.ui_text("scooter_hint_touch") or s.hint_text == Content.ui_text("scooter_hint_keys"),
+			"the hint of the first ride shows when the world is ready (D12): \"%s\"" % s.hint_text)
+	await d.screenshot("ride_hint")
+	await d.wait_showcase()
+	await d.wait_frames(3)
+	s = d.state()
+	# The route: the road of Quang Trung to the south from the scooter, to the
+	# end of Nguyễn Trãi at Quang Trung, then along Nguyễn Trãi.
+	var nt_points: Array[Vector3] = []
+	for road: Dictionary in w.data.roads:
+		if road.name == NGUYEN_TRAI:
+			for p: Array in road.points:
+				nt_points.append(Vector3(p[0], p[1], p[2]))
+	if not d.expect(nt_points.size() > 1, "the road Nguyễn Trãi is in the data"):
+		return
+	if Vector2(nt_points[-1].x - s.player.x, nt_points[-1].z - s.player.z).length() \
+			< Vector2(nt_points[0].x - s.player.x, nt_points[0].z - s.player.z).length():
+		nt_points.reverse()
+	var corner: Vector3 = nt_points[0]
+	var route := PackedVector3Array()
+	var south := _road_points(d, QUANG_TRUNG_SOUTH)
+	var nearest := 0
+	for i in south.size():
+		if Vector2(south[i].x - s.player.x, south[i].z - s.player.z).length() < Vector2(south[nearest].x - s.player.x, south[nearest].z - s.player.z).length():
+			nearest = i
+	for i in range(nearest, south.size()):
+		if south[i].z > corner.z - 6.0:
+			break
+		route.append(south[i])
+	route.append(Vector3(corner.x - 8.0, corner.y, corner.z))
+	for p in nt_points:
+		route.append(p)
+	var turn_at := PlaytestDriver.route_distance(route, corner)
+	d.step("the route: %.0f m to the corner of Nguyễn Trãi at %s" % [turn_at, corner])
+	var player: Player = d.main().player
+	var bumps_before: int = s.bumps
+	var trace := {"off": [], "names": [], "braked": false, "max_kmh": 0.0}
+	var watch := func() -> void:
+		_check(d)
+		var now := d.state()
+		trace.max_kmh = maxf(float(trace.max_kmh), now.speed_kmh)
+		if player.move_input.y < -0.05:
+			trace.braked = true
+		if now.road_name != "" and (trace.names.is_empty() or trace.names[-1] != now.road_name):
+			trace.names.append(now.road_name)
+		var middle := player.ride_middle()
+		if not _near_road(w, middle, 2.5) and _on_ground(player, middle) and trace.off.size() < 5:
+			trace.off.append(middle)
+	# The name of the road shows when the scooter starts on it, and when it comes onto Nguyễn Trãi.
+	var on_qt := func() -> bool: return d.state().road_name == "Quang Trung"
+	await d.ride_along(route, turn_at - 20.0, TOP_KMH, watch, false, 120.0, on_qt, "road_quang_trung", true)
+	d.expect(d.state().road_name == "Quang Trung", "the name \"Quang Trung\" shows when the scooter rides on it (D13)")
+	var on_nt := func() -> bool: return d.state().road_name == NGUYEN_TRAI
+	await d.ride_along(route, turn_at + LET_GO_AT, TOP_KMH, watch, false, 120.0, on_nt, "road_nguyen_trai", true)
+	s = d.state()
+	d.expect(s.road_name == NGUYEN_TRAI, "the name \"%s\" shows when the scooter comes onto it (D13): \"%s\"" % [NGUYEN_TRAI, s.road_name])
+	var ok := await d.ride_along(route, turn_at + LET_GO_AT, 30.0, watch, false, 120.0, Callable(), "", true)
+	s = d.state()
+	d.step("the turn into Nguyễn Trãi: the top %.1f km/h, %d bumps, off the roads at %s, the names %s, the brake used %s" % [
+			float(trace.max_kmh), s.bumps - bumps_before, trace.off, trace.names, trace.braked])
+	d.expect(ok, "the scooter rides into Nguyễn Trãi with the stick only")
+	d.expect(float(trace.max_kmh) >= TOP_KMH - 2.0, "the scooter goes at the top speed on Quang Trung: %.1f km/h" % float(trace.max_kmh))
+	d.expect(not trace.braked, "the turn has no brake (D11)")
+	d.expect(s.bumps == bumps_before, "the turn into Nguyễn Trãi has no bump (D11): %d" % (s.bumps - bumps_before))
+	d.expect(trace.off.is_empty(), "the scooter stays on the roads: %s" % [trace.off])
+	d.expect(trace.names.has("Quang Trung") and trace.names.has(NGUYEN_TRAI), "the names of the roads show: %s (D13)" % [trace.names])
+	# D10: the rider lets go on a straight road; the engine slows the scooter at 1.5 m/s².
+	var v0: float = s.speed_kmh / 3.6
+	var frame0 := Engine.get_physics_frames()
+	await d.wait_seconds(1.5)
+	s = d.state()
+	var seconds := (Engine.get_physics_frames() - frame0) / float(Engine.physics_ticks_per_second)
+	var slow: float = (v0 - s.speed_kmh / 3.6) / maxf(seconds, 0.001)
+	d.step("let go at %.1f km/h: %.1f km/h after %.2f s, %.2f m/s²" % [v0 * 3.6, s.speed_kmh, seconds, slow])
+	d.expect(v0 * 3.6 > 10.0 and absf(slow - ScooterMotion.ENGINE_SLOW) <= 0.2,
+			"with no stick the engine slows the scooter at 1.5 m/s² (D10): %.2f m/s² from %.1f km/h" % [slow, v0 * 3.6])
+	await d.screenshot("let_go_slows")
+	d.expect(_overlaps.is_empty(), "the scooter never goes into a solid thing: %s" % [_overlaps])
+
+
+## True when the floor under the point is the height map of the ground (not a
+## road surface of the showcase or a part).
+func _on_ground(player: Player, point: Vector3) -> bool:
+	var query := PhysicsRayQueryParameters3D.create(point + Vector3(0, 1.0, 0), point - Vector3(0, 2.0, 0), Layers.FLOOR)
+	query.exclude = [player.get_rid()]
+	var hit := player.get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		return false
+	var body := hit.collider as CollisionObject3D
+	if body == null:
+		return false
+	return body.shape_owner_get_shape(body.shape_find_owner(int(hit.shape)), 0) is HeightMapShape3D
+
+
+## True when a road is at the point or within "margin" of it (the asphalt of
+## a junction between the two roads of Quang Trung is between their widths:
+## at Nguyễn Trãi it is about 4.4 m wide).
+func _near_road(w: VungTau, point: Vector3, margin: float) -> bool:
+	for offset: Vector3 in [Vector3.ZERO, Vector3(margin, 0, 0), Vector3(-margin, 0, 0), Vector3(0, 0, margin), Vector3(0, 0, -margin)]:
+		if not w.road_at(point + offset).is_empty():
+			return true
+	return false

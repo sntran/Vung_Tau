@@ -35,6 +35,12 @@ const HOME_DISTANCE := 5.0
 ## The subtitles stay out of it (R13).
 const STICK_ZONE := Vector2(340, 260)
 const SUBTITLE_MARGIN := 16.0
+## Plan 0018, D13: the name of a road shows this long (s of the clock).
+const ROAD_NAME_S := 3.0
+## The name changes only while the player moves faster than this (m/s).
+const ROAD_NAME_MOVING := 0.3
+## Plan 0018, D12: the hint of the first rides (Riding.HINT_RIDES) shows this long (s).
+const RIDE_HINT_S := 6.0
 
 ## The test ID of the focus ("spot.pho", "npc.batu"), or "".
 var focus_id := ""
@@ -83,6 +89,15 @@ var debug_overlay: Label
 @onready var action_button: Button = $UI/Root/ActionButton
 ## True while the action button is at its place for the scooter (D-0018-02).
 var _action_on_scooter := false
+## Plan 0018, D12 and D13: the hint of the first rides and the name of the road.
+var _hint_note: ScreenNote
+var _road_note: ScreenNote
+## The name of the last road that the player was on ("" for a road with no name).
+var _road_name_last := "-"
+## The directions of the stick that the rider used while the hint shows.
+var _hint_used := {}
+## The kind of the last input: "touch", "keys", or "gamepad" (D12).
+var last_input := "keys"
 @onready var ting_player: AudioStreamPlayer = $Sounds/Ting
 var subtitles: Subtitles
 var phone: Phone
@@ -119,6 +134,14 @@ var _stopped := false
 func _ready() -> void:
 	add_to_group("main")
 	ui_root.theme = UiTheme.make()
+	if DisplayServer.is_touchscreen_available():
+		last_input = "touch"
+	_road_note = ScreenNote.new()
+	_road_note.name = "RoadName"
+	ui_root.add_child(_road_note)
+	_hint_note = ScreenNote.new()
+	_hint_note.name = "RideHint"
+	ui_root.add_child(_hint_note)
 	ting_player.stream = Tones.ting()
 	action_button.set_meta("test_id", "action")
 	action_button.theme_type_variation = "PrimaryButton"
@@ -246,6 +269,8 @@ func _process(delta: float) -> void:
 	_read_keys()
 	_read_gyro(delta)
 	_update_focus()
+	_update_road_name(delta)
+	_update_ride_hint(delta)
 	_update_speech(delta)
 	_update_talk(delta)
 	_update_chats(delta)
@@ -276,12 +301,18 @@ func _read_keys() -> void:
 		keys.x += 1.0
 	if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT):
 		keys.x -= 1.0
+	var from_keys := keys != Vector2.ZERO
 	keys += desktop.move_stick()
-	# Plan 0018, D8: on a scooter the right trigger is the throttle and the left trigger the brake.
-	if player.is_riding():
-		keys.y += desktop.triggers()
 	var was_moving := player.move_input.length() > 0.0
-	player.move_input = keys.limit_length(1.0)
+	if player.is_riding():
+		# Plan 0018, D8: on a scooter the right trigger is the throttle and the left trigger the brake.
+		keys.y += desktop.triggers()
+		# D10, D11: W is the full stick up and D the full stick to the side,
+		# also together (each part from -1 to 1).
+		player.move_input = keys.clamp(Vector2(-1, -1), Vector2(1, 1))
+	else:
+		player.move_input = keys.limit_length(1.0)
+	player.move_from_keys = from_keys
 	if was_moving and keys == Vector2.ZERO:
 		_save_position()
 
@@ -307,10 +338,15 @@ func center_view() -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch or event is InputEventScreenDrag:
 		touch_mode = true
+		last_input = "touch"
 	elif (event is InputEventKey and event.pressed) or event is InputEventJoypadButton:
 		touch_mode = false
+		last_input = "keys" if event is InputEventKey else "gamepad"
+	elif event is InputEventJoypadMotion and absf((event as InputEventJoypadMotion).axis_value) > 0.5:
+		last_input = "gamepad"
 	elif event is InputEventMouseButton and event.pressed and event.device != InputEvent.DEVICE_ID_EMULATION:
 		touch_mode = false
+		last_input = "keys"
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -372,6 +408,7 @@ func _move(id: Variant, pos: Vector2, relative: Vector2) -> void:
 		var offset: Vector2 = (pos - t.start) / Joystick.RADIUS
 		joystick.set_knob(offset)
 		player.move_input = Vector2(offset.x, -offset.y).limit_length(1.0)
+		player.move_from_keys = false
 	else:
 		var sensitivity := float(GameState.settings.look_sensitivity) * LOOK_DEG_PER_PIXEL
 		var invert := -1.0 if GameState.settings.invert_y else 1.0
@@ -1239,6 +1276,7 @@ func _layout() -> void:
 	var center := view / 2.0
 	center_dot.position = center - center_dot.size / 2.0
 	_place_action_button(player != null and player.is_riding(), true)
+	_layout_notes(view)
 	joystick.position = Vector2.ZERO
 	joystick.size = view
 	phone.layout(view)
@@ -1269,6 +1307,90 @@ func _place_action_button(on_scooter: bool, force := false) -> void:
 		_layout_subtitles(view)
 
 
+## Plan 0018, D13: the name of the road at the top, in the middle; D12: the
+## hint of the first rides above the zone of the joystick, at the left.
+func _layout_notes(view: Vector2) -> void:
+	if _road_note == null:
+		return
+	_road_note.reset_size()
+	_road_note.position = Vector2((view.x - _road_note.size.x) / 2.0, SUBTITLE_MARGIN)
+	_hint_note.reset_size()
+	# By the joystick (D12), clear of it (R13): above its ring, where the thumb
+	# holds it now or at its rest place; below the ring when no room is above.
+	var center: Vector2 = joystick.center if joystick.visible else stick_rest()
+	var radius := Joystick.RADIUS
+	var hint_size := _hint_note.size
+	var x := clampf(center.x - hint_size.x / 2.0, SUBTITLE_MARGIN, maxf(SUBTITLE_MARGIN, view.x - hint_size.x - SUBTITLE_MARGIN))
+	var y := center.y - radius - hint_size.y - SUBTITLE_MARGIN / 2.0
+	if y < SUBTITLE_MARGIN:
+		y = center.y + radius + SUBTITLE_MARGIN / 2.0
+	_hint_note.position = Vector2(x, y)
+
+
+## Plan 0018, D13: when the player comes onto a road with another name (on a
+## walk or a ride), its name shows for ROAD_NAME_S. A road with no name shows
+## nothing. The time of the note runs with the clock.
+func _update_road_name(delta: float) -> void:
+	if vung_tau == null:
+		return
+	var at := player.ride_middle() if player.is_riding() else player.global_position
+	# The player comes onto a road by a walk or a ride: a placement (the start,
+	# a setup step of a play test) or a flight of the camera shows no name.
+	var moving := Vector2(player.velocity.x, player.velocity.z).length() > ROAD_NAME_MOVING
+	var road := vung_tau.road_at(at) if moving else {}
+	if not road.is_empty():
+		var road_name := str(road.get("name", ""))
+		if road_name != _road_name_last:
+			_road_name_last = road_name
+			if road_name != "":
+				_road_note.show_text(road_name, ROAD_NAME_S)
+			else:
+				_road_note.hide_note()
+	_road_note.tick(delta if GameState.clock_running else 0.0)
+
+
+## Plan 0018, D12: the hint on the first Riding.HINT_RIDES rides (Riding calls it
+## when the player gets on). The words are for the last kind of input.
+func start_ride_hint() -> void:
+	_hint_used = {}
+	_hint_note.show_text(_ride_hint_words(), RIDE_HINT_S)
+
+
+## The words of the hint for the last kind of input (data/ui.json).
+func _ride_hint_words() -> String:
+	var key := {"touch": "scooter_hint_touch", "gamepad": "scooter_hint_gamepad"}.get(last_input, "scooter_hint_keys") as String
+	if touch_mode:
+		key = "scooter_hint_touch"
+	return Content.ui_text(key)
+
+
+## The hint goes after RIDE_HINT_S, or when the rider used each direction (up,
+## down, a side), or when the player gets off.
+func _update_ride_hint(delta: float) -> void:
+	if _hint_note == null or not _hint_note.visible:
+		return
+	if not player.is_riding():
+		_hint_note.hide_note()
+		return
+	# The words follow the kind of input (a phone knows it at the first touch).
+	var words := _ride_hint_words()
+	if _hint_note.label.text != words:
+		_hint_note.label.text = words
+	var stick := player.move_input
+	if stick.y > 0.3:
+		_hint_used.up = true
+	if stick.y < -0.3:
+		_hint_used.down = true
+	if absf(stick.x) > 0.3:
+		_hint_used.side = true
+	if _hint_used.size() >= 3:
+		_hint_note.hide_note()
+		return
+	# The time of the hint runs only while the rider can ride (with --ride the
+	# world loads first, and the scooter waits for the showcase: D-0018-03).
+	_hint_note.tick(delta if GameState.clock_running and not player.ride_hold else 0.0)
+
+
 func _layout_subtitles(view: Vector2) -> void:
 	var stick := stick_zone()
 	var phone_left := view.x - minf(view.x * Phone.MAX_FRACTION, Phone.MAX_WIDTH) - Phone.MARGIN
@@ -1292,6 +1414,9 @@ func _layout_subtitles(view: Vector2) -> void:
 		left = SUBTITLE_MARGIN
 		right = (phone_left if phone.up else view.x) - SUBTITLE_MARGIN
 		bottom = minf(stick.position.y, top_right) - SUBTITLE_MARGIN
+		# Plan 0018, D12: and above the hint of the first rides.
+		if _hint_note != null and _hint_note.visible:
+			bottom = minf(bottom, _hint_note.position.y - SUBTITLE_MARGIN)
 	var x := clampf((left + right) / 2.0 - width / 2.0, left, maxf(left, right - width))
 	subtitles.size = Vector2(width, 0)
 	subtitles.position = Vector2(x, bottom - subtitles.size.y)
@@ -1313,6 +1438,24 @@ func stick_rest() -> Vector2:
 
 
 # --- Values for the play tests ---------------------------------------------
+
+## Plan 0018, D12: the text of the hint of the first rides, or "".
+func ride_hint_text() -> String:
+	return _hint_note.shown() if _hint_note != null else ""
+
+
+func ride_hint_rect() -> Rect2:
+	return _hint_note.get_global_rect() if _hint_note != null and _hint_note.visible else Rect2()
+
+
+## Plan 0018, D13: the name of the road on the screen, or "".
+func road_name_text() -> String:
+	return _road_note.shown() if _road_note != null else ""
+
+
+func road_name_rect() -> Rect2:
+	return _road_note.get_global_rect() if _road_note != null and _road_note.visible else Rect2()
+
 
 ## The zone of the joystick and the zone of the look, in base coordinates.
 func input_zones() -> Dictionary:
