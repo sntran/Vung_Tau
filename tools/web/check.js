@@ -84,7 +84,16 @@ async function memoryOf(page) {
 async function openOnce(context, cdp, label, shots) {
   const page = context.pages()[0] || await context.newPage();
   const errors = [], log = [];
-  page.on('console', (m) => { log.push(`${m.type()}: ${m.text()}`); if (m.type() === 'error') errors.push(m.text()); });
+  // A file that the network cuts stops the load of the engine: stop the wait
+  // at once, not after its time limit (openings() then tries again).
+  let cut;
+  const networkCut = new Promise((_, reject) => { cut = reject; });
+  networkCut.catch(() => {});
+  page.on('console', (m) => {
+    log.push(`${m.type()}: ${m.text()}`);
+    if (m.type() === 'error') errors.push(m.text());
+    if (/ERR_CONNECTION_RESET|ERR_CONNECTION_CLOSED|ERR_HTTP2|TypeError: network error|ERR_NETWORK_CHANGED/.test(m.text())) cut(new Error('NETWORK CUT: ' + m.text()));
+  });
   page.on('pageerror', (e) => errors.push(String(e)));
   page.on('crash', () => errors.push('the page crashed (memory: ' + JSON.stringify(rssByType()) + ')'));
   let bytes = 0, requests = 0, fromCache = 0;
@@ -97,7 +106,8 @@ async function openOnce(context, cdp, label, shots) {
   try {
     await page.goto(url, { waitUntil: 'commit', timeout: 600000 });
     if (shots) setTimeout(() => page.screenshot({ path: `${out}/${label}_loading.png` }).catch(() => {}), 5000);
-    await page.waitForFunction(() => window.vungTau && window.vungTau.firstFrameMs >= 0, null, { timeout: 1800000, polling: 250 });
+    await Promise.race([networkCut,
+      page.waitForFunction(() => window.vungTau && window.vungTau.firstFrameMs >= 0, null, { timeout: 1800000, polling: 250 })]);
     result.firstFrameS = (Date.now() - t0) / 1000;
     result.bytesBeforeFirstFrameMB = Math.round(bytes / 1e5) / 10;
     result.requestsBeforeFirstFrame = requests;
@@ -143,16 +153,24 @@ async function measure() {
   const rows = [];
   for (const size of sizes) {
     for (const mbps of networks) {
-      const { context, cdp, profile } = await phoneContext(size, mbps, cpu);
-      for (const cache of ['empty', 'cache']) {
-        const label = `${size}_${mbps}mbps_${cache}`;
-        const r = await openOnce(context, cdp, label, cache === 'empty');
-        Object.assign(r, { size, mbps, cache, cpu });
-        rows.push(r);
-        console.log(JSON.stringify(r));
+      // A cut of the network is not a measure of the build: one more try,
+      // with a new profile (an empty cache again). The row says so.
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        const { context, cdp, profile } = await phoneContext(size, mbps, cpu);
+        const pair = [];
+        for (const cache of ['empty', 'cache']) {
+          const label = `${size}_${mbps}mbps_${cache}`;
+          const r = await openOnce(context, cdp, label, cache === 'empty');
+          Object.assign(r, { size, mbps, cache, cpu, attempt });
+          pair.push(r);
+          console.log(JSON.stringify(r));
+          if (r.failure) break;
+        }
+        await context.close();
+        fs.rmSync(profile, { recursive: true, force: true });
+        const wasCut = pair.some((r) => /NETWORK CUT/.test(r.failure || ''));
+        if (!wasCut || attempt === 2) { rows.push(...pair); break; }
       }
-      await context.close();
-      fs.rmSync(profile, { recursive: true, force: true });
     }
   }
   fs.writeFileSync(`${out}/measure.json`, JSON.stringify({ url, rows }, null, 2));
@@ -178,7 +196,7 @@ function writeMarkdown(file, step, rows) {
     const at25 = r.mbps <= 25;
     const m = r.memoryAtFirstFrame || {};
     const move = r.cache === 'cache' ? TARGETS.canMoveCachedS : TARGETS.canMoveS;
-    lines.push(`| ${r.size.replace('x', ' × ')} | ${r.mbps} Mbit/s | ${r.cache === 'empty' ? 'empty' : 'with the cache'} | ` +
+    lines.push(`| ${r.size.replace('x', ' × ')} | ${r.mbps} Mbit/s | ${r.cache === 'empty' ? 'empty' : 'with the cache'}${r.attempt > 1 ? ' (second try: the network cut the first)' : ''} | ` +
       `${cell(r.bytesBeforeFirstFrameMB, ' MB', at25 && r.cache === 'empty' ? TARGETS.bytesMB : undefined)} | ` +
       `${cell(r.firstFrameS !== undefined ? Math.round(r.firstFrameS) : undefined, ' s', at25 ? TARGETS.firstFrameS : undefined)} | ` +
       `${cell(r.canMoveS !== undefined ? Math.round(r.canMoveS) : undefined, ' s', at25 ? move : undefined)} | ` +
