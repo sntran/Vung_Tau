@@ -199,7 +199,7 @@ func _check_room(d: PlaytestDriver, where: String) -> void:
 	if s.phone_up:
 		others["the phone"] = s.phone_rect
 	# R13, R14: the hint and the name of the road are clear of the other things.
-	for label: String in ["hint", "road_name"]:
+	for label: String in ["hint", "road_sign"]:
 		var r: Rect2 = s["%s_rect" % label]
 		if r.size == Vector2.ZERO:
 			continue

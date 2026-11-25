@@ -1171,7 +1171,10 @@ func lens_card() -> Dictionary:
 		var npc_id := parts[1]
 		var shown: String = Content.speaker(npc_id).name if GameState.has_met(npc_id) else Content.string("someone")
 		return {"kind": "person", "name": shown}
-	var spot := Content.spot(parts[1])
+	# A parked scooter ("scooter.N", plan 0018, R4) is not a spot.
+	var spot := Content.spot(parts[1]) if parts[0] == "spot" else {}
+	if spot.is_empty():
+		return {}
 	var rule := Content.rule_for(spot, "lens", GameState.minutes)
 	var params := _spot_params(spot)
 	return {"kind": "spot", "id": spot.id, "line": rule.get("line", ""), "name": spot.name, "en": spot.en,

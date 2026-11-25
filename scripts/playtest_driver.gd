@@ -1065,8 +1065,8 @@ func state() -> Dictionary:
 		# Plan 0018, D12 and D13: the hint of the first rides and the name of the road.
 		"hint_text": m.ride_hint_text(),
 		"hint_rect": m.ride_hint_rect(),
-		"road_name": m.road_name_text(),
-		"road_name_rect": m.road_name_rect(),
+		"road_sign": m.road_name_text(),
+		"road_sign_rect": m.road_name_rect(),
 
 		"lights_in_view": m.lights_in_view(),
 		"view_settled": _view_settled(m),
