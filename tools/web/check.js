@@ -1,11 +1,42 @@
-// Plan 0009, R16: open the web build in Chromium (Playwright), wait for the
-// first frame of the world, and keep a screenshot, the times, the memory, and
-// the console errors. Usage: node tools/web/check.js URL OUT_FOLDER
+// Plan 0009, R16, and plan 0031, R1: open the web build in Chromium
+// (Playwright) and measure it.
+//
+//   node tools/web/check.js URL OUT
+//       As a computer (1280 × 720, no limits): the first frame of the world,
+//       screenshots, the times, the memory, and the console errors.
+//   node tools/web/check.js URL OUT --measure [--md=docs/web/load.md --step=NAME]
+//       Plan 0031, D3: as a phone (720 × 1280 and 2400 × 1080, a touch screen,
+//       the processor four times slower), with a limit on the network of
+//       25 Mbit/s and of 100 Mbit/s, with an empty cache and then with the
+//       cache. For each: the bytes over the network before the first frame,
+//       the time to the first frame of the world, the time until the player
+//       can move, and the memory (the heap of the engine, the JavaScript heap,
+//       and all of the page). --sizes=, --mbps=, and --cpu= change the set.
+//   node tools/web/check.js URL OUT --pt85 [--mbps=50] [--targets]
+//       Plan 0031, PT-85: see tools/web/pt85.js.
+//   node tools/web/check.js URL OUT --packtest
+//       Plan 0031, D5: the page with ?packtest downloads a second pack while
+//       the game runs and loads a scene from it (scripts/web/pack_test.gd).
+//
+// URL is the page with its parameters (for example ...?start=bai_truoc&ride).
 const { chromium } = require('playwright');
 const { execSync } = require('child_process');
 const fs = require('fs');
-const [url, out] = [process.argv[2], process.argv[3]];
+const os = require('os');
+const path = require('path');
+
+const positional = process.argv.slice(2).filter((a) => !a.startsWith('--'));
+const options = Object.fromEntries(process.argv.slice(2).filter((a) => a.startsWith('--'))
+  .map((a) => { const [k, v] = a.slice(2).split('='); return [k, v === undefined ? true : v]; }));
+const [url, out] = positional;
 fs.mkdirSync(out, { recursive: true });
+
+const ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--enable-precise-memory-info'];
+// A phone of the reference of plan 0031 (Q1, Q3): Chrome on Android. A generic agent string.
+const PHONE_AGENT = 'Mozilla/5.0 (Linux; Android 15; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36';
+// D10: the targets, at 25 Mbit/s.
+const TARGETS = { bytesMB: 40, firstFrameS: 20, canMoveS: 40, canMoveCachedS: 15, memoryMB: 700 };
+
 // The memory (resident) of the processes of Chromium, by type, in MB.
 function rssByType() {
   const lines = execSync('ps -eo rss,args').toString().split('\n');
@@ -19,12 +50,153 @@ function rssByType() {
   for (const k in sum) sum[k] = Math.round(sum[k]);
   return sum;
 }
-(async () => {
-  const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--enable-precise-memory-info'] });
+
+// Before the page: keep each WebAssembly.Memory of the engine, for its heap.
+const WASM_HOOK = `(() => {
+  const memories = [];
+  const keep = (imports, result) => {
+    try {
+      const instance = result.instance || result;
+      for (const value of Object.values(instance.exports || {})) if (value instanceof WebAssembly.Memory) memories.push(value);
+      for (const group of Object.values(imports || {})) for (const value of Object.values(group || {})) if (value instanceof WebAssembly.Memory) memories.push(value);
+    } catch (e) {}
+    return result;
+  };
+  const instantiate = WebAssembly.instantiate;
+  WebAssembly.instantiate = function (source, imports) { return instantiate.apply(this, arguments).then((r) => keep(imports, r)); };
+  const streaming = WebAssembly.instantiateStreaming;
+  if (streaming) WebAssembly.instantiateStreaming = function (source, imports) { return streaming.apply(this, arguments).then((r) => keep(imports, r)); };
+  window.__wasmHeapMB = () => memories.length ? Math.round(Math.max(...memories.map((m) => m.buffer.byteLength)) / 1048576) : null;
+})();`;
+
+async function memoryOf(page) {
+  const rss = rssByType();
+  return {
+    engineHeapMB: await page.evaluate(() => window.__wasmHeapMB ? window.__wasmHeapMB() : null).catch(() => null),
+    jsHeapMB: await page.evaluate(() => performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : null).catch(() => null),
+    pageMB: (rss.renderer || 0) + (rss['gpu-process'] || 0),
+    rssMB: rss,
+  };
+}
+
+// One opening of the page: the times from the start of the navigation, the
+// bytes over the network before the first frame, and the memory.
+async function openOnce(context, cdp, label, shots) {
+  const page = context.pages()[0] || await context.newPage();
+  const errors = [], log = [];
+  page.on('console', (m) => { log.push(`${m.type()}: ${m.text()}`); if (m.type() === 'error') errors.push(m.text()); });
+  page.on('pageerror', (e) => errors.push(String(e)));
+  page.on('crash', () => errors.push('the page crashed (memory: ' + JSON.stringify(rssByType()) + ')'));
+  let bytes = 0, requests = 0, fromCache = 0;
+  const onFinished = (e) => { bytes += e.encodedDataLength; requests += 1; };
+  const onServed = () => { fromCache += 1; };
+  cdp.on('Network.loadingFinished', onFinished);
+  cdp.on('Network.requestServedFromCache', onServed);
+  const result = { label, errors };
+  const t0 = Date.now();
+  try {
+    await page.goto(url, { waitUntil: 'commit', timeout: 600000 });
+    if (shots) setTimeout(() => page.screenshot({ path: `${out}/${label}_loading.png` }).catch(() => {}), 5000);
+    await page.waitForFunction(() => window.vungTau && window.vungTau.firstFrameMs >= 0, null, { timeout: 1800000, polling: 250 });
+    result.firstFrameS = (Date.now() - t0) / 1000;
+    result.bytesBeforeFirstFrameMB = Math.round(bytes / 1e5) / 10;
+    result.requestsBeforeFirstFrame = requests;
+    result.fromCache = fromCache;
+    result.memoryAtFirstFrame = await memoryOf(page);
+    if (shots) await page.screenshot({ path: `${out}/${label}_first_frame.png` });
+    await page.waitForFunction(() => window.vungTau.canMoveMs >= 0, null, { timeout: 1800000, polling: 250 });
+    result.canMoveS = (Date.now() - t0) / 1000;
+    result.memoryCanMove = await memoryOf(page);
+    if (shots) await page.screenshot({ path: `${out}/${label}_can_move.png` });
+  } catch (e) {
+    result.failure = String(e).slice(0, 300);
+    await page.screenshot({ path: `${out}/${label}_failure.png` }).catch(() => {});
+  }
+  result.bytesAllMB = Math.round(bytes / 1e5) / 10;
+  cdp.off('Network.loadingFinished', onFinished);
+  cdp.off('Network.requestServedFromCache', onServed);
+  fs.writeFileSync(`${out}/${label}_console.log`, log.join('\n'));
+  return result;
+}
+
+async function phoneContext(size, mbps, cpu) {
+  const [width, height] = size.split('x').map(Number);
+  const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'vt-profile-'));
+  const context = await chromium.launchPersistentContext(profile, {
+    args: ARGS, viewport: { width, height }, isMobile: true, hasTouch: true, deviceScaleFactor: 1, userAgent: PHONE_AGENT,
+  });
+  await context.addInitScript(WASM_HOOK);
+  const page = context.pages()[0] || await context.newPage();
+  const cdp = await context.newCDPSession(page);
+  await cdp.send('Network.enable');
+  await cdp.send('Network.emulateNetworkConditions', {
+    offline: false, latency: 40, downloadThroughput: mbps * 1e6 / 8, uploadThroughput: Math.min(mbps, 10) * 1e6 / 8,
+  });
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: cpu });
+  return { context, cdp, profile };
+}
+
+async function measure() {
+  const sizes = String(options.sizes || '720x1280,2400x1080').split(',');
+  const networks = String(options.mbps || '25,100').split(',').map(Number);
+  const cpu = Number(options.cpu || 4);
+  const rows = [];
+  for (const size of sizes) {
+    for (const mbps of networks) {
+      const { context, cdp, profile } = await phoneContext(size, mbps, cpu);
+      for (const cache of ['empty', 'cache']) {
+        const label = `${size}_${mbps}mbps_${cache}`;
+        const r = await openOnce(context, cdp, label, cache === 'empty');
+        Object.assign(r, { size, mbps, cache, cpu });
+        rows.push(r);
+        console.log(JSON.stringify(r));
+      }
+      await context.close();
+      fs.rmSync(profile, { recursive: true, force: true });
+    }
+  }
+  fs.writeFileSync(`${out}/measure.json`, JSON.stringify({ url, rows }, null, 2));
+  if (options.md) writeMarkdown(String(options.md), String(options.step || 'A measure'), rows);
+}
+
+function cell(value, unit, target) {
+  if (value === undefined || value === null) return '—';
+  const text = `${value}${unit}`;
+  return target !== undefined && value > target ? `**${text}**` : text;
+}
+
+// Adds a section with one row for each opening to the file (R1).
+function writeMarkdown(file, step, rows) {
+  const date = new Date().toISOString().slice(0, 10);
+  const lines = [
+    '', `## ${step} (${date})`, '',
+    `\`${url}\`, the processor ${rows[0] ? rows[0].cpu : 4} times slower. A value in bold is over its target of D10 (at 25 Mbit/s).`, '',
+    '| Size | Network | Cache | Over the network before the first frame | First frame | Can move | Heap of the engine | JavaScript heap | Page (renderer + GPU) |',
+    '|---|---|---|---|---|---|---|---|---|',
+  ];
+  for (const r of rows) {
+    const at25 = r.mbps <= 25;
+    const m = r.memoryAtFirstFrame || {};
+    const move = r.cache === 'cache' ? TARGETS.canMoveCachedS : TARGETS.canMoveS;
+    lines.push(`| ${r.size.replace('x', ' × ')} | ${r.mbps} Mbit/s | ${r.cache === 'empty' ? 'empty' : 'with the cache'} | ` +
+      `${cell(r.bytesBeforeFirstFrameMB, ' MB', at25 && r.cache === 'empty' ? TARGETS.bytesMB : undefined)} | ` +
+      `${cell(r.firstFrameS !== undefined ? Math.round(r.firstFrameS) : undefined, ' s', at25 ? TARGETS.firstFrameS : undefined)} | ` +
+      `${cell(r.canMoveS !== undefined ? Math.round(r.canMoveS) : undefined, ' s', at25 ? move : undefined)} | ` +
+      `${cell(m.engineHeapMB, ' MB')} | ${cell(m.jsHeapMB, ' MB')} | ${cell(m.pageMB, ' MB', TARGETS.memoryMB)} |` +
+      (r.failure ? ` ${r.failure.replace(/\|/g, '/').slice(0, 120)}` : ''));
+  }
+  const errors = [...new Set(rows.flatMap((r) => r.errors || []))].filter((e) => !/Occlusion culling is disabled|_print_warning/.test(e));
+  if (errors.length) lines.push('', 'Errors in the console: ' + errors.slice(0, 5).map((e) => `\`${e.slice(0, 160)}\``).join('; '));
+  fs.appendFileSync(file, lines.join('\n') + '\n');
+}
+
+// The legacy check (plan 0009, R16): as a computer, no limits.
+async function check() {
+  const browser = await chromium.launch({ args: ARGS });
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   const errors = [], log = [];
-  page.on('console', m => { log.push(`${m.type()}: ${m.text()}`); if (m.type() === 'error') errors.push(m.text()); });
-  page.on('pageerror', e => errors.push(String(e)));
+  page.on('console', (m) => { log.push(`${m.type()}: ${m.text()}`); if (m.type() === 'error') errors.push(m.text()); });
+  page.on('pageerror', (e) => errors.push(String(e)));
   page.on('crash', () => errors.push('the page crashed (memory: ' + JSON.stringify(rssByType()) + ')'));
   browser.on('disconnected', () => errors.push('the browser closed'));
   const t0 = Date.now();
@@ -32,9 +204,7 @@ function rssByType() {
   try {
     await page.goto(url, { waitUntil: 'load', timeout: 600000 });
     result.loadMs = Date.now() - t0;
-    // The signal of the game (R16), or for a build before R16 the hidden status box of the loader.
     await page.waitForFunction(() => (window.vungTau && window.vungTau.firstFrameMs >= 0) ||
-        // The loader of Godot 4.7 removes its status box when the engine starts.
         !document.getElementById('status') || getComputedStyle(document.getElementById('status')).visibility === 'hidden',
         null, { timeout: 1200000, polling: 500 });
     result.firstFrameMs = Date.now() - t0;
@@ -63,4 +233,40 @@ function rssByType() {
   fs.writeFileSync(`${out}/result.json`, JSON.stringify(result, null, 2));
   console.log(JSON.stringify(result, null, 2));
   await browser.close();
+}
+
+// Plan 0031, D5: the test of a second pack, as a computer with no limits.
+async function packTest() {
+  const browser = await chromium.launch({ args: ARGS });
+  const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
+  await context.addInitScript(WASM_HOOK);
+  const page = await context.newPage();
+  const log = [], errors = [];
+  page.on('console', (m) => { log.push(`${m.type()}: ${m.text()}`); if (/SCRIPT ERROR|^ERROR:/.test(m.text())) errors.push(m.text()); });
+  const target = url + (url.includes('?') ? '&' : '?') + 'packtest';
+  const t0 = Date.now();
+  const result = { url: target, errors };
+  try {
+    await page.goto(target, { waitUntil: 'commit', timeout: 600000 });
+    await page.waitForFunction(() => window.vungTau && window.vungTau.packTest && window.vungTau.packTest.done, null, { timeout: 1800000, polling: 500 });
+    result.packTest = await page.evaluate(() => window.vungTau.packTest);
+    result.seconds = (Date.now() - t0) / 1000;
+    result.memory = await memoryOf(page);
+    result.userAgent = await page.evaluate(() => navigator.userAgent);
+  } catch (e) { result.failure = String(e).slice(0, 300); }
+  await page.screenshot({ path: `${out}/packtest.png` }).catch(() => {});
+  fs.writeFileSync(`${out}/packtest_console.log`, log.join('\n'));
+  fs.writeFileSync(`${out}/packtest.json`, JSON.stringify(result, null, 2));
+  console.log(JSON.stringify(result, null, 2));
+  await browser.close();
+  const t = result.packTest || {};
+  return t.loaded && t.scene && errors.length === 0 ? 0 : 1;
+}
+
+const pt85 = require('./pt85.js');
+(async () => {
+  if (options.measure) await measure();
+  else if (options.pt85) process.exitCode = await pt85.run({ url, out, options, ARGS, WASM_HOOK, TARGETS, memoryOf, rssByType });
+  else if (options.packtest) process.exitCode = await packTest();
+  else await check();
 })();

@@ -96,6 +96,10 @@ var _road_note: ScreenNote
 var _road_name_last := "-"
 ## The directions of the stick that the rider used while the hint shows.
 var _hint_used := {}
+## Plan 0031, R1: the time when the player can move, for the page, and the
+## time to the next state for the page.
+var _web_can_move_ms := -1
+var _web_state_left := 0.0
 ## The kind of the last input: "touch", "keys", or "gamepad" (D12).
 var last_input := "keys"
 @onready var ting_player: AudioStreamPlayer = $Sounds/Ting
@@ -264,6 +268,8 @@ func _process(delta: float) -> void:
 	if _web_settled_ms < 0 and vung_tau != null and OS.has_feature("web") and first_frame_ms >= 0 and vung_tau.is_settled():
 		_web_settled_ms = Time.get_ticks_msec()
 		JavaScriptBridge.eval("window.vungTau.settledMs = %d" % _web_settled_ms, true)
+	if OS.has_feature("web") and first_frame_ms >= 0:
+		_update_web_state(delta)
 	_layout()
 	_update_rest_stick()
 	_read_keys()
@@ -1438,6 +1444,23 @@ func stick_rest() -> Vector2:
 
 
 # --- Values for the play tests ---------------------------------------------
+
+## Plan 0031, R1: what the page measures (tools/web/check.js, PT-85): the time
+## when the player can move (the clock runs, and a scooter is not held for the
+## showcase), and four times each second the place, the heading, and the speed.
+func _update_web_state(delta: float) -> void:
+	if _web_can_move_ms < 0 and GameState.clock_running and not player.ride_hold:
+		_web_can_move_ms = Time.get_ticks_msec()
+		JavaScriptBridge.eval("window.vungTau.canMoveMs = %d" % _web_can_move_ms, true)
+	_web_state_left -= delta
+	if _web_state_left > 0.0:
+		return
+	_web_state_left = 0.25
+	var at := player.global_position
+	var heading := player.ride.heading if player.is_riding() else player.yaw
+	JavaScriptBridge.eval("window.vungTau.state = {x: %.2f, z: %.2f, heading: %.1f, speedKmh: %.1f, riding: %s, frames: %d}" % [
+			at.x, at.z, heading, player.ride_speed_kmh(), "true" if player.is_riding() else "false", Engine.get_frames_drawn()], true)
+
 
 ## Plan 0018, D12: the text of the hint of the first rides, or "".
 func ride_hint_text() -> String:
