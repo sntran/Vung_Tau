@@ -135,6 +135,13 @@ async function openOnce(context, cdp, label, shots) {
     result.canMoveS = (Date.now() - t0) / 1000;
     result.memoryCanMove = await memoryOf(page);
     result.parts = await startParts(page);
+    // D13, D16: the memory of the page when the pack people is there (bai_truoc is in its area).
+    const people = await page.waitForFunction(() => window.vungTau.packs && window.vungTau.packs.people, null, { timeout: 300000, polling: 1000 })
+      .then(() => true).catch(() => false);
+    if (people) {
+      result.peopleS = (Date.now() - t0) / 1000;
+      result.memoryPeople = await memoryOf(page);
+    }
     if (shots) await page.screenshot({ path: `${out}/${label}_can_move.png`, timeout: 120000 }).catch(() => {});
   } catch (e) {
     result.failure = String(e).slice(0, 300);
@@ -195,6 +202,12 @@ async function measure() {
   if (options.md) writeMarkdown(String(options.md), String(options.step || 'A measure'), rows);
 }
 
+function peopleCell(r) {
+  if (r.peopleS === undefined) return '—';
+  const m = r.memoryPeople || {};
+  return `${Math.round(r.peopleS)} s, ${m.pageMB} MB, ${m.engineHeapMB} MB`;
+}
+
 function partsCell(p) {
   if (!p || p.downloadS === undefined) return '—';
   const v = (x) => (x === undefined ? '—' : `${x}`);
@@ -213,8 +226,8 @@ function writeMarkdown(file, step, rows) {
   const lines = [
     '', `## ${step} (${date})`, '',
     `\`${url}\`, the processor ${rows[0] ? rows[0].cpu : 4} times slower. A value in bold is over its target of D10 (at 25 Mbit/s).`, '',
-    '| Size | Network | Cache | Over the network before the first frame | First frame | Can move | Heap of the engine | JavaScript heap | Page (renderer + GPU) | Parts: download / compile / engine / world / move |',
-    '|---|---|---|---|---|---|---|---|---|---|',
+    '| Size | Network | Cache | Over the network before the first frame | First frame | Can move | Heap of the engine | JavaScript heap | Page (renderer + GPU) | Parts: download / compile / engine / world / move | The people there: time, page, heap of the engine |',
+    '|---|---|---|---|---|---|---|---|---|---|---|',
   ];
   for (const r of rows) {
     const at25 = r.mbps <= 25;
@@ -224,7 +237,7 @@ function writeMarkdown(file, step, rows) {
       `${cell(r.bytesBeforeFirstFrameMB, ' MB', at25 && r.cache === 'empty' ? TARGETS.bytesMB : undefined)} | ` +
       `${cell(r.firstFrameS !== undefined ? Math.round(r.firstFrameS) : undefined, ' s', at25 ? TARGETS.firstFrameS : undefined)} | ` +
       `${cell(r.canMoveS !== undefined ? Math.round(r.canMoveS) : undefined, ' s', at25 ? move : undefined)} | ` +
-      `${cell(m.engineHeapMB, ' MB')} | ${cell(m.jsHeapMB, ' MB')} | ${cell(m.pageMB, ' MB', TARGETS.memoryMB)} | ${partsCell(r.parts)} |` +
+      `${cell(m.engineHeapMB, ' MB')} | ${cell(m.jsHeapMB, ' MB')} | ${cell(m.pageMB, ' MB', TARGETS.memoryMB)} | ${partsCell(r.parts)} | ${peopleCell(r)} |` +
       (r.failure ? ` ${r.failure.split('\n')[0].replace(/\|/g, '/').slice(0, 120)}` : ''));
   }
   const errors = [...new Set(rows.flatMap((r) => r.errors || []))].filter((e) => !/Occlusion culling is disabled|_print_warning/.test(e));
