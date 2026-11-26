@@ -132,7 +132,8 @@ async function openPage(base, query, label, ctx) {
     r.firstMoveM = Math.round(moved * 100) / 100;
     expect(moved > 0.5, `a touch on the joystick moves the ${after && after.riding ? 'scooter' : 'player'}: ${r.firstMoveM} m`);
     if (after && after.riding) {
-      const ridden = await rideAlong(page, cdp, quangTrung(), RIDE_M, 600);
+      // At 0.4 frames a second (SwiftShader of the workspace), 300 m take about 20 minutes.
+      const ridden = await rideAlong(page, cdp, quangTrung(), RIDE_M, 1500);
       r.riddenM = Math.round(ridden);
       await page.waitForTimeout(1000);
       await page.screenshot({ path: `${out}/${label}_4_after_${RIDE_M}m.png`, timeout: 120000 }).catch(() => {});

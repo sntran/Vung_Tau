@@ -8,6 +8,10 @@ extends Node
 const PACKS := "res://data/web/packs.json"
 ## The player is checked this often (s).
 const CHECK_S := 1.0
+## On the web, HTTPRequest reads one part of the body in each frame, 64 KiB
+## by default: a pack of 81 MB then takes about 1240 frames. With 4 MiB, about
+## 20 frames.
+const CHUNK_BYTES := 4 * 1024 * 1024
 
 signal pack_ready(pack_id: String)
 
@@ -72,6 +76,7 @@ func _init(player: Node3D) -> void:
 func _ready() -> void:
 	_http = HTTPRequest.new()
 	_http.use_threads = false
+	_http.download_chunk_size = CHUNK_BYTES
 	add_child(_http)
 	_http.request_completed.connect(_on_downloaded)
 
@@ -89,9 +94,12 @@ static func url_of(pack_id: String) -> String:
 
 func _process(delta: float) -> void:
 	_left -= delta
-	if _left > 0.0 or _loading != "" or _player == null:
+	if _left > 0.0 or _player == null:
 		return
 	_left = CHECK_S
+	if _loading != "":
+		_tell_page()
+		return
 	var at := _player.global_position
 	for pack_id: String in entries():
 		if not waiting(pack_id):
