@@ -221,16 +221,28 @@ IMPORT_PARAMS = {
 }
 
 
-def write_import(path: Path) -> None:
-    """Writes or corrects the .import file of a GLB with IMPORT_PARAMS."""
+def import_params(model: dict) -> dict[str, str]:
+    """The import settings of the GLBs of a model. Plan 0031, D13: the pictures
+    of a person stay compressed in its scenes (Basis Universal): with no
+    compression the scenes of the people were three times their files, and
+    their pictures took 263 MB of the memory of the textures (docs/web/load.md)."""
+    params = dict(IMPORT_PARAMS)
+    if model.get("order", {}).get("blueprint") == "person":
+        params["gltf/embedded_image_handling"] = "2"
+    return params
+
+
+def write_import(path: Path, params: dict[str, str] | None = None) -> None:
+    """Writes or corrects the .import file of a GLB with its params (IMPORT_PARAMS by default)."""
+    params = IMPORT_PARAMS if params is None else params
     import_path = path.with_name(path.name + ".import")
     if not import_path.exists():
         lines = ["[remap]", "", 'importer="scene"', "importer_version=1", "", "[params]", ""]
-        lines += [f"{key}={value}" for key, value in IMPORT_PARAMS.items()]
+        lines += [f"{key}={value}" for key, value in params.items()]
         import_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
         return
     text = import_path.read_text(encoding="utf-8")
-    for key, value in IMPORT_PARAMS.items():
+    for key, value in params.items():
         if f"\n{key}=" in text:
             text = re.sub(rf"(?m)^{re.escape(key)}=.*$", f"{key}={value}", text)
         else:
@@ -318,7 +330,7 @@ def run(args: argparse.Namespace) -> int:
         for name, data in files.items():
             (assets / name).write_bytes(data)
             if name.endswith(".glb"):
-                write_import(assets / name)
+                write_import(assets / name, import_params(model))
         lock["models"][model["id"]] = {
             "hash": receipt["hash"],
             "files": {name: wf.sha256(data) for name, data in sorted(files.items())},

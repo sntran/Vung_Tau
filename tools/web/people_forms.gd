@@ -13,6 +13,7 @@ extends SceneTree
 const PACKS := "res://data/web/packs.json"
 const SHEET_MODEL := "walker_1"
 const SHEET_DISTANCE := 5.0
+## The field of view of the sheet: the person fills the height of the picture.
 
 
 func _init() -> void:
@@ -96,7 +97,7 @@ func _sheet(out_dir: String, form: String) -> void:
 		var scene := load(WorldModel.ROOT + SHEET_MODEL + WorldModel.SUFFIX[level]) as PackedScene
 		stage.add_child(scene.instantiate())
 		var camera := Camera3D.new()
-		camera.fov = 40.0
+		camera.fov = 24.0
 		stage.add_child(camera)
 		camera.look_at_from_position(Vector3(0.0, 1.6, SHEET_DISTANCE), Vector3(0.0, 1.0, 0.0))
 		camera.current = true
@@ -106,9 +107,11 @@ func _sheet(out_dir: String, form: String) -> void:
 		images.append(get_root().get_texture().get_image())
 		stage.queue_free()
 		await process_frame
-	var w := images[0].get_width()
+	# The middle of each picture: the person, not the ground around it.
 	var h := images[0].get_height()
+	var w := 360
+	var x0 := (images[0].get_width() - w) / 2
 	var sheet := Image.create(w * 2, h, false, images[0].get_format())
-	sheet.blit_rect(images[0], Rect2i(0, 0, w, h), Vector2i(0, 0))
-	sheet.blit_rect(images[1], Rect2i(0, 0, w, h), Vector2i(w, 0))
+	sheet.blit_rect(images[0], Rect2i(x0, 0, w, h), Vector2i(0, 0))
+	sheet.blit_rect(images[1], Rect2i(x0, 0, w, h), Vector2i(w, 0))
 	sheet.save_png(out_dir.path_join(form + "_sheet.png"))

@@ -199,7 +199,7 @@ def test_keep_going_builds_the_other_models(tmp_path, monkeypatch, capsys):
 
     monkeypatch.setattr(fetch, "checkout_files", lambda model, clone, mix: files(model))
     monkeypatch.setattr(fetch, "clone_commit", lambda clone: "abc")
-    monkeypatch.setattr(fetch, "write_import", lambda path: None)
+    monkeypatch.setattr(fetch, "write_import", lambda path, params=None: None)
     args = ["--source=checkout", f"--world={tmp_path}", f"--orders={orders}", f"--lock={lock}", f"--assets={assets}"]
     # With no --keep-going the run stops at the model that does not build.
     assert fetch.main(args) == 1
@@ -238,3 +238,15 @@ def test_another_error_of_the_factory_is_an_error(monkeypatch):
     monkeypatch.setattr(fetch, "_http", fake)
     with pytest.raises(fetch.FetchError):
         fetch.factory_files({"id": "m", "order": {}, "levels": ["mid"]}, refused=[])
+
+
+def test_the_pictures_of_a_person_import_as_basis_universal(tmp_path):
+    """Plan 0031, D13: the pictures of a person stay compressed (Basis Universal); the other models keep theirs."""
+    person = {"id": "p", "order": {"blueprint": "person", "options": {}}}
+    thing = {"id": "t", "order": {"blueprint": "drawing", "options": {}}}
+    assert fetch.import_params(person)["gltf/embedded_image_handling"] == "2"
+    assert fetch.import_params(thing)["gltf/embedded_image_handling"] == "3"
+    glb = tmp_path / "p.mid.glb"
+    glb.write_bytes(b"")
+    fetch.write_import(glb, fetch.import_params(person))
+    assert "gltf/embedded_image_handling=2" in (tmp_path / "p.mid.glb.import").read_text(encoding="utf-8")

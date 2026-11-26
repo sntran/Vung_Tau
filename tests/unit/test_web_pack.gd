@@ -115,3 +115,13 @@ func test_no_pack_waits_on_a_computer() -> void:
 	var called := [false]
 	WebPacks.when_ready("people", func() -> void: called[0] = true)
 	assert_true(called[0], "when_ready() calls at once")
+
+
+## D13 (R13): the pictures of the people stay compressed: each scene of the
+## pack people imports its pictures as Basis Universal (docs/web/load.md).
+func test_the_pictures_of_the_people_import_as_basis_universal() -> void:
+	for file: String in WebPacks.entries().people.files:
+		var cfg := ConfigFile.new()
+		assert_eq(cfg.load(file + ".import"), OK, "%s.import reads" % file)
+		assert_eq(int(cfg.get_value("params", "gltf/embedded_image_handling", -1)), 2,
+				"%s imports its pictures as Basis Universal" % file)
