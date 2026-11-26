@@ -54,16 +54,21 @@ for file in "$WEB"/*; do
     *) cp "$file" "$ASSETS/" ;;
   esac
 done
+# Plan 0031, D7: the picture of the loading screen.
+cp "$ROOT/tools/web/loading/loading.jpg" "$ASSETS/loading.jpg"
 KIND="new"; grep -q "func web_args" autoload/game_state.gd || KIND="old"
-python3 - "$ASSETS/index.html" "$BUILD" "$KIND" "$BRANCH" "$ROOT/tools/web/page.js" "$WEB/packs.json" <<'PY'
+python3 - "$ASSETS/index.html" "$BUILD" "$KIND" "$BRANCH" "$ROOT/tools/web/page.js" "$WEB/packs.json" "$ROOT/data/ui.json" <<'PY'
 import json, re, sys
-path, build, kind, branch, page_js, packs_json = sys.argv[1:7]
+path, build, kind, branch, page_js, packs_json, ui_json = sys.argv[1:8]
 packs = json.load(open(packs_json, encoding="utf-8"))["packs"]
+# Plan 0031, D7: the text of the loading screen (the content is data).
+ui = json.load(open(ui_json, encoding="utf-8"))
+text = {key: ui[key] for key in ("world_name", "loading_download", "loading_world")}
 html = open(path, encoding="utf-8").read()
 # Plan 0031, D11: the build and the branch for the game, and the marks of the
 # times of the start, before the script of Godot.
 page = open(page_js, encoding="utf-8").read()
-head = "<script>window.vungTauBuild = %s;\n%s</script>" % (json.dumps({"build": build, "branch": branch, "packs": packs}), page)
+head = "<script>window.vungTauBuild = %s;\n%s</script>" % (json.dumps({"build": build, "branch": branch, "packs": packs, "text": text}), page)
 html = html.replace("<head>", "<head>" + head, 1)
 # Plan 0031, D15: the page gets the start pack and gives it to the engine.
 assert html.count("engine.startGame({") == 1

@@ -35,6 +35,7 @@
     if (name === 'firstFrame') {
       vt.marks.downloadEnd = downloadEnd();
       vt.bytesAtFirstFrame = bytes();
+      vt.hideLoading();
     }
   };
 
@@ -165,20 +166,113 @@
   vt.startGame = function (engine, override) {
     vt.engine = engine;
     if (!(build().packs || {}).index) return engine.startGame(override);
-    var onProgress = override && override.onProgress;
+    showLoading();
     var exe = engine.config.executable;
     engine.config.update(override || {});
+    // The loader of Godot gives the progress of the WebAssembly.
+    engine.config.onProgress = function (done, total) { fileProgress('wasm', done, total); };
     engine.config.args = ['--main-pack', 'index.pck'].concat(engine.config.args);
     return Promise.all([
       engine.init(exe),
-      vt.getPack('index', function (done, total) { if (onProgress) onProgress(done, total); }).then(function (buffer) {
+      vt.getPack('index', function (done, total) { fileProgress('pack', done, total); }).then(function (buffer) {
         vt.mark('packEnd');
         return engine.preloadFile(buffer, 'index.pck');
       }),
     ]).then(function () {
+      setStage('world');
       vt.pruneCache();
+      // The frame of the line, then the start (a long task with no frame between).
+      return new Promise(function (resolve) { requestAnimationFrame(function () { setTimeout(resolve, 0); }); });
+    }).then(function () {
       return engine.start();
     });
+  };
+
+  // Plan 0031, D7: the loading screen. A picture of the game, the name, and
+  // the part of the load that is done: the download of the start pack and the
+  // WebAssembly (in MB), then the start of the engine and the build of the
+  // street. These are long tasks with no frame between, so the bar then moves
+  // with an animation of the compositor. It stays until the first frame of the world. The text comes from
+  // data/ui.json (deploy.sh puts it in window.vungTauBuild.text). The box of
+  // Godot shows only its notice of an error, over this screen.
+  var loading = { el: null, bar: null, line: null, stage: 'download', files: {} };
+  function say(key, values) {
+    var t = (build().text || {})[key] || '';
+    Object.keys(values || {}).forEach(function (k) { t = t.split('{' + k + '}').join(values[k]); });
+    return t;
+  }
+  var STYLE = '#vt-loading{position:fixed;inset:0;z-index:5;background:#10211e;color:#f4efe6;' +
+    'font-family:"Be Vietnam Pro","Noto Sans",Arial,sans-serif;display:flex;flex-direction:column;' +
+    'justify-content:flex-end;align-items:center;overflow:hidden}' +
+    '#vt-loading img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.75}' +
+    '#vt-loading .vt-box{position:relative;width:min(560px,86vw);margin:0 0 9vh;padding:20px 24px;' +
+    'background:rgba(16,33,30,.82);border-radius:14px;text-align:center}' +
+    '#vt-loading h1{margin:0 0 14px;font-size:clamp(30px,6vmin,52px);font-weight:700;letter-spacing:.5px}' +
+    '#vt-loading .vt-track{height:10px;border-radius:5px;background:rgba(244,239,230,.25);overflow:hidden}' +
+    '#vt-loading .vt-bar{height:100%;width:0;border-radius:5px;background:#e8b04a;transition:width .3s}' +
+    '#vt-loading .vt-wait .vt-bar{width:30%!important;animation:vt-move 1.4s ease-in-out infinite}' +
+    '@keyframes vt-move{0%{transform:translateX(-100%)}100%{transform:translateX(340%)}}' +
+    '#vt-loading p{margin:12px 0 0;font-size:clamp(14px,2.6vmin,19px)}' +
+    '#status{background:transparent!important;z-index:10}#status-splash,#status-progress{display:none!important}';
+
+  function showLoading() {
+    if (loading.el || !document.body) return;
+    var style = document.createElement('style');
+    style.textContent = STYLE;
+    document.head.appendChild(style);
+    var el = loading.el = document.createElement('div');
+    el.id = 'vt-loading';
+    var img = document.createElement('img');
+    img.src = 'loading.jpg';
+    img.alt = '';
+    var box = document.createElement('div');
+    box.className = 'vt-box';
+    var title = document.createElement('h1');
+    title.textContent = say('world_name') || 'Vũng Tàu';
+    var track = document.createElement('div');
+    track.className = 'vt-track';
+    loading.bar = document.createElement('div');
+    loading.bar.className = 'vt-bar';
+    track.appendChild(loading.bar);
+    loading.line = document.createElement('p');
+    box.appendChild(title); box.appendChild(track); box.appendChild(loading.line);
+    el.appendChild(img); el.appendChild(box);
+    document.body.appendChild(el);
+    loading.track = track;
+    drawLoading();
+  }
+
+  // The part of the load that is done, from 0 to 1, and the line under the bar.
+  vt.loadingState = function () {
+    var done = 0, total = 0;
+    Object.keys(loading.files).forEach(function (k) { done += loading.files[k][0]; total += loading.files[k][1]; });
+    if (loading.stage === 'download') {
+      return { stage: 'download', part: total > 0 ? 0.8 * done / total : 0,
+        text: say('loading_download', { done: Math.round(done / 1e6), total: Math.round(total / 1e6) }) };
+    }
+    return { stage: 'world', part: 0.9, text: say('loading_world') };
+  };
+
+  function drawLoading() {
+    if (!loading.el) return;
+    var state = vt.loadingState();
+    loading.bar.style.width = Math.round(state.part * 100) + '%';
+    loading.track.className = 'vt-track' + (state.stage === 'world' ? ' vt-wait' : '');
+    loading.line.textContent = state.text;
+  }
+
+  function fileProgress(name, done, total) {
+    if (total > 0) loading.files[name] = [done, total];
+    drawLoading();
+  }
+
+  function setStage(stage) {
+    loading.stage = stage;
+    drawLoading();
+  }
+
+  vt.hideLoading = function () {
+    if (loading.el) { loading.el.remove(); loading.el = null; }
   };
 
   // The times of the line (LoadTimes.line()): s from the start of the page.

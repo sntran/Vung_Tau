@@ -161,6 +161,8 @@
 	"scooter_wait": "The street is not ready yet. Wait a moment.",
 	"load_times_line": "{mb} MB · first frame {first} s · ride {move} s · {fps} fps",
 	"load_times_page": " · page {page} MB",
+	"loading_download": "Getting the town: {done} of {total} MB",
+	"loading_world": "Starting the game and building the street",
 	"scooter_hint_touch": "Stick up: go · down: brake · to the sides: turn",
 	"scooter_hint_keys": "W go · S brake · A D turn · E get off",
 	"scooter_hint_gamepad": "RT go · LT brake · left stick turn · A get off"
