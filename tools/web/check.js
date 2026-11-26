@@ -14,6 +14,11 @@
 //       and all of the page). --sizes=, --mbps=, and --cpu= change the set.
 //   node tools/web/check.js URL OUT --pt85 [--mbps=50] [--targets]
 //       Plan 0031, PT-85: see tools/web/pt85.js.
+//   node tools/web/check.js URL OUT --r15 [--mbps=100 --md=docs/web/load.md --step=NAME]
+//       Plan 0031, R15: two visits with a disk cache of 50 MB; the second
+//       visit gets no pack over the network.
+//   node tools/web/check.js URL OUT --loading
+//       Plan 0031, R6: screenshots of the loading screen at three sizes.
 //   node tools/web/check.js URL OUT --packtest
 //       Plan 0031, D5: the page with ?packtest downloads a second pack while
 //       the game runs and loads a scene from it (scripts/web/pack_test.gd).
@@ -112,9 +117,16 @@ async function openOnce(context, cdp, label, shots) {
   });
   page.on('pageerror', (e) => errors.push(String(e)));
   page.on('crash', () => errors.push('the page crashed (memory: ' + JSON.stringify(rssByType()) + ')'));
-  let bytes = 0, requests = 0, fromCache = 0;
-  const onFinished = (e) => { bytes += e.encodedDataLength; requests += 1; };
+  let bytes = 0, requests = 0, fromCache = 0, packBytes = 0;
+  // Plan 0031, R15: the bytes of the packs over the network (index.pck, p/HASH.pck, and the other packs).
+  const urls = {};
+  const onResponse = (e) => { urls[e.requestId] = e.response.url; };
+  const onFinished = (e) => {
+    bytes += e.encodedDataLength; requests += 1;
+    if (/\.pck(\.br)?(\?|$)/.test((urls[e.requestId] || '').split('#')[0])) packBytes += e.encodedDataLength;
+  };
   const onServed = () => { fromCache += 1; };
+  cdp.on('Network.responseReceived', onResponse);
   cdp.on('Network.loadingFinished', onFinished);
   cdp.on('Network.requestServedFromCache', onServed);
   const result = { label, errors };
@@ -148,17 +160,19 @@ async function openOnce(context, cdp, label, shots) {
     await page.screenshot({ path: `${out}/${label}_failure.png` }).catch(() => {});
   }
   result.bytesAllMB = Math.round(bytes / 1e5) / 10;
+  result.packsOverNetworkMB = Math.round(packBytes / 1e5) / 10;
+  cdp.off('Network.responseReceived', onResponse);
   cdp.off('Network.loadingFinished', onFinished);
   cdp.off('Network.requestServedFromCache', onServed);
   fs.writeFileSync(`${out}/${label}_console.log`, log.join('\n'));
   return result;
 }
 
-async function phoneContext(size, mbps, cpu) {
+async function phoneContext(size, mbps, cpu, extraArgs = [], profileDir = null) {
   const [width, height] = size.split('x').map(Number);
-  const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'vt-profile-'));
+  const profile = profileDir || fs.mkdtempSync(path.join(os.tmpdir(), 'vt-profile-'));
   const context = await chromium.launchPersistentContext(profile, {
-    args: ARGS, viewport: { width, height }, isMobile: true, hasTouch: true, deviceScaleFactor: 1, userAgent: PHONE_AGENT,
+    args: ARGS.concat(extraArgs), viewport: { width, height }, isMobile: true, hasTouch: true, deviceScaleFactor: 1, userAgent: PHONE_AGENT,
   });
   await context.addInitScript(WASM_HOOK);
   const page = context.pages()[0] || await context.newPage();
@@ -200,6 +214,80 @@ async function measure() {
   }
   fs.writeFileSync(`${out}/measure.json`, JSON.stringify({ url, rows }, null, 2));
   if (options.md) writeMarkdown(String(options.md), String(options.step || 'A measure'), rows);
+}
+
+// Plan 0031, R6: the loading screen of D7 at 1280 × 720, 2400 × 1080, and
+// 720 × 1280 (a phone at 25 Mbit/s): a screenshot while the pack downloads and
+// one while the engine starts and builds the street.
+async function loadingShots() {
+  const sizes = String(options.sizes || '1280x720,2400x1080,720x1280').split(',');
+  const result = { url, sizes: {} };
+  for (const size of sizes) {
+    const { context, profile } = await phoneContext(size, Number(options.mbps || 25), Number(options.cpu || 4));
+    const page = context.pages()[0];
+    const r = result.sizes[size] = {};
+    try {
+      await page.goto(url, { waitUntil: 'commit', timeout: 600000 });
+      await page.waitForFunction(() => window.vungTau && window.vungTau.loadingState && window.vungTau.loadingState().part > 0.1,
+        null, { timeout: 600000, polling: 250 });
+      r.download = await page.evaluate(() => window.vungTau.loadingState());
+      await page.screenshot({ path: `${out}/loading_${size}_download.png` });
+      await page.waitForFunction(() => window.vungTau.loadingState().stage === 'world', null, { timeout: 900000, polling: 250 });
+      r.world = await page.evaluate(() => window.vungTau.loadingState());
+      await page.screenshot({ path: `${out}/loading_${size}_world.png`, timeout: 120000 }).catch((e) => { r.worldShot = String(e).slice(0, 120); });
+      await page.waitForFunction(() => window.vungTau.firstFrameMs >= 0, null, { timeout: 1800000, polling: 500 });
+      r.hiddenAtFirstFrame = await page.evaluate(() => !document.getElementById('vt-loading'));
+    } catch (e) { r.failure = String(e).slice(0, 300); }
+    console.log(size, JSON.stringify(r));
+    await context.close();
+    fs.rmSync(profile, { recursive: true, force: true });
+  }
+  fs.writeFileSync(`${out}/loading.json`, JSON.stringify(result, null, 2));
+  return Object.values(result.sizes).every((r) => !r.failure && r.hiddenAtFirstFrame) ? 0 : 1;
+}
+
+// Plan 0031, R15: two visits with a disk cache of 50 MB (smaller than the
+// start pack); the second visit gets no pack over the network (D15: the page
+// keeps the packs in its Cache Storage). Each visit waits for the pack people.
+async function cacheCheck() {
+  const size = String(options.sizes || '720x1280'), mbps = Number(options.mbps || 100), cpu = Number(options.cpu || 4);
+  // Each visit is a new browser on the same profile (its disk cache and its
+  // Cache Storage), as a next visit on a phone: no memory of the browser
+  // from the visit before.
+  const rows = [];
+  let profile = null;
+  for (const visit of ['first', 'second']) {
+    const browser = await phoneContext(size, mbps, cpu, ['--disk-cache-size=52428800'], profile);
+    profile = browser.profile;
+    // The Chromium of the workspace keeps the start pack (91 MB) also in a disk
+    // cache of 50 MB. A phone does not (report 0031, D-0031-04): the second
+    // visit has no HTTP cache. The Cache Storage of the page (D15) stays.
+    if (visit === 'second') await browser.cdp.send('Network.setCacheDisabled', { cacheDisabled: true });
+    const r = await openOnce(browser.context, browser.cdp, `r15_${visit}`, false);
+    Object.assign(r, { visit, size, mbps });
+    rows.push(r);
+    console.log(JSON.stringify(r));
+    await browser.context.close();
+    if (r.failure) break;
+  }
+  fs.rmSync(profile, { recursive: true, force: true });
+  const second = rows[1] || {};
+  const pass = !second.failure && second.peopleS !== undefined && second.packsOverNetworkMB === 0;
+  fs.writeFileSync(`${out}/r15.json`, JSON.stringify({ url, pass, rows }, null, 2));
+  if (options.md) {
+    const date = new Date().toISOString().slice(0, 10);
+    const lines = ['', `## ${options.step || 'R15'} (${date})`, '',
+      `R15: \`${url}\`, ${size.replace('x', ' × ')}, ${mbps} Mbit/s, a disk cache of 50 MB, two visits (each a new browser on the same profile; the second with no HTTP cache, as a phone). ${pass ? 'Pass' : '**Fail**'}: the second visit gets ${second.packsOverNetworkMB} MB of packs over the network.`, '',
+      '| Visit | Packs over the network | All over the network | First frame | Can move | The pack people there |',
+      '|---|---|---|---|---|---|'];
+    for (const r of rows) {
+      lines.push(`| ${r.visit} | ${r.packsOverNetworkMB} MB | ${r.bytesAllMB} MB | ${cell(r.firstFrameS !== undefined ? Math.round(r.firstFrameS) : undefined, ' s')} | ` +
+        `${cell(r.canMoveS !== undefined ? Math.round(r.canMoveS) : undefined, ' s')} | ${r.peopleS !== undefined ? Math.round(r.peopleS) + ' s' : 'no'} |` +
+        (r.failure ? ` ${r.failure.split('\n')[0].replace(/\|/g, '/').slice(0, 120)}` : ''));
+    }
+    fs.appendFileSync(String(options.md), lines.join('\n') + '\n');
+  }
+  return pass ? 0 : 1;
 }
 
 function peopleCell(r) {
@@ -323,5 +411,7 @@ const pt85 = require('./pt85.js');
   if (options.measure) await measure();
   else if (options.pt85) process.exitCode = await pt85.run({ url, out, options, ARGS, WASM_HOOK, TARGETS, memoryOf, rssByType });
   else if (options.packtest) process.exitCode = await packTest();
+  else if (options.r15) process.exitCode = await cacheCheck();
+  else if (options.loading) process.exitCode = await loadingShots();
   else await check();
 })();
