@@ -5,7 +5,7 @@
 | Plan | [0031](../plans/0031-web-load.md) |
 | Branch | `feat/0031-web-load` |
 | Audit 1 | 2026-11-26, at `a4210ce` (steps 1 and 2) |
-| Result | Steps 1 and 2 are made as the plan says, and they help. No target of D10 is met yet. The plan has the changes D11 to D16 for the next steps. |
+| Result | Steps 1 and 2 are made as the plan says, and they help. In the measures of the workspace no target of D10 is met; on my phone the start took about 25 s (section 6). The plan has the changes D11 to D16 for the next steps. |
 
 ## 1. What I audited
 
@@ -93,8 +93,23 @@ The start pack is 121.8 MB: 49.6 MB of textures, 27.8 MB of near levels of the t
 - The game reads a pack in parts of 4 MiB: the pack `people` takes about 20 frames, not 1 240.
 - The checks of the pack run at each deploy.
 
-## 6. What is open
+## 6. My look on my phone (2026-11-26)
 
-- My look on my phone: https://feat-0031-web-load-vung-tau.fifo.workers.dev/?start=bai_truoc&ride
+After this audit the report of the builder came to me, and I opened the build of step 2 on my Pixel 10: the loading screen took about 20 s, and then the street was ready after about 5 s more. I did not note the connection (at home I have fiber) or if the cache was empty.
+
+| | The workspace of the builder (25 Mbit/s) | My phone |
+|---|---|---|
+| To the first frame | 115 s | about 20 s |
+| From the first frame until I can ride | 140 s | about 5 s |
+
+What follows:
+
+- D-0031-01 is confirmed: the times of the workspace are not the times of the phone. The report of the builder also says that an old Godot process used two processors of its workspace during the measures, so its times are slower again.
+- On my phone the wait after the first frame is short. The wait before the first frame is the main part. On a fast connection it is mostly the work of the phone (the compile, the start of the engine, the build of the world); at 25 Mbit/s the download of 122 MB adds about 39 s.
+- So the order of the next work changes: first the times on the screen (D11), then the size of the first download (D13, D14) and the packs that the page keeps (D15), then the loading screen and the load by time (D7, D12) and the memory (D16). The threads (D6) come last, and only if the parts of D11 on my phone show that the build of the world is a large part of the start.
+
+## 7. What is open
+
+- On my phone I did not yet look at the second visit, at the moment when the people come (a stop of the game), and at the turn with the thumb far to the side.
 - Q5 of the plan (the far levels first).
 - The changes D11 to D16 of the plan wait for my approval.
