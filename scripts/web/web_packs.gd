@@ -4,6 +4,13 @@ extends Node
 ## it runs (data/web/packs.json). The game gets a pack when the player comes
 ## near its area, and the things of the pack show when it is there. On a
 ## computer (one whole pack) each pack is there from the start.
+##
+## D14: the pack "models" has the mid and near levels of the models of World.
+## Until it is there, each model shows its far level from 0 m; when it comes,
+## the models and the cells of the rows get their better levels, the nearest
+## first, with UPGRADE_MS of work in each frame. A play test on a computer
+## keeps the files of a pack out with --packs-sim=SECONDS (simulate()), and
+## they come SECONDS after the first frame (release()).
 
 const PACKS := "res://data/web/packs.json"
 ## The player is checked this often (s).
@@ -13,12 +20,18 @@ const CHECK_S := 1.0
 ## 20 frames.
 const CHUNK_BYTES := 4 * 1024 * 1024
 
+## The work of the upgrades of D14 in each frame (ms).
+const UPGRADE_MS := 8.0
+
 signal pack_ready(pack_id: String)
 
 static var _instance: WebPacks
 static var _entries: Dictionary = {}
 static var _read := false
 static var _loaded: Dictionary = {}
+## D14: the packs that a computer keeps out (a play test, a unit test), and their files.
+static var _simulated: Dictionary = {}
+static var _hidden: Dictionary = {}
 
 var _http: HTTPRequest
 var _loading := ""
@@ -26,6 +39,9 @@ var _start_ms := 0
 var _left := 0.0
 var _player: Node3D
 var _times: Dictionary = {}
+## D14: the upgrades that wait, nearest first: [WorldModel] or [WorldRow, cell index].
+var _upgrades: Array = []
+var _sim_left := -1.0
 
 
 ## The entries of data/web/packs.json by id.
@@ -42,6 +58,8 @@ static func entries() -> Dictionary:
 ## True while the pack is not there yet: only on the web, for a pack of the
 ## list whose files are not in the main pack.
 static func waiting(pack_id: String) -> bool:
+	if _simulated.has(pack_id):
+		return true
 	if not OS.has_feature("web") or _loaded.has(pack_id):
 		return false
 	var entry: Dictionary = entries().get(pack_id, {})
@@ -53,6 +71,47 @@ static func waiting(pack_id: String) -> bool:
 		_loaded[pack_id] = true
 		return false
 	return true
+
+
+## D14: keeps the files of these packs out on a computer, as on the web before
+## the packs come (a play test with --packs-sim, a unit test). [] ends it.
+static func simulate(pack_ids: Array) -> void:
+	_simulated.clear()
+	_hidden.clear()
+	for pack_id: String in pack_ids:
+		_simulated[pack_id] = true
+		_loaded.erase(pack_id)
+		for file: String in entries().get(pack_id, {}).get("files", []):
+			_hidden[file] = pack_id
+	WorldModel.forget_levels()
+
+
+## True when the file is in a pack that simulate() keeps out.
+static func hides(path: String) -> bool:
+	return _hidden.has(path)
+
+
+## D14: the files of a pack that simulate() kept out come (as a download on the web).
+static func release(pack_id: String) -> void:
+	_simulated.erase(pack_id)
+	for path: String in _hidden.keys():
+		if _hidden[path] == pack_id:
+			_hidden.erase(path)
+	_loaded[pack_id] = true
+	WorldModel.forget_levels()
+	if _instance != null:
+		_instance._on_pack(pack_id)
+
+
+## The number of upgrades that wait within the distance of the point (D14, R14).
+static func upgrades_within(point: Vector3, distance: float) -> int:
+	if _instance == null:
+		return 0
+	var count := 0
+	for job: Array in _instance._upgrades:
+		if _job_at(job).distance_to(point) <= distance:
+			count += 1
+	return count
 
 
 ## Calls "call" when the pack is there (at once when it is there now).
@@ -71,6 +130,9 @@ func _init(player: Node3D) -> void:
 	name = "WebPacks"
 	_player = player
 	_instance = self
+	if GameState.has_arg("packs-sim"):
+		_sim_left = float(GameState.arg_value("packs-sim"))
+		simulate(["models"])
 
 
 func _ready() -> void:
@@ -93,6 +155,15 @@ static func url_of(pack_id: String) -> String:
 
 
 func _process(delta: float) -> void:
+	_run_upgrades()
+	# D14 on a computer: the pack "comes" some seconds after the first frame.
+	if _sim_left >= 0.0 and Engine.get_frames_drawn() > 1:
+		_sim_left -= delta
+		if _sim_left < 0.0:
+			for pack_id: String in _simulated.keys():
+				release(pack_id)
+	if not OS.has_feature("web"):
+		return
 	_left -= delta
 	if _left > 0.0 or _player == null:
 		return
@@ -151,8 +222,56 @@ func _on_downloaded(status: int, code: int, _headers: PackedStringArray, body: P
 	# storeLoadMs: the write to user:// and the load of the pack, in one frame.
 	_times[pack_id] = {"downloadMs": download_ms, "bytes": body.size(),
 			"storeLoadMs": Time.get_ticks_msec() - t0, "readyMs": Time.get_ticks_msec()}
-	pack_ready.emit(pack_id)
+	_on_pack(pack_id)
 	_tell_page()
+
+
+## A pack is there: the things that wait for it come, and (D14) the models
+## and the cells of the rows get their better levels, the nearest first.
+func _on_pack(pack_id: String) -> void:
+	pack_ready.emit(pack_id)
+	var at := _player.global_position if _player != null else Vector3.ZERO
+	for node in get_tree().get_nodes_in_group(WorldModel.GROUP):
+		var model := node as WorldModel
+		if model != null and model.missing_levels():
+			_upgrades.append([model])
+	for node in get_tree().get_nodes_in_group(WorldRow.GROUP):
+		var row := node as WorldRow
+		if row == null:
+			continue
+		for index in row.cells.size():
+			if row.cell_needs_upgrade(index):
+				_upgrades.append([row, index])
+	_upgrades.sort_custom(func(a: Array, b: Array) -> bool: return _job_at(a).distance_to(at) < _job_at(b).distance_to(at))
+
+
+## The place of an upgrade (the model, or the middle of the cell).
+static func _job_at(job: Array) -> Vector3:
+	if not is_instance_valid(job[0]):
+		return Vector3.INF
+	if job.size() == 1:
+		return (job[0] as Node3D).global_position
+	var row := job[0] as WorldRow
+	return row.global_transform * (row.cells[int(job[1])].node as Node3D).position
+
+
+## The upgrades of D14, nearest first, for UPGRADE_MS in each frame. A model
+## whose files still load waits at the end of the list.
+func _run_upgrades() -> void:
+	if _upgrades.is_empty():
+		return
+	var end := Time.get_ticks_usec() + int(UPGRADE_MS * 1000.0)
+	var tries := _upgrades.size()
+	while not _upgrades.is_empty() and tries > 0 and Time.get_ticks_usec() < end:
+		tries -= 1
+		var job: Array = _upgrades.pop_front()
+		if not is_instance_valid(job[0]):
+			continue
+		if job.size() == 1:
+			if not (job[0] as WorldModel).upgrade():
+				_upgrades.append(job)
+		else:
+			(job[0] as WorldRow).upgrade_cell(int(job[1]))
 
 
 ## window.vungTau.packs (the time of each pack) and window.vungTau.waiting

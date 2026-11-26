@@ -52,7 +52,10 @@ func test_the_web_preset_leaves_out_the_files_of_step_1() -> void:
 	assert_false(filters.is_empty(), "export_presets.cfg has the preset Web")
 	for id: String in _web().buildings:
 		assert_true(_matches("assets/world/%s.glb" % id, filters.exclude), "the near level of %s is out of the web pack" % id)
-		assert_false(_matches("assets/world/%s.mid.glb" % id, filters.exclude), "the mid level of %s stays" % id)
+		# D14: the mid level is in the main pack, or in the pack "models".
+		var mid := "assets/world/%s.mid.glb" % id
+		assert_true(not _matches(mid, filters.exclude) or WebPacks.entries().models.files.has("res://" + mid),
+				"the mid level of %s stays in the web build" % id)
 	assert_true(_matches("data/geo/raw/osm.json", filters.exclude), "data/geo/raw is out of the web pack")
 	assert_true(_matches("data/geo/build/roads.json", filters.exclude), "the JSON of the build is out")
 	assert_true(_matches("data/geo/build/roads.json.gz", filters.include), "its gzip copy is in")

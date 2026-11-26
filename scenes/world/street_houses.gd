@@ -61,8 +61,10 @@ func setup(w: VungTau) -> bool:
 		var template := WorldModel.make(model_id, WorldMaterials.DEFAULT_PAINT, "house")
 		if template == null:
 			continue
-		var mid := template.level("mid")
-		var box := template.level_aabb("mid")
+		# Plan 0031, D14: on the web the mid level can come later; the far level has the same footing.
+		var level_name := "mid" if template.level("mid") != null else "far"
+		var mid := template.level(level_name)
+		var box := template.level_aabb(level_name)
 		# WorldModel puts the lowest point (the footing) on y = 0: the ground floor of World is at the lift.
 		var sink := mid.position.y if mid != null else 0.0
 		sizes[model_id] = {"sink": sink, "height": box.end.y - sink}

@@ -100,7 +100,9 @@ static func levels_of(model_id: String) -> Array[String]:
 	var result: Array[String] = []
 	var wanted: Array = order(model_id).get("levels", ["near"])
 	for level: String in wanted:
-		if wanted.size() > 1 and not ResourceLoader.exists(ROOT + model_id + SUFFIX[level]):
+		# D14: a level in a pack that is not there yet (WebPacks.hides(): a play test on a computer).
+		var path: String = ROOT + model_id + SUFFIX[level]
+		if wanted.size() > 1 and (not ResourceLoader.exists(path) or WebPacks.hides(path)):
 			continue
 		result.append(level)
 	if result.is_empty() and not wanted.is_empty():
@@ -527,6 +529,27 @@ func apply_ranges() -> void:
 			g.visibility_range_end_margin = FADE
 			g.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
 		begin = end
+
+
+## Plan 0031, D14: true when a level that the preset shows came after the
+## model was made (a pack of the web build), and the model does not have it.
+func missing_levels() -> bool:
+	for level: String in levels_shown(id, custom_ranges):
+		if not _levels.has(level):
+			return true
+	return false
+
+
+## Plan 0031, D14: gives the model the levels that came with a pack. The files
+## load in other threads first: false while they load (WebPacks tries again).
+func upgrade() -> bool:
+	if not missing_levels():
+		return true
+	request(id, custom_ranges)
+	if not is_loaded(id, custom_ranges):
+		return false
+	apply_ranges()
+	return true
 
 
 ## The node of a level ("near", "mid", "far").

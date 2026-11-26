@@ -33,6 +33,8 @@ var material_set := ""
 ## WorldModel.ranges. A near range of 0 hides the near level (the pieces of a
 ## wall on Low, as the buildings of plan 0026, D6).
 var custom_ranges: Dictionary = {}
+## Plan 0031, D14: false when the cells cast no shadow (also a cell made again).
+var shadow := true
 var _items: Array[Dictionary] = []
 ## The cells: {"near": [MultiMeshInstance3D], "mid": [...], "mid_whole": [...], "impostor": [...]}.
 var cells: Array[Dictionary] = []
@@ -93,17 +95,64 @@ func build() -> void:
 			by_cell[key] = []
 		by_cell[key].append(item)
 	for key: Vector2i in by_cell:
-		_build_cell(key, by_cell[key])
-	# The templates are nodes outside the tree: free them, or they stay at the quit.
-	for model_id: String in _templates:
-		if is_instance_valid(_templates[model_id]):
-			(_templates[model_id] as Node).free()
-	_templates.clear()
+		cells.append(_build_cell(key, by_cell[key]))
+	_free_templates()
 	add_to_group(GROUP)
 	apply_ranges()
 
 
-func _build_cell(key: Vector2i, items: Array) -> void:
+## The templates are nodes outside the tree: free them, or they stay at the quit.
+static func _free_templates() -> void:
+	for model_id: String in _templates:
+		if is_instance_valid(_templates[model_id]):
+			(_templates[model_id] as Node).free()
+	_templates.clear()
+
+
+## Plan 0031, D14: true when a model of a cell has more levels now than when
+## the cell was made (a pack of the web build came).
+func cell_needs_upgrade(index: int) -> bool:
+	var built: Dictionary = cells[index].built
+	for model_id: String in built:
+		if WorldModel.levels_of(model_id).size() > int(built[model_id]):
+			return true
+	return false
+
+
+func needs_upgrade() -> bool:
+	for index in cells.size():
+		if cell_needs_upgrade(index):
+			return true
+	return false
+
+
+## Plan 0031, D14: makes a cell again with the levels that came, and then frees
+## the old cell (no frame with no cell). The hidden models stay hidden.
+func upgrade_cell(index: int) -> void:
+	if index < 0 or index >= cells.size() or not cell_needs_upgrade(index):
+		return
+	var old: Dictionary = cells[index]
+	for item: Dictionary in old.items:
+		item.slots = []
+	var entry := _build_cell(old.key, old.items)
+	_free_templates()
+	cells[index] = entry
+	for item: Dictionary in old.items:
+		if item.get("hidden", false):
+			set_hidden(int(item.index), true)
+	(old.node as Node).queue_free()
+	_apply_cell_ranges(entry, custom_ranges.get(WorldModel.preset, WorldModel.ranges))
+
+
+## Makes the next cell that waits for its better levels (a unit test).
+func upgrade_next() -> void:
+	for index in cells.size():
+		if cell_needs_upgrade(index):
+			upgrade_cell(index)
+			return
+
+
+func _build_cell(key: Vector2i, items: Array) -> Dictionary:
 	var cell := Node3D.new()
 	cell.name = "cell_%d_%d" % [key.x, key.y]
 	var center := Vector3.ZERO
@@ -114,18 +163,25 @@ func _build_cell(key: Vector2i, items: Array) -> void:
 	add_child(cell)
 	# "mid_whole": the mid level of a model with no near file (plan 0031, D4:
 	# the web pack has no near level of a building), from 0 m.
-	var entry := {"near": [], "mid": [], "mid_whole": [], "impostor": [], "node": cell}
+	# "far_whole" (D14): the far level of a model whose mid and near levels are
+	# in a pack that is not there yet, from 0 m (no hole), with no card.
+	var entry := {"near": [], "mid": [], "mid_whole": [], "far_whole": [], "impostor": [], "node": cell,
+			"key": key, "items": items, "built": {}}
+	var far_only := {}
 	# For each level and each mesh node: the transform of each model.
 	var batches := {}  # "level/model/node" -> {"mesh", "transforms", "colors"}
 	for item: Dictionary in items:
 		var template := _template(item.id, material_set)
 		if template == null:
 			continue
+		entry.built[item.id] = WorldModel.levels_of(item.id).size()
+		if template.level("near") == null and template.level("mid") == null:
+			far_only[item.id] = true
 		template.set_pose(_rest_pose(template))
 		template.set_pose(item.pose)
 		var local_at := Transform3D(item.at.basis, item.at.origin - center)
 		var levels := ROW_LEVELS.duplicate()
-		if impostor_values(item.id).is_empty():
+		if impostor_values(item.id).is_empty() or far_only.has(item.id):
 			levels.append("far")
 		for level: String in levels:
 			var level_node := template.level(level)
@@ -136,7 +192,8 @@ func _build_cell(key: Vector2i, items: Array) -> void:
 				var batch_key := "%s/%s/%s/%s" % [level, item.id, material_set, template.level(level).get_path_to(m)]
 				if not batches.has(batch_key):
 					batches[batch_key] = {"level": level, "mesh": _row_mesh(batch_key, m, material_set),
-							"transforms": [], "colors": [], "items": [], "whole": level == "mid" and template.level("near") == null}
+							"transforms": [], "colors": [], "items": [],
+							"whole": (level == "mid" and template.level("near") == null) or (level == "far" and far_only.has(item.id))}
 				batches[batch_key].transforms.append(local_at * template._global_of(m))
 				batches[batch_key].colors.append(item.paint)
 				batches[batch_key].items.append(item)
@@ -144,11 +201,18 @@ func _build_cell(key: Vector2i, items: Array) -> void:
 		var batch: Dictionary = batches[batch_key]
 		var node := _multimesh_node(batch.mesh, batch.transforms, batch.colors)
 		node.name = batch_key.replace("/", "_")
+		if not shadow:
+			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		cell.add_child(node)
 		for i in batch.items.size():
 			(batch.items[i].slots as Array).append([node.multimesh, i, batch.transforms[i]])
 		# The far level of a model with no impostor takes the range of the cards.
-		entry["impostor" if batch.level == "far" else ("mid_whole" if batch.whole else batch.level)].append(node)
+		var part: String = batch.level
+		if batch.level == "far":
+			part = "far_whole" if batch.whole else "impostor"
+		elif batch.whole:
+			part = "mid_whole"
+		entry[part].append(node)
 	# The impostor: one card for each model.
 	var by_model := {}
 	for item: Dictionary in items:
@@ -157,7 +221,7 @@ func _build_cell(key: Vector2i, items: Array) -> void:
 		by_model[item.id].append(item)
 	for model_id: String in by_model:
 		var values := impostor_values(model_id)
-		if values.is_empty():
+		if values.is_empty() or far_only.has(model_id):
 			continue
 		var size := float(values.size)
 		var quad := QuadMesh.new()
@@ -176,7 +240,7 @@ func _build_cell(key: Vector2i, items: Array) -> void:
 		card.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		cell.add_child(card)
 		entry.impostor.append(card)
-	cells.append(entry)
+	return entry
 
 
 static func _rest_pose(template: WorldModel) -> Dictionary:
@@ -295,10 +359,15 @@ static func impostor_material(model_id: String) -> ShaderMaterial:
 func apply_ranges() -> void:
 	var r: Vector3 = custom_ranges.get(WorldModel.preset, WorldModel.ranges)
 	for entry in cells:
-		_set_range(entry.near, 0.0, r.x)
-		_set_range(entry.mid, r.x, r.y)
-		_set_range(entry.mid_whole, 0.0, r.y)
-		_set_range(entry.impostor, r.y, r.z)
+		_apply_cell_ranges(entry, r)
+
+
+static func _apply_cell_ranges(entry: Dictionary, r: Vector3) -> void:
+	_set_range(entry.near, 0.0, r.x)
+	_set_range(entry.mid, r.x, r.y)
+	_set_range(entry.mid_whole, 0.0, r.y)
+	_set_range(entry.far_whole, 0.0, r.z)
+	_set_range(entry.impostor, r.y, r.z)
 
 
 static func _set_range(nodes: Array, begin: float, end: float) -> void:
