@@ -78,3 +78,50 @@ On 2026-11-25 I opened the web build of plan 0018 on my computer. The loading sc
   - **My answer (2026-11-25):** an Android phone, a Pixel 10, with Chrome.
 - **Q4.** Do I also want the app on my phone for my tests (the Android build of CI as a file, or the iOS build with TestFlight, which needs a paid Apple Developer account)? (I answer.) An app starts from its own files in some seconds and uses the Mobile renderer, but I must get each new build.
   - **My answer (2026-11-25):** the web only, for now.
+
+## 9. Builder notes (2026-11-26)
+
+Steps 1 and 2 are done; steps 3 and 4 wait for the look of the owner on the phone. The tables of each measure are in [`docs/web/load.md`](../web/load.md).
+
+### R1: the measures (`tools/web/check.js --measure`)
+
+- Chromium of the workspace as a phone (D3): 720 × 1280 and 2400 × 1080, a touch screen, a mobile user agent, the processor four times slower, 25 Mbit/s and 100 Mbit/s with 40 ms of latency, first an empty cache and then the cache (a profile on the disk). The heap of WebAssembly comes from a hook of `WebAssembly.instantiate`; the memory of the page is the resident memory of the renderer and the GPU process.
+- The workspace draws WebGL 2 with SwiftShader (on the processor). The throttle of the processor slows only the page, not SwiftShader; PT-85 gets 0.4 to 0.6 frames a second at 1280 × 720. The times are for the comparison of the steps; the phone gives the real times.
+- A cut of the network (a reset of the connection through the proxy of the workspace) stops an opening at once, and the measure tries once more with an empty cache; the row says so.
+
+### The three measures at 25 Mbit/s, 720 × 1280, an empty cache
+
+| | Base line (`98ff3d71277c`) | Step 1 (`32feaeec2693`) | Step 2 (`e2430eaea126`) | Target of D10 |
+|---|---|---|---|---|
+| Over the network before the first frame | 331 MB | 199.5 MB | 122.4 MB | 40 MB |
+| First frame | 192 s | 144 s | 115 s | 20 s |
+| Can move | 326 s | 271 s | 255 s | 40 s |
+| With the cache: over the network / first frame / can move | 321.4 MB / 182 s / 313 s | 191.5 MB / 135 s / 256 s | 0 MB / 63 s / 195 s | — / — / 15 s |
+| Page (renderer + GPU) at the first frame | 1923 MB | 1711 MB | 1407 MB | 700 MB |
+| Heap of the engine at the first frame | 344 MB | 344 MB | 344 MB | — |
+
+**The targets of D10 are out of reach after step 1 and step 2** (the numbers above, and all the rows in `docs/web/load.md`). The targets stay as they are.
+
+### Step 1 (D4, R2, R3)
+
+- `data/web/web.json` lists what the web pack leaves out: the near level of each of the 14 buildings of World (on the web the mid level shows also from near, Q2: `WorldModel.levels_of()` keeps the levels with a file, and a row of World starts such a mid level at 0 m), `data/geo/raw`, and the files of the build that the game does not read. The JSON of the build that the game reads goes as gzip copies (`GeoData.read_text()`; a computer reads the JSON). `tools/web/prepare.py` writes the filters of the preset Web and makes the copies; `tools/web/check_pack.py` fails the deploy when a near level of a building, a raw file, or a file of a pack is in the main pack (R2); `tests/unit/test_web_pack.gd` checks the list, the preset, and the reader.
+- The pack, the wasm, and each pack go over the network as Brotli copies (`FILE.br`, quality 9; the Worker sends `Content-Encoding: br` and `Vary: Accept-Encoding`). The wasm goes from 39.5 MB to 7.9 MB; the pack from 215.2 MB to 191.5 MB (most of it is textures and meshes, which are compressed already).
+- The pack: 321.4 MB → 215.2 MB.
+
+### Step 2 (D5, R4)
+
+- **The test of D5** (`?packtest`, `scripts/web/pack_test.gd`): it works in Chromium, with the body of the download in memory and FileAccess to `user://`, then `ProjectSettings.load_resource_pack()`. On the web, `HTTPRequest.download_file` of Godot 4.7.2 writes a file of 0 bytes, although the request counts all the bytes (also with no compression). The workspace has no Firefox and no Safari: a download of Firefox was not permitted in the workspace, so the test is in Chromium only.
+- **The packs** (`data/web/packs.json`): the main pack is the start pack; the pack `people` has the mid and far levels of the walkers, the sitters, the swimmers, and the aerobics group (93.4 MB, 81.3 MB with Brotli), with the area of the showcase of Bãi Trước and 300 m around it. `tools/web/deploy.sh` makes each pack with `tools/web/make_pack.gd`; `scripts/web/web_packs.gd` downloads a pack when the player comes near its area, writes it to `user://packs/`, and loads it; the people of the showcase and of the morning exercise come when it is there. A computer keeps one pack (the files are there, and no pack waits). The start pack: 121.8 MB (114.4 MB with Brotli).
+- On the web, HTTPRequest reads one part of the body in each frame, 64 KiB by default: the pack `people` took about 1240 frames. WebPacks reads parts of 4 MiB (about 20 frames).
+- **The cache:** Chromium keeps no entry in its cache that is larger than a part of its disk cache. The pack of step 1 (191.5 MB) came again over the network on each visit; the start pack of step 2 (114.4 MB) stays in the cache (0 MB on the second visit). A phone has the same rule, with a smaller cache.
+- **What is not a pack yet:** what stays in the start pack shows near the two start points (`bai_truoc` is in the showcase; `hem` is the hẻm): 49.6 MB of textures, 27.8 MB of near levels of the props (bins, benches, shades, hills), 22 MB of mid levels (the buildings of the showcase, the houses of Quang Trung), 13.2 MB of the data of the build. Plan 0009 phase 3 waits, so there are no streets of phase 3 to put in packs. To come nearer to 40 MB, the start pack must lose the showcase: the showcase then shows its stand-ins until its pack comes (`bai_truoc` starts in it). This is a change of what the web build shows at its first frame, so I did not make it; it needs a decision.
+
+### PT-85 (`tools/web/check.js URL OUT --pt85`)
+
+- After each deploy: `?start=bai_truoc&ride` and `?start=hem` at 50 Mbit/s with an empty cache, a real touch on the joystick (CDP), the first move, and a ride of 300 m along Quang Trung with the stick.
+- The first move passes on each build, at each start (the stick held until the scooter or the player moves 1 m). The ride of 300 m does not end in the workspace: at 0.4 frames a second, 300 m takes more than 20 minutes. The ride has 1500 s now.
+- At the first frame the game wrote a new `window.vungTau`, and the signals of the packs from before it were lost; the object now keeps them.
+
+### The other corrections
+
+- PT-80 run 2 failed in CI on a faster runner (also on `feat/0018-scooter`): a brake during the climb of a curb gave a bump. The correction is on `feat/0018-scooter` (plan 0018, section 8).
