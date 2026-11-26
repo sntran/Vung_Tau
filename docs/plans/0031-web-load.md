@@ -81,7 +81,7 @@ On 2026-11-25 I opened the web build of plan 0018 on my computer. The loading sc
 
 ## 9. Builder notes (2026-11-26)
 
-Steps 1 and 2 are done; steps 3 and 4 wait for the look of the owner on the phone. The web build of step 2: `https://feat-0031-web-load-vung-tau.fifo.workers.dev/?start=bai_truoc&ride` (the build `f416161ee448`, the version `https://1e651075-vung-tau.fifo.workers.dev`; the measures of step 2 are of `e2430eaea126`, with the same packs). The tables of each measure are in [`docs/web/load.md`](../web/load.md).
+Steps 1 and 2 are done; steps 3 and 4 wait for my look on my phone. The web build of step 2: `https://feat-0031-web-load-vung-tau.fifo.workers.dev/?start=bai_truoc&ride` (the build `f416161ee448`, the version `https://1e651075-vung-tau.fifo.workers.dev`; the measures of step 2 are of `e2430eaea126`, with the same packs). The tables of each measure are in [`docs/web/load.md`](../web/load.md).
 
 ### R1: the measures (`tools/web/check.js --measure`)
 
