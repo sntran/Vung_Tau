@@ -147,12 +147,28 @@ async function openOnce(context, cdp, label, shots) {
     result.canMoveS = (Date.now() - t0) / 1000;
     result.memoryCanMove = await memoryOf(page);
     result.parts = await startParts(page);
-    // D13, D16: the memory of the page when the pack people is there (bai_truoc is in its area).
-    const people = await page.waitForFunction(() => window.vungTau.packs && window.vungTau.packs.people, null, { timeout: 300000, polling: 1000 })
-      .then(() => true).catch(() => false);
-    if (people) {
-      result.peopleS = (Date.now() - t0) / 1000;
-      result.memoryPeople = await memoryOf(page);
+    // D13, D16: the memory of the page when each pack is there (bai_truoc is
+    // in the area of the pack people), 300 s at most; the memory before the
+    // packs is the memory when the player can move.
+    const wanted = await page.evaluate(() => Object.keys((window.vungTauBuild || {}).packs || {}).filter((k) => k !== 'index')).catch(() => []);
+    if (!wanted.length) wanted.push('people');
+    result.packs = {};
+    const tPacks = Date.now();
+    while (Date.now() - tPacks < 300000 && Object.keys(result.packs).length < wanted.length) {
+      const there = await page.evaluate(() => Object.keys((window.vungTau && window.vungTau.packs) || {})).catch(() => []);
+      for (const id of there) {
+        if (wanted.includes(id) && !result.packs[id]) result.packs[id] = { s: (Date.now() - t0) / 1000, memory: await memoryOf(page) };
+      }
+      await page.waitForTimeout(1000);
+    }
+    // D16: the game writes the longest frame of a pack when its upgrades are done (60 s at most).
+    await page.waitForFunction((ids) => ids.every((id) => !window.vungTau.packs[id] || window.vungTau.packs[id].longestFrameMs !== undefined),
+      Object.keys(result.packs), { timeout: 60000, polling: 1000 }).catch(() => {});
+    const times = await page.evaluate(() => window.vungTau.packs || {}).catch(() => ({}));
+    for (const id in result.packs) result.packs[id].times = times[id] || {};
+    if (result.packs.people) {
+      result.peopleS = result.packs.people.s;
+      result.memoryPeople = result.packs.people.memory;
     }
     if (shots) await page.screenshot({ path: `${out}/${label}_can_move.png`, timeout: 120000 }).catch(() => {});
   } catch (e) {
@@ -227,7 +243,8 @@ async function loadingShots() {
     const page = context.pages()[0];
     const r = result.sizes[size] = {};
     try {
-      await page.goto(url, { waitUntil: 'commit', timeout: 600000 });
+      // ?loadingshot: the page waits 5 s before the start of the engine (a screenshot needs a frame).
+      await page.goto(url + (url.includes('?') ? '&' : '?') + 'loadingshot', { waitUntil: 'commit', timeout: 600000 });
       await page.waitForFunction(() => window.vungTau && window.vungTau.loadingState && window.vungTau.loadingState().part > 0.1,
         null, { timeout: 600000, polling: 250 });
       r.download = await page.evaluate(() => window.vungTau.loadingState());
@@ -291,9 +308,21 @@ async function cacheCheck() {
 }
 
 function peopleCell(r) {
-  if (r.peopleS === undefined) return '—';
-  const m = r.memoryPeople || {};
-  return `${Math.round(r.peopleS)} s, ${m.pageMB} MB, ${m.engineHeapMB} MB`;
+  return packCell(r, 'people');
+}
+
+// The time when the pack is there, the page and the heap of the engine then,
+// and the longest frame from its request until its upgrades are done (D16).
+function packCell(r, id) {
+  const p = (r.packs || {})[id];
+  if (!p && id === 'people' && r.peopleS !== undefined) {
+    const m = r.memoryPeople || {};
+    return `${Math.round(r.peopleS)} s, ${m.pageMB} MB, ${m.engineHeapMB} MB`;
+  }
+  if (!p) return '—';
+  const m = p.memory || {};
+  const longest = p.times && p.times.longestFrameMs !== undefined ? `, longest frame ${p.times.longestFrameMs} ms` : '';
+  return `${Math.round(p.s)} s, ${m.pageMB} MB, ${m.engineHeapMB} MB${longest}`;
 }
 
 function partsCell(p) {
@@ -314,8 +343,8 @@ function writeMarkdown(file, step, rows) {
   const lines = [
     '', `## ${step} (${date})`, '',
     `\`${url}\`, the processor ${rows[0] ? rows[0].cpu : 4} times slower. A value in bold is over its target of D10 (at 25 Mbit/s).`, '',
-    '| Size | Network | Cache | Over the network before the first frame | First frame | Can move | Heap of the engine | JavaScript heap | Page (renderer + GPU) | Parts: download / compile / engine / world / move | The people there: time, page, heap of the engine |',
-    '|---|---|---|---|---|---|---|---|---|---|---|',
+    '| Size | Network | Cache | Over the network before the first frame | First frame | Can move | Heap of the engine | JavaScript heap | Page (renderer + GPU) | Parts: download / compile / engine / world / move | Page when the player can move | The pack models there: time, page, heap of the engine | The people there: time, page, heap of the engine |',
+    '|---|---|---|---|---|---|---|---|---|---|---|---|---|',
   ];
   for (const r of rows) {
     const at25 = r.mbps <= 25;
@@ -325,7 +354,7 @@ function writeMarkdown(file, step, rows) {
       `${cell(r.bytesBeforeFirstFrameMB, ' MB', at25 && r.cache === 'empty' ? TARGETS.bytesMB : undefined)} | ` +
       `${cell(r.firstFrameS !== undefined ? Math.round(r.firstFrameS) : undefined, ' s', at25 ? TARGETS.firstFrameS : undefined)} | ` +
       `${cell(r.canMoveS !== undefined ? Math.round(r.canMoveS) : undefined, ' s', at25 ? move : undefined)} | ` +
-      `${cell(m.engineHeapMB, ' MB')} | ${cell(m.jsHeapMB, ' MB')} | ${cell(m.pageMB, ' MB', TARGETS.memoryMB)} | ${partsCell(r.parts)} | ${peopleCell(r)} |` +
+      `${cell(m.engineHeapMB, ' MB')} | ${cell(m.jsHeapMB, ' MB')} | ${cell(m.pageMB, ' MB', TARGETS.memoryMB)} | ${partsCell(r.parts)} | ${cell((r.memoryCanMove || {}).pageMB, ' MB')} | ${packCell(r, 'models')} | ${peopleCell(r)} |` +
       (r.failure ? ` ${r.failure.split('\n')[0].replace(/\|/g, '/').slice(0, 120)}` : ''));
   }
   const errors = [...new Set(rows.flatMap((r) => r.errors || []))].filter((e) => !/Occlusion culling is disabled|_print_warning/.test(e));

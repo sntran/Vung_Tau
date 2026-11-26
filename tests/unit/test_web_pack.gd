@@ -128,3 +128,18 @@ func test_the_pictures_of_the_people_import_as_basis_universal() -> void:
 		assert_eq(cfg.load(file + ".import"), OK, "%s.import reads" % file)
 		assert_eq(int(cfg.get_value("params", "gltf/embedded_image_handling", -1)), 2,
 				"%s imports its pictures as Basis Universal" % file)
+
+
+## Plan 0031, D16 (report 0031, D-0031-03): the builds before D15 wrote each
+## pack to user://packs/, and the browser reads all of user:// into memory at
+## each start. The game removes that folder; the packs now stay in the cache of
+## the page (D15).
+func test_the_game_removes_the_packs_of_old_builds_from_user() -> void:
+	DirAccess.make_dir_recursive_absolute(WebPacks.OLD_PACKS)
+	var file := FileAccess.open(WebPacks.OLD_PACKS.path_join("people.pck"), FileAccess.WRITE)
+	file.store_string("old pack")
+	file.close()
+	WebPacks.remove_old_packs()
+	assert_false(DirAccess.dir_exists_absolute(WebPacks.OLD_PACKS), "user://packs/ is gone")
+	WebPacks.remove_old_packs()
+	assert_false(DirAccess.dir_exists_absolute(WebPacks.OLD_PACKS), "a second call does nothing")

@@ -20,6 +20,8 @@ const POLL_S := 0.25
 
 ## The work of the upgrades of D14 in each frame (ms).
 const UPGRADE_MS := 8.0
+## D16: the builds before D15 wrote each pack here (report 0031, D-0031-03).
+const OLD_PACKS := "user://packs"
 
 signal pack_ready(pack_id: String)
 
@@ -39,6 +41,9 @@ var _times: Dictionary = {}
 ## D14: the upgrades that wait, nearest first: [WorldModel] or [WorldRow, cell index].
 var _upgrades: Array = []
 var _sim_left := -1.0
+## D16: the pack whose load and upgrades go on, and its longest frame (ms).
+var _measured := ""
+var _longest_ms := 0.0
 
 
 ## The entries of data/web/packs.json by id.
@@ -111,6 +116,16 @@ static func upgrades_within(point: Vector3, distance: float) -> int:
 	return count
 
 
+## D16: removes the packs that the builds before D15 wrote to user://. The
+## browser reads all of user:// into memory at each start.
+static func remove_old_packs() -> void:
+	if not DirAccess.dir_exists_absolute(OLD_PACKS):
+		return
+	for file: String in DirAccess.get_files_at(OLD_PACKS):
+		DirAccess.remove_absolute(OLD_PACKS.path_join(file))
+	DirAccess.remove_absolute(OLD_PACKS)
+
+
 ## Calls "call" when the pack is there (at once when it is there now).
 static func when_ready(pack_id: String, call: Callable) -> void:
 	if not waiting(pack_id) or _instance == null:
@@ -127,6 +142,8 @@ func _init(player: Node3D) -> void:
 	name = "WebPacks"
 	_player = player
 	_instance = self
+	if OS.has_feature("web"):
+		remove_old_packs()
 	if GameState.has_arg("packs-sim"):
 		_sim_left = float(GameState.arg_value("packs-sim"))
 		simulate(["models"])
@@ -139,6 +156,7 @@ func _exit_tree() -> void:
 
 func _process(delta: float) -> void:
 	_run_upgrades()
+	_measure_frame(delta)
 	# D14 on a computer: the pack "comes" some seconds after the first frame.
 	if _sim_left >= 0.0 and Engine.get_frames_drawn() > 1:
 		_sim_left -= delta
@@ -175,6 +193,8 @@ func _process(delta: float) -> void:
 func _start(pack_id: String) -> void:
 	_loading = pack_id
 	_start_ms = Time.get_ticks_msec()
+	_measured = pack_id
+	_longest_ms = 0.0
 	JavaScriptBridge.eval("window.vungTau.loadPack(%s)" % JSON.stringify(pack_id), true)
 	_tell_page()
 
@@ -255,6 +275,20 @@ func _run_upgrades() -> void:
 				_upgrades.append(job)
 		else:
 			(job[0] as WorldRow).upgrade_cell(int(job[1]))
+
+
+## D16: the longest frame from the request of a pack until its upgrades are
+## done (longestFrameMs), and the time of the upgrades (upgradesMs).
+func _measure_frame(delta: float) -> void:
+	if _measured == "":
+		return
+	_longest_ms = maxf(_longest_ms, delta * 1000.0)
+	if _loading != "" or not _upgrades.is_empty() or not _times.has(_measured):
+		return
+	_times[_measured].longestFrameMs = roundf(_longest_ms)
+	_times[_measured].upgradesMs = Time.get_ticks_msec() - int(_times[_measured].readyMs)
+	_measured = ""
+	_tell_page()
 
 
 ## window.vungTau.packs (the time of each pack) and window.vungTau.waiting

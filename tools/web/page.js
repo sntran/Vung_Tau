@@ -182,7 +182,10 @@
       setStage('world');
       vt.pruneCache();
       // The frame of the line, then the start (a long task with no frame between).
-      return new Promise(function (resolve) { requestAnimationFrame(function () { setTimeout(resolve, 0); }); });
+      // R6: with ?loadingshot the page waits 5 s here, so that check.js --loading
+      // can take a screenshot of this stage (a screenshot needs a frame).
+      var hold = /[?&]loadingshot(&|$)/.test(window.location.search) ? 5000 : 0;
+      return new Promise(function (resolve) { requestAnimationFrame(function () { setTimeout(resolve, hold); }); });
     }).then(function () {
       return engine.start();
     });
