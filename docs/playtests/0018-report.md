@@ -139,6 +139,46 @@ I rode the web build of `bf5c096` at `?start=bai_truoc&ride`. Acceptance 2 does 
 | The loading screen of Godot took about one minute, and then I could not ride, because the world was not ready. | Plan 0031 (approved on 2026-11-25): the web build loads in steps. |
 | I did not know the roads, and I did not know where I was. | I looked at a map of the roads of the game around Bãi Trước (2026-11-25): the layout is right. I did not know the place from the boxes and the roads that are not finished (report 0009, D-0009-29). The roads are those of OpenStreetMap. Out of the showcase, the town is boxes with no fronts and no signs; only Trương Công Định has houses. Plan 0018 has the change D13 (the name of the road on the screen). The app Maps of plan 0030 (approved) shows where the player is. The houses of phase 3 of plan 0009 make a street look as I know it. |
 
-## 9. Status
+## 9. Audit 3 (2026-11-26): the changes D10 to D13
 
-The builder corrected D-0018-01 to D-0018-04 and made the change of D4. Plan 0018 stays Built. I approved the changes D10 to D13 on 2026-11-25. After the builder makes them, I ride again on my phone (acceptance 2).
+I audited `feat/0018-scooter` at `000d596` (in `feat/0031-web-load` at `a4210ce`, which has it). The report of the builder did not come to me, so I read the builder notes of plan 0018 (section 8) and the code.
+
+### 9.1 Runs
+
+| Run | Result |
+|---|---|
+| Unit tests | 161 pass. |
+| PT-80 run 5 (the turn into Nguyễn Trãi with the stick only), 1280 × 720 | Pass: the top speed 40.0 km/h, no bump, no brake, never off the roads, the names "Quang Trung" and "Nguyễn Trãi" on the screen, 1.50 m/s² with no stick. |
+| PT-81 at 2400 × 1080 and 720 × 1280 | Pass. The hint of the touch screen shows above the joystick, clear of the buttons and the subtitles. |
+| CI | Test run 453 and Export run 260 pass on `000d596`. |
+| My scenario (temporary, not in the repository) | See 9.2. |
+
+### 9.2 What I measured
+
+**The speed (D10).** I held the thumb at half of the stick and read the speed in each frame: the scooter gets faster at 1.39 m/s², holds 20.0 km/h, slows at 1.50 m/s² with no stick, and at 4.00 m/s² with the stick down. These are the numbers of the plan.
+
+**The turn (D11).** PT-80 run 5 steers as a controller: it changes the stick in each frame. A person does not. So I made the turn from Quang Trung into Nguyễn Trãi with the thumb at one fixed place: full up, then one place for the turn until the scooter pointed along Nguyễn Trãi, then full up again.
+
+![The four turns](0018/audit-2026-11-26/turns.jpg)
+
+| The thumb in the turn | From | Time in the turn | Slowest | Result |
+|---|---|---|---|---|
+| Hard to the left (0.95 to the side, 0.31 up) | 12 m before the corner | 2.9 s | 14 km/h | The scooter turns in a square of about 11 m and goes into Nguyễn Trãi. No bump. |
+| The same | 25 m before the corner (too early) | 2.7 s | 18 km/h | The turn ends before the junction, and the scooter hits the median: 2 bumps. That is correct: I turned too early. |
+| Fully to the left (no part up) | 12 m before the corner | 2.7 s | 18 km/h | The same good turn. |
+| On the diagonal (0.71 to the side, 0.71 up) | 12 m before the corner | 5.0 s | 28 km/h | The curve is about 39 m long, and the scooter misses Nguyễn Trãi. |
+
+So the tight turn works when the thumb goes far to the side. With the thumb on the diagonal, which is how many people steer with a stick, the scooter keeps 28 km/h and the curve has a radius of about 25 m. That is as D11 says (the tight turn starts at 0.8 to the side). The hint says only "to the sides: turn". I do not change D11 before my ride on my phone; if the diagonal is how my thumb moves, the tight turn must start earlier (for example from 0.6 to the side), and the hint must say "far to a side".
+
+**The hint (D12) and the name of the road (D13).** Both show as the plan says.
+
+![The hint, the turn, and the name of the road](0018/audit-2026-11-26/d10_d13.jpg)
+
+### 9.3 Notes
+
+- After my turns, my thumb went full up and did not steer again, so the scooter left the road at the far side of Nguyễn Trãi and rode on the bare ground between the boxes of the town. Nothing stops it there (the boxes have no collision; section 8 of plan 0018). That stays until plan 0009 puts houses on the streets.
+- The first corrections of the builder after CI were real defects that the play tests found (the state key `road_name` twice, a parked scooter in the focus of the lens, a bump at a brake during the climb of a curb). Each has a test or a step now.
+
+## 10. Status
+
+The builder made the changes D10 to D13, and my audit found no defect. Plan 0018 stays Built until my ride on my phone (acceptance 2): https://feat-0031-web-load-vung-tau.fifo.workers.dev/?start=bai_truoc&ride (the build of plan 0031 has the same scooter). Q2 (the sounds) and Q3 (the limit of R9) of section 6 are open.
