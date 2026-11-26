@@ -32,6 +32,9 @@ def choose(objects: list[dict], manifests: dict, keep: int, protect: set) -> lis
     kept = set(sorted(newest, key=lambda b: newest[b], reverse=True)[:keep]) | set(protect)
     used = set()
     for build in kept:
+        # A manifest with no packs (an error of the API in its place) would remove the parts that it uses.
+        if build in manifests and not isinstance(manifests[build].get("packs"), dict):
+            raise ValueError(f"the manifest of the build {build} has no packs: no removal")
         for pack in manifests.get(build, {}).get("packs", {}).values():
             for part in pack.get("parts", []):
                 used.add(part["url"])

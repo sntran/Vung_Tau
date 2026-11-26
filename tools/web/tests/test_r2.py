@@ -62,3 +62,12 @@ def test_the_manifest_of_parts_py_keeps_its_parts_in_the_bucket(tmp_path, capsys
     urls = [p["url"] for p in manifest["packs"]["index"]["parts"]]
     objects = [obj(f"builds/{bid(1)}/manifest.json", "2026-11-26T00:00:00Z")] + [obj(u, "2026-11-26T00:00:00Z") for u in urls]
     assert r2.choose(objects, {bid(1): manifest}, keep=5, protect=set()) == [], "deploy.sh uploads this output as the manifest"
+
+
+def test_a_manifest_with_no_packs_stops_the_removal():
+    objects = [obj(f"builds/{bid(1)}/manifest.json", "2026-11-26T00:00:00Z"), obj("p/aaa.pck", "2026-11-26T00:00:00Z")]
+    try:
+        r2.choose(objects, {bid(1): {"success": False}}, keep=5, protect=set())
+    except ValueError:
+        return
+    raise AssertionError("a manifest that is not a manifest of the packs must stop the removal")
