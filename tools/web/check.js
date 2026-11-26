@@ -113,11 +113,12 @@ async function openOnce(context, cdp, label, shots) {
     result.requestsBeforeFirstFrame = requests;
     result.fromCache = fromCache;
     result.memoryAtFirstFrame = await memoryOf(page);
-    if (shots) await page.screenshot({ path: `${out}/${label}_first_frame.png` });
+    // A slow frame of SwiftShader can take more than 30 s: a screenshot is not a measure.
+    if (shots) await page.screenshot({ path: `${out}/${label}_first_frame.png`, timeout: 120000 }).catch(() => {});
     await page.waitForFunction(() => window.vungTau.canMoveMs >= 0, null, { timeout: 1800000, polling: 250 });
     result.canMoveS = (Date.now() - t0) / 1000;
     result.memoryCanMove = await memoryOf(page);
-    if (shots) await page.screenshot({ path: `${out}/${label}_can_move.png` });
+    if (shots) await page.screenshot({ path: `${out}/${label}_can_move.png`, timeout: 120000 }).catch(() => {});
   } catch (e) {
     result.failure = String(e).slice(0, 300);
     await page.screenshot({ path: `${out}/${label}_failure.png` }).catch(() => {});
@@ -201,7 +202,7 @@ function writeMarkdown(file, step, rows) {
       `${cell(r.firstFrameS !== undefined ? Math.round(r.firstFrameS) : undefined, ' s', at25 ? TARGETS.firstFrameS : undefined)} | ` +
       `${cell(r.canMoveS !== undefined ? Math.round(r.canMoveS) : undefined, ' s', at25 ? move : undefined)} | ` +
       `${cell(m.engineHeapMB, ' MB')} | ${cell(m.jsHeapMB, ' MB')} | ${cell(m.pageMB, ' MB', TARGETS.memoryMB)} |` +
-      (r.failure ? ` ${r.failure.replace(/\|/g, '/').slice(0, 120)}` : ''));
+      (r.failure ? ` ${r.failure.split('\n')[0].replace(/\|/g, '/').slice(0, 120)}` : ''));
   }
   const errors = [...new Set(rows.flatMap((r) => r.errors || []))].filter((e) => !/Occlusion culling is disabled|_print_warning/.test(e));
   if (errors.length) lines.push('', 'Errors in the console: ' + errors.slice(0, 5).map((e) => `\`${e.slice(0, 160)}\``).join('; '));

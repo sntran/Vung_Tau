@@ -101,12 +101,12 @@ async function openPage(base, query, label, ctx) {
   try {
     await page.goto(base + query, { waitUntil: 'commit', timeout: 600000 });
     await page.waitForTimeout(3000);
-    await page.screenshot({ path: `${out}/${label}_1_loading.png` });
+    await page.screenshot({ path: `${out}/${label}_1_loading.png`, timeout: 120000 }).catch(() => {});
     await page.waitForFunction(() => window.vungTau && window.vungTau.firstFrameMs >= 0, null, { timeout: 1800000, polling: 250 });
     r.firstFrameS = (Date.now() - t0) / 1000;
     r.bytesBeforeFirstFrameMB = Math.round(bytes / 1e5) / 10;
     r.memoryAtFirstFrame = await memoryOf(page);
-    await page.screenshot({ path: `${out}/${label}_2_first_frame.png` });
+    await page.screenshot({ path: `${out}/${label}_2_first_frame.png`, timeout: 120000 }).catch(() => {});
     await page.waitForFunction(() => window.vungTau.canMoveMs >= 0, null, { timeout: 1800000, polling: 250 });
     r.canMoveS = (Date.now() - t0) / 1000;
     // The first move: a real touch on the joystick, up.
@@ -117,7 +117,7 @@ async function openPage(base, query, label, ctx) {
       await page.waitForTimeout(150);
     }
     const after = await state(page);
-    await page.screenshot({ path: `${out}/${label}_3_first_move.png` });
+    await page.screenshot({ path: `${out}/${label}_3_first_move.png`, timeout: 120000 }).catch(() => {});
     await touch(cdp, 'touchEnd', 0, 0);
     const moved = before && after ? Math.hypot(after.x - before.x, after.z - before.z) : 0;
     r.firstMoveM = Math.round(moved * 100) / 100;
@@ -126,7 +126,7 @@ async function openPage(base, query, label, ctx) {
       const ridden = await rideAlong(page, cdp, quangTrung(), RIDE_M, 300);
       r.riddenM = Math.round(ridden);
       await page.waitForTimeout(1000);
-      await page.screenshot({ path: `${out}/${label}_4_after_${RIDE_M}m.png` });
+      await page.screenshot({ path: `${out}/${label}_4_after_${RIDE_M}m.png`, timeout: 120000 }).catch(() => {});
       expect(ridden >= RIDE_M, `the scooter rides ${RIDE_M} m along Quang Trung: ${r.riddenM} m`);
       const waiting = await page.evaluate(() => window.vungTau.waiting).catch(() => undefined);
       r.waitingModels = waiting === undefined ? 'no signal (before step 2)' : waiting;
