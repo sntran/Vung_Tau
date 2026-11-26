@@ -353,16 +353,47 @@ func _run_2(d: PlaytestDriver) -> void:
 	# ground is level here: 5.14 m to 5.15 m from x 99.5 to 93.75).
 	var road_y: float = here.y
 	var rise := func() -> float: return float(d.state().player.y) - road_y
-	var on_sidewalk := func() -> bool: return rise.call() > 0.12
+	# On the sidewalk: up, and the climb has ended (during the climb the body
+	# is up at the height of the step before a floor is under it).
+	var on_sidewalk := func() -> bool: return rise.call() > 0.12 and not d.state().climbing
 	var onto := PackedVector3Array([here, Vector3(CURB_TO.x, here.y, CURB_TO.z)])
 	var bumps_before: int = s.bumps
+	d.main().player.hit_note = ""
 	await d.ride_along(onto, PlaytestDriver.route_length(onto) - 0.5, 8.0, checker, false, 30.0, on_sidewalk)
 	await d.hold_stick(Vector2(0, 1), 1.5)
 	s = d.state()
-	d.step("on the sidewalk: %s, %.2f m over the road" % [s.player, s.player.y - road_y])
+	d.step("on the sidewalk: %s, %.2f m over the road; the road at %.3f m, the ground of detail %s; the last hit: %s" % [
+			s.player, s.player.y - road_y, road_y, s.get("detail_here", "?"), s.hit_note])
 	d.expect(s.player.y > road_y + 0.1, "the scooter rides up the curb onto the sidewalk: %.2f m up (D5)" % (s.player.y - road_y))
 	d.expect(s.riding and s.bumps == bumps_before, "the curb does not stop the scooter")
 	await d.screenshot("over_the_curb")
+	# A brake during the climb of the curb (CI of plan 0018): the scooter goes
+	# back onto the road, with no bump. The step catches the climb at the
+	# physics tick (a frame can have up to eight ticks), and then holds the
+	# brake (the stick down: the brake, then back) for 120 ticks.
+	await d.start_at(CURB_FROM, 90.0)
+	await d.wait_frames(5)
+	s = d.state()
+	var back_y: float = s.player.y
+	var bumps_climb: int = s.bumps
+	var rider: Player = d.main().player
+	rider.hit_note = ""
+	var climb := {"caught": false, "ticks": 0}
+	var brake_in_climb := func() -> void:
+		if rider.is_climbing():
+			climb.caught = true
+		if climb.caught and int(climb.ticks) < 120:
+			climb.ticks = int(climb.ticks) + 1
+			rider.move_input = Vector2(0, -1)
+	d.main().get_tree().physics_frame.connect(brake_in_climb)
+	var climb_route := PackedVector3Array([s.player, Vector3(CURB_TO.x, s.player.y, CURB_TO.z)])
+	await d.ride_along(climb_route, PlaytestDriver.route_length(climb_route) - 0.5, 8.0, checker, false, 30.0,
+			func() -> bool: return int(climb.ticks) >= 120)
+	d.main().get_tree().physics_frame.disconnect(brake_in_climb)
+	s = d.state()
+	d.step("a brake during the climb (caught: %s): %.2f m over the road, the last hit: %s" % [climb.caught, s.player.y - back_y, s.hit_note])
+	d.expect(climb.caught, "the step catches the scooter in the climb of the curb")
+	d.expect(s.bumps == bumps_climb, "a brake during the climb of the curb gives no bump: %s" % s.hit_note)
 	# The wall: a setup step puts the rider on Hạ Long at Cầu Đá, to the west;
 	# the walk on the sea wall stands 0.5 m to 0.75 m over the road there.
 	await d.start_at(Vector3(PORT_POINT.x, 0.0, PORT_POINT.y), 90.0)

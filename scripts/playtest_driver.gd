@@ -1057,6 +1057,8 @@ func state() -> Dictionary:
 		"head_offset": player.head_offset,
 		"ground_pitch": player.ground_pitch,
 		"bumps": m.riding.bumps if m.riding != null else 0,
+		"hit_note": m.player.hit_note,
+		"climbing": m.player.is_climbing(),
 		"touch_mode": m.touch_mode,
 		"stick_visible": m.joystick.visible,
 		"stick_resting": m.joystick.resting,

@@ -120,11 +120,17 @@ static func _road_direction(road: Dictionary, at: Vector3) -> Vector3:
 ## The player checks the point of its leading wheel. The roads, the
 ## sidewalks, the paving and the lawns of the showcase, and the parts of the
 ## places (the walk of Hạ Long, the deck of the jetty) are not sand.
+## Why _can_ride() last returned false (the play tests write it).
+var refusal := ""
+
+
 func _can_ride(point: Vector3, from: Vector3) -> bool:
 	var world: VungTau = _main.vung_tau
 	if not world.can_stand(point, from):
+		refusal = "the player cannot stand at %s" % point
 		return false
 	if world.on_stairs(point):
+		refusal = "stairs at %s" % point
 		return false
 	var query := PhysicsRayQueryParameters3D.create(point + Vector3(0, 0.5, 0), point - Vector3(0, 1.5, 0), Layers.FLOOR)
 	var player: Player = _main.player
@@ -136,6 +142,7 @@ func _can_ride(point: Vector3, from: Vector3) -> bool:
 	# walker can wade, a scooter cannot).
 	var floor_y := float(hit.position.y)
 	if floor_y < world.sea_level or floor_y < world.inland_level_at(point.x, point.z) - 0.02:
+		refusal = "water at %s" % point
 		return false
 	var body := hit.collider as CollisionObject3D
 	if body == null:
@@ -143,7 +150,10 @@ func _can_ride(point: Vector3, from: Vector3) -> bool:
 	var owner_id := body.shape_find_owner(int(hit.shape))
 	var shape := body.shape_owner_get_shape(owner_id, 0)
 	# The ground of the chunks is a height map; a road or a part is another shape.
-	return not (shape is HeightMapShape3D and world.sand_at(point.x, point.z))
+	if shape is HeightMapShape3D and world.sand_at(point.x, point.z):
+		refusal = "sand at %s (the ground at %.3f m)" % [point, floor_y]
+		return false
+	return true
 
 
 ## The index of the parked scooter that the player looks at, or -1 (R4).

@@ -105,6 +105,12 @@ var ground_pitch := 0.0
 var _look_idle := 0.0
 ## While more than 0: the scooter climbs a curb (the distance that is left, m).
 var _climb := 0.0
+## The facts of the last hit of the scooter (the play tests write them): the
+## shape that it hit, the normal and the height of the contact, the speed, and
+## why a step up did not occur.
+var hit_note := ""
+var _step_note := ""
+var _drop_note := ""
 ## The view and the model are this far under the body after a step up (m, 0 or less).
 var _step_view := 0.0
 var _walk_shape: CollisionShape3D
@@ -222,6 +228,12 @@ func start_ride(model: WorldModel, at: Transform3D) -> void:
 	_apply_view()
 
 
+## True during the climb of a curb: the scooter is up at the height of the
+## step until a floor is under it.
+func is_climbing() -> bool:
+	return _climb > 0.0
+
+
 ## Stops a climb at once (a new place, get on, get off).
 func _end_climb() -> void:
 	_climb = 0.0
@@ -306,7 +318,11 @@ func _ride_physics(delta: float) -> void:
 		velocity.y -= GRAVITY * delta
 	var wanted := Vector3(v.x, 0, v.z) * delta
 	# Stairs down, a wall over the sand: a drop in front of the wheels stops the scooter.
-	if absf(ride.speed) > 0.01 and _drop_ahead(signf(ride.speed), wanted.length()):
+	# Not during the climb of a curb: the body is up at the height of the step
+	# there, not on a floor, and a move back ends the climb on the road
+	# (_climb_on()); a brake on the curb gave a bump (CI of plan 0018, PT-80 run 2).
+	if _climb <= 0.0 and absf(ride.speed) > 0.01 and _drop_ahead(signf(ride.speed), wanted.length()):
+		hit_note = "%.1f km/h; a drop ahead: %s" % [ride.speed * 3.6, _drop_note]
 		_hit()
 		velocity.x = 0.0
 		velocity.z = 0.0
@@ -318,6 +334,8 @@ func _ride_physics(delta: float) -> void:
 	var lead := ride.forward() * (AXLE if ride.speed >= 0.0 else -AXLE) + ride.forward() * RIDE_EYE_BACK
 	var limited: bool = ride_limit.is_valid() and not ride_limit.call(global_position + lead, start + lead)
 	if limited:
+		var limiter := ride_limit.get_object()
+		hit_note = "%.1f km/h; the limit of the ride: %s" % [ride.speed * 3.6, limiter.get("refusal") if limiter != null else "?"]
 		global_position = Vector3(start.x, global_position.y, start.z)
 		# The bump and its caption; not the caption of a walk into the water
 		# ("blocked"), which showed at the sand and the stairs (report 0018).
@@ -327,7 +345,9 @@ func _ride_physics(delta: float) -> void:
 		# A curb or a ramp goes up at each angle: also at a small angle, where the
 		# scooter slid along it (report 0018, D-0018-01).
 		var stepped_up := false
+		_step_note = "not a step (the ground)"
 		if _wall_is_step():
+			_step_note = ""
 			var before_y := global_position.y
 			_try_ride_step(wanted - moved)
 			stepped_up = global_position.y > before_y + 0.01
@@ -335,6 +355,7 @@ func _ride_physics(delta: float) -> void:
 		# stops (D5). Along a wall (a smaller angle) it slides.
 		var into := _into_wall(wanted.normalized()) > 0.5 or moved.length() < wanted.length() * 0.5
 		if into and not stepped_up:
+			hit_note = "%.1f km/h; %s; %s" % [ride.speed * 3.6, _contacts_text(), _step_note]
 			_hit()
 			velocity.x = 0.0
 			velocity.z = 0.0
@@ -375,7 +396,16 @@ func _drop_ahead(direction: float, step: float) -> bool:
 	var front := ride.forward() * direction
 	var point := middle + front * (AXLE + 0.25 + step)
 	var floor_y := _floor_under(point, global_position.y + RIDE_STEP + 0.3)
-	return floor_y < global_position.y - RIDE_DROP
+	# From the floor under the middle of the scooter, when it is lower than the
+	# body: at the edge of a curb (the body up at the height of the step, or on
+	# the edge), the middle is over the road, and the road behind is no drop
+	# (CI of plan 0018, PT-80 run 2). On stairs down the middle is on the top step.
+	var here := minf(global_position.y, _floor_under(middle, global_position.y + 0.3))
+	if here == -INF:
+		here = global_position.y
+	_drop_note = "the floor at %.3f m under %s, the floor under the middle at %.3f m, the scooter at %.3f m" % [
+			floor_y, point, here, global_position.y]
+	return floor_y < here - RIDE_DROP
 
 
 ## The height of the floor under the point, from "top" down, or -INF.
@@ -392,16 +422,20 @@ func _floor_under(point: Vector3, top: float) -> float:
 func _try_ride_step(motion: Vector3) -> void:
 	var up := Vector3(0, RIDE_STEP, 0)
 	if test_move(global_transform, up):
+		_step_note = "no room above"
 		return
 	var raised := global_transform.translated(up)
 	if test_move(raised, motion):
+		_step_note = "higher than a step"
 		return
 	# A stair: the floor 0.5 m further on is one more step up (a slope after a curb is not).
 	var ahead := ride_middle() + Vector3(motion.x, 0.0, motion.z).normalized() * (AXLE + 0.75)
 	if _floor_under(ahead, global_position.y + 2.0 * RIDE_STEP + 0.3) > global_position.y + RIDE_STEP + 0.1:
+		_step_note = "a stair"
 		return
 	var lead := ride.forward() * (AXLE + RIDE_EYE_BACK)
 	if ride_limit.is_valid() and not ride_limit.call(global_position + motion + lead, global_position + lead):
+		_step_note = "a limit of the ride"
 		return
 	var before_y := global_position.y
 	global_position += up + motion
@@ -588,6 +622,21 @@ func _check_arrival(walked: float, delta: float) -> void:
 	if _stuck_time > STUCK_SECONDS:
 		walking = false
 		arrived.emit()
+
+
+## The contacts of the last move: the shape, the normal, and the height over the scooter.
+func _contacts_text() -> String:
+	var parts: Array[String] = []
+	for i in get_slide_collision_count():
+		var collision := get_slide_collision(i)
+		var body := collision.get_collider() as CollisionObject3D
+		var shape_name := "?"
+		if body != null:
+			var shape := body.shape_owner_get_shape(body.shape_find_owner(collision.get_collider_shape_index()), 0)
+			shape_name = "%s/%s" % [body.name, shape.get_class() if shape != null else "?"]
+		var n := collision.get_normal()
+		parts.append("%s n(%.2f, %.2f, %.2f) at %+.2f m" % [shape_name, n.x, n.y, n.z, collision.get_position().y - global_position.y])
+	return ", ".join(parts)
 
 
 func _wall_is_step() -> bool:
