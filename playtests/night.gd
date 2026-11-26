@@ -14,11 +14,11 @@ func run(d: PlaytestDriver) -> void:
 	await d.screenshot("lights_on")
 	# Two clacks, each with the caption. The clacks come each 4 to 5 seconds.
 	# The times are game time. At a low frame rate, the game time is slower
-	# than the real time.
+	# than the real time: the wait is 7 s of game time (CI of plan 0018).
 	var times: Array[float] = []
 	for i in 2:
 		var count: int = d.state().clack_count
-		if not await d.wait_until(func() -> bool: return d.state().clack_count > count, 7.0, "clack %d" % (i + 1)):
+		if not await d.wait_until_game(func() -> bool: return d.state().clack_count > count, 7.0, "clack %d" % (i + 1)):
 			return
 		times.append(float(d.state().clack_time))
 		await d.wait_frames(2)
