@@ -221,3 +221,18 @@ R6 (`check.js --loading`, the build `a0d368c1d8d8`): the loading screen at 1280 
 ![The loading screen at 1280 × 720](r6_loading_1280x720.jpg)
 ![The loading screen at 2400 × 1080](r6_loading_2400x1080.jpg)
 ![The loading screen at 720 × 1280](r6_loading_720x1280.jpg)
+
+## Item 6 (D16): the memory of the packs (3959b420ef61). No old Godot process (2026-11-26)
+
+`https://11c7715a-vung-tau.fifo.workers.dev/?start=bai_truoc&ride`, the processor 4 times slower. A value in bold is over its target of D10 (at 25 Mbit/s).
+
+| Size | Network | Cache | Over the network before the first frame | First frame | Can move | Heap of the engine | JavaScript heap | Page (renderer + GPU) | Parts: download / compile / engine / world / move | Page when the player can move | The pack models there: time, page, heap of the engine | The people there: time, page, heap of the engine |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 720 × 1280 | 25 Mbit/s | empty | **94.1 MB** | **94 s** | **155 s** | 344 MB | 206 MB | **1346 MB** | 39.3 / 5.4 / 4.7 / 46.3 / 63.3 s | 1564 MB | 202 s, 1752 MB, 344 MB | 252 s, 1928 MB, 412 MB |
+| 720 × 1280 | 25 Mbit/s | with the cache | 0 MB | **49 s** | **101 s** | 344 MB | 294 MB | **1310 MB** | 4 / 1.3 / 2.5 / 40.1 / 53.2 s | 1505 MB | 108 s, 1579 MB, 344 MB | 148 s, 1834 MB, 412 MB |
+| 720 × 1280 | 100 Mbit/s | empty | 94.1 MB | 67 s | 119 s | 344 MB | 295 MB | **1339 MB** | 17 / 1.7 / 4.4 / 42.8 / 53.3 s | 1536 MB | 165 s, 1699 MB, 344 MB | 212 s, 1906 MB, 412 MB |
+| 720 × 1280 | 100 Mbit/s | with the cache | 0 MB | 53 s | 110 s | 344 MB | 295 MB | **1302 MB** | 4 / 1.3 / 4.4 / 41.8 / 58.1 s | 1488 MB | 124 s, 1662 MB, 344 MB | 148 s, 1808 MB, 412 MB |
+| 2400 × 1080 | 25 Mbit/s | empty | **94.1 MB** | **92 s** | **214 s** | 344 MB | 206 MB | **1435 MB** | 38.2 / 5.2 / 4.3 / 42.6 / 121.3 s | 1661 MB | 359 s, 1846 MB, 344 MB | 500 s, 2031 MB, 412 MB |
+| 2400 × 1080 | 25 Mbit/s | with the cache | 0 MB | **53 s** | **161 s** | 344 MB | 562 MB | **2050 MB** | 6.7 / 1.1 / 2.5 / 37.5 / 110.6 s | 2410 MB | 182 s, 2359 MB, 344 MB | 293 s, 2656 MB, 412 MB |
+| 2400 × 1080 | 100 Mbit/s | empty | 94.1 MB | 69 s | 183 s | 344 MB | 206 MB | **1427 MB** | 16.3 / 1.6 / 4.5 / 41.2 / 117 s | 1654 MB | 322 s, 1845 MB, 344 MB | 454 s, 2028 MB, 412 MB |
+| 2400 × 1080 | 100 Mbit/s | with the cache | 0 MB | 52 s | 161 s | 344 MB | 294 MB | **1385 MB** | 6.7 / 1 / 2.4 / 36.7 / 108 s | 1577 MB | 214 s, 1717 MB, 344 MB | 307 s, 1925 MB, 412 MB |

@@ -161,9 +161,10 @@ async function openOnce(context, cdp, label, shots) {
       }
       await page.waitForTimeout(1000);
     }
-    // D16: the game writes the longest frame of a pack when its upgrades are done (60 s at most).
-    await page.waitForFunction((ids) => ids.every((id) => !window.vungTau.packs[id] || window.vungTau.packs[id].longestFrameMs !== undefined),
-      Object.keys(result.packs), { timeout: 60000, polling: 1000 }).catch(() => {});
+    // D16: the game ends the measure of the longest frame of a pack when its
+    // upgrades are done, or 60 s after the pack is there (70 s at most here).
+    await page.waitForFunction((ids) => ids.every((id) => !window.vungTau.packs[id] || window.vungTau.packs[id].upgradesMs !== undefined),
+      Object.keys(result.packs), { timeout: 70000, polling: 1000 }).catch(() => {});
     const times = await page.evaluate(() => window.vungTau.packs || {}).catch(() => ({}));
     for (const id in result.packs) result.packs[id].times = times[id] || {};
     if (result.packs.people) {
@@ -321,7 +322,9 @@ function packCell(r, id) {
   }
   if (!p) return '—';
   const m = p.memory || {};
-  const longest = p.times && p.times.longestFrameMs !== undefined ? `, longest frame ${p.times.longestFrameMs} ms` : '';
+  const t = p.times || {};
+  const left = t.upgradesLeft ? ` (${t.upgradesLeft} upgrades wait after ${Math.round((t.upgradesMs || 0) / 1000)} s)` : '';
+  const longest = t.longestFrameMs !== undefined ? `, longest frame ${t.longestFrameMs} ms${left}` : '';
   return `${Math.round(p.s)} s, ${m.pageMB} MB, ${m.engineHeapMB} MB${longest}`;
 }
 

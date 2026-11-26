@@ -20,6 +20,8 @@ const POLL_S := 0.25
 
 ## The work of the upgrades of D14 in each frame (ms).
 const UPGRADE_MS := 8.0
+## D16: the longest frame of a pack is measured until this time after it is there (s).
+const MEASURE_S := 60.0
 ## D16: the builds before D15 wrote each pack here (report 0031, D-0031-03).
 const OLD_PACKS := "user://packs"
 
@@ -278,16 +280,24 @@ func _run_upgrades() -> void:
 
 
 ## D16: the longest frame from the request of a pack until its upgrades are
-## done (longestFrameMs), and the time of the upgrades (upgradesMs).
+## done, or MEASURE_S after the pack is there (longestFrameMs, written each
+## second for the page), and the upgrades that wait then (upgradesLeft).
 func _measure_frame(delta: float) -> void:
 	if _measured == "":
 		return
 	_longest_ms = maxf(_longest_ms, delta * 1000.0)
-	if _loading != "" or not _upgrades.is_empty() or not _times.has(_measured):
+	if not _times.has(_measured):
 		return
-	_times[_measured].longestFrameMs = roundf(_longest_ms)
-	_times[_measured].upgradesMs = Time.get_ticks_msec() - int(_times[_measured].readyMs)
-	_measured = ""
+	var times: Dictionary = _times[_measured]
+	var since := Time.get_ticks_msec() - int(times.readyMs)
+	var done := _upgrades.is_empty() or since > int(MEASURE_S * 1000.0)
+	if not done and times.get("longestFrameMs", -1.0) == roundf(_longest_ms) and since % 1000 > int(delta * 1000.0):
+		return
+	times.longestFrameMs = roundf(_longest_ms)
+	times.upgradesLeft = _upgrades.size()
+	if done:
+		times.upgradesMs = since
+		_measured = ""
 	_tell_page()
 
 
