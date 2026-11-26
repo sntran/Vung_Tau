@@ -110,20 +110,29 @@ async function openPage(base, query, label, ctx) {
     await page.waitForFunction(() => window.vungTau.canMoveMs >= 0, null, { timeout: 1800000, polling: 250 });
     r.canMoveS = (Date.now() - t0) / 1000;
     // The first move: a real touch on the joystick, up.
+    // The stick up until the scooter (or the player) moves 1 m, for 30 s at
+    // most: SwiftShader of the workspace can give few frames a second, and
+    // the test counts the time of the page, not of the game.
     const before = await state(page);
+    let after = before;
+    const moveStart = Date.now();
     await touch(cdp, 'touchStart', STICK.x, STICK.y);
-    for (let i = 0; i < 20; i++) {
+    while (Date.now() - moveStart < 30000) {
       await touch(cdp, 'touchMove', STICK.x, STICK.y - STICK.radius);
       await page.waitForTimeout(150);
+      after = await state(page) || after;
+      if (before && after && Math.hypot(after.x - before.x, after.z - before.z) > 1.0) break;
     }
-    const after = await state(page);
+    r.firstMoveS = (Date.now() - moveStart) / 1000;
+    const framesAt = after && before ? (after.frames - before.frames) / Math.max(r.firstMoveS, 0.1) : null;
+    r.framesPerSecond = framesAt === null ? null : Math.round(framesAt * 10) / 10;
     await page.screenshot({ path: `${out}/${label}_3_first_move.png`, timeout: 120000 }).catch(() => {});
     await touch(cdp, 'touchEnd', 0, 0);
     const moved = before && after ? Math.hypot(after.x - before.x, after.z - before.z) : 0;
     r.firstMoveM = Math.round(moved * 100) / 100;
     expect(moved > 0.5, `a touch on the joystick moves the ${after && after.riding ? 'scooter' : 'player'}: ${r.firstMoveM} m`);
     if (after && after.riding) {
-      const ridden = await rideAlong(page, cdp, quangTrung(), RIDE_M, 300);
+      const ridden = await rideAlong(page, cdp, quangTrung(), RIDE_M, 600);
       r.riddenM = Math.round(ridden);
       await page.waitForTimeout(1000);
       await page.screenshot({ path: `${out}/${label}_4_after_${RIDE_M}m.png`, timeout: 120000 }).catch(() => {});
