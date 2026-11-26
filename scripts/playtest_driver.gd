@@ -102,6 +102,12 @@ func wait_until_game(check: Callable, game_s: float, what := "", wall_s := 120.0
 	return false
 
 
+## The limit of real time of a wait in game time: the lines and the steps of a
+## talk run in game time, which is slower than the real time at a low frame rate.
+static func _guard(game_s: float) -> float:
+	return maxf(120.0, game_s * 6.0)
+
+
 ## Waits until the player stops walking and the view stops turning.
 ## The view must be still for 5 frames in a row: a new panel needs some
 ## frames for its height.
@@ -875,12 +881,12 @@ func audio_playing(npc_id: String) -> bool:
 ## line that the test waits for: with "skip_intro", it waits for the next line.
 func wait_line(npc_id: String, timeout_s := 15.0, skip_intro := true) -> String:
 	var m: Node = main()
-	if not await wait_until(func() -> bool: return m.is_speaking(npc_id), timeout_s, "%s speaks" % npc_id):
+	if not await wait_until_game(func() -> bool: return m.is_speaking(npc_id), timeout_s, "%s speaks" % npc_id, _guard(timeout_s)):
 		return ""
 	var line: String = m.speech[npc_id].line
 	if skip_intro and Content.line(line).has("introduces"):
-		if not await wait_until(func() -> bool: return m.is_speaking(npc_id) and m.speech[npc_id].line != line,
-				timeout_s, "%s speaks after the introduction" % npc_id):
+		if not await wait_until_game(func() -> bool: return m.is_speaking(npc_id) and m.speech[npc_id].line != line,
+				timeout_s, "%s speaks after the introduction" % npc_id, _guard(timeout_s)):
 			return ""
 		line = m.speech[npc_id].line
 	return line
@@ -889,8 +895,8 @@ func wait_line(npc_id: String, timeout_s := 15.0, skip_intro := true) -> String:
 ## Waits until the talk waits for an answer (the phrasebook shows the replies).
 func wait_answer(timeout_s := 20.0) -> bool:
 	var m: Node = main()
-	return await wait_until(func() -> bool: return not m.talk.is_empty() and m.talk.state == "answer",
-			timeout_s, "the person waits for an answer")
+	return await wait_until_game(func() -> bool: return not m.talk.is_empty() and m.talk.state == "answer",
+			timeout_s, "the person waits for an answer", _guard(timeout_s))
 
 
 ## Turns to the person, taps the person, and waits for the first line.
@@ -920,8 +926,8 @@ func answer(reply_id: String, mode: String) -> bool:
 ## Waits until no person speaks and the talk does not wait for a step.
 func wait_quiet(timeout_s := 20.0) -> bool:
 	var m: Node = main()
-	return await wait_until(func() -> bool: return m.speech.is_empty() and m._steps.is_empty(), timeout_s,
-			"the people are quiet")
+	return await wait_until_game(func() -> bool: return m.speech.is_empty() and m._steps.is_empty(), timeout_s,
+			"the people are quiet", _guard(timeout_s))
 
 
 ## Returns the collision objects that the player capsule goes into by more
