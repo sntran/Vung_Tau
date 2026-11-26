@@ -200,3 +200,24 @@ R15: `https://3e18add5-vung-tau.fifo.workers.dev/?start=bai_truoc&ride`, 720 × 
 | 2400 × 1080 | 25 Mbit/s | with the cache | 0 MB | **57 s** | **283 s** | 344 MB | 294 MB | **1379 MB** | 6.5 / 0.9 / 4.1 / 40 / 215.6 s | 304 s, 2201 MB, 412 MB |
 | 2400 × 1080 | 100 Mbit/s | empty | 94 MB | 68 s | 280 s | 344 MB | 206 MB | **1424 MB** | 16.1 / 1.6 / 4.1 / 41.5 / 210.3 s | 415 s, 1990 MB, 412 MB |
 | 2400 × 1080 | 100 Mbit/s | with the cache | 0 MB | 57 s | 268 s | 344 MB | 294 MB | **1371 MB** | 6.3 / 1.2 / 4.3 / 39.5 / 214.2 s | 288 s, 2098 MB, 412 MB |
+
+## Item 5 (D7, D12): the loading screen and the load by time (a0d368c1d8d8). No old Godot process (2026-11-26)
+
+`https://14385bf5-vung-tau.fifo.workers.dev/?start=bai_truoc&ride`, the processor 4 times slower. A value in bold is over its target of D10 (at 25 Mbit/s).
+
+| Size | Network | Cache | Over the network before the first frame | First frame | Can move | Heap of the engine | JavaScript heap | Page (renderer + GPU) | Parts: download / compile / engine / world / move | The people there: time, page, heap of the engine |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 720 × 1280 | 25 Mbit/s | empty | **94.1 MB** | **86 s** | **140 s** | 344 MB | 206 MB | **1349 MB** | 37.8 / 5.1 / 4.2 / 41.2 / 54.7 s | 239 s, 1903 MB, 412 MB |
+| 720 × 1280 | 25 Mbit/s | with the cache | 0 MB | **55 s** | **106 s** | 344 MB | 295 MB | **1293 MB** | 4.1 / 1 / 4.6 / 43.1 / 52.8 s | 173 s, 1843 MB, 412 MB |
+| 720 × 1280 | 100 Mbit/s | empty | 94.1 MB | 66 s | 117 s | 344 MB | 206 MB | **1340 MB** | 16.3 / 1.5 / 4.5 / 41.9 / 53.1 s | 209 s, 1943 MB, 412 MB |
+| 720 × 1280 | 100 Mbit/s | with the cache | 0 MB | 52 s | 106 s | 344 MB | 295 MB | **1295 MB** | 3.8 / 1 / 4.5 / 41.3 / 54.3 s | 172 s, 1875 MB, 412 MB |
+| 2400 × 1080 | 25 Mbit/s | empty | **94.1 MB** | **94 s** | **211 s** | 344 MB | 206 MB | **1437 MB** | 38.7 / 5.1 / 4.7 / 43.3 / 120.5 s | 488 s, 2023 MB, 412 MB |
+| 2400 × 1080 | 25 Mbit/s | with the cache | 0 MB | **56 s** | **176 s** | 344 MB | 294 MB | **1386 MB** | 6.8 / 0.9 / 4 / 38.9 / 118 s | 294 s, 1925 MB, 412 MB |
+| 2400 × 1080 | 100 Mbit/s | empty | 94.1 MB | 67 s | 183 s | 344 MB | 206 MB | **1429 MB** | 16.3 / 1.5 / 4.4 / 39.9 / 114.3 s | 451 s, 2008 MB, 412 MB |
+| 2400 × 1080 | 100 Mbit/s | with the cache | 0 MB | 63 s | 187 s | 344 MB | 294 MB | **1381 MB** | 7.3 / 1.2 / 4.3 / 44.3 / 122.3 s | 278 s, 1916 MB, 412 MB |
+
+R6 (`check.js --loading`, the build `a0d368c1d8d8`): the loading screen at 1280 × 720, 2400 × 1080, and 720 × 1280 while the start pack downloads. At each size the screen goes at the first frame.
+
+![The loading screen at 1280 × 720](r6_loading_1280x720.jpg)
+![The loading screen at 2400 × 1080](r6_loading_2400x1080.jpg)
+![The loading screen at 720 × 1280](r6_loading_720x1280.jpg)
