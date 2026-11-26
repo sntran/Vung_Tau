@@ -236,3 +236,12 @@ R6 (`check.js --loading`, the build `a0d368c1d8d8`): the loading screen at 1280 
 | 2400 × 1080 | 25 Mbit/s | with the cache | 0 MB | **53 s** | **161 s** | 344 MB | 562 MB | **2050 MB** | 6.7 / 1.1 / 2.5 / 37.5 / 110.6 s | 2410 MB | 182 s, 2359 MB, 344 MB | 293 s, 2656 MB, 412 MB |
 | 2400 × 1080 | 100 Mbit/s | empty | 94.1 MB | 69 s | 183 s | 344 MB | 206 MB | **1427 MB** | 16.3 / 1.6 / 4.5 / 41.2 / 117 s | 1654 MB | 322 s, 1845 MB, 344 MB | 454 s, 2028 MB, 412 MB |
 | 2400 × 1080 | 100 Mbit/s | with the cache | 0 MB | 52 s | 161 s | 344 MB | 294 MB | **1385 MB** | 6.7 / 1 / 2.4 / 36.7 / 108 s | 1577 MB | 214 s, 1717 MB, 344 MB | 307 s, 1925 MB, 412 MB |
+
+## Item 6 again (D16): the longest frame of each pack (a7ae6d138072). No old Godot process (2026-11-26)
+
+`https://743a0648-vung-tau.fifo.workers.dev/?start=bai_truoc&ride`, the processor 4 times slower. A value in bold is over its target of D10 (at 25 Mbit/s).
+
+| Size | Network | Cache | Over the network before the first frame | First frame | Can move | Heap of the engine | JavaScript heap | Page (renderer + GPU) | Parts: download / compile / engine / world / move | Page when the player can move | The pack models there: time, page, heap of the engine | The people there: time, page, heap of the engine |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 720 × 1280 | 25 Mbit/s | empty | **94.1 MB** | **86 s** | **137 s** | 344 MB | 206 MB | **1346 MB** | 37.9 / 5.3 / 4.2 / 41 / 52.4 s | 1540 MB | 182 s, 1772 MB, 344 MB, longest frame 283 ms (325 upgrades wait after 0 s) | 230 s, 1973 MB, 412 MB, longest frame 283 ms (215 upgrades wait after 61 s) |
+| 720 × 1280 | 25 Mbit/s | with the cache | 0 MB | **49 s** | **100 s** | 344 MB | 295 MB | **1306 MB** | 4.1 / 1.1 / 4 / 38.7 / 51 s | 1533 MB | 111 s, 1622 MB, 344 MB, longest frame 283 ms (325 upgrades wait after 0 s) | 137 s, 1818 MB, 412 MB, longest frame 283 ms (261 upgrades wait after 61 s) |

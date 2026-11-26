@@ -43,9 +43,11 @@ var _times: Dictionary = {}
 ## D14: the upgrades that wait, nearest first: [WorldModel] or [WorldRow, cell index].
 var _upgrades: Array = []
 var _sim_left := -1.0
-## D16: the pack whose load and upgrades go on, and its longest frame (ms).
-var _measured := ""
-var _longest_ms := 0.0
+## D16: the packs whose load and upgrades go on, each with its longest frame
+## (ms, the real time between two frames: the delta of a frame stops at the
+## time of 16 physics steps), and the time of the frame before (µs).
+var _measured: Dictionary = {}
+var _last_usec := 0
 
 
 ## The entries of data/web/packs.json by id.
@@ -195,8 +197,7 @@ func _process(delta: float) -> void:
 func _start(pack_id: String) -> void:
 	_loading = pack_id
 	_start_ms = Time.get_ticks_msec()
-	_measured = pack_id
-	_longest_ms = 0.0
+	_measured[pack_id] = 0.0
 	JavaScriptBridge.eval("window.vungTau.loadPack(%s)" % JSON.stringify(pack_id), true)
 	_tell_page()
 
@@ -282,23 +283,29 @@ func _run_upgrades() -> void:
 ## D16: the longest frame from the request of a pack until its upgrades are
 ## done, or MEASURE_S after the pack is there (longestFrameMs, written each
 ## second for the page), and the upgrades that wait then (upgradesLeft).
-func _measure_frame(delta: float) -> void:
-	if _measured == "":
-		return
-	_longest_ms = maxf(_longest_ms, delta * 1000.0)
-	if not _times.has(_measured):
-		return
-	var times: Dictionary = _times[_measured]
-	var since := Time.get_ticks_msec() - int(times.readyMs)
-	var done := _upgrades.is_empty() or since > int(MEASURE_S * 1000.0)
-	if not done and times.get("longestFrameMs", -1.0) == roundf(_longest_ms) and since % 1000 > int(delta * 1000.0):
-		return
-	times.longestFrameMs = roundf(_longest_ms)
-	times.upgradesLeft = _upgrades.size()
-	if done:
-		times.upgradesMs = since
-		_measured = ""
-	_tell_page()
+func _measure_frame(_delta: float) -> void:
+	var now := Time.get_ticks_usec()
+	var frame_ms := (now - _last_usec) / 1000.0 if _last_usec > 0 else 0.0
+	_last_usec = now
+	var tell := false
+	for pack_id: String in _measured.keys():
+		_measured[pack_id] = maxf(float(_measured[pack_id]), frame_ms)
+		if not _times.has(pack_id):
+			continue
+		var times: Dictionary = _times[pack_id]
+		var since := Time.get_ticks_msec() - int(times.readyMs)
+		var done := _upgrades.is_empty() or since > int(MEASURE_S * 1000.0)
+		var longest := roundf(float(_measured[pack_id]))
+		if not done and times.get("longestFrameMs", -1.0) == longest:
+			continue
+		times.longestFrameMs = longest
+		times.upgradesLeft = _upgrades.size()
+		if done:
+			times.upgradesMs = since
+			_measured.erase(pack_id)
+		tell = true
+	if tell:
+		_tell_page()
 
 
 ## window.vungTau.packs (the time of each pack) and window.vungTau.waiting
