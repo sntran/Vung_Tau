@@ -22,12 +22,14 @@ extends RefCounted
 # longest frame and the count of the frames
 # longer than three times the median frame along the ride (R9: the limit comes
 # after the first measure), also in out/frames.json.
+# Phase 5 starts with a new save file: it is the first ride, with the hint of
+# D12 (the hint shows on the first three rides only).
 # sizes: 1280x720
 # phase: --world=vung_tau --start=bai_truoc --start-time=17:00 --quality=low
 # phase: --world=vung_tau --start=bai_truoc --start-time=17:05 --quality=low --ride
 # phase: --world=vung_tau --start=bai_truoc --start-time=17:10 --quality=low --ride
 # phase: --world=vung_tau --start=bai_truoc --start-time=17:15 --quality=low --ride
-# phase: --world=vung_tau --start=bai_truoc --start-time=17:20 --quality=low --ride
+# phase: --world=vung_tau --start=bai_truoc --start-time=17:20 --quality=low --ride --fresh-save
 
 ## The roads of the ride (OSM ways): Quang Trung to the south, Hạ Long to the
 ## west and its last part to the junction at Cầu Đá, and Hạ Long from the
