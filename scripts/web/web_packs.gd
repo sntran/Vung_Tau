@@ -110,8 +110,8 @@ func _process(delta: float) -> void:
 func _start(pack_id: String) -> void:
 	_loading = pack_id
 	_start_ms = Time.get_ticks_msec()
-	DirAccess.make_dir_recursive_absolute("user://packs")
-	_http.download_file = "user://packs/%s.pck" % pack_id
+	# The body stays in memory: on the web, HTTPRequest.download_file writes a
+	# file of 0 bytes (Godot 4.7.2; docs/web/load.md, the test of D5).
 	var error := _http.request(url_of(pack_id))
 	if error != OK:
 		push_warning("WebPacks: the request of the pack %s did not start: %d" % [pack_id, error])
@@ -119,19 +119,30 @@ func _start(pack_id: String) -> void:
 	_tell_page()
 
 
-func _on_downloaded(status: int, code: int, _headers: PackedStringArray, _body: PackedByteArray) -> void:
+func _on_downloaded(status: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
 	var pack_id := _loading
 	_loading = ""
 	var path := "user://packs/%s.pck" % pack_id
 	var download_ms := Time.get_ticks_msec() - _start_ms
-	if status != HTTPRequest.RESULT_SUCCESS or code != 200 or not ProjectSettings.load_resource_pack(path, false):
+	var stored := false
+	var t0 := Time.get_ticks_msec()
+	if status == HTTPRequest.RESULT_SUCCESS and code == 200:
+		DirAccess.make_dir_recursive_absolute("user://packs")
+		var out := FileAccess.open(path, FileAccess.WRITE)
+		if out != null:
+			out.store_buffer(body)
+			out.close()
+			stored = true
+	if not stored or not ProjectSettings.load_resource_pack(path, false):
 		push_warning("WebPacks: the pack %s did not load (result %d, HTTP %d)" % [pack_id, status, code])
 		_left = 5.0
 		_tell_page()
 		return
 	_loaded[pack_id] = true
 	WorldModel.forget_levels()
-	_times[pack_id] = {"downloadMs": download_ms, "readyMs": Time.get_ticks_msec()}
+	# storeLoadMs: the write to user:// and the load of the pack, in one frame.
+	_times[pack_id] = {"downloadMs": download_ms, "bytes": body.size(),
+			"storeLoadMs": Time.get_ticks_msec() - t0, "readyMs": Time.get_ticks_msec()}
 	pack_ready.emit(pack_id)
 	_tell_page()
 

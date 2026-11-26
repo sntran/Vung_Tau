@@ -278,7 +278,7 @@ async function packTest() {
   console.log(JSON.stringify(result, null, 2));
   await browser.close();
   const t = result.packTest || {};
-  return t.loaded && t.scene && errors.length === 0 ? 0 : 1;
+  return t.works && errors.length === 0 ? 0 : 1;
 }
 
 const pt85 = require('./pt85.js');
