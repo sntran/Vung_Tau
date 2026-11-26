@@ -215,6 +215,21 @@ tools/web/deploy.sh               # main: https://vung-tau.fifo.workers.dev
 SKIP_EXPORT=1 tools/web/deploy.sh # deploy build/web as it is
 BRANCH=main tools/web/deploy.sh   # in a worktree with no branch (detached)
 node tools/web/check.js "URL?start=bai_truoc" OUT   # Chromium: the first frame of the world, screenshots, times, memory, errors
+# Plan 0031 (the web build loads in steps): the measures of D3 as a phone, to docs/web/load.md (R1),
+# PT-85 after each deploy, and the test of a second pack (D5).
+node tools/web/check.js "URL?start=bai_truoc&ride" OUT --measure --md=docs/web/load.md --step="NAME"
+node tools/web/check.js "URL" OUT --pt85            # PT-85 web_load (--targets: the targets of D10 fail it)
+node tools/web/check.js "URL?start=bai_truoc" OUT --packtest
+python3 tools/web/prepare.py      # the filters of the preset Web and the gzip copies (deploy.sh runs it)
+python3 tools/web/check_pack.py build/web/index.pck   # the parts of the pack; fails on a file that must be out
+# The web pack (plan 0031, step 1 and step 2): data/web/web.json lists what it leaves out (the
+# near levels of the buildings, data/geo/raw, the build files that the game does not read); the
+# JSON of the build goes as .json.gz copies (GeoData.read_text()). data/web/packs.json lists the
+# packs that the game gets while it runs (now "people"); deploy.sh makes each one with
+# tools/web/make_pack.gd, and scripts/web/web_packs.gd gets it near its area. The pack, the
+# wasm, and each pack go over the network as Brotli copies (FILE.br, "Content-Encoding: br").
+# The desktop builds keep one whole pack. On the web, HTTPRequest.download_file writes 0 bytes:
+# keep the body in memory and write it with FileAccess (docs/web/load.md, the test of D5).
 # The URL parameters: world=hem (the test street; the Vũng Tàu world is the default), start=ID
 # (data/geo/starts.json: hem, bai_truoc, cho_xom_luoi, truong_cong_dinh), debug (the debug screen),
 # ride (plan 0018, R8: the game starts on the scooter of the start; the argument --ride does the same).
