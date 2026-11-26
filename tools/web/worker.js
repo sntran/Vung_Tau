@@ -17,9 +17,44 @@ async function partsOf(env, key) {
     .sort((a, b) => a.index - b.index);
 }
 
+// Plan 0031, D15 and R7: a part of a pack (p/HASH.pck in the bucket). The name
+// changes with the content, so the cache time is one year; the Brotli copy goes
+// to a browser that takes it.
+async function packPart(request, env, name) {
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    return new Response("Method not allowed", { status: 405 });
+  }
+  const key = `p/${name}`;
+  const headers = new Headers();
+  headers.set("Content-Type", "application/octet-stream");
+  headers.set("Cache-Control", "public, max-age=31536000, immutable");
+  headers.set("Vary", "Accept-Encoding");
+  if ((request.headers.get("Accept-Encoding") || "").includes("br")) {
+    const encoded = await env.BUILDS.get(`${key}.br`);
+    if (encoded !== null) {
+      headers.set("Content-Encoding", "br");
+      headers.set("Content-Length", String(encoded.size));
+      headers.set("ETag", `"${name}-br"`);
+      return new Response(request.method === "HEAD" ? null : encoded.body, { headers, encodeBody: "manual" });
+    }
+  }
+  const object = await env.BUILDS.get(key);
+  if (object === null) {
+    return new Response("Not found", { status: 404 });
+  }
+  headers.set("Content-Length", String(object.size));
+  headers.set("ETag", `"${name}"`);
+  return new Response(request.method === "HEAD" ? null : object.body, { headers });
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    // Plan 0031, D15 and R7: a part of a pack, named by the hash of its content.
+    const part = url.pathname.match(/^\/p\/([0-9a-f]{16,64}\.pck)$/);
+    if (part) {
+      return packPart(request, env, part[1]);
+    }
     const match = url.pathname.match(/^\/b\/([0-9a-f]{7,40})\/([A-Za-z0-9._-]+)$/);
     if (!match) {
       return env.ASSETS.fetch(request);

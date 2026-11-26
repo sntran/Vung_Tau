@@ -84,7 +84,7 @@ jobs:
 
       # R4: the factory and a clone of World at the same commit give the same bytes.
       - name: Run the Python tests
-        run: python -m pytest -q tools/world/tests
+        run: python -m pytest -q tools/world/tests tools/web/tests
 
   trees:
     name: Tree build check
