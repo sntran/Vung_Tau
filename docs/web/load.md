@@ -176,3 +176,27 @@ R15: `https://1e202e10-vung-tau.fifo.workers.dev/?start=bai_truoc&ride`, 720 × 
 |---|---|---|---|---|---|
 | first | 204.5 MB | 212.5 MB | 63 s | 147 s | 374 s |
 | second | 204.5 MB | 212.5 MB | 66 s | 152 s | 382 s |
+
+## R15 after item 4 (df663736c421) (2026-11-26)
+
+R15: `https://3e18add5-vung-tau.fifo.workers.dev/?start=bai_truoc&ride`, 720 × 1280, 100 Mbit/s, a disk cache of 50 MB, two visits (each a new browser on the same profile; the second with no HTTP cache, as a phone). Pass: the second visit gets 0 MB of packs over the network.
+
+| Visit | Packs over the network | All over the network | First frame | Can move | The pack people there |
+|---|---|---|---|---|---|
+| first | 207.7 MB | 215.7 MB | 65 s | 144 s | 197 s |
+| second | 0 MB | 8 MB | 50 s | 131 s | 160 s |
+
+## Item 4 (D15): the page keeps the packs (df663736c421). No old Godot process (2026-11-26)
+
+`https://3e18add5-vung-tau.fifo.workers.dev/?start=bai_truoc&ride`, the processor 4 times slower. A value in bold is over its target of D10 (at 25 Mbit/s).
+
+| Size | Network | Cache | Over the network before the first frame | First frame | Can move | Heap of the engine | JavaScript heap | Page (renderer + GPU) | Parts: download / compile / engine / world / move | The people there: time, page, heap of the engine |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 720 × 1280 | 25 Mbit/s | empty | **94 MB** | **86 s** | **168 s** | 344 MB | 206 MB | **1332 MB** | 38 / 5.3 / 4.2 / 40.7 / 83.8 s | 223 s, 1899 MB, 412 MB |
+| 720 × 1280 | 25 Mbit/s | with the cache | 0 MB | **50 s** | **146 s** | 344 MB | 294 MB | **1283 MB** | 3.9 / 0.9 / 3.9 / 39.3 / 97.4 s | 152 s, 1949 MB, 412 MB |
+| 720 × 1280 | 100 Mbit/s | empty | 94 MB | 65 s | 152 s | 344 MB | 206 MB | **1329 MB** | 16.1 / 1.6 / 4.2 / 41.9 / 86.6 s | 199 s, 1913 MB, 412 MB |
+| 720 × 1280 | 100 Mbit/s | with the cache | 0 MB | 49 s | 141 s | 344 MB | 301 MB | **1286 MB** | 4.1 / 1 / 2.3 / 39.5 / 92.9 s | 148 s, 1941 MB, 412 MB |
+| 2400 × 1080 | 25 Mbit/s | empty | **94 MB** | **89 s** | **295 s** | 344 MB | 206 MB | **1428 MB** | 37.9 / 5.3 / 4.2 / 40.5 / 208.4 s | 447 s, 2088 MB, 412 MB |
+| 2400 × 1080 | 25 Mbit/s | with the cache | 0 MB | **57 s** | **283 s** | 344 MB | 294 MB | **1379 MB** | 6.5 / 0.9 / 4.1 / 40 / 215.6 s | 304 s, 2201 MB, 412 MB |
+| 2400 × 1080 | 100 Mbit/s | empty | 94 MB | 68 s | 280 s | 344 MB | 206 MB | **1424 MB** | 16.1 / 1.6 / 4.1 / 41.5 / 210.3 s | 415 s, 1990 MB, 412 MB |
+| 2400 × 1080 | 100 Mbit/s | with the cache | 0 MB | 57 s | 268 s | 344 MB | 294 MB | **1371 MB** | 6.3 / 1.2 / 4.3 / 39.5 / 214.2 s | 288 s, 2098 MB, 412 MB |

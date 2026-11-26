@@ -109,6 +109,7 @@ Verified in the development workspace (Linux, 2 CPUs, no GPU, no Vulkan):
 - In the Vũng Tàu world, the views of PT-54 had 0.75 to 1.55 million triangles on Low, more than the limit of 300 000 (plan 0020, Q7): most were the far clumps of the hill trees (72 triangles each) and the far ground tiles. With the detail levels of report 0005, D-0005-10 (plan 0005, N40), Low has 226 000 to 275 000. `RenderingServer.get_rendering_info()` counts the shadow pass too.
 - With the sun shadow on, the Compatibility renderer under llvmpipe makes up-facing surfaces about three times too bright when the sun is high. Plan 0004 (R5) checked it again with Godot 4.7.2 at 12:00: the roofs and the hẻm floor become almost white (33 % of the lower half of the roof view is near white, against 4 % with the shadow off). The web build (Compatibility) keeps the sun shadow off. The Mobile and Forward+ renderers have shadows on all presets.
 - The web export (thread support off) starts in the pre-installed Chromium with WebGL 2.
+- The headless Chromium of the workspace (plan 0031, R15, 2026-11-26) kept the start pack of 91 MB in its HTTP cache also with `--disk-cache-size=52428800`, and a second visit in the same browser process can come from its memory. `check.js --r15` opens each visit in a new browser on the same profile, and the second visit with the HTTP cache off (CDP `Network.setCacheDisabled`): the Cache Storage of the page stays.
 - Hugging Face is reachable from the workspace. VieNeu-TTS v3 Turbo (`vieneu==3.8.3`) runs on the CPU with ONNX Runtime: about 2 s for each line with 4 CPUs. ONNX Runtime 1.23 and later refuse the model files in the Hugging Face cache ("External data path escapes model directory"), so `tools/voices/requirements.txt` pins 1.22.1.
 - A quit in the first seconds after the start does not end the process: the main thread waits for a task of the worker threads, and no worker runs it (seen with the house kit of plan 0004, with `gdb`). The play-test system waits 1 s of game time after the end of a run before it quits.
 - `TaskStop` on a play-test run stops the shell, but the Godot processes go on and use the CPU. Look for them with `pgrep -fa godot` and stop them.
@@ -225,11 +226,23 @@ python3 tools/web/check_pack.py build/web/index.pck   # the parts of the pack; f
 # The web pack (plan 0031, step 1 and step 2): data/web/web.json lists what it leaves out (the
 # near levels of the buildings, data/geo/raw, the build files that the game does not read); the
 # JSON of the build goes as .json.gz copies (GeoData.read_text()). data/web/packs.json lists the
-# packs that the game gets while it runs (now "people"); deploy.sh makes each one with
-# tools/web/make_pack.gd, and scripts/web/web_packs.gd gets it near its area. The pack, the
-# wasm, and each pack go over the network as Brotli copies (FILE.br, "Content-Encoding: br").
-# The desktop builds keep one whole pack. On the web, HTTPRequest.download_file writes 0 bytes:
-# keep the body in memory and write it with FileAccess (docs/web/load.md, the test of D5).
+# packs that the game gets while it runs ("models": the mid and near levels of the models of
+# World, right after the first frame, D14; "people", near its area); deploy.sh makes each one
+# with tools/web/make_pack.gd. The desktop builds keep one whole pack.
+# D15: tools/web/parts.py cuts the start pack and each pack in parts of at most 40 MB named by
+# the hash of their content (p/HASH.pck, with a Brotli copy, "Content-Encoding: br"); deploy.sh
+# puts the manifest in the page (window.vungTauBuild.packs) and in builds/BUILD/manifest.json.
+# The page (tools/web/page.js) gets each part from its Cache Storage ("vung-tau-packs") or the
+# network, keeps it there, gives the start pack to the engine (engine.preloadFile), and writes a
+# later pack to /tmp/packs/ of the engine (not user://: the browser reads all of user:// into
+# memory at each start); scripts/web/web_packs.gd asks for it and loads it. R9: after each
+# deploy, tools/web/r2.py removes the files of the builds older than the last five (the build
+# of main stays) and the parts that no kept build uses (only the bucket vung-tau).
+# On the web, HTTPRequest.download_file writes 0 bytes (docs/web/load.md, the test of D5).
+node tools/web/check.js "URL?start=bai_truoc&ride" OUT --r15      # R15: two visits, the second with no HTTP cache
+node tools/web/check.js "URL?start=bai_truoc" OUT --loading       # R6: the loading screen at three sizes
+python3 tools/web/r2.py prune --keep 5 --protect MAIN_BUILD --dry-run   # what the deploy removes
+tools/playtest.sh far_first      # PT-86 (D14): --packs-sim=30 keeps the pack "models" out on a computer
 # The URL parameters: world=hem (the test street; the Vũng Tàu world is the default), start=ID
 # (data/geo/starts.json: hem, bai_truoc, cho_xom_luoi, truong_cong_dinh), debug (the debug screen),
 # ride (plan 0018, R8: the game starts on the scooter of the start; the argument --ride does the same).
@@ -383,7 +396,7 @@ The audio driver prints ALSA errors in the workspace. These errors are not defec
 | `docs/showcase/` | Plan 0026: the sheets of the shots of PT-72. |
 | `tests/data/world/` | The test file of the GPU instancing import (`instancing.glb`) and the script that makes it. |
 | `addons/` | `gut/` (the unit tests) and `gpu_instancing/` (the import of `EXT_mesh_gpu_instancing` for the GLB files of World). |
-| `playtests/` | Play-test scenarios PT-01, PT-03 to PT-17, PT-18 to PT-24 of plan 0003, PT-25 to PT-32 of plan 0004, PT-33 to PT-39 of plan 0005, PT-52 to PT-55 of plan 0020, PT-56 to PT-58 of plan 0023, PT-60 to PT-64 of plan 0008, and PT-71 to PT-77 of plan 0026 (PT-02 and PT-07 were removed in plan 0002). |
+| `playtests/` | Play-test scenarios PT-01, PT-03 to PT-17, PT-18 to PT-24 of plan 0003, PT-25 to PT-32 of plan 0004, PT-33 to PT-39 of plan 0005, PT-52 to PT-55 of plan 0020, PT-56 to PT-58 of plan 0023, PT-60 to PT-64 of plan 0008, PT-71 to PT-77 of plan 0026, PT-80 and PT-81 of plan 0018, and PT-86 and PT-87 of plan 0031 (PT-85 of plan 0031 is `tools/web/check.js --pt85`; PT-02 and PT-07 were removed in plan 0002). |
 | `tools/` | `setup.sh`, `test.sh`, `playtest.sh`, `voices/` (the voice build and its tests), `trees/` (the tree build of plan 0020), `world/` (the models of World of plan 0023: `fetch.py`, `impostors.py`, `sheets.py`, and the tests; plan 0026: `drawings.py` and `look.gd`), `photos/` (the reference photos of plan 0026, R17), `showcase/` (the sheets of PT-72), `look/` (the texture sets of plan 0026), and `geo/` (the geodata pipeline: `fetch.py`, `build.py`, `tide.py`, the `geodata` package, and its tests). |
 | `assets/` | Fonts, icons, voices, and `CREDITS.md`. |
 | `docs/voices/` | The voice audition page (made by the voices workflow). |
