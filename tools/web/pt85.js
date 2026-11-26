@@ -131,6 +131,11 @@ async function openPage(base, query, label, ctx) {
     const moved = before && after ? Math.hypot(after.x - before.x, after.z - before.z) : 0;
     r.firstMoveM = Math.round(moved * 100) / 100;
     expect(moved > 0.5, `a touch on the joystick moves the ${after && after.riding ? 'scooter' : 'player'}: ${r.firstMoveM} m`);
+    // R11: the line of the times shows at the top after the first move (a build of a branch).
+    r.timesLine = await page.evaluate(() => window.vungTau.timesLine || '').catch(() => '');
+    r.parts = await page.evaluate(() => window.vungTau.marks || {}).catch(() => ({}));
+    expect(r.timesLine !== '', `the line of the times shows after the first move: "${r.timesLine}"`);
+    await page.screenshot({ path: `${out}/${label}_3b_times_line.png`, timeout: 120000 }).catch(() => {});
     if (after && after.riding) {
       // At 0.4 frames a second (SwiftShader of the workspace), 300 m take about 20 minutes.
       const ridden = await rideAlong(page, cdp, quangTrung(), RIDE_M, 1500);

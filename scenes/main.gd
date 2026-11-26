@@ -99,6 +99,12 @@ var _hint_used := {}
 ## Plan 0031, R1: the time when the player can move, for the page, and the
 ## time to the next state for the page.
 var _web_can_move_ms := -1
+## Plan 0031, D11: the line of the times of the start (the Settings app shows the last line).
+var load_times_text := ""
+var _times_note: ScreenNote
+var _times_shown := false
+var _times_left := 0.0
+var _times_update := 0.0
 var _web_state_left := 0.0
 ## The kind of the last input: "touch", "keys", or "gamepad" (D12).
 var last_input := "keys"
@@ -146,6 +152,9 @@ func _ready() -> void:
 	_hint_note = ScreenNote.new()
 	_hint_note.name = "RideHint"
 	ui_root.add_child(_hint_note)
+	_times_note = ScreenNote.new()
+	_times_note.name = "LoadTimes"
+	ui_root.add_child(_times_note)
 	ting_player.stream = Tones.ting()
 	action_button.set_meta("test_id", "action")
 	action_button.theme_type_variation = "PrimaryButton"
@@ -181,7 +190,7 @@ func _ready() -> void:
 			# Plan 0009, R16: the page knows the first frame of the world.
 			if OS.has_feature("web"):
 				# The object keeps what the game gave before (the packs of plan 0031, D5).
-				JavaScriptBridge.eval("window.vungTau = window.vungTau || {}; window.vungTau.world = '%s'; window.vungTau.firstFrameMs = %d" % [world_name, first_frame_ms], true)
+				JavaScriptBridge.eval("window.vungTau = window.vungTau || {}; window.vungTau.world = '%s'; window.vungTau.firstFrameMs = %d; window.vungTau.mark && window.vungTau.mark('firstFrame')" % [world_name, first_frame_ms], true)
 			# Plan 0031, D5: the test of a second pack, after the first frame.
 			if GameState.has_arg("packtest"):
 				add_child.call_deferred(WebPackTest.new()), CONNECT_ONE_SHOT)
@@ -1136,7 +1145,7 @@ func phone_state() -> Dictionary:
 		"clock":
 			return {"minutes": GameState.minutes, "day": GameState.day, "at_home": is_at_home()}
 		"settings":
-			return {"settings": GameState.settings, "sound": GameState.sound}
+			return {"settings": GameState.settings, "sound": GameState.sound, "load_times": load_times_text}
 	return {}
 
 
@@ -1329,7 +1338,13 @@ func _layout_notes(view: Vector2) -> void:
 	if _road_note == null:
 		return
 	_road_note.reset_size()
-	_road_note.position = Vector2((view.x - _road_note.size.x) / 2.0, SUBTITLE_MARGIN)
+	var top := SUBTITLE_MARGIN
+	# Plan 0031, D11: the line of the times is at the top; the name of the road under it.
+	if _times_note != null and _times_note.visible:
+		_times_note.reset_size()
+		_times_note.position = Vector2(maxf((view.x - _times_note.size.x) / 2.0, 0.0), SUBTITLE_MARGIN)
+		top += _times_note.size.y + SUBTITLE_MARGIN / 2.0
+	_road_note.position = Vector2((view.x - _road_note.size.x) / 2.0, top)
 	_hint_note.reset_size()
 	# By the joystick (D12), clear of it (R13): above its ring, where the thumb
 	# holds it now or at its rest place; below the ring when no room is above.
@@ -1461,7 +1476,14 @@ func stick_rest() -> Vector2:
 func _update_web_state(delta: float) -> void:
 	if _web_can_move_ms < 0 and GameState.clock_running and not player.ride_hold:
 		_web_can_move_ms = Time.get_ticks_msec()
-		JavaScriptBridge.eval("window.vungTau.canMoveMs = %d" % _web_can_move_ms, true)
+		JavaScriptBridge.eval("window.vungTau.canMoveMs = %d; window.vungTau.mark && window.vungTau.mark('canMove')" % _web_can_move_ms, true)
+		# Plan 0031, D11: the line of the times at the top, for LoadTimes.SHOW_S.
+		var branch := str(JavaScriptBridge.eval("window.vungTauBuild ? window.vungTauBuild.branch : ''", true))
+		_times_shown = LoadTimes.shows(true, branch, GameState.has_arg("times"))
+		_times_left = LoadTimes.SHOW_S if _times_shown else 0.0
+		_times_update = 0.0
+	if _times_shown:
+		_update_times_line(delta)
 	_web_state_left -= delta
 	if _web_state_left > 0.0:
 		return
@@ -1470,6 +1492,29 @@ func _update_web_state(delta: float) -> void:
 	var heading := player.ride.heading if player.is_riding() else player.yaw
 	JavaScriptBridge.eval("window.vungTau.state = {x: %.2f, z: %.2f, heading: %.1f, speedKmh: %.1f, riding: %s, frames: %d}" % [
 			at.x, at.z, heading, player.ride_speed_kmh(), "true" if player.is_riding() else "false", Engine.get_frames_drawn()], true)
+
+
+## Plan 0031, D11: the line of the times, each second while it shows (the
+## frames each second and the memory change). The Settings app keeps the last line.
+func _update_times_line(delta: float) -> void:
+	_times_update -= delta
+	if _times_update > 0.0:
+		_times_note.tick(delta)
+		return
+	_times_update = 1.0
+	var parsed: Variant = JSON.parse_string(str(JavaScriptBridge.eval("JSON.stringify(window.vungTau.times ? window.vungTau.times() : {})", true)))
+	var line := LoadTimes.line(parsed if parsed is Dictionary else {}, Engine.get_frames_per_second())
+	if line != "":
+		load_times_text = line
+		JavaScriptBridge.eval("window.vungTau.timesLine = %s" % JSON.stringify(line), true)
+	if _times_left > 0.0:
+		_times_note.show_text(line, _times_left)
+	_times_left = maxf(_times_left - 1.0, 0.0)
+
+
+## The line of the times on the screen, or "".
+func load_times_shown() -> String:
+	return _times_note.shown() if _times_note != null else ""
 
 
 ## Plan 0018, D12: the text of the hint of the first rides, or "".

@@ -32,6 +32,8 @@ var _preset := "low"
 var _credits: TextButton
 var _language := "vi"
 var _quiet := false
+## Plan 0031, D11: the line of the times of the start of the web build.
+var _load_times: Label
 
 
 func _init() -> void:
@@ -39,6 +41,11 @@ func _init() -> void:
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_column = PhoneUi.column(8)
 	add_child(_column)
+	_load_times = PhoneUi.label("", "", 18)
+	_load_times.set_meta("test_id", "settings.load_times")
+	_load_times.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_load_times.visible = false
+	_column.add_child(_load_times)
 	_quality = PhoneUi.button("settings.quality", "")
 	_quality.pressed.connect(_next_preset)
 	_column.add_child(_quality)
@@ -105,6 +112,8 @@ func _toggle(test_id: String) -> CheckButton:
 func refresh(state: Dictionary) -> void:
 	var settings: Dictionary = state.get("settings", SaveFormat.DEFAULT_SETTINGS)
 	_quiet = true
+	_load_times.text = str(state.get("load_times", ""))
+	_load_times.visible = _load_times.text != ""
 	_sound.text = Content.ui_text("settings_sound")
 	_invert.text = Content.ui_text("settings_invert")
 	_gyro.text = Content.ui_text("settings_gyro")

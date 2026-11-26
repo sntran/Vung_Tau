@@ -69,6 +69,22 @@ const WASM_HOOK = `(() => {
   window.__wasmHeapMB = () => memories.length ? Math.round(Math.max(...memories.map((m) => m.buffer.byteLength)) / 1048576) : null;
 })();`;
 
+// Plan 0031, D11: the parts of the start from the marks of the page
+// (tools/web/page.js), in s, as LoadTimes.parts() gives them in the game.
+async function startParts(page) {
+  return page.evaluate(() => {
+    const m = (window.vungTau && window.vungTau.marks) || {};
+    const r = {};
+    const s = (v) => Math.round(v / 100) / 10;
+    if (m.downloadEnd >= 0) r.downloadS = s(m.downloadEnd);
+    if (m.compileEnd >= 0 && m.compileStart >= 0) r.compileS = s(m.compileEnd - m.compileStart);
+    if (m.engine >= 0) r.engineS = s(m.engine - Math.max(m.downloadEnd || 0, m.compileEnd || 0));
+    if (m.firstFrame >= 0 && m.engine >= 0) r.worldS = s(m.firstFrame - m.engine);
+    if (m.canMove >= 0 && m.firstFrame >= 0) r.moveS = s(m.canMove - m.firstFrame);
+    return r;
+  }).catch(() => ({}));
+}
+
 async function memoryOf(page) {
   const rss = rssByType();
   return {
@@ -118,6 +134,7 @@ async function openOnce(context, cdp, label, shots) {
     await page.waitForFunction(() => window.vungTau.canMoveMs >= 0, null, { timeout: 1800000, polling: 250 });
     result.canMoveS = (Date.now() - t0) / 1000;
     result.memoryCanMove = await memoryOf(page);
+    result.parts = await startParts(page);
     if (shots) await page.screenshot({ path: `${out}/${label}_can_move.png`, timeout: 120000 }).catch(() => {});
   } catch (e) {
     result.failure = String(e).slice(0, 300);
@@ -178,6 +195,12 @@ async function measure() {
   if (options.md) writeMarkdown(String(options.md), String(options.step || 'A measure'), rows);
 }
 
+function partsCell(p) {
+  if (!p || p.downloadS === undefined) return '—';
+  const v = (x) => (x === undefined ? '—' : `${x}`);
+  return `${v(p.downloadS)} / ${v(p.compileS)} / ${v(p.engineS)} / ${v(p.worldS)} / ${v(p.moveS)} s`;
+}
+
 function cell(value, unit, target) {
   if (value === undefined || value === null) return '—';
   const text = `${value}${unit}`;
@@ -190,8 +213,8 @@ function writeMarkdown(file, step, rows) {
   const lines = [
     '', `## ${step} (${date})`, '',
     `\`${url}\`, the processor ${rows[0] ? rows[0].cpu : 4} times slower. A value in bold is over its target of D10 (at 25 Mbit/s).`, '',
-    '| Size | Network | Cache | Over the network before the first frame | First frame | Can move | Heap of the engine | JavaScript heap | Page (renderer + GPU) |',
-    '|---|---|---|---|---|---|---|---|---|',
+    '| Size | Network | Cache | Over the network before the first frame | First frame | Can move | Heap of the engine | JavaScript heap | Page (renderer + GPU) | Parts: download / compile / engine / world / move |',
+    '|---|---|---|---|---|---|---|---|---|---|',
   ];
   for (const r of rows) {
     const at25 = r.mbps <= 25;
@@ -201,7 +224,7 @@ function writeMarkdown(file, step, rows) {
       `${cell(r.bytesBeforeFirstFrameMB, ' MB', at25 && r.cache === 'empty' ? TARGETS.bytesMB : undefined)} | ` +
       `${cell(r.firstFrameS !== undefined ? Math.round(r.firstFrameS) : undefined, ' s', at25 ? TARGETS.firstFrameS : undefined)} | ` +
       `${cell(r.canMoveS !== undefined ? Math.round(r.canMoveS) : undefined, ' s', at25 ? move : undefined)} | ` +
-      `${cell(m.engineHeapMB, ' MB')} | ${cell(m.jsHeapMB, ' MB')} | ${cell(m.pageMB, ' MB', TARGETS.memoryMB)} |` +
+      `${cell(m.engineHeapMB, ' MB')} | ${cell(m.jsHeapMB, ' MB')} | ${cell(m.pageMB, ' MB', TARGETS.memoryMB)} | ${partsCell(r.parts)} |` +
       (r.failure ? ` ${r.failure.split('\n')[0].replace(/\|/g, '/').slice(0, 120)}` : ''));
   }
   const errors = [...new Set(rows.flatMap((r) => r.errors || []))].filter((e) => !/Occlusion culling is disabled|_print_warning/.test(e));

@@ -42,10 +42,15 @@ for file in "$WEB"/*; do
   esac
 done
 KIND="new"; grep -q "func web_args" autoload/game_state.gd || KIND="old"
-python3 - "$ASSETS/index.html" "$BUILD" "$KIND" <<'PY'
+python3 - "$ASSETS/index.html" "$BUILD" "$KIND" "$BRANCH" "$ROOT/tools/web/page.js" <<'PY'
 import json, re, sys
-path, build, kind = sys.argv[1], sys.argv[2], sys.argv[3]
+path, build, kind, branch, page_js = sys.argv[1:6]
 html = open(path, encoding="utf-8").read()
+# Plan 0031, D11: the build and the branch for the game, and the marks of the
+# times of the start, before the script of Godot.
+page = open(page_js, encoding="utf-8").read()
+head = "<script>window.vungTauBuild = %s;\n%s</script>" % (json.dumps({"build": build, "branch": branch}), page)
+html = html.replace("<head>", "<head>" + head, 1)
 match = re.search(r"const GODOT_CONFIG = (\{.*?\});", html)
 config = json.loads(match.group(1))
 base = f"b/{build}/index"

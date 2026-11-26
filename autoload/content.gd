@@ -33,6 +33,9 @@ var _npcs_by_id: Dictionary = {}
 
 
 func _init() -> void:
+	# Plan 0031, D11: the page marks the start of the engine (the first script of the game).
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.vungTau && window.vungTau.mark && window.vungTau.mark('engine')", true)
 	load_all()
 
 
