@@ -49,8 +49,13 @@ func run(d: PlaytestDriver) -> void:
 			d.expect(ratio <= MAX_RATIO, "the wait at %d frames each second is at most %.1f times the wait at the full frame rate: %.2f" % [fps_cap, MAX_RATIO, ratio])
 	# The ride: the stick up for 3 s of game time. The longest frame of the ride.
 	var start := player.global_position
+	# The real time between frames: the delta of a frame stops at the time of 16 physics steps (about 283 ms).
 	var frames: Array[float] = []
-	var record := func() -> void: frames.append(main.get_process_delta_time() * 1000.0)
+	var last := {"usec": Time.get_ticks_usec()}
+	var record := func() -> void:
+		var now := Time.get_ticks_usec()
+		frames.append((now - int(last.usec)) / 1000.0)
+		last.usec = now
 	main.get_tree().process_frame.connect(record)
 	await d.hold_stick(Vector2(0.0, -1.0), 3.0)
 	main.get_tree().process_frame.disconnect(record)

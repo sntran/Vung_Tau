@@ -223,6 +223,11 @@ func _can_make(key: Vector2i) -> bool:
 ## Plan 0031, D12: one pass of the start (VungTau.starting): the new tasks
 ## and all the chunks that are done. Gives the count of the chunks that it
 ## started or applied.
+## True while chunks build in other threads (plan 0031, D12).
+func busy() -> bool:
+	return _tasks > 0
+
+
 func build_start() -> int:
 	if world == null or counts.is_empty():
 		return 0

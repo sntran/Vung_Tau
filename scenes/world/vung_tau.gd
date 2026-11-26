@@ -756,11 +756,18 @@ func _process(delta: float) -> void:
 
 
 ## Plan 0031, D12: the passes of the start in one frame, for START_FRAME_MS at
-## least, until a pass does nothing (the work of the other threads is not done
-## yet: the next frame). On the web the tasks run on the main thread, so each
-## pass builds a part.
+## least (80 % of the frame with a limit of the frame rate). When a pass does nothing while work of other threads goes on (the
+## ground, the town, the files of a model of the showcase), the frame waits for
+## it, to the end of START_FRAME_MS: at 1 frame each second, a frame that ends
+## at once costs one second. On the web the tasks run on the main thread, so
+## each pass builds a part.
 func _build_start() -> void:
-	var end := Time.get_ticks_msec() + START_FRAME_MS
+	# With a limit of the frame rate the engine sleeps for the rest of each
+	# frame: the start takes that time too ("all the time of each frame").
+	var budget := START_FRAME_MS
+	if Engine.max_fps > 0:
+		budget = maxf(budget, 0.8 * 1000.0 / Engine.max_fps)
+	var end := Time.get_ticks_msec() + budget
 	while true:
 		var before := _work
 		var steps := showcase.steps_left() if showcase != null else 0
@@ -775,8 +782,14 @@ func _build_start() -> void:
 		if _showcase_wanted(_focus) and Engine.get_frames_drawn() > 0 and _tasks == 0 and left > 0:
 			showcase.build_some(left)
 		var moved := _work != before or (showcase != null and showcase.steps_left() != steps)
-		if not moved or Time.get_ticks_msec() >= end:
+		if Time.get_ticks_msec() >= end:
 			return
+		if not moved:
+			var others := _tasks > 0 or (town != null and town.busy()) \
+					or (showcase != null and showcase.waits_for_files() and _showcase_wanted(_focus))
+			if not others:
+				return
+			OS.delay_usec(2000)
 
 
 ## True when the point is on stairs: the stairs of the known places and the

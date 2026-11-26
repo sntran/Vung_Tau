@@ -274,6 +274,12 @@ func steps_left() -> int:
 	return _steps.size()
 
 
+## True when the next step waits for the files of a model that load in other
+## threads (plan 0031, D12).
+func waits_for_files() -> bool:
+	return _waiting and not _steps.is_empty()
+
+
 ## Does all the steps of the build that are left.
 func build_all() -> void:
 	_forced = true
