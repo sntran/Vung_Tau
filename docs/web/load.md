@@ -167,3 +167,12 @@ walker_1 at 5 m, in the light of noon (the mid level, then the far level), in ea
 | 2400 × 1080 | 25 Mbit/s | with the cache | 0 MB | **62 s** | **283 s** | 344 MB | 196 MB | **1374 MB** | 7.2 / 1.2 / 4.9 / 42.4 / 219.9 s | — |
 | 2400 × 1080 | 100 Mbit/s | empty | 94 MB | 70 s | 302 s | 344 MB | 198 MB | **1393 MB** | 14.5 / 1.7 / 5 / 43.9 / 233.6 s | — |
 | 2400 × 1080 | 100 Mbit/s | with the cache | 0 MB | 65 s | 286 s | 344 MB | 197 MB | **1380 MB** | 7 / 1.3 / 4.8 / 45.8 / 220.4 s | — |
+
+## R15 before item 4: the build of item 3 (09cf5f9c3445) (2026-11-26)
+
+R15: `https://1e202e10-vung-tau.fifo.workers.dev/?start=bai_truoc&ride`, 720 × 1280, 100 Mbit/s, a disk cache of 50 MB, two visits (each a new browser on the same profile; the second with no HTTP cache, as a phone). **Fail**: the second visit gets 204.5 MB of packs over the network.
+
+| Visit | Packs over the network | All over the network | First frame | Can move | The pack people there |
+|---|---|---|---|---|---|
+| first | 204.5 MB | 212.5 MB | 63 s | 147 s | 374 s |
+| second | 204.5 MB | 212.5 MB | 66 s | 152 s | 382 s |

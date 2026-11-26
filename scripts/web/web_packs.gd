@@ -15,10 +15,8 @@ extends Node
 const PACKS := "res://data/web/packs.json"
 ## The player is checked this often (s).
 const CHECK_S := 1.0
-## On the web, HTTPRequest reads one part of the body in each frame, 64 KiB
-## by default: a pack of 81 MB then takes about 1240 frames. With 4 MiB, about
-## 20 frames.
-const CHUNK_BYTES := 4 * 1024 * 1024
+## D15: the state of a pack that the page gets is checked this often (s).
+const POLL_S := 0.25
 
 ## The work of the upgrades of D14 in each frame (ms).
 const UPGRADE_MS := 8.0
@@ -33,7 +31,6 @@ static var _loaded: Dictionary = {}
 static var _simulated: Dictionary = {}
 static var _hidden: Dictionary = {}
 
-var _http: HTTPRequest
 var _loading := ""
 var _start_ms := 0
 var _left := 0.0
@@ -135,23 +132,9 @@ func _init(player: Node3D) -> void:
 		simulate(["models"])
 
 
-func _ready() -> void:
-	_http = HTTPRequest.new()
-	_http.use_threads = false
-	_http.download_chunk_size = CHUNK_BYTES
-	add_child(_http)
-	_http.request_completed.connect(_on_downloaded)
-
-
 func _exit_tree() -> void:
 	if _instance == self:
 		_instance = null
-
-
-## The URL of a pack: next to the main pack of the page (b/BUILD/).
-static func url_of(pack_id: String) -> String:
-	return str(JavaScriptBridge.eval(
-			"new URL(GODOT_CONFIG.mainPack.replace(/[^/]*$/, '%s.pck'), window.location.href).href" % pack_id, true))
 
 
 func _process(delta: float) -> void:
@@ -169,7 +152,8 @@ func _process(delta: float) -> void:
 		return
 	_left = CHECK_S
 	if _loading != "":
-		_tell_page()
+		_left = POLL_S
+		_poll()
 		return
 	var at := _player.global_position
 	for pack_id: String in entries():
@@ -186,42 +170,41 @@ func _process(delta: float) -> void:
 	_tell_page()
 
 
+## D15: the page gets the pack (from its cache or the network, tools/web/page.js)
+## and writes it in the file system of the engine (not user://).
 func _start(pack_id: String) -> void:
 	_loading = pack_id
 	_start_ms = Time.get_ticks_msec()
-	# The body stays in memory: on the web, HTTPRequest.download_file writes a
-	# file of 0 bytes (Godot 4.7.2; docs/web/load.md, the test of D5).
-	var error := _http.request(url_of(pack_id))
-	if error != OK:
-		push_warning("WebPacks: the request of the pack %s did not start: %d" % [pack_id, error])
-		_loading = ""
+	JavaScriptBridge.eval("window.vungTau.loadPack(%s)" % JSON.stringify(pack_id), true)
 	_tell_page()
 
 
-func _on_downloaded(status: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+## The state of the pack that the page gets; its load when it is there.
+func _poll() -> void:
 	var pack_id := _loading
+	var parsed: Variant = JSON.parse_string(str(JavaScriptBridge.eval(
+			"JSON.stringify((window.vungTau.packState || {})[%s] || {})" % JSON.stringify(pack_id), true)))
+	var state: Dictionary = parsed if parsed is Dictionary else {}
+	if state.get("state", "") == "error":
+		push_warning("WebPacks: the page did not get the pack %s: %s" % [pack_id, state.get("error", "")])
+		_loading = ""
+		_left = 5.0
+		_tell_page()
+		return
+	if state.get("state", "") != "done" or not state.has("path"):
+		return
 	_loading = ""
-	var path := "user://packs/%s.pck" % pack_id
-	var download_ms := Time.get_ticks_msec() - _start_ms
-	var stored := false
 	var t0 := Time.get_ticks_msec()
-	if status == HTTPRequest.RESULT_SUCCESS and code == 200:
-		DirAccess.make_dir_recursive_absolute("user://packs")
-		var out := FileAccess.open(path, FileAccess.WRITE)
-		if out != null:
-			out.store_buffer(body)
-			out.close()
-			stored = true
-	if not stored or not ProjectSettings.load_resource_pack(path, false):
-		push_warning("WebPacks: the pack %s did not load (result %d, HTTP %d)" % [pack_id, status, code])
+	if not ProjectSettings.load_resource_pack(str(state.path), false):
+		push_warning("WebPacks: the pack %s did not load from %s" % [pack_id, state.path])
 		_left = 5.0
 		_tell_page()
 		return
 	_loaded[pack_id] = true
 	WorldModel.forget_levels()
-	# storeLoadMs: the write to user:// and the load of the pack, in one frame.
-	_times[pack_id] = {"downloadMs": download_ms, "bytes": body.size(),
-			"storeLoadMs": Time.get_ticks_msec() - t0, "readyMs": Time.get_ticks_msec()}
+	# loadMs: the load of the pack (one frame); fromCache: the bytes from the cache of the page.
+	_times[pack_id] = {"downloadMs": Time.get_ticks_msec() - _start_ms, "bytes": int(state.get("size", 0)),
+			"fromCache": int(state.get("fromCache", 0)), "loadMs": Time.get_ticks_msec() - t0, "readyMs": Time.get_ticks_msec()}
 	_on_pack(pack_id)
 	_tell_page()
 

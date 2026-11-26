@@ -3,7 +3,11 @@ hash of its content (p/HASH.pck), so that a part that does not change between
 builds keeps its name, and the page keeps it in its cache. A part is at most
 PART_BYTES before Brotli, so at most 50 MB over the network.
 
-    python3 tools/web/parts.py OUT_DIR ID=FILE ...   # writes OUT_DIR/p/*.pck and prints the packs as JSON
+    python3 tools/web/parts.py OUT_DIR ID=FILE ...   # writes OUT_DIR/p/*.pck and prints the manifest as JSON
+
+The manifest is {"packs": {ID: {"size", "parts"}}}: deploy.sh puts its packs in
+the page and uploads it as builds/BUILD/manifest.json, and r2.py keeps the
+parts that the manifests of the kept builds use.
 """
 import hashlib
 import json
@@ -32,7 +36,7 @@ def main(argv: list[str]) -> int:
     for item in argv[1:]:
         pack_id, file = item.split("=", 1)
         packs[pack_id] = split(Path(file), out / "p")
-    print(json.dumps(packs))
+    print(json.dumps({"packs": packs}))
     return 0
 
 

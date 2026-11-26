@@ -1,5 +1,6 @@
 """Plan 0031, R7 and R9: the parts of the packs by the hash of their content,
 and the choice of the files of the bucket that the deploy removes."""
+import json
 import sys
 from pathlib import Path
 
@@ -51,3 +52,13 @@ def test_a_pack_goes_in_parts_named_by_the_hash_of_their_content(tmp_path):
     assert all(p["url"].startswith("p/") and p["url"].endswith(".pck") for p in entry["parts"])
     again = parts.split(pack, tmp_path / "q", part_bytes=100_000)
     assert again["parts"] == entry["parts"], "the same content has the same names"
+
+
+def test_the_manifest_of_parts_py_keeps_its_parts_in_the_bucket(tmp_path, capsys):
+    pack = tmp_path / "index.pck"
+    pack.write_bytes(bytes(range(256)) * 400)
+    assert parts.main([str(tmp_path / "out"), f"index={pack}"]) == 0
+    manifest = json.loads(capsys.readouterr().out)
+    urls = [p["url"] for p in manifest["packs"]["index"]["parts"]]
+    objects = [obj(f"builds/{bid(1)}/manifest.json", "2026-11-26T00:00:00Z")] + [obj(u, "2026-11-26T00:00:00Z") for u in urls]
+    assert r2.choose(objects, {bid(1): manifest}, keep=5, protect=set()) == [], "deploy.sh uploads this output as the manifest"
