@@ -4,7 +4,7 @@
 // push the joystick with a real touch, and check that the scooter (or the
 // player) moves. Keep a screenshot of the loading screen, of the first frame,
 // and of the first move, with the times, the bytes, and the memory. On the
-// scooter, ride 300 m along Quang Trung with the stick and check that no
+// scooter, ride 300 m along Quang Trung and Hạ Long with the stick and check that no
 // model of the showcase waits for its files at the end ("waiting", step 2),
 // and that the page has at most 1 000 MB then (R16).
 // A script error or an engine error in the console is a failure. With
@@ -25,18 +25,24 @@ let WINDOW = { width: 640, height: 360 };
 // Joystick.RADIUS (80). On the screen it scales with the window.
 const BASE_STICK = { x: 170, y: 720 - 130, radius: 80 };
 let STICK = { ...BASE_STICK };
-// The road of the ride: Quang Trung to the south from the start of Bãi Trước.
-const QUANG_TRUNG_SOUTH = 1558591261;
+// The roads of the ride (OSM ways, as PT-80): Quang Trung to the south from
+// the start of Bãi Trước, then Hạ Long to the west (Quang Trung ends at its
+// junction with Hạ Long, before 300 m: item 7 rode into a building there).
+const ROUTE_WAYS = [1558591261, 200554629, 1423071603];
 const RIDE_M = 300;
 const RIDE_LIMIT_S = 600;
 // Plan 0031, D16 and R16: the memory of the page (renderer + GPU) at the end of the ride.
 const PAGE_END_MB = 1000;
 
-function quangTrung() {
+function route() {
   const data = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/geo/build/roads.json'), 'utf8'));
   const roads = data.roads || data;
-  const road = roads.find((r) => Number(r.id) === QUANG_TRUNG_SOUTH);
-  return road ? road.points.map((p) => ({ x: p[0], z: p[2] })) : [];
+  const points = [];
+  for (const id of ROUTE_WAYS) {
+    const road = roads.find((r) => Number(r.id) === id);
+    if (road) points.push(...road.points.map((p) => ({ x: p[0], z: p[2] })));
+  }
+  return points;
 }
 
 async function touch(cdp, type, x, y) {
@@ -154,11 +160,11 @@ async function openPage(base, query, label, ctx) {
     await page.screenshot({ path: `${out}/${label}_3b_times_line.png`, timeout: 120000 }).catch(() => {});
     if (after && after.riding) {
       // Item 7: the ride ends in 10 minutes in the workspace (the window of 640 × 360).
-      const ridden = await rideAlong(page, cdp, quangTrung(), RIDE_M, RIDE_LIMIT_S);
+      const ridden = await rideAlong(page, cdp, route(), RIDE_M, RIDE_LIMIT_S);
       r.riddenM = Math.round(ridden);
       await page.waitForTimeout(1000);
       await page.screenshot({ path: `${out}/${label}_4_after_${RIDE_M}m.png`, timeout: 120000 }).catch(() => {});
-      expect(ridden >= RIDE_M, `the scooter rides ${RIDE_M} m along Quang Trung: ${r.riddenM} m`);
+      expect(ridden >= RIDE_M, `the scooter rides ${RIDE_M} m along Quang Trung and Hạ Long: ${r.riddenM} m`);
       const waiting = await page.evaluate(() => window.vungTau.waiting).catch(() => undefined);
       r.waitingModels = waiting === undefined ? 'no signal (before step 2)' : waiting;
       if (waiting !== undefined) expect(waiting === 0, `no model of the showcase waits for its files at the end: ${waiting}`);
