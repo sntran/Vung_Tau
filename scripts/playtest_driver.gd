@@ -84,6 +84,24 @@ func wait_until(check: Callable, timeout_s := 10.0, what := "") -> bool:
 	return false
 
 
+## Waits until "check" returns true, for at most game_s seconds of game time
+## (the time of the frames: at a low frame rate a frame gives at most eight
+## physics steps, so the game time is slower than the real time), and at most
+## wall_s seconds of real time. Records a failure at the timeout.
+func wait_until_game(check: Callable, game_s: float, what := "", wall_s := 120.0) -> bool:
+	var game := 0.0
+	var end := Time.get_ticks_msec() + int(wall_s * 1000.0)
+	while game < game_s and Time.get_ticks_msec() < end:
+		if check.call():
+			return true
+		await _tree.process_frame
+		game += _tree.root.get_process_delta_time()
+	if check.call():
+		return true
+	fail("wait timed out after %.1f s of game time (%.1f s wanted)%s" % [game, game_s, (": " + what) if what else ""])
+	return false
+
+
 ## Waits until the player stops walking and the view stops turning.
 ## The view must be still for 5 frames in a row: a new panel needs some
 ## frames for its height.
