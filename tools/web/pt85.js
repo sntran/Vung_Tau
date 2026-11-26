@@ -5,7 +5,8 @@
 // player) moves. Keep a screenshot of the loading screen, of the first frame,
 // and of the first move, with the times, the bytes, and the memory. On the
 // scooter, ride 300 m along Quang Trung with the stick and check that no
-// model of the showcase waits for its files at the end ("waiting", step 2).
+// model of the showcase waits for its files at the end ("waiting", step 2),
+// and that the page has at most 1 000 MB then (R16).
 // A script error or an engine error in the console is a failure. With
 // --targets (after step 2 of plan 0031), a time or a size over its target of
 // D10 is a failure. Usage: node tools/web/check.js URL OUT --pt85
@@ -14,13 +15,22 @@ const path = require('path');
 const { chromium } = require('playwright');
 
 const ROOT = path.resolve(__dirname, '../..');
-// The joystick: its rest place is the middle of its zone (Main.STICK_ZONE,
-// 340 × 260 at the bottom left of the base view of 1280 × 720), its radius
-// Joystick.RADIUS (80).
-const STICK = { x: 170, y: 720 - 130, radius: 80 };
+// Plan 0031, item 7: the window of PT-85 (--window=WxH). SwiftShader of the
+// workspace draws on the processor: at 1280 × 720 it gave 0.4 frames a second,
+// and the ride of 300 m did not end in 25 minutes. A smaller window of the same
+// aspect gives more frames; the game scales its view (canvas_items, expand).
+let WINDOW = { width: 640, height: 360 };
+// The joystick in the base view of 1280 × 720: its rest place is the middle of
+// its zone (Main.STICK_ZONE, 340 × 260 at the bottom left), its radius
+// Joystick.RADIUS (80). On the screen it scales with the window.
+const BASE_STICK = { x: 170, y: 720 - 130, radius: 80 };
+let STICK = { ...BASE_STICK };
 // The road of the ride: Quang Trung to the south from the start of Bãi Trước.
 const QUANG_TRUNG_SOUTH = 1558591261;
 const RIDE_M = 300;
+const RIDE_LIMIT_S = 600;
+// Plan 0031, D16 and R16: the memory of the page (renderer + GPU) at the end of the ride.
+const PAGE_END_MB = 1000;
 
 function quangTrung() {
   const data = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/geo/build/roads.json'), 'utf8'));
@@ -78,8 +88,14 @@ async function rideAlong(page, cdp, route, meters, limitS) {
 async function openPage(base, query, label, ctx) {
   const { out, options, ARGS, WASM_HOOK, memoryOf } = ctx;
   const mbps = Number(options.mbps || 50);
+  if (options.window) {
+    const [width, height] = String(options.window).split('x').map(Number);
+    WINDOW = { width, height };
+  }
+  const k = Math.min(WINDOW.width / 1280, WINDOW.height / 720);
+  STICK = { x: BASE_STICK.x * k, y: BASE_STICK.y * k, radius: BASE_STICK.radius * k };
   const browser = await chromium.launch({ args: ARGS });
-  const context = await browser.newContext({ viewport: { width: 1280, height: 720 }, hasTouch: true });
+  const context = await browser.newContext({ viewport: WINDOW, hasTouch: true });
   await context.addInitScript(WASM_HOOK);
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);
@@ -95,7 +111,7 @@ async function openPage(base, query, label, ctx) {
   });
   page.on('pageerror', (e) => errors.push(String(e).slice(0, 300)));
   page.on('crash', () => errors.push('the page crashed'));
-  const r = { label, url: base + query, mbps, errors, checks: [] };
+  const r = { label, url: base + query, mbps, window: `${WINDOW.width}x${WINDOW.height}`, errors, checks: [] };
   const t0 = Date.now();
   const expect = (ok, text) => { r.checks.push({ ok: Boolean(ok), text }); if (!ok) console.log(`FAIL ${label}: ${text}`); };
   try {
@@ -137,8 +153,8 @@ async function openPage(base, query, label, ctx) {
     expect(r.timesLine !== '', `the line of the times shows after the first move: "${r.timesLine}"`);
     await page.screenshot({ path: `${out}/${label}_3b_times_line.png`, timeout: 120000 }).catch(() => {});
     if (after && after.riding) {
-      // At 0.4 frames a second (SwiftShader of the workspace), 300 m take about 20 minutes.
-      const ridden = await rideAlong(page, cdp, quangTrung(), RIDE_M, 1500);
+      // Item 7: the ride ends in 10 minutes in the workspace (the window of 640 × 360).
+      const ridden = await rideAlong(page, cdp, quangTrung(), RIDE_M, RIDE_LIMIT_S);
       r.riddenM = Math.round(ridden);
       await page.waitForTimeout(1000);
       await page.screenshot({ path: `${out}/${label}_4_after_${RIDE_M}m.png`, timeout: 120000 }).catch(() => {});
@@ -148,6 +164,10 @@ async function openPage(base, query, label, ctx) {
       if (waiting !== undefined) expect(waiting === 0, `no model of the showcase waits for its files at the end: ${waiting}`);
     }
     r.memoryEnd = await memoryOf(page);
+    // Plan 0031, D16 and R16: the page at most 1 000 MB at the end of the ride.
+    if (after && after.riding) {
+      expect(r.memoryEnd.pageMB <= PAGE_END_MB, `the page at most ${PAGE_END_MB} MB at the end of the ride: ${r.memoryEnd.pageMB} MB`);
+    }
   } catch (e) {
     r.failure = String(e).slice(0, 300);
     expect(false, r.failure);
