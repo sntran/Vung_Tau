@@ -81,7 +81,7 @@ On 2026-11-25 I opened the web build of plan 0018 on my computer. The loading sc
 
 ## 9. Builder notes (2026-11-26)
 
-Steps 1 and 2 are done; steps 3 and 4 wait for the look of the owner on the phone. The tables of each measure are in [`docs/web/load.md`](../web/load.md).
+Steps 1 and 2 are done; steps 3 and 4 wait for the look of the owner on the phone. The web build of step 2: `https://feat-0031-web-load-vung-tau.fifo.workers.dev/?start=bai_truoc&ride` (the build `f416161ee448`, the version `https://1e651075-vung-tau.fifo.workers.dev`; the measures of step 2 are of `e2430eaea126`, with the same packs). The tables of each measure are in [`docs/web/load.md`](../web/load.md).
 
 ### R1: the measures (`tools/web/check.js --measure`)
 
@@ -119,7 +119,14 @@ Steps 1 and 2 are done; steps 3 and 4 wait for the look of the owner on the phon
 ### PT-85 (`tools/web/check.js URL OUT --pt85`)
 
 - After each deploy: `?start=bai_truoc&ride` and `?start=hem` at 50 Mbit/s with an empty cache, a real touch on the joystick (CDP), the first move, and a ride of 300 m along Quang Trung with the stick.
-- The first move passes on each build, at each start (the stick held until the scooter or the player moves 1 m). The ride of 300 m does not end in the workspace: at 0.4 frames a second, 300 m takes more than 20 minutes. The ride has 1500 s now.
+| Build | Start | First frame | Can move | First move | Ride | The pack people | Errors |
+|---|---|---|---|---|---|---|---|
+| Step 1 (`32feaeec2693`) | `bai_truoc&ride` | 59 s | 179 s | 1.26 m | 85 m in 600 s (0.4 frames a second) | — | none |
+| Step 1 (`32feaeec2693`) | `hem` | 61 s | 125 s | 1.16 m | — | — | none |
+| Step 2 (`f416161ee448`) | `bai_truoc&ride` | 44 s | 171 s | 1.26 m | 258 m in 1500 s (0.4 frames a second) | there at the end (`waiting` 0; 203.7 MB in all over the network) | none |
+| Step 2 (`f416161ee448`) | `hem` | 44 s | 109 s | 1.16 m | — | — | none |
+
+- The first move passes on each build, at each start (the stick held until the scooter or the player moves 1 m). The ride of 300 m does not end in the workspace: at 0.4 frames a second, 300 m takes more than 20 minutes (the ride has 1500 s now). So PT-85 fails on the ride only; the phone gives the real ride. At the end of the ride of step 2 the page has 2449 MB (the people are there); in the hẻm 1595 MB.
 - At the first frame the game wrote a new `window.vungTau`, and the signals of the packs from before it were lost; the object now keeps them.
 
 ### The other corrections
