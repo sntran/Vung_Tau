@@ -163,6 +163,15 @@ var mainland: MainlandFar
 ## for them (report 0026, D-0026-12).
 const SHOWCASE_NEAR_M := 600.0
 const SHOWCASE_FRAME_MS := 8.0
+## Plan 0031, D12: the load by time. While the player cannot move (Main sets
+## "starting"), the world builds the start with at least this time of each
+## frame (ms): the ground, the town, and the steps of the showcase. Then the
+## world builds the rest with a small part of each frame, as before.
+const START_FRAME_MS := 100.0
+var starting := false
+## The count of the things that the world started or applied (the ground and
+## the town), so that the start knows when a pass did nothing.
+var _work := 0
 ## The season values of the game day (R12a), from Season.of_day().
 var season: Dictionary = {}
 var _season_day := -1
@@ -734,6 +743,9 @@ func _process(delta: float) -> void:
 	# The steps of the showcase wait while the ground builds chunks: the loads
 	# of the models of World in other threads made the first ground of PT-33
 	# slower than 30 s in CI.
+	if starting:
+		_build_start()
+		return
 	if _showcase_wanted(_focus) and Engine.get_frames_drawn() > 0 and _tasks == 0:
 		showcase.build_some(SHOWCASE_FRAME_MS)
 	_update_wanted()
@@ -741,6 +753,30 @@ func _process(delta: float) -> void:
 	_update_patches()
 	_update_far_strides()
 	_apply_done()
+
+
+## Plan 0031, D12: the passes of the start in one frame, for START_FRAME_MS at
+## least, until a pass does nothing (the work of the other threads is not done
+## yet: the next frame). On the web the tasks run on the main thread, so each
+## pass builds a part.
+func _build_start() -> void:
+	var end := Time.get_ticks_msec() + START_FRAME_MS
+	while true:
+		var before := _work
+		var steps := showcase.steps_left() if showcase != null else 0
+		_update_wanted()
+		_start_tasks()
+		_update_patches()
+		_update_far_strides()
+		_apply_all_done()
+		if town:
+			_work += town.build_start()
+		var left := end - Time.get_ticks_msec()
+		if _showcase_wanted(_focus) and Engine.get_frames_drawn() > 0 and _tasks == 0 and left > 0:
+			showcase.build_some(left)
+		var moved := _work != before or (showcase != null and showcase.steps_left() != steps)
+		if not moved or Time.get_ticks_msec() >= end:
+			return
 
 
 ## True when the point is on stairs: the stairs of the known places and the
@@ -824,6 +860,7 @@ func _start_tasks() -> void:
 	state.busy = true
 	state.asked = Time.get_ticks_msec()
 	_tasks += 1
+	_work += 1
 	var strides := _patch_strides(best) if state.wanted == Detail.NEAR else {}
 	WorkerThreadPool.add_task(_build_chunk.bind(best, int(state.wanted), strides), false, "ground chunk")
 
@@ -861,6 +898,7 @@ func _apply_done() -> void:
 	_mutex.unlock()
 	for result: Dictionary in ready:
 		_tasks -= 1
+		_work += 1
 		if result.has("patch"):
 			_show_patch(result)
 			continue
@@ -1008,6 +1046,7 @@ func _update_patches() -> void:
 	var state: Dictionary = _chunks[best_key]
 	state.patches[best_at].busy = true
 	_tasks += 1
+	_work += 1
 	WorkerThreadPool.add_task(_build_patch.bind(best_key, best_at, best_stride, state.heights), false, "ground patch")
 
 
@@ -1694,6 +1733,7 @@ func _update_far_strides() -> void:
 		if stride != _far_strides[tile]:
 			_far_strides[tile] = stride
 			_rebuild_far_tile(tile)
+			_work += 1
 			return
 
 

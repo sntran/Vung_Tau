@@ -269,6 +269,11 @@ func build_some(budget_ms: float) -> void:
 		built.emit()
 
 
+## The count of the steps of the build that are left (plan 0031, D12).
+func steps_left() -> int:
+	return _steps.size()
+
+
 ## Does all the steps of the build that are left.
 func build_all() -> void:
 	_forced = true

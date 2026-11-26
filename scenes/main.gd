@@ -287,6 +287,9 @@ func _process(delta: float) -> void:
 		JavaScriptBridge.eval("window.vungTau.settledMs = %d" % _web_settled_ms, true)
 	if OS.has_feature("web") and first_frame_ms >= 0:
 		_update_web_state(delta)
+	# Plan 0031, D12: the world builds the start with the time of each frame until the player can move.
+	if vung_tau != null:
+		vung_tau.starting = not GameState.clock_running or (player.is_riding() and player.ride_hold)
 	_layout()
 	_update_rest_stick()
 	_read_keys()

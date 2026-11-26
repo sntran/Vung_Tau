@@ -46,6 +46,10 @@ func _ready() -> void:
 	var day := GameState.arg_value("day")
 	if day.is_valid_int():
 		GameState.day = maxi(day.to_int(), 1)
+	# Plan 0031, R12: a run can limit the frame rate (a phase of PT-87 at 3 frames each second).
+	var max_fps := GameState.arg_value("max-fps")
+	if max_fps.is_valid_int():
+		Engine.max_fps = max_fps.to_int()
 	var seed_text := GameState.arg_value("seed")
 	if seed_text.is_valid_int():
 		seed(seed_text.to_int())

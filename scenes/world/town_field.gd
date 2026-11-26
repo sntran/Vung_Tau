@@ -220,6 +220,25 @@ func _can_make(key: Vector2i) -> bool:
 	return true
 
 
+## Plan 0031, D12: one pass of the start (VungTau.starting): the new tasks
+## and all the chunks that are done. Gives the count of the chunks that it
+## started or applied.
+func build_start() -> int:
+	if world == null or counts.is_empty():
+		return 0
+	var before := _tasks
+	_start_tasks()
+	var started := _tasks - before
+	_mutex.lock()
+	var ready := _done.duplicate()
+	_done.clear()
+	_mutex.unlock()
+	for result: Dictionary in ready:
+		_tasks -= 1
+		_show(result)
+	return started + ready.size()
+
+
 func _start_tasks() -> void:
 	# Each task must be waited for once (WorkerThreadPool): the done tasks now.
 	var running: Array[int] = []
