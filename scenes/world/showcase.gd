@@ -293,8 +293,25 @@ func _add_people() -> void:
 	# Plan 0031, D5: on the web the people come in a pack of their own, when the
 	# player is near; the showcase is there before them.
 	if WebPacks.waiting("people"):
-		WebPacks.when_ready("people", _add_people)
+		WebPacks.when_ready("people", _add_people_later)
 		return
+	_make_people()
+
+
+## Plan 0031, D18: the pack of the people came after the start (the web). Its
+## scenes load one in each frame (the load of all of them in one frame took
+## 8.7 s in the measure of the web build), then the people come.
+func _add_people_later() -> void:
+	for pair: Array in ShowcasePeople.scenes_of(ShowcasePeople.PATH):
+		if not is_inside_tree():
+			return
+		WorldModel.scene(str(pair[0]), str(pair[1]))
+		await get_tree().process_frame
+	if is_inside_tree() and people == null:
+		_make_people()
+
+
+func _make_people() -> void:
 	people = ShowcasePeople.new()
 	people.name = "People"
 	add_child(people)

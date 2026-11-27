@@ -93,6 +93,28 @@ func setup(world: VungTau, showcase: Showcase, path := PATH) -> bool:
 	return true
 
 
+## Plan 0031, D18: the scenes of the people of the file, as [id, level]: each
+## level with a file of each model of the walkers, the sitters, and the
+## swimmers, and the swim ring.
+static func scenes_of(path := PATH) -> Array:
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var out: Array = []
+	if not parsed is Dictionary:
+		return out
+	var ids: Array[String] = []
+	for group: String in ["walkers", "sitters", "swimmers"]:
+		var cfg: Dictionary = parsed.get(group, {})
+		for id: Variant in cfg.get("models", []):
+			if not ids.has(str(id)):
+				ids.append(str(id))
+		if cfg.has("ring_model") and not ids.has(str(cfg.ring_model)):
+			ids.append(str(cfg.ring_model))
+	for id in ids:
+		for level: String in WorldModel.levels_of(id):
+			out.append([id, level])
+	return out
+
+
 ## The part of the people that is there at the clock time (0 to 1).
 func share_at(minutes: float) -> float:
 	var hour := fposmod(minutes / 60.0, 24.0)

@@ -31,3 +31,18 @@ func test_a_walker_does_not_pass_through_the_player_in_a_long_frame() -> void:
 	people._process(1.7)
 	var x := (w.model as WorldModel).global_position.x
 	assert_lt(x, 7.0 - ShowcasePeople.KEEP_GAP + 0.001, "the walker stays in front of the player: x %.2f" % x)
+
+
+## Plan 0031, D18: when the pack of the people comes after the start (the web),
+## the showcase loads their scenes one in each frame. The list has each level
+## of each model of the people, one time.
+func test_the_scenes_of_the_people_are_each_level_of_each_model_one_time() -> void:
+	var scenes := ShowcasePeople.scenes_of()
+	assert_gt(scenes.size(), 10)
+	assert_has(scenes, ["walker_1", "mid"])
+	assert_has(scenes, ["walker_1", "far"])
+	assert_has(scenes, ["phao_boi", WorldModel.levels_of("phao_boi")[0]], "the swim ring")
+	var keys := {}
+	for pair: Array in scenes:
+		assert_false(keys.has(str(pair)), "one time: %s" % [pair])
+		keys[str(pair)] = true
