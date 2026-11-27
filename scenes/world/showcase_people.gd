@@ -19,6 +19,9 @@ const STEP_ASIDE := 0.8
 ## A walker does not move nearer than this to the player (m, foot to foot): the
 ## two bodies and a margin.
 const KEEP_GAP := 0.6
+## The longest move of a walker in one step (m): less than KEEP_GAP, so that no
+## step goes past the player (report 0031, D-0031-06).
+const STEP_M := 0.2
 
 ## Each walker: {"model", "body", "line" (PackedVector3Array), "length", "at" (m along the line),
 ## "speed", "sign", "side" (m to the right of the middle of the way), "now" (the side now),
@@ -292,52 +295,62 @@ func _show(people: Array[Dictionary], share: float) -> void:
 
 func _process(delta: float) -> void:
 	var camera := get_viewport().get_camera_3d()
+	var player := camera.global_position if camera else Vector3.INF
 	for w: Dictionary in walkers:
 		var model: WorldModel = w.model
 		if not model.visible or bool(w.get("held", false)):
 			continue
-		# The player in front of the walker: the walker stops and steps aside,
-		# away from the player, in the width of its way.
-		var stop := false
-		var aside := float(w.side)
-		var player := Vector3.INF
-		if camera:
-			player = camera.global_position
-			var to_player := player - model.global_position
-			to_player.y = 0.0
-			var forward := model.global_transform.basis.z
-			forward.y = 0.0
-			forward = forward.normalized()
-			var ahead := to_player.dot(forward)
-			var right := forward.cross(Vector3.UP)
-			stop = ahead > 0.0 and ahead < STOP_GAP and absf(to_player.dot(right)) < LANE
-			if stop:
-				aside = -float(w.room) if to_player.dot(right) > 0.0 else float(w.room)
-		var before := {"at": w.at, "now": w.now, "sign": w.sign}
-		if stop:
-			w.now = move_toward(float(w.now), aside, STEP_ASIDE * delta)
-		else:
-			w.now = move_toward(float(w.now), float(w.side), STEP_ASIDE * 0.5 * delta)
-			var at := float(w.at) + float(w.speed) * float(w.sign) * delta
-			if at < 0.0 or at > float(w.length):
-				w.sign = -float(w.sign)
-				at = clampf(at, 0.0, float(w.length))
-			w.at = at
-		var place := _walker_transform(w)
-		# Never into the player: the walker waits where it is.
-		var near := player != Vector3.INF and Vector2(place.origin.x - player.x, place.origin.z - player.z).length() < KEEP_GAP \
-				and Vector2(place.origin.x - player.x, place.origin.z - player.z).length() \
-				< Vector2(model.global_position.x - player.x, model.global_position.z - player.z).length()
-		if near:
-			w.at = before.at
-			w.now = before.now
-			w.sign = before.sign
-		else:
-			model.transform = place
-		var waits := stop or near
+		# Report 0031, D-0031-06: in a long frame of game time a walker moves in
+		# steps of at most STEP_M, and each step checks the gap to the player.
+		var steps := maxi(1, ceili(maxf(float(w.speed), STEP_ASIDE) * delta / STEP_M))
+		var waits := false
+		for i in steps:
+			waits = _step_walker(w, delta / steps, player)
 		if waits != bool(w.stopped):
 			w.stopped = waits
 			model.set_animation_active(not waits)
+
+
+## One step of a walker. Returns true when the walker waits for the player.
+func _step_walker(w: Dictionary, delta: float, player: Vector3) -> bool:
+	var model: WorldModel = w.model
+	# The player in front of the walker: the walker stops and steps aside,
+	# away from the player, in the width of its way.
+	var stop := false
+	var aside := float(w.side)
+	if player != Vector3.INF:
+		var to_player := player - model.global_position
+		to_player.y = 0.0
+		var forward := model.global_transform.basis.z
+		forward.y = 0.0
+		forward = forward.normalized()
+		var ahead := to_player.dot(forward)
+		var right := forward.cross(Vector3.UP)
+		stop = ahead > 0.0 and ahead < STOP_GAP and absf(to_player.dot(right)) < LANE
+		if stop:
+			aside = -float(w.room) if to_player.dot(right) > 0.0 else float(w.room)
+	var before := {"at": w.at, "now": w.now, "sign": w.sign}
+	if stop:
+		w.now = move_toward(float(w.now), aside, STEP_ASIDE * delta)
+	else:
+		w.now = move_toward(float(w.now), float(w.side), STEP_ASIDE * 0.5 * delta)
+		var at := float(w.at) + float(w.speed) * float(w.sign) * delta
+		if at < 0.0 or at > float(w.length):
+			w.sign = -float(w.sign)
+			at = clampf(at, 0.0, float(w.length))
+		w.at = at
+	var place := _walker_transform(w)
+	# Never into the player: the walker waits where it is.
+	var near := player != Vector3.INF and Vector2(place.origin.x - player.x, place.origin.z - player.z).length() < KEEP_GAP \
+			and Vector2(place.origin.x - player.x, place.origin.z - player.z).length() \
+			< Vector2(model.global_position.x - player.x, model.global_position.z - player.z).length()
+	if near:
+		w.at = before.at
+		w.now = before.now
+		w.sign = before.sign
+	else:
+		model.transform = place
+	return stop or near
 
 
 ## Report 0026, D-0026-28 and D-0026-38 (PT-73): the worst case of the budget
@@ -430,7 +443,7 @@ func _walker_transform(w: Dictionary) -> Transform3D:
 				dir = Vector3.BACK
 			# People keep to the right of the way.
 			p += dir.normalized().cross(Vector3.UP) * float(w.get("now", 0.0))
-			p.y = _world.ground_height(p.x, p.z) + 0.03
+			p.y = (_world.ground_height(p.x, p.z) if _world != null else 0.0) + 0.03
 			return Transform3D(Basis.looking_at(-dir.normalized(), Vector3.UP), p)
 		along += length
 	return (w.model as WorldModel).transform
