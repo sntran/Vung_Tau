@@ -41,6 +41,13 @@ const ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignor
 const PHONE_AGENT = 'Mozilla/5.0 (Linux; Android 15; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36';
 // D10: the targets, at 25 Mbit/s.
 const TARGETS = { bytesMB: 40, firstFrameS: 20, canMoveS: 40, canMoveCachedS: 15, memoryMB: 700 };
+// Plan 0031, D18 and R18: no frame longer than this while a pack loads (ms).
+const PACK_FRAME_MS = 500;
+// R18: the packs of a row whose longest frame is over PACK_FRAME_MS.
+function packFrameFailures(r) {
+  return Object.entries(r.packs || {}).filter(([, p]) => ((p.times || {}).longestFrameMs || 0) > PACK_FRAME_MS)
+    .map(([id, p]) => `${r.label}: the pack ${id}, a frame of ${p.times.longestFrameMs} ms`);
+}
 
 // The memory (resident) of the processes of Chromium, by type, in MB.
 function rssByType() {
@@ -235,6 +242,10 @@ async function measure() {
   }
   fs.writeFileSync(`${out}/measure.json`, JSON.stringify({ url, rows }, null, 2));
   if (options.md) writeMarkdown(String(options.md), String(options.step || 'A measure'), rows);
+  // R18: a frame longer than 500 ms while a pack loads fails the measure.
+  const long = rows.flatMap(packFrameFailures);
+  long.forEach((text) => console.log(`FAIL R18 (at most ${PACK_FRAME_MS} ms): ${text}`));
+  return long.length ? 1 : 0;
 }
 
 // Plan 0031, R6: the loading screen of D7 at 1280 × 720, 2400 × 1080, and
@@ -331,7 +342,8 @@ function packCell(r, id) {
   // D18: what the longest frame did (the upgrades, the load of the pack, all the scripts) and the copy of the page.
   const f = t.longestFrame || {};
   const parts = f.ms !== undefined ? ` (upgrades ${f.upgradesMs}, load ${f.pollMs}, scripts ${f.processMs}, physics ${f.physicsMs} ms; copy of the page ${(p.page || {}).copyMs} ms)` : '';
-  const longest = t.longestFrameMs !== undefined ? `, longest frame ${t.longestFrameMs} ms${parts}${left}` : '';
+  const over = (t.longestFrameMs || 0) > PACK_FRAME_MS;
+  const longest = t.longestFrameMs !== undefined ? `, longest frame ${over ? '**' : ''}${t.longestFrameMs} ms${over ? '**' : ''}${parts}${left}` : '';
   return `${Math.round(p.s)} s, ${m.pageMB} MB, ${m.engineHeapMB} MB${longest}`;
 }
 
@@ -447,7 +459,7 @@ async function packTest() {
 
 const pt85 = require('./pt85.js');
 (async () => {
-  if (options.measure) await measure();
+  if (options.measure) process.exitCode = await measure();
   else if (options.pt85) process.exitCode = await pt85.run({ url, out, options, ARGS, WASM_HOOK, TARGETS, memoryOf, rssByType });
   else if (options.packtest) process.exitCode = await packTest();
   else if (options.r15) process.exitCode = await cacheCheck();

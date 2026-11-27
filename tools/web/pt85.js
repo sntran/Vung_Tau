@@ -6,7 +6,8 @@
 // and of the first move, with the times, the bytes, and the memory. On the
 // scooter, ride 300 m along Quang Trung and Hạ Long with the stick and check that no
 // model of the showcase waits for its files at the end ("waiting", step 2),
-// and that the page has at most 1 000 MB then (R16).
+// and that the heap of the engine and the JavaScript heap have at most
+// 1 000 MB then (R16), and no frame is longer than 500 ms while a pack loads (R18).
 // A script error or an engine error in the console is a failure. With
 // --targets (after step 2 of plan 0031), a time or a size over its target of
 // D10 is a failure. Usage: node tools/web/check.js URL OUT --pt85
@@ -31,7 +32,9 @@ let STICK = { ...BASE_STICK };
 const ROUTE_WAYS = [1558591261, 200554629, 1423071603];
 const RIDE_M = 300;
 const RIDE_LIMIT_S = 600;
-// Plan 0031, D16 and R16: the memory of the page (renderer + GPU) at the end of the ride.
+// Plan 0031, D18 and R18: the longest frame while a pack loads (ms).
+const PACK_FRAME_MS = 500;
+// Plan 0031, D16 and R16: the heap of the engine and the JavaScript heap at the end of the ride.
 const PAGE_END_MB = 1000;
 
 function route() {
@@ -170,9 +173,22 @@ async function openPage(base, query, label, ctx) {
       if (waiting !== undefined) expect(waiting === 0, `no model of the showcase waits for its files at the end: ${waiting}`);
     }
     r.memoryEnd = await memoryOf(page);
-    // Plan 0031, D16 and R16: the page at most 1 000 MB at the end of the ride.
+    // Plan 0031, D18 and R18: no frame longer than 500 ms while a pack loads.
+    const packs = await page.evaluate(() => window.vungTau.packs || {}).catch(() => ({}));
+    r.packFrames = {};
+    for (const [id, t] of Object.entries(packs)) {
+      if (t.longestFrameMs === undefined) continue;
+      r.packFrames[id] = t.longestFrameMs;
+      expect(t.longestFrameMs <= PACK_FRAME_MS, `no frame longer than ${PACK_FRAME_MS} ms while the pack ${id} loads: ${t.longestFrameMs} ms`);
+    }
+    // Plan 0031, D16 and R16 (changed 2026-11-27): at most 1 000 MB at the end
+    // of the ride for the heap of the engine and the JavaScript heap (the
+    // number "page" of the line of the times), not the memory of the page:
+    // in the workspace most of that is the software graphics.
+    r.gameEndMB = await page.evaluate(() => (window.vungTau.times() || {}).pageMB).catch(() => undefined);
     if (after && after.riding) {
-      expect(r.memoryEnd.pageMB <= PAGE_END_MB, `the page at most ${PAGE_END_MB} MB at the end of the ride: ${r.memoryEnd.pageMB} MB`);
+      expect(r.gameEndMB !== undefined && r.gameEndMB <= PAGE_END_MB,
+        `the heap of the engine and the JavaScript heap at most ${PAGE_END_MB} MB at the end of the ride: ${r.gameEndMB} MB (the page: ${r.memoryEnd.pageMB} MB)`);
     }
   } catch (e) {
     r.failure = String(e).slice(0, 300);
