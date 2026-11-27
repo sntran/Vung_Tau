@@ -32,8 +32,9 @@ let STICK = { ...BASE_STICK };
 const ROUTE_WAYS = [1558591261, 200554629, 1423071603];
 const RIDE_M = 300;
 const RIDE_LIMIT_S = 600;
-// Plan 0031, D18 and R18: the longest frame while a pack loads (ms).
-const PACK_FRAME_MS = 500;
+// Plan 0031, D18 and R18 (changed 2026-11-27): the longest frame while a pack
+// loads is at most the median frame of the run plus 250 ms (frame_limit.js).
+const { OVER_MEDIAN_MS, packFrameFailures } = require('./frame_limit');
 // Plan 0031, D16 and R16: the heap of the engine and the JavaScript heap at the end of the ride.
 const PAGE_END_MB = 1000;
 
@@ -160,6 +161,8 @@ async function openPage(base, query, label, ctx) {
     r.timesLine = await page.evaluate(() => window.vungTau.timesLine || '').catch(() => '');
     r.parts = await page.evaluate(() => window.vungTau.marks || {}).catch(() => ({}));
     expect(r.timesLine !== '', `the line of the times shows after the first move: "${r.timesLine}"`);
+    // R19: the line gives the longest frame after "can move" (my phone reads it there).
+    expect(/longest frame \d+ ms/.test(r.timesLine), `the line of the times gives the longest frame after "can move": "${r.timesLine}"`);
     await page.screenshot({ path: `${out}/${label}_3b_times_line.png`, timeout: 120000 }).catch(() => {});
     if (after && after.riding) {
       // Item 7: the ride ends in 10 minutes in the workspace (the window of 640 × 360).
@@ -173,14 +176,21 @@ async function openPage(base, query, label, ctx) {
       if (waiting !== undefined) expect(waiting === 0, `no model of the showcase waits for its files at the end: ${waiting}`);
     }
     r.memoryEnd = await memoryOf(page);
-    // Plan 0031, D18 and R18: no frame longer than 500 ms while a pack loads.
+    // Plan 0031, D18 and R18 (changed 2026-11-27): no frame longer than the
+    // median frame of the run plus 250 ms while a pack loads.
     const packs = await page.evaluate(() => window.vungTau.packs || {}).catch(() => ({}));
+    r.frames = await page.evaluate(() => window.vungTau.frames).catch(() => undefined);
     r.packFrames = {};
+    const row = { label: r.label, frames: r.frames, packs: {} };
     for (const [id, t] of Object.entries(packs)) {
       if (t.longestFrameMs === undefined) continue;
       r.packFrames[id] = t.longestFrameMs;
-      expect(t.longestFrameMs <= PACK_FRAME_MS, `no frame longer than ${PACK_FRAME_MS} ms while the pack ${id} loads: ${t.longestFrameMs} ms`);
+      row.packs[id] = { times: t };
     }
+    const over = packFrameFailures(row);
+    const median = r.frames && r.frames.count ? `${Math.round(r.frames.medianMs)} ms` : 'none';
+    expect(over.length === 0, `no frame longer than the median frame (${median}) plus ${OVER_MEDIAN_MS} ms while a pack loads: ` +
+      (over.length ? over.join('; ') : JSON.stringify(r.packFrames)));
     // Plan 0031, D16 and R16 (changed 2026-11-27): at most 1 000 MB at the end
     // of the ride for the heap of the engine and the JavaScript heap (the
     // number "page" of the line of the times), not the memory of the page:

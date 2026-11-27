@@ -41,13 +41,9 @@ const ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignor
 const PHONE_AGENT = 'Mozilla/5.0 (Linux; Android 15; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36';
 // D10: the targets, at 25 Mbit/s.
 const TARGETS = { bytesMB: 40, firstFrameS: 20, canMoveS: 40, canMoveCachedS: 15, memoryMB: 700 };
-// Plan 0031, D18 and R18: no frame longer than this while a pack loads (ms).
-const PACK_FRAME_MS = 500;
-// R18: the packs of a row whose longest frame is over PACK_FRAME_MS.
-function packFrameFailures(r) {
-  return Object.entries(r.packs || {}).filter(([, p]) => ((p.times || {}).longestFrameMs || 0) > PACK_FRAME_MS)
-    .map(([id, p]) => `${r.label}: the pack ${id}, a frame of ${p.times.longestFrameMs} ms`);
-}
+// Plan 0031, D18 and R18 (changed 2026-11-27): the longest frame while a pack
+// loads is at most the median frame of the run plus 250 ms (frame_limit.js).
+const { OVER_MEDIAN_MS, packFrameLimitMs, packFrameFailures } = require('./frame_limit');
 
 // The memory (resident) of the processes of Chromium, by type, in MB.
 function rssByType() {
@@ -251,9 +247,9 @@ async function measure() {
   }
   fs.writeFileSync(`${out}/measure.json`, JSON.stringify({ url, rows }, null, 2));
   if (options.md) writeMarkdown(String(options.md), String(options.step || 'A measure'), rows);
-  // R18: a frame longer than 500 ms while a pack loads fails the measure.
+  // R18: a frame longer than the median frame plus 250 ms while a pack loads fails the measure.
   const long = rows.flatMap(packFrameFailures);
-  long.forEach((text) => console.log(`FAIL R18 (at most ${PACK_FRAME_MS} ms): ${text}`));
+  long.forEach((text) => console.log(`FAIL R18 (at most the median frame + ${OVER_MEDIAN_MS} ms): ${text}`));
   return long.length ? 1 : 0;
 }
 
@@ -351,7 +347,8 @@ function packCell(r, id) {
   // D18: what the longest frame did (the upgrades, the load of the pack, all the scripts) and the copy of the page.
   const f = t.longestFrame || {};
   const parts = f.ms !== undefined ? ` (upgrades ${f.upgradesMs}, load ${f.pollMs}, scripts ${f.processMs}, physics ${f.physicsMs} ms; copy of the page ${(p.page || {}).copyMs} ms)` : '';
-  const over = (t.longestFrameMs || 0) > PACK_FRAME_MS;
+  const limit = packFrameLimitMs(r.frames);
+  const over = limit === null || (t.longestFrameMs || 0) > limit;
   const longest = t.longestFrameMs !== undefined ? `, longest frame ${over ? '**' : ''}${t.longestFrameMs} ms${over ? '**' : ''}${parts}${left}` : '';
   return `${Math.round(p.s)} s, ${m.pageMB} MB, ${m.engineHeapMB} MB${longest}`;
 }
@@ -379,7 +376,7 @@ function writeMarkdown(file, step, rows) {
   const date = new Date().toISOString().slice(0, 10);
   const lines = [
     '', `## ${step} (${date})`, '',
-    `\`${url}\`, the processor ${rows[0] ? rows[0].cpu : 4} times slower. A value in bold is over its target of D10 (at 25 Mbit/s).`, '',
+    `\`${url}\`, the processor ${rows[0] ? rows[0].cpu : 4} times slower. A value in bold is over its target of D10 (at 25 Mbit/s), and a longest frame of a pack in bold is over the limit of R18 (the median frame after "can move" plus ${OVER_MEDIAN_MS} ms).`, '',
     '| Size | Network | Cache | Over the network before the first frame | First frame | Can move | Heap of the engine | JavaScript heap | Page (renderer + GPU) | Parts: download / compile / engine / world / move | Page when the player can move | The pack models there: time, page, heap of the engine | The people there: time, page, heap of the engine | At "can move" the world still builds | Frames after "can move": median / longest |',
     '|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|',
   ];
