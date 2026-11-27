@@ -90,11 +90,22 @@ var _bake_again := false
 
 func _ready() -> void:
 	StartProfile.mark("the engine, the autoloads, and the main scene")
+	# Plan 0031, D17: the Vũng Tàu world removes the test street, so it does not
+	# build it (0.7 s on a computer, 2.2 s on the web). Main builds it when the
+	# Vũng Tàu world cannot start.
+	if GameState.arg_value("world") == "vung_tau":
+		return
 	build()
 	StartProfile.mark("the test street (the hẻm)")
 
 
+## Plan 0031, D17: the count of builds of the test street in this run (PT-37:
+## the Vũng Tàu world does not build it).
+static var builds := 0
+
+
 func build() -> void:
+	builds += 1
 	var layout: Dictionary = Content.layout
 	hem_width = float(layout.hem_width)
 	house_depth = float(layout.house_depth)

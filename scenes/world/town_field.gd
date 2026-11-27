@@ -220,14 +220,24 @@ func _can_make(key: Vector2i) -> bool:
 	return true
 
 
-## Plan 0031, D12: one pass of the start (VungTau.starting): the new tasks
-## and all the chunks that are done. Gives the count of the chunks that it
-## started or applied.
+## The count of the chunks of boxes that are made (plan 0031, D17: PT-37 counts
+## them at the first frame).
+func made_chunks() -> int:
+	var n := 0
+	for key: Vector2i in _chunks:
+		if int(_chunks[key].get("state", 0)) == 2:
+			n += 1
+	return n
+
+
 ## True while chunks build in other threads (plan 0031, D12).
 func busy() -> bool:
 	return _tasks > 0
 
 
+## Plan 0031, D12: one pass of the start (VungTau.starting): the new tasks
+## and all the chunks that are done. Gives the count of the chunks that it
+## started or applied.
 func build_start() -> int:
 	if world == null or counts.is_empty():
 		return 0

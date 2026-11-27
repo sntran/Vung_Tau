@@ -71,6 +71,8 @@ var vung_tau: VungTau = null
 ## frame (ms), or -1 (report 0026, D-0026-12: PT-37 checks the start of the
 ## Vũng Tàu world).
 var first_frame_ms := -1
+## Plan 0031, D17: the chunks of the boxes of the town at the first frame (PT-37).
+var first_frame_town_chunks := -1
 ## Plan 0018, R1: the longest wait for the ground of the start before the clock runs.
 const CLOCK_WAIT_S := 60.0
 var _clock_wait := 0.0
@@ -188,7 +190,10 @@ func _ready() -> void:
 	RenderingServer.frame_post_draw.connect(func() -> void:
 		if first_frame_ms < 0:
 			first_frame_ms = Time.get_ticks_msec()
-			StartProfile.mark("the first frame (the scripts of the frame and the draw)")
+			StartProfile.mark("the first frame: the draw")
+			StartProfile.note_render("at the first frame")
+			if vung_tau != null and vung_tau.town != null:
+				first_frame_town_chunks = vung_tau.town.made_chunks()
 			# Plan 0009, R16: the page knows the first frame of the world.
 			if OS.has_feature("web"):
 				# The object keeps what the game gave before (the packs of plan 0031, D5).
@@ -231,6 +236,11 @@ func _ready() -> void:
 	check_messages()
 	_update_dot()
 	StartProfile.mark("the rest of the main scene")
+	# D17: the first frame in its parts: the scripts and the physics, then the draw.
+	RenderingServer.frame_pre_draw.connect(func() -> void:
+		if first_frame_ms < 0:
+			StartProfile.mark("the first frame: the scripts and the physics")
+			StartProfile.note_render("before the first draw"), CONNECT_ONE_SHOT)
 
 
 ## Plan 0031, D17: the last part of the profile of the start, when the player
@@ -240,8 +250,9 @@ func _end_profile() -> void:
 		return
 	_profile_done = true
 	StartProfile.mark("until the player can move")
+	StartProfile.note_render("when the player can move")
 	if GameState.has_arg("start-profile"):
-		print("[start profile]\n" + StartProfile.text())
+		print("[start profile]\n" + StartProfile.text() + "\n" + StartProfile.render_text())
 	if OS.has_feature("web"):
 		JavaScriptBridge.eval("window.vungTau.profile = %s" % StartProfile.json(), true)
 
@@ -255,6 +266,8 @@ func _start_vung_tau() -> void:
 	StartProfile.mark("the scene of the world")
 	if not world.setup():
 		world.queue_free()
+		# Plan 0031, D17: the test street did not build for the Vũng Tàu world.
+		hem.build()
 		return
 	vung_tau = world
 	world_name = "vung_tau"
@@ -271,7 +284,9 @@ func _start_vung_tau() -> void:
 	player.camera.far = 40000.0
 	var start := world.spawn(GameState.arg_value("start"))
 	# The parts of the showcase build in the first frames (report 0026, D-0026-12).
-	world.prepare_at(start.position, 64.0, false)
+	# Plan 0031, D17: before the first frame only the boxes of the town near the
+	# start (all the boxes in the range took 2.6 s on a computer, 17 s on the web).
+	world.prepare_at(start.position, 64.0, false, 64.0)
 	player.place(start.position, start.yaw)
 	world_build_ms = Time.get_ticks_msec() - begin
 

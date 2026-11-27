@@ -24,6 +24,9 @@ const STEP := 14.0
 const MAX_LOAD_MS := 2000.0
 const MAX_BUILD_MS := 20000
 const MAX_FIRST_FRAME_MS := 90000
+## Plan 0031, D17: before the first frame the town makes only the chunks near
+## the start (all the chunks within 1 500 m took 2.6 s in the workspace).
+const MAX_FIRST_FRAME_TOWN_CHUNKS := 16
 
 
 func run(d: PlaytestDriver) -> void:
@@ -37,6 +40,11 @@ func run(d: PlaytestDriver) -> void:
 			"the build of the world takes at most %d s: %.1f s" % [MAX_BUILD_MS / 1000, main.world_build_ms / 1000.0])
 	d.expect(main.first_frame_ms >= 0 and main.first_frame_ms <= MAX_FIRST_FRAME_MS,
 			"the first frame comes at most %d s after the start: %.1f s" % [MAX_FIRST_FRAME_MS / 1000, main.first_frame_ms / 1000.0])
+	# Plan 0031, D17: the Vũng Tàu world does not build the test street.
+	d.expect(Hem.builds == 0, "the Vũng Tàu world does not build the test street: %d builds" % Hem.builds)
+	d.expect(main.first_frame_town_chunks >= 0 and main.first_frame_town_chunks <= MAX_FIRST_FRAME_TOWN_CHUNKS,
+			"before the first frame the town makes at most %d chunks (the chunks near the start): %d" % [
+			MAX_FIRST_FRAME_TOWN_CHUNKS, main.first_frame_town_chunks])
 	await d.wait_ground()
 	var beach := w.data.landmark("bai_sau")
 	var near_beach := Vector3(beach.position[0], 0.0, beach.position[1])

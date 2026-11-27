@@ -338,7 +338,7 @@ func markers_visible() -> bool:
 ## Builds the near chunks around the point at once (not in a worker thread), so
 ## that the ground has collision before the player stands on it. Near the
 ## showcase, also all its parts when "with_showcase" (they have collision too).
-func prepare_at(point: Vector3, radius := 64.0, with_showcase := true) -> void:
+func prepare_at(point: Vector3, radius := 64.0, with_showcase := true, town_radius := INF) -> void:
 	_focus = point
 	if with_showcase and _showcase_wanted(point):
 		showcase.build_all()
@@ -387,8 +387,10 @@ func prepare_at(point: Vector3, radius := 64.0, with_showcase := true) -> void:
 			_rebuild_far_tile(tile)
 	_profile("prepare_at(): the far tiles")
 	# Plan 0009, phase 2: the boxes of the town in the range of the preset.
+	# Plan 0031, D17: at the start only the chunks in town_radius; the other
+	# chunks come after the first frame in the tasks of the town (D12).
 	if town:
-		town.prepare_at(point, TownField.range_end)
+		town.prepare_at(point, minf(town_radius, TownField.range_end))
 	_profile("prepare_at(): the town")
 	_profiled = true
 
