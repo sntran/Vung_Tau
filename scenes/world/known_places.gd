@@ -72,6 +72,11 @@ var stairs: Array[Dictionary] = []
 var jetty: Dictionary = {}
 var world: VungTau
 var _materials: Dictionary = {}
+## Plan 0031, D17: the stairs that are not built yet: [entry, road]. The
+## surface of the stairs of Chúa Kitô Vua took 0.7 s of the 0.85 s of the
+## known places on a computer (4 s on the web), and the stairs show only
+## nearer than NEAR_END.
+var _pending_stairs: Array = []
 
 
 ## The place records of data/geo/landmarks.json, by id.
@@ -125,7 +130,9 @@ static func check(entries: Dictionary, records: Dictionary, bounds := Rect2()) -
 const TREE_MIN_M := 3.0
 
 
-func setup(w: VungTau, path := CONFIG) -> bool:
+## With "defer_stairs", the stairs wait: build_stairs_near() and
+## build_next_stairs() build them (plan 0031, D17).
+func setup(w: VungTau, path := CONFIG, defer_stairs := false) -> bool:
 	world = w
 	var entries := configs(path)
 	var records := {}
@@ -160,7 +167,40 @@ func setup(w: VungTau, path := CONFIG) -> bool:
 		entry.radius = _radius(entry)
 		for way_id: Variant in place.get("stairs", []):
 			if roads.has(int(way_id)):
-				_stairs(entry, roads[int(way_id)])
+				if defer_stairs:
+					_pending_stairs.append([entry, roads[int(way_id)]])
+				else:
+					_stairs(entry, roads[int(way_id)])
+	return true
+
+
+## The count of the stairs that are not built yet (plan 0031, D17).
+func pending_stairs() -> int:
+	return _pending_stairs.size()
+
+
+## Builds each waiting stairs that has a point within "distance" of the point.
+func build_stairs_near(point: Vector3, distance: float) -> void:
+	var left: Array = []
+	for item: Array in _pending_stairs:
+		var near := false
+		for p: Array in item[1].points:
+			if Vector2(float(p[0]) - point.x, float(p[2]) - point.z).length() <= distance:
+				near = true
+				break
+		if near:
+			_stairs(item[0], item[1])
+		else:
+			left.append(item)
+	_pending_stairs = left
+
+
+## Builds the next waiting stairs. False when none waits.
+func build_next_stairs() -> bool:
+	if _pending_stairs.is_empty():
+		return false
+	var item: Array = _pending_stairs.pop_front()
+	_stairs(item[0], item[1])
 	return true
 
 
@@ -497,6 +537,21 @@ func _base_platform(st: SurfaceTool, entry: Dictionary, y0: float) -> void:
 	_prism(st, grown, minf(low, y0 - 0.1) - 0.5, y0)
 	var box := _outline_box(grown)
 	_box_shape(entry, Vector3(box.size.x, 0.6, box.size.y), Transform3D(Basis(), Vector3(box.get_center().x, y0 - 0.3, box.get_center().y)))
+
+
+## The count of the stairs that are built and are farther than "distance"
+## from the point (plan 0031, D17: PT-37 counts them at the first frame).
+func stairs_farther_than(point: Vector3, distance: float) -> int:
+	var n := 0
+	for s: Dictionary in stairs:
+		var near := false
+		for p: Vector3 in s.points:
+			if Vector2(p.x - point.x, p.z - point.z).length() <= distance:
+				near = true
+				break
+		if not near:
+			n += 1
+	return n
 
 
 ## The distance from the middle of a place to its farthest edge.

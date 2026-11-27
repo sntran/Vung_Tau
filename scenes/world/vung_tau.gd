@@ -269,7 +269,8 @@ func setup(folder := GeoData.ROOT) -> bool:
 	places = KnownPlaces.new()
 	places.name = "KnownPlaces"
 	add_child(places)
-	places.setup(self)
+	# Plan 0031, D17: the stairs come in prepare_at() (near the point) and in the passes of the start.
+	places.setup(self, KnownPlaces.CONFIG, true)
 	StartProfile.mark("setup(): the known places")
 	parked = ParkedRows.new()
 	parked.name = "ParkedRows"
@@ -342,6 +343,11 @@ func prepare_at(point: Vector3, radius := 64.0, with_showcase := true, town_radi
 	_focus = point
 	if with_showcase and _showcase_wanted(point):
 		showcase.build_all()
+	# Plan 0031, D17: the stairs of the known places near the point (they show
+	# nearer than KnownPlaces.NEAR_END); the others come after the first frame.
+	if places:
+		places.build_stairs_near(point, maxf(radius, KnownPlaces.NEAR_END))
+	_profile("prepare_at(): the stairs near the point")
 	# Each chunk in the radius at the detail that the world wants for it now: a
 	# near chunk with its patches, a mid chunk with its mid grid. (A near build of
 	# all chunks in the radius was built again at the mid detail after it; on
@@ -601,6 +607,8 @@ func is_settled() -> bool:
 			return false
 	if town and town.pending() > 0:
 		return false
+	if places and places.pending_stairs() > 0:
+		return false
 	return true
 
 
@@ -633,6 +641,8 @@ func unsettled_reason() -> String:
 		parts.append("%d far tiles" % tiles)
 	if town and town.pending() > 0:
 		parts.append("%d chunks of the town" % town.pending())
+	if places and places.pending_stairs() > 0:
+		parts.append("%d stairs of the known places" % places.pending_stairs())
 	return ", ".join(parts)
 
 
@@ -811,6 +821,9 @@ func _process(delta: float) -> void:
 	_update_patches()
 	_update_far_strides()
 	_apply_done()
+	# Plan 0031, D17: the stairs that still wait (the start builds them all).
+	if places and Engine.get_frames_drawn() > 0:
+		places.build_next_stairs()
 
 
 func _profile(part: String) -> void:
@@ -864,6 +877,9 @@ func _build_start() -> void:
 		_apply_all_done()
 		if town:
 			_work += town.build_start()
+		# Plan 0031, D17: one stairs of the known places in each pass, after the first frame.
+		if places and Engine.get_frames_drawn() > 0 and places.build_next_stairs():
+			_work += 1
 		var left := end - Time.get_ticks_msec()
 		if _showcase_wanted(_focus) and Engine.get_frames_drawn() > 0 and _tasks == 0 and left > 0:
 			showcase.build_some(left)

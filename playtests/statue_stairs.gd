@@ -35,6 +35,8 @@ func run(d: PlaytestDriver) -> void:
 	var w := d.world()
 	if not d.expect(w != null and w.places != null and w.places.places.has("chua_kito_vua"), "the statue is a place"):
 		return
+	# Plan 0031, D17: the far stairs come after the first frame (is_settled() waits for them).
+	await d.wait_ground()
 	var entry: Dictionary = w.places.places.chua_kito_vua
 	var route := route_line(w, entry.place.get("route", []))
 	if not d.expect(route.size() >= 2, "the route from the road has points"):

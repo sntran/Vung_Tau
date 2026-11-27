@@ -45,6 +45,9 @@ func run(d: PlaytestDriver) -> void:
 	d.expect(main.first_frame_town_chunks >= 0 and main.first_frame_town_chunks <= MAX_FIRST_FRAME_TOWN_CHUNKS,
 			"before the first frame the town makes at most %d chunks (the chunks near the start): %d" % [
 			MAX_FIRST_FRAME_TOWN_CHUNKS, main.first_frame_town_chunks])
+	d.expect(main.first_frame_far_stairs == 0,
+			"before the first frame the known places build no stairs farther than %d m from the start (they do not show): %d" % [
+			int(KnownPlaces.NEAR_END), main.first_frame_far_stairs])
 	await d.wait_ground()
 	var beach := w.data.landmark("bai_sau")
 	var near_beach := Vector3(beach.position[0], 0.0, beach.position[1])

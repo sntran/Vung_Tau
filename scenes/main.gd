@@ -73,6 +73,9 @@ var vung_tau: VungTau = null
 var first_frame_ms := -1
 ## Plan 0031, D17: the chunks of the boxes of the town at the first frame (PT-37).
 var first_frame_town_chunks := -1
+## Plan 0031, D17: the stairs of the known places farther than their range
+## (KnownPlaces.NEAR_END) from the start that are built at the first frame (PT-37).
+var first_frame_far_stairs := -1
 ## Plan 0018, R1: the longest wait for the ground of the start before the clock runs.
 const CLOCK_WAIT_S := 60.0
 var _clock_wait := 0.0
@@ -194,6 +197,8 @@ func _ready() -> void:
 			StartProfile.note_render("at the first frame")
 			if vung_tau != null and vung_tau.town != null:
 				first_frame_town_chunks = vung_tau.town.made_chunks()
+			if vung_tau != null and vung_tau.places != null:
+				first_frame_far_stairs = vung_tau.places.stairs_farther_than(player.global_position, KnownPlaces.NEAR_END)
 			# Plan 0009, R16: the page knows the first frame of the world.
 			if OS.has_feature("web"):
 				# The object keeps what the game gave before (the packs of plan 0031, D5).
