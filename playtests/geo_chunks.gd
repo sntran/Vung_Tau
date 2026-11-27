@@ -16,11 +16,15 @@ extends RefCounted
 # cuts of D17: at most 16 chunks of the town and no far stairs of the known
 # places before the first frame; on a computer the test street and the town
 # of the start stay before the first frame (only the web build cuts them).
+# Run 5 takes the start of the web build (--web-start, plan 0031, R20): no
+# test street, and at most 16 chunks of the town before the first frame. It
+# checks the start only.
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=10:00
 # phase: --world=vung_tau --start-time=10:00
 # phase: --world=vung_tau --start-time=10:00
 # phase: --world=vung_tau --start-time=10:00
+# phase: --world=vung_tau --start-time=10:00 --web-start
 
 const LENGTH := 2000.0
 const RUNS := 4
@@ -46,18 +50,33 @@ func run(d: PlaytestDriver) -> void:
 			"the build of the world takes at most %d s: %.1f s" % [MAX_BUILD_MS / 1000, main.world_build_ms / 1000.0])
 	d.expect(main.first_frame_ms >= 0 and main.first_frame_ms <= MAX_FIRST_FRAME_MS,
 			"the first frame comes at most %d s after the start: %.1f s" % [MAX_FIRST_FRAME_MS / 1000, main.first_frame_ms / 1000.0])
-	# Plan 0031, D17: only the web build leaves out the test street. On a computer
-	# the world without it drew each frame about 20 % slower (Hem._ready()).
-	d.expect(Hem.builds == 1, "on a computer the Vũng Tàu world builds the test street one time: %d builds" % Hem.builds)
-	# Only the web build makes the town of the start after the first frame. On a
-	# computer the tasks of the town then waited for the compile of the
-	# pipelines: the first wait of PT-33 took more than 30 s in CI.
-	d.expect(main.first_frame_town_chunks > MAX_FIRST_FRAME_TOWN_CHUNKS,
-			"on a computer the town makes the chunks of the start before the first frame: %d chunks" % main.first_frame_town_chunks)
+	if GameState.has_arg("web-start"):
+		# Plan 0031, R20 (run 5): the start of the web build on a computer
+		# (--web-start): no test street, and only the town near the start
+		# before the first frame.
+		d.expect(Hem.builds == 0, "with the start of the web build the Vũng Tàu world does not build the test street: %d builds" % Hem.builds)
+		d.expect(main.first_frame_town_chunks >= 0 and main.first_frame_town_chunks <= MAX_FIRST_FRAME_TOWN_CHUNKS,
+				"with the start of the web build the town makes at most %d chunks before the first frame (the chunks near the start): %d" % [
+				MAX_FIRST_FRAME_TOWN_CHUNKS, main.first_frame_town_chunks])
+	else:
+		# Plan 0031, D17: only the web build leaves out the test street. On a computer
+		# the world without it drew each frame about 20 % slower (Hem._ready()).
+		d.expect(Hem.builds == 1, "on a computer the Vũng Tàu world builds the test street one time: %d builds" % Hem.builds)
+		# Only the web build makes the town of the start after the first frame. On a
+		# computer the tasks of the town then waited for the compile of the
+		# pipelines: the first wait of PT-33 took more than 30 s in CI.
+		d.expect(main.first_frame_town_chunks > MAX_FIRST_FRAME_TOWN_CHUNKS,
+				"on a computer the town makes the chunks of the start before the first frame: %d chunks" % main.first_frame_town_chunks)
 	d.expect(main.first_frame_far_stairs == 0,
 			"before the first frame the known places build no stairs farther than %d m from the start (they do not show): %d" % [
 			int(KnownPlaces.NEAR_END), main.first_frame_far_stairs])
 	await d.wait_ground()
+	if d.phase > RUNS:
+		# The run of R20 checks the start only; the walk is in runs 1 to RUNS.
+		d.expect(w.chunks_without_ground().is_empty(), "with the start of the web build, each near chunk shows its ground: %s have no patches" % [
+				w.chunks_without_ground()])
+		await d.screenshot("web_start")
+		return
 	var beach := w.data.landmark("bai_sau")
 	var near_beach := Vector3(beach.position[0], 0.0, beach.position[1])
 	# The route starts at one end of the road.

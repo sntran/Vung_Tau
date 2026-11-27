@@ -253,6 +253,8 @@ node tools/web/check.js "URL?start=bai_truoc&ride" OUT --r15      # R15: two vis
 node tools/web/check.js "URL?start=bai_truoc" OUT --loading       # R6: the loading screen at three sizes
 python3 tools/web/r2.py prune --keep 5 --protect MAIN_BUILD --dry-run   # what the deploy removes
 tools/playtest.sh far_first      # PT-86 (D14): --packs-sim=30 keeps the pack "models" out on a computer
+tools/playtest.sh geo_chunks --only-phase=5   # R20: --web-start takes the start of the web build on a computer
+# (GameState.web_start(): no test street, only the town near the start before the first frame)
 # The URL parameters: world=hem (the test street; the Vũng Tàu world is the default), start=ID
 # (data/geo/starts.json: hem, bai_truoc, cho_xom_luoi, truong_cong_dinh), debug (the debug screen),
 # ride (plan 0018, R8: the game starts on the scooter of the start; the argument --ride does the same).

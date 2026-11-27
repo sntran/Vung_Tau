@@ -90,13 +90,13 @@ var _bake_again := false
 
 func _ready() -> void:
 	StartProfile.mark("the engine, the autoloads, and the main scene")
-	# Plan 0031, D17: on the web the Vũng Tàu world does not build the test
-	# street that it removes (1.7 s to 2.2 s). Main builds it when the Vũng Tàu
+	# Plan 0031, D17: on the web (and with --web-start, R20) the Vũng Tàu world
+	# does not build the test street that it removes (1.7 s to 2.2 s). Main builds it when the Vũng Tàu
 	# world cannot start. On a computer it stays: without it the Mobile renderer
 	# made other pipelines for the world (66 pipelines of new meshes, not 40),
 	# and each frame of the world was about 20 % slower in the workspace (report
 	# 0031, D-0031-06: PT-62 run 3 went over 180 s in CI run 486). I do not know why.
-	if GameState.arg_value("world") == "vung_tau" and OS.has_feature("web"):
+	if GameState.arg_value("world") == "vung_tau" and GameState.web_start():
 		return
 	build()
 	StartProfile.mark("the test street (the hẻm)")

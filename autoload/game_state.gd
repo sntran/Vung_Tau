@@ -104,6 +104,13 @@ static func all_args() -> PackedStringArray:
 	return OS.get_cmdline_user_args() + OS.get_cmdline_args() + web_args()
 
 
+## Plan 0031, R20: the start of the web build (D17: no test street, and only
+## the town near the start before the first frame). A play test on a computer
+## takes it with --web-start (PT-37 run 5).
+static func web_start() -> bool:
+	return OS.has_feature("web") or has_arg("web-start")
+
+
 ## True when the arguments have "--name" (or "--name=value").
 static func has_arg(arg_name: String) -> bool:
 	for arg in all_args():
