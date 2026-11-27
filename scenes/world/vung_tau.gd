@@ -190,6 +190,8 @@ var _mainland_preset := ""
 var _done: Array = []
 var _mutex := Mutex.new()
 var _tasks := 0
+## The handles of the tasks in other threads (D-0031-06).
+var _task_ids: Array[int] = []
 var _focus := Vector3.ZERO
 
 
@@ -578,6 +580,38 @@ func is_settled() -> bool:
 	return true
 
 
+## What is_settled() still waits for, in words (empty when it is settled), for
+## the message of a play test (report 0031, D-0031-06: in CI the ground of a
+## view of PT-54 did not settle in 90 s, and the screenshot showed it whole).
+func unsettled_reason() -> String:
+	var parts: Array[String] = []
+	if _tasks > 0:
+		parts.append("%d tasks of the ground" % _tasks)
+	var chunks := 0
+	var patches := 0
+	for key: Vector2i in _chunks:
+		var state: Dictionary = _chunks[key]
+		if state.wanted != state.detail:
+			chunks += 1
+		var chunk_patches: Dictionary = state.get("patches", {})
+		for at: Vector2i in chunk_patches:
+			if chunk_patches[at].stride != _patch_stride(key, at, chunk_patches[at].stride):
+				patches += 1
+	var tiles := 0
+	for tile: Vector2i in _far_tiles:
+		if _far_strides[tile] != _far_stride(tile):
+			tiles += 1
+	if chunks > 0:
+		parts.append("%d chunks" % chunks)
+	if patches > 0:
+		parts.append("%d patches" % patches)
+	if tiles > 0:
+		parts.append("%d far tiles" % tiles)
+	if town and town.pending() > 0:
+		parts.append("%d chunks of the town" % town.pending())
+	return ", ".join(parts)
+
+
 func loaded_counts() -> Dictionary:
 	var counts := {"far": 0, "mid": 0, "near": 0, "busy": _tasks}
 	for state: Dictionary in _chunks.values():
@@ -755,6 +789,29 @@ func _process(delta: float) -> void:
 	_apply_done()
 
 
+## Report 0031, D-0031-06: starts a task in another thread and keeps its
+## handle, so that the world can wait for it (a task of a world that the game
+## frees ran on freed memory: an abort at the quit in CI).
+func add_task(task: Callable, description: String) -> void:
+	_task_ids = _task_ids.filter(func(id: int) -> bool:
+		if WorkerThreadPool.is_task_completed(id):
+			WorkerThreadPool.wait_for_task_completion(id)
+			return false
+		return true)
+	_task_ids.append(WorkerThreadPool.add_task(task, false, description))
+
+
+## The tasks of the world that are not waited for yet.
+func task_count() -> int:
+	return _task_ids.size()
+
+
+func _exit_tree() -> void:
+	for id in _task_ids:
+		WorkerThreadPool.wait_for_task_completion(id)
+	_task_ids.clear()
+
+
 ## Plan 0031, D12: the passes of the start in one frame, for START_FRAME_MS at
 ## least (80 % of the frame with a limit of the frame rate). When a pass does nothing while work of other threads goes on (the
 ## ground, the town, the files of a model of the showcase), the frame waits for
@@ -875,7 +932,7 @@ func _start_tasks() -> void:
 	_tasks += 1
 	_work += 1
 	var strides := _patch_strides(best) if state.wanted == Detail.NEAR else {}
-	WorkerThreadPool.add_task(_build_chunk.bind(best, int(state.wanted), strides), false, "ground chunk")
+	add_task(_build_chunk.bind(best, int(state.wanted), strides), "ground chunk")
 
 
 ## Runs in a worker thread: decodes the heights and makes the mesh arrays. A
@@ -1060,7 +1117,7 @@ func _update_patches() -> void:
 	state.patches[best_at].busy = true
 	_tasks += 1
 	_work += 1
-	WorkerThreadPool.add_task(_build_patch.bind(best_key, best_at, best_stride, state.heights), false, "ground patch")
+	add_task(_build_patch.bind(best_key, best_at, best_stride, state.heights), "ground patch")
 
 
 ## Runs in a worker thread.
