@@ -89,7 +89,9 @@ var _bake_again := false
 
 
 func _ready() -> void:
+	StartProfile.mark("the engine, the autoloads, and the main scene")
 	build()
+	StartProfile.mark("the test street (the hẻm)")
 
 
 func build() -> void:

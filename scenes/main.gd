@@ -99,6 +99,7 @@ var _hint_used := {}
 ## Plan 0031, R1: the time when the player can move, for the page, and the
 ## time to the next state for the page.
 var _web_can_move_ms := -1
+var _profile_done := false
 ## Plan 0031, D11: the line of the times of the start (the Settings app shows the last line).
 var load_times_text := ""
 var _times_note: ScreenNote
@@ -187,6 +188,7 @@ func _ready() -> void:
 	RenderingServer.frame_post_draw.connect(func() -> void:
 		if first_frame_ms < 0:
 			first_frame_ms = Time.get_ticks_msec()
+			StartProfile.mark("the first frame (the scripts of the frame and the draw)")
 			# Plan 0009, R16: the page knows the first frame of the world.
 			if OS.has_feature("web"):
 				# The object keeps what the game gave before (the packs of plan 0031, D5).
@@ -198,6 +200,7 @@ func _ready() -> void:
 	# Plan 0031, D14: a play test on a computer can keep the pack "models" out (--packs-sim).
 	if OS.has_feature("web") or GameState.has_arg("packs-sim"):
 		add_child(WebPacks.new(player))
+	StartProfile.mark("the start of the main scene")
 	if GameState.arg_value("world") == "vung_tau":
 		_start_vung_tau()
 	if vung_tau == null:
@@ -227,6 +230,20 @@ func _ready() -> void:
 		check_messages("start")
 	check_messages()
 	_update_dot()
+	StartProfile.mark("the rest of the main scene")
+
+
+## Plan 0031, D17: the last part of the profile of the start, when the player
+## can move. --start-profile prints the parts; the web page gets them.
+func _end_profile() -> void:
+	if _profile_done or first_frame_ms < 0 or not GameState.clock_running or (player.is_riding() and player.ride_hold):
+		return
+	_profile_done = true
+	StartProfile.mark("until the player can move")
+	if GameState.has_arg("start-profile"):
+		print("[start profile]\n" + StartProfile.text())
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.vungTau.profile = %s" % StartProfile.json(), true)
 
 
 ## Plan 0005: the real ground in place of the hẻm. The hẻm world, its sun,
@@ -235,6 +252,7 @@ func _start_vung_tau() -> void:
 	var begin := Time.get_ticks_msec()
 	var world: VungTau = load("res://scenes/world/vung_tau.tscn").instantiate()
 	$World.add_child(world)
+	StartProfile.mark("the scene of the world")
 	if not world.setup():
 		world.queue_free()
 		return
@@ -242,6 +260,7 @@ func _start_vung_tau() -> void:
 	world_name = "vung_tau"
 	for node: Node in [$World/Hem, $World/Sun, $World/Environment]:
 		node.queue_free()
+	StartProfile.mark("the removal of the test street, its sun, and its environment")
 	$World.remove_child($World/Hem)
 	hem = null
 	sun = world.sun
@@ -291,6 +310,7 @@ func _process(delta: float) -> void:
 	if vung_tau != null:
 		vung_tau.starting = not GameState.clock_running or (player.is_riding() and player.ride_hold)
 	WebPacks.playing = vung_tau == null or not vung_tau.starting
+	_end_profile()
 	_layout()
 	_update_rest_stick()
 	_read_keys()

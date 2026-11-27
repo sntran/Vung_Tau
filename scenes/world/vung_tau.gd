@@ -190,6 +190,8 @@ var _mainland_preset := ""
 var _done: Array = []
 var _mutex := Mutex.new()
 var _tasks := 0
+## Plan 0031, D17: the first prepare_at() (the start) marks its parts.
+var _profiled := false
 ## The handles of the tasks in other threads (D-0031-06).
 var _task_ids: Array[int] = []
 var _focus := Vector3.ZERO
@@ -229,50 +231,61 @@ func setup(folder := GeoData.ROOT) -> bool:
 			bounds = bounds.expand(p)
 		_islands.append(outline)
 		_island_bounds.append(bounds)
+	StartProfile.mark("setup(): the data of the build")
 	_make_environment()
 	_read_cover()
 	_make_materials()
 	_make_sea()
 	_make_far_ground()
 	_make_markers()
+	StartProfile.mark("setup(): the environment, the cover, the materials, the sea, the far ground, the markers")
 	canopy = HillCanopy.new()
 	canopy.name = "HillCanopy"
 	add_child(canopy)
 	canopy.setup(self)
 	set_canopy(true)
+	StartProfile.mark("setup(): the canopy of the hills")
 	trees = TreeField.new()
 	trees.name = "Trees"
 	add_child(trees)
 	trees.setup(TreeLibrary.shared())
 	_read_hill_settings()
+	StartProfile.mark("setup(): the tree field")
 	street_trees = StreetTrees.new()
 	street_trees.setup(data.root.path_join("trees.json"), trees)
+	StartProfile.mark("setup(): the street trees")
 	sea_objects = SeaObjects.new()
 	sea_objects.name = "SeaObjects"
 	add_child(sea_objects)
 	sea_objects.setup(data.root.path_join("sea_objects.json"))
+	StartProfile.mark("setup(): the sea objects")
 	roadworks = Roadworks.new()
 	roadworks.name = "Roadworks"
 	add_child(roadworks)
 	if not roadworks.setup(data.root.path_join("roadworks.json")):
 		roadworks.queue_free()
 		roadworks = null
+	StartProfile.mark("setup(): the roadworks")
 	places = KnownPlaces.new()
 	places.name = "KnownPlaces"
 	add_child(places)
 	places.setup(self)
+	StartProfile.mark("setup(): the known places")
 	parked = ParkedRows.new()
 	parked.name = "ParkedRows"
 	add_child(parked)
 	parked.setup(self)
+	StartProfile.mark("setup(): the parked rows")
 	exercise = MorningExercise.new()
 	exercise.name = "MorningExercise"
 	add_child(exercise)
 	exercise.setup(self)
+	StartProfile.mark("setup(): the morning exercise")
 	showcase = Showcase.new()
 	showcase.name = "Showcase"
 	add_child(showcase)
 	showcase.setup(self)
+	StartProfile.mark("setup(): the showcase")
 	# Plan 0009, phase 3: the houses of World on the streets, before the town
 	# (the town leaves out its boxes under their lots).
 	houses = StreetHouses.new()
@@ -281,24 +294,28 @@ func setup(folder := GeoData.ROOT) -> bool:
 	if not houses.setup(self):
 		houses.queue_free()
 		houses = null
+	StartProfile.mark("setup(): the street houses")
 	town = TownField.new()
 	town.name = "Town"
 	add_child(town)
 	if not town.setup(self):
 		town.queue_free()
 		town = null
+	StartProfile.mark("setup(): the town")
 	inland_water = InlandWater.new()
 	inland_water.name = "InlandWater"
 	add_child(inland_water)
 	if not inland_water.setup(self):
 		inland_water.queue_free()
 		inland_water = null
+	StartProfile.mark("setup(): the water of the land")
 	mainland = MainlandFar.new()
 	mainland.name = "MainlandFar"
 	add_child(mainland)
 	if not mainland.setup(self):
 		mainland.queue_free()
 		mainland = null
+	StartProfile.mark("setup(): the mainland")
 	return true
 
 
@@ -341,6 +358,7 @@ func prepare_at(point: Vector3, radius := 64.0, with_showcase := true) -> void:
 		var detail := int(state.wanted)
 		_build_chunk(key, detail, _patch_strides(key) if detail == Detail.NEAR else {})
 	_apply_all_done()
+	_profile("prepare_at(): the chunks")
 	# The patches of a chunk that was near before have the grids of the point
 	# before. The world built them again one in each frame: 71 patches took 73
 	# frames, more than 60 s on High in CI (PT-76, the CI of 52e373a).
@@ -358,6 +376,7 @@ func prepare_at(point: Vector3, radius := 64.0, with_showcase := true) -> void:
 			_tasks += 1
 			_build_patch(key, at, stride, state.heights)
 	_apply_all_done()
+	_profile("prepare_at(): the patches")
 	# The far tiles with the grids of the point. The world makes one again in
 	# each frame, so a measure soon after a fly saw the finer grids of the
 	# point before (S2 of PT-73: 323 000 triangles, not 288 000).
@@ -366,9 +385,12 @@ func prepare_at(point: Vector3, radius := 64.0, with_showcase := true) -> void:
 		if stride != _far_strides[tile]:
 			_far_strides[tile] = stride
 			_rebuild_far_tile(tile)
+	_profile("prepare_at(): the far tiles")
 	# Plan 0009, phase 2: the boxes of the town in the range of the preset.
 	if town:
 		town.prepare_at(point, TownField.range_end)
+	_profile("prepare_at(): the town")
+	_profiled = true
 
 
 ## Shows each finished build now, not some in each frame.
@@ -787,6 +809,11 @@ func _process(delta: float) -> void:
 	_update_patches()
 	_update_far_strides()
 	_apply_done()
+
+
+func _profile(part: String) -> void:
+	if not _profiled:
+		StartProfile.mark(part)
 
 
 ## Report 0031, D-0031-06: starts a task in another thread and keeps its
