@@ -48,7 +48,7 @@ The builder writes questions and answers under "Open questions". The builder doe
 | 0028 | [The weather of 2019](0028-weather-of-2019.md) | Approved |
 | 0029 | [Small Vũng Tàu: the illustrated map](0029-small-vung-tau.md) | Draft |
 | 0030 | [The phone looks and works like a real phone](0030-the-phone.md) | Approved |
-| 0031 | [The web build loads in steps](0031-web-load.md) | Approved. Steps 1 and 2 are built (report 0031). D11 to D16, added on 2026-11-26, wait for my approval. |
+| 0031 | [The web build loads in steps](0031-web-load.md) | In progress. Steps 1, 2, and 4 and D11 to D15 are built (report 0031, audit 2). CI is not green (D-0031-06). Q6, the threads, and the start of the game wait for my decisions. |
 
 ## Proposed order of the next plans
 
