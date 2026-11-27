@@ -335,7 +335,9 @@ func _show(result: Dictionary) -> void:
 	triangles += int(result.triangles)
 	for part: Dictionary in result.parts:
 		_chunks[key].nodes.append(_add_mesh(key, part, range_end, "Town"))
-	_applied_range = range_end
+	# Report 0031, D-0031-06: only apply_range() sets _applied_range. A chunk that
+	# came after a change of the preset and before _process() set it here, so
+	# the range of the ground (the far town) and of the nodes before stayed old.
 
 
 func _add_mesh(key: Vector2i, part: Dictionary, end: float, prefix: String) -> MeshInstance3D:
