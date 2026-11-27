@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | In progress. Approved (2026-11-25). After steps 1 and 2 (report 0031): D11 to D16 and R11 to R16 are added, and I approved them (2026-11-26). |
+| Status | In progress. Approved (2026-11-25). After steps 1 and 2 (report 0031): D11 to D16 and R11 to R16 are added, and I approved them (2026-11-26). D11 to D15 are built; D16 waits for Q6; step 3 waits for my decision. |
 | Branch | `feat/0031-web-load`, made from `feat/0018-scooter` (the newest branch of the town). |
 | Depends on | 0009 (R16: the web build on Cloudflare, and its measures), 0018 (the ride that needs the world at once), 0023 (the files of the models of World). |
 | Changes | 0009 (R16: the files of the web build and the deploy), 0004 (the quality presets of the web build), AGENTS.md section 5 (the web build). |
@@ -96,7 +96,7 @@ On 2026-11-25 I opened the web build of plan 0018 on my computer. The loading sc
 
 ## 9. Builder notes (2026-11-26)
 
-Steps 1 and 2 are done; steps 3 and 4 wait for my look on my phone. The web build of step 2: `https://feat-0031-web-load-vung-tau.fifo.workers.dev/?start=bai_truoc&ride` (the build `f416161ee448`, the version `https://1e651075-vung-tau.fifo.workers.dev`; the measures of step 2 are of `e2430eaea126`, with the same packs). The tables of each measure are in [`docs/web/load.md`](../web/load.md).
+Steps 1 and 2 are done. On 2026-11-26 I did the items 1 to 7 of my message in their order (section "The items of 2026-11-26" below): step 4 (D7, R6) is done with D12; step 3 (D6, R5, the threads) waits for my decision after I read the parts of the start on my phone; Q6 (D16) waits for my answer. The web build of step 2: `https://feat-0031-web-load-vung-tau.fifo.workers.dev/?start=bai_truoc&ride` (the build `f416161ee448`, the version `https://1e651075-vung-tau.fifo.workers.dev`; the measures of step 2 are of `e2430eaea126`, with the same packs). The tables of each measure are in [`docs/web/load.md`](../web/load.md).
 
 ### R1: the measures (`tools/web/check.js --measure`)
 
