@@ -412,3 +412,49 @@ What I could not cut, and what is left:
 |---|---|---|---|---|---|---|---|---|
 | `bai_truoc&ride` | 31.8 s | 54.5 s | 1.26 m | 303 m | **813 ms** / **1 297 ms** | 693 MB (1 938 MB) | none | FAIL (R18 only) |
 | `hem` | 32.1 s | 51.1 s | 1.16 m | — | — | 573 MB (1 466 MB) | none | pass |
+
+## Round 3, D17 on a computer after the corrections of CI (1dd12a0) (2026-11-27)
+
+After CI runs 486 and 487 (`docs/plans/0031-web-load.md`, round 3), a computer builds the test street and the town of the start before the first frame again; only the web build has cuts 1 and 2. Cut 3 (the far stairs after the first frame) is on both. PT-87 run 1 in the workspace (the same arguments as the profile before the cuts), no old Godot process. Run 1 of this series had a cold start of the engine (10.2 s for the engine, the autoloads, and the main scene, against 1.4 s to 1.5 s in the other runs; the first frame at 32.8 s), so I do not use it. Between the cuts and these corrections (`dc2da33`: the test street, but the town after the first frame) two runs gave the first frame at 14.2 s and 16.0 s.
+
+| Part of the start | Before the cuts, run 1 (ms) | Before the cuts, run 2 (ms) | Now, run 2 (ms) | Now, run 3 (ms) |
+|---|---|---|---|---|
+| the engine, the autoloads, and the main scene | 1 445 | 1 524 | 1 398 | 1 481 |
+| the test street (the hẻm) | 520 | 724 | 523 | 577 |
+| the start of the main scene | 25 | 29 | 26 | 24 |
+| the scene of the world | 0 | 0 | 0 | 0 |
+| setup(): the data of the build | 230 | 301 | 264 | 256 |
+| setup(): the environment | — | — | 0 | 0 |
+| setup(): the cover | — | — | 144 | 133 |
+| setup(): the materials | — | — | 293 | 287 |
+| setup(): the sea | — | — | 0 | 0 |
+| setup(): the far ground | — | — | 375 | 354 |
+| setup(): the markers | — | — | 1 | 1 |
+| setup(): the canopy of the hills | 463 | 410 | 344 | 332 |
+| setup(): the tree field | 1 | 1 | 1 | 1 |
+| setup(): the street trees | 392 | 506 | 407 | 410 |
+| setup(): the sea objects | 324 | 322 | 310 | 324 |
+| setup(): the roadworks | 0 | 0 | 0 | 0 |
+| setup(): the known places | 839 | 845 | 44 | 52 |
+| setup(): the parked rows | 95 | 97 | 96 | 94 |
+| setup(): the morning exercise | 0 | 0 | 0 | 0 |
+| setup(): the showcase | 172 | 148 | 166 | 165 |
+| setup(): the street houses | 135 | 440 | 425 | 334 |
+| setup(): the town | 1 | 2 | 2 | 2 |
+| setup(): the water of the land | 36 | 38 | 50 | 64 |
+| setup(): the mainland | 45 | 47 | 41 | 46 |
+| the removal of the test street, its sun, and its environment | 0 | 0 | 0 | 0 |
+| prepare_at(): the stairs near the point | — | — | 8 | 12 |
+| prepare_at(): the chunks | 331 | 328 | 282 | 303 |
+| prepare_at(): the patches | 1 | 1 | 4 | 1 |
+| prepare_at(): the far tiles | 0 | 0 | 0 | 0 |
+| prepare_at(): the town | 2 732 | 2 564 | 2 605 | 2 579 |
+| the rest of the main scene | 67 | 77 | 73 | 77 |
+| the first frame: the scripts and the physics | — | — | 466 | 448 |
+| the first frame: the draw | — | — | 6 992 | 7 375 |
+| until the player can move | 9 982 | 9 481 | 10 106 | 10 196 |
+| the first frame (the scripts of the frame and the draw) | 8 063 | 8 050 | — | — |
+| **To the first frame** | **16 664** | **17 312** | **15 340** | **15 732** |
+| **In all** | 26 646 | 26 793 | 25 448 | 25 929 |
+
+The first frame comes at 15.3 s and 15.7 s, against 16.7 s and 17.3 s before the cuts: about 9 %, less than the 15 % that a row of the workspace needs to be a result (audit 3). The known places take 0.05 s to 0.07 s before the first frame (0.84 s before). My decision of 2026-11-27: a computer needs no target of D17 (report 0031, D-0031-13); R17 stays as a guard in PT-37 (at most 26.4 s).
