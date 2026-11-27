@@ -166,7 +166,11 @@ async function openOnce(context, cdp, label, shots) {
     await page.waitForFunction((ids) => ids.every((id) => !window.vungTau.packs[id] || window.vungTau.packs[id].upgradesMs !== undefined),
       Object.keys(result.packs), { timeout: 70000, polling: 1000 }).catch(() => {});
     const times = await page.evaluate(() => window.vungTau.packs || {}).catch(() => ({}));
-    for (const id in result.packs) result.packs[id].times = times[id] || {};
+    const states = await page.evaluate(() => window.vungTau.packState || {}).catch(() => ({}));
+    for (const id in result.packs) {
+      result.packs[id].times = times[id] || {};
+      result.packs[id].page = states[id] || {};
+    }
     if (result.packs.people) {
       result.peopleS = result.packs.people.s;
       result.memoryPeople = result.packs.people.memory;
@@ -324,7 +328,10 @@ function packCell(r, id) {
   const m = p.memory || {};
   const t = p.times || {};
   const left = t.upgradesLeft ? ` (${t.upgradesLeft} upgrades wait after ${Math.round((t.upgradesMs || 0) / 1000)} s)` : '';
-  const longest = t.longestFrameMs !== undefined ? `, longest frame ${t.longestFrameMs} ms${left}` : '';
+  // D18: what the longest frame did (the upgrades, the load of the pack, all the scripts) and the copy of the page.
+  const f = t.longestFrame || {};
+  const parts = f.ms !== undefined ? ` (upgrades ${f.upgradesMs}, load ${f.pollMs}, scripts ${f.processMs}, physics ${f.physicsMs} ms; copy of the page ${(p.page || {}).copyMs} ms)` : '';
+  const longest = t.longestFrameMs !== undefined ? `, longest frame ${t.longestFrameMs} ms${parts}${left}` : '';
   return `${Math.round(p.s)} s, ${m.pageMB} MB, ${m.engineHeapMB} MB${longest}`;
 }
 

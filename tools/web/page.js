@@ -153,7 +153,10 @@
     if (vt.packState[id] && vt.packState[id].state !== 'error') return;
     vt.getPack(id).then(function (buffer) {
       var path = '/tmp/packs/' + id + '.pck';
+      // D18: the time of the copy into the file system of the engine (ms).
+      var c0 = performance.now();
       vt.engine.copyToFS(path, buffer);
+      vt.packState[id].copyMs = Math.round(performance.now() - c0);
       vt.packState[id].path = path;
       vt.packState[id].state = 'done';
     }).catch(function (e) {

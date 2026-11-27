@@ -48,6 +48,11 @@ var _sim_left := -1.0
 ## time of 16 physics steps), and the time of the frame before (µs).
 var _measured: Dictionary = {}
 var _last_usec := 0
+## D18: the work of this node in the frame (ms), for the longest frame: the
+## upgrades and the load of a pack. The rest of a long frame is the other
+## scripts (Performance.TIME_PROCESS), the physics, and the draw.
+var _work := {"upgradesMs": 0.0, "pollMs": 0.0}
+var _longest: Dictionary = {}
 
 
 ## The entries of data/web/packs.json by id.
@@ -159,8 +164,11 @@ func _exit_tree() -> void:
 
 
 func _process(delta: float) -> void:
-	_run_upgrades()
 	_measure_frame(delta)
+	var t0 := Time.get_ticks_usec()
+	_run_upgrades()
+	_work.upgradesMs = (Time.get_ticks_usec() - t0) / 1000.0
+	_work.pollMs = 0.0
 	# D14 on a computer: the pack "comes" some seconds after the first frame.
 	if _sim_left >= 0.0 and Engine.get_frames_drawn() > 1:
 		_sim_left -= delta
@@ -175,7 +183,9 @@ func _process(delta: float) -> void:
 	_left = CHECK_S
 	if _loading != "":
 		_left = POLL_S
+		var p0 := Time.get_ticks_usec()
 		_poll()
+		_work.pollMs = (Time.get_ticks_usec() - p0) / 1000.0
 		return
 	var at := _player.global_position
 	for pack_id: String in entries():
@@ -289,6 +299,15 @@ func _measure_frame(_delta: float) -> void:
 	_last_usec = now
 	var tell := false
 	for pack_id: String in _measured.keys():
+		if frame_ms > float(_measured[pack_id]):
+			# The frame that ends now: the work of this node in it, and the
+			# process and physics time of all the scripts (the monitors give
+			# the frame before this one).
+			_longest[pack_id] = {"ms": roundf(frame_ms), "upgradesMs": snappedf(float(_work.upgradesMs), 0.1),
+					"pollMs": snappedf(float(_work.pollMs), 0.1),
+					"processMs": snappedf(Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0, 0.1),
+					"physicsMs": snappedf(Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0, 0.1),
+					"frame": Engine.get_frames_drawn()}
 		_measured[pack_id] = maxf(float(_measured[pack_id]), frame_ms)
 		if not _times.has(pack_id):
 			continue
@@ -299,6 +318,7 @@ func _measure_frame(_delta: float) -> void:
 		if not done and times.get("longestFrameMs", -1.0) == longest:
 			continue
 		times.longestFrameMs = longest
+		times.longestFrame = _longest.get(pack_id, {})
 		times.upgradesLeft = _upgrades.size()
 		if done:
 			times.upgradesMs = since
