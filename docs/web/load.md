@@ -514,3 +514,15 @@ R18 (the longest frame while a pack loads at most the median frame after "can mo
 | `hem` | 32.8 s | 43.2 s | 1.16 m | — | 613 ms / 709 ms | — (no pack) | 607 MB (1 416 MB) | none | pass |
 
 The line of the times on the page gives the longest frame after "can move" (`bai_truoc&ride`: "94.1 MB · first frame 28.3 s · ride 40.6 s · 2 fps · page 579 MB · longest frame 782 ms"; the page reads it at the first move). Against round 3 (`8fb1775d8979`): the player can move 9 s earlier at `bai_truoc&ride` (45.3 s against 54.5 s) and 8 s earlier in the hẻm (43.2 s against 51.1 s). The longest frame of a pack is 118 ms and 205 ms over the limit of R18.
+
+## PT-85 on the last build of round 4 (d7809843cedb). No old Godot process (2026-11-27)
+
+After CI run 492 a computer keeps the start budget and the whole stairs of before; the web build does not change (`GameState.web_start()`). I deployed `d7809843cedb` (`https://d49df278-vung-tau.fifo.workers.dev`, and the branch URL) and ran PT-85 on the branch URL again, with the same arguments as above.
+
+| Start | First frame | Can move | First move | Ride | Frames after "can move": median / longest | The longest frame of the pack models / people (R18 limit) | R16: heaps at the end of the ride (page) | Errors | Result |
+|---|---|---|---|---|---|---|---|---|---|
+| `bai_truoc&ride` | 32.6 s | 45.7 s | 1.26 m | 305 m | 605 ms / 1 176 ms | **991 ms** / **1 209 ms** (855 ms) | 754 MB (2 010 MB) | none | FAIL (R18 only) |
+| `hem` | 31.8 s | 41.9 s | 1.16 m | — | 576 ms / 688 ms | — (no pack) | 525 MB (1 337 MB) | none | pass |
+
+The line of the times: "94.1 MB · first frame 28.7 s · ride 41.0 s · 1 fps · page 581 MB · longest frame 732 ms" (`bai_truoc&ride`). The values are within 15 % of the run on `1baf43eff104`, except the heaps of the hẻm (525 MB against 607 MB) and the longest frame of the pack people (1 209 ms against 1 053 ms), one run each.
+

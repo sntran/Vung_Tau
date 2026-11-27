@@ -252,6 +252,10 @@ The changes: only the start of the web build (`GameState.web_start()`) takes the
 
 **Item 4: PT-85 on the branch URL.** I deployed `1baf43eff104` (`https://7d20d669-vung-tau.fifo.workers.dev`, and the branch URL `https://feat-0031-web-load-vung-tau.fifo.workers.dev`) and ran PT-85 on the branch URL (`docs/web/load.md`, "PT-85 after the deploy of round 4"): it fails only R18. At `bai_truoc&ride` the longest frame of the pack models is 966 ms and of the pack people 1 053 ms, against a limit of 848 ms (the median frame after "can move", 598 ms, plus 250 ms). The player can move at 45.3 s (`bai_truoc&ride`) and 43.2 s (the hẻm), against 54.5 s and 51.1 s in round 3. The line of the times gives the longest frame after "can move".
 
+After the correction of CI run 492 I deployed the last build, `d7809843cedb` (`https://d49df278-vung-tau.fifo.workers.dev`, and the branch URL), and ran PT-85 on the branch URL again (`docs/web/load.md`, "PT-85 on the last build of round 4"): it fails only R18 (the pack models 991 ms, the pack people 1 209 ms, the limit 855 ms); the player can move at 45.7 s (`bai_truoc&ride`) and 41.9 s (the hẻm).
+
+The versions of round 4: `baff72803066` (item 2, first version) `https://12d89606-vung-tau.fifo.workers.dev`; `bdabc1e33d7b` (item 2, second version) `https://f8cd3709-vung-tau.fifo.workers.dev`; `1baf43eff104` (item 3) `https://7d20d669-vung-tau.fifo.workers.dev`; `d7809843cedb` (the last build) `https://d49df278-vung-tau.fifo.workers.dev`, also on the branch URL `https://feat-0031-web-load-vung-tau.fifo.workers.dev`.
+
 ### The other corrections
 
 - PT-80 run 2 failed in CI on a faster runner (also on `feat/0018-scooter`): a brake during the climb of a curb gave a bump. The correction is on `feat/0018-scooter` (plan 0018, section 8).
