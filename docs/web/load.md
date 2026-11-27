@@ -260,3 +260,71 @@ R6 (`check.js --loading`, the build `a0d368c1d8d8`): the loading screen at 1280 
 | 2400 × 1080 | 25 Mbit/s | with the cache | 0 MB | **50 s** | **151 s** | 344 MB | 301 MB | **1389 MB** | 6.8 / 0.9 / 2.3 / 34.7 / 103.9 s | 1588 MB | 207 s, 1749 MB, 344 MB, longest frame 7634 ms (275 upgrades wait after 63 s) | 287 s, 1925 MB, 412 MB, longest frame 10359 ms (409 upgrades wait after 62 s) |
 | 2400 × 1080 | 100 Mbit/s | empty | 94.1 MB | 63 s | 164 s | 344 MB | 206 MB | **1430 MB** | 15.6 / 1.4 / 3.8 / 37.1 / 103.7 s | 1642 MB | 297 s, 1749 MB, 344 MB, longest frame 7411 ms (275 upgrades wait after 63 s) | 411 s, 1998 MB, 412 MB, longest frame 10335 ms (345 upgrades wait after 62 s) |
 | 2400 × 1080 | 100 Mbit/s | with the cache | 0 MB | 51 s | 150 s | 344 MB | 295 MB | **1381 MB** | 6.1 / 1 / 3.8 / 34.8 / 98.5 s | 1738 MB | 169 s, 1688 MB, 344 MB, longest frame 7256 ms (275 upgrades wait after 62 s) | 255 s, 1967 MB, 412 MB, longest frame 9992 ms (359 upgrades wait after 62 s) |
+
+## Round 3, D18 and R18: the longest frame while a pack loads (2026-11-27)
+
+The measure of each build: 720 × 1280, 25 Mbit/s, the processor 4 times slower, `check.js --measure`. Before each measure I looked for old Godot processes (`pgrep -fa godot`): there was none. The time of a frame is the real time between two frames of the game (the delta of the engine stops at about 283 ms). The measure counts a frame only after the player can move (`WebPacks.playing`). In the cells: the longest frame of the pack, then what the game did in that frame: the upgrades of the rows of models, the poll of the loads, all the scripts of the frame (`TIME_PROCESS`), and the physics; then the time of the copy of the pack into the files of the page (`page.js`).
+
+| Build (version) | What changed | Cache | The pack models | The pack people |
+|---|---|---|---|---|
+| Before (`03a7bbc736ac`, `https://61988614-vung-tau.fifo.workers.dev`) | — | empty | 8 691 ms | 8 691 ms |
+| `f14ca9ee2a18` (`https://4af664b0-vung-tau.fifo.workers.dev`) | The measure of the parts of the frame | empty | 10 134 ms (upgrades 175, load 8 694, scripts 8 949, physics 4 ms; copy 404 ms) | the same frame |
+| | | with the cache | 10 808 ms (upgrades 151, load 9 063, scripts 9 302, physics 4 ms; copy 297 ms) | the same frame |
+| `91573e261c2e` (`https://9ff114f9-vung-tau.fifo.workers.dev`) | The loads of the models wait for the end of their load in a thread (`WorldModel.request()`), and the people load one scene in each frame | empty | 4 634 ms (scripts 1 799 ms; copy 332 ms) | 5 977 ms (scripts 66 ms; copy 157 ms) |
+| | | with the cache | 4 785 ms (scripts 233 ms; copy 302 ms) | 6 233 ms (upgrades 271, scripts 344 ms; copy 137 ms) |
+| `c0206c596dae` (`https://56385e79-vung-tau.fifo.workers.dev`) | The measure starts when the player can move; the build of the people is measured alone | empty | 1 968 ms (upgrades 217, scripts 286 ms; copy 317 ms) | 5 903 ms (scripts 218 ms; the build of the people 4 407 ms) |
+| | | with the cache | 1 733 ms (upgrades 260, scripts 454 ms) | 5 981 ms (upgrades 749, scripts 807 ms; the build of the people 4 018 ms) |
+| `ff898944bf89` (`https://f3db7acc-vung-tau.fifo.workers.dev`) | The people build in steps of 60 ms, one step in each frame | empty | 2 179 ms (upgrades 242, load 361, scripts 672 ms) | 2 333 ms (upgrades 846, scripts 1 257 ms; the longest load of a scene 226 ms) |
+| | | with the cache | 2 048 ms (load 526, scripts 573 ms) | the same frame |
+| `8d4d0526b1af` (`https://4b19624a-vung-tau.fifo.workers.dev`) | A row loads the files of the models of a cell before the cell changes, one model in a call; the things of a pack come in the frame after its load | empty | **1 775 ms** (upgrades 0.1, load 0.9, scripts 72, physics 5 ms; copy 290 ms) | **1 891 ms** (upgrades 252, scripts 615 ms; the longest load of a scene 307 ms) |
+| | | with the cache | **2 155 ms** (upgrades 586, scripts 714, physics 13 ms; copy 295 ms) | the same frame |
+
+The steps that took the long frame, in order: (1) a row of models upgraded a cell and loaded the files of its models on the main thread (the load of the frame: 8.7 s to 9.1 s); (2) the showcase made all the people in one frame (4.0 s to 4.4 s); (3) a cell upgraded with a model that was not loaded yet. I spread each of these over frames. The longest frame went from 10.1 s to 1.8 s to 2.2 s.
+
+R18 (at most 500 ms) is still out of reach. In the longest frame of the last build, the scripts of the game take 72 ms (models, empty cache) to 714 ms (with the cache). The other 1.1 s to 1.7 s are not in the scripts, the physics, or the copy of the page: they are the draw of the frame and the work of the browser. My reading (not measured): WebGL compiles the shader of a material when it draws it for the first time, and the new models of a pack bring new materials. What is left: measure the draw of the frame of a new model (the time of each first draw of a material), and show the new materials one in each frame, or compile them before the player can move.
+
+## Round 3, D17: the profile of the start before the cuts (8d4d0526b1af) (2026-11-27)
+
+Each part of the start marks its end (`StartProfile`); a part is the time from the mark before, and the first mark counts from the start of the engine. On a computer the argument `--start-profile` prints the parts; on the web `check.js` reads them from the page (`window.vungTau.profile`).
+
+- Computer: the workspace (no graphics card: lavapipe, 4 processors), PT-87 run 1 (`--world=vung_tau --start=bai_truoc --start-time=09:00 --quality=low --ride`, 1280 × 720, Mobile renderer), two runs. No old Godot process.
+- Web: `https://4b19624a-vung-tau.fifo.workers.dev/?start=bai_truoc&ride`, 720 × 1280, 25 Mbit/s, the processor 4 times slower. No old Godot process. On the web the engine starts after the download and the compile of the engine (41.2 s and 5.6 s with an empty cache).
+
+| Part of the start | Computer, run 1 (ms) | Computer, run 2 (ms) | Web, empty cache (ms) | Web, with the cache (ms) |
+|---|---|---|---|---|
+| the engine, the autoloads, and the main scene | 1 445 | 1 524 | 7 742 | 3 952 |
+| the test street (the hẻm) | 520 | 724 | 2 232 | 1 732 |
+| the start of the main scene | 25 | 29 | 258 | 171 |
+| the scene of the world | 0 | 0 | 2 | 2 |
+| setup(): the data of the build | 230 | 301 | 1 605 | 1 622 |
+| setup(): the environment, the cover, the materials, the sea, the far ground, the markers | 747 | 858 | 4 404 | 4 377 |
+| setup(): the canopy of the hills | 463 | 410 | 2 535 | 2 297 |
+| setup(): the tree field | 1 | 1 | 8 | 7 |
+| setup(): the street trees | 392 | 506 | 2 021 | 1 884 |
+| setup(): the sea objects | 324 | 322 | 874 | 712 |
+| setup(): the roadworks | 0 | 0 | 2 | 1 |
+| setup(): the known places | 839 | 845 | 5 386 | 4 563 |
+| setup(): the parked rows | 95 | 97 | 613 | 554 |
+| setup(): the morning exercise | 0 | 0 | 1 | 1 |
+| setup(): the showcase | 172 | 148 | 510 | 479 |
+| setup(): the street houses | 135 | 440 | 464 | 401 |
+| setup(): the town | 1 | 2 | 8 | 8 |
+| setup(): the water of the land | 36 | 38 | 104 | 78 |
+| setup(): the mainland | 45 | 47 | 325 | 260 |
+| the removal of the test street, its sun, and its environment | 0 | 0 | 0 | 0 |
+| prepare_at(): the chunks | 331 | 328 | 1 915 | 1 554 |
+| prepare_at(): the patches | 1 | 1 | 6 | 5 |
+| prepare_at(): the far tiles | 0 | 0 | 0 | 0 |
+| prepare_at(): the town | 2 732 | 2 564 | 17 410 | 16 348 |
+| the rest of the main scene | 67 | 77 | 483 | 392 |
+| the first frame (the scripts of the frame and the draw) | 8 063 | 8 050 | 5 652 | 3 756 |
+| until the player can move | 9 982 | 9 481 | 62 574 | 68 812 |
+| **To the first frame** | **16 664** | **17 312** | **54 559** | **45 154** |
+| **In all** | 26 646 | 26 793 | 117 133 | 113 966 |
+
+What the profile shows:
+
+- The test street takes 0.5 s to 0.7 s on a computer and 1.7 s to 2.2 s on the web, and the game removes it before the first frame.
+- `prepare_at()` makes all the boxes of the town in the range of the preset (400 chunks to 1 500 m on Low): 2.6 s to 2.7 s on a computer and 16.3 s to 17.4 s on the web. The first frame shows only a part of them.
+- On a computer the first frame takes 8.1 s. In it the scripts take 0.4 s to 0.7 s and the draw takes 7.2 s to 8.2 s (I split the part in two after this measure). The renderer compiles 84 pipelines for the first draw: 68 for new surfaces, 13 specializations, and 3 for the 2D. With gdb I sampled the threads in the draw: the main thread waits, and the worker threads compile the pipelines in the Vulkan driver (lavapipe). Godot makes a pipeline cache ("Startup PSO cache (0.0 MiB)"), but in the workspace it does not write it to `user://vulkan/`, so each start compiles the pipelines again.
+- On the web the largest parts after the town are the known places (4.6 s to 5.4 s), the environment and the materials (4.4 s), the first frame (3.8 s to 5.7 s), the canopy (2.3 s to 2.5 s), and the street trees (1.9 s to 2.0 s).
