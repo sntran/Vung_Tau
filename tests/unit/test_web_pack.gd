@@ -143,3 +143,21 @@ func test_the_game_removes_the_packs_of_old_builds_from_user() -> void:
 	assert_false(DirAccess.dir_exists_absolute(WebPacks.OLD_PACKS), "user://packs/ is gone")
 	WebPacks.remove_old_packs()
 	assert_false(DirAccess.dir_exists_absolute(WebPacks.OLD_PACKS), "a second call does nothing")
+
+
+## Plan 0031, R18 (round 4): the measure of a pack counts the frames after
+## "can move" only. The first frame after it ended a frame of the start (with
+## the work of the start in it): it does not count.
+func test_the_measure_of_a_pack_starts_with_the_frame_after_can_move() -> void:
+	var packs := WebPacks.new(null)
+	packs._measured["models"] = 0.0
+	WebPacks.playing = false
+	packs._measure_frame(0.0)
+	OS.delay_msec(150)
+	WebPacks.playing = true
+	packs._measure_frame(0.0)
+	assert_eq(float(packs._measured["models"]), 0.0, "the last frame of the start does not count")
+	OS.delay_msec(30)
+	packs._measure_frame(0.0)
+	assert_between(float(packs._measured["models"]), 25.0, 140.0, "the next frame counts")
+	packs.free()

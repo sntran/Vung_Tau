@@ -51,6 +51,8 @@ var _sim_left := -1.0
 ## time of 16 physics steps), and the time of the frame before (µs).
 var _measured: Dictionary = {}
 var _last_usec := 0
+## True when the frame before was a frame after "can move" (playing).
+var _played := false
 ## D18: the work of this node in the frame (ms), for the longest frame: the
 ## upgrades and the load of a pack. The rest of a long frame is the other
 ## scripts (Performance.TIME_PROCESS), the physics, and the draw.
@@ -311,6 +313,13 @@ func _measure_frame(_delta: float) -> void:
 	_last_usec = now
 	var tell := false
 	if not playing:
+		_played = false
+		return
+	# Plan 0031, R18 (round 4): the first frame after "can move" ended a frame
+	# of the start, with the work of the start in it: it does not count (the
+	# frames of main, Main.frames_after_move, start there too).
+	if not _played:
+		_played = true
 		return
 	for pack_id: String in _measured.keys():
 		if frame_ms > float(_measured[pack_id]):

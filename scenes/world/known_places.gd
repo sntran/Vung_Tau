@@ -77,6 +77,12 @@ var _materials: Dictionary = {}
 ## known places on a computer (4 s on the web), and the stairs show only
 ## nearer than NEAR_END.
 var _pending_stairs: Array = []
+## Plan 0031, D19: true while a stairs builds in steps over frames.
+var _stairs_busy := false
+
+## Plan 0031, D19: each frame; a stairs that builds in steps waits for it. (A
+## signal of this node: when the world is freed, the build does not go on.)
+signal _frame
 
 
 ## The place records of data/geo/landmarks.json, by id.
@@ -176,7 +182,11 @@ func setup(w: VungTau, path := CONFIG, defer_stairs := false) -> bool:
 
 ## The count of the stairs that are not built yet (plan 0031, D17).
 func pending_stairs() -> int:
-	return _pending_stairs.size()
+	return _pending_stairs.size() + (1 if _stairs_busy else 0)
+
+
+func _process(_delta: float) -> void:
+	_frame.emit()
 
 
 ## Builds each waiting stairs that has a point within "distance" of the point.
@@ -206,12 +216,34 @@ func stairs_pending_near(point: Vector3, distance: float) -> bool:
 
 
 ## Builds the next waiting stairs. False when none waits.
-func build_next_stairs() -> bool:
+## With "budget_ms", the stairs builds in steps of that time in each frame
+## (plan 0031, D19); true also while it builds.
+func build_next_stairs(budget_ms := INF) -> bool:
+	if _stairs_busy:
+		return true
 	if _pending_stairs.is_empty():
 		return false
 	var item: Array = _pending_stairs.pop_front()
-	_stairs(item[0], item[1])
+	if is_inf(budget_ms):
+		_stairs(item[0], item[1])
+	else:
+		_stairs_in_steps(item, budget_ms)
 	return true
+
+
+func _stairs_in_steps(item: Array, budget_ms: float) -> void:
+	_stairs_busy = true
+	await _stairs(item[0], item[1], budget_ms)
+	_stairs_busy = false
+
+
+## Plan 0031, D19: in a build in steps, waits for the next frame when the
+## step is over its time. Gives the end of the next step (ms).
+func _next_step(deadline: float, budget_ms: float) -> float:
+	if Time.get_ticks_msec() <= deadline:
+		return deadline
+	await _frame
+	return Time.get_ticks_msec() + budget_ms
 
 
 # --- Stand-ins ------------------------------------------------------------------
@@ -636,7 +668,8 @@ func _cylinder_shape(entry: Dictionary, c: Vector2, r: float, y0: float, y1: flo
 
 ## The stairs on an OSM line of steps: the height of the line follows the
 ## ground, with a landing at each turn; the steps are 15 cm to 18 cm high.
-func _stairs(entry: Dictionary, road: Dictionary) -> void:
+## With "budget_ms" the build takes some frames (a coroutine; plan 0031, D19).
+func _stairs(entry: Dictionary, road: Dictionary, budget_ms := INF) -> void:
 	var line := PackedVector3Array()
 	for p: Array in road.points:
 		line.append(Vector3(p[0], world.ground_height(p[0], p[2]) + STAIR_LIFT, p[2]))
@@ -674,7 +707,7 @@ func _stairs(entry: Dictionary, road: Dictionary) -> void:
 	for p: Vector3 in profile.walk:
 		if walk.is_empty() or _flat(p).distance_to(_flat(walk[walk.size() - 1])) > 0.02:
 			walk.append(p)
-	var surface := _stair_surface(entry, walk, width)
+	var surface: Dictionary = await _stair_surface(entry, walk, width, budget_ms)
 	stairs.append({"way": int(road.id), "place": entry.id, "points": walk, "steps": profile.steps, "width": width,
 			"treads": profile.treads, "surface": surface})
 
@@ -686,9 +719,10 @@ func _stairs(entry: Dictionary, road: Dictionary) -> void:
 ## player who walks beside the stairs can walk onto them. Farther out, the map
 ## is under the ground. Boxes on each part of the line had edges at the joints,
 ## and one surface on the line had steep folds on the inner side of a bend.
-func _stair_surface(entry: Dictionary, walk: PackedVector3Array, width: float) -> Dictionary:
+func _stair_surface(entry: Dictionary, walk: PackedVector3Array, width: float, budget_ms := INF) -> Dictionary:
 	if walk.size() < 2:
 		return {}
+	var deadline: float = Time.get_ticks_msec() + budget_ms
 	var half := width / 2.0
 	var reach := half + SKIRT_M
 	var low := Vector2(INF, INF)
@@ -713,6 +747,7 @@ func _stair_surface(entry: Dictionary, walk: PackedVector3Array, width: float) -
 	sum_w.resize(nx * nz)
 	for pass_index in 2:
 		for i in walk.size() - 1:
+			deadline = await _next_step(deadline, budget_ms)
 			var a := walk[i]
 			var b := walk[i + 1]
 			var a2 := Vector2(a.x, a.z)
@@ -747,6 +782,7 @@ func _stair_surface(entry: Dictionary, walk: PackedVector3Array, width: float) -
 	var heights := PackedFloat32Array()
 	heights.resize(nx * nz)
 	for r in nz:
+		deadline = await _next_step(deadline, budget_ms)
 		for c in nx:
 			var k := r * nx + c
 			var d := best_d[k]
@@ -793,6 +829,7 @@ func _stair_surface(entry: Dictionary, walk: PackedVector3Array, width: float) -
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var cells := 0
 	for r in nz - 1:
+		deadline = await _next_step(deadline, budget_ms)
 		for c in nx - 1:
 			var ks := [r * nx + c, r * nx + c + 1, (r + 1) * nx + c + 1, (r + 1) * nx + c]
 			var inside := true

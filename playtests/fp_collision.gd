@@ -4,8 +4,9 @@ extends RefCounted
 # collision shape. The player must stay on the floor. Look at a wall from
 # 0.3 m. The screenshot must not show the inside of the wall.
 # Run 1: the bánh mì cart (06:00), after the intro. Runs 2, 3, 10, and 11:
-# the house walls of the hẻm (06:00), one wall in each run. Run 4: the beach wall, the palm trees, and
-# the water. Runs 5 and 6: the carts of 15:00 (nước mía, hột vịt lộn) and of
+# the house walls of the hẻm (06:00), one wall in each run. Run 4: the beach wall and the palm
+# trees; run 12: the water (report 0031, round 4: run 4 with the water took 180.1 s of game time on a
+# slow computer of CI, run 491, and 131.5 s in run 488). Runs 5 and 6: the carts of 15:00 (nước mía, hột vịt lộn) and of
 # 18:30 (hủ tiếu gõ). Runs 7 and 8: the other walls. Run 9: the stools of the
 # cà phê cóc (06:00). Each run has few pushes, so that it is shorter than
 # 180 s at 2400×1080 on a slow computer (run 1 has the intro too, D-0004-01).
@@ -17,6 +18,7 @@ extends RefCounted
 # phase: --start-time=18:30 --fresh-save
 # phase: --start-time=12:00 --fresh-save
 # phase: --start-time=12:00 --fresh-save
+# phase: --start-time=06:00 --fresh-save
 # phase: --start-time=06:00 --fresh-save
 # phase: --start-time=06:00 --fresh-save
 # phase: --start-time=06:00 --fresh-save
@@ -36,6 +38,8 @@ func run(d: PlaytestDriver) -> void:
 		await _push(d, "cart " + spot_id, from, cart.global_position + Vector3(0, 1.0, 0))
 	if d.phase == 4:
 		await _beach(d)
+	if d.phase == 12:
+		await _water(d)
 	if WALL_RUNS.has(d.phase):
 		# The house walls of the main row (not the open shops).
 		var walls: Array = Content.layout.lots.filter(func(lot: Dictionary) -> bool:
@@ -76,10 +80,9 @@ func run(d: PlaytestDriver) -> void:
 	await d.screenshot("wall_close")
 
 
-## The beach wall, then the palm trees on the sand, then the water.
+## The beach wall, then the palm trees on the sand.
 func _beach(d: PlaytestDriver) -> void:
 	var hem: Node = d.main().hem
-	var s := d.state()
 	var road_x: float = hem.end_x + 4.5
 	await d.stick_to(Vector3(road_x, 0, 0))
 	var wall_x: float = hem.end_x + hem.beach.road_width
@@ -88,10 +91,19 @@ func _beach(d: PlaytestDriver) -> void:
 	await d.stick_to(Vector3(wall_x + 3.5, Beach.SAND_Y, 0))
 	for palm: Vector3 in [Vector3(wall_x + 1.7, Beach.SAND_Y, -3.2), Vector3(wall_x + 2.3, Beach.SAND_Y, 3.6)]:
 		await _push(d, "palm", Vector3(wall_x + 4.0, Beach.SAND_Y, palm.z), palm + Vector3(0, 1.6, 0))
-	# The edge of the water.
+
+
+## Run 12: over the sand to the edge of the water.
+func _water(d: PlaytestDriver) -> void:
+	var hem: Node = d.main().hem
+	var road_x: float = hem.end_x + 4.5
+	var wall_x: float = hem.end_x + hem.beach.road_width
+	await d.stick_to(Vector3(road_x, 0, 0))
+	await d.stick_to(Vector3(wall_x + 0.5, 0, 0))
+	await d.stick_to(Vector3(wall_x + 3.5, Beach.SAND_Y, 0))
 	await _push(d, "water edge", Vector3(wall_x + 11.0, Beach.SAND_Y, 0.0),
 			Vector3(wall_x + 40.0, Beach.SAND_Y + 1.6, 0.0))
-	s = d.state()
+	var s := d.state()
 	d.expect(s.player.x < wall_x + hem.beach.sand_width, "the player cannot walk into the sea")
 
 

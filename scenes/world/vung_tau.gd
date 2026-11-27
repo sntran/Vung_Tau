@@ -165,12 +165,22 @@ const SHOWCASE_NEAR_M := 600.0
 ## Plan 0031, D19 (D7): the player can move when the start within this
 ## distance is ready (start_ready()); the rest of the world builds after.
 const START_M := 150.0
+## Plan 0031, D19: the time of each frame for the far stairs after "can move" (ms).
+const STAIRS_FRAME_MS := 8.0
 const SHOWCASE_FRAME_MS := 8.0
 ## Plan 0031, D12: the load by time. While the player cannot move (Main sets
 ## "starting"), the world builds the start with at least this time of each
-## frame (ms): the ground, the town, and the steps of the showcase. Then the
-## world builds the rest with a small part of each frame, as before.
+## frame (ms): the ground and the steps of the showcase (D19: the town, the far
+## tiles, and the far stairs come after "can move"). Then the world builds the
+## rest with a small part of each frame, as before.
 const START_FRAME_MS := 100.0
+## Plan 0031, D19: the start takes the time of the last frame for its work (all
+## the time of each frame, D12), at most this (ms). On the web of the workspace
+## a frame took about 1.4 s, and 100 ms of work in each frame made the start
+## mostly frames.
+const START_FRAME_MAX_MS := 1000.0
+## The end of the work of the start in the last frame (Time.get_ticks_usec()), or -1.
+var _start_frame_usec := -1
 var starting := false
 ## The count of the things that the world started or applied (the ground and
 ## the town), so that the start knows when a pass did nothing.
@@ -822,6 +832,7 @@ func _process(delta: float) -> void:
 	if starting:
 		_build_start()
 		return
+	_start_frame_usec = -1
 	if _showcase_wanted(_focus) and Engine.get_frames_drawn() > 0 and _tasks == 0:
 		showcase.build_some(SHOWCASE_FRAME_MS)
 	_update_wanted()
@@ -829,9 +840,10 @@ func _process(delta: float) -> void:
 	_update_patches()
 	_update_far_strides()
 	_apply_done()
-	# Plan 0031, D17: the stairs that still wait (the start builds them all).
+	# Plan 0031, D17 and D19: the stairs that wait, after "can move", in steps
+	# of STAIRS_FRAME_MS in each frame (a whole stairs took 0.7 s on a computer).
 	if places and Engine.get_frames_drawn() > 0:
-		places.build_next_stairs()
+		places.build_next_stairs(STAIRS_FRAME_MS)
 
 
 func _profile(part: String) -> void:
@@ -869,25 +881,37 @@ func _exit_tree() -> void:
 ## at once costs one second. On the web the tasks run on the main thread, so
 ## each pass builds a part.
 func _build_start() -> void:
-	# With a limit of the frame rate the engine sleeps for the rest of each
-	# frame: the start takes that time too ("all the time of each frame").
-	var budget := START_FRAME_MS
-	if Engine.max_fps > 0:
-		budget = maxf(budget, 0.8 * 1000.0 / Engine.max_fps)
+	_build_start_passes()
+	_start_frame_usec = Time.get_ticks_usec()
+
+
+## Plan 0031, D12 and D19: the time of the work of the start in a frame (ms):
+## the time of the last frame (the frame of the work before and its draw),
+## START_FRAME_MS at least and START_FRAME_MAX_MS at most. With a limit of the
+## frame rate the engine sleeps for the rest of each frame: the start takes
+## that time too (80 % of a frame at least).
+static func start_budget_ms(last_frame_ms: float, max_fps: int) -> float:
+	var budget := clampf(last_frame_ms, START_FRAME_MS, START_FRAME_MAX_MS)
+	if max_fps > 0:
+		budget = maxf(budget, 0.8 * 1000.0 / max_fps)
+	return budget
+
+
+func _build_start_passes() -> void:
+	var now := Time.get_ticks_usec()
+	var last_frame_ms := (now - _start_frame_usec) / 1000.0 if _start_frame_usec >= 0 else 0.0
+	var budget := start_budget_ms(last_frame_ms, Engine.max_fps)
 	var end := Time.get_ticks_msec() + budget
 	while true:
 		var before := _work
 		var steps := showcase.steps_left() if showcase != null else 0
+		# Plan 0031, D19: the start builds only what the player needs to move
+		# (the ground and the showcase near the start). The far tiles, the town,
+		# and the far stairs build after "can move", with a small part of each frame.
 		_update_wanted()
 		_start_tasks()
 		_update_patches()
-		_update_far_strides()
 		_apply_all_done()
-		if town:
-			_work += town.build_start()
-		# Plan 0031, D17: one stairs of the known places in each pass, after the first frame.
-		if places and Engine.get_frames_drawn() > 0 and places.build_next_stairs():
-			_work += 1
 		var left := end - Time.get_ticks_msec()
 		if _showcase_wanted(_focus) and Engine.get_frames_drawn() > 0 and _tasks == 0 and left > 0:
 			showcase.build_some(left)
@@ -895,7 +919,7 @@ func _build_start() -> void:
 		if Time.get_ticks_msec() >= end:
 			return
 		if not moved:
-			var others := _tasks > 0 or (town != null and town.busy()) \
+			var others := _tasks > 0 \
 					or (showcase != null and showcase.waits_for_files() and _showcase_wanted(_focus))
 			if not others:
 				return
