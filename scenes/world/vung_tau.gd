@@ -162,6 +162,9 @@ var mainland: MainlandFar
 ## (m), some in each frame (ms), so that the start of the world does not wait
 ## for them (report 0026, D-0026-12).
 const SHOWCASE_NEAR_M := 600.0
+## Plan 0031, D19 (D7): the player can move when the start within this
+## distance is ready (start_ready()); the rest of the world builds after.
+const START_M := 150.0
 const SHOWCASE_FRAME_MS := 8.0
 ## Plan 0031, D12: the load by time. While the player cannot move (Main sets
 ## "starting"), the world builds the start with at least this time of each
@@ -930,7 +933,44 @@ func sand_at(x: float, z: float) -> bool:
 ## in steps after the first frame (plan 0018, report 0018, D-0018-03: a
 ## scooter waits for them).
 func showcase_pending(point: Vector3) -> bool:
-	return _showcase_wanted(point)
+	# Plan 0031, D19: only the steps of the showcase within START_M of the point.
+	return showcase != null and not showcase.is_built() and showcase.pending_near(point, START_M)
+
+
+## Plan 0031, D19 (D7): true when the start at the point is ready: the ground
+## and the roads of each chunk within START_M (at the detail that the world
+## wants, with its patches), the stairs of the known places and the steps of
+## the showcase within START_M. The town, the far tiles, the far stairs, and
+## the far part of the showcase build after it. The play tests keep
+## is_settled() for their waits.
+func start_ready(point: Vector3) -> bool:
+	return start_waits_for(point).is_empty()
+
+
+## What start_ready() still waits for, in words (empty when it is ready).
+func start_waits_for(point: Vector3) -> String:
+	var parts: Array[String] = []
+	var chunks := 0
+	var patches := 0
+	for key: Vector2i in _chunks:
+		if _distance_from(key, point) >= START_M:
+			continue
+		var state: Dictionary = _chunks[key]
+		if state.busy or state.wanted != state.detail:
+			chunks += 1
+		var chunk_patches: Dictionary = state.get("patches", {})
+		for at: Vector2i in chunk_patches:
+			if chunk_patches[at].busy or chunk_patches[at].stride != _patch_stride(key, at, chunk_patches[at].stride):
+				patches += 1
+	if chunks > 0:
+		parts.append("%d chunks of the ground" % chunks)
+	if patches > 0:
+		parts.append("%d patches" % patches)
+	if places and places.stairs_pending_near(point, START_M):
+		parts.append("the stairs of the known places")
+	if showcase_pending(point):
+		parts.append("the showcase")
+	return ", ".join(parts)
 
 
 ## True when the showcase has parts to build and the point is near its area.
@@ -939,9 +979,13 @@ func _showcase_wanted(point: Vector3) -> bool:
 
 
 func _distance_to_chunk(key: Vector2i) -> float:
+	return _distance_from(key, _focus)
+
+
+func _distance_from(key: Vector2i, point: Vector3) -> float:
 	var size := data.chunk_size
-	var dx := maxf(maxf(key.x * size - _focus.x, _focus.x - (key.x + 1) * size), 0.0)
-	var dz := maxf(maxf(key.y * size - _focus.z, _focus.z - (key.y + 1) * size), 0.0)
+	var dx := maxf(maxf(key.x * size - point.x, point.x - (key.x + 1) * size), 0.0)
+	var dz := maxf(maxf(key.y * size - point.z, point.z - (key.y + 1) * size), 0.0)
 	return Vector2(dx, dz).length()
 
 

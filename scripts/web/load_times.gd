@@ -14,8 +14,9 @@ const SHOW_S := 20.0
 
 ## The line: the megabytes over the network before the first frame, the
 ## seconds to the first frame and until the player can move, the frames each
-## second, and the memory of the page when the browser gives it. "" with no times.
-static func line(times: Dictionary, fps: int) -> String:
+## second, the memory of the page when the browser gives it, and the longest
+## frame after "can move" (plan 0031, R19) when it is 0 or more. "" with no times.
+static func line(times: Dictionary, fps: int, longest_frame_ms := -1.0) -> String:
 	if not times.has("firstFrameS") or not times.has("canMoveS"):
 		return ""
 	var text := Content.format(Content.ui_text("load_times_line"), {
@@ -26,6 +27,8 @@ static func line(times: Dictionary, fps: int) -> String:
 	})
 	if times.get("pageMB") != null:
 		text += Content.format(Content.ui_text("load_times_page"), {"page": int(times.pageMB)})
+	if longest_frame_ms >= 0.0:
+		text += Content.format(Content.ui_text("load_times_frame"), {"frame": roundi(longest_frame_ms)})
 	return text
 
 

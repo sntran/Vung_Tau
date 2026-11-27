@@ -104,6 +104,10 @@ var _hint_used := {}
 ## Plan 0031, R1: the time when the player can move, for the page, and the
 ## time to the next state for the page.
 var _web_can_move_ms := -1
+## Plan 0031, R18 and R19: the frames after "can move" (real time), and the
+## time of the last frame (-1 while the player cannot move).
+var frames_after_move := FrameStats.new()
+var _move_frame_usec := -1
 var _profile_done := false
 ## Plan 0031, D11: the line of the times of the start (the Settings app shows the last line).
 var load_times_text := ""
@@ -320,9 +324,10 @@ func _process(delta: float) -> void:
 	# Plan 0018, R1: the clock runs from the first frame of the world, and in
 	# the Vũng Tàu world when the ground of the start is ready (or after
 	# CLOCK_WAIT_S of frames, so that a world that never settles does not stop it).
+	# Plan 0031, D19: the start within VungTau.START_M, not the whole world.
 	if not GameState.clock_running and first_frame_ms >= 0:
 		_clock_wait += delta
-		if vung_tau == null or vung_tau.is_settled() or _clock_wait > CLOCK_WAIT_S:
+		if vung_tau == null or vung_tau.start_ready(player.global_position) or _clock_wait > CLOCK_WAIT_S:
 			GameState.clock_running = true
 	# Plan 0009, R16: the page knows when the ground of the start is ready.
 	if _web_settled_ms < 0 and vung_tau != null and OS.has_feature("web") and first_frame_ms >= 0 and vung_tau.is_settled():
@@ -334,6 +339,14 @@ func _process(delta: float) -> void:
 	if vung_tau != null:
 		vung_tau.starting = not GameState.clock_running or (player.is_riding() and player.ride_hold)
 	WebPacks.playing = vung_tau == null or not vung_tau.starting
+	# Plan 0031, R19: the frames after "can move" (the time between two frames).
+	if vung_tau != null and not vung_tau.starting:
+		var now := Time.get_ticks_usec()
+		if _move_frame_usec >= 0:
+			frames_after_move.add((now - _move_frame_usec) / 1000.0)
+		_move_frame_usec = now
+	else:
+		_move_frame_usec = -1
 	_end_profile()
 	_layout()
 	_update_rest_stick()
@@ -1526,6 +1539,9 @@ func _update_web_state(delta: float) -> void:
 	if _web_can_move_ms < 0 and GameState.clock_running and not player.ride_hold:
 		_web_can_move_ms = Time.get_ticks_msec()
 		JavaScriptBridge.eval("window.vungTau.canMoveMs = %d; window.vungTau.mark && window.vungTau.mark('canMove')" % _web_can_move_ms, true)
+		# Plan 0031, R19: what the world still builds when the player can move (D19).
+		if vung_tau != null:
+			JavaScriptBridge.eval("window.vungTau.canMoveLeft = %s" % JSON.stringify(vung_tau.unsettled_reason()), true)
 		# Plan 0031, D11: the line of the times at the top, for LoadTimes.SHOW_S.
 		var branch := str(JavaScriptBridge.eval("window.vungTauBuild ? window.vungTauBuild.branch : ''", true))
 		_times_shown = LoadTimes.shows(true, branch, GameState.has_arg("times"))
@@ -1541,6 +1557,8 @@ func _update_web_state(delta: float) -> void:
 	var heading := player.ride.heading if player.is_riding() else player.yaw
 	JavaScriptBridge.eval("window.vungTau.state = {x: %.2f, z: %.2f, heading: %.1f, speedKmh: %.1f, riding: %s, frames: %d}" % [
 			at.x, at.z, heading, player.ride_speed_kmh(), "true" if player.is_riding() else "false", Engine.get_frames_drawn()], true)
+	# Plan 0031, R18 and R19: the median and the longest frame after "can move".
+	JavaScriptBridge.eval("window.vungTau.frames = %s" % JSON.stringify(frames_after_move.to_dict()), true)
 
 
 ## Plan 0031, D11: the line of the times, each second while it shows (the
@@ -1552,7 +1570,8 @@ func _update_times_line(delta: float) -> void:
 		return
 	_times_update = 1.0
 	var parsed: Variant = JSON.parse_string(str(JavaScriptBridge.eval("JSON.stringify(window.vungTau.times ? window.vungTau.times() : {})", true)))
-	var line := LoadTimes.line(parsed if parsed is Dictionary else {}, Engine.get_frames_per_second())
+	var line := LoadTimes.line(parsed if parsed is Dictionary else {}, Engine.get_frames_per_second(),
+			frames_after_move.longest_ms() if frames_after_move.count() > 0 else -1.0)
 	if line != "":
 		load_times_text = line
 		JavaScriptBridge.eval("window.vungTau.timesLine = %s" % JSON.stringify(line), true)

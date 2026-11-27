@@ -19,9 +19,15 @@ extends RefCounted
 # phase: --world=vung_tau --start=bai_truoc --start-time=09:00 --quality=low --ride
 # phase: --world=vung_tau --start=bai_truoc --start-time=09:00 --quality=low --ride --max-fps=3
 # phase: --world=vung_tau --start=bai_truoc --start-time=09:00 --quality=low --ride --max-fps=1
+# phase: --world=vung_tau --start=bai_truoc --start-time=09:00 --quality=low --ride --web-start
 
 ## The wait at 3 frames each second, at most this times the wait at the full frame rate.
 const MAX_RATIO := 1.5
+## Plan 0031, R18 and R19: no frame after "can move" longer than the median
+## frame of the same time plus this (ms).
+const OVER_MEDIAN_MS := 250.0
+## Run 4 (R19) records the frames after "can move" until the world is settled, at most this long (s).
+const SETTLE_S := 180.0
 const FILE := "start_wait.json"
 
 
@@ -36,6 +42,9 @@ func run(d: PlaytestDriver) -> void:
 	d.step("the scooter can start %.1f s (real time) after the first frame, at %s" % [
 			wait_s, "%d frames each second at most" % fps_cap if fps_cap > 0 else "the full frame rate"])
 	await d.screenshot("can_start")
+	if GameState.has_arg("web-start"):
+		await _after_can_move(d, main)
+		return
 	var path := d.out_dir.path_join(FILE)
 	if d.phase == 1:
 		var out := FileAccess.open(path, FileAccess.WRITE)
@@ -65,3 +74,34 @@ func run(d: PlaytestDriver) -> void:
 	if not frames.is_empty():
 		d.step("the ride: %d frames, the longest %.0f ms" % [frames.size(), frames[-1]])
 	await d.screenshot("started")
+
+
+## Plan 0031, R19 (run 4, the start of the web build): the scooter can start
+## before the town is complete (D19), and while the rest of the world builds,
+## no frame is longer than the median frame plus OVER_MEDIAN_MS (R18).
+func _after_can_move(d: PlaytestDriver, main: Node) -> void:
+	var w := d.world()
+	var town_left: int = w.town.pending() if w.town else 0
+	d.step("when the scooter can start: %s" % (w.unsettled_reason() if not w.is_settled() else "the world is settled"))
+	d.expect(town_left > 0, "the scooter can start before the town is complete: %d chunks of the town are left" % town_left)
+	var frames: Array[float] = []
+	var last := {"usec": Time.get_ticks_usec()}
+	var record := func() -> void:
+		var now := Time.get_ticks_usec()
+		frames.append((now - int(last.usec)) / 1000.0)
+		last.usec = now
+	main.get_tree().process_frame.connect(record)
+	var settled := await d.wait_until(func() -> bool: return w.is_settled(), SETTLE_S, "the rest of the world is built")
+	main.get_tree().process_frame.disconnect(record)
+	if frames.size() < 3:
+		d.fail("too few frames after the scooter can start: %d" % frames.size())
+		return
+	var sorted := frames.duplicate()
+	sorted.sort()
+	var median: float = sorted[sorted.size() / 2]
+	var longest: float = sorted[-1]
+	d.step("after the scooter can start: %d frames until the world is settled (%s), the median frame %.0f ms, the longest %.0f ms" % [
+			frames.size(), "yes" if settled else "no", median, longest])
+	d.expect(longest <= median + OVER_MEDIAN_MS, "no frame after the scooter can start is longer than the median frame plus %.0f ms: %.0f ms (the median %.0f ms)" % [
+			OVER_MEDIAN_MS, longest, median])
+	await d.screenshot("settled")

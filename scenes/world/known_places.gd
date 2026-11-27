@@ -195,6 +195,16 @@ func build_stairs_near(point: Vector3, distance: float) -> void:
 	_pending_stairs = left
 
 
+## True when a waiting stairs has a point within "distance" of the point
+## (plan 0031, D19: the start waits for it).
+func stairs_pending_near(point: Vector3, distance: float) -> bool:
+	for item: Array in _pending_stairs:
+		for p: Array in item[1].points:
+			if Vector2(float(p[0]) - point.x, float(p[2]) - point.z).length() <= distance:
+				return true
+	return false
+
+
 ## Builds the next waiting stairs. False when none waits.
 func build_next_stairs() -> bool:
 	if _pending_stairs.is_empty():

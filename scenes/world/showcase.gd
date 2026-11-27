@@ -161,6 +161,10 @@ var _near_roads_read := false
 const MODEL_BODY_MIN_HEIGHT := 2.5
 ## The steps of the build that are not done yet (Callables).
 var _steps: Array[Callable] = []
+## Plan 0031, D19 (report 0031, D-0031-09): the place of each step of _steps,
+## a box of x and z of the game. The start waits only for the steps whose box
+## is within VungTau.START_M of the start (pending_near()).
+var _step_boxes: Array[Rect2] = []
 var _built := false
 ## The last clock time of update_time(), or -1.
 var _minutes := -1
@@ -200,34 +204,76 @@ func setup(w: VungTau, path := CONFIG) -> bool:
 	# The other parts are steps that the world does when the player comes
 	# near the area (report 0026, D-0026-12).
 	_steps.clear()
+	_step_boxes.clear()
 	_place_steps(PLACES)
 	if data.has("median"):
-		_steps.append(_median.bind(data.median))
+		_add_step(_median.bind(data.median), _ways_box(data.median.get("ways", [])))
 	for sidewalk: Dictionary in data.get("sidewalks", []):
-		_steps.append(_sidewalk.bind(sidewalk))
+		_add_step(_sidewalk.bind(sidewalk), _ways_box([sidewalk.get("way", 0)]))
 	if data.has("path_borders"):
-		_steps.append(_path_borders.bind(data.path_borders))
+		_add_step(_path_borders.bind(data.path_borders), _bounds)
 	for wall: Dictionary in data.get("walls", []):
-		_steps.append(_walls.bind(wall))
+		_add_step(_walls.bind(wall), _ways_box(wall.get("ways", [])))
 	for sea_wall: Dictionary in data.get("sea_walls", []):
-		_steps.append(_sea_wall.bind(sea_wall))
+		_add_step(_sea_wall.bind(sea_wall), _ways_box(sea_wall.get("ways", [])))
 	for fence: Dictionary in data.get("fences", []):
-		_steps.append(_fence.bind(fence))
+		_add_step(_fence.bind(fence), _points_box(fence.get("line", [])))
 	for row: Dictionary in data.get("lamp_rows", []):
-		_steps.append(_lamp_row.bind(row))
+		_add_step(_lamp_row.bind(row), _ways_box([row.get("way", 0)]))
 	if data.has("path_lamps"):
-		_steps.append(_path_lamps.bind(data.path_lamps))
+		_add_step(_path_lamps.bind(data.path_lamps), _bounds)
 	if data.has("park_plants"):
-		_steps.append(_park_plants.bind(data.park_plants))
+		_add_step(_park_plants.bind(data.park_plants), _bounds)
 	if data.has("stand_ins"):
-		_steps.append(_stand_ins.bind(data.stand_ins))
+		_add_step(_stand_ins.bind(data.stand_ins), _bounds)
 	var beached: Variant = data.get("beached", [])
 	for cfg: Dictionary in (beached if beached is Array else [beached]):
-		_steps.append(_beached.bind(cfg))
-	_steps.append(_commit)
+		_add_step(_beached.bind(cfg), _points_box(cfg.get("points", [])))
+	# The commit shows the parts of all the steps before it, and the people walk
+	# in the whole area: their place is the whole area.
+	_add_step(_commit, _bounds)
 	# R10: the people, after the parts (they sit on the raised lawns).
-	_steps.append(_add_people)
+	_add_step(_add_people, _bounds)
 	return true
+
+
+## Plan 0031, D19: a step of the build and its place (a box of x and z).
+func _add_step(step: Callable, box: Rect2) -> void:
+	_steps.append(step)
+	_step_boxes.append(box)
+
+
+## True while a step whose place is within "radius" of the point is not done
+## (plan 0031, D19). The steps are done in their order, so the steps before it
+## are not done too.
+func pending_near(point: Vector3, radius: float) -> bool:
+	var p := Vector2(point.x, point.z)
+	for box: Rect2 in _step_boxes:
+		var nearest := Vector2(clampf(p.x, box.position.x, box.end.x), clampf(p.y, box.position.y, box.end.y))
+		if nearest.distance_to(p) < radius:
+			return true
+	return false
+
+
+## The box of the roads of OSM with these ids, or the box of the area when the
+## data has none of them.
+func _ways_box(ids: Array) -> Rect2:
+	var points: Array = []
+	for id: Variant in ids:
+		if _roads.has(int(id)):
+			for q: Array in _roads[int(id)].points:
+				points.append([q[0], q[2]])
+	return _points_box(points)
+
+
+## The box of points [x, z, ...], or the box of the area when there are none.
+func _points_box(points: Array) -> Rect2:
+	if points.is_empty():
+		return _bounds
+	var box := Rect2(Vector2(float(points[0][0]), float(points[0][1])), Vector2.ZERO)
+	for q: Array in points:
+		box = box.expand(Vector2(float(q[0]), float(q[1])))
+	return box
 
 
 ## The distance (m) from the point to the box of the area (0 in the box).
@@ -259,6 +305,7 @@ func build_some(budget_ms: float) -> void:
 			# The files of the model load in other threads: the next frame.
 			break
 		_steps.pop_front()
+		_step_boxes.pop_front()
 		if Time.get_ticks_msec() >= end:
 			break
 	if _steps.is_empty() and not _built:
@@ -1523,7 +1570,22 @@ func _place_steps(path: String) -> void:
 		# So does an order whose files wait for the job "Models of World".
 		if _has_model(str(place.id)):
 			_place_ids.append(str(place.id))
-			_steps.append(_place.bind(place, ranges))
+			_add_step(_place.bind(place, ranges), _place_box(place))
+
+
+## Plan 0031, D19: the box of a place (x and z of the game), from its front,
+## its facing, and the box of the model in its own frame.
+static func _place_box(place: Dictionary) -> Rect2:
+	var facing := Vector2(float(place.facing[0]), float(place.facing[1])).normalized()
+	var basis := Basis(Vector3.UP, atan2(facing.x, facing.y))
+	var front := Vector3(float(place.front[0]), 0.0, float(place.front[1]))
+	var t := Transform3D(basis, front - basis * Vector3(float(place.get("front_middle_x", 0.0)), 0, 0))
+	var b: Array = place.get("box", [0.0, 0.0, 0.0, 0.0])
+	var box := Rect2(Vector2(front.x, front.z), Vector2.ZERO)
+	for c: Vector3 in [Vector3(b[0], 0, b[2]), Vector3(b[1], 0, b[2]), Vector3(b[1], 0, b[3]), Vector3(b[0], 0, b[3])]:
+		var q := t * c
+		box = box.expand(Vector2(q.x, q.z))
+	return box
 
 
 ## One model of World at its place: one step of the build, because the load

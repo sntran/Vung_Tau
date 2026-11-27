@@ -153,6 +153,8 @@ async function openOnce(context, cdp, label, shots) {
     await page.waitForFunction(() => window.vungTau.canMoveMs >= 0, null, { timeout: 1800000, polling: 250 });
     result.canMoveS = (Date.now() - t0) / 1000;
     result.memoryCanMove = await memoryOf(page);
+    // D19: what the world still built when the player could move (R19: the town is not complete).
+    result.canMoveLeft = await page.evaluate(() => window.vungTau.canMoveLeft).catch(() => undefined);
     result.parts = await startParts(page);
     // D17: the profile of the start (each part of the start of the game, ms).
     result.profile = await page.waitForFunction(() => window.vungTau.profile, null, { timeout: 30000, polling: 500 })
@@ -178,6 +180,8 @@ async function openOnce(context, cdp, label, shots) {
     const times = await page.evaluate(() => window.vungTau.packs || {}).catch(() => ({}));
     const states = await page.evaluate(() => window.vungTau.packState || {}).catch(() => ({}));
     result.peopleMakeMs = await page.evaluate(() => window.vungTau.peopleMakeMs).catch(() => undefined);
+    // R18, R19: the frames after "can move" (the game counts them): the median and the longest.
+    result.frames = await page.evaluate(() => window.vungTau.frames).catch(() => undefined);
     result.peopleLoadMax = await page.evaluate(() => window.vungTau.peopleLoadMax).catch(() => undefined);
     for (const id in result.packs) {
       result.packs[id].times = times[id] || {};
@@ -352,6 +356,12 @@ function packCell(r, id) {
   return `${Math.round(p.s)} s, ${m.pageMB} MB, ${m.engineHeapMB} MB${longest}`;
 }
 
+// R18, R19: the frames after "can move" (window.vungTau.frames of the game).
+function framesCell(f) {
+  if (!f || !f.count) return '—';
+  return `${Math.round(f.medianMs)} / ${Math.round(f.longestMs)} ms (${f.count} frames)`;
+}
+
 function partsCell(p) {
   if (!p || p.downloadS === undefined) return '—';
   const v = (x) => (x === undefined ? '—' : `${x}`);
@@ -370,8 +380,8 @@ function writeMarkdown(file, step, rows) {
   const lines = [
     '', `## ${step} (${date})`, '',
     `\`${url}\`, the processor ${rows[0] ? rows[0].cpu : 4} times slower. A value in bold is over its target of D10 (at 25 Mbit/s).`, '',
-    '| Size | Network | Cache | Over the network before the first frame | First frame | Can move | Heap of the engine | JavaScript heap | Page (renderer + GPU) | Parts: download / compile / engine / world / move | Page when the player can move | The pack models there: time, page, heap of the engine | The people there: time, page, heap of the engine |',
-    '|---|---|---|---|---|---|---|---|---|---|---|---|---|',
+    '| Size | Network | Cache | Over the network before the first frame | First frame | Can move | Heap of the engine | JavaScript heap | Page (renderer + GPU) | Parts: download / compile / engine / world / move | Page when the player can move | The pack models there: time, page, heap of the engine | The people there: time, page, heap of the engine | At "can move" the world still builds | Frames after "can move": median / longest |',
+    '|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|',
   ];
   for (const r of rows) {
     const at25 = r.mbps <= 25;
@@ -381,7 +391,7 @@ function writeMarkdown(file, step, rows) {
       `${cell(r.bytesBeforeFirstFrameMB, ' MB', at25 && r.cache === 'empty' ? TARGETS.bytesMB : undefined)} | ` +
       `${cell(r.firstFrameS !== undefined ? Math.round(r.firstFrameS) : undefined, ' s', at25 ? TARGETS.firstFrameS : undefined)} | ` +
       `${cell(r.canMoveS !== undefined ? Math.round(r.canMoveS) : undefined, ' s', at25 ? move : undefined)} | ` +
-      `${cell(m.engineHeapMB, ' MB')} | ${cell(m.jsHeapMB, ' MB')} | ${cell(m.pageMB, ' MB', TARGETS.memoryMB)} | ${partsCell(r.parts)} | ${cell((r.memoryCanMove || {}).pageMB, ' MB')} | ${packCell(r, 'models')} | ${peopleCell(r)} |` +
+      `${cell(m.engineHeapMB, ' MB')} | ${cell(m.jsHeapMB, ' MB')} | ${cell(m.pageMB, ' MB', TARGETS.memoryMB)} | ${partsCell(r.parts)} | ${cell((r.memoryCanMove || {}).pageMB, ' MB')} | ${packCell(r, 'models')} | ${peopleCell(r)} | ${r.canMoveLeft === undefined ? '—' : (r.canMoveLeft || 'nothing')} | ${framesCell(r.frames)} |` +
       (r.failure ? ` ${r.failure.split('\n')[0].replace(/\|/g, '/').slice(0, 120)}` : ''));
   }
   const errors = [...new Set(rows.flatMap((r) => r.errors || []))].filter((e) => !/Occlusion culling is disabled|_print_warning/.test(e));
