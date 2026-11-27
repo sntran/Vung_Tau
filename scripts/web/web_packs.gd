@@ -56,6 +56,8 @@ var _last_usec := 0
 ## scripts (Performance.TIME_PROCESS), the physics, and the draw.
 var _work := {"upgradesMs": 0.0, "pollMs": 0.0}
 var _longest: Dictionary = {}
+## D18: the packs that were loaded in the frame before; their things come now.
+var _ready_next: Array[String] = []
 
 
 ## The entries of data/web/packs.json by id.
@@ -169,6 +171,11 @@ func _exit_tree() -> void:
 func _process(delta: float) -> void:
 	_measure_frame(delta)
 	var t0 := Time.get_ticks_usec()
+	if not _ready_next.is_empty():
+		_on_pack(_ready_next.pop_front())
+		_work.upgradesMs = (Time.get_ticks_usec() - t0) / 1000.0
+		_work.pollMs = 0.0
+		return
 	_run_upgrades()
 	_work.upgradesMs = (Time.get_ticks_usec() - t0) / 1000.0
 	_work.pollMs = 0.0
@@ -241,7 +248,9 @@ func _poll() -> void:
 	# loadMs: the load of the pack (one frame); fromCache: the bytes from the cache of the page.
 	_times[pack_id] = {"downloadMs": Time.get_ticks_msec() - _start_ms, "bytes": int(state.get("size", 0)),
 			"fromCache": int(state.get("fromCache", 0)), "loadMs": Time.get_ticks_msec() - t0, "readyMs": Time.get_ticks_msec()}
-	_on_pack(pack_id)
+	# D18: the things that wait for the pack come in the next frame, not in the
+	# frame of the load of the pack.
+	_ready_next.append(pack_id)
 	_tell_page()
 
 
@@ -289,8 +298,8 @@ func _run_upgrades() -> void:
 		if job.size() == 1:
 			if not (job[0] as WorldModel).upgrade():
 				_upgrades.append(job)
-		else:
-			(job[0] as WorldRow).upgrade_cell(int(job[1]))
+		elif not (job[0] as WorldRow).upgrade_cell(int(job[1])):
+			_upgrades.append(job)
 
 
 ## D16: the longest frame from the request of a pack until its upgrades are

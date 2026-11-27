@@ -60,8 +60,12 @@ func test_a_row_shows_a_level_from_0_m_and_then_its_mid_level() -> void:
 	assert_false(row.needs_upgrade(), "no better level yet")
 	WebPacks.release("models")
 	assert_true(row.needs_upgrade(), "the cell waits for its better levels")
-	while row.needs_upgrade():
-		row.upgrade_next()
+	# D18: the files of the model load first (in other threads), then the cell changes.
+	var frames := 0
+	while row.needs_upgrade() and frames < 600:
+		if not row.upgrade_next():
+			await wait_frames(1)
+		frames += 1
 	assert_true(_shows_at(row, 0.5))
 	# A model with no near level shows its mid level from 0 m ("mid_whole").
 	assert_gt(row.cells[0].mid.size() + row.cells[0].mid_whole.size(), 0, "the cell has its mid level")

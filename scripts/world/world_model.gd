@@ -165,13 +165,18 @@ static func levels_shown(model_id: String, model_ranges := {}) -> Array[String]:
 
 ## Starts the load of the files of the levels of a model in other threads, so
 ## that make() does not wait for them (report 0026, D-0026-12).
-static func request(model_id: String, model_ranges := {}) -> void:
+static func request(model_id: String, model_ranges := {}) -> int:
+	# Plan 0031, D18: the count of the new loads (on the web, with no threads,
+	# a load is done in this call).
+	var count := 0
 	for level: String in levels_shown(model_id, model_ranges):
 		var path: String = ROOT + model_id + SUFFIX[level]
 		if _scenes.has(model_id + "/" + level) or _requested.has(path):
 			continue
 		if ResourceLoader.load_threaded_request(path) == OK:
 			_requested[path] = true
+			count += 1
+	return count
 
 
 ## True when no file of a level of the model is still in the load of request().

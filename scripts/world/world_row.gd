@@ -128,10 +128,20 @@ func needs_upgrade() -> bool:
 
 ## Plan 0031, D14: makes a cell again with the levels that came, and then frees
 ## the old cell (no frame with no cell). The hidden models stay hidden.
-func upgrade_cell(index: int) -> void:
+func upgrade_cell(index: int) -> bool:
 	if index < 0 or index >= cells.size() or not cell_needs_upgrade(index):
-		return
+		return true
 	var old: Dictionary = cells[index]
+	# Plan 0031, D18: the files of the models load first, one model in a call
+	# (in other threads; on the web, with no threads, in the call), and the cell
+	# changes when they are there: the templates of the cell then make no load
+	# on the main thread (846 ms for one cell in the measure of the web build).
+	for item: Dictionary in old.items:
+		if WorldModel.request(str(item.id)) > 0:
+			return false
+	for item: Dictionary in old.items:
+		if not WorldModel.is_loaded(str(item.id)):
+			return false
 	for item: Dictionary in old.items:
 		item.slots = []
 	var entry := _build_cell(old.key, old.items)
@@ -142,14 +152,15 @@ func upgrade_cell(index: int) -> void:
 			set_hidden(int(item.index), true)
 	(old.node as Node).queue_free()
 	_apply_cell_ranges(entry, custom_ranges.get(WorldModel.preset, WorldModel.ranges))
+	return true
 
 
 ## Makes the next cell that waits for its better levels (a unit test).
-func upgrade_next() -> void:
+func upgrade_next() -> bool:
 	for index in cells.size():
 		if cell_needs_upgrade(index):
-			upgrade_cell(index)
-			return
+			return upgrade_cell(index)
+	return true
 
 
 func _build_cell(key: Vector2i, items: Array) -> Dictionary:
