@@ -504,3 +504,13 @@ The first version changed less than 15 % (not a result). In the second version t
 
 R18 (the longest frame while a pack loads at most the median frame after "can move" plus 250 ms) passes in one row of eight (720 × 1280, 100 Mbit/s, the cache: the pack models, 1 785 ms against a limit of 1 849 ms). In the others the longest frame of a pack is 60 ms to 470 ms over the limit: at 720 × 1280 the median frame is 1 388 ms to 1 599 ms and the longest frame of a pack 1 734 ms to 2 055 ms; at 2400 × 1080 the median is 4 202 ms to 4 427 ms and the longest 4 572 ms to 5 065 ms. R19 on the web: the longest frame after "can move" is the frame of a pack in each row (1 799 ms to 5 270 ms), so it is over the limit by the same amount. What is left: the frame in which a pack shows its new models (the first draw of their materials), as in round 3.
 
+## PT-85 after the deploy of round 4 (1baf43eff104). No old Godot process (2026-11-27)
+
+`node tools/web/check.js https://feat-0031-web-load-vung-tau.fifo.workers.dev OUT --pt85` (the branch URL; the version is `https://7d20d669-vung-tau.fifo.workers.dev`). The window of 640 × 360 of item 7, 50 Mbit/s, an empty cache, the processor at full speed. R18 now has the limit of round 4: the median frame after "can move" plus 250 ms.
+
+| Start | First frame | Can move | First move | Ride | Frames after "can move": median / longest | The longest frame of the pack models / people (R18 limit) | R16: heaps at the end of the ride (page) | Errors | Result |
+|---|---|---|---|---|---|---|---|---|---|
+| `bai_truoc&ride` | 32.2 s | 45.3 s | 1.8 m | 302 m | 598 ms / 1 046 ms | **966 ms** / **1 053 ms** (848 ms) | 757 MB (2 027 MB) | none | FAIL (R18 only) |
+| `hem` | 32.8 s | 43.2 s | 1.16 m | — | 613 ms / 709 ms | — (no pack) | 607 MB (1 416 MB) | none | pass |
+
+The line of the times on the page gives the longest frame after "can move" (`bai_truoc&ride`: "94.1 MB · first frame 28.3 s · ride 40.6 s · 2 fps · page 579 MB · longest frame 782 ms"; the page reads it at the first move). Against round 3 (`8fb1775d8979`): the player can move 9 s earlier at `bai_truoc&ride` (45.3 s against 54.5 s) and 8 s earlier in the hẻm (43.2 s against 51.1 s). The longest frame of a pack is 118 ms and 205 ms over the limit of R18.

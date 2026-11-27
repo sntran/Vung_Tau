@@ -82,6 +82,8 @@ func run(d: PlaytestDriver) -> void:
 	if d.phase == 2:
 		# Before the ground and the showcase are ready (report 0018, D-0018-03).
 		await _first_push(d)
+	if d.phase == 5:
+		await _hint_at_can_move(d)
 	await d.wait_ground(120.0)
 	if d.phase == 1:
 		await _run_1(d)
@@ -640,6 +642,20 @@ func _on_sand(player: Player, w: VungTau, point: Vector3) -> bool:
 	return shape is HeightMapShape3D
 
 
+## Run 5 (plan 0018, D12; plan 0031, D19): the hint of the first ride shows
+## when the scooter can start ("can move"). The clock counts its RIDE_HINT_S
+## from then, while the town and the far parts of the world still build (in
+## CI they built for more than 6 s, and the hint was gone at is_settled()).
+func _hint_at_can_move(d: PlaytestDriver) -> void:
+	var player: Player = d.main().player
+	await d.wait_until(func() -> bool: return GameState.clock_running and not player.ride_hold, 120.0,
+			"the scooter can start")
+	var s := d.state()
+	d.expect(s.hint_text == Content.ui_text("scooter_hint_touch") or s.hint_text == Content.ui_text("scooter_hint_keys"),
+			"the hint of the first ride shows when the scooter can start (D12): \"%s\"" % s.hint_text)
+	await d.screenshot("ride_hint")
+
+
 ## Run 5 (plan 0018, D10, D11, D13): from the start of Bãi Trước, south on
 ## Quang Trung at the top speed, then left into Nguyễn Trãi with the stick only
 ## (up, then hard to the side; no brake). The scooter stays on the roads, with
@@ -651,9 +667,6 @@ func _run_5(d: PlaytestDriver) -> void:
 	if not d.expect(s.riding, "with --ride the game starts on the scooter of the start (R8)"):
 		return
 	var w := d.world()
-	d.expect(s.hint_text == Content.ui_text("scooter_hint_touch") or s.hint_text == Content.ui_text("scooter_hint_keys"),
-			"the hint of the first ride shows when the world is ready (D12): \"%s\"" % s.hint_text)
-	await d.screenshot("ride_hint")
 	await d.wait_showcase()
 	await d.wait_frames(3)
 	s = d.state()

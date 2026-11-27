@@ -165,7 +165,9 @@ const SHOWCASE_NEAR_M := 600.0
 ## Plan 0031, D19 (D7): the player can move when the start within this
 ## distance is ready (start_ready()); the rest of the world builds after.
 const START_M := 150.0
-## Plan 0031, D19: the time of each frame for the far stairs after "can move" (ms).
+## Plan 0031, D19: the time of each frame for the far stairs after "can move"
+## in the start of the web build (ms). A computer makes a whole stairs in a
+## frame, as before (stairs_budget_ms()).
 const STAIRS_FRAME_MS := 8.0
 const SHOWCASE_FRAME_MS := 8.0
 ## Plan 0031, D12: the load by time. While the player cannot move (Main sets
@@ -174,10 +176,12 @@ const SHOWCASE_FRAME_MS := 8.0
 ## tiles, and the far stairs come after "can move"). Then the world builds the
 ## rest with a small part of each frame, as before.
 const START_FRAME_MS := 100.0
-## Plan 0031, D19: the start takes the time of the last frame for its work (all
-## the time of each frame, D12), at most this (ms). On the web of the workspace
-## a frame took about 1.4 s, and 100 ms of work in each frame made the start
-## mostly frames.
+## Plan 0031, D19: the start of the web build takes the time of the last frame
+## for its work (all the time of each frame, D12), at most this (ms). On the web
+## of the workspace a frame took about 1.4 s, and 100 ms of work in each frame
+## made the start mostly frames. A computer keeps START_FRAME_MS: in CI the
+## first frames of a run with no shader cache took 28 s to 37 s more with the
+## time of the last frame (report 0031, round 4, run 492).
 const START_FRAME_MAX_MS := 1000.0
 ## The end of the work of the start in the last frame (Time.get_ticks_usec()), or -1.
 var _start_frame_usec := -1
@@ -840,10 +844,11 @@ func _process(delta: float) -> void:
 	_update_patches()
 	_update_far_strides()
 	_apply_done()
-	# Plan 0031, D17 and D19: the stairs that wait, after "can move", in steps
-	# of STAIRS_FRAME_MS in each frame (a whole stairs took 0.7 s on a computer).
+	# Plan 0031, D17 and D19: the stairs that wait, after "can move". The web
+	# build makes them in steps of STAIRS_FRAME_MS in each frame (a whole stairs
+	# took 0.7 s on a computer); a computer makes a whole stairs in a frame.
 	if places and Engine.get_frames_drawn() > 0:
-		places.build_next_stairs(STAIRS_FRAME_MS)
+		places.build_next_stairs(stairs_budget_ms(GameState.web_start()))
 
 
 func _profile(part: String) -> void:
@@ -885,22 +890,30 @@ func _build_start() -> void:
 	_start_frame_usec = Time.get_ticks_usec()
 
 
-## Plan 0031, D12 and D19: the time of the work of the start in a frame (ms):
-## the time of the last frame (the frame of the work before and its draw),
-## START_FRAME_MS at least and START_FRAME_MAX_MS at most. With a limit of the
-## frame rate the engine sleeps for the rest of each frame: the start takes
-## that time too (80 % of a frame at least).
-static func start_budget_ms(last_frame_ms: float, max_fps: int) -> float:
-	var budget := clampf(last_frame_ms, START_FRAME_MS, START_FRAME_MAX_MS)
+## Plan 0031, D12 and D19: the time of the work of the start in a frame (ms).
+## In the start of the web build ("web"): the time of the last frame (the frame
+## of the work before and its draw), START_FRAME_MS at least and
+## START_FRAME_MAX_MS at most. On a computer: START_FRAME_MS, as before. With a
+## limit of the frame rate the engine sleeps for the rest of each frame: the
+## start takes that time too (80 % of a frame at least).
+static func start_budget_ms(last_frame_ms: float, max_fps: int, web := true) -> float:
+	var budget := clampf(last_frame_ms, START_FRAME_MS, START_FRAME_MAX_MS) if web else START_FRAME_MS
 	if max_fps > 0:
 		budget = maxf(budget, 0.8 * 1000.0 / max_fps)
 	return budget
 
 
+## Plan 0031, D19: the time of each frame for the far stairs after "can move"
+## (ms): STAIRS_FRAME_MS in the start of the web build ("web"), INF on a
+## computer (a whole stairs in a frame, as before).
+static func stairs_budget_ms(web: bool) -> float:
+	return STAIRS_FRAME_MS if web else INF
+
+
 func _build_start_passes() -> void:
 	var now := Time.get_ticks_usec()
 	var last_frame_ms := (now - _start_frame_usec) / 1000.0 if _start_frame_usec >= 0 else 0.0
-	var budget := start_budget_ms(last_frame_ms, Engine.max_fps)
+	var budget := start_budget_ms(last_frame_ms, Engine.max_fps, GameState.web_start())
 	var end := Time.get_ticks_msec() + budget
 	while true:
 		var before := _work
