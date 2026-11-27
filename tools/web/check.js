@@ -175,6 +175,7 @@ async function openOnce(context, cdp, label, shots) {
     const times = await page.evaluate(() => window.vungTau.packs || {}).catch(() => ({}));
     const states = await page.evaluate(() => window.vungTau.packState || {}).catch(() => ({}));
     result.peopleMakeMs = await page.evaluate(() => window.vungTau.peopleMakeMs).catch(() => undefined);
+    result.peopleLoadMax = await page.evaluate(() => window.vungTau.peopleLoadMax).catch(() => undefined);
     for (const id in result.packs) {
       result.packs[id].times = times[id] || {};
       result.packs[id].page = states[id] || {};

@@ -298,18 +298,35 @@ func _add_people() -> void:
 	_make_people()
 
 
+## Plan 0031, D18: the time of one step of the people when their pack comes late (ms).
+const PEOPLE_STEP_MS := 60.0
+
+
 ## Plan 0031, D18: the pack of the people came after the start (the web). Its
 ## scenes load one in each frame (the load of all of them in one frame took
 ## 8.7 s in the measure of the web build), then the people come.
 func _add_people_later() -> void:
+	var longest := [0, ""]
 	for pair: Array in ShowcasePeople.scenes_of(ShowcasePeople.PATH):
 		if not is_inside_tree():
 			return
+		var l0 := Time.get_ticks_msec()
 		WorldModel.scene(str(pair[0]), str(pair[1]))
+		if Time.get_ticks_msec() - l0 > int(longest[0]):
+			longest = [Time.get_ticks_msec() - l0, "%s.%s" % [pair[0], pair[1]]]
 		await get_tree().process_frame
+	# D18: the longest load of one scene, for the measure of the web build.
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.vungTau.peopleLoadMax = %s" % JSON.stringify({"ms": longest[0], "scene": longest[1]}), true)
 	if is_inside_tree() and people == null:
 		var t0 := Time.get_ticks_msec()
-		_make_people()
+		people = ShowcasePeople.new()
+		people.name = "People"
+		add_child(people)
+		# The people come in steps of PEOPLE_STEP_MS, one in each frame.
+		await people.setup(world, self, ShowcasePeople.PATH, PEOPLE_STEP_MS)
+		if _built and _minutes >= 0:
+			people.redo_time(_minutes)
 		# D18: the time of the build of the people for the measure of the web build.
 		if OS.has_feature("web"):
 			JavaScriptBridge.eval("window.vungTau.peopleMakeMs = %d" % (Time.get_ticks_msec() - t0), true)

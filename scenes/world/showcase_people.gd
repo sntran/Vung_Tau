@@ -75,11 +75,19 @@ var _world: VungTau
 var _showcase: Showcase
 var _hours: Array = []
 var _shown := -1.0
+## D18: the time of a step of the setup (µs; -1: no steps), and its end.
+var _step_us := -1
+var _step_end := 0
 
 
-func setup(world: VungTau, showcase: Showcase, path := PATH) -> bool:
+func setup(world: VungTau, showcase: Showcase, path := PATH, step_ms := -1.0) -> bool:
 	_world = world
 	_showcase = showcase
+	# Plan 0031, D18: with step_ms, the setup makes the people in steps of that
+	# time, one frame each (the web, when the pack of the people comes late);
+	# with no step it makes them all at once (a coroutine that does not wait).
+	_step_us = int(step_ms * 1000.0)
+	_step_end = Time.get_ticks_usec() + _step_us
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 	if not parsed is Dictionary:
 		push_error("ShowcasePeople: cannot read %s." % path)
@@ -87,10 +95,19 @@ func setup(world: VungTau, showcase: Showcase, path := PATH) -> bool:
 	_hours = parsed.get("hours", [])
 	var rng := RandomNumberGenerator.new()
 	rng.seed = int(parsed.get("seed", 1))
-	_add_walkers(world, showcase, parsed.get("walkers", {}), rng)
-	_add_sitters(world, showcase, parsed.get("sitters", {}), rng)
-	_add_swimmers(parsed.get("swimmers", {}), rng)
+	await _add_walkers(world, showcase, parsed.get("walkers", {}), rng)
+	await _add_sitters(world, showcase, parsed.get("sitters", {}), rng)
+	await _add_swimmers(parsed.get("swimmers", {}), rng)
+	_step_us = -1
 	return true
+
+
+## D18: the end of a step of the setup: the next frame, when the step took its time.
+func _pause() -> void:
+	if _step_us <= 0 or Time.get_ticks_usec() < _step_end or not is_inside_tree():
+		return
+	await get_tree().process_frame
+	_step_end = Time.get_ticks_usec() + _step_us
 
 
 ## Plan 0031, D18: the scenes of the people of the file, as [id, level]: each
@@ -135,6 +152,14 @@ func shown_count() -> int:
 	for s: Dictionary in sitters:
 		n += 1 if (s.model as Node3D).visible else 0
 	return n
+
+
+## D18: the people of the hour again after a setup in steps (an update during
+## the steps showed only the people that were there then).
+func redo_time(minutes: int) -> void:
+	_shown = -1.0
+	_swim_shown = -1.0
+	update_time(minutes)
 
 
 func update_time(minutes: int) -> void:
@@ -193,6 +218,7 @@ func _add_swimmers(cfg: Dictionary, rng: RandomNumberGenerator) -> void:
 		var side := Vector3.ZERO if depth == child else Vector3(RING_SIDE * (1.0 if rng.randf() < 0.5 else -1.0), 0.0, 0.0)
 		swimmers.append({"model": model, "ring": ring, "side": side, "base": _along(line, total * (i + rng.randf()) / int(cfg.count)),
 				"depth": rng.randf_range(float(depth[0]), float(depth[1])), "turn": rng.randf_range(-70.0, 70.0)})
+		await _pause()
 	# The first swimmers of the list are in the sea when only some are there: a
 	# mixed order, so that they are not all at one end of the line.
 	for i in range(swimmers.size() - 1, 0, -1):
@@ -546,6 +572,7 @@ func _add_walkers(world: VungTau, showcase: Showcase, cfg: Dictionary, rng: Rand
 				"shot": str(spot[3]) if not spot.is_empty() else "", "held": false}
 		_place_walker(w)
 		walkers.append(w)
+		await _pause()
 
 
 ## The body of a walker: it moves with the model, and it stops the player.
@@ -644,6 +671,7 @@ func _add_sitters(world: VungTau, showcase: Showcase, cfg: Dictionary, rng: Rand
 		shape.position = seats[i].origin + Vector3(0, BODY_HEIGHT * 0.375, 0)
 		body.add_child(shape)
 		sitters.append({"model": model, "shape": shape})
+		await _pause()
 
 
 ## The models of the list whose files are in assets/world (a model whose order
