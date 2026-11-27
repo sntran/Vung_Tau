@@ -119,6 +119,19 @@ func wait_idle(timeout_s := 30.0) -> bool:
 		return still[0] >= 5, timeout_s, "the player and the view stop")
 
 
+## The wait between two turns of a loop that turns the view to a point: as
+## wait_idle(), but its time limit is not a failure. The loop checks the view
+## itself and fails when the view does not come to the point (report 0031,
+## D-0031-06: on a slow computer of CI, 5 still frames took more than 15 s in
+## the first turn of PT-80 run 1, and the next turn came to the scooter).
+func _wait_still(timeout_s: float) -> void:
+	var still := [0]
+	var end := Time.get_ticks_msec() + int(timeout_s * 1000.0)
+	while Time.get_ticks_msec() < end and still[0] < 5:
+		still[0] = still[0] + 1 if state().view_settled else 0
+		await _tree.process_frame
+
+
 # --- Input ---------------------------------------------------------------
 
 ## Converts a point in viewport (base) coordinates to a screen (window) pixel position.
@@ -368,7 +381,7 @@ func look_at_point(point: Vector3, tolerance := 2.0, timeout_s := 30.0) -> bool:
 		# 15 s of real time: at about 3 frames per second (CI), with a slow
 		# frame when the world loads cells, 5 still frames took more than 5 s
 		# (PT-74 run 1 in the CI of 933b45f).
-		await wait_idle(15.0)
+		await _wait_still(15.0)
 	fail("the view does not turn to %s" % point)
 	return false
 
@@ -582,15 +595,15 @@ func _other_points(node: Node3D) -> Array[Vector2]:
 
 
 ## Waits until a control is shown and its screen position does not change
-## in two frames (a new panel needs some frames for its layout). It waits
-## not more than 15 frames. It does not wait for a 3D node: a player taps a
-## shop also when the camera moves.
+## in two frames (a new panel needs some frames for its layout), and until
+## the point of a 3D node stops (the view turns). It waits not more than 15
+## frames, then the tap comes: a player taps a shop also when the camera moves.
 func _wait_stable(test_id: String) -> void:
+	# A 3D node waits too: at a low frame rate a turn of the view (as the turn
+	# to the face of a person in a talk) ends in one frame, and the point of
+	# the node moves with it (report 0031, D-0031-06: reply_modes in CI).
 	var last := Vector2(-1, -1)
 	for i in 15:
-		var node := find(test_id)
-		if node is Node3D:
-			return
 		var where := locate(test_id)
 		if where.error == "" and where.point.distance_to(last) < 0.5:
 			return
@@ -1243,9 +1256,12 @@ func world() -> VungTau:
 ## Returns false at the timeout.
 func wait_ground(timeout_s := 30.0) -> bool:
 	await wait_frames(2)
-	return await wait_until(func() -> bool:
-		var w := world()
+	var w := world()
+	var ok := await wait_until(func() -> bool:
 		return w != null and w.is_settled(), timeout_s, "the ground is ready")
+	if not ok and w != null:
+		step("the ground waits for: %s" % w.unsettled_reason(), false)
+	return ok
 
 
 # --- Fixed views (plan 0004) --------------------------------------------------
@@ -1388,7 +1404,7 @@ func mouse_look_at(point: Vector3, tolerance := 2.0, timeout_s := 30.0) -> bool:
 		var per_pixel := float(s.settings.mouse_sensitivity) * DesktopControls.MOUSE_DEG_PER_PIXEL
 		var invert := -1.0 if s.settings.invert_y else 1.0
 		await mouse_move(Vector2(-error_yaw / per_pixel, -error_pitch / per_pixel * invert))
-		await wait_idle(5.0)
+		await _wait_still(5.0)
 	fail("the mouse does not turn the view to %s" % point)
 	return false
 
@@ -1425,7 +1441,7 @@ func pad_look_at(point: Vector3, tolerance := 3.0, timeout_s := 40.0) -> bool:
 			await pad_stick(true, Vector2(-signf(error_yaw) * push, 0), seconds)
 		else:
 			await pad_stick(true, Vector2(0, -signf(error_pitch) * invert * push), seconds)
-		await wait_idle(5.0)
+		await _wait_still(5.0)
 	fail("the right stick does not turn the view to %s" % point)
 	return false
 

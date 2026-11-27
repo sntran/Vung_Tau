@@ -1,6 +1,7 @@
 extends RefCounted
 # PT-10 harness_self_test. A button with a known test ID must react to
-# tap_id(). A tap on an off-screen node must fail with a clear message.
+# tap_id(). A tap on an off-screen node must fail with a clear message. A tap
+# on a 3D node waits until its point on the screen stops (D-0031-06).
 # This scenario checks the play-test system itself.
 # phase: --start-time=06:00
 
@@ -63,6 +64,19 @@ func run(d: PlaytestDriver) -> void:
 	await d.wait_idle()
 	d.expect(wrapf(float(d.state().yaw) - yaw0, -180.0, 180.0) > 5.0, "a drag to the left turns the view to the left")
 	d.expect(await d.look_at_id("spot.pho"), "look_at_id() turns the view to the phở shop")
+
+	# Report 0031, D-0031-06: a tap on a 3D node waits until its point on the
+	# screen stops. In CI the view still turned to Cô Sáu after a talk
+	# (reply_modes), and the tap hit the floor beside her. A setup step turns
+	# the view a little (as _turn_to() of a talk does).
+	var main: Node = d.main()
+	main.player.target_yaw += 6.0
+	await d._wait_stable("spot.pho")
+	var first: Vector2 = d.locate("spot.pho").get("point", Vector2.ZERO)
+	await d.wait_frames(1)
+	var second: Vector2 = d.locate("spot.pho").get("point", Vector2.ZERO)
+	d.expect(first.distance_to(second) < 0.5, "a tap on a 3D node waits until its point stops: it moved %.1f px in a frame" % first.distance_to(second))
+	await d.wait_idle()
 
 	# wait_until() and expect() record failures. Remove them after the check.
 	var count := d.failures.size()

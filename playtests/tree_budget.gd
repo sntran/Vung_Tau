@@ -47,7 +47,9 @@ func run(d: PlaytestDriver) -> void:
 	var results := []
 	for view: Dictionary in [all_views[(d.phase - 1) % VIEWS]]:
 		await d.fly_to(view.eye, view.target)
+		var ground_t0 := Time.get_ticks_msec()
 		await d.wait_ground(90.0)
+		d.step("the ground is ready %.1f s (real time) after the flight" % ((Time.get_ticks_msec() - ground_t0) / 1000.0))
 		await d.wait_frames(6)
 		var draw_calls := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)
 		var triangles := RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME)

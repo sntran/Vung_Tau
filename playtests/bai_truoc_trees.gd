@@ -5,10 +5,15 @@ extends RefCounted
 # coconut palms are in the frame (the trees of the TreeField near the view,
 # R10). The test also checks that no tree stands on the sand of the main beach
 # or in the water (R11).
-# High takes the views in two runs (the first two views, then the other two):
-# with the patches of the start chunks (report 0005, D-0005-10), one run of the
-# four views took more than 300 s in CI. Low takes the four views in one run.
+# High takes each view in a run of its own: with the patches of the start
+# chunks (report 0005, D-0005-10), one run of the four views took more than
+# 300 s in CI, and in the CI of plan 0031 one run of two views did too (report
+# 0031, D-0031-06: the first frame on Forward+ with an empty shader cache came
+# 87 s after the start of the engine, 19 s in the workspace). Low takes the
+# four views in one run.
 # sizes: 1280x720
+# phase: --world=vung_tau --start-time=16:30 --quality=high --renderer=forward_plus
+# phase: --world=vung_tau --start-time=16:30 --quality=high --renderer=forward_plus
 # phase: --world=vung_tau --start-time=16:30 --quality=high --renderer=forward_plus
 # phase: --world=vung_tau --start-time=16:30 --quality=high --renderer=forward_plus
 # phase: --world=vung_tau --start-time=16:30 --quality=low --renderer=forward_plus
@@ -27,7 +32,7 @@ func run(d: PlaytestDriver) -> void:
 		return
 	# Forward+ under lavapipe needs more time for the first ground.
 	await d.wait_ground(120.0)
-	var preset: String = ["high", "high", "low"][d.phase - 1]
+	var preset: String = ["high", "high", "high", "high", "low"][d.phase - 1]
 	var beach := w.data.landmark("bai_truoc")
 	if not d.expect(not beach.is_empty(), "the data has Bãi Trước"):
 		return
@@ -37,9 +42,8 @@ func run(d: PlaytestDriver) -> void:
 	d.step("the trees of each type: %s" % [w.trees.counts])
 	_check_places(d, w, beach)
 	var all_views := views(w, beach)
-	# The views of this run: the first half or the second half on High, all on Low.
-	var half := ceili(all_views.size() / 2.0)
-	var run_views: Array = [all_views.slice(0, half), all_views.slice(half), all_views][d.phase - 1]
+	# The views of this run: one view on High, all on Low.
+	var run_views: Array = all_views if preset == "low" else all_views.slice(d.phase - 1, d.phase)
 	for view: Dictionary in run_views:
 		await d.fly_to(view.eye, view.target)
 		# The CI of 214344b: on High the ground of a view took more than 60 s
