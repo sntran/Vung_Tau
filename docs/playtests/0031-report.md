@@ -6,6 +6,7 @@
 | Branch | `feat/0031-web-load` |
 | Audit 1 | 2026-11-26, at `a4210ce` (steps 1 and 2) |
 | Audit 2 | 2026-11-26, at `dbbf86c` (the items 1 to 7: D11 to D16) |
+| Audit 3 | 2026-11-27, at `1dd12a0` (CI, D17, D18) |
 | Result | Steps 1 and 2 are made as the plan says, and they help. In the measures of the workspace no target of D10 is met; on my phone the start took about 25 s (section 6). The plan has the changes D11 to D16 for the next steps. |
 
 ## 1. What I audited
@@ -194,9 +195,70 @@ So before the first frame the game works for about 22 s on a computer with no gr
 3. A new step: the start of the game (D-0031-08). A profile of each part of `setup()`, `prepare_at()`, and the first frame, on the web with the processor four times slower; then no build of the test street in the Vũng Tàu world, and only what the first frame shows before the first frame.
 4. Then the threads, if the profile and my phone say so.
 
-## 8. What is open
+## 8. Audit 3 (2026-11-27): CI, D17, and D18
+
+I audited `feat/0031-web-load` at `1dd12a0` with the report of the builder.
+
+### 8.1 What is correct
+
+- **CI is green two times on the head.** Run 488, attempts 1 and 2: 18 of 18 jobs pass each time. Export run 295 passes.
+- **The causes of D-0031-06.** I read each correction:
+
+| Play test | Cause | My check |
+|---|---|---|
+| `touch_controls` (exit code 134) | A task of the ground ran after the world was freed. | A real defect. The world now keeps the handle of each task and waits for it in `_exit_tree()`, with a unit test. |
+| `showcase_walk` run 1 | In a long frame a walker moved past the player in one step. | A real defect. A walker now moves in steps of at most 0.2 m, and each step checks the gap, with a unit test. |
+| `reply_modes` | The driver tapped a person while the view still turned. | A defect of the driver. A tap now waits until the point stops, and the self test of the driver checks it. |
+| `scooter_ride` run 1 | The wait between two turns of the view recorded a failure. | Acceptable: the loop still fails when the view does not come to its point. |
+| `bai_truoc_trees` | Only the speed of CI (the first frame on Forward+ at 87 s). | Acceptable: one view in each run on High. |
+| `tree_budget` | Not found. | It failed one time (run 469) and passed since. It now writes what the ground waits for. Watch it. |
+
+- **D18.** The three steps that stopped the game when a pack came (the load of the files of a row on the main thread, all the people in one frame, a model that was not loaded yet) are spread over frames. The longest frame went from 8.7 s to 10.1 s to 1.7 s to 2.0 s.
+
+### 8.2 Findings
+
+**D-0031-10: "Can move" waits for the whole world, not for the start (high).** D7 says that the player can move when the ground, the roads, and the parts within 150 m of the start are ready. The game starts the clock and lets the scooter go when `VungTau.is_settled()` is true and the showcase is built. `is_settled()` waits for each ground chunk, each patch, each far tile, each chunk of the town to 1 500 m on Low (and the tall buildings to 6 000 m), and each stair of the known places. So the cuts of D17 moved the work from before the first frame to after it, but not after "can move". The parts of the web measure (720 × 1280, 25 Mbit/s, an empty cache) show it:
+
+| | The part "world" (to the first frame) | From the first frame to "can move" | Can move |
+|---|---|---|---|
+| Item 6 (`03a7bbc`) | 39.7 s | 52.0 s | 135 s |
+| After the cuts of D17 (`8fb1775`) | 28.0 s | 89.6 s | 167 s |
+
+The first frame is 12 s earlier, and "can move" is about 30 s later. In the workspace a frame is slow (software graphics), so work after the first frame costs more there than before it; on my phone that is less so, but the work is still in front of the ride. The stairs cut is a clear case: the far stairs no longer come before the first frame, but `pending_stairs()` holds "can move" until they are built, so the player can move 7 s later. D-0031-09 (the showcase) is a part of this finding. This is now the largest part of the wait that the game can change.
+
+**D-0031-11: My limit of R18 cannot be met in the workspace (high; my error).** I wrote "no frame longer than 500 ms while a pack loads, in the measure of the workspace". The measure of the workspace draws with software graphics, and an ordinary frame there can already be longer than 500 ms. The measure gives the longest frame but not the ordinary frame, and its numbers point to the draw, not to the pack:
+
+- The longest frame is 1.7 s to 1.8 s at 720 × 1280 and 4.8 s to 5.2 s at 2400 × 1080. That is 2.8 times longer, and 2400 × 1080 has 2.8 times more pixels. The compile of a shader does not get longer with more pixels; the draw of the frame does.
+- In that frame the scripts take 50 ms to 714 ms.
+- In PT-85 (640 × 360, about 1.9 frames each second, so an ordinary frame of about 530 ms), the longest frames are 813 ms and 1 297 ms.
+
+So the stop that a pack makes is now at most about 0.8 s more than an ordinary frame of the workspace, and maybe much less. The builder's reading (WebGL compiles the shader of each new material at its first draw) can be true, but the measure does not show it. R18 must compare with the ordinary frame of the same run, and my phone must give the real number.
+
+**D-0031-12: The cuts of D17 are on the web only, and CI does not test them (medium).** On a computer, the builder put back the test street and the town before the first frame: without the test street, each frame of the world was about 20 % slower in the workspace (the Mobile renderer made 66 pipelines, not 40; the builder does not know why), and the town after the first frame waited for the compile of the pipelines. That choice is correct for a computer. But now the start of the web build (no test street, only the town near the start, the far stairs after the first frame) runs only when `OS.has_feature("web")` is true. PT-37 checks the start of a computer, and CI never runs the web start. Only PT-85 in the workspace of the builder runs it, by hand. The game already has an argument for this case (`--packs-sim` takes the packs of the web on a computer).
+
+**D-0031-13: The target of D17 on a computer measures the software graphics of the workspace (low; my error).** On a computer in the workspace the first draw is the compile of about 84 pipelines in the software Vulkan driver (8.1 s). A computer with a graphics card compiles them much faster, and keeps them in its shader cache for the next start. My target "half of 23.7 s on a computer" measured the workspace, not a player. The computer is not slow to start for a player, so the computer needs no target of D17. R17 stays as a guard (the first frame not later than 26.4 s in PT-37).
+
+**Notes.**
+
+- The measures of the workspace are not stable between days. The same build (item 6) gave "can move" at 135 s on 2026-11-26, and the builder's "before" row of 2026-11-27 (`8d4d052`) gave 159.9 s. A change of less than about 15 % in one row is not a result.
+- The builder did not commit the new numbers of the computer profile, because a commit starts the full CI (about 75 minutes) again. A commit that changes only `docs/` needs one green run, not two.
+
+### 8.3 The questions of the builder
+
+- **The cuts on the web only.** The audit recommends yes (D-0031-13), with a test of the web start in CI (D-0031-12).
+- **The stairs cut.** The audit recommends: keep it, and correct D-0031-10. The far stairs must not hold "can move". Then the cut helps.
+- **R18.** See D-0031-11 and section 8.4.
+- **The documents.** Yes, commit them.
+
+### 8.4 What the audit recommends next
+
+1. D-0031-10: "can move" waits only for what D7 lists (the ground and the roads under the start, and the parts, the models, and the showcase within 150 m). The rest of the world (the town, the far tiles, the far stairs, the far part of the showcase) builds after "can move", by time (D12), with no long frame. The play tests keep `is_settled()` for their waits; the player does not.
+2. D-0031-11: R18 compares the longest frame while a pack loads with the median frame of the same run: at most the median frame plus 250 ms. Each row of the measure gives the median frame. The line of the times on the phone gives the longest frame after "can move", so that my phone gives the real number.
+3. D-0031-12: a play-test argument that takes the start of the web build on a computer, and a run of PT-37 with it in CI.
+4. Then my look on my phone, with the line of the times. The threads, the shaders of the first draw, and Q6 wait for that.
+
+## 9. What is open
 
 - The line of the times on my phone (a screenshot): https://feat-0031-web-load-vung-tau.fifo.workers.dev/?start=bai_truoc&ride
 - On my phone I did not yet look at the second visit, at the moment when the people come (a stop of the game), and at the turn with the thumb far to the side.
-- My answers of 7.4: Basis Universal, Q6, the limit of R16, and the threads.
-- D-0031-06 to D-0031-09.
+- D-0031-10 to D-0031-13.
