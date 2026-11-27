@@ -328,3 +328,78 @@ What the profile shows:
 - `prepare_at()` makes all the boxes of the town in the range of the preset (400 chunks to 1 500 m on Low): 2.6 s to 2.7 s on a computer and 16.3 s to 17.4 s on the web. The first frame shows only a part of them.
 - On a computer the first frame takes 8.1 s. In it the scripts take 0.4 s to 0.7 s and the draw takes 7.2 s to 8.2 s (I split the part in two after this measure). The renderer compiles 84 pipelines for the first draw: 68 for new surfaces, 13 specializations, and 3 for the 2D. With gdb I sampled the threads in the draw: the main thread waits, and the worker threads compile the pipelines in the Vulkan driver (lavapipe). Godot makes a pipeline cache ("Startup PSO cache (0.0 MiB)"), but in the workspace it does not write it to `user://vulkan/`, so each start compiles the pipelines again.
 - On the web the largest parts after the town are the known places (4.6 s to 5.4 s), the environment and the materials (4.4 s), the first frame (3.8 s to 5.7 s), the canopy (2.3 s to 2.5 s), and the street trees (1.9 s to 2.0 s).
+
+## Round 3, after the cuts of D17 (8fb1775d8979). No old Godot process (2026-11-27)
+
+`https://36c79031-vung-tau.fifo.workers.dev/?start=bai_truoc&ride`, the processor 4 times slower. A value in bold is over its target of D10 (at 25 Mbit/s).
+
+| Size | Network | Cache | Over the network before the first frame | First frame | Can move | Heap of the engine | JavaScript heap | Page (renderer + GPU) | Parts: download / compile / engine / world / move | Page when the player can move | The pack models there: time, page, heap of the engine | The people there: time, page, heap of the engine |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 720 × 1280 | 25 Mbit/s | empty | **94.1 MB** | **80 s** | **167 s** | 286 MB | 206 MB | **1236 MB** | 42.4 / 5.6 / 5.9 / 28 / 89.6 s | 1490 MB | 198 s, 1651 MB, 286 MB, longest frame **1823 ms** (upgrades 0, load 0.1, scripts 50.6, physics 8 ms; copy of the page 395 ms) | 248 s, 1665 MB, 286 MB, longest frame **1989 ms** (upgrades 412.2, load 0, scripts 469.9, physics 7.4 ms; copy of the page 201 ms) (343 upgrades wait after 61 s) |
+| 720 × 1280 | 25 Mbit/s | with the cache | 0 MB | **36 s** | **117 s** | 286 MB | 206 MB | **1190 MB** | 4.9 / 1.6 / 5.2 / 22.6 / 81.3 s | 1411 MB | 131 s, 1567 MB, 286 MB, longest frame **1723 ms** (upgrades 0, load 1.1, scripts 47.5, physics 4.4 ms; copy of the page 294 ms) | 166 s, 1541 MB, 286 MB, longest frame **1956 ms** (upgrades 19.7, load 0, scripts 95.3, physics 5.5 ms; copy of the page 156 ms) (393 upgrades wait after 60 s) |
+| 720 × 1280 | 100 Mbit/s | empty | 94.1 MB | 53 s | 139 s | 286 MB | 206 MB | **1234 MB** | 18.1 / 1.8 / 5.5 / 26.2 / 88.2 s | 1483 MB | 171 s, 1612 MB, 286 MB, longest frame **1756 ms** (upgrades 0.2, load 0.2, scripts 72.7, physics 5.6 ms; copy of the page 290 ms) | 217 s, 1643 MB, 286 MB, longest frame **2605 ms** (upgrades 45.8, load 1.8, scripts 467.5, physics 7.3 ms; copy of the page 163 ms) (393 upgrades wait after 61 s) |
+| 720 × 1280 | 100 Mbit/s | with the cache | 0 MB | 36 s | 127 s | 286 MB | 205 MB | **1196 MB** | 5.1 / 1.3 / 3 / 24.2 / 90.7 s | 1704 MB | 140 s, 1666 MB, 344 MB, longest frame **5101 ms** (upgrades 37.5, load 0.1, scripts 1903.1, physics 4 ms; copy of the page 324 ms) (51 upgrades wait after 61 s) | 146 s, 1768 MB, 344 MB, longest frame **5101 ms** (upgrades 37.5, load 0.1, scripts 1903.1, physics 4 ms; copy of the page 178 ms) |
+| 2400 × 1080 | 25 Mbit/s | empty | **94.1 MB** | **84 s** | **274 s** | 286 MB | 206 MB | **1242 MB** | 42.2 / 5.4 / 6.4 / 27.6 / 193.2 s | 1587 MB | 367 s, 1715 MB, 286 MB, longest frame **5159 ms** (upgrades 0, load 0.1, scripts 102, physics 8.5 ms; copy of the page 349 ms) | 519 s, 1710 MB, 286 MB, longest frame **5606 ms** (upgrades 29.2, load 0.1, scripts 107.1, physics 7.9 ms; copy of the page 154 ms) (485 upgrades wait after 62 s) |
+| 2400 × 1080 | 25 Mbit/s | with the cache | 0 MB | **46 s** | **227 s** | 286 MB | 205 MB | **1203 MB** | 8 / 1.1 / 3.6 / 25.9 / 180.7 s | 1504 MB | 288 s, 1643 MB, 286 MB, longest frame **4831 ms** (upgrades 0, load 0.1, scripts 45.4, physics 3.7 ms; copy of the page 308 ms) | 366 s, 1675 MB, 286 MB, longest frame **5174 ms** (upgrades 18.3, load 0, scripts 176.4, physics 3.9 ms; copy of the page 182 ms) (554 upgrades wait after 64 s) |
+| 2400 × 1080 | 100 Mbit/s | empty | 94.1 MB | 59 s | 240 s | 286 MB | 206 MB | **1234 MB** | 18.3 / 1.8 / 5.8 / 27.3 / 183.7 s | 1577 MB | 343 s, 1772 MB, 286 MB, longest frame **5043 ms** (upgrades 0, load 0.8, scripts 64.2, physics 6.1 ms; copy of the page 299 ms) | 474 s, 1715 MB, 286 MB, longest frame **5219 ms** (upgrades 14.3, load 0, scripts 237.6, physics 4.5 ms; copy of the page 200 ms) (517 upgrades wait after 63 s) |
+| 2400 × 1080 | 100 Mbit/s | with the cache | 0 MB | 45 s | 222 s | 286 MB | 206 MB | **1194 MB** | 7.6 / 1.4 / 5.4 / 24.2 / 180.3 s | 1775 MB | 257 s, 1841 MB, 344 MB, longest frame **4762 ms** (upgrades 310.9, load 0.7, scripts 439.6, physics 4.5 ms; copy of the page 292 ms) (72 upgrades wait after 73 s) | 303 s, 1868 MB, 344 MB, longest frame **4762 ms** (upgrades 310.9, load 0.7, scripts 439.6, physics 4.5 ms; copy of the page 145 ms) |
+
+## Round 3, D17: the cuts and the profile after them (8fb1775d8979) (2026-11-27)
+
+The cuts, each with a step of PT-37 that failed first: (1) the Vũng Tàu world does not build the test street; (2) before the first frame `prepare_at()` makes only the boxes of the town within 64 m of the start (400 chunks before, at most 16 now), and the tasks of the town make the others after it; (3) the known places build their stairs near the start before the first frame (the stairs show nearer than 450 m), and the others after it, one in each pass of the start (`is_settled()` waits for them). The same measures as the profile before; no old Godot process.
+
+| Measure | Before (8d4d0526b1af) | After cuts 1 and 2 (0640657b2cff) | After cut 3 (8fb1775d8979) | Target |
+|---|---|---|---|---|
+| Computer: the first frame after the start of the engine, PT-87 run 1 | 16.7 s, 17.3 s | 19.2 s; 21.5 s (`tools/playtest.sh`) | 18.9 s, 18.3 s | 11.9 s |
+| Computer: the first frame, PT-37 run 1 | 16.6 s, 17.5 s | 18.7 s; 19.8 s to 22.3 s (4 runs) | 19.6 s, 20.3 s | 11.9 s |
+| Computer: the work of the scripts before the first frame (the sum of the parts before "the first frame") | 8.6 s | 5.8 s | 5.1 s | — |
+| Web, 720 × 1280, 25 Mbit/s, empty cache: the part "world" / the first frame / can move | 48.7 s / 99.4 s / 159.9 s | 29.3 s / 79.3 s / 158.3 s | 28.0 s / 80.1 s / 167.2 s | 20 s (the part "world") |
+| Web, 720 × 1280, 25 Mbit/s, with the cache: the part "world" / the first frame / can move | 42.5 s / 52.9 s / 120.0 s | 26.6 s / 39.1 s / 110.5 s | 22.6 s / 36.2 s / 116.7 s | 20 s (the part "world") |
+
+The version of `0640657b2cff`: `https://8e79fcd1-vung-tau.fifo.workers.dev`; of `8fb1775d8979`: `https://36c79031-vung-tau.fifo.workers.dev` (the table of all sizes and networks is above, "Round 3, after the cuts of D17").
+
+The profile after the cuts (the part "environment" now has its six steps):
+
+| Part of the start | Computer, run 1 (ms) | Computer, run 2 (ms) | Web, empty cache (ms) | Web, with the cache (ms) |
+|---|---|---|---|---|
+| the engine, the autoloads, and the main scene | 1 520 | 1 407 | 7 862 | 6 504 |
+| the start of the main scene | 28 | 25 | 482 | 374 |
+| the scene of the world | 0 | 0 | 4 | 2 |
+| setup(): the data of the build | 250 | 239 | 2 160 | 1 434 |
+| setup(): the environment | 0 | 0 | 3 | 2 |
+| setup(): the cover | 139 | 169 | 1 071 | 915 |
+| setup(): the materials | 260 | 306 | 1 580 | 1 302 |
+| setup(): the sea | 0 | 1 | 22 | 12 |
+| setup(): the far ground | 338 | 367 | 2 166 | 2 054 |
+| setup(): the markers | 1 | 1 | 16 | 7 |
+| setup(): the canopy of the hills | 348 | 340 | 2 799 | 2 484 |
+| setup(): the tree field | 1 | 1 | 10 | 5 |
+| setup(): the street trees | 414 | 395 | 2 060 | 1 922 |
+| setup(): the sea objects | 310 | 320 | 756 | 720 |
+| setup(): the roadworks | 0 | 0 | 2 | 2 |
+| setup(): the known places | 83 | 76 | 274 | 297 |
+| setup(): the parked rows | 323 | 184 | 1 358 | 1 182 |
+| setup(): the morning exercise | 0 | 0 | 1 | 1 |
+| setup(): the showcase | 188 | 215 | 655 | 540 |
+| setup(): the street houses | 401 | 244 | 470 | 457 |
+| setup(): the town | 1 | 2 | 8 | 5 |
+| setup(): the water of the land | 77 | 36 | 109 | 96 |
+| setup(): the mainland | 64 | 105 | 353 | 445 |
+| the removal of the test street, its sun, and its environment | 0 | 0 | 1 | 0 |
+| prepare_at(): the stairs near the point | 7 | 24 | 37 | 30 |
+| prepare_at(): the chunks | 275 | 403 | 1 721 | 1 560 |
+| prepare_at(): the patches | 1 | 1 | 5 | 5 |
+| prepare_at(): the far tiles | 0 | 0 | 1 | 0 |
+| prepare_at(): the town | 24 | 25 | 164 | 163 |
+| the rest of the main scene | 65 | 79 | 468 | 408 |
+| the first frame: the scripts and the physics | 6 138 | 6 070 | 2 566 | 2 144 |
+| the first frame: the draw | 7 626 | 7 224 | 4 333 | 2 362 |
+| until the player can move | 15 710 | 15 746 | 89 637 | 81 340 |
+| **To the first frame** | **18 882** | **18 259** | **33 516** | **27 434** |
+| **In all** | 34 593 | 34 008 | 123 153 | 108 774 |
+
+What I could not cut, and what is left:
+
+- **Computer.** The target (11.9 s) is out of reach: the first frame came later, not earlier. The work of the scripts before the first frame went from 8.6 s to 5.1 s, but the first frame now waits about 6 s in its scripts and 7 s to 8 s in its draw. Both waits are the compile of the pipelines of the renderer in lavapipe (the section "Round 3, D17: the profile of the start before the cuts"). With no test street before the world, 43 pipelines of new meshes compile before the first draw (17 with it), and the new tree nodes of the first frame wait for them (about 400 ms each, 14 nodes). I bisected the test street: each of its four parts alone gives 17 pipelines; one box with the same material, one light, or a wait of 700 ms gives 43. I did not find the cause. The workspace keeps no pipeline cache, so I cannot measure a second start with its pipelines. A computer with a graphics card compiles pipelines much faster; I have none to measure.
+- **Web.** The part "world" is 28.0 s with an empty cache and 22.6 s with the cache (the target is 20 s). The largest parts before the first frame now are the first frame (4.5 s to 6.9 s), the engine, the autoloads, and the main scene (6.5 s to 7.9 s from the start of the engine), the canopy of the hills (2.5 s to 2.8 s), the far ground (2.1 s to 2.2 s), the street trees (1.9 s to 2.1 s), the data of the build (1.4 s to 2.2 s), the chunks of the ground (1.6 s to 1.7 s), and the materials (1.3 s to 1.6 s). The first frame shows the canopy, the far ground, and the ground; a cut there must keep what the first frame shows.
+- **Can move.** The cuts move work from before the first frame to the frames after it, while the player cannot move yet: with an empty cache the player can move 7 s later than before (167.2 s against 159.9 s), with the cache 3 s earlier (116.7 s against 120.0 s). The stairs of the known places are about 4 s of this work on the web. The target of D17 is the first frame; I did not change the targets of D10.
