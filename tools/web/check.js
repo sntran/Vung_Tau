@@ -154,6 +154,9 @@ async function openOnce(context, cdp, label, shots) {
     result.canMoveS = (Date.now() - t0) / 1000;
     result.memoryCanMove = await memoryOf(page);
     result.parts = await startParts(page);
+    // D17: the profile of the start (each part of the start of the game, ms).
+    result.profile = await page.waitForFunction(() => window.vungTau.profile, null, { timeout: 30000, polling: 500 })
+      .then((h) => h.jsonValue()).catch(() => undefined);
     // D13, D16: the memory of the page when each pack is there (bai_truoc is
     // in the area of the pack people), 300 s at most; the memory before the
     // packs is the memory when the player can move.
