@@ -8,6 +8,8 @@ extends RefCounted
 
 static var _parts: Array = []
 static var _last_usec := -1
+## What the renderer did until a point of the start: [point, {name: value}].
+static var _render: Array = []
 
 
 ## The end of a part of the start.
@@ -16,6 +18,34 @@ static func mark(part: String) -> void:
 	var from := _last_usec if _last_usec >= 0 else 0
 	_parts.append([part, (now - from) / 1000.0])
 	_last_usec = now
+
+
+## What the renderer did until now: the pipelines it compiled (by cause),
+## the objects and the draw calls of the last frame, and the memory of the
+## pictures and the meshes.
+static func note_render(point: String) -> void:
+	var info := {}
+	for item: Array in [
+			["pipelines of the 2D", RenderingServer.RENDERING_INFO_PIPELINE_COMPILATIONS_CANVAS],
+			["pipelines of new meshes", RenderingServer.RENDERING_INFO_PIPELINE_COMPILATIONS_MESH],
+			["pipelines of new surfaces", RenderingServer.RENDERING_INFO_PIPELINE_COMPILATIONS_SURFACE],
+			["pipelines at the draw", RenderingServer.RENDERING_INFO_PIPELINE_COMPILATIONS_DRAW],
+			["pipelines of specializations", RenderingServer.RENDERING_INFO_PIPELINE_COMPILATIONS_SPECIALIZATION],
+			["objects in the frame", RenderingServer.RENDERING_INFO_TOTAL_OBJECTS_IN_FRAME],
+			["draw calls in the frame", RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME],
+			["MB of pictures", RenderingServer.RENDERING_INFO_TEXTURE_MEM_USED],
+			["MB of meshes and buffers", RenderingServer.RENDERING_INFO_BUFFER_MEM_USED]]:
+		var value := RenderingServer.get_rendering_info(item[1])
+		info[item[0]] = snappedf(value / 1048576.0, 0.1) if String(item[0]).begins_with("MB") else value
+	_render.append([point, info])
+
+
+## The notes of the renderer as lines of text.
+static func render_text() -> String:
+	var lines: Array[String] = []
+	for note: Array in _render:
+		lines.append("%s: %s" % [note[0], JSON.stringify(note[1])])
+	return "\n".join(lines)
 
 
 ## The parts: [name, ms], in order.
@@ -47,4 +77,5 @@ static func json() -> String:
 
 static func clear() -> void:
 	_parts.clear()
+	_render.clear()
 	_last_usec = -1
