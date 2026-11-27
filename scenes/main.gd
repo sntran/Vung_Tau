@@ -290,6 +290,7 @@ func _process(delta: float) -> void:
 	# Plan 0031, D12: the world builds the start with the time of each frame until the player can move.
 	if vung_tau != null:
 		vung_tau.starting = not GameState.clock_running or (player.is_riding() and player.ride_hold)
+	WebPacks.playing = vung_tau == null or not vung_tau.starting
 	_layout()
 	_update_rest_stick()
 	_read_keys()

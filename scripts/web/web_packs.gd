@@ -32,6 +32,9 @@ static var _entries: Dictionary = {}
 static var _read := false
 static var _loaded: Dictionary = {}
 ## D14: the packs that a computer keeps out (a play test, a unit test), and their files.
+## D18: true when the player can move (Main sets it). Before, the frames are
+## the frames of the start (D12, D17), and the measure of a pack skips them.
+static var playing := true
 static var _simulated: Dictionary = {}
 static var _hidden: Dictionary = {}
 
@@ -298,6 +301,8 @@ func _measure_frame(_delta: float) -> void:
 	var frame_ms := (now - _last_usec) / 1000.0 if _last_usec > 0 else 0.0
 	_last_usec = now
 	var tell := false
+	if not playing:
+		return
 	for pack_id: String in _measured.keys():
 		if frame_ms > float(_measured[pack_id]):
 			# The frame that ends now: the work of this node in it, and the

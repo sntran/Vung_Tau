@@ -174,6 +174,7 @@ async function openOnce(context, cdp, label, shots) {
       Object.keys(result.packs), { timeout: 70000, polling: 1000 }).catch(() => {});
     const times = await page.evaluate(() => window.vungTau.packs || {}).catch(() => ({}));
     const states = await page.evaluate(() => window.vungTau.packState || {}).catch(() => ({}));
+    result.peopleMakeMs = await page.evaluate(() => window.vungTau.peopleMakeMs).catch(() => undefined);
     for (const id in result.packs) {
       result.packs[id].times = times[id] || {};
       result.packs[id].page = states[id] || {};

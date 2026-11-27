@@ -308,7 +308,11 @@ func _add_people_later() -> void:
 		WorldModel.scene(str(pair[0]), str(pair[1]))
 		await get_tree().process_frame
 	if is_inside_tree() and people == null:
+		var t0 := Time.get_ticks_msec()
 		_make_people()
+		# D18: the time of the build of the people for the measure of the web build.
+		if OS.has_feature("web"):
+			JavaScriptBridge.eval("window.vungTau.peopleMakeMs = %d" % (Time.get_ticks_msec() - t0), true)
 
 
 func _make_people() -> void:
