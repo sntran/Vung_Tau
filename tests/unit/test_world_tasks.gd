@@ -10,11 +10,15 @@ extends GutTest
 func test_the_world_waits_for_its_tasks_when_it_leaves_the_tree() -> void:
 	var world := VungTau.new()
 	add_child(world)
+	# The tasks run in three threads at the same time: the count has a lock.
 	var done := {"count": 0}
+	var lock := Mutex.new()
 	for i in 3:
 		world.add_task(func() -> void:
 			OS.delay_msec(150)
-			done.count += 1, "test")
+			lock.lock()
+			done.count += 1
+			lock.unlock(), "test")
 	assert_eq(world.task_count(), 3, "the world keeps a handle of each task")
 	remove_child(world)
 	assert_eq(done.count, 3, "each task is done when the world leaves the tree")
