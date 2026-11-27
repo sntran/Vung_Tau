@@ -289,9 +289,12 @@ func _start_vung_tau() -> void:
 	player.camera.far = 40000.0
 	var start := world.spawn(GameState.arg_value("start"))
 	# The parts of the showcase build in the first frames (report 0026, D-0026-12).
-	# Plan 0031, D17: before the first frame only the boxes of the town near the
-	# start (all the boxes in the range took 2.6 s on a computer, 17 s on the web).
-	world.prepare_at(start.position, 64.0, false, 64.0)
+	# Plan 0031, D17: on the web, before the first frame only the boxes of the
+	# town near the start (all the boxes in the range took 17 s there). On a
+	# computer all of them (2.6 s): after the first frame the tasks of the town
+	# waited for the compile of the pipelines, and the first wait of PT-33 took
+	# more than 30 s in CI (report 0031, D-0031-06).
+	world.prepare_at(start.position, 64.0, false, 64.0 if OS.has_feature("web") else INF)
 	player.place(start.position, start.yaw)
 	world_build_ms = Time.get_ticks_msec() - begin
 
