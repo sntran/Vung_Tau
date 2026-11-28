@@ -515,7 +515,7 @@ R18 (the longest frame while a pack loads at most the median frame after "can mo
 
 The line of the times on the page gives the longest frame after "can move" (`bai_truoc&ride`: "94.1 MB · first frame 28.3 s · ride 40.6 s · 2 fps · page 579 MB · longest frame 782 ms"; the page reads it at the first move). Against round 3 (`8fb1775d8979`): the player can move 9 s earlier at `bai_truoc&ride` (45.3 s against 54.5 s) and 8 s earlier in the hẻm (43.2 s against 51.1 s). The longest frame of a pack is 118 ms and 205 ms over the limit of R18.
 
-## PT-85 on the last build of round 4 (d7809843cedb). No old Godot process (2026-11-27)
+## PT-85 after the correction of CI run 492 (d7809843cedb). No old Godot process (2026-11-27)
 
 After CI run 492 a computer keeps the start budget and the whole stairs of before; the web build does not change (`GameState.web_start()`). I deployed `d7809843cedb` (`https://d49df278-vung-tau.fifo.workers.dev`, and the branch URL) and ran PT-85 on the branch URL again, with the same arguments as above.
 
@@ -525,4 +525,15 @@ After CI run 492 a computer keeps the start budget and the whole stairs of befor
 | `hem` | 31.8 s | 41.9 s | 1.16 m | — | 576 ms / 688 ms | — (no pack) | 525 MB (1 337 MB) | none | pass |
 
 The line of the times: "94.1 MB · first frame 28.7 s · ride 41.0 s · 1 fps · page 581 MB · longest frame 732 ms" (`bai_truoc&ride`). The values are within 15 % of the run on `1baf43eff104`, except the heaps of the hẻm (525 MB against 607 MB) and the longest frame of the pack people (1 209 ms against 1 053 ms), one run each.
+
+## PT-85 on the last build of round 4 (ae0da6077b42). No old Godot process (2026-11-28)
+
+After CI runs 493 and 494 a computer builds the rest of the world with the passes of the start until it is settled; the web build does not change. I deployed `ae0da6077b42` (`https://dc924870-vung-tau.fifo.workers.dev`, and the branch URL) and ran PT-85 on the branch URL again, with the same arguments as above.
+
+| Start | First frame | Can move | First move | Ride | Frames after "can move": median / longest | The longest frame of the pack models / people (R18 limit) | R16: heaps at the end of the ride (page) | Errors | Result |
+|---|---|---|---|---|---|---|---|---|---|
+| `bai_truoc&ride` | 32.4 s | 44.9 s | 1.26 m | 305 m | 573 ms / 1 202 ms | **1 021 ms** / **1 210 ms** (823 ms) | 786 MB (2 051 MB) | none | FAIL (R18 only) |
+| `hem` | 31.9 s | 41.8 s | 1.16 m | — | 562 ms / 666 ms | — (no pack) | 527 MB (1 332 MB) | none | pass |
+
+The line of the times: "94.1 MB · first frame 28.7 s · ride 39.7 s · 2 fps · page 578 MB · longest frame 752 ms" (`bai_truoc&ride`). Against `d7809843cedb` each value changed less than 15 % (one run each).
 
