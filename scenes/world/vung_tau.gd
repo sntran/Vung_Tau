@@ -185,6 +185,9 @@ const START_FRAME_MS := 100.0
 const START_FRAME_MAX_MS := 1000.0
 ## The end of the work of the start in the last frame (Time.get_ticks_usec()), or -1.
 var _start_frame_usec := -1
+## Plan 0031, D19: true when the world was settled one time after the start
+## (a computer builds the rest of the world with the passes of the start until then).
+var _settled_once := false
 var starting := false
 ## The count of the things that the world started or applied (the ground and
 ## the town), so that the start knows when a pass did nothing.
@@ -837,6 +840,15 @@ func _process(delta: float) -> void:
 		_build_start()
 		return
 	_start_frame_usec = -1
+	# Plan 0031, D19: on a computer the rest of the world builds with the passes
+	# of the start until the world is settled, as before D19; only the clock and
+	# the scooter do not wait for it.
+	var web := GameState.web_start()
+	if not web and not _settled_once:
+		_settled_once = is_settled()
+	if rest_in_start_passes(web, _settled_once):
+		_build_start()
+		return
 	if _showcase_wanted(_focus) and Engine.get_frames_drawn() > 0 and _tasks == 0:
 		showcase.build_some(SHOWCASE_FRAME_MS)
 	_update_wanted()
@@ -910,21 +922,40 @@ static func stairs_budget_ms(web: bool) -> float:
 	return STAIRS_FRAME_MS if web else INF
 
 
+## Plan 0031, D19: true when the world builds the rest after "can move" (the
+## far tiles, the town, the far stairs) with the passes of the start: on a
+## computer, until the world is settled one time, as before D19 (report 0031,
+## round 4: with one pass in each frame, 28 far tiles held PT-38 for 60 s in
+## CI). The start of the web build ("web") makes them with a small part of each frame.
+static func rest_in_start_passes(web: bool, settled_once: bool) -> bool:
+	return not web and not settled_once
+
+
 func _build_start_passes() -> void:
 	var now := Time.get_ticks_usec()
 	var last_frame_ms := (now - _start_frame_usec) / 1000.0 if _start_frame_usec >= 0 else 0.0
-	var budget := start_budget_ms(last_frame_ms, Engine.max_fps, GameState.web_start())
+	var web := GameState.web_start()
+	var budget := start_budget_ms(last_frame_ms, Engine.max_fps, web)
 	var end := Time.get_ticks_msec() + budget
 	while true:
 		var before := _work
 		var steps := showcase.steps_left() if showcase != null else 0
-		# Plan 0031, D19: the start builds only what the player needs to move
-		# (the ground and the showcase near the start). The far tiles, the town,
-		# and the far stairs build after "can move", with a small part of each frame.
+		# Plan 0031, D19: the start of the web build builds only what the player
+		# needs to move (the ground and the showcase near the start). Its far
+		# tiles, town, and far stairs build after "can move", with a small part
+		# of each frame. A computer builds them in these passes, as before D19.
 		_update_wanted()
 		_start_tasks()
 		_update_patches()
+		if not web:
+			_update_far_strides()
 		_apply_all_done()
+		if not web:
+			if town:
+				_work += town.build_start()
+			# Plan 0031, D17: one stairs of the known places in each pass, after the first frame.
+			if places and Engine.get_frames_drawn() > 0 and places.build_next_stairs():
+				_work += 1
 		var left := end - Time.get_ticks_msec()
 		if _showcase_wanted(_focus) and Engine.get_frames_drawn() > 0 and _tasks == 0 and left > 0:
 			showcase.build_some(left)
@@ -932,7 +963,7 @@ func _build_start_passes() -> void:
 		if Time.get_ticks_msec() >= end:
 			return
 		if not moved:
-			var others := _tasks > 0 \
+			var others := _tasks > 0 or (not web and town != null and town.busy()) \
 					or (showcase != null and showcase.waits_for_files() and _showcase_wanted(_focus))
 			if not others:
 				return

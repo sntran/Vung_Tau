@@ -15,7 +15,8 @@ extends RefCounted
 # the player, PLAYER_RADIUS, from WALK_BACK m on the walk to SAND_OUT m on the
 # sand), and no lamp pole stands nearer than POLE_CLEAR m to a side of an
 # opening (in audit 4 a blue pole stood at the top of the steps of openings 0
-# and 3).
+# and 3). The walkers of the showcase go away for the walk (a setup step,
+# PlaytestDriver.clear_walkers()).
 # sizes: 1280x720
 # phase: --world=vung_tau --start-time=17:00 --quality=low
 # phase: --world=vung_tau --start-time=17:00 --quality=low
@@ -51,6 +52,10 @@ func run(d: PlaytestDriver) -> void:
 		return
 	if not await d.wait_showcase():
 		return
+	# Report 0031, round 4: the walkers walk with the frames also with the clock
+	# held, and in CI one stood in opening 4 and waited for the player there.
+	# The test is of the fixed way through each opening: the walkers go away.
+	d.step("the walkers of the showcase go away for the walk through the openings: %d" % d.clear_walkers())
 	var openings: Array = w.showcase.wall_openings
 	if not d.expect(openings.size() > 0, "the low wall of the beach has openings: %d" % openings.size()):
 		return

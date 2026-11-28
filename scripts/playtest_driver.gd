@@ -1470,6 +1470,29 @@ func hold_clock() -> void:
 	GameState.clock_held = true
 
 
+## A setup step, as hold_clock(): the walkers of the showcase stop and go out
+## of the world (no model, no body), so that a walk on a fixed way does not
+## depend on where they are at the time of the test. They walk with the
+## frames, also with the clock held: in CI (report 0031, round 4, run 493) a
+## walker stood in opening 4 of PT-77 and waited for the player there. Gives
+## the count of the walkers.
+func clear_walkers() -> int:
+	var w := world()
+	if w == null or w.showcase == null or w.showcase.people == null:
+		return 0
+	var people: ShowcasePeople = w.showcase.people
+	people.process_mode = Node.PROCESS_MODE_DISABLED
+	for entry: Dictionary in people.walkers:
+		var model: WorldModel = entry.model
+		model.visible = false
+		model.set_animation_active(false)
+		if entry.has("shape"):
+			(entry.shape as CollisionShape3D).disabled = true
+		if entry.has("body"):
+			(entry.body as CollisionObject3D).collision_layer = 0
+	return people.walkers.size()
+
+
 ## A setup step at the start of a phase: puts the player at the point, makes
 ## the ground there, and waits until it is ready. It is the same kind of step
 ## as --start-time: a long walk in phases starts where the last phase stopped.

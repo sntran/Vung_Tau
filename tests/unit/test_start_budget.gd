@@ -38,3 +38,14 @@ func test_a_computer_keeps_the_time_of_before() -> void:
 func test_the_far_stairs_build_in_steps_only_on_the_web() -> void:
 	assert_almost_eq(VungTau.stairs_budget_ms(true), VungTau.STAIRS_FRAME_MS, 0.001)
 	assert_eq(VungTau.stairs_budget_ms(false), INF)
+
+
+## Plan 0031, D19 (report 0031, round 4, CI run 493): after "can move" a
+## computer builds the rest of the world (the far tiles, the town, the far
+## stairs) with the passes of the start until the world is settled, as before
+## D19 (with one pass in each frame, 28 far tiles held PT-38 for 60 s in CI).
+## The start of the web build makes them with a small part of each frame.
+func test_a_computer_builds_the_rest_with_the_passes_of_the_start() -> void:
+	assert_true(VungTau.rest_in_start_passes(false, false))
+	assert_false(VungTau.rest_in_start_passes(false, true))
+	assert_false(VungTau.rest_in_start_passes(true, false))

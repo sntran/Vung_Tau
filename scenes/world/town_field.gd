@@ -190,9 +190,10 @@ func _process(_delta: float) -> void:
 		_read_keep_out()
 	if _applied_range != range_end:
 		apply_range()
-	# Plan 0031, D19: the town builds after "can move" (on the web its tasks
-	# run on the main thread and took the time of the start).
-	if world.starting:
+	# Plan 0031, D19: in the start of the web build the town builds after "can
+	# move" (on the web its tasks run on the main thread and took the time of
+	# the start). On a computer the passes of the start build it (build_start()).
+	if world.starting and GameState.web_start():
 		return
 	if _keep_out_ready and _tall_made.size() < _tall.size():
 		_make_tall()
@@ -237,6 +238,25 @@ func made_chunks() -> int:
 ## True while chunks build in other threads (plan 0031, D12).
 func busy() -> bool:
 	return _tasks > 0
+
+
+## Plan 0031, D12: one pass of the start (VungTau.starting) on a computer: the
+## new tasks and all the chunks that are done. Gives the count of the chunks
+## that it started or applied.
+func build_start() -> int:
+	if world == null or counts.is_empty():
+		return 0
+	var before := _tasks
+	_start_tasks()
+	var started := _tasks - before
+	_mutex.lock()
+	var ready := _done.duplicate()
+	_done.clear()
+	_mutex.unlock()
+	for result: Dictionary in ready:
+		_tasks -= 1
+		_show(result)
+	return started + ready.size()
 
 
 func _start_tasks() -> void:
